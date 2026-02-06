@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+
 namespace risk.control.system.Models
 {
     public class InvestigationTask : BaseEntity
@@ -7,6 +8,7 @@ namespace risk.control.system.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long Id { get; set; }
+
         public long? ClientCompanyId { get; set; }
         public ClientCompany? ClientCompany { get; set; }
         public long? VendorId { get; set; }
@@ -34,22 +36,28 @@ namespace risk.control.system.Models
         public bool AiEnabled { get; set; } = false;
         public bool Deleted { get; set; } = false;
         public bool IsQueryCase { get; set; } = false;
+
         [EmailAddress]
         public string? AllocatingSupervisordEmail { get; set; }
+
         [EmailAddress]
         public string? SubmittingSupervisordEmail { get; set; }
+
         [EmailAddress]
         public string? SubmittedAssessordEmail { get; set; }
+
         [EmailAddress]
         public string? RequestedAssessordEmail { get; set; }
+
         [EmailAddress]
         public string? TaskedAgentEmail { get; set; }
+
         public DateTime? TaskToAgentTime { get; set; }
         public DateTime? SubmittedToSupervisorTime { get; set; }
         public DateTime? SubmittedToAssessorTime { get; set; }
         public DateTime? ProcessedByAssessorTime { get; set; }
         public DateTime? EnquiredByAssessorTime { get; set; }
-        public DateTime? EnquiryReplyByAssessorTime { get; set; }
+        public DateTime? EnquiryReplyByAgencyTime { get; set; }
         public DateTime? ReviewByAssessorTime { get; set; }
         public DateTime? AllocatedToAgencyTime { get; set; }
         public bool IsNew { get; set; } = true;
@@ -65,12 +73,15 @@ namespace risk.control.system.Models
         public int AgentSla { get; set; } = 5;
         public bool UpdateAgentAnswer { get; set; } = false;
         public string? SelectedAgentDrivingMap { get; set; }
+
         [Display(Name = "Distance")]
         public string? SelectedAgentDrivingDistance { get; set; } = default!;
+
         public float? SelectedAgentDrivingDistanceInMetres { get; set; } = default!;
 
         [Display(Name = "Duration")]
         public string? SelectedAgentDrivingDuration { get; set; } = default!;
+
         public int? SelectedAgentDrivingDurationInSeconds { get; set; } = default!;
         public ICollection<InvestigationTimeline> InvestigationTimeline { get; set; }
     }

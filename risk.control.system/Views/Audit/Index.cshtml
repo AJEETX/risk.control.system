@@ -1,35 +1,35 @@
 ﻿@{
-    ViewData["Title"] = "Audi Log";
+	ViewData["Title"] = "Audi Log";
 }
 
 <section class="content">
-    <div class="card card-secondary border-secondary">
-        <div class="card-header">
-            <h3 class="card-title"><i class="fa fa-align-center"></i> @Applicationsettings.AUDIT_LOGS</h3>
-        </div>
-    </div>
-    <div class="card-body">
-        <div class="submit-progress hidden">
-            <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
-        </div>
-        <table id="datatable" class="table table-bordered table-hover dt-responsive nowrap w-100">
-            <thead>
-                <tr>
-                    <th>UserId</th>
-                    <th>Type</th>
-                    <th>TableName</th>
-                    <th>DateTime</th>
-                    <th>OldValues</th>
-                    <th>NewValues</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- The table body will be populated dynamically by DataTables -->
-            </tbody>
-        </table>
-    </div>
+	<div class="card card-secondary border-secondary">
+		<div class="card-header">
+			<h3 class="card-title"><i class="fa fa-align-center"></i> @Applicationsettings.AUDIT_LOGS</h3>
+		</div>
+	</div>
+	<div class="card-body">
+		<div class="submit-progress hidden">
+			<i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+		</div>
+		<table id="dataTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
+			<thead>
+				<tr>
+					<th>UserId</th>
+					<th>Type</th>
+					<th>TableName</th>
+					<th>DateTime</th>
+					<th>OldValues</th>
+					<th>NewValues</th>
+					<th>Action</th>
+				</tr>
+			</thead>
+			<tbody>
+				<!-- The table body will be populated dynamically by DataTables -->
+			</tbody>
+		</table>
+	</div>
 </section>
 @section Scripts {
-    <script src="~/js/company-admin/audit.js"></script>
+	<script src="~/js/company-admin/audit.js"></script>
 }

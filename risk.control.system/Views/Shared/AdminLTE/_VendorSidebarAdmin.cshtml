@@ -1,66 +1,70 @@
 ﻿@using risk.control.system.Helpers;
 
 <li class="nav-item">
-    <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("Agency","") @Url.MakeActiveClass("AgentWorkload","")">
-        <i class="nav-icon fas fa-shield-alt"></i>
-        <p class="sidebar-menu-header-label">
-            @Applicationsettings.ADMIN_SETTINGS
-            <i class="right fas fa-angle-down"></i>
-        </p>
-    </a>
+	<a is-active-page
+	   class="navlink-border nav-link @Url.MakeActiveClass("Agency", "")
+									@Url.MakeActiveClass("AgencyUser", "")
+									@Url.MakeActiveClass("AgencyService", "")">
+		<i class="nav-icon fas fa-shield-alt"></i>
+		<p class="sidebar-menu-header-label">
+			@Applicationsettings.ADMIN_SETTINGS
+			<div class="right"><i class="fas fa-angle-down"></i></div>
+		</p>
+	</a>
 </li>
 
 <li class="nav-item">
-    <a is-active-page asp-controller="Agency" asp-action="Profile" class="actual-link nav-link @Url.MakeActiveClass("Agency","Profile") @Url.MakeActiveClass("Agency","Edit")">
-        <i class="fas fa-building nav-icon"></i>
-        <p>
-            Agency Profile
-        </p>
-    </a>
+	<a is-active-page asp-controller="Agency" asp-action="Profile"
+	   class="actual-link nav-link
+								@Url.MakeActiveClass("Agency", "Profile")
+								@Url.MakeActiveClass("Agency", "Edit")">
+		<i class="fas fa-building nav-icon"></i>
+		<p>
+			Agency Profile
+		</p>
+	</a>
 </li>
 <li class="nav-item">
-    <a is-active-page asp-controller="Agency" asp-action="Service" class="actual-link nav-link @Url.MakeActiveClass("Agency","Service")
-                                                        @Url.MakeActiveClass("Agency","EditService")  @Url.MakeActiveClass("Agency","DeleteService") @Url.MakeActiveClass("Agency","ServiceDetail")">
-        <i class="fas fa-truck nav-icon"></i>
-        <p>
-            @Applicationsettings.MANAGE_SERVICE
-        </p>
-    </a>
+	<a is-active-page asp-controller="AgencyService" asp-action="Service"
+	   class="actual-link nav-link
+								@Url.MakeActiveClass("AgencyService","Service")
+                                @Url.MakeActiveClass("AgencyService","Edit")
+                                @Url.MakeActiveClass("AgencyService","Delete")">
+		<i class="fas fa-cogs nav-icon"></i>
+		<p>
+			@Applicationsettings.MANAGE_SERVICE
+		</p>
+	</a>
 </li>
 
 <li class="nav-item">
-    <a is-active-page asp-controller="Agency" asp-action="CreateService" class="actual-link nav-link @Url.MakeActiveClass("Agency","CreateService")
-                                        ">
-        <i class="fas fa-truck nav-icon"></i>
-        <p>
-            Add Service
-        </p>
-    </a>
+	<a is-active-page asp-controller="AgencyService" asp-action="Create"
+	   class="actual-link nav-link @Url.MakeActiveClass("AgencyService", "Create")">
+		<i class="fas fa-cog nav-icon"></i>
+		<p>
+			Add Service
+		</p>
+	</a>
 </li>
 <li class="nav-item">
-    <a is-active-page asp-controller="Agency" asp-action="Users" class="actual-link nav-link @Url.MakeActiveClass("Agency","Users") @Url.MakeActiveClass("Agency","EditUser")
-                                            @Url.MakeActiveClass("Agency","DeleteUser")">
-        <i class="fas fa-user-friends nav-icon"></i>
-        <p>
-            @Applicationsettings.MANAGE_USERS
-        </p>
-    </a>
+	<a is-active-page asp-controller="AgencyUser" asp-action="Users"
+	   class="actual-link nav-link
+								@Url.MakeActiveClass("AgencyUser","Users")
+                                @Url.MakeActiveClass("AgencyUser","Edit")
+                                @Url.MakeActiveClass("AgencyUser","Delete")">
+		<i class="fas fa-user-friends nav-icon"></i>
+		<p>
+			@Applicationsettings.MANAGE_USERS
+		</p>
+	</a>
 </li>
 <li class="nav-item">
-    <a is-active-page asp-controller="Agency" asp-action="CreateUser" class="actual-link nav-link @Url.MakeActiveClass("Agency","CreateUser")
+	<a is-active-page asp-controller="AgencyUser" asp-action="Create"
+	class="actual-link nav-link @Url.MakeActiveClass("AgencyUser", "Create")
                                 ">
-        <i class="fas fa-user-plus nav-icon"></i>
-        <p>
-            Add User
-        </p>
-    </a>
+		<i class="fas fa-user-plus nav-icon"></i>
+		<p>
+			Add User
+		</p>
+	</a>
 </li>
-@* <li class="nav-item">
-    <a is-active-page asp-controller="AgentWorkload" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("AgentWorkload","Load")
-                                                @Url.MakeActiveClass("AgentWorkload","Open") @Url.MakeActiveClass("AgentWorkload","Details")">
-        <i class="fas fa-stream nav-icon"></i>
-        <p>
-            Agency workload
-        </p>
-    </a>
-</li> *@

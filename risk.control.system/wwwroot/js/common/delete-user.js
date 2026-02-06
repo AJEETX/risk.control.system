@@ -1,6 +1,6 @@
 $(document).ready(function () {
     var askConfirmation = true;
-    $('#create-form').submit(function (e) {
+    $('#delete-form').submit(function (e) {
         if (askConfirmation) {
             e.preventDefault();
             $.confirm({
@@ -22,11 +22,11 @@ $(document).ready(function () {
                             setTimeout(function () {
                                 $(".submit-progress").removeClass("hidden");
                             }, 1);
-                            $('#create-user').attr('disabled', 'disabled');
-                            $('#create-user').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Delete");
+                            $('#delete-user').attr('disabled', 'disabled');
+                            $('#delete-user').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Delete");
 
-                            $('#create-form').submit();
-                            var createForm = document.getElementById("create-form");
+                            $('#delete-form').submit();
+                            var createForm = document.getElementById("delete-form");
                             if (createForm) {
 
                                 var nodes = createForm.getElementsByTagName('*');

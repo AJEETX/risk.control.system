@@ -1,5 +1,5 @@
 ﻿$(document).ready(function () {
-    $('#datatable').DataTable({
+    $('#dataTable').DataTable({
         processing: true,
         serverSide: true,
         ajax: {
@@ -9,6 +9,30 @@
                 d.search = d.search.value; // Pass the search term
                 d.orderColumn = d.order[0].column; // Column index
                 d.orderDirection = d.order[0].dir; // "asc" or "desc"
+            },
+            error: function (xhr, status, error) {
+                console.error("AJAX Error:", status, error);
+                console.error("Response:", xhr.responseText);
+                if (xhr.status === 401 || xhr.status === 403) {
+                    $.confirm({
+                        title: 'Session Expired!',
+                        content: 'Your session has expired or you are unauthorized. You will be redirected to the login page.',
+                        type: 'red',
+                        typeAnimated: true,
+                        buttons: {
+                            Ok: {
+                                text: 'Login',
+                                btnClass: 'btn-red',
+                                action: function () {
+                                    window.location.href = '/Account/Login';
+                                }
+                            }
+                        },
+                        onClose: function () {
+                            window.location.href = '/Account/Login';
+                        }
+                    });
+                }
             }
         },
         order: [[3, "desc"]],
@@ -31,7 +55,6 @@
             {
                 data: 'oldValues', // or newValues
                 render: function (data, type, row) {
-
                     if (!data) return '';
 
                     let display = '';
@@ -87,14 +110,12 @@
             }
         ],
         "drawCallback": function (settings, start, end, max, total, pre) {
-
-            $('#datatable tbody').on('click', '.btn-info', function (e) {
+            $('#dataTable tbody').on('click', '.btn-info', function (e) {
                 e.preventDefault(); // Prevent the default anchor behavior
                 var id = $(this).attr('id').replace('details', ''); // Extract the ID from the button's ID attribute
                 getaudit(id); // Call the getdetails function with the ID
                 window.location.href = $(this).attr('href'); // Navigate to the delete page
             });
-
         }
     });
 });
@@ -122,4 +143,3 @@ function getaudit(id) {
         }
     }
 }
-

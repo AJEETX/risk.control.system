@@ -61,8 +61,8 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="far fa-file-powerpoint"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
                         </div>
-                        <input id="ContractNumber" required asp-for="PolicyDetail.ContractNumber" class="form-control remarks" type="text" placeholder="Policy #" maxlength="20" autocomplete="off" />
-                        <span asp-validation-for="PolicyDetail.ContractNumber" class="text-danger"></span>
+                        <input id="ContractNumber" required asp-for="PolicyDetailDto.ContractNumber" class="form-control remarks" type="text" placeholder="Policy #" maxlength="20" autocomplete="off" />
+                        <span asp-validation-for="PolicyDetailDto.ContractNumber" class="text-danger"></span>
                     </div>
                 </div>
                 <div class="form-group">
@@ -71,10 +71,10 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="nav-icon fas fa-tools"></i> <i class="fa fa-asterisk asterik-style"></i> </span>
                         </div>
-                        <select id="InsuranceType" required asp-for="PolicyDetail.InsuranceType" class="form-control remarks" asp-items="ViewBag.InsuranceType">
+                        <select id="InsuranceType" required asp-for="PolicyDetailDto.InsuranceType" class="form-control remarks" asp-items="ViewBag.InsuranceType">
                             <option value="">--- SELECT ---</option>
                         </select>
-                        <span asp-validation-for="PolicyDetail.InsuranceType" class="text-danger"></span>
+                        <span asp-validation-for="PolicyDetailDto.InsuranceType" class="text-danger"></span>
                     </div>
                 </div>
                 <div class="form-group">
@@ -83,10 +83,10 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="nav-icon fas fa-wrench"></i> <i class="fa fa-asterisk asterik-style"></i> </span>
                         </div>
-                        <select id="InvestigationServiceTypeId" required asp-for="PolicyDetail.InvestigationServiceTypeId" class="form-control remarks" asp-items="ViewBag.InvestigationServiceTypeId">
+                        <select id="InvestigationServiceTypeId" required asp-for="PolicyDetailDto.InvestigationServiceTypeId" class="form-control remarks" asp-items="ViewBag.InvestigationServiceTypeId">
                             <option value="">--- SELECT ---</option>
                         </select>
-                        <span asp-validation-for="PolicyDetail.InvestigationServiceTypeId" class="text-danger"></span>
+                        <span asp-validation-for="PolicyDetailDto.InvestigationServiceTypeId" class="text-danger"></span>
                     </div>
                 </div>
                 
@@ -98,8 +98,8 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="far fa-calendar-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                         </div>
-                        <input id="ContractIssueDate" required asp-for="PolicyDetail.ContractIssueDate" class="form-control remarks" type="date" />
-                        <span asp-validation-for="PolicyDetail.ContractIssueDate" class="text-danger"></span>
+                        <input id="ContractIssueDate" required asp-for="PolicyDetailDto.ContractIssueDate" class="form-control remarks" type="date" />
+                        <span asp-validation-for="PolicyDetailDto.ContractIssueDate" class="text-danger"></span>
                     </div>
                 </div>
                 <div class="form-group">
@@ -108,8 +108,8 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="far fa-calendar-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                         </div>
-                        <input id="DateOfIncident" required asp-for="PolicyDetail.DateOfIncident" class="form-control remarks" type="date" />
-                        <span asp-validation-for="PolicyDetail.DateOfIncident" class="text-danger"></span>
+                        <input id="DateOfIncident" required asp-for="PolicyDetailDto.DateOfIncident" class="form-control remarks" type="date" />
+                        <span asp-validation-for="PolicyDetailDto.DateOfIncident" class="text-danger"></span>
                     </div>
                 </div>
                 <div class="form-group">
@@ -118,10 +118,10 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="nav-icon fas fa-puzzle-piece"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                         </div>
-                        <select id="CaseEnablerId" required asp-for="PolicyDetail.CaseEnablerId" class="form-control remarks" asp-items="ViewBag.CaseEnablerId">
+                        <select id="CaseEnablerId" required asp-for="PolicyDetailDto.CaseEnablerId" class="form-control remarks" asp-items="ViewBag.CaseEnablerId">
                             <option value="">--- SELECT ---</option>
                         </select>
-                        <span asp-validation-for="PolicyDetail.CaseEnablerId" class="text-danger"></span>
+                        <span asp-validation-for="PolicyDetailDto.CaseEnablerId" class="text-danger"></span>
                     </div>
                 </div>
                 <div class="form-group">
@@ -130,9 +130,9 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="fas fa-money-bill-wave"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
                         </div>
-                        <input id="SumAssuredValue" required asp-for="PolicyDetail.SumAssuredValue" class="form-control remarks" type="text"
+                        <input id="SumAssuredValue" required asp-for="PolicyDetailDto.SumAssuredValue" class="form-control remarks" type="text"
                                placeholder="Assured Amount (@ViewBag.Currency) of minimum 100" min="100" maxlength="10" autocomplete="off" title="Assured Amount (@ViewBag.Currency) of minimum 100" data-bs-toggle="tooltip" />
-                        <span asp-validation-for="PolicyDetail.SumAssuredValue" class="text-danger"></span>
+                        <span asp-validation-for="PolicyDetailDto.SumAssuredValue" class="text-danger"></span>
                     </div>
                 </div>
                 <div class="form-group">
@@ -141,8 +141,8 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="nav-icon far fa-flag"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                         </div>
-                        <input id="CauseOfLoss" required asp-for="PolicyDetail.CauseOfLoss" class="form-control remarks" type="text" placeholder="Cause Of Incident" maxlength="70" autocomplete="off" />
-                        <span asp-validation-for="PolicyDetail.CauseOfLoss" class="text-danger"></span>
+                        <input id="CauseOfLoss" required asp-for="PolicyDetailDto.CauseOfLoss" class="form-control remarks" type="text" placeholder="Cause Of Incident" maxlength="70" autocomplete="off" />
+                        <span asp-validation-for="PolicyDetailDto.CauseOfLoss" class="text-danger"></span>
                     </div>
                 </div>
                 <div class="form-group">
@@ -151,10 +151,10 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="nav-icon fas fa-building"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                         </div>
-                        <select id="CostCentreId" required asp-for="PolicyDetail.CostCentreId" class="form-control remarks" asp-items="ViewBag.CostCentreId">
+                        <select id="CostCentreId" required asp-for="PolicyDetailDto.CostCentreId" class="form-control remarks" asp-items="ViewBag.CostCentreId">
                             <option value="">--- SELECT ---</option>
                         </select>
-                        <span asp-validation-for="PolicyDetail.CostCentreId" class="text-danger"></span>
+                        <span asp-validation-for="PolicyDetailDto.CostCentreId" class="text-danger"></span>
                     </div>
                 </div>
                 
@@ -163,7 +163,7 @@
     </div>
     <div class="card-footer">
         <div class="text-right">
-            <a id="cancel" asp-action="Create" class="btn btn-secondary">
+            <a id="cancel" asp-controller="CaseCreateEdit"  asp-action="Create" class="btn btn-secondary">
                 <i class="fa fa-window-close"></i>
                 @Applicationsettings.CANCEL
             </a>

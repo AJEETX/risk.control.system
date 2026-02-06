@@ -1,6 +1,5 @@
 ﻿$(document).ready(function () {
-
-    var table = $("#customerTable").DataTable({
+    var table = $("#dataTable").DataTable({
         ajax: {
             url: '/api/Agency/AllAgencies',
             dataSrc: '',
@@ -8,7 +7,24 @@
                 console.error("AJAX Error:", status, error);
                 console.error("Response:", xhr.responseText);
                 if (xhr.status === 401 || xhr.status === 403) {
-                    window.location.href = '/Account/Login'; // Or session timeout handler
+                    $.confirm({
+                        title: 'Session Expired!',
+                        content: 'Your session has expired or you are unauthorized. You will be redirected to the login page.',
+                        type: 'red',
+                        typeAnimated: true,
+                        buttons: {
+                            Ok: {
+                                text: 'Login',
+                                btnClass: 'btn-red',
+                                action: function () {
+                                    window.location.href = '/Account/Login';
+                                }
+                            }
+                        },
+                        onClose: function () {
+                            window.location.href = '/Account/Login';
+                        }
+                    });
                 }
             }
         },
@@ -104,14 +120,12 @@
             }
         ],
         "drawCallback": function (settings, start, end, max, total, pre) {
-
-            $('#customerTable tbody').on('click', '.btn-info', function (e) {
+            $('#dataTable tbody').on('click', '.btn-info', function (e) {
                 e.preventDefault(); // Prevent the default anchor behavior
                 var id = $(this).attr('id').replace('details', ''); // Extract the ID from the button's ID attribute
                 showdetails(id); // Call the getdetails function with the ID
                 window.location.href = $(this).attr('href'); // Navigate to the delete page
             });
-
         }
     });
 

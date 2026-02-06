@@ -1,96 +1,96 @@
 ﻿@model CaseTransactionModel
 
 @{
-    string beneficiaryProgressClass = "progress-bar-lightgrey"; // Default class
+	string beneficiaryProgressClass = "progress-bar-lightgrey"; // Default class
 
-    bool customerExist = Model.ClaimsInvestigation?.CustomerDetail != null;
-    bool beneficiaryExist = Model.Location?.BeneficiaryDetailId > 0;
+	bool customerExist = Model.ClaimsInvestigation?.CustomerDetail != null;
+	bool beneficiaryExist = Model.Location?.BeneficiaryDetailId > 0;
 
-    if (customerExist)
-    {
-        beneficiaryProgressClass = beneficiaryExist ? "progress-bar-green" : "progress-bar-grey";
-    }
+	if (customerExist)
+	{
+		beneficiaryProgressClass = beneficiaryExist ? "progress-bar-green" : "progress-bar-grey";
+	}
 }
 
 <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
-    <div class="card bg-light d-flex flex-fill">
-        <div class="card-header text-muted border-bottom-0">
-            <i class="fas fa-user-tie"></i> Beneficiary Details
-            <span class="hover-text">
-                <i class="fas fa-info-circle"></i>
-                <span class="tooltip-text" id="beneficiary-information">
-                    <b><i class="fas fa-user-tie"></i> Add Beneficiary Details</b>
-                </span>
-            </span>
-        </div>
+	<div class="card bg-light d-flex flex-fill">
+		<div class="card-header text-muted border-bottom-0">
+			<i class="fas fa-user-tie"></i> Beneficiary Details
+			<span class="hover-text">
+				<i class="fas fa-info-circle"></i>
+				<span class="tooltip-text" id="beneficiary-information">
+					<b><i class="fas fa-user-tie"></i> Add Beneficiary Details</b>
+				</span>
+			</span>
+		</div>
 
-        <div class="progress">
-            <i class="far fa-bookmark bookmark-green"></i>
-            <div class="progress-bar @beneficiaryProgressClass" role="progressbar">
-                <i class="fas fa-user-tie"></i>
-            </div>
-        </div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col-7">
-                    <h2 class="lead @(customerExist ? "text-black" : "text-lightgray")">
-                        <b>@(Model.Location?.Name ?? "Beneficiary Name")</b>
-                    </h2>
-                    <p class="text-muted text-sm">
-                        <b>Relation:</b> ---
-                    </p>
-                    <ul class="ml-4 mb-0 fa-ul text-muted">
-                        <li class="small">
-                            <span class="fa-li"><i class="fa fa-money"></i></span>
-                            Annual Income: ----
-                        </li>
-                        <li class="small">
-                            <span class="fa-li"><i class="fas fa-user-alt"></i></span>
-                            Age: ---
-                        </li>
-                        <li class="small">
-                            <span class="fa-li"><i class="fas fa-building"></i></span>
-                            Address: ---
-                        </li>
-                        <li class="small">
-                            <span class="fa-li"><i class="fas fa-lg fa-globe"></i></span>
-                            Country: ---
-                        </li>
-                        <li class="small">
-                            <span class="fa-li"><i class="fas fa-lg fa-phone"></i></span>
-                            Mobile #: ---
-                        </li>
-                    </ul>
-                </div>
-                <div class="col-5 text-center">
-                    <img class="form-Image img-fluid img-circle" id="profileImage" src="@Applicationsettings.NO_USER" alt="Beneficiary" title="No Beneficiary Photo" data-bs-toggle="tooltip" />
-                </div>
-            </div>
-        </div>
-        <div class="card-footer">
-            <div class="text-right">
-                @if (customerExist)
-                {
-                    if (beneficiaryExist)
-                    {
-                        <a id="edit-beneficiary" class="btn btn-warning" asp-action="EditBeneficiary" asp-route-id="@Model.Location.BeneficiaryDetailId">
-                            <i class="fas fa-user-tie"></i> Edit Beneficiary
-                        </a>
-                    }
-                    else
-                    {
-                        <a id="add-beneficiary" class="btn btn-success" asp-action="CreateBeneficiary" asp-route-id="@Model.ClaimsInvestigation.Id">
-                            <i class="fas fa-user-tie"></i> Add Beneficiary
-                        </a>
-                    }
-                }
-                else
-                {
-                    <a class="btn btn-outline-secondary btn-btn-grey">
-                        <i class="fas fa-user-tie"></i> Beneficiary
-                    </a>
-                }
-            </div>
-        </div>
-    </div>
+		<div class="progress">
+			<i class="far fa-bookmark bookmark-green"></i>
+			<div class="progress-bar @beneficiaryProgressClass" role="progressbar">
+				<i class="fas fa-user-tie"></i>
+			</div>
+		</div>
+		<div class="card-body">
+			<div class="row">
+				<div class="col-7">
+					<h2 class="lead @(customerExist ? "text-black" : "text-lightgray")">
+						<b>@(Model.Location?.Name ?? "Beneficiary Name")</b>
+					</h2>
+					<p class="text-muted text-sm">
+						<b>Relation:</b> ---
+					</p>
+					<ul class="ml-4 mb-0 fa-ul text-muted">
+						<li class="small">
+							<span class="fa-li"><i class="fa fa-money"></i></span>
+							Annual Income: ----
+						</li>
+						<li class="small">
+							<span class="fa-li"><i class="fas fa-user-alt"></i></span>
+							Age: ---
+						</li>
+						<li class="small">
+							<span class="fa-li"><i class="fas fa-building"></i></span>
+							Address: ---
+						</li>
+						<li class="small">
+							<span class="fa-li"><i class="fas fa-lg fa-globe"></i></span>
+							Country: ---
+						</li>
+						<li class="small">
+							<span class="fa-li"><i class="fas fa-lg fa-phone"></i></span>
+							Mobile #: ---
+						</li>
+					</ul>
+				</div>
+				<div class="col-5 text-center">
+					<img class="form-Image img-fluid img-circle" id="profileImage" src="@Applicationsettings.NO_USER" alt="Beneficiary" title="No Beneficiary Photo" data-bs-toggle="tooltip" />
+				</div>
+			</div>
+		</div>
+		<div class="card-footer">
+			<div class="text-right">
+				@if (customerExist)
+				{
+					if (beneficiaryExist)
+					{
+						<a id="edit-beneficiary" class="btn btn-warning" asp-controller="Beneficiary" asp-action="EditBeneficiary" asp-route-id="@Model.Location.BeneficiaryDetailId">
+							<i class="fas fa-user-tie"></i> Edit Beneficiary
+						</a>
+					}
+					else
+					{
+						<a id="add-beneficiary" class="btn btn-success" asp-controller="Beneficiary" asp-action="CreateBeneficiary" asp-route-id="@Model.ClaimsInvestigation.Id">
+							<i class="fas fa-user-tie"></i> Add Beneficiary
+						</a>
+					}
+				}
+				else
+				{
+					<a class="btn btn-outline-secondary btn-btn-grey">
+						<i class="fas fa-user-tie"></i> Beneficiary
+					</a>
+				}
+			</div>
+		</div>
+	</div>
 </div>

@@ -5,7 +5,7 @@
         setTimeout(function () {
             $(".submit-progress").removeClass("hidden");
         }, 1);
-        
+
         $('#allocatedcase').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Allocate");
         disableAllInteractiveElements();
 
@@ -26,7 +26,7 @@
             $(".submit-progress").removeClass("hidden");
         }, 1);
         // Disable all buttons, submit inputs, and anchors
-        
+
         $('#investigatecase').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Investigate");
         disableAllInteractiveElements();
 
@@ -40,15 +40,79 @@
         }
     });
 
-    var table = $("#customerTable").DataTable({
+    var table = $("#dataTable").DataTable({
         ajax: {
             url: '/api/agency/VendorInvestigation/GetNewCases',
-            dataSrc: '',
+            type: 'GET',
+            dataSrc: function (json) {
+                return json.data; // Return table data
+            },
+            data: function (d) {
+                console.log("Data before sending:", d); // Debugging
+
+                return {
+                    draw: d.draw || 1,
+                    start: d.start || 0,
+                    length: d.length || 10,
+                    search: d.search?.value || "", // Instead of empty string, send "all"
+                    orderColumn: d.order?.[0]?.column ?? 12, // Default to column 15
+                    orderDir: d.order?.[0]?.dir || "desc"
+                };
+            },
             error: function (xhr, status, error) {
                 console.error("AJAX Error:", status, error);
                 console.error("Response:", xhr.responseText);
                 if (xhr.status === 401 || xhr.status === 403) {
-                    window.location.href = '/Account/Login'; // Or session timeout handler
+                    $.confirm({
+                        title: 'Session Expired!',
+                        content: 'Your session has expired or you are unauthorized. You will be redirected to the login page.',
+                        type: 'red',
+                        typeAnimated: true,
+                        buttons: {
+                            Ok: {
+                                text: 'Login',
+                                btnClass: 'btn-red',
+                                action: function () {
+                                    window.location.href = '/Account/Login';
+                                }
+                            }
+                        },
+                        onClose: function () {
+                            window.location.href = '/Account/Login';
+                        }
+                    });
+                }
+                else if (xhr.status === 500) {
+                    $.confirm({
+                        title: 'Server Error!',
+                        content: 'An unexpected server error occurred. You will be redirected to the Assign page.',
+                        type: 'orange',
+                        typeAnimated: true,
+                        buttons: {
+                            Ok: function () {
+                                window.location.href = '/VendorInvestigation/Allocate';
+                            }
+                        },
+                        onClose: function () {
+                            window.location.href = '/VendorInvestigation/Allocate';
+                        }
+                    });
+                }
+                else if (xhr.status === 400) {
+                    $.confirm({
+                        title: 'Bad Request!',
+                        content: 'Try with valid data.You will be redirected to the Assign page',
+                        type: 'orange',
+                        typeAnimated: true,
+                        buttons: {
+                            Ok: function () {
+                                window.location.href = '/VendorInvestigation/Allocate';
+                            }
+                        },
+                        onClose: function () {
+                            window.location.href = '/VendorInvestigation/Allocate';
+                        }
+                    });
                 }
             }
         },
@@ -61,41 +125,45 @@
                 return '<input type="checkbox" name="selectedcase[]" value="' + $('<div/>').text(data).html() + '">';
             }
         },
-            {
-                className: 'max-width-column-number', // Apply the CSS class,
-                targets: 1                      // Index of the column to style
-            },
-            {
-                className: 'max-width-column-number', // Apply the CSS class,
-                targets: 2                      // Index of the column to style
-            },
-            {
-                className: 'max-width-column-name', // Apply the CSS class,
-                targets: 3                      // Index of the column to style
-            },
-            {
-                className: 'max-width-column-name', // Apply the CSS class,
-                targets: 7                      // Index of the column to style
-            },
-            {
-                className: 'max-width-column-name', // Apply the CSS class,
-                targets: 8                      // Index of the column to style
-            },
-            {
-                className: 'max-width-column-name', // Apply the CSS class,
-                targets: 9                      // Index of the column to style
-            },
-            {
-                className: 'max-width-column-name', // Apply the CSS class,
-                targets: 10                      // Index of the column to style
-            },
-            {
-                className: 'max-width-column-name', // Apply the CSS class,
-                targets: 11                      // Index of the column to style
-            }],
-        order: [[14, 'asc']],
+        {
+            className: 'max-width-column-number', // Apply the CSS class,
+            targets: 1                      // Index of the column to style
+        },
+        {
+            className: 'max-width-column-number', // Apply the CSS class,
+            targets: 2                      // Index of the column to style
+        },
+        {
+            className: 'max-width-column-name', // Apply the CSS class,
+            targets: 3                      // Index of the column to style
+        },
+        {
+            className: 'max-width-column-name', // Apply the CSS class,
+            targets: 7                      // Index of the column to style
+        },
+        {
+            className: 'max-width-column-name', // Apply the CSS class,
+            targets: 8                      // Index of the column to style
+        },
+        {
+            className: 'max-width-column-name', // Apply the CSS class,
+            targets: 9                      // Index of the column to style
+        },
+        {
+            className: 'max-width-column-name', // Apply the CSS class,
+            targets: 10                      // Index of the column to style
+        },
+        {
+            className: 'max-width-column-name', // Apply the CSS class,
+            targets: 11                      // Index of the column to style
+        }],
+        order: [[12, 'asc']],
+        responsive: true,
         fixedHeader: true,
         processing: true,
+        autoWidth: false,
+        serverSide: true,
+        deferRender: true,
         paging: true,
         language: {
             loadingRecords: '&nbsp;',
@@ -109,7 +177,6 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     if (!row.isQueryCase) {
-
                         var img = '<input name="selectedcase" class="selected-case" type="radio" id="' + row.id + '"  value="' + row.id + '"  data-bs-toggle="tooltip" title="Select Case to Allocate" />';
                         return img;
                     }
@@ -133,7 +200,6 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     return '<span title="' + data + '" data-bs-toggle="tooltip">' + data + '</span>';
-
                 }
             },
             {
@@ -197,9 +263,10 @@
                     return '<span title="' + row.service + '" data-bs-toggle="tooltip">' + data + '</span>'
                 }
             },
-            
+
             {
                 "data": "addressLocationInfo",
+                "bSortable": false,
                 "mRender": function (data, type, row) {
                     return '<span title="' + row.addressLocationInfo + '" data-bs-toggle="tooltip">' + data + '</span>'
                 }
@@ -222,10 +289,10 @@
                 "mRender": function (data, type, row) {
                     var buttons = "";
                     if (row.isQueryCase) {
-                        buttons += '<a id="details' + row.id + '" href="/VendorInvestigation/ReplyEnquiry?Id=' + row.id + '"  class="btn btn-xs btn-warning"><i class="fas fa-question" aria-hidden="true"></i> Enquiry </a>'
+                        buttons += `<a data-id="${row.id}" class="btn btn-xs btn-warning"><i class="fas fa-question" aria-hidden="true"></i> Enquiry </a> &nbsp;` ;
                     }
                     else {
-                        buttons += '<a id="details' + row.id + '" href="/VendorInvestigation/CaseDetail?Id=' + row.id + '"  class="btn btn-xs btn-info"><i class="fas fa-search"></i> Detail</a>'
+                        buttons += `<a data-id="${row.id}" class="btn btn-xs btn-info"><i class="fas fa-search"></i> Detail</a>`
                     }
                     return buttons;
                 }
@@ -243,21 +310,11 @@
                     $('td', row).removeClass('isNewAssigned');
                 }, 3000);
             }
+            $('.btn-info', row).addClass('btn-white-color');
+
         },
         "drawCallback": function (settings, start, end, max, total, pre) {
-
-            $('#customerTable tbody').on('click', '.btn-info', function (e) {
-                e.preventDefault(); // Prevent the default anchor behavior
-                var id = $(this).attr('id').replace('details', ''); // Extract the ID from the button's ID attribute
-                showdetails(id); // Call the getdetails function with the ID
-                window.location.href = $(this).attr('href'); // Navigate to the delete page
-            });
-            $('#customerTable tbody').on('click', '.btn-warning', function (e) {
-                e.preventDefault(); // Prevent the default anchor behavior
-                var id = $(this).attr('id').replace('details', ''); // Extract the ID from the button's ID attribute
-                showenquiry(id); // Call the getdetails function with the ID
-                window.location.href = $(this).attr('href'); // Navigate to the edit page
-            });
+            
             // Reinitialize Bootstrap 5 tooltips
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
             tooltipTriggerList.map(function (el) {
@@ -268,6 +325,45 @@
             });
         }
     });
+    $('body').on('click', 'a.btn-info', function (e) {
+        e.preventDefault();
+        const id = $(this).data('id');
+        showdetail(id, this);
+    });
+    function showdetail(id, element) {
+        id = String(id).replace(/[^a-zA-Z0-9_-]/g, "");
+        $("body").addClass("submit-progress-bg");
+        setTimeout(() => $(".submit-progress").removeClass("hidden"), 1);
+
+        showSpinnerOnButton(element, "Detail");
+
+        const url = `/VendorInvestigation/CaseDetail?Id=${encodeURIComponent(id)}`;
+
+        setTimeout(() => {
+            window.location.href = url;
+        }, 1000);
+    }
+    $('body').on('click', 'a.btn-warning', function (e) {
+        e.preventDefault();
+        const id = $(this).data('id');
+        showenquiry(id, this);
+    });
+    function showenquiry(id, element) {
+        id = String(id).replace(/[^a-zA-Z0-9_-]/g, "");
+        $("body").addClass("submit-progress-bg");
+        setTimeout(() => $(".submit-progress").removeClass("hidden"), 1);
+
+        showSpinnerOnButton(element, "Enquiry");
+
+        const editUrl = `/VendorInvestigation/ReplyEnquiry?Id=${encodeURIComponent(id)}`;
+
+        setTimeout(() => {
+            window.location.href = editUrl;
+        }, 1000);
+    }
+    function showSpinnerOnButton(selector, spinnerText) {
+        $(selector).html(`<i class='fas fa-sync fa-spin'></i> ${spinnerText}`);
+    }
 
     table.on('xhr.dt', function () {
         $('#refreshIcon').removeClass('fa-spin');
@@ -289,9 +385,9 @@
         $("#modalMapImage").attr("src", imageUrl);
         $("#mapModalLabel").text(title || "Map Preview");
     });
-   
-    $('#customerTable tbody').hide();
-    $('#customerTable tbody').fadeIn(2000);
+
+    $('#dataTable tbody').hide();
+    $('#dataTable tbody').fadeIn(2000);
     table.on('draw.dt', function () {
         $('[data-toggle="tooltip"]').tooltip({
             animated: 'fade',
@@ -312,23 +408,23 @@
     $("input[type='radio'].selected-case").change(function (e) {
         if ($(this).is(":checked")) {
             $("#allocatedcase").prop('disabled', false);
-        $("#investigatecase").prop('disabled', false);
+            $("#investigatecase").prop('disabled', false);
         }
         else {
             $("#allocatedcase").prop('disabled', true);
-        $("#investigatecase").prop('disabled', true);
+            $("#investigatecase").prop('disabled', true);
         }
     });
 
     // Handle click on checkbox to set state of "Select all" control
-    $('#customerTable tbody').on('change', 'input[type="radio"]', function () {
+    $('#dataTable tbody').on('change', 'input[type="radio"]', function () {
         // If checkbox is not checked
         if (this.checked) {
             $("#allocatedcase").prop('disabled', false);
             $("#investigatecase").prop('disabled', false);
         } else {
             $("#allocatedcase").prop('disabled', true);
-        $("#investigatecase").prop('disabled', true);
+            $("#investigatecase").prop('disabled', true);
         }
     });
     let askConfirmation = false;
@@ -354,46 +450,4 @@
             }
         });
     });
-
 });
-
-function showdetails(id) {
-    $("body").addClass("submit-progress-bg");
-    // Wrap in setTimeout so the UI
-    // can update the spinners
-    setTimeout(function () {
-        $(".submit-progress").removeClass("hidden");
-    }, 1);
-    
-    $('a#details' + id + '.btn.btn-xs.btn-info').html("<i class='fas fa-sync fa-spin'></i> Detail");
-    disableAllInteractiveElements();
-
-    var article = document.getElementById("article");
-    if (article) {
-        var nodes = article.getElementsByTagName('*');
-        for (var i = 0; i < nodes.length; i++) {
-            nodes[i].disabled = true;
-        }
-    }
-}
-
-
-function showenquiry(id) {
-    $("body").addClass("submit-progress-bg");
-    // Wrap in setTimeout so the UI
-    // can update the spinners
-    setTimeout(function () {
-        $(".submit-progress").removeClass("hidden");
-    }, 1);
-    
-    $('a#details' + id + '.btn.btn-xs.btn-warning').html("<i class='fas fa-sync fa-spin'></i> Enquiry");
-    disableAllInteractiveElements();
-
-    var article = document.getElementById("article");
-    if (article) {
-        var nodes = article.getElementsByTagName('*');
-        for (var i = 0; i < nodes.length; i++) {
-            nodes[i].disabled = true;
-        }
-    }
-}

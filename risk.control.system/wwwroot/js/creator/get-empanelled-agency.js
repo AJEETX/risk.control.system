@@ -1,7 +1,7 @@
 ﻿$(function () {
     var claimId = $('#claimId').val();
     var vendorId = $('#vendorId').val();
-    var table = $("#customerTable").DataTable({
+    var table = $("#dataTable").DataTable({
         ajax: {
             url: '/api/Company/GetEmpanelledAgency?caseId=' + claimId,
             dataSrc: '',
@@ -9,7 +9,56 @@
                 console.error("AJAX Error:", status, error);
                 console.error("Response:", xhr.responseText);
                 if (xhr.status === 401 || xhr.status === 403) {
-                    window.location.href = '/Account/Login'; // Or session timeout handler
+                    $.confirm({
+                        title: 'Session Expired!',
+                        content: 'Your session has expired or you are unauthorized. You will be redirected to the login page.',
+                        type: 'red',
+                        typeAnimated: true,
+                        buttons: {
+                            Ok: {
+                                text: 'Login',
+                                btnClass: 'btn-red',
+                                action: function () {
+                                    window.location.href = '/Account/Login';
+                                }
+                            }
+                        },
+                        onClose: function () {
+                            window.location.href = '/Account/Login';
+                        }
+                    });
+                }
+                else if (xhr.status === 500) {
+                    $.confirm({
+                        title: 'Server Error!',
+                        content: 'An unexpected server error occurred. You will be redirected to the Main page.',
+                        type: 'orange',
+                        typeAnimated: true,
+                        buttons: {
+                            Ok: function () {
+                                window.location.href = '/Investigation/EmpanelledVendors?id' + claimId;
+                            }
+                        },
+                        onClose: function () {
+                            window.location.href = '/Investigation/EmpanelledVendors?id' + claimId;
+                        }
+                    });
+                }
+                else if (xhr.status === 400) {
+                    $.confirm({
+                        title: 'Bad Request!',
+                        content: 'Try with valid data.You will be redirected to the Main page',
+                        type: 'orange',
+                        typeAnimated: true,
+                        buttons: {
+                            Ok: function () {
+                                window.location.href = '/Investigation/EmpanelledVendors?id' + claimId;
+                            }
+                        },
+                        onClose: function () {
+                            window.location.href = '/Investigation/EmpanelledVendors?id' + claimId;
+                        }
+                    });
                 }
             }
         },
@@ -38,7 +87,7 @@
             {
                 className: 'max-width-column', // Apply the CSS class,
                 targets: 5                      // Index of the column to style
-            },        ],
+            },],
         order: [[1, 'asc']],
         fixedHeader: true,
         processing: true,
@@ -148,7 +197,7 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    buttons += '<a id="details' + row.id + '" href="/Investigation/VendorDetail?Id=' + row.id + '&selectedcase=' + claimId + '" class="btn btn-xs btn-info"><i class="fa fa-search"></i> Agency Info</a>&nbsp;'
+                    buttons += `<a data-id="${row.id}" class="btn btn-xs btn-info"><i class="fas fa-search"></i> Agency Info</a>`
                     return buttons;
                 }
             }],
@@ -159,6 +208,7 @@
                     $(row).removeClass('highlight-new-user');
                 }, 3000);
             }
+            $('.btn-info', row).addClass('btn-white-color');
         },
         "drawCallback": function (settings, start, end, max, total, pre) {
             // Preselect the radio button matching vendorId
@@ -167,12 +217,7 @@
                 $("input[type='radio'][name='selectedcase'][value='" + selectedVendorId + "']").prop('checked', true);
                 $('#allocatedcase').prop("disabled", false);
             }
-            $('#customerTable tbody').on('click', '.btn-info', function (e) {
-                e.preventDefault(); // Prevent the default anchor behavior
-                var id = $(this).attr('id').replace('details', ''); // Extract the ID from the button's ID attribute
-                getdetails(id); // Call the getdetails function with the ID
-                window.location.href = $(this).attr('href'); // Navigate to the delete page
-            });
+            
             // Reinitialize Bootstrap 5 tooltips
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
             tooltipTriggerList.map(function (el) {
@@ -183,6 +228,28 @@
             });
         }
     });
+
+    $('body').on('click', 'a.btn-info', function (e) {
+        e.preventDefault();
+        const id = $(this).data('id');
+        showagencydetail(id, this);
+    });
+    function showagencydetail(id, element) {
+        id = String(id).replace(/[^a-zA-Z0-9_-]/g, "");
+        $("body").addClass("submit-progress-bg");
+        setTimeout(() => $(".submit-progress").removeClass("hidden"), 1);
+
+        showSpinnerOnButton(element, "Agency Info");
+
+        const url = `/Investigation/VendorDetail?Id=${encodeURIComponent(id)}&selectedcase=${claimId}`;
+
+        setTimeout(() => {
+            window.location.href = url;
+        }, 1000);
+    }
+    function showSpinnerOnButton(selector, spinnerText) {
+        $(selector).html(`<i class='fas fa-sync fa-spin'></i> ${spinnerText}`);
+    }
     $('#refreshTable').click(function () {
         var $icon = $('#refreshIcon');
         if ($icon) {
@@ -196,13 +263,13 @@
     });
 
     table.on('mouseenter', '.map-thumbnail', function () {
-            const $this = $(this); // Cache the current element
+        const $this = $(this); // Cache the current element
 
-            // Set a timeout to show the full map after 1 second
-            hoverTimeout = setTimeout(function () {
-                $this.find('.full-map').show(); // Show full map
-            }, 1000); // Delay of 1 second
-        })
+        // Set a timeout to show the full map after 1 second
+        hoverTimeout = setTimeout(function () {
+            $this.find('.full-map').show(); // Show full map
+        }, 1000); // Delay of 1 second
+    })
         .on('mouseleave', '.map-thumbnail', function () {
             const $this = $(this); // Cache the current element
 
@@ -214,7 +281,7 @@
         });
     table.on('draw', function () {
         // Loop through each row of the table after it has been redrawn
-        $("#customerTable > tbody > tr").each(function () {
+        $("#dataTable > tbody > tr").each(function () {
             var av = parseFloat($(this).find("span.avr").text()); // Get the average rating
             if (!isNaN(av) && av > 0) {  // Ensure it's a valid rating
                 var stars = $(this).find("img.rating");  // Get all star images in the row
@@ -236,10 +303,10 @@
 
     // Initial draw to set the stars when the table first loads
     table.draw();
- 
-    $('#customerTable tbody').hide();
-    $('#customerTable tbody').fadeIn(2000);
-    $('#customerTable tbody').on('mouseover', 'img.rating', function () {
+
+    $('#dataTable tbody').hide();
+    $('#dataTable tbody').fadeIn(2000);
+    $('#dataTable tbody').on('mouseover', 'img.rating', function () {
         var starImage = $(this);
 
         if (!starImage.data('bs.tooltip')) {
@@ -267,7 +334,7 @@
             tooltip.show();
         }
     });
-    $('#customerTable tbody').on('mouseleave', 'img.rating', function () {
+    $('#dataTable tbody').on('mouseleave', 'img.rating', function () {
         var starImage = $(this);
 
         // Dispose of the tooltip only if it has been initialized
@@ -281,12 +348,12 @@
         giveRating(starImage, "StarFade.gif");
         refilRating(starImage);
     });
-    $('#customerTable tbody').on('click', 'img.rating', function (e) {
+    $('#dataTable tbody').on('click', 'img.rating', function (e) {
         var starId = $(this).attr('id');
         var vendorId = $(this).attr('vendorId');
         console.log('Rated ' + starId + ' stars for vendor ' + vendorId);
         $(this).css('color', 'red');
-        var url = "/Vendors/PostRating?rating=" + parseInt($(this).attr("id")) + "&mid=" + $(this).attr("vendorId");
+        var url = "/Rating/PostRating?rating=" + parseInt($(this).attr("id")) + "&mid=" + $(this).attr("vendorId");
         $.post(url, null, function (data) {
             var $rowResult = $(e.currentTarget).closest('tr').find('span.result');
 
@@ -305,7 +372,7 @@
     } else {
         $("#allocatedcase").prop('disabled', true);
     }
-    // When user checks a radio button, Enable submit button    
+    // When user checks a radio button, Enable submit button   
     $("input[type='radio'].selected-case").change(function (e) {
         if ($(this).is(":checked")) {
             $("#allocatedcase").prop('disabled', false);
@@ -313,16 +380,16 @@
             $("#allocatedcase").prop('disabled', true);
         }
     });
-    // Handle click on checkbox to set state of "Select all" control    
-    $('#customerTable tbody').on('change', 'input[type="radio"]', function () {
-        // If checkbox is not checked        
+    // Handle click on checkbox to set state of "Select all" control   
+    $('#dataTable tbody').on('change', 'input[type="radio"]', function () {
+        // If checkbox is not checked       
         if (this.checked) {
             $("#allocatedcase").prop('disabled', false);
         } else {
             $("#allocatedcase").prop('disabled', true);
         }
     });
-    $("#customerTable > tbody  > tr").each(function () {
+    $("#dataTable > tbody  > tr").each(function () {
         var av = $(this).find("span.avr").text();
         if (av != "" || av != null) {
             var img = $(this).find("img[id='" + parseInt(av) + "']");
@@ -334,22 +401,22 @@
     $('#radioButtons').submit(function (e) {
         if (askConfirmation) {
             e.preventDefault(); $.confirm({
-                title: "Confirm Assign<sub>manual</sub>",
+                title: "Confirm Assign <sub>manual</sub>",
                 content: "Are you sure ?",
                 icon: 'fas fa-external-link-alt',
                 type: 'blue',
                 closeIcon: true, buttons: {
                     confirm: {
-                        text: "Assign<sub>manual</sub>",
+                        text: "Assign <sub>manual</sub>",
                         btnClass: 'btn-info', action: function () {
                             askConfirmation = false;
                             $("body").addClass("submit-progress-bg");
                             // Wrap in setTimeout so the UI
-                            // can update the spinners                            
+                            // can update the spinners                           
                             setTimeout(function () {
                                 $(".submit-progress").removeClass("hidden");
                             }, 1);
-                            
+
                             $('#allocatedcase').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Assign <sub>manual</sub>");
                             disableAllInteractiveElements();
 
@@ -399,7 +466,6 @@
             }
         }
     });
-
 });
 function giveRating(img, image) {
     img.attr("src", "/img/" + image).prevAll("img.rating").attr("src", "/img/" + image);

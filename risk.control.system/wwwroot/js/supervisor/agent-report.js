@@ -1,5 +1,4 @@
 ﻿$(document).ready(function () {
-
     $('#allocatedcase').on('click', function () {
         $("body").addClass("submit-progress-bg");
         // Wrap in setTimeout so the UI
@@ -7,9 +6,9 @@
         setTimeout(function () {
             $(".submit-progress").removeClass("hidden");
         }, 1);
-        
+
         $('#allocatedcase').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Submit <sub>report</sub>");
-        
+
         $('#allocatedcase').css('pointer-events', 'none')
 
         var article = document.getElementById("article");
@@ -20,16 +19,82 @@
             }
         }
     });
-    
-    var table = $("#customerTable").DataTable({
+
+    var table = $("#dataTable").DataTable({
         ajax: {
             url: '/api/agency/VendorInvestigation/GetReport',
-            dataSrc: '',
+            type: 'GET',
+            dataType: 'json',
+            dataSrc: function (json) {
+                return json.data; // Return table data
+            },
+            data: function (d) {
+                console.log("Data before sending:", d); // Debugging
+
+                return {
+                    draw: d.draw || 1,
+                    start: d.start || 0,
+                    length: d.length || 10,
+                    caseType: $('#caseTypeFilter').val() || "",  // Send selected filter value
+                    search: d.search?.value || "", // Instead of empty string, send "all"
+                    orderColumn: d.order?.[0]?.column ?? 15,
+                    orderDir: d.order?.[0]?.dir || "asc"
+                };
+            },
             error: function (xhr, status, error) {
                 console.error("AJAX Error:", status, error);
                 console.error("Response:", xhr.responseText);
                 if (xhr.status === 401 || xhr.status === 403) {
-                    window.location.href = '/Account/Login'; // Or session timeout handler
+                    $.confirm({
+                        title: 'Session Expired!',
+                        content: 'Your session has expired or you are unauthorized. You will be redirected to the login page.',
+                        type: 'red',
+                        typeAnimated: true,
+                        buttons: {
+                            Ok: {
+                                text: 'Login',
+                                btnClass: 'btn-red',
+                                action: function () {
+                                    window.location.href = '/Account/Login';
+                                }
+                            }
+                        },
+                        onClose: function () {
+                            window.location.href = '/Account/Login';
+                        }
+                    });
+                }
+                else if (xhr.status === 500) {
+                    $.confirm({
+                        title: 'Server Error!',
+                        content: 'An unexpected server error occurred. You will be redirected to Submitted Report page.',
+                        type: 'orange',
+                        typeAnimated: true,
+                        buttons: {
+                            Ok: function () {
+                                window.location.href = '/VendorInvestigation/CaseReport';
+                            }
+                        },
+                        onClose: function () {
+                            window.location.href = '/VendorInvestigation/CaseReport';
+                        }
+                    });
+                }
+                else if (xhr.status === 400) {
+                    $.confirm({
+                        title: 'Bad Request!',
+                        content: 'Try with valid data.You will be redirected to Submitted Report page',
+                        type: 'orange',
+                        typeAnimated: true,
+                        buttons: {
+                            Ok: function () {
+                                window.location.href = '/VendorInvestigation/CaseReport';
+                            }
+                        },
+                        onClose: function () {
+                            window.location.href = '/VendorInvestigation/CaseReport';
+                        }
+                    });
                 }
             }
         },
@@ -42,21 +107,25 @@
                 return '<input type="checkbox" name="selectedcase[]" value="' + $('<div/>').text(data).html() + '">';
             }
         },
-            {
-                className: 'max-width-column-number', // Apply the CSS class,
-                targets: 1                      // Index of the column to style
-            },
-            {
-                className: 'max-width-column-number', // Apply the CSS class,
-                targets: 2                      // Index of the column to style
-            },
-            {
-                className: 'max-width-column-name', // Apply the CSS class,
-                targets: 9                      // Index of the column to style
-            }],
+        {
+            className: 'max-width-column-number', // Apply the CSS class,
+            targets: 1                      // Index of the column to style
+        },
+        {
+            className: 'max-width-column-number', // Apply the CSS class,
+            targets: 2                      // Index of the column to style
+        },
+        {
+            className: 'max-width-column-name', // Apply the CSS class,
+            targets: 9                      // Index of the column to style
+        }],
         order: [[14, 'asc']],
+        responsive: true,
         fixedHeader: true,
         processing: true,
+        autoWidth: false,
+        serverSide: true,
+        deferRender: true,
         paging: true,
         language: {
             loadingRecords: '&nbsp;',
@@ -207,13 +276,13 @@
     });
 
     table.on('mouseenter', '.map-thumbnail', function () {
-            const $this = $(this); // Cache the current element
+        const $this = $(this); // Cache the current element
 
-            // Set a timeout to show the full map after 1 second
-            hoverTimeout = setTimeout(function () {
-                $this.find('.full-map').show(); // Show full map
-            }, 1000); // Delay of 1 second
-        })
+        // Set a timeout to show the full map after 1 second
+        hoverTimeout = setTimeout(function () {
+            $this.find('.full-map').show(); // Show full map
+        }, 1000); // Delay of 1 second
+    })
         .on('mouseleave', '.map-thumbnail', function () {
             const $this = $(this); // Cache the current element
 
@@ -223,8 +292,8 @@
             // Immediately hide the full map
             $this.find('.full-map').hide();
         });
-    $('#customerTable tbody').hide();
-    $('#customerTable tbody').fadeIn(2000);
+    $('#dataTable tbody').hide();
+    $('#dataTable tbody').fadeIn(2000);
     table.on('draw.dt', function () {
         $('[data-toggle="tooltip"]').tooltip({
             animated: 'fade',
@@ -250,7 +319,7 @@
     });
 
     // Handle click on checkbox to set state of "Select all" control
-    $('#customerTable tbody').on('change', 'input[type="radio"]', function () {
+    $('#dataTable tbody').on('change', 'input[type="radio"]', function () {
         // If checkbox is not checked
         if (this.checked) {
             $("#allocatedcase").prop('disabled', false);
@@ -280,6 +349,4 @@
             }
         });
     });
-    
-
 });

@@ -1,5 +1,5 @@
 ﻿$(document).ready(function () {
-    var table = $('#customerTable').DataTable({
+    var table = $('#dataTable').DataTable({
         ajax: {
             url: '/api/Agency/GetAgentWithCases?id=' + $('#claimId').val(),
             dataSrc: '',
@@ -7,7 +7,22 @@
                 console.error("AJAX Error:", status, error);
                 console.error("Response:", xhr.responseText);
                 if (xhr.status === 401 || xhr.status === 403) {
+                    $.alert({
+                        title: 'Session Expired! Login again',
+                    });
                     window.location.href = '/Account/Login'; // Or session timeout handler
+                }
+                if (xhr.status === 500) {
+                    $.alert({
+                        title: 'Server Error Occurred! Try again.',
+                    });
+                    window.location.href = '/VendorInvestigation/Allocate'; // // Refresh page
+                }
+                if (xhr.status === 400) {
+                    $.alert({
+                        title: 'Bad Request occurred!',
+                    });
+                    window.location.href = '/VendorInvestigation/Allocate'; // // Refresh page
                 }
             }
         },
@@ -164,7 +179,7 @@
         table.ajax.reload(null, false);
         $("#allocatedcase").prop('disabled', true);
     });
-    $('#customerTable').on('draw.dt', function () {
+    $('#dataTable').on('draw.dt', function () {
         $('[data-toggle="tooltip"]').tooltip({
             animated: 'fade',
             placement: 'top',
@@ -172,29 +187,29 @@
         });
     });
 
-    $('#customerTable tbody').hide();
-    $('#customerTable tbody').fadeIn(2000);
+    $('#dataTable tbody').hide();
+    $('#dataTable tbody').fadeIn(2000);
 
-    $('#customerTable').on('mouseenter', '.map-thumbnail', function () {
+    $('#dataTable').on('mouseenter', '.map-thumbnail', function () {
         $(this).find('.full-map').show(); // Show full map
     }).on('mouseleave', '.map-thumbnail', function () {
         $(this).find('.full-map').hide(); // Hide full map
     });
 
-    $('#customerTable').on('mouseenter', '.map-thumbnail', function () {
+    $('#dataTable').on('mouseenter', '.map-thumbnail', function () {
         $(this).find('.full-driving-map').show(); // Show full map
     }).on('mouseleave', '.map-thumbnail', function () {
         $(this).find('.full-driving-map').hide(); // Hide full map
     });
     // Handle click on checkbox to set state of "Select all" control    
-    $('#customerTable tbody').on('change', 'input[type="radio"]', function () {
+    $('#dataTable tbody').on('change', 'input[type="radio"]', function () {
         // If checkbox is not checked        
         if (this.checked) {
             // Get the selected row
             var selectedRow = $(this).closest('tr');
 
             var rowIndex = $(this).closest('tr').index();
-            var rowData = $('#customerTable').DataTable().row(rowIndex).data();
+            var rowData = $('#dataTable').DataTable().row(rowIndex).data();
 
             // Assuming the data object has `duration` and `distance` keys
             var duration = rowData.duration; // "15 mins"

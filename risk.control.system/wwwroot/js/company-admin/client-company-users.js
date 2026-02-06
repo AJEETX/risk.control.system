@@ -1,5 +1,4 @@
 ﻿$(document).ready(function () {
-
     $('.btn.btn-success').on('click', function () {
         $("body").addClass("submit-progress-bg");
         // Wrap in setTimeout so the UI
@@ -26,14 +25,31 @@
     });
 
     var id = $('#companyId').val();
-    var table = $("#customerTable").DataTable({
+    var table = $("#dataTable").DataTable({
         ajax: {
-            url: '/api/Company/CompanyUsers?id=' + id,
+            url: '/api/PortalCompany/CompanyUsers?id=' + id,
             error: function (xhr, status, error) {
                 console.error("AJAX Error:", status, error);
                 console.error("Response:", xhr.responseText);
                 if (xhr.status === 401 || xhr.status === 403) {
-                    window.location.href = '/Account/Login'; // Or session timeout handler
+                    $.confirm({
+                        title: 'Session Expired!',
+                        content: 'Your session has expired or you are unauthorized. You will be redirected to the login page.',
+                        type: 'red',
+                        typeAnimated: true,
+                        buttons: {
+                            Ok: {
+                                text: 'Login',
+                                btnClass: 'btn-red',
+                                action: function () {
+                                    window.location.href = '/Account/Login';
+                                }
+                            }
+                        },
+                        onClose: function () {
+                            window.location.href = '/Account/Login';
+                        }
+                    });
                 }
             },
             dataSrc: '',
@@ -73,7 +89,7 @@
                     var colorClass = getColorClass(data); // Class for the color
                     var tooltip = row.onlineStatusName; // Tooltip text
                     var onlineStatusIcon = `<i class="${iconClass} ${colorClass}" title="${tooltip}" data-toggle="tooltip"></i>`;
-                    
+
                     var img = '<div class="image-container"><img alt="' + row.name + '" title="' + row.name + '" src="' + row.photo + '" class="table-profile-image" data-toggle="tooltip"/>';
                     var buttons = "";
                     buttons += '<span class="user-verified">';
@@ -169,8 +185,7 @@
             }
         },
         "drawCallback": function (settings, start, end, max, total, pre) {
-
-            $('#customerTable tbody').on('click', '.btn-warning', function (e) {
+            $('#dataTable tbody').on('click', '.btn-warning', function (e) {
                 e.preventDefault(); // Prevent the default anchor behavior
                 var id = $(this).attr('id').replace('edit', ''); // Extract the ID from the button's ID attribute
                 showedit(id); // Call the getdetails function with the ID
@@ -178,7 +193,7 @@
             });
         }
     });
-    $('#customerTable').on('draw.dt', function () {
+    $('#dataTable').on('draw.dt', function () {
         $('[data-toggle="tooltip"]').tooltip({
             animated: 'fade',
             placement: 'top',

@@ -13,13 +13,21 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.FeatureManagement;
 using Microsoft.FeatureManagement.FeatureFilters;
-
-using risk.control.system.Controllers.Api.Claims;
+using risk.control.system.Controllers.Api.PortalAdmin;
 using risk.control.system.Models;
 using risk.control.system.Permission;
 using risk.control.system.Services;
-
+using risk.control.system.Services.Agency;
+using risk.control.system.Services.Agent;
+using risk.control.system.Services.Api;
+using risk.control.system.Services.Assessor;
+using risk.control.system.Services.Common;
+using risk.control.system.Services.Company;
+using risk.control.system.Services.Creator;
+using risk.control.system.Services.Report;
+using risk.control.system.Services.Tool;
 using SmartBreadcrumbs.Extensions;
+
 namespace risk.control.system.StartupExtensions;
 
 public static class BusinessServiceExtension
@@ -28,7 +36,7 @@ public static class BusinessServiceExtension
     {
         services.AddMemoryCache(options =>
         {
-            options.SizeLimit = 1024; // Arbitrary units
+            options.SizeLimit = 2048; // Arbitrary units
         });
         services.AddHsts(options =>
         {
@@ -67,15 +75,22 @@ public static class BusinessServiceExtension
             config.Position = NotyfPosition.TopCenter;
         });
 
-        services.AddCors(opt =>
+        var allowedOrigins = configuration
+            .GetSection("Cors:AllowedOrigins")
+            .Get<string[]>();
+
+        services.AddCors(options =>
         {
-            opt.AddDefaultPolicy(builder =>
+            options.AddDefaultPolicy(builder =>
             {
-                builder.AllowAnyOrigin()
-                .AllowAnyHeader()
-                    .AllowAnyMethod();
+                builder
+                    .WithOrigins(allowedOrigins!)
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .AllowCredentials();
             });
         });
+
         // For FileUpload
         services.Configure<FormOptions>(x =>
         {
@@ -90,10 +105,10 @@ public static class BusinessServiceExtension
 
                 await context.HttpContext.Response.WriteAsync(
                     """
-        {
-            "error": "Too many requests. Please try again later."
-        }
-        """,
+                    {
+                        "error": "Too many requests. Please try again later."
+                    }
+                    """,
                     token);
             };
 
@@ -128,22 +143,48 @@ public static class BusinessServiceExtension
             options.KnownProxies.Clear();
         });
         services.AddHttpClient();
+        services.AddScoped<IAdminDashBoardService, AdminDashBoardService>();
+        services.AddScoped<ICompanyDashboardService, CompanyDashboardService>();
+        services.AddScoped<IAssessorQueryService, AssessorQueryService>();
+        services.AddScoped<IAgencyUserApiService, AgencyUserApiService>();
+        services.AddScoped<ICompanyUserApiService, CompanyUserApiService>();
+        services.AddScoped<IAgencyQueryReplyService, AgencyQueryReplyService>();
+        services.AddScoped<IProcessSubmittedReportService, ProcessSubmittedReportService>();
+        services.AddScoped<IDeclineCaseService, DeclineCaseService>();
+        services.AddScoped<IWithdrawCaseService, WithdrawCaseService>();
+        services.AddScoped<ICaseAllocationService, CaseAllocationService>();
+        services.AddScoped<IProcessImageService, ProcessImageService>();
+        services.AddScoped<IAgencyAgentAllocationService, AgencyAgentAllocationService>();
+        services.AddScoped<IAgencyDetailService, AgencyDetailService>();
+        services.AddScoped<IDateParserService, DateParserService>();
+        services.AddScoped<IBase64FileService, Base64FileService>();
+        services.AddScoped<IAgencyInvestigationDetailService, AgencyInvestigationDetailService>();
+        services.AddScoped<IInvestigationDetailService, InvestigationDetailService>();
+        services.AddScoped<IPolicyProcessor, PolicyProcessor>();
+        services.AddScoped<IVerifierProcessor, VerifierProcessor>();
+        services.AddScoped<ICustomerValidator, CustomerValidator>();
+        services.AddScoped<IUploadFileDataProcessor, UploadFileDataProcessor>();
+        services.AddScoped<IExtractorService, ExtractorService>();
+        services.AddScoped<IBeneficiaryValidator, BeneficiaryValidator>();
+        services.AddScoped<ILicenseService, LicenseService>();
+        services.AddScoped<IUploadFileInitiator, UploadFileInitiator>();
+        services.AddScoped<IFileUploadProcessor, FileUploadProcessor>();
         services.AddScoped<IUploadFileStatusService, UploadFileStatusService>();
         services.AddScoped<ICsvFileReaderService, CsvFileReaderService>();
-        services.AddScoped<IUploadFileService, UploadFileService>();
+        services.AddScoped<IZipFileService, ZipFileService>();
         services.AddScoped<IImageAnalysisService, ImageAnalysisService>();
         services.AddScoped<ISpeech2TextService, Speech2TextService>();
         services.AddScoped<IText2SpeechService, Text2SpeechService>();
         services.AddScoped<IInvestigationReportPdfService, InvestigationReportPdfService>();
         services.AddScoped<IAzureAdService, AzureAdService>();
-        services.AddScoped<IAnswerService, AnswerService>();
+        services.AddScoped<IAgentAnswerService, AgentAnswerService>();
         services.AddScoped<IMediaIdfyService, MediaIdfyService>();
         services.AddScoped<IDocumentIdfyService, DocumentIdfyService>();
         services.AddScoped<IAgentFaceIdfyService, AgentFaceIdfyService>();
         services.AddScoped<ILoginService, LoginService>();
-        services.AddScoped<IVendorUserService, VendorUserService>();
+        services.AddScoped<IAgencyUserService, AgencyUserService>();
         services.AddScoped<ICompanyUserService, CompanyUserService>();
-        services.AddScoped<IVendorServiceTypeManager, VendorServiceTypeManager>();
+        services.AddScoped<IAgencyServiceTypeManager, AgencyServiceTypeManager>();
         services.AddScoped<IAgencyUserCreateEditService, AgencyUserCreateEditService>();
         services.AddScoped<IAgencyCreateEditService, AgencyCreateEditService>();
         services.AddScoped<IValidateImageService, ValidateImageService>();
@@ -155,8 +196,7 @@ public static class BusinessServiceExtension
         services.AddScoped<IAddInvestigationService, AddInvestigationService>();
         services.AddScoped<IAssessorService, AssessorService>();
         services.AddScoped<ICompanyService, CompanyService>();
-        services.AddScoped<IVendorService, VendorService>();
-        services.AddScoped<ISanitizerService, SanitizerService>();
+        services.AddScoped<Services.Api.IAgencyService, Services.Api.AgencyService>();
         services.AddScoped<IFileStorageService, FileStorageService>();
         services.AddFeatureManagement().AddFeatureFilter<TimeWindowFilter>();
         services.AddScoped<IPhoneService, PhoneService>();
@@ -173,39 +213,37 @@ public static class BusinessServiceExtension
         services.AddScoped<IViewRenderService, ViewRenderService>();
         services.AddScoped<IPanCardService, PanCardService>();
         services.AddScoped<ICloneReportService, CloneReportService>();
-        services.AddScoped<IAgentIdfyService, AgentIdfyService>();
-        services.AddScoped<ICaseVendorService, CaseVendorService>();
-        services.AddScoped<IVendorInvestigationService, VendorInvestigationService>();
-        services.AddScoped<IDashboardCountService, DashboardCountService>();
+        services.AddScoped<IFaceIdfyService, FaceIdfyService>();
+        services.AddScoped<ICaseReportService, CaseReportService>();
+        services.AddScoped<IAgencyInvestigationService, AgencyInvestigationService>();
+        services.AddScoped<IAgencyDashboardService, AgencyDashboardService>();
         services.AddScoped<ITimelineService, TimelineService>();
         services.AddScoped<IMailService, MailService>();
         services.AddScoped<IProcessCaseService, ProcessCaseService>();
         services.AddScoped<IInvestigationService, InvestigationService>();
         services.AddScoped<IHangfireJobService, HangfireJobService>();
-        services.AddScoped<IProgressService, ProgressService>();
-        services.AddScoped<ICaseCreationService, CaseCreationService>();
         services.AddScoped<ICaseDetailCreationService, CaseDetailCreationService>();
         services.AddScoped<ICustomerCreationService, CustomerCreationService>();
         services.AddScoped<IBeneficiaryCreationService, BeneficiaryCreationService>();
         services.AddScoped<ICaseImageCreationService, CaseImageCreationService>();
         services.AddScoped<IUploadService, UploadService>();
-        services.AddSingleton<IValidationService, ValidationService>();
+        services.AddSingleton<IJwtService, JwtService>();
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<ICustomApiClient, CustomApiClient>();
-        services.AddScoped<IAgencyService, AgencyService>();
-        services.AddScoped<ICaseAgentService, CaseAgentService>();
+        services.AddScoped<Services.Agency.IAgencyService, Services.Agency.AgencyService>();
+        services.AddScoped<IAgentSubmitCaseService, AgentSubmitCaseService>();
         services.AddScoped<IAmazonApiService, AmazonApiService>();
         services.AddScoped<ISmsService, SmsService>();
         services.AddScoped<IInvoiceService, InvoiceService>();
         services.AddScoped<INumberSequenceService, NumberSequenceService>();
         services.AddScoped<INotificationService, NotificationService>();
         services.AddScoped<IAgentService, AgentService>();
-        services.AddScoped<ICaseInvestigationService, CaseInvestigationService>();
+        services.AddScoped<ICaseNotesService, CaseNotesService>();
         services.AddScoped<IEmpanelledAgencyService, EmpanelledAgencyService>();
-        services.AddScoped<ICaseService, CaseService>();
+        services.AddScoped<IAgentCaseDetailService, AgentCaseDetailService>();
         services.AddScoped<IAccountService, AccountService>();
-        services.AddScoped<IFtpService, FtpService>();
+        services.AddScoped<IUploadZipFileService, UploadZipFileService>();
         services.AddScoped<IDashboardService, DashboardService>();
         services.AddScoped<IFaceMatchService, FaceMatchService>();
         services.AddScoped<IGoogleService, GoogleService>();
@@ -215,7 +253,6 @@ public static class BusinessServiceExtension
         services.AddScoped<IHttpClientService, HttpClientService>();
         services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
         services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
-        //services.AddTransient<CustomCookieAuthenticationEvents>();
 
         var connectionString = "Data Source=" + Environment.GetEnvironmentVariable("COUNTRY") + "_" + configuration.GetConnectionString("Database");
         services.AddDbContext<ApplicationDbContext>(options =>

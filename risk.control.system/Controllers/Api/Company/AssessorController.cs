@@ -24,7 +24,7 @@ namespace risk.control.system.Controllers.Api.Company
         }
 
         [HttpGet("GetInvestigations")]
-        public async Task<IActionResult> GetInvestigations()
+        public async Task<IActionResult> GetInvestigations(int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc")
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 
@@ -34,19 +34,19 @@ namespace risk.control.system.Controllers.Api.Company
             }
             try
             {
-                var response = await assesorService.GetInvestigations(userEmail);
+                var response = await assesorService.GetInvestigationReports(userEmail, draw, start, length, search, caseType, orderColumn, orderDir);
 
                 return Ok(response);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred while getting investigations for user {UserEmail}", userEmail);
+                logger.LogError(ex, "Error occurred while getting investigations for user {UserEmail}", userEmail ?? "Anonymous");
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
 
         [HttpGet("GetReviewCases")]
-        public async Task<IActionResult> GetReviewCases()
+        public async Task<IActionResult> GetReviewCases(int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc")
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 
@@ -56,19 +56,19 @@ namespace risk.control.system.Controllers.Api.Company
             }
             try
             {
-                var response = await assesorService.GetReview(userEmail);
+                var response = await assesorService.GetReviews(userEmail, draw, start, length, search, caseType, orderColumn, orderDir);
 
                 return Ok(response);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred while getting review for user {UserEmail}", userEmail);
+                logger.LogError(ex, "Error occurred while getting review for user {UserEmail}", userEmail ?? "Anonymous");
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
 
         [HttpGet("GetApprovededCases")]
-        public async Task<IActionResult> GetApprovededCases()
+        public async Task<IActionResult> GetApprovededCases(int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc")
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 
@@ -78,18 +78,18 @@ namespace risk.control.system.Controllers.Api.Company
             }
             try
             {
-                var response = await assesorService.GetApprovededCases(userEmail);
+                var response = await assesorService.GetApprovededCases(userEmail, draw, start, length, search, caseType, orderColumn, orderDir);
                 return Ok(response);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred while getting approved cases for user {UserEmail}", userEmail);
+                logger.LogError(ex, "Error occurred while getting approved cases for user {UserEmail}", userEmail ?? "Anonymous");
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
 
         [HttpGet("GetRejectedCases")]
-        public async Task<IActionResult> GetRejectedCases()
+        public async Task<IActionResult> GetRejectedCases(int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc")
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 
@@ -99,13 +99,13 @@ namespace risk.control.system.Controllers.Api.Company
             }
             try
             {
-                var response = await assesorService.GetRejectedCases(userEmail);
+                var response = await assesorService.GetRejectedCases(userEmail, draw, start, length, search, caseType, orderColumn, orderDir);
 
                 return Ok(response);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred while getting rejected cases for user {UserEmail}", userEmail);
+                logger.LogError(ex, "Error occurred while getting rejected cases for user {UserEmail}", userEmail ?? "Anonymous");
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }

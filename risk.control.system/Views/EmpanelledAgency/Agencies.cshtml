@@ -1,0 +1,66 @@
+﻿@{
+	ViewData["Title"] = "Empanelled Agencies";
+}
+
+<section class="content">
+	<div id="article" class="card shadow-lg border-1 rounded-lg">
+		<div class="card-header bg-secondary text-white text-center">
+			<h3 class="card-title"><i class="fas fa-handshake"></i> Empanelled Agencies</h3>
+		</div>
+		<form id="checkboxes" method="post" asp-action="Agencies">
+			<div class="card-body">
+				<div class="submit-progress hidden">
+					<i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+				</div>
+
+				<table id="dataTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
+					<thead>
+						<tr>
+							<th data-orderable="false"><input type="checkbox" name="select_all" id="checkall" value="0" title="select all to depanel" data-bs-toggle="tooltip" /></th>
+							<th data-orderable="false">
+								<i class="far fa-file-word"></i>
+							</th>
+							<th>
+								Domain
+							</th>
+							<th>
+								Mobile #
+							</th>
+							<th>
+								Address
+							</th>
+							<th>
+								District
+							</th>
+							<th>
+								State
+							</th>
+							<th>
+								Country
+							</th>
+							<th>Case load</th>
+							<th>
+								Updated
+							</th>
+							<th>
+								UpdatedBy
+							</th>
+						</tr>
+					</thead>
+				</table>
+			</div>
+			<div class="card-footer">
+				<div class="col-md-12">
+					<a id="back" asp-controller="Dashboard" asp-action="Index" class="btn btn-default"><i class="fas fa-arrow-left"></i> Back</a>
+
+					<button id="empanel-vendors" disabled type="submit" class="btn btn-warning">
+						<i class="fas fa-hand-pointer" aria-hidden="true"></i> Depanel
+					</button>
+				</div>
+			</div>
+		</form>
+	</div>
+</section>
+@section Scripts {
+	<script src="~/js/manager/empanelled-agencies.js"></script>
+}

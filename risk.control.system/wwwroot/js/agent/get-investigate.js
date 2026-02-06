@@ -1,5 +1,4 @@
 ﻿document.addEventListener("DOMContentLoaded", function () {
-
     // Reference to the modal and close button
     var termsModal = document.getElementById('termsModal');
     var closeTermsButton = document.getElementById('closeterms');
@@ -38,7 +37,7 @@
 
 $(document).ready(function () {
     var caseId = $('#caseId').val();
-    
+
     var latitude = "";
     var longitude = "";
     if (navigator.geolocation) {
@@ -101,7 +100,7 @@ $(document).ready(function () {
         button.prop("disabled", true);
 
         $.ajax({
-            url: '/Uploads/UploadFaceImage',
+            url: '/AgentReport/SubmitFaceImage',
             type: "POST",
             data: formData,
             processData: false,
@@ -168,7 +167,7 @@ $(document).ready(function () {
         button.prop("disabled", true);
 
         $.ajax({
-            url: '/Uploads/UploadDocumentImage',
+            url: '/AgentReport/SubmitDocumentImage',
             type: "POST",
             data: formData,
             processData: false,
@@ -245,9 +244,8 @@ $(document).ready(function () {
         }
         console.log("Uploaded file type:", file.type);
 
-
         $.ajax({
-            url: '/Uploads/UploadMediaFile',
+            url: '/AgentReport/SubmitMediaFile',
             type: "POST",
             data: formData,
             processData: false,
@@ -301,72 +299,72 @@ $(document).ready(function () {
     let askConfirmation = false;
 
     $('#create-form').on('submit', function (e) {
-    var report = $('#remarks').val();
+        var report = $('#remarks').val();
 
-    if (report == '') {
-        e.preventDefault();
-        $.alert({
-            title: "Report submission !!!",
-            content: "Please enter remarks ?",
-            icon: 'fas fa-exclamation-triangle',
+        if (report == '') {
+            e.preventDefault();
+            $.alert({
+                title: "Report submission !!!",
+                content: "Please enter remarks ?",
+                icon: 'fas fa-exclamation-triangle',
 
-            type: 'red',
-            closeIcon: true,
-            buttons: {
-                cancel: {
-                    text: "OK",
-                    btnClass: 'btn-danger',
-                    action: function () {
-                        $.alert('Canceled!');
-                        $('#remarks').focus();
-                    }
-                }
-            }
-        });
-    }
-    else if (!askConfirmation) {
-        e.preventDefault();
-        $.confirm({
-            title: "Confirm SUBMIT",
-            content: "Are you sure?",
-            icon: 'fa fa-binoculars',
-
-            type: 'red',
-            closeIcon: true,
-            buttons: {
-                confirm: {
-                    text: "SUBMIT",
-                    btnClass: 'btn-danger',
-                    action: function () {
-                        askConfirmation = true;
-
-                        $("body").addClass("submit-progress-bg");
-                        // Wrap in setTimeout so the UI
-                        // can update the spinners
-                        setTimeout(function () {
-                            $(".submit-progress").removeClass("hidden");
-                        }, 1);
-
-                        $('#submit-case').html("<i class='fas fa-sync fa-spin'></i> SUBMIT");
-                        disableAllInteractiveElements();
-
-                        $('#create-form').submit();
-
-                        var article = document.getElementById("article");
-                        if (article) {
-                            var nodes = article.getElementsByTagName('*');
-                            for (var i = 0; i < nodes.length; i++) {
-                                nodes[i].disabled = true;
-                            }
+                type: 'red',
+                closeIcon: true,
+                buttons: {
+                    cancel: {
+                        text: "OK",
+                        btnClass: 'btn-danger',
+                        action: function () {
+                            $.alert('Canceled!');
+                            $('#remarks').focus();
                         }
                     }
-                },
-                cancel: {
-                    text: "Cancel",
-                    btnClass: 'btn-default'
                 }
-            }
-        });
-    }
-});
+            });
+        }
+        else if (!askConfirmation) {
+            e.preventDefault();
+            $.confirm({
+                title: "Confirm SUBMIT",
+                content: "Are you sure?",
+                icon: 'fa fa-binoculars',
+
+                type: 'red',
+                closeIcon: true,
+                buttons: {
+                    confirm: {
+                        text: "SUBMIT",
+                        btnClass: 'btn-danger',
+                        action: function () {
+                            askConfirmation = true;
+
+                            $("body").addClass("submit-progress-bg");
+                            // Wrap in setTimeout so the UI
+                            // can update the spinners
+                            setTimeout(function () {
+                                $(".submit-progress").removeClass("hidden");
+                            }, 1);
+
+                            $('#submit-case').html("<i class='fas fa-sync fa-spin'></i> SUBMIT");
+                            disableAllInteractiveElements();
+
+                            $('#create-form').submit();
+
+                            var article = document.getElementById("article");
+                            if (article) {
+                                var nodes = article.getElementsByTagName('*');
+                                for (var i = 0; i < nodes.length; i++) {
+                                    nodes[i].disabled = true;
+                                }
+                            }
+                        }
+                    },
+                    cancel: {
+                        text: "Cancel",
+                        btnClass: 'btn-default'
+                    }
+                }
+            });
+        }
+    });
 });

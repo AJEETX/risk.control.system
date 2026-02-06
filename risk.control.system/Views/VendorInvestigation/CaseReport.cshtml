@@ -1,0 +1,86 @@
+﻿@{
+    ViewData["Title"] = "Index";
+}
+
+<section class="content">
+    <div class="card shadow-lg border-1 rounded-lg">
+        <div class="card-header bg-secondary text-white text-center">
+            <h3 class="card-title">
+                <i class="far fa-file-archive"></i> Submit<span class="badge badge-secondary">report</span>
+                <span class="hover-text">
+                    <i class="fas fa-info-circle"></i>
+                    <span class="tooltip-text" id="information">
+                        <li>
+                            <i class='far fa-hand-point-right'></i> Select <input name="report" type='radio' /> report
+                        </li>
+                        <li>
+                            <i class='far fa-thumbs-up'></i> <b>
+                                <button class='btn btn-info btn-xs'>
+                                    <span class='badge badge-info btn-xs'>
+                                        <i class='far fa-file-archive'></i>
+                                    </span> Submit <sub> report</sub>
+                                </button>
+                            </b>
+                        </li>
+                    </span>
+                </span>
+            </h3>
+        </div>
+        <div class="card shadow-lg border-1 rounded-lg">
+            <div class="submit-progress hidden">
+                <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+            </div>
+            <button id="refreshTable" class="btn btn-default"> <i id="refreshIcon" class="fas fa-sync"></i> Refresh</button>
+        </div>
+            
+            <form id="checkboxes" asp-action="GetInvestigateReport" method="get">
+            <div class="card-body">
+
+                <table id="dataTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
+                    <thead>
+                        <tr>
+
+                            <th data-toggle="tooltip" title="Select Case to submit (report)"><img class="action-image" src="~/headers/arrow-down.gif" alt="select" /></th>
+                            <th data-toggle="tooltip" title="Case Number"><img class="action-image" src="~/headers/policy-num.gif" alt="Case" /></th>
+                            <th data-toggle="tooltip" title="Assured Amount"><img class="action-image" src="~/headers/amount.gif" alt="Amount"/></th>
+                            <th data-toggle="tooltip" title="Insurance Company"><img class="action-image" src="~/headers/company.gif" alt="Insurer" /></th>
+                            <th data-toggle="tooltip" title="Address of Interest" alt="Address of Interest"><img class="action-image" src="~/headers/pincode.gif" alt="pincode" /></th>
+                            <th data-toggle="tooltip" title="Driving Distance" alt="Driving Distance"><img class="action-image" src="~/headers/driving.gif" alt="Driving distance"/></th>
+                            <th data-toggle="tooltip" title="Driving  Duration" alt="Driving  Duration"><img class="action-image" src="~/headers/driving-time.gif" alt="Driving duration" /></th>
+                            <th data-toggle="tooltip" title="Case Document" alt="Case Document"><img class="action-image" src="~/headers/policy-doc.gif" alt="Case Document" /></th>
+                            <th data-toggle="tooltip" title="Person Photo"><img class="action-image" src="~/headers/portrait.gif" alt="Person" /></th>
+                            <th data-toggle="tooltip" title="Person Name"><img class="action-image" src="~/headers/customer.gif" alt="Person"/></th>
+                            <th data-toggle="tooltip" title="Case Type"><img class="action-image" src="~/headers/claim-type.gif" alt="Type" /></th>
+                            <th data-toggle="tooltip" title="Service"><img class="action-image" src="~/headers/service.gif" alt="Service" /></th>
+                            <th data-toggle="tooltip" title="Submitted Date"><img class="action-image" src="~/headers/created.gif" alt="Submitted date" /></th>
+                            <th data-toggle="tooltip" title="Duration since Submitted">
+                                <img class="action-image" src="~/headers/timer.gif" alt="Duration" />
+                            </th>
+                        </tr>
+                    </thead>
+
+
+                </table>
+
+        </div>
+            <div class="card-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <a id="back" asp-controller="Dashboard" asp-action="Index" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
+
+                        <button disabled id="allocatedcase" type="submit" class="btn btn-info">
+                            <span class="badge badge-info"> <i class="far fa-file-archive" aria-hidden="true"></i> </span>
+                            Submit <sub>report</sub>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            </form>
+    </div>
+</section>
+<partial name="_DisplayPopUp" />
+
+@section Scripts {
+    <script src="~/js/supervisor/agent-report.js"></script>
+}

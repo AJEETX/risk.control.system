@@ -11,10 +11,20 @@
         }
     });
     var uploadId = $('#uploadId').val();
-    var table = $('#customerTableAuto').DataTable({
+    var table = $('#dataTable').DataTable({
         "ajax": {
             "url": `/api/Investigation/GetFilesData/${uploadId}`,
             "type": "GET",
+            data: function (d) {
+                return {
+                    draw: d.draw,
+                    start: d.start,
+                    length: d.length,
+                    orderColumn: d.order[0].column ?? 0,
+                    orderDir: d.order[0].dir ?? "asc",
+                    searchValue: d.search?.value ?? ""
+                };
+            },
             "dataSrc": function (json) {
                 if (uploadId > 0 && !json.maxAssignReadyAllowed) {
                     $("#uploadAssignCheckbox, #postedFile, #UploadFileButton").prop("disabled", true);
@@ -34,18 +44,78 @@
                         }
                     });
                 }
+                if (json.isManager === true) {
+                    table.column(4).visible(true);   // Show UploadedBy
+                } else {
+                    table.column(4).visible(false);  // Hide UploadedBy
+                }
+                console.log(json.data[0]);
+
                 return json.data;
             },
             error: function (xhr, status, error) {
                 console.error("AJAX Error:", status, error);
                 console.error("Response:", xhr.responseText);
                 if (xhr.status === 401 || xhr.status === 403) {
-                    window.location.href = '/Account/Login'; // Or session timeout handler
+                    $.confirm({
+                        title: 'Session Expired!',
+                        content: 'Your session has expired or you are unauthorized. You will be redirected to the login page.',
+                        type: 'red',
+                        typeAnimated: true,
+                        buttons: {
+                            Ok: {
+                                text: 'Login',
+                                btnClass: 'btn-red',
+                                action: function () {
+                                    window.location.href = '/Account/Login';
+                                }
+                            }
+                        },
+                        onClose: function () {
+                            window.location.href = '/Account/Login';
+                        }
+                    });
+                }
+                else if (xhr.status === 500) {
+                    $.confirm({
+                        title: 'Server Error!',
+                        content: 'An unexpected server error occurred. You will be redirected to the Upload page.',
+                        type: 'orange',
+                        typeAnimated: true,
+                        buttons: {
+                            Ok: function () {
+                                window.location.href = '/CaseUpload/Uploads';
+                            }
+                        },
+                        onClose: function () {
+                            window.location.href = '/CaseUpload/Uploads';
+                        }
+                    });
+                }
+                else if (xhr.status === 400) {
+                    $.confirm({
+                        title: 'Bad Request!',
+                        content: 'Try with valid data.You will be redirected to the Upload  page',
+                        type: 'orange',
+                        typeAnimated: true,
+                        buttons: {
+                            Ok: function () {
+                                window.location.href = '/CaseUpload/Uploads';
+                            }
+                        },
+                        onClose: function () {
+                            window.location.href = '/CaseUpload/Uploads';
+                        }
+                    });
                 }
             }
         },
+        responsive: true,
         fixedHeader: true,
         processing: true,
+        autoWidth: false,
+        serverSide: true,
+        deferRender: true,
         paging: true,
         language: {
             loadingRecords: '&nbsp;',
@@ -56,19 +126,12 @@
             { "data": "sequenceNumber" },
             {
                 "data": "icon",
-                "bSortable": false,
                 "mRender": function (data, type, row) {
                     return '<i class="' + data + '" data-bs-toggle="tooltip"></i>';
                 }
             },
             {
                 "data": "name",
-                "mRender": function (data, type, row) {
-                    return '<i title="' + data + '" data-bs-toggle="tooltip">' + data + '</i>';
-                }
-            },
-            {
-                "data": "fileType",
                 "mRender": function (data, type, row) {
                     return '<i title="' + data + '" data-bs-toggle="tooltip">' + data + '</i>';
                 }
@@ -82,18 +145,17 @@
             {
                 "data": "createdOn",
                 "mRender": function (data, type, row) {
-                    return '<i title="' + data + '" data-bs-toggle="tooltip">' + data + '</i>';
+                    return '<i title="' + data + '" data-bs-toggle="tooltip"><small><strong>' + data + '</strong></small></i>';
                 }
             },
             {
-                "data": "timeTaken",
+                "data": "timeTakenSeconds",
                 "mRender": function (data, type, row) {
-                    return '<i>' + data + '</i>';
+                    return '<i>' + row.timeTaken + '</i>';
                 }
             },
             {
                 "data": "uploadedType",
-                "bSortable": false,
                 "mRender": function (data, type, row) {
                     var title = row.directAssign ? "Assigned" : "Uploaded";
                     return `
@@ -104,8 +166,6 @@
             },
             {
                 data: "message",
-                "bSortable": false,
-                orderable: false,
                 render: function (data, type, row) {
                     if (!data) return "";
                     if (row.completed) {
@@ -114,16 +174,16 @@
                             <small><strong> ${data}</strong></small>
                         </span>`;
                     } else if (row.status == 'Error') {
-                            return `
+                        return `
                         <span class="custom-message-badge i-red" title="${data}" data-toggle="tooltip">
                             <small><strong> ${data}</strong></small>
                         </span>`;
-                        } else {
-                            return `
+                    } else {
+                        return `
                         <span class="custom-message-badge i-grey" title="${data}" data-toggle="tooltip">
                             <small><strong> ${data}</strong></small>
                         </span>`;
-                        }
+                    }
                 }
             },
             {
@@ -132,27 +192,40 @@
                 "render": function (data, type, row) {
                     var img = '';
                     var title = row.directAssign ? "Assigned" : "Uploaded";
-                    if (row.status == 'Error' && row.recordCount == 0) {
-                        img += `<div class='btn-xs upload-err' title='Limit exceeded' data-bs-toggle='tooltip'> <i class='fas fa-times-circle i-orangered'></i> Limit exceed</div>`;
+                    if (row.status == 'Error' && row.recordCount == 0 && row.message != "Error uploading the file") {
+                        img += `<div class='btn-xs upload-exceed' title='Limit exceeded' data-bs-toggle='tooltip'> <i class='fas fa-times-circle i-orangered'></i> Limit exceed</div>`;
                     }
-                    else if (row.hasError) {
-                        img += `<a href='/Uploads/DownloadErrorLog/${row.id}' class='btn btn-xs btn-danger' title='Download Error file' data-bs-toggle='tooltip'> <i class='fa fa-download'></i> Error File</a>`;
+                    else if (row.hasError && row.message == "Error uploading the file") {
+                        img += `
+                            <button class="btn btn-xs btn-danger upload-err"
+                                    data-id="${row.id}"
+                                    data-url="/CaseUpload/DownloadErrorLog"
+                                    data-bs-toggle="tooltip"
+                                    title="Download Error file">
+                                <i class="fa fa-download"></i> Error File
+                            </button>`;
                     }
-                    
+
                     else if (!row.hasError && row.status == 'Completed') {
                         img += `<div class='btn btn-xs i-green upload-success' title='${title} Successfully' data-bs-toggle='tooltip'><i class='fa fa-check'></i> ${title} </div> `;
-                    } 
-                    else if (row.status == 'Processing'){
+                    }
+                    else if (row.status == 'Processing') {
                         img += `<div class='upload-progress' title='Action in-progress' data-bs-toggle='tooltip'><i class='fas fa-sync fa-spin i-grey'></i> </div>`;
                     }
 
-                    img += '<a href="/Uploads/DownloadLog/' + row.id + '" class="btn btn-xs btn-primary" title="Download upload file" data-bs-toggle="tooltip"><i class="nav-icon fa fa-download"></i> Download</a> ';
+                    img += `
+                            <button class="btn btn-xs btn-primary upload-download"
+                                    data-id="${row.id}"
+                                    data-url="/CaseUpload/DownloadLog"
+                                    data-bs-toggle="tooltip"
+                                    title="Download upload file">
+                                <i class="fa fa-download"></i> Download
+                            </button>`;
 
-                    img += '<button class="btn-xs btn-danger delete-file" data-id="' + row.id + '" title="Delete" data-bs-toggle="tooltip"><i class="fas fa-trash"></i> Delete </button>';
+                    img += '<button class="btn-xs btn-danger upload-delete" data-id="' + row.id + '" title="Delete" data-bs-toggle="tooltip"><i class="fas fa-trash"></i> Delete </button>';
                     return img;
                 }
-            },
-            { "data": "isManager", "bVisible": false }
+            }
         ],
         "order": [[1, "desc"]],  // ✅ Sort by 'createdOn' (index 5) in descending order
         "columnDefs": [
@@ -173,29 +246,25 @@
                 "targets": 4
             },
             {
-                className: 'max-width-column-name', // ✅ Apply CSS class
+                className: 'max-width-column-email', // ✅ Apply CSS class
                 targets: 5
             },
             {
-                className: 'max-width-column-email', // ✅ Apply CSS class
-                targets: 6
-            },
-            {
                 className: 'max-width-column-email', // Apply the CSS class,
-                targets: 7                      // Index of the column to style
+                targets: 6                      // Index of the column to style
             },
             {
                 className: 'max-width-column-name', // Apply the CSS class,
-                targets: 8                      // Index of the column to style
+                targets: 7                      // Index of the column to style
             },
             {
                 className: 'max-width-column-status', // Apply the CSS class,
-                targets: 9                      // Index of the column to style
+                targets: 8                      // Index of the column to style
             }
         ],
         rowCallback: function (row, data, index) {
             var $row = $(row);
-            
+
             if (data.status === "Processing" && data.id == uploadId) {
                 $row.addClass('processing-row');
                 startPolling(data.id);
@@ -215,15 +284,6 @@
         },
         initComplete: function () {
             var api = this.api();
-
-            // ✅ Correct index for `isManager` column is `9`
-            var isManager = api.column(9).data().toArray().every(function (value) {
-                return value === true;
-            });
-
-            if (!isManager) {
-                api.column(5).visible(false); // ✅ Hide 'uploadedBy' if all are managers
-            }
 
             var tableData = api.rows().data().toArray(); // ✅ Get all rows' data
 
@@ -252,7 +312,6 @@
                 url: `/api/Investigation/GetFileById/${uploadId}`, // Call the API to check status
                 type: 'GET',
                 success: function (updatedRowData) {
-
                     var icon = updatedRowData.data.result.directAssign ? 'fas fa-random' : 'fas fa-upload';  // Dynamic icon based on checkbox
                     var popType = updatedRowData.data.result.directAssign ? 'red' : 'blue';  // Dynamic color type ('blue' for Upload & Assign, 'green' for just Upload)
                     var title = updatedRowData.data.result.directAssign ? "Assign" : "Upload";
@@ -293,20 +352,8 @@
         }
     }
 
-    table.on('xhr.dt', function () {
-        $('#refreshIcon').removeClass('fa-spin');
-    });
-    // Enable tooltips
-    table.on('draw.dt', function () {
-        $('[data-toggle="tooltip"]').tooltip({
-            animated: 'fade',
-            placement: 'top',
-            html: true
-        });
-    });
-
     // Delete file with jConfirm
-    $('#customerTableAuto tbody').on('click', '.delete-file', function () {
+    $('#dataTable tbody').on('click', '.upload-delete', function () {
         var fileId = $(this).data('id');
 
         $.confirm({
@@ -319,7 +366,7 @@
                     btnClass: 'btn-red',
                     action: function () {
                         $.ajax({
-                            url: '/Uploads/DeleteLog/' + fileId,
+                            url: '/CaseUpload/DeleteLog/' + fileId,
                             type: 'POST',
                             headers: {
                                 __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val(),
@@ -373,6 +420,12 @@
         }
         table.ajax.reload(null, false);
     });
+    table.on('xhr.dt', function () {
+        $('#refreshIcon').removeClass('fa-spin');
+    });
+
+    $('#dataTable tbody').hide();
+    $('#dataTable tbody').fadeIn(2000);
 
     $('#uploadAssignCheckbox').on('change', function () {
         let isChecked = $(this).is(':checked');
@@ -394,7 +447,6 @@
 
         if (extn == "zip") {
             if (typeof (FileReader) != "undefined") {
-
                 //loop for each file selected for uploaded.
                 for (var i = 0; i < countFiles; i++) {
                     var fileSize = $(this)[0].files[i].size;
@@ -416,7 +468,6 @@
                         );
                     }
                 }
-
             } else {
                 $.alert(
                     {
@@ -485,9 +536,9 @@
                                 disableAllInteractiveElements();
                                 // Customize the button text before the submission
                                 if (isChecked) {
-                                    $(buttonId).html('<i class="fas fa-sync fa-spin"></i> Assign...');
+                                    $(buttonId).html('<i class="fas fa-sync fa-spin"></i> Assigning ...');
                                 } else {
-                                    $(buttonId).html('<i class="fas fa-sync fa-spin"></i> Upload...');
+                                    $(buttonId).html('<i class="fas fa-sync fa-spin"></i> Uploading ...');
                                 }
                                 $(formId).submit();
 
@@ -511,9 +562,107 @@
         });
     }
 
-
     // Apply confirmation to both forms
     handleUploadConfirmation("#upload-claims", "#UploadFileButton", "#uploadAssignCheckbox");
+    $(document).on('click', '.upload-download', function (e) {
+        e.preventDefault();
+
+        const btn = $(this);
+        const id = btn.data('id');
+        const url = btn.data('url');
+        const token = $('input[name="__RequestVerificationToken"]').val();
+
+        btn.prop('disabled', true);
+
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: {
+                id: id,
+                __RequestVerificationToken: token
+            },
+            headers: {
+                __RequestVerificationToken: token,
+            },
+            xhrFields: {
+                responseType: 'blob'   // ⭐ critical
+            },
+            success: function (blob, status, xhr) {
+                // Get filename from response headers
+                let fileName =
+                    xhr.getResponseHeader('X-File-Name') ||
+                    'download.file';
+
+                const url = window.URL.createObjectURL(blob);
+
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = fileName;
+                document.body.appendChild(a);
+                a.click();
+
+                a.remove();
+                window.URL.revokeObjectURL(url);
+            },
+            error: function (xhr) {
+                let msg = xhr.responseText || 'Download failed';
+                alert(msg);
+            },
+            complete: function () {
+                btn.prop('disabled', false);
+            }
+        });
+    });
+
+    $(document).on('click', '.upload-err', function (e) {
+        e.preventDefault();
+
+        const btn = $(this);
+        const id = btn.data('id');
+        const url = btn.data('url');
+        const token = $('input[name="__RequestVerificationToken"]').val();
+
+        btn.prop('disabled', true);
+
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: {
+                id: id,
+                __RequestVerificationToken: token
+            },
+            headers: {
+                __RequestVerificationToken: token,
+            },
+            xhrFields: {
+                responseType: 'blob'   // ⭐ critical
+            },
+            success: function (blob, status, xhr) {
+                // Get filename from response headers
+                let fileName =
+                    xhr.getResponseHeader('X-File-Name') ||
+                    'download.file';
+
+                const url = window.URL.createObjectURL(blob);
+
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = fileName;
+                document.body.appendChild(a);
+                a.click();
+
+                a.remove();
+                window.URL.revokeObjectURL(url);
+            },
+            error: function (xhr) {
+                let msg = xhr.responseText || 'Download failed';
+                alert(msg);
+            },
+            complete: function () {
+                btn.prop('disabled', false);
+            }
+        });
+    });
 });
 
 if (window.location.search.includes("uploadId")) {

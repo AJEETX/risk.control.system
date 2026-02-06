@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 
 using risk.control.system.AppConstant;
-using risk.control.system.Services;
+using risk.control.system.Services.Api;
 
 namespace risk.control.system.Controllers.Api.Agency
 {
@@ -13,17 +13,17 @@ namespace risk.control.system.Controllers.Api.Agency
     public class AgencyController : ControllerBase
     {
         private readonly ILogger<AgencyController> logger;
-        private readonly IUserService userService;
-        private readonly IVendorService vendorService;
+        private readonly IAgencyUserApiService agencyUserApiService;
+        private readonly IAgencyService agencyService;
 
         public AgencyController(
             ILogger<AgencyController> logger,
-            IUserService userService,
-            IVendorService vendorService)
+            IAgencyUserApiService agencyUserApiService,
+            IAgencyService agencyService)
         {
             this.logger = logger;
-            this.userService = userService;
-            this.vendorService = vendorService;
+            this.agencyUserApiService = agencyUserApiService;
+            this.agencyService = agencyService;
         }
 
         [HttpGet("AllAgencies")]
@@ -37,7 +37,7 @@ namespace risk.control.system.Controllers.Api.Agency
             }
             try
             {
-                var response = await vendorService.AllAgencies();
+                var response = await agencyService.AllAgencies();
 
                 return Ok(response);
             }
@@ -59,7 +59,7 @@ namespace risk.control.system.Controllers.Api.Agency
             }
             try
             {
-                var response = await vendorService.AllServices(userEmail);
+                var response = await agencyService.AllServices(userEmail);
                 return Ok(response);
             }
             catch (Exception ex)
@@ -84,7 +84,7 @@ namespace risk.control.system.Controllers.Api.Agency
             }
             try
             {
-                var result = await userService.GetCompanyAgencyUsers(userEmail, id);
+                var result = await agencyUserApiService.GetCompanyAgencyUsers(userEmail, id);
 
                 return Ok(result);
             }
@@ -106,7 +106,7 @@ namespace risk.control.system.Controllers.Api.Agency
             }
             try
             {
-                var agentWithLoad = await userService.GetAgencyUsers(userEmail);
+                var agentWithLoad = await agencyUserApiService.GetAgencyUsers(userEmail);
                 return Ok(agentWithLoad);
             }
             catch (Exception ex)
@@ -115,7 +115,6 @@ namespace risk.control.system.Controllers.Api.Agency
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
-
 
         [HttpGet("GetAgentWithCases")]
         public async Task<IActionResult> GetAgentWithCases(long id)
@@ -132,7 +131,7 @@ namespace risk.control.system.Controllers.Api.Agency
             }
             try
             {
-                var agentList = await vendorService.GetAgentWithCases(userEmail, id);
+                var agentList = await agencyService.GetAgentWithCases(userEmail, id);
                 return Ok(agentList);
             }
             catch (Exception ex)

@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using risk.control.system.Models;
 
 using risk.control.system.Models.ViewModel;
-using risk.control.system.Services;
+using risk.control.system.Services.Tool;
 
 namespace risk.control.system.Controllers.Tools
 {

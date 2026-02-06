@@ -1,14 +1,77 @@
 ﻿$(document).ready(function () {
-
-    var table = $("#customerTable").DataTable({
+    var table = $("#dataTable").DataTable({
         ajax: {
             url: '/api/agency/VendorInvestigation/GetCompleted',
-            dataSrc: '',
+            type: 'GET',
+            dataSrc: function (json) {
+                return json.data; // Return table data
+            },
+            data: function (d) {
+                console.log("Data before sending:", d); // Debugging
+
+                return {
+                    draw: d.draw || 1,
+                    start: d.start || 0,
+                    length: d.length || 10,
+                    search: d.search?.value || "", // Instead of empty string, send "all"
+                    orderColumn: d.order?.[0]?.column ?? 14, // Default to column 15
+                    orderDir: d.order?.[0]?.dir || "desc"
+                };
+            },
             error: function (xhr, status, error) {
                 console.error("AJAX Error:", status, error);
                 console.error("Response:", xhr.responseText);
                 if (xhr.status === 401 || xhr.status === 403) {
-                    window.location.href = '/Account/Login'; // Or session timeout handler
+                    $.confirm({
+                        title: 'Session Expired!',
+                        content: 'Your session has expired or you are unauthorized. You will be redirected to the login page.',
+                        type: 'red',
+                        typeAnimated: true,
+                        buttons: {
+                            Ok: {
+                                text: 'Login',
+                                btnClass: 'btn-red',
+                                action: function () {
+                                    window.location.href = '/Account/Login';
+                                }
+                            }
+                        },
+                        onClose: function () {
+                            window.location.href = '/Account/Login';
+                        }
+                    });
+                }
+                else if (xhr.status === 500) {
+                    $.confirm({
+                        title: 'Server Error!',
+                        content: 'An unexpected server error occurred. You will be redirected to Completed case page.',
+                        type: 'orange',
+                        typeAnimated: true,
+                        buttons: {
+                            Ok: function () {
+                                window.location.href = '/VendorInvestigation/Completed';
+                            }
+                        },
+                        onClose: function () {
+                            window.location.href = '/VendorInvestigation/Completed';
+                        }
+                    });
+                }
+                else if (xhr.status === 400) {
+                    $.confirm({
+                        title: 'Bad Request!',
+                        content: 'Try with valid data.You will be redirected to Completed case page',
+                        type: 'orange',
+                        typeAnimated: true,
+                        buttons: {
+                            Ok: function () {
+                                window.location.href = '/VendorInvestigation/Completed';
+                            }
+                        },
+                        onClose: function () {
+                            window.location.href = '/VendorInvestigation/Completed';
+                        }
+                    });
                 }
             }
         },
@@ -26,8 +89,12 @@
                 targets: 7                      // Index of the column to style
             }],
         order: [[13, 'asc']],
+        responsive: true,
         fixedHeader: true,
         processing: true,
+        autoWidth: false,
+        serverSide: true,
+        deferRender: true,
         paging: true,
         language: {
             loadingRecords: '&nbsp;',
@@ -135,7 +202,7 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    buttons += '<a id="details' + row.id + '" href="/VendorInvestigation/CompletedDetail?Id=' + row.id + '" class="btn btn-xs btn-info"><i class="fa fa-search"></i> Detail</a>&nbsp;'
+                    buttons += `<a data-id="${row.id}" class="btn btn-xs btn-info"><i class="fa fa-search"></i> Detail</a>&nbsp;`
                     //buttons += (row.canDownload)
                     //    ? '<a href="/Report/PrintPdfReport?Id=' + row.id + '" class="btn btn-xs btn-danger"><i class="far fa-file-pdf"></i> PDF</a>'
                     //    : '<button class="btn btn-xs btn-secondary" disabled><i class="far fa-file-pdf"></i> limit Reached</button>';
@@ -144,14 +211,10 @@
             },
             { "data": "timeElapsed", "bVisible": false }
         ],
+        rowCallback: function (row, data, index) {
+            $('.btn-info', row).addClass('btn-white-color');
+        },
         "drawCallback": function (settings, start, end, max, total, pre) {
-
-            $('#customerTable tbody').on('click', '.btn-info', function (e) {
-                e.preventDefault(); // Prevent the default anchor behavior
-                var id = $(this).attr('id').replace('details', ''); // Extract the ID from the button's ID attribute
-                getdetails(id); // Call the getdetails function with the ID
-                window.location.href = $(this).attr('href'); // Navigate to the delete page
-            });
             // Reinitialize Bootstrap 5 tooltips
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
             tooltipTriggerList.map(function (el) {
@@ -162,14 +225,35 @@
             });
         }
     });
-    table.on('mouseenter', '.map-thumbnail', function () {
-            const $this = $(this); // Cache the current element
+    $('body').on('click', 'a.btn-info', function (e) {
+        e.preventDefault();
+        const id = $(this).data('id');
+        showdetail(id, this);
+    });
+    function showdetail(id, element) {
+        id = String(id).replace(/[^a-zA-Z0-9_-]/g, "");
+        $("body").addClass("submit-progress-bg");
+        setTimeout(() => $(".submit-progress").removeClass("hidden"), 1);
 
-            // Set a timeout to show the full map after 1 second
-            hoverTimeout = setTimeout(function () {
-                $this.find('.full-map').show(); // Show full map
-            }, 1000); // Delay of 1 second
-        })
+        showSpinnerOnButton(element, "Detail");
+
+        const editUrl = `/VendorInvestigation/CompletedDetail?Id=${encodeURIComponent(id)}`;
+
+        setTimeout(() => {
+            window.location.href = editUrl;
+        }, 1000);
+    }
+    function showSpinnerOnButton(selector, spinnerText) {
+        $(selector).html(`<i class='fas fa-sync fa-spin'></i> ${spinnerText}`);
+    }
+    table.on('mouseenter', '.map-thumbnail', function () {
+        const $this = $(this); // Cache the current element
+
+        // Set a timeout to show the full map after 1 second
+        hoverTimeout = setTimeout(function () {
+            $this.find('.full-map').show(); // Show full map
+        }, 1000); // Delay of 1 second
+    })
         .on('mouseleave', '.map-thumbnail', function () {
             const $this = $(this); // Cache the current element
 
@@ -198,24 +282,3 @@
         table.ajax.reload(null, false); // false => Retains current page
     });
 });
-
-
-function getdetails(id) {
-    $("body").addClass("submit-progress-bg");
-    // Wrap in setTimeout so the UI
-    // can update the spinners
-    setTimeout(function () {
-        $(".submit-progress").removeClass("hidden");
-    }, 1);
-   
-    $('a#details' + id + '.btn.btn-xs.btn-info').html("<i class='fas fa-sync fa-spin'></i> Detail");
-    disableAllInteractiveElements();
-
-    var article = document.getElementById("article");
-    if (article) {
-        var nodes = article.getElementsByTagName('*');
-        for (var i = 0; i < nodes.length; i++) {
-            nodes[i].disabled = true;
-        }
-    }
-}

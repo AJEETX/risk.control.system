@@ -4,12 +4,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 using risk.control.system.AppConstant;
+using risk.control.system.Controllers.Common;
 using risk.control.system.Helpers;
-using risk.control.system.Services;
-
+using risk.control.system.Services.Agent;
 using SmartBreadcrumbs.Attributes;
-
-using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers.Agency
 {
@@ -18,100 +16,79 @@ namespace risk.control.system.Controllers.Agency
     public class AgentController : Controller
     {
         private readonly INotyfService notifyService;
-        private readonly ICaseVendorService vendorService;
+        private readonly IAgentCaseDetailService agentCaseDetailService;
         private readonly ILogger<AgentController> logger;
 
-        public AgentController(INotyfService notifyService, ICaseVendorService vendorService, ILogger<AgentController> logger)
+        public AgentController(INotyfService notifyService, IAgentCaseDetailService agentCaseDetailService, ILogger<AgentController> logger)
         {
             this.notifyService = notifyService;
-            this.vendorService = vendorService;
+            this.agentCaseDetailService = agentCaseDetailService;
             this.logger = logger;
         }
+
         public IActionResult Index()
         {
-            return RedirectToAction("Agent");
+            return RedirectToAction(nameof(Agent));
         }
 
         [Breadcrumb(" Tasks")]
         public IActionResult Agent()
         {
-            var currentUserEmail = HttpContext.User?.Identity?.Name;
-            if (currentUserEmail == null)
-            {
-                notifyService.Error("OOPs !!!..Unauthenticated Access");
-                return RedirectToAction(nameof(Index), "Dashboard");
-            }
             return View();
         }
 
         [Breadcrumb("Submit", FromAction = "Agent")]
         public async Task<IActionResult> GetInvestigate(long selectedcase, bool uploaded = false)
         {
+            var userEmail = HttpContext.User?.Identity?.Name;
             try
             {
-                if (selectedcase < 1)
+                if (!ModelState.IsValid || selectedcase < 1)
                 {
                     notifyService.Error("No case selected!!!. Please select case to be investigate.");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
 
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-                if (currentUserEmail == null)
-                {
-                    notifyService.Error("OOPs !!!..Unauthenticated Access");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-
-                var model = await vendorService.GetInvestigate(currentUserEmail, selectedcase, uploaded);
-                ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
+                var model = await agentCaseDetailService.GetInvestigate(userEmail, selectedcase, uploaded);
+                ViewData["Currency"] = CustomExtensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 return View(model);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, $"Error occurred.");
+                logger.LogError(ex, "Error occurred for case {Id}. {UserEmail}.", selectedcase, userEmail ?? "Anonymous");
                 notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
 
         [Breadcrumb(title: " Submitted")]
         public IActionResult Submitted()
         {
-            var currentUserEmail = HttpContext.User?.Identity?.Name;
-            if (currentUserEmail == null)
-            {
-                notifyService.Error("OOPs !!!..Unauthenticated Access");
-                return RedirectToAction(nameof(Index), "Dashboard");
-            }
             return View();
         }
+
         [Breadcrumb(title: " Detail", FromAction = "Submitted")]
         public async Task<IActionResult> SubmittedDetail(long id)
         {
-            if (id == 0)
+            var userEmail = HttpContext.User?.Identity?.Name;
+            if (!ModelState.IsValid || id == 0)
             {
                 notifyService.Error("NOT FOUND !!!..");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
             try
             {
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-                if (currentUserEmail == null)
-                {
-                    notifyService.Error("OOPs !!!..Unauthenticated Access");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-                var model = await vendorService.GetInvestigatedForAgent(currentUserEmail, id);
-                ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
+                var model = await agentCaseDetailService.GetInvestigatedForAgent(userEmail, id);
+                ViewData["Currency"] = CustomExtensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 return View(model);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, $"Error occurred.");
+                logger.LogError(ex, "Error occurred for case {Id}. {UserEmail}.", id, userEmail ?? "Anonymous");
                 notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
     }

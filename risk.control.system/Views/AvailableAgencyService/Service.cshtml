@@ -1,0 +1,47 @@
+﻿@model ServiceModel
+@{
+	ViewData["Title"] = "Agency Service";
+}
+<section class="content">
+	<div id="article" class="card shadow-lg border-1 rounded-lg">
+		<div class="card-header bg-secondary text-white text-center">
+			<h3 class="card-title"><i class="fas fa-cogs"></i> Manage Service</h3>
+		</div>
+		<div class="card-body">
+			<div class="submit-progress hidden">
+				<i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+			</div>
+			<input type="hidden" asp-for="Id" />
+			<table id="dataTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
+				<thead>
+					<tr>
+						<th></th>
+						<th>CaseType</th>
+						<th>Verification Type</th>
+						<th>Rate</th>
+						<th>District</th>
+						<th>State</th>
+						<th>Country</th>
+						<th>UpdatedBy</th>
+						<th>Updated</th>
+						<th>Actions</th>
+					</tr>
+				</thead>
+			</table>
+		</div>
+		<div class="card-footer">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="form-group">
+						<a id="back" asp-controller="AvailableAgency" asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
+
+						<a class="create-agency-service btn btn-success" asp-controller="AvailableAgencyService" asp-action="Create" asp-route-id="@Model.Id"><i class="fas fa-cog"></i> Add Service</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+@section Scripts {
+	<script src="~/js/manager/available-agency-services.js"></script>
+}

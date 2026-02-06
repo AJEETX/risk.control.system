@@ -1,7 +1,7 @@
 ﻿$(document).ready(function () {
     var jobId = $('#jobId').val(); // Get the job ID from the hidden input field
     var pendingCount = $('#pendingCount').val(); // Get the pending allocations from the hidden input field
-    var table = $("#customerTable").DataTable({
+    var table = $("#dataTable").DataTable({
         ajax: {
             url: '/api/Investigation/GetActive',
             type: 'GET',
@@ -23,30 +23,79 @@
                 console.error("AJAX Error:", status, error);
                 console.error("Response:", xhr.responseText);
                 if (xhr.status === 401 || xhr.status === 403) {
-                    window.location.href = '/Account/Login'; // Or session timeout handler
+                    $.confirm({
+                        title: 'Session Expired!',
+                        content: 'Your session has expired or you are unauthorized. You will be redirected to the login page.',
+                        type: 'red',
+                        typeAnimated: true,
+                        buttons: {
+                            Ok: {
+                                text: 'Login',
+                                btnClass: 'btn-red',
+                                action: function () {
+                                    window.location.href = '/Account/Login';
+                                }
+                            }
+                        },
+                        onClose: function () {
+                            window.location.href = '/Account/Login';
+                        }
+                    });
+                }
+                else if (xhr.status === 500) {
+                    $.confirm({
+                        title: 'Server Error!',
+                        content: 'An unexpected server error occurred. You will be redirected to the Active page.',
+                        type: 'orange',
+                        typeAnimated: true,
+                        buttons: {
+                            Ok: function () {
+                                window.location.href = '/Investigation/Active';
+                            }
+                        },
+                        onClose: function () {
+                            window.location.href = '/Investigation/Active';
+                        }
+                    });
+                }
+                else if (xhr.status === 400) {
+                    $.confirm({
+                        title: 'Bad Request!',
+                        content: 'Try with valid data.You will be redirected to the Active page',
+                        type: 'orange',
+                        typeAnimated: true,
+                        buttons: {
+                            Ok: function () {
+                                window.location.href = '/Investigation/Active';
+                            }
+                        },
+                        onClose: function () {
+                            window.location.href = '/Investigation/Active';
+                        }
+                    });
                 }
             }
         },
         columnDefs: [
-        {
-            className: 'max-width-column-name', // Apply the CSS class,
-            targets: 0                      // Index of the column to style
-        },
-        {
-            className: 'max-width-column-number', // Apply the CSS class,
-            targets: 1                      // Index of the column to style
-        },
-        {
-            className: 'max-width-column-name', // Apply the CSS class,
-            targets: 2                      // Index of the column to style
+            {
+                className: 'max-width-column-name', // Apply the CSS class,
+                targets: 0                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column-number', // Apply the CSS class,
+                targets: 1                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column-name', // Apply the CSS class,
+                targets: 2                      // Index of the column to style
             },
             {
                 className: 'max-width-column-name', // Apply the CSS class,
                 targets: 6                      // Index of the column to style
             },
-        {
-            className: 'max-width-column-name', // Apply the CSS class,
-            targets: 8                      // Index of the column to style
+            {
+                className: 'max-width-column-name', // Apply the CSS class,
+                targets: 8                      // Index of the column to style
             },
             {
                 className: 'max-width-column-number', // Apply the CSS class,
@@ -60,11 +109,13 @@
                 'targets': 16, // Index for the "Case Type" column
                 'name': 'policy' // Name for the "Case Type" column
             }],
-        order: [[15, 'asc']],
+        order: [[15, 'desc']],
         responsive: true,
         fixedHeader: true,
         processing: true,
+        autoWidth: false,
         serverSide: true,
+        deferRender: true,
         paging: true,
         language: {
             loadingRecords: '&nbsp;',
@@ -147,7 +198,6 @@
                 "sDefaultContent": "",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-
                     var img = '<div class="map-thumbnail table-profile-image">';
                     img += '<img data-title="Beneficiary: ' + row.beneficiaryFullName + '" data-img="' + row.beneficiaryPhoto + '" src="' + row.beneficiaryPhoto + '" class="thumbnail table-profile-image open-map-modal" title="' + row.beneficiaryFullName + '" data-bs-toggle="tooltip"/>'; // Thumbnail image with class 'thumbnail'
                     img += '</div>';
@@ -190,7 +240,7 @@
                         buttons += '<i class="fas fa-user-tag" title="MANUAL ALLOCATION" data-bs-toggle="tooltip"></i>';
                     }
                     buttons += '</span>';
-                    
+
                     return buttons;
                 }
             },
@@ -205,10 +255,9 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    buttons += '<a id="details' + row.id + '" href="ActiveDetail?Id=' + row.id + '" class="active-claims btn btn-xs btn-info"><i class="fa fa-search"></i> Detail</a>&nbsp;'
+                    buttons += `<a data-id="${row.id}" class="active-claims btn btn-xs btn-info"><i class="fa fa-search"></i> Detail</a>&nbsp;`
 
                     if (row.autoAllocated) {
-
                     }
                     //if (row.withdrawable) {
                     //    buttons += '<a href="withdraw?Id=' + row.id + '" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i> Withdraw</a>&nbsp;'
@@ -227,15 +276,10 @@
                     $('td', row).removeClass('isNewAssigned');
                 }, 3000);
             }
+            $('.btn-info', row).addClass('btn-white-color');
+
         },
         "drawCallback": function (settings, start, end, max, total, pre) {
-
-            $('#customerTable tbody').on('click', '.btn-info', function (e) {
-                e.preventDefault(); // Prevent the default anchor behavior
-                var id = $(this).attr('id').replace('details', ''); // Extract the ID from the button's ID attribute
-                getdetails(id); // Call the getdetails function with the ID
-                window.location.href = $(this).attr('href'); // Navigate to the delete page
-            });
             // Reinitialize Bootstrap 5 tooltips
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
             tooltipTriggerList.map(function (el) {
@@ -246,6 +290,27 @@
             });
         }
     });
+    $('body').on('click', 'a.btn-info', function (e) {
+        e.preventDefault();
+        const id = $(this).data('id');
+        showdetail(id, this);
+    });
+    function showdetail(id, element) {
+        id = String(id).replace(/[^a-zA-Z0-9_-]/g, "");
+        $("body").addClass("submit-progress-bg");
+        setTimeout(() => $(".submit-progress").removeClass("hidden"), 1);
+
+        showSpinnerOnButton(element, "Detail");
+
+        const editUrl = `/Investigation/ActiveDeatil?Id=${encodeURIComponent(id)}`;
+
+        setTimeout(() => {
+            window.location.href = editUrl;
+        }, 1000);
+    }
+    function showSpinnerOnButton(selector, spinnerText) {
+        $(selector).html(`<i class='fas fa-sync fa-spin'></i> ${spinnerText}`);
+    }
     // Case Type Filter
     $('#caseTypeFilter').on('change', function () {
         table.ajax.reload(); // Reload the table when the filter is changed
@@ -261,7 +326,7 @@
     table.on('xhr.dt', function () {
         $('#refreshIcon').removeClass('fa-spin');
     });
- 
+
     $(document).on("click", ".open-map-modal", function () {
         $("#mapModal").modal("show");
 
@@ -272,46 +337,14 @@
         $("#mapModalLabel").text(title || "Map Preview");
     });
 
-    $('#customerTable tbody').hide();
-    $('#customerTable tbody').fadeIn(2000);
-
+    $('#dataTable tbody').hide();
+    $('#dataTable tbody').fadeIn(2000);
 
     if (jobId) {
         checkJobStatus(jobId);
     }
 });
 let finalCheckAttempts = 0; // Counter for final checks
-function getdetails(id) {
-    $("body").addClass("submit-progress-bg");
-    // Wrap in setTimeout so the UI
-    // can update the spinners
-    setTimeout(function () {
-        $(".submit-progress").removeClass("hidden");
-    }, 1);
-    
-    $('a#details' + id + '.btn.btn-xs.btn-info').html("<i class='fas fa-sync fa-spin'></i> Detail");
-    disableAllInteractiveElements()
-    var article = document.getElementById("article");
-    if (article) {
-        var nodes = article.getElementsByTagName('*');
-        for (var i = 0; i < nodes.length; i++) {
-            nodes[i].disabled = true;
-        }
-    }
-}
-function showedit(id) {
-    
-    $('a#edit' + id + '.btn.btn-xs.btn-warning').html("<i class='fas fa-sync fa-spin'></i> Edit");
-    disableAllInteractiveElements();
-
-    var article = document.getElementById("article");
-    if (article) {
-        var nodes = article.getElementsByTagName('*');
-        for (var i = 0; i < nodes.length; i++) {
-            nodes[i].disabled = true;
-        }
-    }
-}
 
 function checkJobStatus(jobId) {
     if (!jobId) {
@@ -330,7 +363,7 @@ function checkJobStatus(jobId) {
                 }, 2000);
             } else if (response.status === "Completed" || response.status === "Succeeded") {
                 console.log("Job Completed:", response.status);
-                    $('#refreshTable').click(); // Refresh the table after completion
+                $('#refreshTable').click(); // Refresh the table after completion
             } else {
                 console.warn("Job has an issue:", response.status);
                 $.confirm({
@@ -361,4 +394,3 @@ window.addEventListener('beforeunload', function () {
         window.history.replaceState({}, document.title, newUrl);
     }
 });
-

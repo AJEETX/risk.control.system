@@ -1,19 +1,83 @@
 ﻿$(document).ready(function () {
-
-    var table = $("#customerTable").DataTable({
+    var table = $("#dataTable").DataTable({
         ajax: {
             url: '/api/agency/VendorInvestigation/GetOpenCases',
-            dataSrc: '',
+            type: 'GET',
+            dataSrc: function (json) {
+                console.log("Data after receiving:", json.data); // Debugging
+                return json.data; // Return table data
+            },
+            data: function (d) {
+                console.log("Data before sending:", d); // Debugging
+
+                return {
+                    draw: d.draw || 1,
+                    start: d.start || 0,
+                    length: d.length || 10,
+                    search: d.search?.value || "", // Instead of empty string, send "all"
+                    orderColumn: d.order?.[0]?.column ?? 12, // Default to column 15
+                    orderDir: d.order?.[0]?.dir || "asc"
+                };
+            },
             error: function (xhr, status, error) {
                 console.error("AJAX Error:", status, error);
                 console.error("Response:", xhr.responseText);
                 if (xhr.status === 401 || xhr.status === 403) {
-                    window.location.href = '/Account/Login'; // Or session timeout handler
+                    $.confirm({
+                        title: 'Session Expired!',
+                        content: 'Your session has expired or you are unauthorized. You will be redirected to the login page.',
+                        type: 'red',
+                        typeAnimated: true,
+                        buttons: {
+                            Ok: {
+                                text: 'Login',
+                                btnClass: 'btn-red',
+                                action: function () {
+                                    window.location.href = '/Account/Login';
+                                }
+                            }
+                        },
+                        onClose: function () {
+                            window.location.href = '/Account/Login';
+                        }
+                    });
+                }
+                else if (xhr.status === 500) {
+                    $.confirm({
+                        title: 'Server Error!',
+                        content: 'An unexpected server error occurred. You will be redirected to the Active page.',
+                        type: 'orange',
+                        typeAnimated: true,
+                        buttons: {
+                            Ok: function () {
+                                window.location.href = '/VendorInvestigation/Open';
+                            }
+                        },
+                        onClose: function () {
+                            window.location.href = '/VendorInvestigation/Open';
+                        }
+                    });
+                }
+                else if (xhr.status === 400) {
+                    $.confirm({
+                        title: 'Bad Request!',
+                        content: 'Try with valid data.You will be redirected to the Active page',
+                        type: 'orange',
+                        typeAnimated: true,
+                        buttons: {
+                            Ok: function () {
+                                window.location.href = '/VendorInvestigation/Open';
+                            }
+                        },
+                        onClose: function () {
+                            window.location.href = '/VendorInvestigation/Open';
+                        }
+                    });
                 }
             }
         },
         columnDefs: [
-            
+
             {
                 className: 'max-width-column-number', // Apply the CSS class,
                 targets: 0                      // Index of the column to style
@@ -25,9 +89,13 @@
                 className: 'max-width-column-name', // Apply the CSS class,
                 targets: 8                      // Index of the column to style
             }],
-        order: [[14, 'asc']],
+        order: [[12, 'asc']],
+        responsive: true,
         fixedHeader: true,
         processing: true,
+        autoWidth: false,
+        serverSide: true,
+        deferRender: true,
         paging: true,
         language: {
             loadingRecords: '&nbsp;',
@@ -141,6 +209,7 @@
             },
             {
                 "data": "timePending",
+                "bSortable": false,
                 "mRender": function (data, type, row) {
                     return '<span title="' + row.timePending + '" data-bs-toggle="tooltip">' + data + '</span>'
                 }
@@ -150,7 +219,7 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    buttons += '<a id="details' + row.id + '" href="Detail?Id=' + row.id + '" class="btn btn-xs btn-info"><i class="fa fa-search"></i> Detail</a>&nbsp;'
+                        buttons += `<a data-id="${row.id}" class="btn btn-xs btn-info"><i class="fas fa-search"></i> Detail</a>`
                     return buttons;
                 }
             },
@@ -159,14 +228,12 @@
                 "bVisible": false
             }
         ],
-        "drawCallback": function (settings, start, end, max, total, pre) {
+        "rowCallback": function (row, data, index) {
+            
+            $('.btn-info', row).addClass('btn-white-color');
 
-            $('#customerTable tbody').on('click', '.btn-info', function (e) {
-                e.preventDefault(); // Prevent the default anchor behavior
-                var id = $(this).attr('id').replace('details', ''); // Extract the ID from the button's ID attribute
-                showdetails(id); // Call the getdetails function with the ID
-                window.location.href = $(this).attr('href'); // Navigate to the delete page
-            });
+        },
+        "drawCallback": function (settings, start, end, max, total, pre) {
             // Reinitialize Bootstrap 5 tooltips
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
             tooltipTriggerList.map(function (el) {
@@ -177,14 +244,36 @@
             });
         }
     });
-    table.on('mouseenter', '.map-thumbnail', function () {
-            const $this = $(this); // Cache the current element
 
-            // Set a timeout to show the full map after 1 second
-            hoverTimeout = setTimeout(function () {
-                $this.find('.full-map').show(); // Show full map
-            }, 1000); // Delay of 1 second
-        })
+    $('body').on('click', 'a.btn-info', function (e) {
+        e.preventDefault();
+        const id = $(this).data('id');
+        showdetail(id, this);
+    });
+    function showdetail(id, element) {
+        id = String(id).replace(/[^a-zA-Z0-9_-]/g, "");
+        $("body").addClass("submit-progress-bg");
+        setTimeout(() => $(".submit-progress").removeClass("hidden"), 1);
+
+        showSpinnerOnButton(element, "Detail");
+
+        const url = `/VendorInvestigation/Detail?Id=${encodeURIComponent(id)}`;
+
+        setTimeout(() => {
+            window.location.href = url;
+        }, 1000);
+    }
+    function showSpinnerOnButton(selector, spinnerText) {
+        $(selector).html(`<i class='fas fa-sync fa-spin'></i> ${spinnerText}`);
+    }
+    table.on('mouseenter', '.map-thumbnail', function () {
+        const $this = $(this); // Cache the current element
+
+        // Set a timeout to show the full map after 1 second
+        hoverTimeout = setTimeout(function () {
+            $this.find('.full-map').show(); // Show full map
+        }, 1000); // Delay of 1 second
+    })
         .on('mouseleave', '.map-thumbnail', function () {
             const $this = $(this); // Cache the current element
 
@@ -221,7 +310,7 @@ function showdetails(id) {
     setTimeout(function () {
         $(".submit-progress").removeClass("hidden");
     }, 1);
-    
+
     $('a#details' + id + '.btn.btn-xs.btn-info').html("<i class='fas fa-sync fa-spin'></i> Detail");
     disableAllInteractiveElements();
 

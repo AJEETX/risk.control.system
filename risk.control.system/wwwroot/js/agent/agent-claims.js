@@ -1,5 +1,4 @@
 $(document).ready(function () {
-
     $('#allocatedcase').on('click', function () {
         $("body").addClass("submit-progress-bg");
         // Wrap in setTimeout so the UI
@@ -9,7 +8,7 @@ $(document).ready(function () {
         }, 1);
 
         $('#allocatedcase').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Investigate");
-       
+
         var article = document.getElementById("article");
         if (article) {
             var nodes = article.getElementsByTagName('*');
@@ -17,10 +16,9 @@ $(document).ready(function () {
                 nodes[i].disabled = true;
             }
         }
-        
     });
 
-    var table = $("#customerTable").DataTable({
+    var table = $("#dataTable").DataTable({
         ajax: {
             url: '/api/agency/agent/GetNewCases',
             dataSrc: '',
@@ -28,7 +26,24 @@ $(document).ready(function () {
                 console.error("AJAX Error:", status, error);
                 console.error("Response:", xhr.responseText);
                 if (xhr.status === 401 || xhr.status === 403) {
-                    window.location.href = '/Account/Login'; // Or session timeout handler
+                    $.confirm({
+                        title: 'Session Expired!',
+                        content: 'Your session has expired or you are unauthorized. You will be redirected to the login page.',
+                        type: 'red',
+                        typeAnimated: true,
+                        buttons: {
+                            Ok: {
+                                text: 'Login',
+                                btnClass: 'btn-red',
+                                action: function () {
+                                    window.location.href = '/Account/Login';
+                                }
+                            }
+                        },
+                        onClose: function () {
+                            window.location.href = '/Account/Login';
+                        }
+                    });
                 }
             }
         },
@@ -41,18 +56,18 @@ $(document).ready(function () {
                 return '<input type="checkbox" name="selectedcase[]" value="' + $('<div/>').text(data).html() + '">';
             }
         },
-            {
-                className: 'max-width-column-name', // Apply the CSS class,
-                targets: 1                      // Index of the column to style
-            },
-            {
-                className: 'max-width-column-number', // Apply the CSS class,
-                targets: 2                     // Index of the column to style
-            },
-            {
-                className: 'max-width-column-name', // Apply the CSS class,
-                targets: 8                      // Index of the column to style
-            }],
+        {
+            className: 'max-width-column-name', // Apply the CSS class,
+            targets: 1                      // Index of the column to style
+        },
+        {
+            className: 'max-width-column-number', // Apply the CSS class,
+            targets: 2                     // Index of the column to style
+        },
+        {
+            className: 'max-width-column-name', // Apply the CSS class,
+            targets: 8                      // Index of the column to style
+        }],
         order: [[12, 'asc']],
         fixedHeader: true,
         processing: true,
@@ -162,13 +177,13 @@ $(document).ready(function () {
         $('#refreshIcon').removeClass('fa-spin');
     });
     table.on('mouseenter', '.map-thumbnail', function () {
-            const $this = $(this); // Cache the current element
+        const $this = $(this); // Cache the current element
 
-            // Set a timeout to show the full map after 1 second
-            hoverTimeout = setTimeout(function () {
-                $this.find('.full-map').show(); // Show full map
-            }, 1000); // Delay of 1 second
-        })
+        // Set a timeout to show the full map after 1 second
+        hoverTimeout = setTimeout(function () {
+            $this.find('.full-map').show(); // Show full map
+        }, 1000); // Delay of 1 second
+    })
         .on('mouseleave', '.map-thumbnail', function () {
             const $this = $(this); // Cache the current element
 
@@ -187,9 +202,8 @@ $(document).ready(function () {
         });
     });
 
-
-    $('#customerTable tbody').hide();
-    $('#customerTable tbody').fadeIn(2000);
+    $('#dataTable tbody').hide();
+    $('#dataTable tbody').fadeIn(2000);
 
     if ($("input[type='radio'].selected-case:checked").length) {
         $("#allocatedcase").prop('disabled', false);
@@ -209,7 +223,7 @@ $(document).ready(function () {
     });
 
     // Handle click on checkbox to set state of "Select all" control
-    $('#customerTable tbody').on('change', 'input[type="radio"]', function () {
+    $('#dataTable tbody').on('change', 'input[type="radio"]', function () {
         // If checkbox is not checked
         if (this.checked) {
             $("#allocatedcase").prop('disabled', false);

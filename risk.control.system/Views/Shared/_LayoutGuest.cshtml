@@ -34,8 +34,8 @@
                     CountryCode = admin.Country.Code,
                     Country = $"{admin.Country.Name} ({admin.Country.Code})",
                     IsdCode = $"(+{admin.Country.ISDCode})",
-                    CurrencyCode = $"{admin.Country.CurrencyCode} ({Extensions.GetCultureByCountry(admin.Country.Code.ToUpper()).NumberFormat.CurrencySymbol})",
-                    CurrencyName = $"{admin.Country.CurrencyName} ({Extensions.GetCultureByCountry(admin.Country.Code.ToUpper()).NumberFormat.CurrencySymbol})",
+                    CurrencyCode = $"{admin.Country.CurrencyCode} ({CustomExtensions.GetCultureByCountry(admin.Country.Code.ToUpper()).NumberFormat.CurrencySymbol})",
+                    CurrencyName = $"{admin.Country.CurrencyName} ({CustomExtensions.GetCultureByCountry(admin.Country.Code.ToUpper()).NumberFormat.CurrencySymbol})",
                     Language = admin.Country.Language
                 };
                 <partial name="AdminLTE/_TopGuestNavigation" model="@navigationModel" />
@@ -54,8 +54,8 @@
         <!-- Logout Modal-->
         <partial name="_LogoutGuest" />
     </div>
-    <partial name="AdminLTE/_Scripts"  />
-    <partial name="AdminLTE/_DataTableScriptPartial"  />
+    <partial name="AdminLTE/_Scripts" />
+    <partial name="AdminLTE/_DataTableScriptPartial" />
     <script src="~/js/site.js"></script>
     @RenderSection("Scripts", required: false)
     @await Component.InvokeAsync("Notyf")

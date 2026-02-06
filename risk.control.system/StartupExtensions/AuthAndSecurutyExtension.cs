@@ -15,8 +15,7 @@ using Microsoft.OpenApi;
 
 using risk.control.system.AppConstant;
 using risk.control.system.Models;
-using risk.control.system.Services;
-
+using risk.control.system.Services.Common;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
 namespace risk.control.system.StartupExtensions;

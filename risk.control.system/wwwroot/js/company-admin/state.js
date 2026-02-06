@@ -1,5 +1,4 @@
 ﻿$(document).ready(function () {
-
     $('#Name').focus();
 
     $("#Code").on("input", function () {
@@ -18,8 +17,29 @@
                     $("#CountryName").val(response.countryName); // Populate input with name
                 }
             },
-            error: function () {
-                console.error('Failed to fetch PinCodeName');
+            error: function (xhr, status, error) {
+                console.error("AJAX Error:", status, error);
+                console.error("Response:", xhr.responseText);
+                if (xhr.status === 401 || xhr.status === 403) {
+                    $.confirm({
+                        title: 'Session Expired!',
+                        content: 'Your session has expired or you are unauthorized. You will be redirected to the login page.',
+                        type: 'red',
+                        typeAnimated: true,
+                        buttons: {
+                            Ok: {
+                                text: 'Login',
+                                btnClass: 'btn-red',
+                                action: function () {
+                                    window.location.href = '/Account/Login';
+                                }
+                            }
+                        },
+                        onClose: function () {
+                            window.location.href = '/Account/Login';
+                        }
+                    });
+                }
             }
         });
     }
@@ -54,7 +74,7 @@
         }
     });
 
-    $('#customerTable').DataTable({
+    $('#dataTable').DataTable({
         processing: true,
         serverSide: true,
         ajax: {
@@ -80,7 +100,7 @@
             { data: 'code', orderable: true }, // Make sortable
             { data: 'name', orderable: true }, // Make sortable
             { data: 'countryName', orderable: true },
-            { data: 'updated'},
+            { data: 'updated' },
             {
                 data: 'stateId',
                 render: function (data, type, row) {
@@ -95,7 +115,7 @@
             }
         ],
         "drawCallback": function (setting) {
-            $('#customerTable tbody').on('click', '.btn-warning', function (e) {
+            $('#dataTable tbody').on('click', '.btn-warning', function (e) {
                 e.preventDefault(); // Prevent the default anchor behavior
                 var id = $(this).attr('id').replace('edit', ''); // Extract the ID from the button's ID attribute
                 showedit(id); // Call the getdetails function with the ID
@@ -221,7 +241,7 @@
         var $spinner = $(".submit-progress"); // global spinner (you already have this)
         var id = $(this).data("id");
         var row = $(this).closest("tr");
-        var table = $('#customerTable').DataTable();
+        var table = $('#dataTable').DataTable();
 
         $.confirm({
             title: 'Confirm Deletion',

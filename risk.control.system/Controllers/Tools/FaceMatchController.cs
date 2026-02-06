@@ -1,14 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-
+using risk.control.system.AppConstant;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
-using risk.control.system.Services;
-
-using static risk.control.system.AppConstant.Applicationsettings;
-using risk.control.system.AppConstant;
+using risk.control.system.Services.Agent;
 
 namespace risk.control.system.Controllers.Tools
 {
@@ -23,6 +20,7 @@ namespace risk.control.system.Controllers.Tools
             this.amazonService = amazonService;
             this._userManager = userManager; // Inject UserManager
         }
+
         public async Task<IActionResult> Index()
         {
             var user = await _userManager.GetUserAsync(User);
@@ -37,6 +35,7 @@ namespace risk.control.system.Controllers.Tools
 
             return View(model);
         }
+
         [HttpPost]
         public async Task<IActionResult> Compare(FaceMatchData data)
         {
@@ -57,8 +56,8 @@ namespace risk.control.system.Controllers.Tools
                 }
 
                 // 2. Perform Biometric Comparison
-                var originalFace = await AgentVerificationHelper.GetBytesFromIFormFile(data.OriginalFaceImage);
-                var secondayFace = await AgentVerificationHelper.GetBytesFromIFormFile(data.MatchFaceImage);
+                var originalFace = await VerificationHelper.GetBytesFromIFormFile(data.OriginalFaceImage);
+                var secondayFace = await VerificationHelper.GetBytesFromIFormFile(data.MatchFaceImage);
                 var faceMatchData = await amazonService.CompareFaceMatch(originalFace, secondayFace);
 
                 // 3. Increment Count in Database

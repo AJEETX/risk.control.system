@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication;
 
 using risk.control.system.Middleware;
 using risk.control.system.Permission;
+
 namespace risk.control.system.StartupExtensions;
 
 public static class AppUseExtenstion
@@ -57,8 +58,8 @@ public static class AppUseExtenstion
         app.UseMiddleware<RequirePasswordChangeMiddleware>();
         app.UseMiddleware<CookieConsentMiddleware>();
         app.UseMiddleware<WhitelistListMiddleware>();
-        //app.UseMiddleware<LicensingMiddleware>();
-        //app.UseMiddleware<UpdateUserLastActivityMiddleware>();
+        app.UseMiddleware<LicensingMiddleware>();
+        app.UseMiddleware<UpdateUserLastActivityMiddleware>();
 
         app.UseNotyf();
         app.UseFileServer();

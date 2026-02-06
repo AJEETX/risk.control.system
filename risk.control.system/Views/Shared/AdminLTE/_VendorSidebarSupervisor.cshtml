@@ -5,7 +5,7 @@
         <i class="nav-icon far fa-money-bill-alt"></i>
         <p class="sidebar-menu-header-label">
             CASES
-            <i class="right fas fa-angle-down"></i>
+            <div class="right"><i class="fas fa-angle-down"></i></div>
         </p>
     </a>
 </li>
@@ -23,7 +23,7 @@
     </a>
 </li>
 <li class="nav-item">
-    <a is-active-page asp-controller="SuperVisor" asp-action="ClaimReport" class="actual-link nav-link @Url.MakeActiveClass("SuperVisor","ClaimReport")
+    <a is-active-page asp-controller="SuperVisor" asp-action="CaseReport" class="actual-link nav-link @Url.MakeActiveClass("SuperVisor","CaseReport")
                                                     @Url.MakeActiveClass("SuperVisor","GetInvestigateReport")
                                                     @Url.MakeActiveClass("SuperVisor","ReSelectVendorAgent")">
         <i class="far fa-file-archive nav-icon"></i>
