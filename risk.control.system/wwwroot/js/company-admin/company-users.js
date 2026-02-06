@@ -174,7 +174,7 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    buttons += '<a id=edit' + row.id + '  href="/ManageCompanyUser/EditUser?userId=' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-edit"></i> Edit</a>&nbsp;'
+                    buttons += `<a data-id="${row.id}" class="btn btn-xs btn-warning"><i class="fas fa-edit"></i> Edit</a> &nbsp;`;
                     if (row.role !== "COMPANY_ADMIN") {
                         buttons += '<button class="btn btn-xs btn-danger btn-delete" data-id="' + row.id + '"><i class="fa fa-trash"></i> Delete</button>';
                     } else {
@@ -200,12 +200,6 @@
             }
         },
         "drawCallback": function (settings, start, end, max, total, pre) {
-            $('#dataTable tbody').on('click', '.btn-warning', function (e) {
-                e.preventDefault(); // Prevent the default anchor behavior
-                var id = $(this).attr('id').replace('edit', ''); // Extract the ID from the button's ID attribute
-                showedit(id); // Call the getdetails function with the ID
-                window.location.href = $(this).attr('href'); // Navigate to the edit page
-            });
             // Reinitialize Bootstrap 5 tooltips
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
             tooltipTriggerList.map(function (el) {
@@ -216,12 +210,34 @@
             });
         }
     });
+    $('body').on('click', 'a.btn-warning', function (e) {
+        e.preventDefault();
+        const id = $(this).data('id');
+        showedit(id, this);
+    });
+    function showedit(id, element) {
+        id = String(id).replace(/[^a-zA-Z0-9_-]/g, "");
+        $("body").addClass("submit-progress-bg");
+        setTimeout(() => $(".submit-progress").removeClass("hidden"), 1);
+
+        showSpinnerOnButton(element, "Edit");
+
+        const url = `/ManageCompanyUser/Edit?userId=${encodeURIComponent(id)}`;
+
+        setTimeout(() => {
+            window.location.href = url;
+        }, 1000);
+    }
+    function showSpinnerOnButton(selector, spinnerText) {
+        $(selector).html(`<i class='fas fa-sync fa-spin'></i> ${spinnerText}`);
+    }
+
     $(document).on('click', '.btn-delete', function (e) {
         e.preventDefault();
         var $btn = $(this);
         var $spinner = $(".submit-progress"); // global spinner (you already have this
         const userId = $(this).data('id');
-        const url = '/ManageCompanyUser/DeleteUser';
+        const url = '/ManageCompanyUser/Delete';
         $.confirm({
             title: 'Confirm Deletion',
             content: 'Are you sure you want to delete this case?',

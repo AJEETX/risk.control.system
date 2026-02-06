@@ -62,7 +62,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
         }
 
         [Breadcrumb("Add User")]
-        public async Task<IActionResult> CreateUser()
+        public async Task<IActionResult> Create()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             try
@@ -154,7 +154,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateUser(ApplicationUser model, string emailSuffix)
+        public async Task<IActionResult> Create(ApplicationUser model, string emailSuffix)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             try
@@ -190,7 +190,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
         }
 
         [Breadcrumb("Edit User", FromAction = "Users")]
-        public async Task<IActionResult> EditUser(long? userId)
+        public async Task<IActionResult> Edit(long? userId)
         {
             try
             {
@@ -250,7 +250,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditUser(long id, ApplicationUser model)
+        public async Task<IActionResult> Edit(long id, ApplicationUser model)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             try
@@ -287,7 +287,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteUser(string userId)
+        public async Task<IActionResult> Delete(string userId)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             try

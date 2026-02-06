@@ -198,11 +198,11 @@
         "rowCallback": function (row, data, index) {
             if (!data.agentOnboarded || !data.active || !data.loginVerified) {
                 $('td', row).addClass('lightgrey');
-                $('.btn-warning', row).css('color', '#000');
+                $('.btn-warning', row).addClass('btn-black-color');
             } else {
                 $('td', row).removeClass('lightgrey');
             }
-            $('.btn-danger', row).css('color', '#fff');
+            $('.btn-danger', row).addClass('btn-white-color');
 
         },
         "drawCallback": function (settings, start, end, max, total, pre) {
@@ -250,10 +250,10 @@
 
         showSpinnerOnButton(element, "Edit");
 
-        const editUrl = `/AgencyUser/Edit?userId=${encodeURIComponent(id)}`;
+        const url = `/AgencyUser/Edit?userId=${encodeURIComponent(id)}`;
 
         setTimeout(() => {
-            window.location.href = editUrl;
+            window.location.href = url;
         }, 1000);
     }
     function showdetail(id, element) {
@@ -261,7 +261,7 @@
         $("body").addClass("submit-progress-bg");
         setTimeout(() => $(".submit-progress").removeClass("hidden"), 1);
 
-        showSpinnerOnButton(element, "Edit");
+        showSpinnerOnButton(element, "Delete");
 
         const editUrl = `/AgencyUser/Delete?userId=${encodeURIComponent(id)}`;
 

@@ -154,8 +154,7 @@ namespace risk.control.system.Services.Api
                 var customerName = a.CustomerName ?? "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\"></i> </span>";
                 var beneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryName) ?
                     "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\"></i> </span>" : a.BeneficiaryName;
-                var PersonMapAddressUrl = string.Format(a.investigation.GetMap(isUW, a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER,
-                                                          a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR), "400", "400");
+                var PersonMapAddressUrl = string.Format(GetMap(a.investigation, isUW, a.CustomerLocationMap, a.BeneficiaryLocationMap, a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR), "400", "400");
 
                 // Fetch files in parallel for this row
                 var docTask = base64FileService.GetBase64FileAsync(a.PolicyDocumentPath, Applicationsettings.NO_POLICY_IMAGE);
@@ -236,6 +235,15 @@ namespace risk.control.system.Services.Api
             var rejectedStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR;
             var rejectedCases = await GetCompletedCases(userEmail, rejectedStatus, draw, start, length, search, caseType, orderColumn, orderDir);
             return rejectedCases;
+        }
+
+        public static string GetMap(InvestigationTask caseTask, bool caseType, string CustomerLocationMap, string BeneficiaryLocationMap, bool allocatedtoAgency = false)
+        {
+            if (allocatedtoAgency)
+            {
+                return caseType ? CustomerLocationMap : BeneficiaryLocationMap;
+            }
+            return caseTask.SelectedAgentDrivingMap;
         }
 
         private async Task<object> GetCompletedCases(string userEmail, string subStatus, int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc")
@@ -371,7 +379,7 @@ namespace risk.control.system.Services.Api
                     Service = a.ServiceTypeName,
                     Location = a.SubStatus,
                     Created = a.Created.ToString("dd-MM-yyyy"),
-                    timePending = CaseExtension.GetAssessorTime(a.investigation, false, true),
+                    timePending = GetAssessorCompletedTime(a.ProcessedByAssessorTime.Value),
                     BeneficiaryName = a.BeneficiaryName,
                     PersonMapAddressUrl = string.Format(a.SelectedAgentDrivingMap, "300", "300"),
                     Distance = a.SelectedAgentDrivingDistance,
@@ -390,6 +398,29 @@ namespace risk.control.system.Services.Api
                 RecordsFiltered = recordsFiltered,
                 Data = finalData.ToArray()
             };
+        }
+
+        public static string GetAssessorCompletedTime(DateTime ProcessedByAssessorTime)
+        {
+            DateTime time2Compare = ProcessedByAssessorTime;
+
+            if (DateTime.Now.Subtract(time2Compare).Days >= 1)
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(time2Compare).Days} day</span>");
+
+            if (DateTime.Now.Subtract(time2Compare).Hours < 24 &&
+                DateTime.Now.Subtract(time2Compare).Hours > 0)
+            {
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(time2Compare).Hours} hr </span>");
+            }
+            if (DateTime.Now.Subtract(time2Compare).Hours == 0 && DateTime.Now.Subtract(time2Compare).Minutes > 0)
+            {
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(time2Compare).Minutes} min </span>");
+            }
+            if (DateTime.Now.Subtract(time2Compare).Minutes == 0 && DateTime.Now.Subtract(time2Compare).Seconds > 0)
+            {
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(time2Compare).Seconds} sec </span>");
+            }
+            return string.Join("", "<span class='badge badge-light'>now</span>");
         }
 
         private static string GetManagerActiveTimePending(InvestigationTask caseTask)

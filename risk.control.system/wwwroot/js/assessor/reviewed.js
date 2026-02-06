@@ -255,7 +255,7 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    buttons += '<a id="details' + row.id + '" href="ReviewDetail?Id=' + row.id + '" class="active-claims btn btn-xs btn-info"><i class="fa fa-search"></i> Detail</a>&nbsp;'
+                    buttons += `<a data-id="${row.id}" class="active-claims btn btn-xs btn-info"><i class="fas fa-search"></i> Detail</a>`
 
                     //if (row.withdrawable) {
                     //    buttons += '<a href="withdraw?Id=' + row.id + '" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i> Withdraw</a>&nbsp;'
@@ -267,13 +267,13 @@
             { "data": "timeElapsed", "bVisible": false },
             { "data": "policy", bVisible: false }
         ],
+        rowCallback: function (row, data, index) {
+            
+            $('.btn-info', row).addClass('btn-white-color');
+
+        },
         "drawCallback": function (settings, start, end, max, total, pre) {
-            $('#dataTable tbody').on('click', '.btn-info', function (e) {
-                e.preventDefault(); // Prevent the default anchor behavior
-                var id = $(this).attr('id').replace('details', ''); // Extract the ID from the button's ID attribute
-                getdetails(id); // Call the getdetails function with the ID
-                window.location.href = $(this).attr('href'); // Navigate to the delete page
-            });
+            
             // Reinitialize Bootstrap 5 tooltips
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
             tooltipTriggerList.map(function (el) {
@@ -284,6 +284,27 @@
             });
         }
     });
+    $('body').on('click', 'a.btn-info', function (e) {
+        e.preventDefault();
+        const id = $(this).data('id');
+        showdetail(id, this);
+    });
+    function showdetail(id, element) {
+        id = String(id).replace(/[^a-zA-Z0-9_-]/g, "");
+        $("body").addClass("submit-progress-bg");
+        setTimeout(() => $(".submit-progress").removeClass("hidden"), 1);
+
+        showSpinnerOnButton(element, "Detail");
+
+        const url = `/Assessor/ReviewDetail?Id=${encodeURIComponent(id)}`;
+
+        setTimeout(() => {
+            window.location.href = url;
+        }, 1000);
+    }
+    function showSpinnerOnButton(selector, spinnerText) {
+        $(selector).html(`<i class='fas fa-sync fa-spin'></i> ${spinnerText}`);
+    }
     $('#caseTypeFilter').on('change', function () {
         table.column('policy:name').search(this.value).draw(); // Column index 9 corresponds to "Case Type"
     });

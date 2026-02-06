@@ -298,13 +298,12 @@
                 "mRender": function (data, type, row) {
                     var buttons = "";
                     if (row.ready2Assign) {
-                        buttons += '<a  id="assign' + row.id + '" href="/Investigation/EmpanelledVendors?Id=' + row.id + '" class="btn btn-xs btn-info refresh-btn" data-id="' + row.id + '">';
-                        buttons += '<i class="fas fa-external-link-alt"></i> Assign</a>&nbsp;';
+                        buttons += `<a data-id="${row.id}" class="btn btn-xs btn-info refresh-btn"><i class="fas fa-external-link-alt"></i> Assign</a>&nbsp;`;
                     } else {
                         buttons += '<button disabled class="btn btn-xs btn-info"><i class="fas fa-external-link-alt"></i> Assign</button>&nbsp;';
                     }
 
-                    buttons += '<a id="edit' + row.id + '" href="/Investigation/Details?Id=' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-edit"></i> Edit</a>&nbsp;';
+                    buttons += `<a data-id="${row.id}" class="btn btn-xs btn-warning"><i class="fas fa-edit"></i> Edit</a> &nbsp;`;
 
                     buttons += '<button id="details' + row.id + '" class="btn btn-xs btn-danger"><i class="fa fa-trash "></i> Delete </button>';
 
@@ -322,6 +321,8 @@
                     $('td', row).removeClass('isNewAssigned');
                 }, 3000);
             }
+            $('.btn-info', row).addClass('btn-white-color');
+
         },
         "drawCallback": function (settings) {
             var api = this.api();
@@ -337,18 +338,6 @@
                 $('#allocatedcase').prop('disabled', true);
             }
 
-            $('#dataTable tbody').on('click', '.btn-info', function (e) {
-                e.preventDefault(); // Prevent the default anchor behavior
-                var id = $(this).attr('id').replace('assign', ''); // Extract the ID from the button's ID attribute
-                assign(id); // Call the getdetails function with the ID
-                window.location.href = $(this).attr('href'); // Navigate to the delete page
-            });
-            $('#dataTable tbody').on('click', '.btn-warning', function (e) {
-                e.preventDefault(); // Prevent the default anchor behavior
-                var id = $(this).attr('id').replace('edit', ''); // Extract the ID from the button's ID attribute
-                showedit(id); // Call the getdetails function with the ID
-                window.location.href = $(this).attr('href'); // Navigate to the edit page
-            });
             // Reinitialize Bootstrap 5 tooltips
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
             tooltipTriggerList.map(function (el) {
@@ -358,6 +347,46 @@
                 });
             });
         }
+    });
+    function showedit(id, element) {
+        id = String(id).replace(/[^a-zA-Z0-9_-]/g, "");
+        $("body").addClass("submit-progress-bg");
+        setTimeout(() => $(".submit-progress").removeClass("hidden"), 1);
+
+        showSpinnerOnButton(element, "Edit");
+
+        const editUrl = `/Investigation/Details?Id=${encodeURIComponent(id)}`;
+
+        setTimeout(() => {
+            window.location.href = editUrl;
+        }, 1000);
+    }
+    function showdetail(id, element) {
+        id = String(id).replace(/[^a-zA-Z0-9_-]/g, "");
+        $("body").addClass("submit-progress-bg");
+        setTimeout(() => $(".submit-progress").removeClass("hidden"), 1);
+
+        showSpinnerOnButton(element, "Assign");
+
+        const editUrl = `/Investigation/EmpanelledVendors?Id=${encodeURIComponent(id)}`;
+
+        setTimeout(() => {
+            window.location.href = editUrl;
+        }, 1000);
+    }
+    function showSpinnerOnButton(selector, spinnerText) {
+        $(selector).html(`<i class='fas fa-sync fa-spin'></i> ${spinnerText}`);
+    }
+    // Event delegation for dynamically generated Edit and Delete buttons
+    $('body').on('click', 'a.btn-warning', function (e) {
+        e.preventDefault();
+        const id = $(this).data('id');
+        showedit(id, this);
+    });
+    $('body').on('click', 'a.btn-info', function (e) {
+        e.preventDefault();
+        const id = $(this).data('id');
+        showdetail(id, this);
     });
 
     $('#caseTypeFilter').on('change', function () {
@@ -805,60 +834,3 @@
         $("#mapModalLabel").text(title || "Map Preview");
     });
 });
-
-function showedit(id) {
-    $("body").addClass("submit-progress-bg");
-    // Wrap in setTimeout so the UI
-    // can update the spinners
-    setTimeout(function () {
-        $(".submit-progress").removeClass("hidden");
-    }, 1);
-
-    $('a#edit' + id + '.btn.btn-xs.btn-warning').html("<i class='fas fa-sync fa-spin'></i> Edit");
-
-    disableAllInteractiveElements();
-
-    var article = document.getElementById("article");
-    if (article) {
-        var nodes = article.getElementsByTagName('*');
-        for (var i = 0; i < nodes.length; i++) {
-            nodes[i].disabled = true;
-        }
-    }
-}
-function getdetails(id) {
-    $("body").addClass("submit-progress-bg");
-    // Wrap in setTimeout so the UI
-    // can update the spinners
-    setTimeout(function () {
-        $(".submit-progress").removeClass("hidden");
-    }, 1);
-
-    $('a#details' + id + '.btn.btn-xs.btn-danger').html("<i class='fas fa-sync fa-spin'></i> Delete");
-    disableAllInteractiveElements();
-    var article = document.getElementById("article");
-    if (article) {
-        var nodes = article.getElementsByTagName('*');
-        for (var i = 0; i < nodes.length; i++) {
-            nodes[i].disabled = true;
-        }
-    }
-}
-function assign(id) {
-    $("body").addClass("submit-progress-bg");
-    // Wrap in setTimeout so the UI
-    // can update the spinners
-    setTimeout(function () {
-        $(".submit-progress").removeClass("hidden");
-    }, 1);
-
-    $('a#assign' + id + '.btn.btn-xs.btn-info').html("<i class='fas fa-sync fa-spin'></i> Assign");
-    disableAllInteractiveElements();
-    var article = document.getElementById("article");
-    if (article) {
-        var nodes = article.getElementsByTagName('*');
-        for (var i = 0; i < nodes.length; i++) {
-            nodes[i].disabled = true;
-        }
-    }
-}

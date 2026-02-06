@@ -23,7 +23,7 @@
 		</li>
 		<li class="nav-item">
 			<a is-active-page asp-controller="ManageCompanyUser" asp-action="Users"
-			   class="actual-link nav-link @Url.MakeActiveClass("ManageCompanyUser","Users") @Url.MakeActiveClass("ManageCompanyUser","EditUser")">
+			   class="actual-link nav-link @Url.MakeActiveClass("ManageCompanyUser","Users") @Url.MakeActiveClass("ManageCompanyUser","Edit")">
 				<i class="fas fa-user-friends nav-icon"></i>
 				<p>
 					@Applicationsettings.COMPANY_USERS
@@ -32,7 +32,7 @@
 		</li>
 		<li class="nav-item">
 			<a is-active-page asp-controller="CreateCompanyUser" asp-action="CreateUser"
-			   class="actual-link nav-link @Url.MakeActiveClass("CreateCompanyUser", "CreateUser")">
+			   class="actual-link nav-link @Url.MakeActiveClass("CreateCompanyUser", "Create")">
 				<i class="fas fa-user-plus nav-icon"></i>
 				<p>
 					Add User
