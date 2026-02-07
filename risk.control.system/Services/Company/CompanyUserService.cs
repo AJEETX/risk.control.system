@@ -14,7 +14,7 @@ namespace risk.control.system.Services.Company
     {
         Task<ServiceResult> CreateAsync(ApplicationUser model, string emailSuffix, string performedBy, string portal_base_url);
 
-        Task<ServiceResult> UpdateAsync(long id, ApplicationUser model, string performedBy, string portal_base_url);
+        Task<ServiceResult> UpdateAsync(string id, ApplicationUser model, string performedBy, string portal_base_url);
     }
 
     public sealed class CompanyUserService : ICompanyUserService
@@ -96,11 +96,11 @@ namespace risk.control.system.Services.Company
             }
         }
 
-        public async Task<ServiceResult> UpdateAsync(long id, ApplicationUser model, string performedBy, string portal_base_url)
+        public async Task<ServiceResult> UpdateAsync(string id, ApplicationUser model, string performedBy, string portal_base_url)
         {
             try
             {
-                var user = await _userManager.FindByIdAsync(id.ToString());
+                var user = await _userManager.FindByIdAsync(id);
                 if (user == null)
                     return Fail("User not found.");
                 var result = new ServiceResult();

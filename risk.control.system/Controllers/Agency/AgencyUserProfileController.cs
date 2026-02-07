@@ -106,6 +106,7 @@ namespace risk.control.system.Controllers.Agency
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(string id, ApplicationUser model)
         {
+            var userEmail = HttpContext.User?.Identity?.Name;
             try
             {
                 if (!ModelState.IsValid)
@@ -118,7 +119,7 @@ namespace risk.control.system.Controllers.Agency
                     notifyService.Error("OOPS !!!..Contact Admin");
                     return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
-                var result = await vendorUserService.UpdateUserAsync(id, model, User?.Identity?.Name, portal_base_url);
+                var result = await vendorUserService.UpdateUserAsync(id, model, userEmail, portal_base_url);
 
                 if (!result.Success)
                 {
@@ -135,7 +136,7 @@ namespace risk.control.system.Controllers.Agency
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error editing {UserId} for {UserEmail}", id, HttpContext.User?.Identity?.Name ?? "Anonymous");
+                logger.LogError(ex, "Error editing {UserId} for {UserEmail}", id, userEmail ?? "Anonymous");
                 notifyService.Error("OOPS !!!..Contact Admin");
             }
             return this.RedirectToAction<DashboardController>(x => x.Index());
@@ -145,9 +146,9 @@ namespace risk.control.system.Controllers.Agency
         [Breadcrumb("Change Password ")]
         public async Task<IActionResult> ChangePassword()
         {
+            var userEmail = HttpContext.User?.Identity?.Name;
             try
             {
-                var userEmail = HttpContext.User?.Identity?.Name;
                 var vendorUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
                 if (vendorUser != null)
                 {
@@ -157,7 +158,7 @@ namespace risk.control.system.Controllers.Agency
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error for {UserEmail}", HttpContext.User?.Identity?.Name ?? "Anonymous");
+                logger.LogError(ex, "Error for {UserEmail}", userEmail ?? "Anonymous");
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return this.RedirectToAction<DashboardController>(x => x.Index());
             }
