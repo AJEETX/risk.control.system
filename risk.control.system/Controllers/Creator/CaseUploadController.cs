@@ -3,6 +3,7 @@
 using AspNetCoreHero.ToastNotification.Abstractions;
 
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
@@ -22,18 +23,21 @@ namespace risk.control.system.Controllers.Creator
     {
         private readonly ApplicationDbContext context;
         private readonly IWebHostEnvironment env;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILicenseService licenseService;
         private readonly ILogger<CaseUploadController> logger;
         private readonly INotyfService notifyService;
 
         public CaseUploadController(ApplicationDbContext context,
             IWebHostEnvironment env,
+            UserManager<ApplicationUser> userManager,
             ILicenseService licenseService,
             ILogger<CaseUploadController> logger,
             INotyfService notifyService)
         {
             this.context = context;
             this.env = env;
+            _userManager = userManager;
             this.licenseService = licenseService;
             this.logger = logger;
             this.notifyService = notifyService;
@@ -95,9 +99,10 @@ namespace risk.control.system.Controllers.Creator
                 {
                     SendLicenseNotifications(licenseStatus);
                 }
-
+                var isManager = await _userManager.IsInRoleAsync(companyUser, MANAGER.DISPLAY_NAME);
                 return View(new CreateClaims
                 {
+                    IsManager = isManager,
                     BulkUpload = companyUser.ClientCompany.BulkUpload,
                     UserCanCreate = licenseStatus.CanCreate,
                     HasClaims = licenseStatus.HasClaimsPending,

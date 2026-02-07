@@ -194,7 +194,7 @@ $(document).ready(function () {
                         </a>
                         <a href="#" data-id="${row.id}" data-action="delete"
                            class="action-btn btn btn-xs btn-danger">
-                            <i class="fas fa-trash"></i> Delete
+                            <i class="fa fa-trash"></i> Delete
                         </a>
                     `;
                 }

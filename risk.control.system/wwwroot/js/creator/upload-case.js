@@ -222,7 +222,7 @@
                                 <i class="fa fa-download"></i> Download
                             </button>`;
 
-                    img += '<button class="btn-xs btn-danger upload-delete" data-id="' + row.id + '" title="Delete" data-bs-toggle="tooltip"><i class="fas fa-trash"></i> Delete </button>';
+                    img += '<button class="btn-xs btn-danger upload-delete" data-id="' + row.id + '" title="Delete" data-bs-toggle="tooltip"><i class="fa fa-trash"></i> Delete </button>';
                     return img;
                 }
             }

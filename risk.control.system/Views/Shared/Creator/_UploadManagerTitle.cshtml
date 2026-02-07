@@ -6,22 +6,11 @@
         <span class="hover-text">
             <i class="fas fa-info-circle"></i>
             <span class="tooltip-text" id="information">
-                    <li>
-                    <i class='far fa-hand-point-right'></i>
-                    @if (Model.BulkUpload)
-                    {
-                        <button class='btn btn-info  btn-xs'><i class='fa fa-upload'></i> Upload File </button>
-                    }
 
-                    else
-                    {
-                        <button disabled class='btn btn-info  btn-xs'><i class='fa fa-upload'></i> Upload File </button>
-                    }
-                </li>
                 @if (Model.HasFileUploads)
                 {
                     <li>
-                        <i class='far fa-hand-point-down'></i>  
+                        <i class='far fa-hand-point-down'></i>
                         <button class='badge xs i-green upload-success'>
                             <span class="badge badge-outline-success"><i class='fa fa-check'></i> </span> Success
                         </button>
@@ -43,8 +32,6 @@
                     </li>
                 }
             </span>
-
         </span>
     </h3>
-    
 </div>
