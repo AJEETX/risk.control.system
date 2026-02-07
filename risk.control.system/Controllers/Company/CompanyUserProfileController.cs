@@ -7,7 +7,6 @@ using risk.control.system.AppConstant;
 using risk.control.system.Controllers.Common;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
-using risk.control.system.Models.ViewModel;
 using risk.control.system.Services.Common;
 using risk.control.system.Services.Company;
 using SmartBreadcrumbs.Attributes;
@@ -168,44 +167,6 @@ namespace risk.control.system.Controllers.Company
                 notifyService.Error("Error occurred. Try again.");
                 return this.RedirectToAction<DashboardController>(x => x.Index());
             }
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
-        {
-            if (!ModelState.IsValid)
-                return View(model);
-            var userEmail = HttpContext.User.Identity.Name;
-            try
-            {
-                var result = await accountService.ChangePasswordAsync(model, User, HttpContext.User.Identity.IsAuthenticated, portal_base_url);
-
-                if (!result.Success)
-                {
-                    notifyService.Error(result.Message);
-
-                    foreach (var error in result.Errors)
-                        ModelState.AddModelError(error.Key, error.Value);
-
-                    return View(model);
-                }
-
-                return View("ChangePasswordConfirmation");
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Error change user password. {UserEmail}", userEmail);
-                notifyService.Error("OOPS !!!..Contact Admin");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
-            }
-        }
-
-        [HttpGet]
-        [Breadcrumb("Password Change Success")]
-        public IActionResult ChangePasswordConfirmation()
-        {
-            notifyService.Custom($"Password edited successfully.", 3, "orange", "fas fa-user");
-            return View();
         }
     }
 }

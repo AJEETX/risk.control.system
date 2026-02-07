@@ -45,7 +45,7 @@
                                 </a>
                                 &nbsp;
                                 <a class="btn btn-xs btn-danger" href="/Country/Delete/${data}">
-                                    <i class="fas fa-trash"></i> Delete
+                                    <i class="fa fa-trash"></i> Delete
                                 </a>`;
                 }
             },

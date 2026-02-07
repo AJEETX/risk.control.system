@@ -99,7 +99,7 @@
                     let editBtn = `<button class="btn btn-xs btn-warning edit-template" data-id="${row.id}"><i class="fas fa-edit"></i> Edit</button>`;
                     let cloneBtn = `<button class="btn btn-xs btn-secondary  clone-btn" data-id="${row.id}"><i class="fas fa-copy"></i> Clone</button>`;
                     let deleteBtn = row.isActive ?
-                        `<button class="btn btn-xs btn-danger" disabled><i class="fas fa-trash"></i> Delete</button>` : `<button class="btn btn-xs btn-danger delete-template" data-id="${row.id}"><i class="fas fa-trash"></i> Delete</button>`;
+                        `<button class="btn btn-xs btn-danger" disabled><i class="fa fa-trash"></i> Delete</button>` : `<button class="btn btn-xs btn-danger delete-template" data-id="${row.id}"><i class="fas fa-trash"></i> Delete</button>`;
 
                     return `${activateBtn} ${cloneBtn} ${editBtn} ${deleteBtn}`;
                 }

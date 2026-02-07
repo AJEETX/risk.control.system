@@ -186,7 +186,7 @@
                         buttons += '<button id="' + row.id + '" class="btn btn-xs btn-danger"><i class="fa fa-trash "></i> Delete </button>';
                     }
                     else {
-                        buttons += '<button disabled class="btn btn-xs btn-danger" data-bs-toggle="tooltip" title="Delete Disabled"><i class="fas fa-trash"></i> Delete</a>';
+                        buttons += '<button disabled class="btn btn-xs btn-danger" data-bs-toggle="tooltip" title="Delete Disabled"><i class="fa fa-trash"></i> Delete</a>';
                     }
                     return buttons;
                 }
