@@ -4,17 +4,12 @@ using System.Threading.RateLimiting;
 
 using AspNetCoreHero.ToastNotification;
 
-using Hangfire;
-using Hangfire.MemoryStorage;
-
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.FeatureManagement;
 using Microsoft.FeatureManagement.FeatureFilters;
 using risk.control.system.Controllers.Api.PortalAdmin;
-using risk.control.system.Models;
 using risk.control.system.Permission;
 using risk.control.system.Services;
 using risk.control.system.Services.Agency;
@@ -253,17 +248,6 @@ public static class BusinessServiceExtension
         services.AddScoped<IHttpClientService, HttpClientService>();
         services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
         services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
-
-        var connectionString = "Data Source=" + Environment.GetEnvironmentVariable("COUNTRY") + "_" + configuration.GetConnectionString("Database");
-        services.AddDbContext<ApplicationDbContext>(options =>
-                                options.UseSqlite(connectionString,
-                sqlOptions => sqlOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)));
-        services.AddHangfire(config => config.UseMemoryStorage());
-        services.AddHangfireServer(options =>
-        {
-            options.WorkerCount = 5;
-            options.Queues = new[] { "default", "emails", "critical" };
-        });
 
         return services;
     }

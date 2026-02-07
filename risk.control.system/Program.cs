@@ -26,6 +26,8 @@ builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnC
 
 builder.Services.AddBusinessServices(builder.Configuration);
 
+builder.Services.AddDatastoreServices(builder.Configuration, env);
+
 builder.Services.AddAwsServices(builder.Configuration);
 
 builder.WebHost.ConfigureKestrel(serverOptions =>
@@ -40,6 +42,8 @@ try
     var app = builder.Build();
 
     await app.UseServices(builder.Configuration);
+    AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", false);
+
     await app.RunAsync();
 }
 catch (Exception ex)

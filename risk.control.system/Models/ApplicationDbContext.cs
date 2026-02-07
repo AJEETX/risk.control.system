@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using risk.control.system.Models.ViewModel;
 
 namespace risk.control.system.Models
@@ -13,6 +13,22 @@ namespace risk.control.system.Models
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+            var utcConverter = new ValueConverter<DateTime, DateTime>(
+            v => v.Kind == DateTimeKind.Utc ? v : v.ToUniversalTime(),
+            v => DateTime.SpecifyKind(v, DateTimeKind.Utc)
+        );
+
+            foreach (var entityType in builder.Model.GetEntityTypes())
+            {
+                foreach (var property in entityType.GetProperties())
+                {
+                    if (property.ClrType == typeof(DateTime))
+                    {
+                        property.SetValueConverter(utcConverter);
+                        property.SetColumnType("timestamptz");
+                    }
+                }
+            }
         }
         public virtual DbSet<BsbInfo> BsbInfo { get; set; }
         public virtual DbSet<EducationType> EducationType { get; set; }
