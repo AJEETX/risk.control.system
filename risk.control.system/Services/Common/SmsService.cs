@@ -20,11 +20,13 @@ namespace risk.control.system.Services.Common
     {
         private readonly IFeatureManager featureManager;
         private readonly IHttpClientFactory httpClientFactory;
+        private readonly ILogger<SmsService> logger;
 
-        public SmsService(IFeatureManager featureManager, IHttpClientFactory httpClientFactory)
+        public SmsService(IFeatureManager featureManager, IHttpClientFactory httpClientFactory, ILogger<SmsService> logger)
         {
             this.featureManager = featureManager;
             this.httpClientFactory = httpClientFactory;
+            this.logger = logger;
         }
 
         public async Task DoSendSmsAsync(string countryCode, string mobile, string message, bool onboard = false)
@@ -65,7 +67,7 @@ namespace risk.control.system.Services.Common
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error sending SMS: " + ex.Message);
+                logger.LogError("Error sending SMS to Mobile {Number} with Error {Message}: ", mobile, ex.Message);
                 return string.Empty;
             }
         }

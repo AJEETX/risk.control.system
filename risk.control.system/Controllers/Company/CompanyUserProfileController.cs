@@ -7,7 +7,6 @@ using risk.control.system.AppConstant;
 using risk.control.system.Controllers.Common;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
-using risk.control.system.Services.Common;
 using risk.control.system.Services.Company;
 using SmartBreadcrumbs.Attributes;
 
@@ -20,20 +19,17 @@ namespace risk.control.system.Controllers.Company
         private readonly INotyfService notifyService;
         private readonly ApplicationDbContext _context;
         private readonly ICompanyUserService companyUserService;
-        private readonly IAccountService accountService;
         private readonly ILogger<CompanyUserProfileController> logger;
         private readonly string portal_base_url = string.Empty;
 
         public CompanyUserProfileController(ApplicationDbContext context,
             ICompanyUserService companyUserService,
-            IAccountService accountService,
             INotyfService notifyService,
              IHttpContextAccessor httpContextAccessor,
             ILogger<CompanyUserProfileController> logger)
         {
             this._context = context;
             this.companyUserService = companyUserService;
-            this.accountService = accountService;
             this.notifyService = notifyService;
             this.logger = logger;
             var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
@@ -86,7 +82,7 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error editing user Profile. {UserEmail}", userEmail);
+                logger.LogError(ex, "Error getting user {UserId} Profile. {UserEmail}", userId, userEmail);
                 notifyService.Error("Error getting user Profile. Try again.");
                 return this.RedirectToAction<DashboardController>(x => x.Index());
             }
@@ -94,7 +90,7 @@ namespace risk.control.system.Controllers.Company
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(long id, ApplicationUser model)
+        public async Task<IActionResult> Edit(string id, ApplicationUser model)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             try
@@ -105,7 +101,7 @@ namespace risk.control.system.Controllers.Company
                     await LoadModel(model, userEmail);
                     return View(model);
                 }
-                var result = await companyUserService.UpdateAsync(id, model, User.Identity?.Name, portal_base_url);
+                var result = await companyUserService.UpdateAsync(id, model, userEmail, portal_base_url);
 
                 if (!result.Success)
                 {
@@ -115,14 +111,14 @@ namespace risk.control.system.Controllers.Company
                     }
 
                     notifyService.Error("Correct the highlighted errors.");
-                    await LoadModel(model, User.Identity?.Name);
+                    await LoadModel(model, userEmail);
                     return View(model); // 🔥 fields now highlight
                 }
                 notifyService.Success(result.Message);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error editing user Profile. {UserEmail}", userEmail);
+                logger.LogError(ex, "Error editing user {UserId} Profile. {UserEmail}", id, userEmail);
                 notifyService.Error("Error getting user Profile. Try again.");
             }
             return this.RedirectToAction<DashboardController>(x => x.Index());

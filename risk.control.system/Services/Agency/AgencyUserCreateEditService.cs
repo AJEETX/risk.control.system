@@ -17,10 +17,10 @@ namespace risk.control.system.Services.Agency
     public interface IAgencyUserCreateEditService
     {
         Task<(bool Success, string Message, Dictionary<string, string> Errors)> CreateVendorUserAsync(CreateVendorUserRequest request, ModelStateDictionary modelState, string portal_base_url);
+
         Task<(bool Success, string Message, Dictionary<string, string> Errors)> EditVendorUserAsync(EditVendorUserRequest request, ModelStateDictionary modelState, string portal_base_url);
-
-
     }
+
     public class AgencyUserCreateEditService : IAgencyUserCreateEditService
     {
         private readonly IValidateImageService validateImageService;
@@ -104,6 +104,7 @@ namespace risk.control.system.Services.Agency
 
             return (true, $"User {email} created successfully.", errors);
         }
+
         public async Task<(bool Success, string Message, Dictionary<string, string> Errors)> EditVendorUserAsync(EditVendorUserRequest request, ModelStateDictionary modelState, string portal_base_url)
         {
             var input = request.Model;
@@ -152,6 +153,7 @@ namespace risk.control.system.Services.Agency
 
             return (true, $"User {user.Email} updated successfully", errors);
         }
+
         private async Task SaveProfileImageAsync(ApplicationUser model, string suffix)
         {
             var safeFolder = Regex.Replace(suffix, @"[^a-zA-Z0-9\-\.]", "");
@@ -161,6 +163,7 @@ namespace risk.control.system.Services.Agency
             model.ProfilePictureUrl = path;
             model.ProfilePictureExtension = Path.GetExtension(fileName);
         }
+
         private static void PopulateUserEntity(ApplicationUser model, string email, string createdBy)
         {
             model.Email = email;
@@ -180,6 +183,7 @@ namespace risk.control.system.Services.Agency
             model.CountryId = model.SelectedCountryId;
             model.IsVendorAdmin = model.Role == AppRoles.AGENCY_ADMIN;
         }
+
         private async Task HandleLockAndNotificationsAsync(ApplicationUser user, string portal_base_url, bool created = true)
         {
             await _userManager.SetLockoutEnabledAsync(user, !user.Active);
@@ -235,6 +239,7 @@ namespace risk.control.system.Services.Agency
                 }
             }
         }
+
         private async Task UpdateGeoLocationAsync(ApplicationUser user)
         {
             if (user.Role != AppRoles.AGENT)
@@ -258,13 +263,12 @@ namespace risk.control.system.Services.Agency
 
                 user.AddressLatitude = coordinates.Latitude;
                 user.AddressLongitude = coordinates.Longitude;
-                user.AddressMapLocation =
-                    $"https://maps.googleapis.com/maps/api/staticmap?center={latLong}&zoom=14&size=200x200" +
+                user.AddressMapLocation = $"https://maps.googleapis.com/maps/api/staticmap?center={latLong}&zoom=14&size=200x200" +
                     $"&maptype=roadmap&markers=color:red%7C{latLong}" +
                     $"&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
             }
-
         }
+
         private async Task UpdateUserRolesAsync(ApplicationUser user)
         {
             var existingRoles = await _userManager.GetRolesAsync(user);
@@ -274,6 +278,7 @@ namespace risk.control.system.Services.Agency
 
             await _userManager.AddToRoleAsync(user, user.Role.ToString());
         }
+
         private static void UpdateUserFields(ApplicationUser input, ApplicationUser user, string updatedBy)
         {
             user.ProfilePictureUrl = input.ProfilePictureUrl ?? user.ProfilePictureUrl;

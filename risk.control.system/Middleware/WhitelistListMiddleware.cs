@@ -1,12 +1,11 @@
-﻿using Microsoft.FeatureManagement;
-
-namespace risk.control.system.Middleware
+﻿namespace risk.control.system.Middleware
 {
     public class WhitelistListMiddleware
     {
         private readonly RequestDelegate _next;
         private readonly ILogger<WhitelistListMiddleware> _logger;
         private readonly IConfiguration config;
+
         public WhitelistListMiddleware(RequestDelegate next, ILogger<WhitelistListMiddleware> logger, IConfiguration config)
         {
             _next = next;
@@ -25,7 +24,7 @@ namespace risk.control.system.Middleware
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.StackTrace);
+                _logger.LogError(ex, "Error ocurred. {UserId}", context?.User?.Identity?.Name ?? "Anonymous");
                 return;
             }
         }
