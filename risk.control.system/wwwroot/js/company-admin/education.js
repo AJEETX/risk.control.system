@@ -52,7 +52,7 @@
                         </a>
                         &nbsp;
                         <button type="button" class="btn btn-xs btn-danger delete-item" data-id="${data}">
-                            <i class="fas fa-trash"></i> Delete
+                            <i class="fa fa-trash"></i> Delete
                         </button>`;
                 }
             }

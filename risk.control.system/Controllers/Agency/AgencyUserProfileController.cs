@@ -151,7 +151,8 @@ namespace risk.control.system.Controllers.Agency
                 var vendorUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
                 if (vendorUser != null)
                 {
-                    return View();
+                    var model = new ChangePasswordViewModel { Id = vendorUser.Id };
+                    return View(model);
                 }
             }
             catch (Exception ex)
@@ -162,45 +163,6 @@ namespace risk.control.system.Controllers.Agency
             }
             notifyService.Error("OOPS !!!..Contact Admin");
             return this.RedirectToAction<DashboardController>(x => x.Index());
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
-        {
-            if (!ModelState.IsValid)
-                return View(model);
-
-            try
-            {
-                var result = await accountService.ChangePasswordAsync(model, User, HttpContext.User.Identity.IsAuthenticated, portal_base_url);
-
-                if (!result.Success)
-                {
-                    notifyService.Error(result.Message);
-
-                    foreach (var error in result.Errors)
-                        ModelState.AddModelError(error.Key, error.Value);
-
-                    return View(model);
-                }
-
-                return View("ChangePasswordConfirmation");
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Error for changing password . {UserEmail}", HttpContext.User?.Identity?.Name ?? "Anonymous");
-                notifyService.Error("OOPS !!!..Contact Admin");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
-            }
-        }
-
-        [HttpGet]
-        [Breadcrumb("Password Change Succees")]
-        public IActionResult ChangePasswordConfirmation()
-        {
-            notifyService.Custom($"Password edited successfully.", 3, "orange", "fas fa-user");
-            return View();
         }
     }
 }

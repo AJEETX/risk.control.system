@@ -68,7 +68,7 @@ namespace risk.control.system.Services.Common
 
             if (!changeResult.Succeeded)
             {
-                await NotifyAdminAsync(admin, user, model.NewPassword, portal_base_url, failed: true);
+                await NotifyAdminAsync(admin, user, portal_base_url, failed: true);
 
                 foreach (var error in changeResult.Errors)
                     result.Errors.TryAdd(string.Empty, error.Description);
@@ -83,19 +83,18 @@ namespace risk.control.system.Services.Common
 
             await signInManager.RefreshSignInAsync(user);
 
-            await NotifyAdminAsync(admin, user, model.NewPassword, portal_base_url, false);
+            await NotifyAdminAsync(admin, user, portal_base_url, false);
             await NotifyUserAsync(admin, user, model.NewPassword, portal_base_url);
 
             result.Success = true;
             return result;
         }
 
-        private async Task NotifyAdminAsync(ApplicationUser admin, ApplicationUser user, string newPassword, string portal_base_url, bool failed = false)
+        private async Task NotifyAdminAsync(ApplicationUser admin, ApplicationUser user, string portal_base_url, bool failed = false)
         {
             var message =
                 $"Dear {admin.Email}\n" +
                 $"User {user.Email} {(failed ? "attempted" : "changed")} password.\n" +
-                $"New password: {newPassword}\n" +
                 $"{portal_base_url}";
 
             await smsService.DoSendSmsAsync(admin.Country.Code, "+" + admin.Country.ISDCode + admin.PhoneNumber, message);

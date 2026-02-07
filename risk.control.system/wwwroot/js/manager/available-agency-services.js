@@ -157,7 +157,7 @@ $(document).ready(function () {
                         <button
                            class="btn btn-xs btn-danger js-delete"
                            data-id="${row.id}">
-                           <i class="fas fa-trash"></i> Delete
+                           <i class="fa fa-trash"></i> Delete
                         </button>`;
                     return buttons;
                 }
@@ -271,7 +271,6 @@ $(document).ready(function () {
                 },
                 cancel: {
                     text: 'Cancel',
-                    btnClass: 'btn-secondary'
                 }
             }
         });
