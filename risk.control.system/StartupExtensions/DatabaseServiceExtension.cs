@@ -12,17 +12,19 @@ public static class DatabaseServiceExtension
     {
         if (env.IsDevelopment())
         {
-            var connString = EnvHelper.Get("DefaultConnection");
+            var connectionString = EnvHelper.Get("DefaultConnection");
             services.AddDbContextFactory<ApplicationDbContext>(options =>
-                options.UseNpgsql(connString));
+                options.UseNpgsql(connectionString));
             services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseNpgsql(connString),
+                options.UseNpgsql(connectionString),
                 ServiceLifetime.Scoped,
                 ServiceLifetime.Singleton);
         }
         else
         {
             var connectionString = "Data Source=" + EnvHelper.Get("COUNTRY") + "_" + configuration.GetConnectionString("Database");
+            services.AddDbContextFactory<ApplicationDbContext>(options =>
+                options.UseNpgsql(connectionString));
             services.AddDbContext<ApplicationDbContext>(options =>
                                     options.UseSqlite(connectionString,
                     sqlOptions => sqlOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)));

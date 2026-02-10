@@ -30,6 +30,8 @@ builder.Host.UseSerilog();
 
 builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true).AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
 
+builder.Services.AddConfigureServices(builder.Configuration);
+
 builder.Services.AddBusinessServices(builder.Configuration);
 
 builder.Services.AddDatastoreServices(builder.Configuration, env);
