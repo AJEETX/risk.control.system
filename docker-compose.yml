@@ -14,11 +14,13 @@ services:
       FtpKey: "C0##ect10n"
       SMS_Url: "http://192.168.1.103:8080/message"
       SMS_Sim: "1"
+      SMS_User: "sms"
       SMS_User_India: "QQCLNH"
       SMS_Sim_India: "1"
       ASPNETCORE_Kestrel__Certificates__Default__Path: /https/aspnet-dev.pfx
       ASPNETCORE_Kestrel__Certificates__Default__Password: devpassword
     secrets:
+      - DefaultConnection
       - AzureAd__ClientSecret
       - aws_id
       - aws_secret
@@ -26,7 +28,6 @@ services:
       - GOOGLE_APPLICATION_CREDENTIALS_JSON
       - HUGING_FACE
       - PHONE_API
-      - SMS_User
       - SMS_Pwd
       - SMS_Pwd_India
       - TINY_URL_KEY
@@ -68,6 +69,8 @@ volumes:
   pgadmin_data:	
 
 secrets:
+  DefaultConnection:
+    file: ./secrets/DefaultConnection.txt
   AzureAd__ClientSecret:
     file: ./secrets/AzureAd__ClientSecret.txt
   aws_id:
@@ -82,8 +85,6 @@ secrets:
     file: ./secrets/HUGING_FACE.txt
   PHONE_API:
     file: ./secrets/PHONE_API.txt
-  SMS_User:
-    file: ./secrets/SMS_User.txt
   SMS_Pwd:
     file: ./secrets/SMS_Pwd.txt
   SMS_Pwd_India:
