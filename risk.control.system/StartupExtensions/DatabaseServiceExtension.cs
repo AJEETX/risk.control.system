@@ -24,10 +24,12 @@ public static class DatabaseServiceExtension
         {
             var connectionString = "Data Source=" + EnvHelper.Get("COUNTRY") + "_" + configuration.GetConnectionString("Database");
             services.AddDbContextFactory<ApplicationDbContext>(options =>
-                options.UseNpgsql(connectionString));
+                options.UseSqlite(connectionString));
             services.AddDbContext<ApplicationDbContext>(options =>
                                     options.UseSqlite(connectionString,
-                    sqlOptions => sqlOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)));
+                    sqlOptions => sqlOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)),
+                ServiceLifetime.Scoped,
+                ServiceLifetime.Singleton);
         }
 
         services.AddHangfire(config => config.UseMemoryStorage());
