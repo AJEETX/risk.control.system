@@ -30,7 +30,7 @@ namespace risk.control.system.Services.Api
             IBase64FileService base64FileService,
             IFeatureManager featureManager)
         {
-            cutoffTime = DateTime.Now.AddMinutes(double.Parse(config["LOGIN_SESSION_TIMEOUT_MIN"]));
+            cutoffTime = DateTime.UtcNow.AddMinutes(double.Parse(config["LOGIN_SESSION_TIMEOUT_MIN"]));
             this.context = context;
             this.webHostEnvironment = webHostEnvironment;
             this.base64FileService = base64FileService;
@@ -39,7 +39,7 @@ namespace risk.control.system.Services.Api
 
         public async Task<List<UserDetailResponse>> GetCompanyUsers(string userEmail)
         {
-            var now = DateTime.Now;
+            var now = DateTime.UtcNow;
 
             // 1️⃣ Get the current company user
             var companyUser = await context.ApplicationUser
@@ -179,7 +179,7 @@ namespace risk.control.system.Services.Api
 
             var loginVerificationEnabled = await featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION);
 
-            var now = DateTime.Now;
+            var now = DateTime.UtcNow;
             var activeUsersDetails = new List<UserDetailResponse>();
 
             foreach (var user in users)

@@ -20,27 +20,28 @@ namespace risk.control.system.Services.Api
 
     internal class ManagerService : IManagerService
     {
-        private readonly ApplicationDbContext context;
+        private readonly IDbContextFactory<ApplicationDbContext> _contextFactory;
         private readonly IWebHostEnvironment env;
         private readonly IBase64FileService base64FileService;
 
-        public ManagerService(ApplicationDbContext context, IWebHostEnvironment env, IBase64FileService base64FileService)
+        public ManagerService(IDbContextFactory<ApplicationDbContext> contextFactory, IWebHostEnvironment env, IBase64FileService base64FileService)
         {
-            this.context = context;
+            _contextFactory = contextFactory;
             this.env = env;
             this.base64FileService = base64FileService;
         }
 
         public async Task<object> GetActiveCases(string currentUserEmail, int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc")
         {
-            var companyUser = await context.ApplicationUser
+            await using var _context = _contextFactory.CreateDbContext();
+            var companyUser = await _context.ApplicationUser
                 .Include(u => u.Country)
                 .Include(u => u.ClientCompany)
                 .FirstOrDefaultAsync(c => c.Email == currentUserEmail);
             var assignedToAssignerStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER;
             var submittedToAssessorStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR;
 
-            var query = context.Investigations
+            var query = _context.Investigations
                 .Where(a => !a.Deleted && a.ClientCompanyId == companyUser.ClientCompanyId &&
                     a.Status == CONSTANTS.CASE_STATUS.INPROGRESS &&
                     (a.SubStatus != CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR ||
@@ -193,7 +194,7 @@ namespace risk.control.system.Services.Api
                     PolicyNum = a.PolicyNum,
                     BeneficiaryPhoto = await beneTask,
                     BeneficiaryName = beneficiaryName,
-                    TimeElapsed = DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).TotalSeconds,
+                    TimeElapsed = DateTime.UtcNow.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).TotalSeconds,
                     IsNewAssigned = a.IsNewAssignedToManager,
                     PersonMapAddressUrl = PersonMapAddressUrl
                 };
@@ -205,14 +206,14 @@ namespace risk.control.system.Services.Api
 
             if (idsToMarkViewed.Any())
             {
-                var entitiesToUpdate = await context.Investigations
+                var entitiesToUpdate = await _context.Investigations
                     .Where(x => idsToMarkViewed.Contains(x.Id))
                     .ToListAsync();
 
                 foreach (var entity in entitiesToUpdate)
                     entity.IsNewAssignedToManager = false;
 
-                await context.SaveChangesAsync(null, false); // mark as viewed
+                await _context.SaveChangesAsync(null, false); // mark as viewed
             }
             return new
             {
@@ -248,15 +249,16 @@ namespace risk.control.system.Services.Api
 
         private async Task<object> GetCompletedCases(string userEmail, string subStatus, int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc")
         {
+            await using var _context = _contextFactory.CreateDbContext();
             // 1. Get User Context (Minimal fetch)
-            var companyUser = await context.ApplicationUser
+            var companyUser = await _context.ApplicationUser
                 .AsNoTracking()
                 .Where(u => u.Email == userEmail)
                 .Select(u => new { u.ClientCompanyId, CountryCode = u.Country.Code.ToUpper() })
                 .FirstOrDefaultAsync();
 
             // 2. Base Query (IQueryable - Not executed yet)
-            var query = context.Investigations
+            var query = _context.Investigations
                 .AsNoTracking()
                 .Where(i => !i.Deleted &&
                             i.ClientCompanyId == companyUser.ClientCompanyId &&
@@ -385,8 +387,8 @@ namespace risk.control.system.Services.Api
                     Distance = a.SelectedAgentDrivingDistance,
                     Duration = a.SelectedAgentDrivingDuration,
 
-                    TimeElapsed = DateTime.Now.Subtract(a.ProcessedByAssessorTime ?? DateTime.Now).TotalSeconds,
-                    CanDownload = CanDownload(a.Id, userEmail)
+                    TimeElapsed = DateTime.UtcNow.Subtract(a.ProcessedByAssessorTime ?? DateTime.UtcNow).TotalSeconds,
+                    CanDownload = await CanDownload(a.Id, userEmail)
                 };
             });
             var finalData = (await Task.WhenAll(finalDataTasks));
@@ -404,21 +406,21 @@ namespace risk.control.system.Services.Api
         {
             DateTime time2Compare = ProcessedByAssessorTime;
 
-            if (DateTime.Now.Subtract(time2Compare).Days >= 1)
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(time2Compare).Days} day</span>");
+            if (DateTime.UtcNow.Subtract(time2Compare).Days >= 1)
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(time2Compare).Days} day</span>");
 
-            if (DateTime.Now.Subtract(time2Compare).Hours < 24 &&
-                DateTime.Now.Subtract(time2Compare).Hours > 0)
+            if (DateTime.UtcNow.Subtract(time2Compare).Hours < 24 &&
+                DateTime.UtcNow.Subtract(time2Compare).Hours > 0)
             {
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(time2Compare).Hours} hr </span>");
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(time2Compare).Hours} hr </span>");
             }
-            if (DateTime.Now.Subtract(time2Compare).Hours == 0 && DateTime.Now.Subtract(time2Compare).Minutes > 0)
+            if (DateTime.UtcNow.Subtract(time2Compare).Hours == 0 && DateTime.UtcNow.Subtract(time2Compare).Minutes > 0)
             {
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(time2Compare).Minutes} min </span>");
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(time2Compare).Minutes} min </span>");
             }
-            if (DateTime.Now.Subtract(time2Compare).Minutes == 0 && DateTime.Now.Subtract(time2Compare).Seconds > 0)
+            if (DateTime.UtcNow.Subtract(time2Compare).Minutes == 0 && DateTime.UtcNow.Subtract(time2Compare).Seconds > 0)
             {
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(time2Compare).Seconds} sec </span>");
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(time2Compare).Seconds} sec </span>");
             }
             return string.Join("", "<span class='badge badge-light'>now</span>");
         }
@@ -427,39 +429,40 @@ namespace risk.control.system.Services.Api
         {
             if (caseTask.CreatorSla == 0)
             {
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(caseTask.AllocatedToAgencyTime.GetValueOrDefault()).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Hurry up, {DateTime.Now.Subtract(caseTask.AllocatedToAgencyTime.GetValueOrDefault()).Days} days since created!\"></i>");
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(caseTask.AllocatedToAgencyTime.GetValueOrDefault()).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Hurry up, {DateTime.UtcNow.Subtract(caseTask.AllocatedToAgencyTime.GetValueOrDefault()).Days} days since created!\"></i>");
             }
-            if (DateTime.Now.Subtract(caseTask.AllocatedToAgencyTime.GetValueOrDefault()).Days >= caseTask.CreatorSla)
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(caseTask.AllocatedToAgencyTime.GetValueOrDefault()).Days} day</span>");
-            else if (DateTime.Now.Subtract(caseTask.AllocatedToAgencyTime.GetValueOrDefault()).Days >= 3 || DateTime.Now.Subtract(caseTask.AllocatedToAgencyTime.GetValueOrDefault()).Days >= caseTask.CreatorSla)
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(caseTask.AllocatedToAgencyTime.GetValueOrDefault()).Days} day</span>");
-            if (DateTime.Now.Subtract(caseTask.AllocatedToAgencyTime.GetValueOrDefault()).Days >= 1)
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(caseTask.AllocatedToAgencyTime.GetValueOrDefault()).Days} day</span>");
+            if (DateTime.UtcNow.Subtract(caseTask.AllocatedToAgencyTime.GetValueOrDefault()).Days >= caseTask.CreatorSla)
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(caseTask.AllocatedToAgencyTime.GetValueOrDefault()).Days} day</span>");
+            else if (DateTime.UtcNow.Subtract(caseTask.AllocatedToAgencyTime.GetValueOrDefault()).Days >= 3 || DateTime.UtcNow.Subtract(caseTask.AllocatedToAgencyTime.GetValueOrDefault()).Days >= caseTask.CreatorSla)
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(caseTask.AllocatedToAgencyTime.GetValueOrDefault()).Days} day</span>");
+            if (DateTime.UtcNow.Subtract(caseTask.AllocatedToAgencyTime.GetValueOrDefault()).Days >= 1)
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(caseTask.AllocatedToAgencyTime.GetValueOrDefault()).Days} day</span>");
 
-            if (DateTime.Now.Subtract(caseTask.AllocatedToAgencyTime.GetValueOrDefault()).Hours < 24 &&
-                DateTime.Now.Subtract(caseTask.AllocatedToAgencyTime.GetValueOrDefault()).Hours > 0)
+            if (DateTime.UtcNow.Subtract(caseTask.AllocatedToAgencyTime.GetValueOrDefault()).Hours < 24 &&
+                DateTime.UtcNow.Subtract(caseTask.AllocatedToAgencyTime.GetValueOrDefault()).Hours > 0)
             {
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(caseTask.AllocatedToAgencyTime.GetValueOrDefault()).Hours} hr </span>");
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(caseTask.AllocatedToAgencyTime.GetValueOrDefault()).Hours} hr </span>");
             }
-            if (DateTime.Now.Subtract(caseTask.AllocatedToAgencyTime.GetValueOrDefault()).Hours == 0 && DateTime.Now.Subtract(caseTask.AllocatedToAgencyTime.GetValueOrDefault()).Minutes > 0)
+            if (DateTime.UtcNow.Subtract(caseTask.AllocatedToAgencyTime.GetValueOrDefault()).Hours == 0 && DateTime.UtcNow.Subtract(caseTask.AllocatedToAgencyTime.GetValueOrDefault()).Minutes > 0)
             {
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(caseTask.AllocatedToAgencyTime.GetValueOrDefault()).Minutes} min </span>");
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(caseTask.AllocatedToAgencyTime.GetValueOrDefault()).Minutes} min </span>");
             }
-            if (DateTime.Now.Subtract(caseTask.AllocatedToAgencyTime.GetValueOrDefault()).Minutes == 0 && DateTime.Now.Subtract(caseTask.AllocatedToAgencyTime.GetValueOrDefault()).Seconds > 0)
+            if (DateTime.UtcNow.Subtract(caseTask.AllocatedToAgencyTime.GetValueOrDefault()).Minutes == 0 && DateTime.UtcNow.Subtract(caseTask.AllocatedToAgencyTime.GetValueOrDefault()).Seconds > 0)
             {
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(caseTask.AllocatedToAgencyTime.GetValueOrDefault()).Seconds} sec </span>");
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(caseTask.AllocatedToAgencyTime.GetValueOrDefault()).Seconds} sec </span>");
             }
             return string.Join("", "<span class='badge badge-light'>now</span>");
         }
 
         private async Task<string> GetOwnerImage(InvestigationTask caseTask)
         {
+            await using var _context = _contextFactory.CreateDbContext();
             var noDataImagefilePath = Path.Combine(env.WebRootPath, "img", "no-photo.jpg");
 
             if (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR || caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR ||
                 caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR)
             {
-                var agent = await context.Vendor.FirstOrDefaultAsync(u => u.VendorId == caseTask.VendorId);
+                var agent = await _context.Vendor.FirstOrDefaultAsync(u => u.VendorId == caseTask.VendorId);
                 if (agent != null && !string.IsNullOrWhiteSpace(agent.DocumentUrl))
                 {
                     return agent.DocumentUrl;
@@ -467,7 +470,7 @@ namespace risk.control.system.Services.Api
             }
             else if (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT)
             {
-                var vendor = await context.ApplicationUser.FirstOrDefaultAsync(v => v.Email == caseTask.TaskedAgentEmail);
+                var vendor = await _context.ApplicationUser.FirstOrDefaultAsync(v => v.Email == caseTask.TaskedAgentEmail);
                 if (vendor != null && !string.IsNullOrWhiteSpace(vendor.ProfilePictureUrl))
                 {
                     return vendor.ProfilePictureUrl;
@@ -481,7 +484,7 @@ namespace risk.control.system.Services.Api
                 caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY
                 )
             {
-                var company = await context.ClientCompany.FirstOrDefaultAsync(v => v.ClientCompanyId == caseTask.ClientCompanyId);
+                var company = await _context.ClientCompany.FirstOrDefaultAsync(v => v.ClientCompanyId == caseTask.ClientCompanyId);
                 if (company != null && !string.IsNullOrWhiteSpace(company.DocumentUrl))
                 {
                     return company.DocumentUrl;
@@ -510,7 +513,8 @@ namespace risk.control.system.Services.Api
                 caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY
                 )
             {
-                var company = await context.ClientCompany.FirstOrDefaultAsync(v => v.ClientCompanyId == caseTask.ClientCompanyId);
+                await using var _context = _contextFactory.CreateDbContext();
+                var company = await _context.ClientCompany.FirstOrDefaultAsync(v => v.ClientCompanyId == caseTask.ClientCompanyId);
                 if (company != null)
                 {
                     return company.Email;
@@ -519,10 +523,11 @@ namespace risk.control.system.Services.Api
             return string.Empty;
         }
 
-        private bool CanDownload(long id, string userEmail)
+        private async Task<bool> CanDownload(long id, string userEmail)
         {
-            var tracker = context.PdfDownloadTracker
-                          .FirstOrDefault(t => t.ReportId == id && t.UserEmail == userEmail);
+            await using var _context = _contextFactory.CreateDbContext();
+            var tracker = await _context.PdfDownloadTracker
+                          .FirstOrDefaultAsync(t => t.ReportId == id && t.UserEmail == userEmail);
             bool canDownload = true;
             if (tracker != null && tracker.DownloadCount > 3)
             {

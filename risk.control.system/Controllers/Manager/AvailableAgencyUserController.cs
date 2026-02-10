@@ -362,7 +362,7 @@ namespace risk.control.system.Controllers.Manager
                     return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
 
-                model.Updated = DateTime.Now;
+                model.Updated = DateTime.UtcNow;
                 model.UpdatedBy = userEmail;
                 model.Deleted = true;
                 _context.ApplicationUser.Update(model);

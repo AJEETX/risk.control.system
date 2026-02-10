@@ -55,11 +55,11 @@ namespace risk.control.system.Services.Assessor
                 }
                 caseTask.InvestigationReport.EnquiryRequest = request;
                 caseTask.InvestigationReport.EnquiryRequests = requests;
-                caseTask.InvestigationReport.Updated = DateTime.Now;
+                caseTask.InvestigationReport.Updated = DateTime.UtcNow;
                 caseTask.InvestigationReport.UpdatedBy = userEmail;
-                caseTask.InvestigationReport.EnquiryRequest.Updated = DateTime.Now;
+                caseTask.InvestigationReport.EnquiryRequest.Updated = DateTime.UtcNow;
                 caseTask.InvestigationReport.EnquiryRequest.UpdatedBy = userEmail;
-                caseTask.EnquiredByAssessorTime = DateTime.Now;
+                caseTask.EnquiredByAssessorTime = DateTime.UtcNow;
                 context.QueryRequest.Update(request);
                 context.Investigations.Update(caseTask);
 

@@ -147,7 +147,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             try
             {
                 country.IsUpdated = true;
-                country.Updated = DateTime.Now;
+                country.Updated = DateTime.UtcNow;
                 country.Code = WebUtility.HtmlEncode(country.Code?.ToUpper(CultureInfo.InvariantCulture));
                 country.Name = WebUtility.HtmlEncode(country.Name);
                 country.UpdatedBy = HttpContext.User?.Identity?.Name;
@@ -201,7 +201,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 {
                     country.Code = WebUtility.HtmlEncode(country.Code?.ToUpper(CultureInfo.InvariantCulture));
                     country.Name = WebUtility.HtmlEncode(country.Name);
-                    country.Updated = DateTime.Now;
+                    country.Updated = DateTime.UtcNow;
                     country.IsUpdated = true;
                     country.UpdatedBy = HttpContext.User?.Identity?.Name;
                     _context.Update(country);
@@ -253,7 +253,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             var country = await _context.Country.FindAsync(id);
             if (country != null)
             {
-                country.Updated = DateTime.Now;
+                country.Updated = DateTime.UtcNow;
                 country.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Country.Remove(country);
             }

@@ -106,7 +106,7 @@ namespace risk.control.system.Services.Report
             section.AddParagraph().AddText("");
 
             // Footer
-            section.AddParagraph().AddText($"Generated on: {DateTime.Now:yyyy-MM-dd HH:mm}").SetItalic().SetFontSize(10);
+            section.AddParagraph().AddText($"Generated on: {DateTime.UtcNow:yyyy-MM-dd HH:mm}").SetItalic().SetFontSize(10);
 
             builder.Build(ReportFilePath);
             investigation.InvestigationReport.PdfReportFilePath = ReportFilePath;

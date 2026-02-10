@@ -31,19 +31,19 @@
                         }
                     });
                 }
-                else if (xhr.status === 500) {
+                else {
                     $.confirm({
                         title: 'Server Error!',
-                        content: 'An unexpected server error occurred. You will be redirected to the Users page.',
+                        content: 'An unexpected server error occurred. You will be redirected to Dashboard page.',
                         type: 'orange',
                         typeAnimated: true,
                         buttons: {
                             Ok: function () {
-                                window.location.href = '/AgencyUser/Users';
+                                window.location.href = '/DashBoard/Index';
                             }
                         },
                         onClose: function () {
-                            window.location.href = '/AgencyUser/Users';
+                            window.location.href = '/DashBoard/Index';
                         }
                     });
                 }

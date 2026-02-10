@@ -26,8 +26,8 @@ namespace risk.control.system.Services.Common
             {
                 Comment = notes,
                 SenderEmail = userEmail,
-                Created = DateTime.Now,
-                Updated = DateTime.Now,
+                Created = DateTime.UtcNow,
+                Updated = DateTime.UtcNow,
                 UpdatedBy = userEmail
             });
             _context.Investigations.Update(caseTask);

@@ -46,6 +46,38 @@ $(document).ready(function () {
                         }
                     });
                 }
+                else if (xhr.status === 400) {
+                    $.confirm({
+                        title: 'Bad Request!',
+                        content: 'Try with valid data.You will be redirected to Dashboard page',
+                        type: 'orange',
+                        typeAnimated: true,
+                        buttons: {
+                            Ok: function () {
+                                window.location.href = '/DashBoard/Index';
+                            }
+                        },
+                        onClose: function () {
+                            window.location.href = '/DashBoard/Index';
+                        }
+                    });
+                }
+                else {
+                    $.confirm({
+                        title: 'Server Error!',
+                        content: 'An unexpected server error occurred. You will be redirected to Dashboard page.',
+                        type: 'orange',
+                        typeAnimated: true,
+                        buttons: {
+                            Ok: function () {
+                                window.location.href = '/DashBoard/Index';
+                            }
+                        },
+                        onClose: function () {
+                            window.location.href = '/DashBoard/Index';
+                        }
+                    });
+                }
             }
         },
         order: [[10, 'desc'], [11, 'desc']], // Sort by `isUpdated` and `lastModified`,
@@ -141,7 +173,7 @@ $(document).ready(function () {
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    buttons += `<a data-id="${row.id}" class="btn btn-xs btn-warning"><i class="fas fa-edit"></i> Edit</a> &nbsp;` ;
+                    buttons += `<a data-id="${row.id}" class="btn btn-xs btn-warning"><i class="fas fa-edit"></i> Edit</a> &nbsp;`;
                     buttons += `
                         <button
                            class="btn btn-xs btn-danger js-delete"

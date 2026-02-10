@@ -51,19 +51,35 @@
                         }
                     });
                 }
-                if (xhr.status === 500) {
+                else if (xhr.status === 400) {
                     $.confirm({
-                        title: 'Server Error!',
-                        content: 'An unexpected server error occurred. You will be redirected to Agency User page.',
+                        title: 'Bad Request!',
+                        content: 'Try with valid data.You will be redirected to Dashboard page',
                         type: 'orange',
                         typeAnimated: true,
                         buttons: {
                             Ok: function () {
-                                window.location.href = '/EmpanelledAgencyUser/Users?id=' + $('#Id').val(); // Server error. Try again
+                                window.location.href = '/DashBoard/Index';
                             }
                         },
                         onClose: function () {
-                            window.location.href = '/EmpanelledAgencyUser/Users?id=' + $('#Id').val(); // Server error. Try again
+                            window.location.href = '/DashBoard/Index';
+                        }
+                    });
+                }
+                else {
+                    $.confirm({
+                        title: 'Server Error!',
+                        content: 'An unexpected server error occurred. You will be redirected to Dashboard page.',
+                        type: 'orange',
+                        typeAnimated: true,
+                        buttons: {
+                            Ok: function () {
+                                window.location.href = '/DashBoard/Index';
+                            }
+                        },
+                        onClose: function () {
+                            window.location.href = '/DashBoard/Index';
                         }
                     });
                 }

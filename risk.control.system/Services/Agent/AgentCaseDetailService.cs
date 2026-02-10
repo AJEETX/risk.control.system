@@ -180,7 +180,7 @@ namespace risk.control.system.Services.Agent
             var lastHistory = caseTask.InvestigationTimeline.OrderByDescending(h => h.StatusChangedAt).FirstOrDefault();
             var endTime = caseTask.Status == CONSTANTS.CASE_STATUS.FINISHED
                 ? caseTask.ProcessedByAssessorTime.GetValueOrDefault()
-                : DateTime.Now;
+                : DateTime.UtcNow;
             var totalTimeTaken = FormatTime(endTime - caseTask.Created);
 
             _logger.LogInformation("Total time taken for case {CaseId}: {TotalTime}", id, totalTimeTaken);

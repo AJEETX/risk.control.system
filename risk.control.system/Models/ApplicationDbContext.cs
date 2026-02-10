@@ -13,23 +13,22 @@ namespace risk.control.system.Models
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
-            var utcConverter = new ValueConverter<DateTime, DateTime>(
-            v => v.Kind == DateTimeKind.Utc ? v : v.ToUniversalTime(),
-            v => DateTime.SpecifyKind(v, DateTimeKind.Utc)
-        );
-
+            // Automatically convert all DateTime properties to UTC on save
             foreach (var entityType in builder.Model.GetEntityTypes())
             {
-                foreach (var property in entityType.GetProperties())
+                var properties = entityType.GetProperties()
+                    .Where(p => p.ClrType == typeof(DateTime) || p.ClrType == typeof(DateTime?));
+
+                foreach (var property in properties)
                 {
-                    if (property.ClrType == typeof(DateTime))
-                    {
-                        property.SetValueConverter(utcConverter);
-                        property.SetColumnType("timestamptz");
-                    }
+                    property.SetValueConverter(new ValueConverter<DateTime, DateTime>(
+                        v => v.Kind == DateTimeKind.Utc ? v : DateTime.SpecifyKind(v, DateTimeKind.Utc),
+                        v => v.Kind == DateTimeKind.Utc ? v : DateTime.SpecifyKind(v, DateTimeKind.Utc)
+                    ));
                 }
             }
         }
+
         public virtual DbSet<BsbInfo> BsbInfo { get; set; }
         public virtual DbSet<EducationType> EducationType { get; set; }
         public virtual DbSet<OccupationType> OccupationType { get; set; }

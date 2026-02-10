@@ -137,13 +137,13 @@
                 var baddress = @Model.Location != null ? @Model.Location?.Addressline + " " +
                 @Model.Location?.District?.Name + " " + @Model.Location?.State?.Name + " " +
                 @Model.Location?.Country?.Name + " " + @Model.Location?.PinCode?.Code : string.Empty;
-                var age = DateTime.Now.Subtract(Model.ClaimsInvestigation.CustomerDetail.DateOfBirth.GetValueOrDefault()).TotalDays;
+                var age = DateTime.UtcNow.Subtract(Model.ClaimsInvestigation.CustomerDetail.DateOfBirth.GetValueOrDefault()).TotalDays;
                 var currentAgeinYrs = (int)age / 365;
                 int beneficaryAge = 0;
 
                 if (Model.Location.DateOfBirth != null)
                 {
-                    var bage = DateTime.Now.Subtract(Model.Location.DateOfBirth.GetValueOrDefault()).TotalDays;
+                    var bage = DateTime.UtcNow.Subtract(Model.Location.DateOfBirth.GetValueOrDefault()).TotalDays;
                     beneficaryAge = (int)bage / 365;
                 }
                 @if (Model.ClaimsInvestigation.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING)

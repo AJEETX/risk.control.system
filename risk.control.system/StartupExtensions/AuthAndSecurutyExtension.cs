@@ -174,7 +174,7 @@ public static class AuthAndSecurutyExtension
         {
             options.Cookie.Path = "/";
             options.Cookie.HttpOnly = true;
-            options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+            options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
             options.Cookie.SameSite = SameSiteMode.None; // ✅ REQUIRED
             options.Cookie.Name = AppCookie.AUTH_COOKIE_NAME;
             options.LoginPath = AppCookie.LOGIN_PATH;

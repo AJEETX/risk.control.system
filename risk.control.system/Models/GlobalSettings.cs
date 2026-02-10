@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using risk.control.system.Helpers;
 
 namespace risk.control.system.Models
 {
@@ -30,13 +31,13 @@ namespace risk.control.system.Models
         public bool EnableClaim { get; set; } = false;
         public bool EnableUnderwriting { get; set; } = false;
 
-        public string SmsUri { get; set; } = Environment.GetEnvironmentVariable("SMS_Url") ?? "test";
-        public string SmsUser { get; set; } = Environment.GetEnvironmentVariable("SMS_User") ?? "test";
-        public string SmsData { get; set; } = Environment.GetEnvironmentVariable("SMS_Pwd") ?? "test";
+        public string SmsUri { get; set; } = EnvHelper.Get("SMS_Url") ?? "test";
+        public string SmsUser { get; set; } = EnvHelper.Get("SMS_User") ?? "test";
+        public string SmsData { get; set; } = EnvHelper.Get("SMS_Pwd") ?? "test";
 
         public string FtpUri { get; set; } = "ftp://ftp.drivehq.com/holosync/";
         public string FtpUser { get; set; } = "its.aby@email.com";
-        public string FtpData { get; set; } = Environment.GetEnvironmentVariable("FtpKey") ?? "test";
+        public string FtpData { get; set; } = EnvHelper.Get("FtpKey") ?? "test";
 
         public string AddressUri { get; set; } = "https://api.geoapify.com/v1/geocode/reverse";
         public string AddressUriData { get; set; } = "f2a54c0ec9ba4dfdbd450116509c6313";
@@ -52,6 +53,6 @@ namespace risk.control.system.Models
         public string? PassportApiHost { get; set; } = "document-ocr1.p.rapidapi.com";
 
         public string AiApiUrl { get; set; } = "https://api-inference.huggingface.co/models/facebook/bart-large-cnn"; // HUGGING FACE
-        public string AiApiData { get; set; } = Environment.GetEnvironmentVariable("HUGING_FACE") ?? "test"; // HUGGING FACE
+        public string AiApiData { get; set; } = EnvHelper.Get("HUGING_FACE") ?? "test"; // HUGGING FACE
     }
 }

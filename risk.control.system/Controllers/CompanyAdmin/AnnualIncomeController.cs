@@ -82,7 +82,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
         {
             if (income is not null)
             {
-                income.Updated = DateTime.Now;
+                income.Updated = DateTime.UtcNow;
                 income.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Add(income);
                 await _context.SaveChangesAsync();
@@ -121,7 +121,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             }
             try
             {
-                income.Updated = DateTime.Now;
+                income.Updated = DateTime.UtcNow;
                 income.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Update(income);
                 await _context.SaveChangesAsync();
@@ -147,7 +147,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             var income = await _context.AnnualIncome.FindAsync(id);
             if (income != null)
             {
-                income.Updated = DateTime.Now;
+                income.Updated = DateTime.UtcNow;
                 income.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.AnnualIncome.Remove(income);
             }

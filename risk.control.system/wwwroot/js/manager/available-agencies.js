@@ -33,35 +33,35 @@
                         }
                     });
                 }
-                else if (xhr.status === 500) {
+                else if (xhr.status === 400) {
                     $.confirm({
-                        title: 'Server Error!',
-                        content: 'An unexpected server error occurred. You will be redirected to Available Agencies page.',
+                        title: 'Bad Request!',
+                        content: 'Try with valid data.You will be redirected to Dashboard page',
                         type: 'orange',
                         typeAnimated: true,
                         buttons: {
                             Ok: function () {
-                                window.location.href = '/AvailableAgency/Agencies';
+                                window.location.href = '/DashBoard/Index';
                             }
                         },
                         onClose: function () {
-                            window.location.href = '/AvailableAgency/Agencies';
+                            window.location.href = '/DashBoard/Index';
                         }
                     });
                 }
-                else if (xhr.status === 400) {
+                else {
                     $.confirm({
-                        title: 'Agencies!',
-                        content: 'Try with valid data. You will be redirected to Available Agencies page.',
+                        title: 'Server Error!',
+                        content: 'An unexpected server error occurred. You will be redirected to Dashboard page.',
                         type: 'orange',
                         typeAnimated: true,
                         buttons: {
                             Ok: function () {
-                                window.location.href = '/AvailableAgency/Agencies';
+                                window.location.href = '/DashBoard/Index';
                             }
                         },
                         onClose: function () {
-                            window.location.href = '/AvailableAgency/Agencies';
+                            window.location.href = '/DashBoard/Index';
                         }
                     });
                 }
@@ -181,7 +181,7 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    buttons += `<a data-id="${row.id}" class="btn btn-xs btn-warning" data-bs-toggle="tooltip" title="Edit"><i class="fas fa-edit"></i> Edit</a> &nbsp;` ;
+                    buttons += `<a data-id="${row.id}" class="btn btn-xs btn-warning" data-bs-toggle="tooltip" title="Edit"><i class="fas fa-edit"></i> Edit</a> &nbsp;`;
                     if (data) {
                         buttons += '<button id="' + row.id + '" class="btn btn-xs btn-danger"><i class="fa fa-trash "></i> Delete </button>';
                     }
@@ -236,7 +236,6 @@
     function showSpinnerOnButton(selector, spinnerText) {
         $(selector).html(`<i class='fas fa-sync fa-spin'></i> ${spinnerText}`);
     }
-
 
     $('#dataTable tbody').on('click', '.btn-danger', function (e) {
         e.preventDefault();

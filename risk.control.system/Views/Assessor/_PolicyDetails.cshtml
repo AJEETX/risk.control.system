@@ -17,13 +17,13 @@
         @Model.Location?.Country?.Name + " " + @Model.Location?.PinCode?.Code : string.Empty;
         if (Model.ClaimsInvestigation?.CustomerDetail.DateOfBirth != null)
         {
-            var age = DateTime.Now.Subtract(Model.ClaimsInvestigation.CustomerDetail.DateOfBirth.GetValueOrDefault()).TotalDays;
+            var age = DateTime.UtcNow.Subtract(Model.ClaimsInvestigation.CustomerDetail.DateOfBirth.GetValueOrDefault()).TotalDays;
             currentAgeinYrs = (int)age / 365;
         }
     }
     if (Model.Location.DateOfBirth != null)
     {
-        var age = DateTime.Now.Subtract(Model.Location.DateOfBirth.GetValueOrDefault()).TotalDays;
+        var age = DateTime.UtcNow.Subtract(Model.Location.DateOfBirth.GetValueOrDefault()).TotalDays;
         beneficaryAge = (int)age / 365;
     }
     if (!string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.PolicyDetail?.ContractNumber))

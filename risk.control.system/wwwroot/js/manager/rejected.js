@@ -40,19 +40,35 @@
                         }
                     });
                 }
-                else if (xhr.status === 500) {
+                else if (xhr.status === 400) {
                     $.confirm({
-                        title: 'Server Error!',
-                        content: 'An unexpected server error occurred. You will be redirected to Rejected page.',
+                        title: 'Bad Request!',
+                        content: 'Try with valid data.You will be redirected to Dashboard page',
                         type: 'orange',
                         typeAnimated: true,
                         buttons: {
                             Ok: function () {
-                                window.location.href = '/Manager/Rejected'; // Server error. Try again
+                                window.location.href = '/DashBoard/Index';
                             }
                         },
                         onClose: function () {
-                            window.location.href = '/Manager/Rejected'; // Server error. Try again
+                            window.location.href = '/DashBoard/Index';
+                        }
+                    });
+                }
+                else {
+                    $.confirm({
+                        title: 'Server Error!',
+                        content: 'An unexpected server error occurred. You will be redirected to Dashboard page.',
+                        type: 'orange',
+                        typeAnimated: true,
+                        buttons: {
+                            Ok: function () {
+                                window.location.href = '/DashBoard/Index';
+                            }
+                        },
+                        onClose: function () {
+                            window.location.href = '/DashBoard/Index';
                         }
                     });
                 }
@@ -243,8 +259,10 @@
             { "data": "timeElapsed", "bVisible": false },
             { "data": "policy", bVisible: false }
         ],
+        rowCallback: function (row, data, index) {
+            $('.btn-info', row).addClass('btn-white-color');
+        },
         "drawCallback": function (settings, start, end, max, total, pre) {
-            
             // Reinitialize Bootstrap 5 tooltips
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
             tooltipTriggerList.map(function (el) {

@@ -284,7 +284,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
                     return RedirectToAction(nameof(Users), "AgencyUser");
                 }
 
-                model.Updated = DateTime.Now;
+                model.Updated = DateTime.UtcNow;
                 model.UpdatedBy = userEmail;
                 model.Deleted = true;
                 _context.ApplicationUser.Update(model);

@@ -86,7 +86,7 @@ namespace risk.control.system.Services.Report
                 ClientCompanyId = currentUser.ClientCompany.ClientCompanyId,
                 GrandTotal = investigationServiced.Price + investigationServiced.Price * (1 / 10),
                 NoteToRecipient = "Auto generated Invoice",
-                Updated = DateTime.Now,
+                Updated = DateTime.UtcNow,
                 Vendor = vendor,
                 ClientCompany = currentUser.ClientCompany,
                 UpdatedBy = userEmail,

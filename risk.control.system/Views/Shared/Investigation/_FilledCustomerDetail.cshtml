@@ -15,7 +15,7 @@
     if (customerExist)
     {
         address = $"{customerDetail.Addressline} {customerDetail.District?.Name} {customerDetail.State?.Name} {customerDetail.PinCode?.Code}";
-        currentAgeInYrs = $"{(int)(DateTime.Now.Subtract(customerDetail.DateOfBirth.GetValueOrDefault()).TotalDays / 365)} years";
+        currentAgeInYrs = $"{(int)(DateTime.UtcNow.Subtract(customerDetail.DateOfBirth.GetValueOrDefault()).TotalDays / 365)} years";
     }
 
     // Progress bar and message setup

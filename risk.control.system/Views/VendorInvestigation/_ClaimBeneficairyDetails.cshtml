@@ -12,12 +12,12 @@
         @Model.CaseLocation?.Country?.Name + " " + @Model.CaseLocation?.PinCode?.Code : string.Empty;
         if (Model.ClaimsInvestigation?.CustomerDetail.DateOfBirth != null)
         {
-            var age = DateTime.Now.Subtract(Model.ClaimsInvestigation.CustomerDetail.DateOfBirth.GetValueOrDefault()).TotalDays;
+            var age = DateTime.UtcNow.Subtract(Model.ClaimsInvestigation.CustomerDetail.DateOfBirth.GetValueOrDefault()).TotalDays;
             currentAgeinYrs = (int)age / 365;
         }
         if (Model.CaseLocation?.DateOfBirth != null)
         {
-            var age = DateTime.Now.Subtract(Model.CaseLocation.DateOfBirth.GetValueOrDefault()).TotalDays;
+            var age = DateTime.UtcNow.Subtract(Model.CaseLocation.DateOfBirth.GetValueOrDefault()).TotalDays;
             currentBAgeinYrs = (int)age / 365;
         }
     }

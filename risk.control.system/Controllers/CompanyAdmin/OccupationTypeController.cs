@@ -82,7 +82,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
         {
             if (occupation is not null)
             {
-                occupation.Updated = DateTime.Now;
+                occupation.Updated = DateTime.UtcNow;
                 occupation.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.OccupationType.Add(occupation);
                 await _context.SaveChangesAsync();
@@ -121,7 +121,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             }
             try
             {
-                occupation.Updated = DateTime.Now;
+                occupation.Updated = DateTime.UtcNow;
                 occupation.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.OccupationType.Update(occupation);
                 await _context.SaveChangesAsync();
@@ -147,7 +147,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             var occupation = await _context.OccupationType.FindAsync(id);
             if (occupation != null)
             {
-                occupation.Updated = DateTime.Now;
+                occupation.Updated = DateTime.UtcNow;
                 occupation.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.OccupationType.Remove(occupation);
             }

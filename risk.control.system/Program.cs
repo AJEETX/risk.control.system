@@ -1,10 +1,16 @@
-﻿using risk.control.system.StartupExtensions;
+﻿using Microsoft.AspNetCore.DataProtection;
+using risk.control.system.StartupExtensions;
 using Serilog;
 
 AppDomain.CurrentDomain.SetData("REGEX_DEFAULT_MATCH_TIMEOUT", TimeSpan.FromMilliseconds(100)); // process-wide setting
 //QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddDataProtection()
+    .PersistKeysToFileSystem(new DirectoryInfo("/app/DataProtection-Keys"))
+    .SetApplicationName("iCheckify");
+
 var env = builder.Environment;
 // Set up logging
 
@@ -42,7 +48,7 @@ try
     var app = builder.Build();
 
     await app.UseServices(builder.Configuration);
-    AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", false);
+    AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
     await app.RunAsync();
 }

@@ -1,6 +1,7 @@
 ﻿using Hangfire;
 using Hangfire.MemoryStorage;
 using Microsoft.EntityFrameworkCore;
+using risk.control.system.Helpers;
 using risk.control.system.Models;
 
 namespace risk.control.system.StartupExtensions;
@@ -11,14 +12,17 @@ public static class DatabaseServiceExtension
     {
         if (env.IsDevelopment())
         {
+            var connString = configuration.GetConnectionString("DefaultConnection");
+            services.AddDbContextFactory<ApplicationDbContext>(options =>
+                options.UseNpgsql(connString));
             services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseNpgsql(
-                configuration.GetConnectionString("DefaultConnection")
-            ));
+                options.UseNpgsql(connString),
+                ServiceLifetime.Scoped,
+                ServiceLifetime.Singleton);
         }
         else
         {
-            var connectionString = "Data Source=" + Environment.GetEnvironmentVariable("COUNTRY") + "_" + configuration.GetConnectionString("Database");
+            var connectionString = "Data Source=" + EnvHelper.Get("COUNTRY") + "_" + configuration.GetConnectionString("Database");
             services.AddDbContext<ApplicationDbContext>(options =>
                                     options.UseSqlite(connectionString,
                     sqlOptions => sqlOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)));

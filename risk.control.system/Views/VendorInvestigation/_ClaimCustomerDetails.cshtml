@@ -8,7 +8,7 @@
 
         if (Model.ClaimsInvestigation?.CustomerDetail.DateOfBirth != null)
         {
-            var age = DateTime.Now.Subtract(Model.ClaimsInvestigation.CustomerDetail.DateOfBirth.GetValueOrDefault()).TotalDays;
+            var age = DateTime.UtcNow.Subtract(Model.ClaimsInvestigation.CustomerDetail.DateOfBirth.GetValueOrDefault()).TotalDays;
             currentAgeinYrs = (int)age / 365;
         }
     }

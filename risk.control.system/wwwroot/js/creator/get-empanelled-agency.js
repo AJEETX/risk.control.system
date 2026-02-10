@@ -229,7 +229,7 @@
         }
     });
 
-    $('body').on('click', 'a.btn-info', function (e) {
+    $('body').on('click', 'a.btn.btn-xs.btn-info', function (e) {
         e.preventDefault();
         const id = $(this).data('id');
         showagencydetail(id, this);

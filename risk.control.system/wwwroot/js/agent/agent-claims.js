@@ -44,6 +44,21 @@ $(document).ready(function () {
                             window.location.href = '/Account/Login';
                         }
                     });
+                } else {
+                    $.confirm({
+                        title: 'Server Error!',
+                        content: 'An unexpected server error occurred. You will be redirected to Dashboard page.',
+                        type: 'orange',
+                        typeAnimated: true,
+                        buttons: {
+                            Ok: function () {
+                                window.location.href = '/DashBoard/Index';
+                            }
+                        },
+                        onClose: function () {
+                            window.location.href = '/DashBoard/Index';
+                        }
+                    });
                 }
             }
         },

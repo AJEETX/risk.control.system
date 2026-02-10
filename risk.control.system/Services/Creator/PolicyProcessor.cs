@@ -13,13 +13,13 @@ namespace risk.control.system.Services.Creator
 
     public class PolicyProcessor : IPolicyProcessor
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IDbContextFactory<ApplicationDbContext> _contextFactory;
         private readonly IVerifierProcessor verifierProcessor;
         private readonly IDateParserService dateParserService;
 
-        public PolicyProcessor(ApplicationDbContext context, IVerifierProcessor verifierProcessor, IDateParserService dateParserService)
+        public PolicyProcessor(IDbContextFactory<ApplicationDbContext> contextFactory, IVerifierProcessor verifierProcessor, IDateParserService dateParserService)
         {
-            _context = context;
+            _contextFactory = contextFactory;
             this.verifierProcessor = verifierProcessor;
             this.dateParserService = dateParserService;
         }
@@ -61,7 +61,7 @@ namespace risk.control.system.Services.Creator
                 CauseOfLoss = uc.Cause ?? "UNKNOWN",
                 DocumentPath = imgPath,
                 DocumentImageExtension = ext,
-                Updated = DateTime.Now,
+                Updated = DateTime.UtcNow,
                 UpdatedBy = user.Email
             };
 
@@ -70,30 +70,50 @@ namespace risk.control.system.Services.Creator
 
         private async Task<InvestigationServiceType> GetServiceType(string code, InsuranceType type)
         {
+            using var context = await _contextFactory.CreateDbContextAsync();
             if (string.IsNullOrWhiteSpace(code))
-                return await _context.InvestigationServiceType.FirstOrDefaultAsync(i => i.InsuranceType == type);
-
-            return await _context.InvestigationServiceType
-                .FirstOrDefaultAsync(b => b.Code.ToLower() == code.ToLower() && b.InsuranceType == type)
-                ?? await _context.InvestigationServiceType.FirstOrDefaultAsync(b => b.InsuranceType == type);
+            {
+                var service = await context.InvestigationServiceType.FirstOrDefaultAsync(i => i.InsuranceType == type);
+                if (service == null)
+                {
+                    service = await context.InvestigationServiceType.FirstOrDefaultAsync();
+                }
+                return service;
+            }
+            else
+            {
+                var services = await context.InvestigationServiceType
+                .FirstOrDefaultAsync(b => b.Code.ToLower() == code.ToLower() && b.InsuranceType == type);
+                if (services == null)
+                {
+                    services = await context.InvestigationServiceType.FirstOrDefaultAsync(b => b.InsuranceType == type);
+                    if (services == null)
+                    {
+                        services = await context.InvestigationServiceType.FirstOrDefaultAsync();
+                    }
+                }
+                return services;
+            }
         }
 
         private async Task<CaseEnabler> GetCaseEnabler(string reason)
         {
+            using var context = await _contextFactory.CreateDbContextAsync();
             if (string.IsNullOrWhiteSpace(reason))
-                return await _context.CaseEnabler.FirstOrDefaultAsync();
+                return await context.CaseEnabler.FirstOrDefaultAsync();
 
-            return await _context.CaseEnabler.FirstOrDefaultAsync(c => c.Code.ToLower() == reason.Trim().ToLower())
-                ?? await _context.CaseEnabler.FirstOrDefaultAsync();
+            return await context.CaseEnabler.FirstOrDefaultAsync(c => c.Code.ToLower() == reason.Trim().ToLower())
+                ?? await context.CaseEnabler.FirstOrDefaultAsync();
         }
 
         private async Task<CostCentre> GetCostCentre(string department)
         {
+            using var context = await _contextFactory.CreateDbContextAsync();
             if (string.IsNullOrWhiteSpace(department))
-                return await _context.CostCentre.FirstOrDefaultAsync();
+                return await context.CostCentre.FirstOrDefaultAsync();
 
-            return await _context.CostCentre.FirstOrDefaultAsync(c => c.Code.ToLower() == department.Trim().ToLower())
-                ?? await _context.CostCentre.FirstOrDefaultAsync();
+            return await context.CostCentre.FirstOrDefaultAsync(c => c.Code.ToLower() == department.Trim().ToLower())
+                ?? await context.CostCentre.FirstOrDefaultAsync();
         }
     }
 }

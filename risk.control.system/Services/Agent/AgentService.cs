@@ -96,7 +96,7 @@ namespace risk.control.system.Services.Agent
                        BeneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail.Name) ?
                         "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>" :
                         a.BeneficiaryDetail.Name,
-                       TimeElapsed = DateTime.Now.Subtract(a.TaskToAgentTime.Value).TotalSeconds,
+                       TimeElapsed = DateTime.UtcNow.Subtract(a.TaskToAgentTime.Value).TotalSeconds,
                        IsNewAssigned = a.IsNewSubmittedToAgent,
                        IsQueryCase = a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR,
                        PersonMapAddressUrl = string.Format(a.SelectedAgentDrivingMap, "300", "300"),
@@ -161,7 +161,7 @@ namespace risk.control.system.Services.Agent
                            PolicyNum = a.PolicyDetail.ContractNumber,
                            BeneficiaryPhoto = await beneficiaryPhotoTask,
                            BeneficiaryName = a.BeneficiaryDetail.Name,
-                           TimeElapsed = DateTime.Now.Subtract(a.SubmittedToSupervisorTime.Value).TotalSeconds,
+                           TimeElapsed = DateTime.UtcNow.Subtract(a.SubmittedToSupervisorTime.Value).TotalSeconds,
                            PersonMapAddressUrl = string.Format(a.SelectedAgentDrivingMap, "300", "300"),
                            Distance = a.SelectedAgentDrivingDistance,
                            Duration = a.SelectedAgentDrivingDuration

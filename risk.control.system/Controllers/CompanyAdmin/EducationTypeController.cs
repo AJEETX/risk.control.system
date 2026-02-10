@@ -82,7 +82,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
         {
             if (education is not null)
             {
-                education.Updated = DateTime.Now;
+                education.Updated = DateTime.UtcNow;
                 education.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.EducationType.Add(education);
                 await _context.SaveChangesAsync();
@@ -121,7 +121,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             }
             try
             {
-                education.Updated = DateTime.Now;
+                education.Updated = DateTime.UtcNow;
                 education.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.EducationType.Update(education);
                 await _context.SaveChangesAsync();
@@ -147,7 +147,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             var education = await _context.EducationType.FindAsync(id);
             if (education != null)
             {
-                education.Updated = DateTime.Now;
+                education.Updated = DateTime.UtcNow;
                 education.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.EducationType.Remove(education);
             }

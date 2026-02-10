@@ -49,7 +49,7 @@ namespace risk.control.system.Seeds
                 PinCodeId = pinCode?.PinCodeId ?? default!,
                 ProfilePictureUrl = relativePath,
                 Role = AppRoles.CREATOR,
-                Updated = DateTime.Now,
+                Updated = DateTime.UtcNow,
             };
             if (userManager.Users.All(u => u.Id != clientCreator.Id))
             {

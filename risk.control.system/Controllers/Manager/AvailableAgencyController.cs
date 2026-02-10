@@ -83,7 +83,7 @@ namespace risk.control.system.Controllers.Manager
                 var vendors2Empanel = await _context.Vendor.AsNoTracking().Where(v => vendors.Contains(v.VendorId)).ToListAsync();
                 company.EmpanelledVendors.AddRange(vendors2Empanel);
 
-                company.Updated = DateTime.Now;
+                company.Updated = DateTime.UtcNow;
                 company.UpdatedBy = userEmail;
                 _context.ClientCompany.Update(company);
                 var savedRows = await _context.SaveChangesAsync();
@@ -238,12 +238,12 @@ namespace risk.control.system.Controllers.Manager
 
                 foreach (var user in vendorUsers)
                 {
-                    user.Updated = DateTime.Now;
+                    user.Updated = DateTime.UtcNow;
                     user.UpdatedBy = userEmail;
                     user.Deleted = true;
                 }
 
-                vendor.Updated = DateTime.Now;
+                vendor.Updated = DateTime.UtcNow;
                 vendor.UpdatedBy = userEmail;
                 vendor.Deleted = true;
 

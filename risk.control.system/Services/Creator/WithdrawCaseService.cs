@@ -35,7 +35,7 @@ namespace risk.control.system.Services.Creator
                 var company = await context.ClientCompany.FirstOrDefaultAsync(c => c.ClientCompanyId == caseTask.ClientCompanyId);
 
                 caseTask.IsNew = true;
-                caseTask.Updated = DateTime.Now;
+                caseTask.Updated = DateTime.UtcNow;
                 caseTask.UpdatedBy = currentUser.Email;
                 caseTask.AssignedToAgency = false;
                 caseTask.CaseOwner = company.Email;

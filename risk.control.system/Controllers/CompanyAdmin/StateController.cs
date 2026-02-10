@@ -201,7 +201,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 }
                 var textInfo = CultureInfo.CurrentCulture.TextInfo;
                 state.Name = textInfo.ToTitleCase(state.Name.ToLower());
-                state.Updated = DateTime.Now;
+                state.Updated = DateTime.UtcNow;
                 state.CountryId = state.SelectedCountryId;
                 state.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.State.Add(state);
@@ -261,7 +261,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 existingState.Code = state.Code;
                 var textInfo = CultureInfo.CurrentCulture.TextInfo;
                 existingState.Name = textInfo.ToTitleCase(state.Name.ToLower());
-                existingState.Updated = DateTime.Now;
+                existingState.Updated = DateTime.UtcNow;
                 existingState.CountryId = state.SelectedCountryId;
                 existingState.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Update(existingState);
@@ -298,7 +298,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 {
                     return Json(new { success = false, message = $"Cannot delete State {state.Name}. It has associated districts." });
                 }
-                state.Updated = DateTime.Now;
+                state.Updated = DateTime.UtcNow;
                 state.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.State.Remove(state);
                 await _context.SaveChangesAsync();

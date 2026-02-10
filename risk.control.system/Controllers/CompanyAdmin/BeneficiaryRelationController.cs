@@ -112,7 +112,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                     notifyService.Error("Beneficiary Relation Code already exists!");
                     return View(beneficiaryRelation);
                 }
-                beneficiaryRelation.Updated = DateTime.Now;
+                beneficiaryRelation.Updated = DateTime.UtcNow;
                 beneficiaryRelation.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Add(beneficiaryRelation);
                 await _context.SaveChangesAsync();
@@ -182,7 +182,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                     notifyService.Error("Beneficiary Relation Code already exists!");
                     return View(beneficiaryRelation);
                 }
-                beneficiaryRelation.Updated = DateTime.Now;
+                beneficiaryRelation.Updated = DateTime.UtcNow;
                 beneficiaryRelation.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Update(beneficiaryRelation);
                 await _context.SaveChangesAsync();
@@ -213,7 +213,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 {
                     return Json(new { success = false, message = "Beneficiary Relation Not found!" });
                 }
-                beneficiaryRelation.Updated = DateTime.Now;
+                beneficiaryRelation.Updated = DateTime.UtcNow;
                 beneficiaryRelation.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.BeneficiaryRelation.Remove(beneficiaryRelation);
                 await _context.SaveChangesAsync();

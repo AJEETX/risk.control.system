@@ -102,7 +102,7 @@ namespace risk.control.system.Controllers.Common
         }
         private static string GetTimeAgo(DateTime createdAt)
         {
-            var timeSpan = DateTime.Now - createdAt;
+            var timeSpan = DateTime.UtcNow - createdAt;
 
             if (timeSpan.TotalSeconds < 60)
                 return $"{timeSpan.Seconds} seconds ago";

@@ -11,7 +11,7 @@
 
         if (Model.Location?.DateOfBirth != null)
         {
-            var age = DateTime.Now.Subtract(Model.Location.DateOfBirth.GetValueOrDefault()).TotalDays;
+            var age = DateTime.UtcNow.Subtract(Model.Location.DateOfBirth.GetValueOrDefault()).TotalDays;
             currentBAgeinYrs = (int)age / 365;
         }
     }

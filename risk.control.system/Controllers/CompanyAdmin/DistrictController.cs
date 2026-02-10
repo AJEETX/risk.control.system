@@ -198,7 +198,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 district.Name = textInfo.ToTitleCase(district.Name.ToLower());
                 district.Name = WebUtility.HtmlEncode((district.Name));
                 district.Code = WebUtility.HtmlEncode(district.Code?.ToUpper());
-                district.Updated = DateTime.Now;
+                district.Updated = DateTime.UtcNow;
                 district.UpdatedBy = HttpContext.User?.Identity?.Name;
                 district.CountryId = district.SelectedCountryId;
                 district.StateId = district.SelectedStateId;
@@ -256,7 +256,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 existingdistrict.Name = WebUtility.HtmlEncode(textInfo.ToTitleCase(district.Name.ToLower()));
                 existingdistrict.Code = WebUtility.HtmlEncode(district.Code);
                 existingdistrict.CountryId = district.SelectedCountryId;
-                existingdistrict.Updated = DateTime.Now;
+                existingdistrict.Updated = DateTime.UtcNow;
                 existingdistrict.UpdatedBy = HttpContext.User?.Identity?.Name;
                 existingdistrict.StateId = district.SelectedStateId;
                 _context.Update(existingdistrict);
@@ -295,7 +295,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                     return Json(new { success = false, message = $"Cannot delete District {district.Name}. It has associated Pincode(s)" });
                 }
 
-                district.Updated = DateTime.Now;
+                district.Updated = DateTime.UtcNow;
                 district.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.District.Remove(district);
                 await _context.SaveChangesAsync();

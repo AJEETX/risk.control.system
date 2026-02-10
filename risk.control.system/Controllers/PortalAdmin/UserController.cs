@@ -68,7 +68,7 @@ namespace risk.control.system.Controllers.PortalAdmin
             user.EmailConfirmed = true;
             user.Email = user.Email.Trim().ToLower();
             user.UserName = user.Email;
-            user.Updated = DateTime.Now;
+            user.Updated = DateTime.UtcNow;
             user.UpdatedBy = HttpContext.User?.Identity?.Name;
             user.PhoneNumber = user.PhoneNumber.TrimStart('0');
             user.PinCodeId = user.SelectedPincodeId;
@@ -114,7 +114,7 @@ namespace risk.control.system.Controllers.PortalAdmin
             var user = await context.ApplicationUser.FirstOrDefaultAsync(a => a.Id.ToString() == id);
             if (user is not null)
             {
-                user.Updated = DateTime.Now;
+                user.Updated = DateTime.UtcNow;
                 user.UpdatedBy = HttpContext.User?.Identity?.Name;
                 user.ProfilePictureUrl = null;
                 await context.SaveChangesAsync();
@@ -167,10 +167,10 @@ namespace risk.control.system.Controllers.PortalAdmin
                 user.PinCodeId = applicationUser.SelectedPincodeId;
 
                 user.IsUpdated = true;
-                user.Updated = DateTime.Now;
+                user.Updated = DateTime.UtcNow;
                 user.PhoneNumber = applicationUser.PhoneNumber;
                 user.UpdatedBy = HttpContext.User?.Identity?.Name;
-                user.SecurityStamp = DateTime.Now.ToString();
+                user.SecurityStamp = DateTime.UtcNow.ToString();
                 var result = await userManager.UpdateAsync(user);
                 if (!result.Succeeded)
                 {

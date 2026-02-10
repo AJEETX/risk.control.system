@@ -2,7 +2,7 @@
 {
     public class BaseEntity
     {
-        public DateTime Created { get; set; } = DateTime.Now;
+        public DateTime Created { get; set; } = DateTime.UtcNow;
         public bool IsUpdated { get; set; } = true;
         public DateTime? Updated { get; set; }
         public string? CreatedUser { get; set; } = "--";

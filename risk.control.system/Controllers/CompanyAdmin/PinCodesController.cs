@@ -193,7 +193,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             }
             try
             {
-                pinCode.Updated = DateTime.Now;
+                pinCode.Updated = DateTime.UtcNow;
                 pinCode.UpdatedBy = HttpContext.User?.Identity?.Name;
                 pinCode.CountryId = pinCode.SelectedCountryId;
                 pinCode.StateId = pinCode.SelectedStateId;
@@ -253,7 +253,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 }
                 existingPincode.Code = pinCode.Code;
                 existingPincode.Name = pinCode.Name;
-                existingPincode.Updated = DateTime.Now;
+                existingPincode.Updated = DateTime.UtcNow;
                 existingPincode.UpdatedBy = HttpContext.User?.Identity?.Name;
                 existingPincode.CountryId = pinCode.SelectedCountryId;
                 existingPincode.StateId = pinCode.SelectedStateId;
@@ -293,7 +293,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 {
                     return Json(new { success = true, message = "Pincode not found!" });
                 }
-                pinCode.Updated = DateTime.Now;
+                pinCode.Updated = DateTime.UtcNow;
                 pinCode.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.PinCode.Remove(pinCode);
                 await _context.SaveChangesAsync();

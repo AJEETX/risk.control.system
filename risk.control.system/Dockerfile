@@ -2,11 +2,37 @@
 
 # This stage is used when running from VS in fast mode (Default for Debug configuration)
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
-USER $APP_UID
+
+ARG APP_UID=1000
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    libgssapi-krb5-2 \
+    libkrb5-3 \
+    libicu-dev \
+    fontconfig \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Microsoft TrueType Fonts (Arial, Times New Roman, etc.)
+RUN apt-get update && \
+    echo "ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true" | debconf-set-selections && \
+    apt-get install -y --no-install-recommends ttf-mscorefonts-installer && \
+    fc-cache -f -v && \
+    rm -rf /var/lib/apt/lists/*
+# Use root to prepare filesystem
+USER root
 WORKDIR /app
+
+# Create Document folder and fix permissions
+RUN mkdir -p /app/Document /app/DataProtection-Keys \
+    && chown -R ${APP_UID}:${APP_UID} /app/Document /app/DataProtection-Keys \
+    && chmod -R 775 /app/Document /app/DataProtection-Keys
+
+# Switch back to non-root user
+USER ${APP_UID}
+
 EXPOSE 8080
 EXPOSE 8081
-
 
 # This stage is used to build the service project
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build

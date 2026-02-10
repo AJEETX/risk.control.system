@@ -4,10 +4,40 @@ services:
     build:
       context: .
       dockerfile: risk.control.system/Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: https://+:8081;http://+:8080
+      APP_URL: "https://ickeckify-apk.s3.ap-southeast-2.amazonaws.com/demo/app-release.apk"
+      COUNTRY: "AU"
+      SAMPLE_MOBILE_AUSTRALIA: "432854196"
+      SAMPLE_MOBILE_INDIA: "9958389949"
+      FtpKey: "C0##ect10n"
+      SMS_Url: "http://192.168.1.103:8080/message"
+      SMS_Sim: "1"
+      SMS_User_India: "QQCLNH"
+      SMS_Sim_India: "1"
+      ASPNETCORE_Kestrel__Certificates__Default__Path: /https/aspnet-dev.pfx
+      ASPNETCORE_Kestrel__Certificates__Default__Password: devpassword
+    secrets:
+      - AzureAd__ClientSecret
+      - aws_id
+      - aws_secret
+      - GOOGLE_MAP_KEY
+      - GOOGLE_APPLICATION_CREDENTIALS_JSON
+      - HUGING_FACE
+      - PHONE_API
+      - SMS_User
+      - SMS_Pwd
+      - SMS_Pwd_India
+      - TINY_URL_KEY
     ports:
       - 8080:8080
+      - 8081:8081
     depends_on:
       - postgres
+    volumes:
+      - ./certs:/https:ro
+      - web_data:/app/Document
   postgres:
     image: postgres:16
     container_name: postgres-db
@@ -32,9 +62,32 @@ services:
       - postgres
     volumes:
       - pgadmin_data:/var/lib/pgadmin
-
 volumes:
+  web_data:
   postgres_data:
-  pgadmin_data:
+  pgadmin_data:	
 
+secrets:
+  AzureAd__ClientSecret:
+    file: ./secrets/AzureAd__ClientSecret.txt
+  aws_id:
+    file: ./secrets/aws_id.txt
+  aws_secret:
+    file: ./secrets/aws_secret.txt
+  GOOGLE_MAP_KEY:
+    file: ./secrets/GOOGLE_MAP_KEY.txt
+  GOOGLE_APPLICATION_CREDENTIALS_JSON:
+    file: ./secrets/GOOGLE_APPLICATION_CREDENTIALS_JSON.json
+  HUGING_FACE:
+    file: ./secrets/HUGING_FACE.txt
+  PHONE_API:
+    file: ./secrets/PHONE_API.txt
+  SMS_User:
+    file: ./secrets/SMS_User.txt
+  SMS_Pwd:
+    file: ./secrets/SMS_Pwd.txt
+  SMS_Pwd_India:
+    file: ./secrets/SMS_Pwd_India.txt
+  TINY_URL_KEY:
+    file: ./secrets/TINY_URL_KEY.txt
 

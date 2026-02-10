@@ -85,7 +85,7 @@ namespace risk.control.system.Controllers.Manager
                 {
                     company.EmpanelledVendors.Remove(agency);
                 }
-                company.Updated = DateTime.Now;
+                company.Updated = DateTime.UtcNow;
                 company.UpdatedBy = userEmail;
                 _context.ClientCompany.Update(company);
                 var savedRows = await _context.SaveChangesAsync();

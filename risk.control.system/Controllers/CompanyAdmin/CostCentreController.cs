@@ -111,7 +111,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                     notifyService.Error("Budget Centre Code already exists!");
                     return View(costCentre);
                 }
-                costCentre.Updated = DateTime.Now;
+                costCentre.Updated = DateTime.UtcNow;
                 costCentre.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Add(costCentre);
                 await _context.SaveChangesAsync();
@@ -183,7 +183,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                     notifyService.Error("Budget Centre Code already exists!");
                     return View(costCentre);
                 }
-                costCentre.Updated = DateTime.Now;
+                costCentre.Updated = DateTime.UtcNow;
                 costCentre.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Update(costCentre);
                 await _context.SaveChangesAsync();
@@ -215,7 +215,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 {
                     return Json(new { success = false, message = "Budget Centre Not found!" });
                 }
-                costCentre.Updated = DateTime.Now;
+                costCentre.Updated = DateTime.UtcNow;
                 costCentre.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.CostCentre.Remove(costCentre);
                 await _context.SaveChangesAsync();

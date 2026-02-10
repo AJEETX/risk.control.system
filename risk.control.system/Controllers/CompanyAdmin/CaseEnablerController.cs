@@ -107,7 +107,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                     return View(caseEnabler);
                 }
                 caseEnabler.Name = WebUtility.HtmlEncode(caseEnabler.Name);
-                caseEnabler.Updated = DateTime.Now;
+                caseEnabler.Updated = DateTime.UtcNow;
                 caseEnabler.UpdatedBy = HttpContext.User?.Identity?.Name;
 
                 _context.Add(caseEnabler);
@@ -188,7 +188,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                     return View(caseEnabler);
                 }
 
-                caseEnabler.Updated = DateTime.Now;
+                caseEnabler.Updated = DateTime.UtcNow;
                 caseEnabler.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Update(caseEnabler);
                 await _context.SaveChangesAsync();
@@ -219,7 +219,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                     return Json(new { success = false, message = "Reason Not found!" });
                 }
 
-                caseEnabler.Updated = DateTime.Now;
+                caseEnabler.Updated = DateTime.UtcNow;
                 caseEnabler.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.CaseEnabler.Remove(caseEnabler);
                 await _context.SaveChangesAsync();

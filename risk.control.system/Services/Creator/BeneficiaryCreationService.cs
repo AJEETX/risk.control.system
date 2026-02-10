@@ -1,4 +1,5 @@
-﻿using risk.control.system.Models;
+﻿using risk.control.system.Helpers;
+using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services.Common;
 using static risk.control.system.AppConstant.CONSTANTS;
@@ -38,19 +39,54 @@ namespace risk.control.system.Services.Creator
 
             try
             {
-                // 1. Validation & Data Extraction
+                // 1️⃣ Validation first (cheap, fail fast)
                 beneficiaryValidator.ValidateRequiredFields(uploadCase, errors, summaries);
                 var (dob, income) = beneficiaryValidator.ValidateDetails(uploadCase, errors, summaries);
-                var relation = await extractorService.GetRelationAsync(uploadCase.Relation);
-                var pinCode = await extractorService.GetPinCodeAsync(uploadCase.BeneficiaryPincode, uploadCase.BeneficiaryDistrictName, companyUser.ClientCompany.CountryId.Value);
 
-                if (pinCode == null) verifierProcessor.AddLocationError(errors, summaries, uploadCase.BeneficiaryPincode, uploadCase.BeneficiaryDistrictName);
+                if (errors.Count > 0)
+                    return (null, errors, summaries);
 
-                // 2. Image & Phone processing
-                var (imagePath, ext) = await verifierProcessor.ProcessImage(uploadCase, data, errors, summaries, BENEFICIARY_IMAGE, "Beneficiary");
-                await verifierProcessor.ValidatePhone(companyUser, uploadCase.BeneficiaryContact, errors, summaries);
+                // 2️⃣ Run independent async operations in parallel
+                var relationTask = extractorService.GetRelationAsync(uploadCase.Relation);
+                var pinCodeTask = extractorService.GetPinCodeAsync(
+                    uploadCase.BeneficiaryPincode,
+                    uploadCase.BeneficiaryDistrictName,
+                    companyUser.ClientCompany.CountryId!.Value);
 
-                // 3. Mapping
+                var imageTask = verifierProcessor.ProcessImage(
+                    uploadCase, data, errors, summaries, BENEFICIARY_IMAGE, "Beneficiary");
+
+                var phoneTask = verifierProcessor.ValidatePhone(
+                    companyUser, uploadCase.BeneficiaryContact, errors, summaries);
+
+                await Task.WhenAll(relationTask, pinCodeTask, imageTask, phoneTask);
+
+                var relation = await relationTask;
+                var pinCode = await pinCodeTask;
+                var (imagePath, ext) = await imageTask;
+
+                // 3️⃣ Defensive null handling (Docker exposes this)
+                if (relation == null)
+                {
+                    errors.Add(new UploadError
+                    {
+                        UploadData = "Relation",
+                        Error = $"Invalid beneficiary relation: '{uploadCase.Relation}'"
+                    });
+
+                    return (null, errors, summaries);
+                }
+
+                if (pinCode == null)
+                {
+                    verifierProcessor.AddLocationError(
+                        errors,
+                        summaries,
+                        uploadCase.BeneficiaryPincode,
+                        uploadCase.BeneficiaryDistrictName);
+                }
+
+                // 4️⃣ Map entity (pure in-memory work)
                 var beneficiary = new BeneficiaryDetail
                 {
                     Name = uploadCase.BeneficiaryName,
@@ -69,13 +105,18 @@ namespace risk.control.system.Services.Creator
                     UpdatedBy = companyUser.Email
                 };
 
-                if (pinCode != null) await EnrichLocationData(beneficiary, pinCode);
+                if (pinCode != null)
+                    await EnrichLocationData(beneficiary, pinCode);
 
                 return (beneficiary, errors, summaries);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error in AddBeneficiary for CaseId: {CaseId}", uploadCase.CaseId);
+                logger.LogError(ex,
+                    "AddBeneficiary failed in Docker. CaseId={CaseId}, Relation='{Relation}'",
+                    uploadCase.CaseId,
+                    uploadCase.Relation);
+
                 return (null, errors, summaries);
             }
         }
@@ -87,7 +128,7 @@ namespace risk.control.system.Services.Creator
 
             beneficiary.Latitude = lat;
             beneficiary.Longitude = lon;
-            beneficiary.BeneficiaryLocationMap = $"https://maps.googleapis.com/maps/api/staticmap?center={lat},{lon}&zoom=14&size=600x300&markers=color:red|{lat},{lon}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+            beneficiary.BeneficiaryLocationMap = $"https://maps.googleapis.com/maps/api/staticmap?center={lat},{lon}&zoom=14&size=600x300&markers=color:red|{lat},{lon}&key={EnvHelper.Get("GOOGLE_MAP_KEY")}";
         }
     }
 }

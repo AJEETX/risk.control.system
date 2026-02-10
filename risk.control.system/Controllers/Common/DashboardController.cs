@@ -1,9 +1,6 @@
 ﻿using System.Security.Claims;
 
 using AspNetCoreHero.ToastNotification.Abstractions;
-
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -104,7 +101,6 @@ namespace risk.control.system.Controllers.Common
             {
                 _logger.LogError(ex, "Error occurred.");
                 notifyService.Error("OOPs !!!...Contact Admin");
-                await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
                 await signInManager.SignOutAsync();
                 return RedirectToAction(nameof(AccountController.Login), "Account");
             }

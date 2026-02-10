@@ -138,6 +138,13 @@ public static class BusinessServiceExtension
             options.KnownProxies.Clear();
         });
         services.AddHttpClient();
+        services.AddScoped<IAgencyAgentService, AgencyAgentService>();
+        services.AddScoped<IAgencyInvestigationServiceService, AgencyInvestigationServiceService>();
+        services.AddScoped<IEmpanelledAvailableAgencyService, EmpanelledAvailableAgencyService>();
+        services.AddScoped<IFileUploadCaseAllocationService, FileUploadCaseAllocationService>();
+        services.AddScoped<IManagerDashboardService, ManagerDashboardService>();
+        services.AddScoped<IAssessorDashboardService, AssessorDashboardService>();
+        services.AddScoped<ICreatorDashboardService, CreatorDashboardService>();
         services.AddScoped<IAdminDashBoardService, AdminDashBoardService>();
         services.AddScoped<ICompanyDashboardService, CompanyDashboardService>();
         services.AddScoped<IAssessorQueryService, AssessorQueryService>();

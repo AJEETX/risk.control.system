@@ -63,15 +63,8 @@ namespace risk.control.system.Controllers.Creator
 
                 var uploadId = await zipFileService.Save(currentUserEmail, postedFile, CREATEDBY.AUTO, model.UploadAndAssign);
                 logger.LogInformation("Hangfire Job Enqueued. JobId = {JobId}", uploadId);
-                var jobId = backgroundJobClient.Enqueue<IUploadZipFileService>(service =>
-                    service.StartFileUpload(
-                        currentUserEmail,
-                        uploadId,
-                        baseUrl,
-                        model.UploadAndAssign
-                    ));
+                var jobId = backgroundJobClient.Enqueue<IUploadZipFileService>(service => service.StartFileUpload(currentUserEmail, uploadId, baseUrl, model.UploadAndAssign));
 
-                //var jobId = backgroundJobClient.Enqueue(() => uploadZipFileService.StartFileUpload(currentUserEmail, uploadId, baseUrl, model.UploadAndAssign));
                 if (!model.UploadAndAssign)
                 {
                     notifyService.Custom($"Uploading ...", 3, "#17A2B8", "fa fa-upload");

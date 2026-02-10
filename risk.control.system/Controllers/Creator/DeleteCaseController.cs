@@ -54,7 +54,7 @@ namespace risk.control.system.Controllers.Creator
                     return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
 
-                claimsInvestigation.Updated = DateTime.Now;
+                claimsInvestigation.Updated = DateTime.UtcNow;
                 claimsInvestigation.UpdatedBy = currentUserEmail;
                 claimsInvestigation.Deleted = true;
                 _context.Investigations.Update(claimsInvestigation);
@@ -95,7 +95,7 @@ namespace risk.control.system.Controllers.Creator
                         return this.RedirectToAction<DashboardController>(x => x.Index());
                     }
 
-                    claimsInvestigation.Updated = DateTime.Now;
+                    claimsInvestigation.Updated = DateTime.UtcNow;
                     claimsInvestigation.UpdatedBy = currentUserEmail;
                     claimsInvestigation.Deleted = true;
                     _context.Investigations.Update(claimsInvestigation);

@@ -42,7 +42,6 @@
     });
 
     $('#beneficiaryGoogleMap').on('click', function () {
-
         const beneficiaryId = $('#beneficiaryId').val();
 
         if (!beneficiaryId) {
@@ -89,11 +88,9 @@
     });
 
     $('#policy-detail').on('click', function () {
-
         const policyId = $('#policyDetailId').val();
-        const claimId = $('#claimId').val();
 
-        if (!policyId || !claimId) {
+        if (!policyId) {
             $.alert('Policy details not found.');
             return;
         }
@@ -114,7 +111,7 @@
                     data: { id: policyId }
                 })
                     .done(function (res) {
-                        self.setContent(renderPolicyDetailHtml(res, claimId));
+                        self.setContent(renderPolicyDetailHtml(res, policyId));
                     })
                     .fail(function (xhr) {
                         if (xhr.status === 401 || xhr.status === 403) {
@@ -135,7 +132,6 @@
     });
 
     $('#customer-detail').on('click', function () {
-
         const customerId = $('#customerDetailId').val();
 
         if (!customerId) {
@@ -153,7 +149,6 @@
     });
 
     $('#beneficiary-detail').on('click', function () {
-
         const beneficiaryId = $('#beneficiaryId').val();
 
         if (!beneficiaryId) {
@@ -171,7 +166,6 @@
     });
 
     $('#notesDetail').on('click', function () {
-
         const claimId = $('#claimId').val();
 
         if (!claimId) {
@@ -532,7 +526,6 @@
 });
 
 function renderPolicyNotesHtml(data) {
-
     if (!data || !data.notes || data.notes.length === 0) {
         return `<div class="text-muted text-center">No notes available.</div>`;
     }
@@ -545,7 +538,6 @@ function renderPolicyNotesHtml(data) {
 }
 
 function renderSingleNote(note) {
-
     const created = note.created
         ? formatDateTime(note.created)
         : { date: '-', time: '-' };
@@ -565,7 +557,6 @@ function renderSingleNote(note) {
 }
 
 function formatDateTime(dateValue) {
-
     const date = new Date(dateValue);
 
     const day = String(date.getDate()).padStart(2, '0');
@@ -583,7 +574,6 @@ function formatDateTime(dateValue) {
 }
 
 function renderBeneficiaryDetailHtml(data, beneficiaryId) {
-
     const beneficiaryImageUrl = `/Document/GetBeneficiaryDocument/${beneficiaryId}`;
 
     return `
@@ -613,7 +603,6 @@ function renderBeneficiaryDetailHtml(data, beneficiaryId) {
 }
 
 function openDetailPopup(options) {
-
     $.confirm({
         title: options.title,
         type: options.type || 'blue',
@@ -649,7 +638,6 @@ function openDetailPopup(options) {
 }
 
 function renderCustomerDetailHtml(data, customerId) {
-
     const customerImageUrl = `/Document/GetCustomerDocument/${customerId}`;
 
     return `
@@ -691,9 +679,8 @@ function detailRow(icon, label, value) {
     `;
 }
 
-function renderPolicyDetailHtml(data, claimId) {
-
-    const policyDocUrl = `/Document/GetPolicyDocument/${claimId}`;
+function renderPolicyDetailHtml(data, policyId) {
+    const policyDocUrl = `/Document/GetPolicyDocument/${policyId}`;
 
     return `
     <article>
@@ -740,6 +727,7 @@ function renderPolicyRow(icon, label, value) {
         </div>
     `;
 }
+
 function renderMapHtml(data) {
     return `
         <div class="mb-2">

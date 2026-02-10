@@ -265,7 +265,7 @@ namespace risk.control.system.Services.Agency
                 user.AddressLongitude = coordinates.Longitude;
                 user.AddressMapLocation = $"https://maps.googleapis.com/maps/api/staticmap?center={latLong}&zoom=14&size=200x200" +
                     $"&maptype=roadmap&markers=color:red%7C{latLong}" +
-                    $"&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+                    $"&key={EnvHelper.Get("GOOGLE_MAP_KEY")}";
             }
         }
 

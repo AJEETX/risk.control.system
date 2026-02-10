@@ -51,6 +51,38 @@
                         }
                     });
                 }
+                else if (xhr.status === 400) {
+                    $.confirm({
+                        title: 'Bad Request!',
+                        content: 'Try with valid data.You will be redirected to Dashboard page',
+                        type: 'orange',
+                        typeAnimated: true,
+                        buttons: {
+                            Ok: function () {
+                                window.location.href = '/DashBoard/Index';
+                            }
+                        },
+                        onClose: function () {
+                            window.location.href = '/DashBoard/Index';
+                        }
+                    });
+                }
+                else {
+                    $.confirm({
+                        title: 'Server Error!',
+                        content: 'An unexpected server error occurred. You will be redirected to Dashboard page.',
+                        type: 'orange',
+                        typeAnimated: true,
+                        buttons: {
+                            Ok: function () {
+                                window.location.href = '/DashBoard/Index';
+                            }
+                        },
+                        onClose: function () {
+                            window.location.href = '/DashBoard/Index';
+                        }
+                    });
+                }
             }
         },
         order: [[11, 'desc'], [12, 'desc']], // Sort by `isUpdated` and `lastModified`,
@@ -173,7 +205,7 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    buttons += `<a data-id="${row.id}" class="btn btn-xs btn-warning"><i class="fas fa-edit"></i> Edit</a> &nbsp;` ;
+                    buttons += `<a data-id="${row.id}" class="btn btn-xs btn-warning"><i class="fas fa-edit"></i> Edit</a> &nbsp;`;
                     if (row.role != "AGENCY_ADMIN") {
                         buttons += `<a data-id="${row.id}" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i> Delete</a>`;
                     } else {
@@ -202,7 +234,6 @@
             $('.btn-danger', row).addClass('btn-white-color');
         },
         drawCallback: function (settings, start, end, max, total, pre) {
-            
             // Reinitialize Bootstrap 5 tooltips
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
             tooltipTriggerList.map(function (el) {

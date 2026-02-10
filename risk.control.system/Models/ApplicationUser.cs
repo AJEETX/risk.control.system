@@ -11,8 +11,10 @@ namespace risk.control.system.Models
     public partial class ApplicationUser : IdentityUser<long>
     {
         public bool IsPasswordChangeRequired { get; set; } = true;
+
         [FileExtensions(Extensions = "jpg,jpeg,png")]
         public string? ProfilePictureUrl { get; set; }
+
         public int FaceMatchCount { get; set; } = 0;
         public int OcrCount { get; set; } = 0;
         public int PdfCount { get; set; } = 0;
@@ -60,7 +62,7 @@ namespace risk.control.system.Models
         [Display(Name = "Address line")]
         public string? Addressline { get; set; }
 
-        public DateTime Created { get; set; } = DateTime.Now;
+        public DateTime Created { get; set; } = DateTime.UtcNow;
         public DateTime? Updated { get; set; }
         public string? UpdatedBy { get; set; } = "--";
 
@@ -78,6 +80,7 @@ namespace risk.control.system.Models
 
         // ───── Business Ownership ─────
         public long? ClientCompanyId { get; set; }
+
         public ClientCompany? ClientCompany { get; set; }
 
         public long? VendorId { get; set; }
@@ -90,15 +93,20 @@ namespace risk.control.system.Models
         public string? AddressMapLocation { get; set; }
         public bool IsUpdated { get; set; } = true;
         public string? Comments { get; set; } = default!;
+
         [Display(Name = "Image")]
         [NotMapped]
         public IFormFile? ProfileImage { get; set; }
+
         [NotMapped]
         public long SelectedPincodeId { get; set; }
+
         [NotMapped]
         public long SelectedDistrictId { get; set; }
+
         [NotMapped]
         public long SelectedStateId { get; set; }
+
         [NotMapped]
         public long SelectedCountryId { get; set; }
 
@@ -127,7 +135,5 @@ namespace risk.control.system.Models
 
     public class ApplicationRole : IdentityRole<long>
     {
-        [StringLength(20)]
-        public string Code { get; set; }
     }
 }

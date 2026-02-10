@@ -72,7 +72,7 @@ namespace risk.control.system.Services.Company
 
                 model.PhoneNumber = model.PhoneNumber.TrimStart('0');
                 model.IsClientAdmin = model.Role == AppRoles.COMPANY_ADMIN;
-                model.Updated = DateTime.Now;
+                model.Updated = DateTime.UtcNow;
                 model.UpdatedBy = performedBy;
                 model.CountryId = model.SelectedCountryId;
                 model.StateId = model.SelectedStateId;
@@ -125,7 +125,7 @@ namespace risk.control.system.Services.Company
                 user.Role = model.Role;
                 user.IsClientAdmin = user.Role == AppRoles.COMPANY_ADMIN;
 
-                user.Updated = DateTime.Now;
+                user.Updated = DateTime.UtcNow;
                 user.UpdatedBy = performedBy;
                 user.SecurityStamp = Guid.NewGuid().ToString();
 
@@ -147,7 +147,7 @@ namespace risk.control.system.Services.Company
                     }
                     else
                     {
-                        await _userManager.SetLockoutEndDateAsync(user, DateTime.Now);
+                        await _userManager.SetLockoutEndDateAsync(user, DateTime.UtcNow);
                     }
                 }
                 var country = await _context.Country.FindAsync(user.CountryId);

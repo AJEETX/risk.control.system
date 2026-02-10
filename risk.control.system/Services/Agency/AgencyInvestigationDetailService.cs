@@ -81,7 +81,7 @@ namespace risk.control.system.Services.Agency
             var maskedBeneficiaryContact = new string('*', caseTask.BeneficiaryDetail.PhoneNumber.ToString().Length - 4) + caseTask.BeneficiaryDetail.PhoneNumber.ToString().Substring(caseTask.BeneficiaryDetail.PhoneNumber.ToString().Length - 4);
             caseTask.BeneficiaryDetail.PhoneNumber = maskedBeneficiaryContact;
 
-            var timeTaken = DateTime.Now - lastHistory.StatusChangedAt;
+            var timeTaken = DateTime.UtcNow - lastHistory.StatusChangedAt;
             var model = new CaseTransactionModel
             {
                 ClaimsInvestigation = caseTask,
@@ -158,7 +158,7 @@ namespace risk.control.system.Services.Agency
                 caseTask.CaseOwner = vendorAgentEmail;
                 caseTask.TaskedAgentEmail = vendorAgentEmail;
                 caseTask.IsNewAssignedToAgency = true;
-                caseTask.Updated = DateTime.Now;
+                caseTask.Updated = DateTime.UtcNow;
                 caseTask.UpdatedBy = currentUser;
                 caseTask.SubStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT;
                 caseTask.SelectedAgentDrivingDistance = drivingDistance;
@@ -166,7 +166,7 @@ namespace risk.control.system.Services.Agency
                 caseTask.SelectedAgentDrivingDistanceInMetres = distanceInMeters;
                 caseTask.SelectedAgentDrivingDurationInSeconds = durationInSeconds;
                 caseTask.SelectedAgentDrivingMap = string.Format(drivingMap, "400", "400");
-                caseTask.TaskToAgentTime = DateTime.Now;
+                caseTask.TaskToAgentTime = DateTime.UtcNow;
 
                 context.Investigations.Update(caseTask);
                 var rows = await context.SaveChangesAsync(null, false);
@@ -192,15 +192,15 @@ namespace risk.control.system.Services.Agency
                 var caseTask = await GetCases().Include(c => c.InvestigationReport)
                     .FirstOrDefaultAsync(c => c.Id == caseId);
 
-                caseTask.Updated = DateTime.Now;
+                caseTask.Updated = DateTime.UtcNow;
                 caseTask.UpdatedBy = agent.Email;
                 caseTask.SubStatus = submitted2Supervisor;
-                caseTask.SubmittedToSupervisorTime = DateTime.Now;
+                caseTask.SubmittedToSupervisorTime = DateTime.UtcNow;
                 caseTask.CaseOwner = agent.Vendor.Email;
                 var claimReport = caseTask.InvestigationReport;
 
                 claimReport.AgentRemarks = remarks;
-                claimReport.AgentRemarksUpdated = DateTime.Now;
+                claimReport.AgentRemarksUpdated = DateTime.UtcNow;
                 claimReport.AgentEmail = userEmail;
 
                 context.Investigations.Update(caseTask);
@@ -257,7 +257,7 @@ namespace risk.control.system.Services.Agency
 
             var companyUser = await context.ApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == currentUserEmail);
             var lastHistory = caseTask.InvestigationTimeline.OrderByDescending(h => h.StatusChangedAt).FirstOrDefault();
-            var endTIme = caseTask.Status == CONSTANTS.CASE_STATUS.FINISHED ? caseTask.ProcessedByAssessorTime.GetValueOrDefault() : DateTime.Now;
+            var endTIme = caseTask.Status == CONSTANTS.CASE_STATUS.FINISHED ? caseTask.ProcessedByAssessorTime.GetValueOrDefault() : DateTime.UtcNow;
             var timeTaken = endTIme - caseTask.Created;
             var totalTimeTaken = timeTaken != TimeSpan.Zero
                 ? $"{(timeTaken.Days > 0 ? $"{timeTaken.Days}d " : "")}" +

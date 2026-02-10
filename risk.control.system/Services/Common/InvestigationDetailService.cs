@@ -73,7 +73,7 @@ namespace risk.control.system.Services.Common
             var companyUser = await context.ApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == currentUserEmail);
             var lastHistory = caseTask.InvestigationTimeline.OrderByDescending(h => h.StatusChangedAt).FirstOrDefault();
 
-            var timeTaken = DateTime.Now - caseTask.Created;
+            var timeTaken = DateTime.UtcNow - caseTask.Created;
             var totalTimeTaken = timeTaken != TimeSpan.Zero
                 ? $"{(timeTaken.Days > 0 ? $"{timeTaken.Days}d " : "")}" +
               $"{(timeTaken.Hours > 0 ? $"{timeTaken.Hours}h " : "")}" +
@@ -143,7 +143,7 @@ namespace risk.control.system.Services.Common
             }
             var companyUser = await context.ApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == currentUserEmail);
             var lastHistory = caseTask.InvestigationTimeline.OrderByDescending(h => h.StatusChangedAt).FirstOrDefault();
-            var endTIme = caseTask.Status == CONSTANTS.CASE_STATUS.FINISHED ? caseTask.ProcessedByAssessorTime.GetValueOrDefault() : DateTime.Now;
+            var endTIme = caseTask.Status == CONSTANTS.CASE_STATUS.FINISHED ? caseTask.ProcessedByAssessorTime.GetValueOrDefault() : DateTime.UtcNow;
             var timeTaken = endTIme - caseTask.Created;
             var totalTimeTaken = timeTaken != TimeSpan.Zero
                 ? $"{(timeTaken.Days > 0 ? $"{timeTaken.Days}d " : "")}" +
@@ -233,7 +233,7 @@ namespace risk.control.system.Services.Common
             var companyUser = await context.ApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == currentUserEmail);
             var lastHistory = caseTask.InvestigationTimeline.OrderByDescending(h => h.StatusChangedAt).FirstOrDefault();
 
-            var timeTaken = DateTime.Now - caseTask.Created;
+            var timeTaken = DateTime.UtcNow - caseTask.Created;
             var totalTimeTaken = timeTaken != TimeSpan.Zero
                 ? $"{(timeTaken.Days > 0 ? $"{timeTaken.Days}d " : "")}" +
               $"{(timeTaken.Hours > 0 ? $"{timeTaken.Hours}h " : "")}" +

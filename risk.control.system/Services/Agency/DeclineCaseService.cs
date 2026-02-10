@@ -37,7 +37,7 @@ namespace risk.control.system.Services.Agency
                 caseTask.IsNewAssignedToAgency = true;
                 caseTask.CaseOwner = currentUser.Vendor.Email;
                 caseTask.TaskedAgentEmail = null;
-                caseTask.Updated = DateTime.Now;
+                caseTask.Updated = DateTime.UtcNow;
                 caseTask.UpdatedBy = currentUser.Email;
                 caseTask.SubStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR;
                 context.Investigations.Update(caseTask);
@@ -67,7 +67,7 @@ namespace risk.control.system.Services.Agency
                 caseTask.IsNew = true;
                 caseTask.IsNewAssignedToAgency = true;
                 caseTask.IsNewSubmittedToAgent = true;
-                caseTask.Updated = DateTime.Now;
+                caseTask.Updated = DateTime.UtcNow;
                 caseTask.UpdatedBy = currentUser.Email;
                 caseTask.AssignedToAgency = false;
                 caseTask.VendorId = null;

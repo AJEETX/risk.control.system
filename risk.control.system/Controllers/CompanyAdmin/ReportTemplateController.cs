@@ -534,7 +534,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 {
                     LocationName = original.LocationName + " (Copy)",
                     ReportTemplateId = reportTemplateId,
-                    Created = DateTime.Now,
+                    Created = DateTime.UtcNow,
                     AgentIdReport = new AgentIdReport
                     {
                         Selected = original.AgentIdReport.Selected,

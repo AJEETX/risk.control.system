@@ -43,35 +43,35 @@
                         }
                     });
                 }
-                else if (xhr.status === 500) {
-                    $.confirm({
-                        title: 'Server Error!',
-                        content: 'An unexpected server error occurred. You will be redirected to Active page.',
-                        type: 'orange',
-                        typeAnimated: true,
-                        buttons: {
-                            Ok: function () {
-                                window.location.href = '/Manager/Active';
-                            }
-                        },
-                        onClose: function () {
-                            window.location.href = '/Manager/Active';
-                        }
-                    });
-                }
                 else if (xhr.status === 400) {
                     $.confirm({
                         title: 'Bad Request!',
-                        content: 'Try with valid data.You will be redirected to Active page',
+                        content: 'Try with valid data.You will be redirected to Dashboard page',
                         type: 'orange',
                         typeAnimated: true,
                         buttons: {
                             Ok: function () {
-                                window.location.href = '/Manager/Active';
+                                window.location.href = '/DashBoard/Index';
                             }
                         },
                         onClose: function () {
-                            window.location.href = '/Manager/Active';
+                            window.location.href = '/DashBoard/Index';
+                        }
+                    });
+                }
+                else {
+                    $.confirm({
+                        title: 'Server Error!',
+                        content: 'An unexpected server error occurred. You will be redirected to Dashboard page.',
+                        type: 'orange',
+                        typeAnimated: true,
+                        buttons: {
+                            Ok: function () {
+                                window.location.href = '/DashBoard/Index';
+                            }
+                        },
+                        onClose: function () {
+                            window.location.href = '/DashBoard/Index';
                         }
                     });
                 }
@@ -269,7 +269,6 @@
                 }, 3000);
             }
             $('.btn-info', row).addClass('btn-white-color');
-
         },
         "drawCallback": function (settings, start, end, max, total, pre) {
             // Reinitialize Bootstrap 5 tooltips

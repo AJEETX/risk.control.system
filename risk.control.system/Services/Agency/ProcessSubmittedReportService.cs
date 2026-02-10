@@ -49,15 +49,15 @@ namespace risk.control.system.Services.Agency
                 var caseTask = await GetCases().Include(c => c.InvestigationReport)
                     .FirstOrDefaultAsync(c => c.Id == caseId);
 
-                caseTask.Updated = DateTime.Now;
+                caseTask.Updated = DateTime.UtcNow;
                 caseTask.UpdatedBy = agent.Email;
                 caseTask.SubStatus = submitted2Supervisor;
-                caseTask.SubmittedToSupervisorTime = DateTime.Now;
+                caseTask.SubmittedToSupervisorTime = DateTime.UtcNow;
                 caseTask.CaseOwner = agent.Vendor.Email;
                 var claimReport = caseTask.InvestigationReport;
 
                 claimReport.AgentRemarks = remarks;
-                claimReport.AgentRemarksUpdated = DateTime.Now;
+                claimReport.AgentRemarksUpdated = DateTime.UtcNow;
                 claimReport.AgentEmail = userEmail;
 
                 context.Investigations.Update(caseTask);
@@ -88,24 +88,24 @@ namespace risk.control.system.Services.Agency
 
                 var submitted2Assessor = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR;
                 caseTask.SubmittingSupervisordEmail = userEmail;
-                caseTask.SubmittedToAssessorTime = DateTime.Now;
+                caseTask.SubmittedToAssessorTime = DateTime.UtcNow;
                 caseTask.AssignedToAgency = false;
-                caseTask.Updated = DateTime.Now;
+                caseTask.Updated = DateTime.UtcNow;
                 caseTask.UpdatedBy = userEmail;
                 caseTask.SubStatus = submitted2Assessor;
                 caseTask.CaseOwner = caseTask.ClientCompany.Email;
-                caseTask.SubmittedToAssessorTime = DateTime.Now;
+                caseTask.SubmittedToAssessorTime = DateTime.UtcNow;
                 var report = caseTask.InvestigationReport;
                 var edited = report.AgentRemarks.Trim() != editRemarks.Trim();
                 if (edited)
                 {
                     report.AgentRemarksEdit = editRemarks;
-                    report.AgentRemarksEditUpdated = DateTime.Now;
+                    report.AgentRemarksEditUpdated = DateTime.UtcNow;
                 }
 
                 report.SupervisorRemarkType = reportUpdateStatus;
                 report.SupervisorRemarks = supervisorRemarks;
-                report.SupervisorRemarksUpdated = DateTime.Now;
+                report.SupervisorRemarksUpdated = DateTime.UtcNow;
                 report.SupervisorEmail = userEmail;
 
                 if (document is not null)
@@ -150,10 +150,10 @@ namespace risk.control.system.Services.Agency
                 //report.SupervisorRemarks = supervisorRemarks;
                 caseToAllocateToVendor.CaseOwner = agencyUser.Email;
                 caseToAllocateToVendor.TaskedAgentEmail = agencyUser.Email;
-                caseToAllocateToVendor.Updated = DateTime.Now;
+                caseToAllocateToVendor.Updated = DateTime.UtcNow;
                 caseToAllocateToVendor.UpdatedBy = userEmail;
                 caseToAllocateToVendor.SubStatus = assignedToAgentSubStatus;
-                caseToAllocateToVendor.TaskToAgentTime = DateTime.Now;
+                caseToAllocateToVendor.TaskToAgentTime = DateTime.UtcNow;
                 context.Investigations.Update(caseToAllocateToVendor);
 
                 var rowsAffected = await context.SaveChangesAsync(null, false) > 0;

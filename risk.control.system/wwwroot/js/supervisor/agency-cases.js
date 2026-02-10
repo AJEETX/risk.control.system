@@ -82,35 +82,35 @@
                         }
                     });
                 }
-                else if (xhr.status === 500) {
-                    $.confirm({
-                        title: 'Server Error!',
-                        content: 'An unexpected server error occurred. You will be redirected to the Assign page.',
-                        type: 'orange',
-                        typeAnimated: true,
-                        buttons: {
-                            Ok: function () {
-                                window.location.href = '/VendorInvestigation/Allocate';
-                            }
-                        },
-                        onClose: function () {
-                            window.location.href = '/VendorInvestigation/Allocate';
-                        }
-                    });
-                }
                 else if (xhr.status === 400) {
                     $.confirm({
                         title: 'Bad Request!',
-                        content: 'Try with valid data.You will be redirected to the Assign page',
+                        content: 'Try with valid data.You will be redirected to Dashboard page',
                         type: 'orange',
                         typeAnimated: true,
                         buttons: {
                             Ok: function () {
-                                window.location.href = '/VendorInvestigation/Allocate';
+                                window.location.href = '/DashBoard/Index';
                             }
                         },
                         onClose: function () {
-                            window.location.href = '/VendorInvestigation/Allocate';
+                            window.location.href = '/DashBoard/Index';
+                        }
+                    });
+                }
+                else {
+                    $.confirm({
+                        title: 'Server Error!',
+                        content: 'An unexpected server error occurred. You will be redirected to Dashboard page.',
+                        type: 'orange',
+                        typeAnimated: true,
+                        buttons: {
+                            Ok: function () {
+                                window.location.href = '/DashBoard/Index';
+                            }
+                        },
+                        onClose: function () {
+                            window.location.href = '/DashBoard/Index';
                         }
                     });
                 }
@@ -289,7 +289,7 @@
                 "mRender": function (data, type, row) {
                     var buttons = "";
                     if (row.isQueryCase) {
-                        buttons += `<a data-id="${row.id}" class="btn btn-xs btn-warning"><i class="fas fa-question" aria-hidden="true"></i> Enquiry </a> &nbsp;` ;
+                        buttons += `<a data-id="${row.id}" class="btn btn-xs btn-warning"><i class="fas fa-question" aria-hidden="true"></i> Enquiry </a> &nbsp;`;
                     }
                     else {
                         buttons += `<a data-id="${row.id}" class="btn btn-xs btn-info"><i class="fas fa-search"></i> Detail</a>`
@@ -311,10 +311,8 @@
                 }, 3000);
             }
             $('.btn-info', row).addClass('btn-white-color');
-
         },
         "drawCallback": function (settings, start, end, max, total, pre) {
-            
             // Reinitialize Bootstrap 5 tooltips
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
             tooltipTriggerList.map(function (el) {

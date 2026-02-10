@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using risk.control.system.AppConstant;
+using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services.Common;
@@ -80,7 +81,7 @@ namespace risk.control.system.Services.Creator
                 caseTask.IsNew = true;
                 caseTask.CreatedUser = userEmail;
                 caseTask.CaseOwner = userEmail;
-                caseTask.Updated = DateTime.Now;
+                caseTask.Updated = DateTime.UtcNow;
                 caseTask.ORIGIN = ORIGIN.USER;
                 caseTask.UpdatedBy = userEmail;
                 caseTask.Status = CONSTANTS.CASE_STATUS.INITIATED;
@@ -125,7 +126,7 @@ namespace risk.control.system.Services.Creator
                 existingPolicy.PolicyDetail.CostCentreId = dto.PolicyDetailDto.CostCentreId;
 
                 existingPolicy.IsNew = true;
-                existingPolicy.Updated = DateTime.Now;
+                existingPolicy.Updated = DateTime.UtcNow;
                 existingPolicy.UpdatedBy = userEmail;
                 existingPolicy.ORIGIN = ORIGIN.USER;
                 if (dto.Document is not null)
@@ -168,7 +169,7 @@ namespace risk.control.system.Services.Creator
                 }
                 caseTask.IsNew = true;
                 caseTask.UpdatedBy = userEmail;
-                caseTask.Updated = DateTime.Now;
+                caseTask.Updated = DateTime.UtcNow;
                 caseTask.ORIGIN = ORIGIN.USER;
 
                 customerDetail.PhoneNumber = customerDetail.PhoneNumber.TrimStart('0');
@@ -190,7 +191,7 @@ namespace risk.control.system.Services.Creator
                 customerDetail.Longitude = latLong.Longitude;
 
                 var url = string.Format("https://maps.googleapis.com/maps/api/staticmap?center={0}&zoom=14&size={{0}}x{{1}}&maptype=roadmap&markers=color:red%7Clabel:A%7C{0}&key={1}",
-                    customerLatLong, Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY"));
+                    customerLatLong, EnvHelper.Get("GOOGLE_MAP_KEY"));
                 customerDetail.CustomerLocationMap = url;
 
                 var addedClaim = context.CustomerDetail.Add(customerDetail);
@@ -227,7 +228,7 @@ namespace risk.control.system.Services.Creator
                 }
                 caseTask.IsNew = true;
                 caseTask.UpdatedBy = userEmail;
-                caseTask.Updated = DateTime.Now;
+                caseTask.Updated = DateTime.UtcNow;
                 caseTask.ORIGIN = ORIGIN.USER;
                 customerDetail.PhoneNumber = customerDetail.PhoneNumber.TrimStart('0');
 
@@ -248,7 +249,7 @@ namespace risk.control.system.Services.Creator
                 customerDetail.Latitude = latLong.Latitude;
                 customerDetail.Longitude = latLong.Longitude;
                 var url = string.Format("https://maps.googleapis.com/maps/api/staticmap?center={0}&zoom=14&size={{0}}x{{1}}&maptype=roadmap&markers=color:red%7Clabel:A%7C{0}&key={1}",
-                    customerLatLong, Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY"));
+                    customerLatLong, EnvHelper.Get("GOOGLE_MAP_KEY"));
                 customerDetail.CustomerLocationMap = url;
 
                 context.CustomerDetail.Attach(customerDetail);
@@ -279,11 +280,11 @@ namespace risk.control.system.Services.Creator
                     beneficiary.ImagePath = relativePath;
                 }
 
-                beneficiary.Updated = DateTime.Now;
+                beneficiary.Updated = DateTime.UtcNow;
                 beneficiary.UpdatedBy = userEmail;
                 caseTask.IsNew = true;
                 caseTask.UpdatedBy = userEmail;
-                caseTask.Updated = DateTime.Now;
+                caseTask.Updated = DateTime.UtcNow;
                 caseTask.IsReady2Assign = true;
                 caseTask.ORIGIN = ORIGIN.USER;
                 beneficiary.PhoneNumber = beneficiary.PhoneNumber.TrimStart('0');
@@ -303,7 +304,7 @@ namespace risk.control.system.Services.Creator
                 var latlong = await customApiCLient.GetCoordinatesFromAddressAsync(address);
                 var customerLatLong = latlong.Latitude + "," + latlong.Longitude;
                 var url = string.Format("https://maps.googleapis.com/maps/api/staticmap?center={0}&zoom=14&size={{0}}x{{1}}&maptype=roadmap&markers=color:red%7Clabel:A%7C{0}&key={1}",
-                    customerLatLong, Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY"));
+                    customerLatLong, EnvHelper.Get("GOOGLE_MAP_KEY"));
                 beneficiary.BeneficiaryLocationMap = url;
                 beneficiary.Latitude = latlong.Latitude;
                 beneficiary.Longitude = latlong.Longitude;
@@ -344,7 +345,7 @@ namespace risk.control.system.Services.Creator
 
                 caseTask.IsNew = true;
                 caseTask.UpdatedBy = userEmail;
-                caseTask.Updated = DateTime.Now;
+                caseTask.Updated = DateTime.UtcNow;
                 caseTask.ORIGIN = ORIGIN.USER;
                 caseTask.SubStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR;
                 caseTask.IsReady2Assign = true;
@@ -367,7 +368,7 @@ namespace risk.control.system.Services.Creator
                 beneficiary.Latitude = latlong.Latitude;
                 beneficiary.Longitude = latlong.Longitude;
                 var url = string.Format("https://maps.googleapis.com/maps/api/staticmap?center={0}&zoom=14&size={{0}}x{{1}}&maptype=roadmap&markers=color:red%7Clabel:A%7C{0}&key={1}",
-                    customerLatLong, Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY"));
+                    customerLatLong, EnvHelper.Get("GOOGLE_MAP_KEY"));
                 beneficiary.BeneficiaryLocationMap = url;
 
                 context.BeneficiaryDetail.Attach(beneficiary);

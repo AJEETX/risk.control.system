@@ -167,7 +167,7 @@ namespace risk.control.system.Controllers.Common
                 {
                     Beneficiary = beneficiary?.ImagePath != null ? beneficiary?.ImagePath : "/img/user.png",
                     BeneficiaryName = beneficiary.Name,
-                    Dob = (int)beneficiary.DateOfBirth.GetValueOrDefault().Subtract(DateTime.Now).TotalDays / 365,
+                    Dob = (int)beneficiary.DateOfBirth.GetValueOrDefault().Subtract(DateTime.UtcNow).TotalDays / 365,
                     Income = beneficiary.Income.GetEnumDisplayName(),
                     BeneficiaryRelation = beneficiary.BeneficiaryRelation.Name,
                     Address = beneficiary.Addressline + "  " + beneficiary.District.Name + "  " + beneficiary.State.Name + "  " + beneficiary.Country.Name + "  " + beneficiary.PinCode.Code,
@@ -205,7 +205,7 @@ namespace risk.control.system.Controllers.Common
                 var latLongString = latitude + "," + longitude;
 
                 string weatherCustomData = await _weatherInfoService.GetWeatherAsync(latitude, longitude); ;
-                var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=400x400&maptype=roadmap&markers=color:red%7Clabel:A%7C{latLongString}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+                var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=400x400&maptype=roadmap&markers=color:red%7Clabel:A%7C{latLongString}&key={EnvHelper.Get("GOOGLE_MAP_KEY")}";
 
                 var data = new
                 {
@@ -246,7 +246,7 @@ namespace risk.control.system.Controllers.Common
                 var longitude = beneficiary.Longitude.Trim();
                 string weatherCustomData = await _weatherInfoService.GetWeatherAsync(latitude, longitude); ;
                 var latLongString = latitude + "," + longitude;
-                var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=400x400&maptype=roadmap&markers=color:red%7Clabel:A%7C{latLongString}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+                var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=400x400&maptype=roadmap&markers=color:red%7Clabel:A%7C{latLongString}&key={EnvHelper.Get("GOOGLE_MAP_KEY")}";
                 var data = new
                 {
                     profileMap = url,
