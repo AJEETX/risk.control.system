@@ -45,32 +45,32 @@
                 else if (xhr.status === 500) {
                     $.confirm({
                         title: 'Server Error!',
-                        content: 'An unexpected server error occurred. You will be redirected to the Active page.',
+                        content: 'An unexpected server error occurred. You will be redirected to the Dashboard page.',
                         type: 'orange',
                         typeAnimated: true,
                         buttons: {
                             Ok: function () {
-                                window.location.href = '/Investigation/Active';
+                                window.location.href = '/Dashboard/Index';
                             }
                         },
                         onClose: function () {
-                            window.location.href = '/Investigation/Active';
+                            window.location.href = '/Dashboard/Index';
                         }
                     });
                 }
                 else if (xhr.status === 400) {
                     $.confirm({
                         title: 'Bad Request!',
-                        content: 'Try with valid data.You will be redirected to the Active page',
+                        content: 'Try with valid data.You will be redirected to the Dashboard page',
                         type: 'orange',
                         typeAnimated: true,
                         buttons: {
                             Ok: function () {
-                                window.location.href = '/Investigation/Active';
+                                window.location.href = '/Dashboard/Index';
                             }
                         },
                         onClose: function () {
-                            window.location.href = '/Investigation/Active';
+                            window.location.href = '/Dashboard/Index';
                         }
                     });
                 }
@@ -277,7 +277,6 @@
                 }, 3000);
             }
             $('.btn-info', row).addClass('btn-white-color');
-
         },
         "drawCallback": function (settings, start, end, max, total, pre) {
             // Reinitialize Bootstrap 5 tooltips
@@ -302,7 +301,7 @@
 
         showSpinnerOnButton(element, "Detail");
 
-        const editUrl = `/Investigation/ActiveDeatil?Id=${encodeURIComponent(id)}`;
+        const editUrl = `/CaseActive/ActiveDetail?Id=${encodeURIComponent(id)}`;
 
         setTimeout(() => {
             window.location.href = editUrl;
