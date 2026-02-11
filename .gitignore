@@ -366,3 +366,4 @@ FodyWeavers.xsd
 /risk.control.system/*.db-wal
 /risk.control.system/Properties/launchSettings.json
 /secrets
+/risk.control.system/Document

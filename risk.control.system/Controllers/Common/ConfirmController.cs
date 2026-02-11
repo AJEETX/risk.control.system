@@ -83,10 +83,10 @@ namespace risk.control.system.Controllers.Common
 
             try
             {
-                var smsSent = await _caseNotesService.SubmitNotes(userEmail, model.CaseId, model.Message);
+                var (smsSent, count) = await _caseNotesService.SubmitNotes(userEmail, model.CaseId, model.Message);
                 if (smsSent)
                 {
-                    return Ok(new { message = "Notes added: Success" });
+                    return Ok(new { message = "Notes added: Success", newCount = count });
                 }
                 return BadRequest("Notes Add Error !!!");
             }

@@ -301,7 +301,7 @@
 
         showSpinnerOnButton(element, "Detail");
 
-        const editUrl = `/Investigation/ActiveDeatil?Id=${encodeURIComponent(id)}`;
+        const editUrl = `/CaseActive/ActiveDetail?Id=${encodeURIComponent(id)}`;
 
         setTimeout(() => {
             window.location.href = editUrl;
