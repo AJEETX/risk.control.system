@@ -12,6 +12,12 @@ namespace risk.control.system.StartupExtensions
     {
         public static IServiceCollection AddConfigureServices(this IServiceCollection services, IConfiguration configuration)
         {
+            services.Configure<ForwardedHeadersOptions>(options =>
+            {
+                options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+                options.KnownNetworks.Clear();
+                options.KnownProxies.Clear();
+            });
             services.AddMemoryCache(options =>
             {
                 options.SizeLimit = 2048; // Arbitrary units
@@ -115,12 +121,6 @@ namespace risk.control.system.StartupExtensions
                 });
             });
 
-            services.Configure<ForwardedHeadersOptions>(options =>
-            {
-                options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
-                options.KnownNetworks.Clear();
-                options.KnownProxies.Clear();
-            });
             return services;
         }
     }

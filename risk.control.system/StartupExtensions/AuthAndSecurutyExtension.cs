@@ -14,6 +14,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 
 using risk.control.system.AppConstant;
+using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Services.Common;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
@@ -70,10 +71,9 @@ public static class AuthAndSecurutyExtension
             options.SignInScheme = IdentityConstants.ApplicationScheme;
 
             options.ClientId = configuration["AzureAd:ClientId"];
-            options.ClientSecret = configuration["AzureAd:ClientSecret"];
+            options.ClientSecret = EnvHelper.Get("AzureAd__ClientSecret");
 
-            options.Authority =
-                $"https://login.microsoftonline.com/{configuration["AzureAd:TenantId"]}/v2.0";
+            options.Authority = $"https://login.microsoftonline.com/{configuration["AzureAd:TenantId"]}/v2.0";
 
             options.ResponseType = OpenIdConnectResponseType.Code;
 
@@ -174,7 +174,7 @@ public static class AuthAndSecurutyExtension
         {
             options.Cookie.Path = "/";
             options.Cookie.HttpOnly = true;
-            options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+            options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
             options.Cookie.SameSite = SameSiteMode.None; // ✅ REQUIRED
             options.Cookie.Name = AppCookie.AUTH_COOKIE_NAME;
             options.LoginPath = AppCookie.LOGIN_PATH;

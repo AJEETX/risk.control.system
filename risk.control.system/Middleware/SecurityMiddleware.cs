@@ -13,6 +13,7 @@ namespace risk.control.system.Middleware
         private readonly IJwtService tokenService;
         private readonly IConfiguration config;
         private string[] errStatusCodes;
+
         public SecurityMiddleware(RequestDelegate next, ILogger<WhitelistListMiddleware> logger,
             string httpStatusErrorCodes, IFeatureManager featureManager,
             IJwtService tokenService,
@@ -30,7 +31,8 @@ namespace risk.control.system.Middleware
         {
             // 🔴 FIRST: Completely bypass Azure AD endpoints
             if (context.Request.Path.StartsWithSegments("/signin-oidc") || context.Request.Path.StartsWithSegments("/swagger") ||
-                context.Request.Path.StartsWithSegments("/Account/AzureLogin"))
+                context.Request.Path.StartsWithSegments("/Account/AzureLogin") ||
+                context.Request.Path.StartsWithSegments("/debug-test"))
             {
                 await _next(context);
                 return;
@@ -69,17 +71,16 @@ namespace risk.control.system.Middleware
             // CSP (SAFE)
             context.Response.Headers["Content-Security-Policy"] =
                 "default-src 'self';" +
-                "connect-src 'self' https://maps.googleapis.com https://ifsc.razorpay.com https://login.microsoftonline.com/*;" +
+                "connect-src 'self' https://maps.googleapis.com https://ifsc.razorpay.com https://login.microsoftonline.com;" +
                 "script-src 'self' 'unsafe-inline' https://maps.googleapis.com https://highcharts.com https://export.highcharts.com https://cdnjs.cloudflare.com;" +
                 "style-src 'self' https://cdnjs.cloudflare.com https://fonts.googleapis.com https://stackpath.bootstrapcdn.com;" +
                 "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com https://fonts.googleapis.com https://stackpath.bootstrapcdn.com;" +
                 "img-src 'self' data: blob: https://maps.gstatic.com https://maps.googleapis.com https://hostedscan.com https://highcharts.com https://export.highcharts.com;" +
-                "frame-src 'self' https://login.microsoftonline.com/*;" +
+                "frame-src 'self' https://login.microsoftonline.com;" +
                 "media-src 'self' data:;" +
                 "object-src 'none';" +
-                "form-action 'self' https://login.microsoftonline.com/*;" +
-                "frame-ancestors 'none';" +
-                "upgrade-insecure-requests;";
+                "form-action 'self' https://login.microsoftonline.com;" +
+                "frame-ancestors 'none';";
 
             try
             {
@@ -100,8 +101,10 @@ namespace risk.control.system.Middleware
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "SecurityMiddleware error");
-                throw;
+                _logger.LogError(ex, "SECURITY MIDDLEWARE CRASHED");
+                context.Response.StatusCode = 500;
+                await context.Response.WriteAsync($"Internal Security Error: {ex.Message}");
+                return;
             }
         }
 

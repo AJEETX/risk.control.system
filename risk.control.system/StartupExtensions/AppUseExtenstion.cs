@@ -3,7 +3,6 @@
 using Hangfire;
 
 using Microsoft.AspNetCore.Authentication;
-
 using risk.control.system.Middleware;
 using risk.control.system.Permission;
 
@@ -13,11 +12,7 @@ public static class AppUseExtenstion
 {
     public static async Task<WebApplication> UseServices(this WebApplication app, IConfiguration configuration)
     {
-        app.UseHangfireDashboard("/hangfire", new DashboardOptions
-        {
-            Authorization = new[] { new BasicAuthAuthorizationFilter() }
-        });
-
+        app.UseForwardedHeaders();
         if (app.Environment.IsDevelopment())
         {
             app.UseDeveloperExceptionPage();
@@ -27,10 +22,12 @@ public static class AppUseExtenstion
             app.UseExceptionHandler("/Home/Error");
             app.UseHsts();
         }
+        app.UseHangfireDashboard("/hangfire", new DashboardOptions
+        {
+            Authorization = new[] { new BasicAuthAuthorizationFilter() }
+        });
 
         app.UseHttpsRedirection();
-
-        await Seeds.DatabaseSeed.SeedDatabase(app);
 
         app.UseStaticFiles(new StaticFileOptions
         {
@@ -54,6 +51,15 @@ public static class AppUseExtenstion
         });
         app.UseAuthentication();
         app.UseAuthorization();
+        app.Map("/debug-test", branch =>
+        {
+            branch.Run(async context =>
+            {
+                var proto = context.Request.Headers["X-Forwarded-Proto"].FirstOrDefault() ?? "none";
+                var isHttps = context.Request.IsHttps;
+                await context.Response.WriteAsync($"Protocol: {proto} | IsHttps: {isHttps} | Scheme: {context.Request.Scheme}");
+            });
+        });
         app.UseMiddleware<SecurityMiddleware>(configuration["HttpStatusErrorCodes"]);
         app.UseMiddleware<RequirePasswordChangeMiddleware>();
         app.UseMiddleware<CookieConsentMiddleware>();
@@ -61,9 +67,10 @@ public static class AppUseExtenstion
         app.UseMiddleware<LicensingMiddleware>();
         app.UseMiddleware<UpdateUserLastActivityMiddleware>();
 
+        app.UseRateLimiter();
+
         app.UseNotyf();
         app.UseFileServer();
-        app.UseRateLimiter();
         app.Use(async (context, next) =>
         {
             await next();
@@ -81,18 +88,8 @@ public static class AppUseExtenstion
             name: "default",
             pattern: "{controller=Dashboard}/{action=Index}/{id?}")
             .RequireRateLimiting("PerUserOrIP");
+        await Seeds.DatabaseSeed.SeedDatabase(app);
 
-        //RecurringJob.AddOrUpdate<IHangfireJobService>(
-        //    "clean-failed-jobs",
-        //    job => job.CleanFailedJobs(),
-        //    Cron.Hourly // Runs every hour
-        //);
-
-        int sessionTimeoutMinutes = int.Parse(configuration["SESSION_TIMEOUT_SEC"]) / 60;
-        //RecurringJob.AddOrUpdate<IdleUserService>(
-        //    "check-idle-users",
-        //    service => service.CheckIdleUsers(),
-        //    $"*/{sessionTimeoutMinutes} * * * *"); // Check every 5 minutes
         return app;
     }
 }

@@ -6,12 +6,17 @@ AppDomain.CurrentDomain.SetData("REGEX_DEFAULT_MATCH_TIMEOUT", TimeSpan.FromMill
 //QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
 
 var builder = WebApplication.CreateBuilder(args);
+var env = builder.Environment;
+// Use a path that exists on Azure Windows or Linux App Service
+var keysPath = env.IsDevelopment()
+    ? "/app/DataProtection-Keys"
+    : Path.Combine(env.ContentRootPath, "DataProtection-Keys");
+
+if (!Directory.Exists(keysPath)) Directory.CreateDirectory(keysPath);
 
 builder.Services.AddDataProtection()
-    .PersistKeysToFileSystem(new DirectoryInfo("/app/DataProtection-Keys"))
+    .PersistKeysToFileSystem(new DirectoryInfo(keysPath))
     .SetApplicationName("iCheckify");
-
-var env = builder.Environment;
 // Set up logging
 
 Log.Logger = new LoggerConfiguration()
@@ -28,7 +33,19 @@ Log.Logger = new LoggerConfiguration()
 
 builder.Host.UseSerilog();
 
-builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true).AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
+builder.Configuration.Sources.Clear();
+
+builder.Configuration
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+    .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
+
+builder.Configuration.AddEnvironmentVariables();
+
+var secretsPath = "/run/secrets";
+if (Directory.Exists(secretsPath))
+{
+    builder.Configuration.AddKeyPerFile(directoryPath: secretsPath, optional: true);
+}
 
 builder.Services.AddConfigureServices(builder.Configuration);
 
@@ -41,6 +58,13 @@ builder.Services.AddAwsServices(builder.Configuration);
 builder.WebHost.ConfigureKestrel(serverOptions =>
 {
     serverOptions.Limits.MaxRequestHeadersTotalSize = 32768;
+
+    if (!env.IsDevelopment())
+    {
+        // Azure App Service usually injects a "PORT" environment variable
+        var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+        serverOptions.ListenAnyIP(int.Parse(port));
+    }
 });
 
 builder.Services.AddAuthAndSecurity(builder.Configuration);

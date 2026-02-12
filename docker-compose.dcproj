@@ -9,6 +9,7 @@
     <DockerServiceName>risk.control.system</DockerServiceName>
   </PropertyGroup>
   <ItemGroup>
+    <None Include="certs\aspnet-dev.pfx" />
     <None Include="docker-compose.override.yml">
       <DependentUpon>docker-compose.yml</DependentUpon>
     </None>

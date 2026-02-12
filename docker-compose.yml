@@ -6,7 +6,7 @@ services:
       dockerfile: risk.control.system/Dockerfile
     environment:
       ASPNETCORE_ENVIRONMENT: Development
-      ASPNETCORE_URLS: https://+:8081;http://+:8080
+      ASPNETCORE_URLS: https://+:8081
       APP_URL: "https://ickeckify-apk.s3.ap-southeast-2.amazonaws.com/demo/app-release.apk"
       COUNTRY: "AU"
       SAMPLE_MOBILE_AUSTRALIA: "432854196"
@@ -32,7 +32,6 @@ services:
       - SMS_Pwd_India
       - TINY_URL_KEY
     ports:
-      - 8080:8080
       - 8081:8081
     depends_on:
       - postgres
