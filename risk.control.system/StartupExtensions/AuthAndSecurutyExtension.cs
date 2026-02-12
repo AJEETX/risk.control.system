@@ -14,6 +14,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 
 using risk.control.system.AppConstant;
+using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Services.Common;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
@@ -70,7 +71,7 @@ public static class AuthAndSecurutyExtension
             options.SignInScheme = IdentityConstants.ApplicationScheme;
 
             options.ClientId = configuration["AzureAd:ClientId"];
-            options.ClientSecret = configuration["AzureAd:ClientSecret"];
+            options.ClientSecret = EnvHelper.Get("AzureAd__ClientSecret");
 
             options.Authority =
                 $"https://login.microsoftonline.com/{configuration["AzureAd:TenantId"]}/v2.0";
