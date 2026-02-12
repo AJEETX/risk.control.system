@@ -33,19 +33,9 @@ Log.Logger = new LoggerConfiguration()
 
 builder.Host.UseSerilog();
 
-builder.Configuration.Sources.Clear();
-
 builder.Configuration
     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
     .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
-
-builder.Configuration.AddEnvironmentVariables();
-
-var secretsPath = "/run/secrets";
-if (Directory.Exists(secretsPath))
-{
-    builder.Configuration.AddKeyPerFile(directoryPath: secretsPath, optional: true);
-}
 
 builder.Services.AddConfigureServices(builder.Configuration);
 
