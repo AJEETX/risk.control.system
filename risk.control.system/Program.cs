@@ -54,6 +54,7 @@ builder.Services.AddAuthAndSecurity(builder.Configuration);
 
 try
 {
+    Log.Information("Starting web host");
     var app = builder.Build();
 
     await app.UseServices(builder.Configuration);
@@ -64,4 +65,9 @@ try
 catch (Exception ex)
 {
     Log.Fatal(ex, "Host terminated unexpectedly");
+}
+finally
+{
+    // Crucial: Flushes the log buffer to the file before the app closes
+    await Log.CloseAndFlushAsync();
 }
