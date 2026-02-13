@@ -71,7 +71,7 @@ public static class AuthAndSecurutyExtension
             options.SignInScheme = IdentityConstants.ApplicationScheme;
 
             options.ClientId = configuration["AzureAd:ClientId"];
-            options.ClientSecret = EnvHelper.Get("AzureAd__ClientSecret");
+            options.ClientSecret = EnvHelper.Get("AZUREAD__CLIENTSECRET");
 
             options.Authority = $"https://login.microsoftonline.com/{configuration["AzureAd:TenantId"]}/v2.0";
 

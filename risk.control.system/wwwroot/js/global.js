@@ -19,12 +19,11 @@
                             $(".submit-progress").removeClass("hidden");
                         }, 1);
                         $('#edit').attr('disabled', 'disabled');
-                        $('#edit').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Edit User");
+                        $('#edit').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Edit");
 
                         form.submit();
                         var createForm = document.getElementById("create-form");
                         if (createForm) {
-
                             var nodes = createForm.getElementsByTagName('*');
                             for (var i = 0; i < nodes.length; i++) {
                                 nodes[i].disabled = true;

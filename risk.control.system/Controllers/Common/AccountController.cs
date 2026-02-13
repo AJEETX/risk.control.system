@@ -61,7 +61,6 @@ namespace risk.control.system.Controllers.Common
                 SetPassword = setPassword,
                 ReturnUrl = returnUrl ?? "/"
             });
-
         }
 
         [HttpPost]
@@ -96,12 +95,15 @@ namespace risk.control.system.Controllers.Common
                 await loginService.SignInWithTimeoutAsync(user);
 
                 notifyService.Success($"Welcome <b>{displayName}</b>, Login successful");
-
+                if (!string.IsNullOrEmpty(model.ReturnUrl) && Url.IsLocalUrl(model.ReturnUrl))
+                {
+                    return Redirect(model.ReturnUrl);
+                }
                 return RedirectToAction("Index", "Dashboard");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error in KeepSessionAlive for {UserEmail}", User.Identity.Name ?? "Anonymous");
+                _logger.LogError(ex, "Error in Login for {UserEmail}", User.Identity.Name ?? "Anonymous");
                 return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred." });
             }
         }
@@ -126,7 +128,6 @@ namespace risk.control.system.Controllers.Common
 
             return RedirectToAction("Login", "Account", new { returnUrl = "/" });
         }
-
 
         [HttpGet]
         public async Task<IActionResult> ChangePassword(string email)

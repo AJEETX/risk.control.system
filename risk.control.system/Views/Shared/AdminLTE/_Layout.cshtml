@@ -14,8 +14,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
 	<link rel="icon" href="/favicon.ico" type="image/x-icon">
-	<partial name="AdminLTE/_Styles" />
-	<partial name="AdminLTE/_DataTableStylePartial" />
+	<link rel="stylesheet" href="~/dist/app.min.css" />
 </head>
 
 <body class="hold-transition sidebar-mini">
@@ -104,10 +103,7 @@
 		<!-- Logout Modal-->
 		<partial name="_Logout" />
 	</div>
-	<partial name="AdminLTE/_Scripts" view-data="@(new ViewDataDictionary(ViewData) { { "CSPNonce", CSPNonce } })" />
-	<partial name="AdminLTE/_DataTableScriptPartial" view-data="@(new ViewDataDictionary(ViewData) { { "CSPNonce", CSPNonce } })" />
-	<script nonce="@CSPNonce" src="~/js/site.js"></script>
-	<script nonce="@CSPNonce" src="~/js/clock.js"></script>
+	<script src="~/dist/app.min.js"></script>
 	@RenderSection("Scripts", required: false)
 	@await Component.InvokeAsync("Notyf", new { nonce = CSPNonce })
 </body>

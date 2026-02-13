@@ -12,7 +12,7 @@ public static class DatabaseServiceExtension
     {
         if (env.IsDevelopment())
         {
-            var connectionString = EnvHelper.Get("DefaultConnection");
+            var connectionString = EnvHelper.Get("DEFAULT_CONNECTION");
             services.AddDbContextFactory<ApplicationDbContext>(options =>
                 options.UseNpgsql(connectionString));
             services.AddDbContext<ApplicationDbContext>(options =>

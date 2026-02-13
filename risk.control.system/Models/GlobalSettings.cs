@@ -33,7 +33,7 @@ namespace risk.control.system.Models
 
         public string SmsUri { get; set; } = EnvHelper.Get("SMS_Url") ?? "test";
         public string SmsUser { get; set; } = EnvHelper.Get("SMS_User") ?? "test";
-        public string SmsData { get; set; } = EnvHelper.Get("SMS_Pwd") ?? "test";
+        public string SmsData { get; set; } = EnvHelper.Get("SMS_PWD") ?? "test";
 
         public string FtpUri { get; set; } = "ftp://ftp.drivehq.com/holosync/";
         public string FtpUser { get; set; } = "its.aby@email.com";
