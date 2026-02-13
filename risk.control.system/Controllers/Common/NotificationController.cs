@@ -5,13 +5,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using risk.control.system.AppConstant;
 
-using static risk.control.system.AppConstant.Applicationsettings;
 using risk.control.system.Services.Common;
 
 namespace risk.control.system.Controllers.Common
 {
     [ApiExplorerSettings(IgnoreApi = true)]
-
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME},{AGENCY_ADMIN.DISPLAY_NAME},{CREATOR.DISPLAY_NAME},{ASSESSOR.DISPLAY_NAME},{MANAGER.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME},{AGENT.DISPLAY_NAME}")]
     [Route("api/[controller]")]
     [ApiController]
@@ -28,6 +26,7 @@ namespace risk.control.system.Controllers.Common
             this.smsService = smsService;
             this.logger = logger;
         }
+
         [HttpPost("ClearAll")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ClearAllNotifications()
@@ -100,6 +99,7 @@ namespace risk.control.system.Controllers.Common
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
+
         private static string GetTimeAgo(DateTime createdAt)
         {
             var timeSpan = DateTime.UtcNow - createdAt;
@@ -127,6 +127,7 @@ namespace risk.control.system.Controllers.Common
         [EnumMember(Value = "in")]
         In // capitalized, avoids keyword issue
     }
+
     public class NotificationRequest
     {
         public int Id { get; set; }
