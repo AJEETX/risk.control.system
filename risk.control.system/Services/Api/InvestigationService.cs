@@ -153,7 +153,6 @@ namespace risk.control.system.Services.Api
                 var pincodeCode = isUW ? i.customerPincode : i.beneficiaryPincode;
                 var customerAddress = i.IsReady2Assign ? i.customerAddressline + ',' + i.customerDistrict + ',' + i.customerState : null;
                 var beneficiaryAddress = i.IsReady2Assign ? i.beneficiaryAddressline + ',' + i.beneficiaryDistrict + ',' + i.beneficiaryState : null;
-                var address = isUW ? customerAddress : beneficiaryAddress;
                 var pincodeName = i.IsReady2Assign ? (isUW ? customerAddress : beneficiaryAddress) : null;
                 var customerName = string.IsNullOrWhiteSpace(i.CustomerName) ? "<span class=\"badge badge-light\">customer name</span>" : i.CustomerName;
                 var policyName = i.InsuranceType.GetEnumDisplayName();
@@ -183,6 +182,7 @@ namespace risk.control.system.Services.Api
                     PolicyNum = i.PolicyNum,
                     AssignedToAgency = i.IsNew,
                     PincodeCode = pincodeCode,
+                    PincodeAddress = pincodeName,
                     Document = await documentTask,
                     Customer = await customerTask,
                     Name = customerName,

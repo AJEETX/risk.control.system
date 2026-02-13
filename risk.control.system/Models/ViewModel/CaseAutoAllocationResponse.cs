@@ -8,6 +8,7 @@
         public string PolicyId { get; set; }
         public bool AssignedToAgency { get; set; }
         public int PincodeCode { get; set; }
+        public string PincodeAddress { get; set; }
         public string Document { get; set; }
         public string Customer { get; set; }
         public string Name { get; set; }

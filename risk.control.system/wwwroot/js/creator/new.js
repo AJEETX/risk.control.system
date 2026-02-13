@@ -204,12 +204,12 @@
                         return `
                         <div class="map-thumbnail profile-image doc-profile-image">
                             <img src="${formattedUrl}"
-                                 title="${row.pincodeCode}"
+                                 title="${row.pincodeAddress}"
                                  class="thumbnail profile-image doc-profile-image preview-map-image open-map-modal"
                                  data-bs-toggle="tooltip"
                                  data-bs-placement="top"
                                  data-img='${formattedUrl}'
-                                 data-title='Addresss: ${row.pincodeCode}' />
+                                 data-title='Addresss: ${row.pincodeAddress}' />
                         </div>`;
                     }
                 }
@@ -322,7 +322,6 @@
                 }, 3000);
             }
             $('.btn-info', row).addClass('btn-white-color');
-
         },
         "drawCallback": function (settings) {
             var api = this.api();
