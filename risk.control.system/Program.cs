@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.DataProtection;
-using risk.control.system.StartupExtensions;
+﻿using risk.control.system.StartupExtensions;
 using Serilog;
 
 AppDomain.CurrentDomain.SetData("REGEX_DEFAULT_MATCH_TIMEOUT", TimeSpan.FromMilliseconds(100)); // process-wide setting
@@ -8,15 +7,15 @@ AppDomain.CurrentDomain.SetData("REGEX_DEFAULT_MATCH_TIMEOUT", TimeSpan.FromMill
 var builder = WebApplication.CreateBuilder(args);
 var env = builder.Environment;
 // Use a path that exists on Azure Windows or Linux App Service
-var keysPath = env.IsDevelopment()
-    ? "/app/DataProtection-Keys"
-    : Path.Combine(env.ContentRootPath, "DataProtection-Keys");
+//var keysPath = env.IsDevelopment()
+//    ? "/app/DataProtection-Keys"
+//    : Path.Combine(env.ContentRootPath, "DataProtection-Keys");
 
-if (!Directory.Exists(keysPath)) Directory.CreateDirectory(keysPath);
+//if (!Directory.Exists(keysPath)) Directory.CreateDirectory(keysPath);
 
-builder.Services.AddDataProtection()
-    .PersistKeysToFileSystem(new DirectoryInfo(keysPath))
-    .SetApplicationName("iCheckify");
+//builder.Services.AddDataProtection()
+//    .PersistKeysToFileSystem(new DirectoryInfo(keysPath))
+//    .SetApplicationName("iCheckify");
 // Set up logging
 
 Log.Logger = new LoggerConfiguration()
