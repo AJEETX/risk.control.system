@@ -70,6 +70,5 @@ try
 }
 catch (Exception ex)
 {
-    await File.WriteAllTextAsync("start.txt", ex.ToString());
-    throw;
+    Log.Fatal(ex, "Host terminated unexpectedly");
 }
