@@ -1,11 +1,12 @@
 ﻿using risk.control.system.StartupExtensions;
 using Serilog;
 
-AppDomain.CurrentDomain.SetData("REGEX_DEFAULT_MATCH_TIMEOUT", TimeSpan.FromMilliseconds(100)); // process-wide setting
+AppDomain.CurrentDomain.SetData("REGEX_DEFAULT_MATCH_TIMEOUT", TimeSpan.FromMilliseconds(200)); // process-wide setting
 //QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
 
 var builder = WebApplication.CreateBuilder(args);
 var env = builder.Environment;
+
 // Use a path that exists on Azure Windows or Linux App Service
 //var keysPath = env.IsDevelopment()
 //    ? "/app/DataProtection-Keys"
@@ -35,6 +36,8 @@ builder.Host.UseSerilog();
 builder.Configuration
     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
     .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
+
+builder.Services.AddBundleFiles();
 
 builder.Services.AddConfigureServices(builder.Configuration);
 
@@ -67,6 +70,5 @@ catch (Exception ex)
 }
 finally
 {
-    // Crucial: Flushes the log buffer to the file before the app closes
     await Log.CloseAndFlushAsync();
 }

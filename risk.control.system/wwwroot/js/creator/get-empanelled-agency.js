@@ -5,62 +5,7 @@
         ajax: {
             url: '/api/Company/GetEmpanelledAgency?caseId=' + claimId,
             dataSrc: '',
-            error: function (xhr, status, error) {
-                console.error("AJAX Error:", status, error);
-                console.error("Response:", xhr.responseText);
-                if (xhr.status === 401 || xhr.status === 403) {
-                    $.confirm({
-                        title: 'Session Expired!',
-                        content: 'Your session has expired or you are unauthorized. You will be redirected to the login page.',
-                        type: 'red',
-                        typeAnimated: true,
-                        buttons: {
-                            Ok: {
-                                text: 'Login',
-                                btnClass: 'btn-red',
-                                action: function () {
-                                    window.location.href = '/Account/Login';
-                                }
-                            }
-                        },
-                        onClose: function () {
-                            window.location.href = '/Account/Login';
-                        }
-                    });
-                }
-                else if (xhr.status === 500) {
-                    $.confirm({
-                        title: 'Server Error!',
-                        content: 'An unexpected server error occurred. You will be redirected to the Main page.',
-                        type: 'orange',
-                        typeAnimated: true,
-                        buttons: {
-                            Ok: function () {
-                                window.location.href = '/Investigation/EmpanelledVendors?id' + claimId;
-                            }
-                        },
-                        onClose: function () {
-                            window.location.href = '/Investigation/EmpanelledVendors?id' + claimId;
-                        }
-                    });
-                }
-                else if (xhr.status === 400) {
-                    $.confirm({
-                        title: 'Bad Request!',
-                        content: 'Try with valid data.You will be redirected to the Main page',
-                        type: 'orange',
-                        typeAnimated: true,
-                        buttons: {
-                            Ok: function () {
-                                window.location.href = '/Investigation/EmpanelledVendors?id' + claimId;
-                            }
-                        },
-                        onClose: function () {
-                            window.location.href = '/Investigation/EmpanelledVendors?id' + claimId;
-                        }
-                    });
-                }
-            }
+            error: DataTableErrorHandler
         },
         columnDefs: [
             {
@@ -217,7 +162,7 @@
                 $("input[type='radio'][name='selectedcase'][value='" + selectedVendorId + "']").prop('checked', true);
                 $('#allocatedcase').prop("disabled", false);
             }
-            
+
             // Reinitialize Bootstrap 5 tooltips
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
             tooltipTriggerList.map(function (el) {

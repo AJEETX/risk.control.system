@@ -29,6 +29,10 @@ public static class AppUseExtenstion
 
         app.UseHttpsRedirection();
 
+        app.UseWebOptimizer();
+
+        app.UseResponseCompression();
+
         app.UseStaticFiles(new StaticFileOptions
         {
             OnPrepareResponse = ctx =>

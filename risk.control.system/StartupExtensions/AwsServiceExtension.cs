@@ -15,7 +15,7 @@ public static class AwsServiceExtension
     {
         var awsOptions = new Amazon.Extensions.NETCore.Setup.AWSOptions
         {
-            Credentials = new BasicAWSCredentials(EnvHelper.Get("aws_id"), EnvHelper.Get("aws_secret")),
+            Credentials = new BasicAWSCredentials(EnvHelper.Get("AWS_ID"), EnvHelper.Get("AWS_SECRET")),
             Region = RegionEndpoint.APSoutheast2
         };
 

@@ -18,10 +18,7 @@ namespace risk.control.system.StartupExtensions
                 options.KnownNetworks.Clear();
                 options.KnownProxies.Clear();
             });
-            services.AddMemoryCache(options =>
-            {
-                options.SizeLimit = 2048; // Arbitrary units
-            });
+            services.AddMemoryCache();
             services.AddHsts(options =>
             {
                 options.MaxAge = TimeSpan.FromDays(365);       // 1 year

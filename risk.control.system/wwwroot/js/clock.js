@@ -90,9 +90,10 @@ function resetIdleTimer() {
 }
 
 function userIsIdle() {
+    const idleMinutes = Math.floor(defaultTimeoutSeconds / 60);
     $.confirm({
         title: '<i class="fas fa-exclamation-triangle text-danger"></i> Session Expired',
-        content: 'You have been inactive for 15 minutes. Please login again.',
+        content: `You have been inactive for ${idleMinutes} minutes. Please login again.`,
         type: 'red',
         closeIcon: false,
         buttons: {
