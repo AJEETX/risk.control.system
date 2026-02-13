@@ -76,7 +76,7 @@ jobs:
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'can-hsbc'
+          app-name: '${{ env.APP_SERVICE_NAME }}'
           slot-name: 'Production'
           package: .
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_243D92813C17446F8D6FDDFB931F0A80 }}

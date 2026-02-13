@@ -9,6 +9,9 @@ on:
       - Net10-without-docker-sqllite
   workflow_dispatch:
 
+env:
+  APP_SERVICE_NAME: "icheckify-10"
+
 jobs:
   build:
     runs-on: windows-latest
@@ -49,7 +52,7 @@ jobs:
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'icheckify-10'
+          app-name: '${{ env.APP_SERVICE_NAME }}'
           slot-name: 'Production'
           package: .
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_B8230710C65446CFA9F95CAFE779BBB4 }}
