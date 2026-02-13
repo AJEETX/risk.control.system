@@ -113,8 +113,8 @@ namespace risk.control.system.StartupExtensions
                         partitionKey: partitionKey,
                         factory: _ => new FixedWindowRateLimiterOptions
                         {
-                            PermitLimit = 500,               // ⬅ max requests
-                            Window = TimeSpan.FromMinutes(1),
+                            PermitLimit = int.Parse(configuration["RateLimit:PerUserOrIP"]),               // ⬅ max requests
+                            Window = TimeSpan.FromMinutes(int.Parse(configuration["RateLimit:PerUserOrIPWindowInMinute"])),
                             QueueLimit = 0,
                             AutoReplenishment = true
                         });
