@@ -48,13 +48,6 @@ builder.Services.AddAwsServices(builder.Configuration);
 builder.WebHost.ConfigureKestrel(serverOptions =>
 {
     serverOptions.Limits.MaxRequestHeadersTotalSize = 32768;
-
-    if (!env.IsDevelopment())
-    {
-        // Azure App Service usually injects a "PORT" environment variable
-        var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
-        serverOptions.ListenAnyIP(int.Parse(port));
-    }
 });
 
 builder.Services.AddAuthAndSecurity(builder.Configuration);
