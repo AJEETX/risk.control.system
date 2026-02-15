@@ -1,7 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc.Rendering;
+
 namespace risk.control.system.Models.ViewModel
 {
-
     public class CreateCaseViewModel
     {
         [Required]
@@ -65,5 +66,12 @@ namespace risk.control.system.Models.ViewModel
         [Required]
         [Display(Name = "Reason To Verify")]
         public long CaseEnablerId { get; set; }
+
+        public IEnumerable<SelectListItem> CaseEnablers { get; set; } = Enumerable.Empty<SelectListItem>();
+        public IEnumerable<SelectListItem> CostCentres { get; set; } = Enumerable.Empty<SelectListItem>();
+        public IEnumerable<SelectListItem> InsuranceTypes { get; set; } = Enumerable.Empty<SelectListItem>();
+        public IEnumerable<SelectListItem> InvestigationServiceTypes { get; set; } = Enumerable.Empty<SelectListItem>();
+
+        public string? CurrencySymbol { get; set; }
     }
 }

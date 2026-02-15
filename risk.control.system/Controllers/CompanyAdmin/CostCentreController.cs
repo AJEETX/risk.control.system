@@ -31,7 +31,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
         // GET: CostCentre
         public IActionResult Index()
         {
-            return RedirectToAction("Profile");
+            return RedirectToAction(nameof(Profile));
         }
 
         [Breadcrumb("Budget Centre")]
@@ -39,6 +39,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
         {
             return View();
         }
+
         public IActionResult GetCostCentres()
         {
             var data = _context.CostCentre
@@ -53,6 +54,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
 
             return Json(new { data });
         }
+
         // GET: CostCentre/Details/5
         [Breadcrumb("Details")]
         public async Task<IActionResult> Details(long id)
@@ -71,7 +73,6 @@ namespace risk.control.system.Controllers.CompanyAdmin
                     return RedirectToAction(nameof(Profile));
                 }
                 return View(costCentre);
-
             }
             catch (Exception ex)
             {
@@ -99,7 +100,6 @@ namespace risk.control.system.Controllers.CompanyAdmin
             }
             try
             {
-
                 costCentre.Code = WebUtility.HtmlEncode(costCentre.Code?.ToUpper(CultureInfo.InvariantCulture));
                 costCentre.Name = WebUtility.HtmlEncode(costCentre.Name);
                 // Check for duplicate code before saving
@@ -117,7 +117,6 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 await _context.SaveChangesAsync();
                 notifyService.Success("Budget Centre created successfully!");
                 return RedirectToAction(nameof(Profile));
-
             }
             catch (Exception ex)
             {
@@ -138,6 +137,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
 
             return Json(exists);
         }
+
         // GET: CostCentre/Edit/5
         [Breadcrumb("Edit ", FromAction = "Profile")]
         public async Task<IActionResult> Edit(long id)
@@ -196,7 +196,6 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 notifyService.Error("Error editing Budget Centre. Try again.");
                 return RedirectToAction(nameof(Profile));
             }
-
         }
 
         // POST: CostCentre/Delete/5

@@ -1,16 +1,16 @@
 ﻿using AspNetCoreHero.ToastNotification.Abstractions;
-using risk.control.system.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using risk.control.system.AppConstant;
+using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
-using SmartBreadcrumbs.Attributes;
-using SmartBreadcrumbs.Nodes;
-using risk.control.system.Services.Creator;
 using risk.control.system.Services.Api;
+using risk.control.system.Services.Common;
+using risk.control.system.Services.Creator;
+using SmartBreadcrumbs.Attributes;
 
 namespace risk.control.system.Controllers.Creator
 {
@@ -20,18 +20,21 @@ namespace risk.control.system.Controllers.Creator
     {
         private readonly ILogger<CaseCreateEditController> logger;
         private readonly ICaseCreateEditService caseCreateEditService;
+        private readonly INavigationService navigationService;
         private readonly ApplicationDbContext context;
         private readonly INotyfService notifyService;
         private readonly IInvestigationService service;
 
         public CaseCreateEditController(ILogger<CaseCreateEditController> logger,
             ICaseCreateEditService createCreateEditService,
+            INavigationService navigationService,
             ApplicationDbContext context,
             INotyfService notifyService,
             IInvestigationService service)
         {
             this.logger = logger;
             this.caseCreateEditService = createCreateEditService;
+            this.navigationService = navigationService;
             this.context = context;
             this.notifyService = notifyService;
             this.service = service;
@@ -52,7 +55,7 @@ namespace risk.control.system.Controllers.Creator
                 bool hasClaim = true;
                 int availableCount = 0;
 
-                var companyUser = await context.ApplicationUser.Include(u => u.ClientCompany).Include(u => u.Country).FirstOrDefaultAsync(u => u.Email == currentUserEmail);
+                var companyUser = await context.ApplicationUser.AsNoTracking().Include(u => u.ClientCompany).Include(u => u.Country).FirstOrDefaultAsync(u => u.Email == currentUserEmail);
                 var fileIdentifier = companyUser.Country.Code.ToLower();
 
                 if (companyUser.ClientCompany.LicenseType == LicenseType.Trial)
@@ -60,7 +63,7 @@ namespace risk.control.system.Controllers.Creator
                     var totalReadyToAssign = await service.GetAutoCount(currentUserEmail);
                     hasClaim = totalReadyToAssign > 0;
                     userCanCreate = userCanCreate && companyUser.ClientCompany.TotalToAssignMaxAllowed > totalReadyToAssign;
-                    var totalClaimsCreated = await context.Investigations.CountAsync(c => !c.Deleted && c.ClientCompanyId == companyUser.ClientCompanyId);
+                    var totalClaimsCreated = await context.Investigations.AsNoTracking().CountAsync(c => !c.Deleted && c.ClientCompanyId == companyUser.ClientCompanyId);
                     availableCount = companyUser.ClientCompany.TotalCreatedClaimAllowed - totalClaimsCreated;
                     if (!userCanCreate)
                     {
@@ -89,8 +92,8 @@ namespace risk.control.system.Controllers.Creator
             }
         }
 
-        [Breadcrumb(" Add New", FromAction = "New")]
-        public async Task<IActionResult> Create()
+        [Breadcrumb(" Add New", FromAction = nameof(New))]
+        public async Task<IActionResult> Add()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             try
@@ -117,13 +120,13 @@ namespace risk.control.system.Controllers.Creator
             }
         }
 
-        [Breadcrumb(title: " Add Case", FromAction = "Create")]
-        public async Task<IActionResult> CreateCase()
+        [Breadcrumb(title: " Add Case", FromAction = nameof(New))]
+        public async Task<IActionResult> Create()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             try
             {
-                var currentUser = await context.ApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == userEmail);
+                var currentUser = await context.ApplicationUser.AsNoTracking().Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == userEmail);
 
                 if (currentUser.ClientCompany.HasSampleData)
                 {
@@ -131,27 +134,40 @@ namespace risk.control.system.Controllers.Creator
                     await LoadDropDowns(model.PolicyDetailDto, userEmail);
                     return View(model);
                 }
-                else
-                {
-                    ViewData["Currency"] = CustomExtensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
-                    ViewData["CaseEnablerId"] = new SelectList(context.CaseEnabler.OrderBy(s => s.Code), "CaseEnablerId", "Name");
-                    ViewData["CostCentreId"] = new SelectList(context.CostCentre.OrderBy(s => s.Code), "CostCentreId", "Name");
-                    ViewData["InsuranceType"] = new SelectList(Enum.GetValues(typeof(InsuranceType)).Cast<InsuranceType>());
-                    ViewData["InvestigationServiceTypeId"] = new SelectList(context.InvestigationServiceType.OrderBy(s => s.Code), "InvestigationServiceTypeId", "Name");
-                    return View();
-                }
+                var modelWithoutSampleData = PopulateViewModelMetadata(currentUser);
+                return View(modelWithoutSampleData);
             }
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error occurred to create case. {UserEmail} ", userEmail);
                 notifyService.Error("Error creating case detail. Try Again.");
-                return RedirectToAction(nameof(CreateCase));
+                return RedirectToAction(nameof(Add));
             }
+        }
+
+        private async Task PopulateViewModelMetadata(ApplicationUser user)
+        {
+            var model = new CreateCaseViewModel();
+
+            model.PolicyDetailDto.CurrencySymbol = CustomExtensions.GetCultureByCountry(user.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
+
+            model.PolicyDetailDto.CaseEnablers = await context.CaseEnabler.AsNoTracking().OrderBy(s => s.Code)
+                .Select(s => new SelectListItem { Text = s.Name, Value = s.CaseEnablerId.ToString() }).ToListAsync();
+
+            model.PolicyDetailDto.CostCentres = await context.CostCentre.AsNoTracking().OrderBy(s => s.Code)
+                .Select(s => new SelectListItem { Text = s.Name, Value = s.CostCentreId.ToString() }).ToListAsync();
+
+            model.PolicyDetailDto.InvestigationServiceTypes = await context.InvestigationServiceType.AsNoTracking().OrderBy(s => s.Code)
+                .Select(s => new SelectListItem { Text = s.Name, Value = s.InvestigationServiceTypeId.ToString() }).ToListAsync();
+
+            model.PolicyDetailDto.InsuranceTypes = Enum.GetValues(typeof(InsuranceType))
+                .Cast<InsuranceType>()
+                .Select(e => new SelectListItem { Text = e.ToString(), Value = e.ToString() });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateCase(CreateCaseViewModel model)
+        public async Task<IActionResult> Create(CreateCaseViewModel model)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             try
@@ -174,49 +190,32 @@ namespace risk.control.system.Controllers.Creator
                     return View(model);
                 }
                 notifyService.Success($"Policy #{result.CaseId} created successfully");
-                return RedirectToAction(nameof(InvestigationController.Details), "Investigation", new { id = result.Id });
+                return RedirectToAction(nameof(InvestigationController.Details), ControllerName<InvestigationController>.Name, new { id = result.Id });
             }
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error occurred to create case. {UserEmail} ", userEmail);
                 notifyService.Error("Error creating case detail. Try Again.");
-                return RedirectToAction(nameof(CreateCase));
+                return RedirectToAction(nameof(Add));
             }
         }
 
         private async Task LoadDropDowns(PolicyDetailDto model, string userEmail)
         {
-            var currentUser = await context.ApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == userEmail);
+            var currentUser = await context.ApplicationUser.AsNoTracking().Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == userEmail);
 
-            ViewData["Currency"] = CustomExtensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
+            model.CurrencySymbol = CustomExtensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
-            ViewData["CaseEnablerId"] = new SelectList(
-                context.CaseEnabler.OrderBy(s => s.Code),
-                "CaseEnablerId",
-                "Name",
-                model.CaseEnablerId
-            );
+            model.CaseEnablers = new SelectList(context.CaseEnabler.AsNoTracking().OrderBy(s => s.Code), "CaseEnablerId", "Name", model.CaseEnablerId);
 
-            ViewData["CostCentreId"] = new SelectList(
-                context.CostCentre.OrderBy(s => s.Code),
-                "CostCentreId",
-                "Name",
-                model.CostCentreId
-            );
+            model.CostCentres = new SelectList(context.CostCentre.AsNoTracking().OrderBy(s => s.Code), "CostCentreId", "Name", model.CostCentreId);
 
-            ViewData["InsuranceType"] = new SelectList(Enum.GetValues(typeof(InsuranceType)).Cast<InsuranceType>(), model.InsuranceType);
+            model.InsuranceTypes = new SelectList(Enum.GetValues(typeof(InsuranceType)).Cast<InsuranceType>(), model.InsuranceType);
 
-            ViewData["InvestigationServiceTypeId"] = new SelectList(
-                    context.InvestigationServiceType
-                        .Where(i => i.InsuranceType == model.InsuranceType)
-                        .OrderBy(s => s.Code),
-                    "InvestigationServiceTypeId",
-                    "Name",
-                    model.InvestigationServiceTypeId
-                );
+            model.InvestigationServiceTypes = new SelectList(context.InvestigationServiceType.AsNoTracking().Where(i => i.InsuranceType == model.InsuranceType).OrderBy(s => s.Code), "InvestigationServiceTypeId", "Name", model.InvestigationServiceTypeId);
         }
 
-        public async Task<IActionResult> EditCase(long id)
+        public async Task<IActionResult> Edit(long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             try
@@ -224,22 +223,18 @@ namespace risk.control.system.Controllers.Creator
                 if (!ModelState.IsValid || id < 0)
                 {
                     notifyService.Error("OOPS!!!.Case Not Found.Try Again");
-                    return RedirectToAction(nameof(CaseCreateEditController.New), "CaseCreateEdit");
+                    return RedirectToAction(nameof(New), "CaseCreateEdit");
                 }
 
                 var model = await caseCreateEditService.GetEditPolicyDetail(id);
                 if (model == null)
                 {
                     notifyService.Error("Case Not Found!!!");
-                    return RedirectToAction(nameof(CreateCase));
+                    return RedirectToAction(nameof(Add));
                 }
                 await LoadDropDowns(model.PolicyDetailDto, userEmail);
 
-                var claimsPage = new MvcBreadcrumbNode("New", "CaseCreateEdit", "Cases");
-                var agencyPage = new MvcBreadcrumbNode("Create", "CaseCreateEdit", "Add/Assign") { Parent = claimsPage, };
-                var details1Page = new MvcBreadcrumbNode("Details", "Investigation", $"Details") { Parent = agencyPage, RouteValues = new { id = id } };
-                var editPage = new MvcBreadcrumbNode("EditCase", "CaseCreateEdit", $"Edit Case") { Parent = details1Page, RouteValues = new { id = id } };
-                ViewData["BreadcrumbNode"] = editPage;
+                ViewData["BreadcrumbNode"] = navigationService.GetEditCasePath(id);
 
                 return View(model);
             }
@@ -247,13 +242,13 @@ namespace risk.control.system.Controllers.Creator
             {
                 logger.LogError(ex, "Error occurred to get edit case {Id}. {UserEmail} ", id, userEmail);
                 notifyService.Error("Error editing case detail. Try Again");
-                return RedirectToAction(nameof(InvestigationController.Details), "Investigation", new { id = id });
+                return RedirectToAction(nameof(InvestigationController.Details), ControllerName<InvestigationController>.Name, new { id = id });
             }
         }
 
         [ValidateAntiForgeryToken]
         [HttpPost]
-        public async Task<IActionResult> EditCase(EditPolicyDto model)
+        public async Task<IActionResult> Edit(EditPolicyDto model)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             try
@@ -276,13 +271,13 @@ namespace risk.control.system.Controllers.Creator
                     return View(model);
                 }
                 notifyService.Custom($"Policy <b>#{result.CaseId}</b> edited successfully", 3, "orange", "far fa-file-powerpoint");
-                return RedirectToAction(nameof(InvestigationController.Details), "Investigation", new { id = model.Id });
+                return RedirectToAction(nameof(InvestigationController.Details), ControllerName<InvestigationController>.Name, new { id = model.Id });
             }
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error occurred to edit case {Id}. {UserEmail} ", model.Id, userEmail);
                 notifyService.Error("OOPs !!!..Error editing Case detail. Try again.");
-                return RedirectToAction(nameof(InvestigationController.Details), "Investigation", new { id = model.Id });
+                return RedirectToAction(nameof(InvestigationController.Details), ControllerName<InvestigationController>.Name, new { id = model.Id });
             }
         }
     }

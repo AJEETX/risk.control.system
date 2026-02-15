@@ -2,18 +2,13 @@
 using System.Linq.Expressions;
 using System.Net;
 using System.Text.RegularExpressions;
-
 using AspNetCoreHero.ToastNotification.Abstractions;
-
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using risk.control.system.Models;
-
-using SmartBreadcrumbs.Attributes;
-
-using static risk.control.system.AppConstant.Applicationsettings;
 using risk.control.system.AppConstant;
+using risk.control.system.Models;
+using SmartBreadcrumbs.Attributes;
 
 namespace risk.control.system.Controllers.CompanyAdmin
 {
@@ -35,13 +30,15 @@ namespace risk.control.system.Controllers.CompanyAdmin
         // GET: RiskCaseStatus
         public IActionResult Index()
         {
-            return RedirectToAction("Profile");
+            return RedirectToAction(nameof(Profile));
         }
+
         [Breadcrumb("State")]
         public IActionResult Profile()
         {
             return View();
         }
+
         [HttpGet]
         public async Task<IActionResult> GetStates(int draw, int start, int length, string search, int? orderColumn, string orderDirection)
         {

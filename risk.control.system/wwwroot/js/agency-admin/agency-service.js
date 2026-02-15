@@ -24,7 +24,7 @@ $(document).ready(function () {
 
         showSpinnerOnButton(element, "Edit");
 
-        const editUrl = `/AgencyService/Edit?id=${encodeURIComponent(id)}`;
+        const editUrl = `/AgencyService/Edit/${encodeURIComponent(id)}`;
 
         setTimeout(() => {
             window.location.href = editUrl;

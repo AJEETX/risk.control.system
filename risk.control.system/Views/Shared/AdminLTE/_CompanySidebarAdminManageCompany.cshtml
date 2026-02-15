@@ -4,7 +4,7 @@
 	{
 		<li class="nav-item">
 			<a is-active-page
-			   class="navlink-border nav-link @Url.MakeActiveClass("ManageCompany", "") @Url.MakeActiveClass("ManageCompanyUser", "") @Url.MakeActiveClass("CreateCompanyUser", "")">
+			   class="navlink-border nav-link @Url.MakeActiveClass("ManageCompany", "") @Url.MakeActiveClass("ManageCompanyUser", "")">
 				<i class="nav-icon fas fa-landmark"></i>
 				<p class="sidebar-menu-header-label">
 					MANAGE COMPANY
@@ -31,8 +31,8 @@
 			</a>
 		</li>
 		<li class="nav-item">
-			<a is-active-page asp-controller="CreateCompanyUser" asp-action="CreateUser"
-			   class="actual-link nav-link @Url.MakeActiveClass("CreateCompanyUser", "Create")">
+			<a is-active-page asp-controller="ManageCompanyUser" asp-action="Create"
+				   class="actual-link nav-link @Url.MakeActiveClass("ManageCompanyUser", "Create")">
 				<i class="fas fa-user-plus nav-icon"></i>
 				<p>
 					Add User

@@ -165,7 +165,7 @@ namespace risk.control.system.Services.Creator
 
         public async Task<EditPolicyDto> GetEditPolicyDetail(long id)
         {
-            var caseTask = await context.Investigations
+            var caseTask = await context.Investigations.AsNoTracking()
                     .Include(c => c.PolicyDetail)
                     .FirstOrDefaultAsync(i => i.Id == id);
 

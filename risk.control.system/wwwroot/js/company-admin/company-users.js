@@ -199,7 +199,7 @@
 
         showSpinnerOnButton(element, "Edit");
 
-        const url = `/ManageCompanyUser/Edit?userId=${encodeURIComponent(id)}`;
+        const url = `/ManageCompanyUser/Edit/${encodeURIComponent(id)}`;
 
         setTimeout(() => {
             window.location.href = url;

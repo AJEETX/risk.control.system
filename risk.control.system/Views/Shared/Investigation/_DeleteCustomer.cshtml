@@ -40,58 +40,60 @@
                 <div class="col-7">
                     <h2 class="lead"><b>@Model.ClaimsInvestigation?.CustomerDetail?.Name</b></h2>
                     <p class="text-muted text-sm">
-                        <b>Occupation: </b> @Model.ClaimsInvestigation?.CustomerDetail?.Occupation
+                        Occupation: <b> @Model.ClaimsInvestigation?.CustomerDetail?.Occupation</b>
                     </p>
                     <ul class="ml-4 mb-0 fa-ul text-muted">
-                        
+
                         <li class="small">
                             <span class="fa-li">
                                 <i class="fa fa-money"></i>
                             </span>
-                            Annual Income: (@ViewBag.Currency) @Model.ClaimsInvestigation?.CustomerDetail?.Income.GetEnumDisplayName()
+                            Annual Income: (@Model.Currency)<b> @Model.ClaimsInvestigation?.CustomerDetail?.Income.GetEnumDisplayName()</b>
                         </li>
                         <li class="small">
                             <span class="fa-li">
                                 <i class="fas fa-restroom"></i>
                             </span>
-                            Gender: @Model.ClaimsInvestigation?.CustomerDetail?.Gender
+                            Gender:<b> @Model.ClaimsInvestigation?.CustomerDetail?.Gender</b>
                         </li>
                         <li class="small">
                             <span class="fa-li">
                                 <i class="fas fa-graduation-cap"></i>
                             </span>
-                            Education: @Model.ClaimsInvestigation?.CustomerDetail?.Education
+                            Education: <b> @Model.ClaimsInvestigation?.CustomerDetail?.Education</b>
                         </li>
                         <li class="small">
                             <span class="fa-li">
                                 <i class="fas fa-user-alt"></i>
                             </span>
-                            Age: @currentAgeinYrs years
+                            Age: <b> @currentAgeinYrs years</b>
                         </li>
                         <li class="small">
                             <span class="fa-li">
                                 <i class="fas fa-lg fa-building"></i>
                             </span>
-                            Address: @address
+                            Address:<b> @address</b>
                         </li>
                         <li class="small">
                             <span class="fa-li">
                                 <i class="fas fa-lg fa-globe"></i>
                             </span>
-                            Country: 
+                            Country:
                             @if(!string.IsNullOrWhiteSpace(country))
                             {
-                                <img src="@imgPath" class="flag-icon" data-bs-toggle="tooltip" /> @country
+                                <img src="@imgPath" class="flag-icon" data-bs-toggle="tooltip" />
+                            
+                                <b> @country</b>
                             }
                         </li>
                         <li class="small">
                             <span class="fa-li">
                                 <i class="fas fa-lg fa-phone"></i>
                             </span>
-                            Mobile #: 
+                            Mobile #:
                             @if(!string.IsNullOrWhiteSpace(phone))
                             {
-                                @phone
+                                <b> @phone</b>
                             }
                         </li>
                     </ul>
@@ -144,7 +146,6 @@
                         </button>
                     }
             </div>
-
         </div>
     </div>
 </div>

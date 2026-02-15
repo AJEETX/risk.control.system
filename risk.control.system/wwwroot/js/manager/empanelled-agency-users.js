@@ -26,7 +26,7 @@
 
     var table = $("#dataTable").DataTable({
         ajax: {
-            url: '/api/Agency/GetCompanyAgencyUser?id=' + $('#Id').val(),
+            url: '/api/Agency/GetCompanyAgencyUser/' + $('#Id').val(),
             dataSrc: '',
             error: DataTableErrorHandler
         },
@@ -206,7 +206,7 @@
 
         showSpinnerOnButton(element, "Delete");
 
-        const editUrl = `/EmpanelledAgencyUser/Delete?userId=${encodeURIComponent(id)}`;
+        const editUrl = `/EmpanelledAgencyUser/Delete/${encodeURIComponent(id)}`;
 
         setTimeout(() => {
             window.location.href = editUrl;
@@ -219,7 +219,7 @@
 
         showSpinnerOnButton(element, "Edit");
 
-        const url = `/EmpanelledAgencyUser/Edit?userId=${encodeURIComponent(id)}`;
+        const url = `/EmpanelledAgencyUser/Edit/${encodeURIComponent(id)}`;
 
         setTimeout(() => {
             window.location.href = url;

@@ -12,6 +12,7 @@
         public long? VendorId { get; set; }
         public string? ReportAiSummary { get; set; }
         public bool FromEditPage { get; set; } = false;
+        public string? Currency { get; set; }
     }
 
     public class CaseInvestigationSubmitAnswerModel
@@ -20,7 +21,5 @@
         public InvestigationTask? ClaimsInvestigation { get; set; }
         public BeneficiaryDetail? Location { get; set; }
         public InvestigationReport? InvestigationReport { get; set; }
-
     }
-
 }

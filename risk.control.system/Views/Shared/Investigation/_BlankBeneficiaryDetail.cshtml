@@ -73,13 +73,13 @@
 				{
 					if (beneficiaryExist)
 					{
-						<a id="edit-beneficiary" class="btn btn-warning" asp-controller="Beneficiary" asp-action="EditBeneficiary" asp-route-id="@Model.Location.BeneficiaryDetailId">
+						<a id="edit-beneficiary" class="btn btn-warning" asp-controller="Beneficiary" asp-action="Edit" asp-route-id="@Model.ClaimsInvestigation.Id">
 							<i class="fas fa-user-tie"></i> Edit Beneficiary
 						</a>
 					}
 					else
 					{
-						<a id="add-beneficiary" class="btn btn-success" asp-controller="Beneficiary" asp-action="CreateBeneficiary" asp-route-id="@Model.ClaimsInvestigation.Id">
+						<a id="add-beneficiary" class="btn btn-success" asp-controller="Beneficiary" asp-action="Create" asp-route-id="@Model.ClaimsInvestigation.Id">
 							<i class="fas fa-user-tie"></i> Add Beneficiary
 						</a>
 					}

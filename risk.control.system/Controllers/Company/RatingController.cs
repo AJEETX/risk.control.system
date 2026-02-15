@@ -6,6 +6,7 @@ using risk.control.system.Models;
 
 namespace risk.control.system.Controllers.Company
 {
+    [Authorize(Roles = $"{CREATOR.DISPLAY_NAME},{MANAGER.DISPLAY_NAME}")]
     public class RatingController : Controller
     {
         private readonly ApplicationDbContext context;
@@ -19,14 +20,13 @@ namespace risk.control.system.Controllers.Company
             this.logger = logger;
         }
 
-        [Authorize(Roles = $"{CREATOR.DISPLAY_NAME}")]
         public async Task<JsonResult> PostRating(int rating, long mid)
         {
-            var currentUserEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name;
 
             try
             {
-                var existingRating = await context.Ratings.FirstOrDefaultAsync(r => r.VendorId == mid && r.UserEmail == currentUserEmail);
+                var existingRating = await context.Ratings.FirstOrDefaultAsync(r => r.VendorId == mid && r.UserEmail == userEmail);
 
                 if (existingRating != null)
                 {
@@ -42,7 +42,7 @@ namespace risk.control.system.Controllers.Company
                     Rate = rating,
                     IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString(),
                     VendorId = mid,
-                    UserEmail = currentUserEmail
+                    UserEmail = userEmail
                 };
 
                 context.Ratings.Add(rt);
@@ -54,7 +54,7 @@ namespace risk.control.system.Controllers.Company
             {
                 logger.LogError(ex,
                     "Error while posting rating. VendorId={VendorId}, Rating={Rating}, User={UserEmail}",
-                    mid, rating, currentUserEmail);
+                    mid, rating, userEmail);
 
                 return Json(new
                 {
@@ -64,7 +64,6 @@ namespace risk.control.system.Controllers.Company
             }
         }
 
-        [Authorize(Roles = $"{CREATOR.DISPLAY_NAME}")]
         public async Task<JsonResult> PostDetailRating(int rating, long vendorId)
         {
             var currentUserEmail = HttpContext.User?.Identity?.Name;

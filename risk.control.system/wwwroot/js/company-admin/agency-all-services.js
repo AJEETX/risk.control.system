@@ -53,18 +53,18 @@ $(document).ready(function () {
         switch (actionType) {
             case 'details':
                 showLoadingState(this, 'Detail');
-                targetUrl = `/AvailableAgencyService/Details?id=${id}`; // Redirect to details page
+                targetUrl = `/AvailableAgencyService/Details/${id}`; // Redirect to details page
                 break;
 
             case 'edit':
                 showLoadingState(this, 'Edit');
-                targetUrl = `/AvailableAgencyService/Edit?id=${id}`; // Redirect to edit page
+                targetUrl = `/AvailableAgencyService/Edit/=${id}`; // Redirect to edit page
                 break;
 
             case 'delete':
                 showLoadingState(this, 'Delete');
                 // Perform your delete logic here, then redirect if necessary
-                targetUrl = `/AvailableAgencyService/Delete?id=${id}`; // For deleting, you may want to confirm before navigating
+                targetUrl = `/AvailableAgencyService/Delete/${id}`; // For deleting, you may want to confirm before navigating
                 break;
 
             default:
@@ -80,7 +80,7 @@ $(document).ready(function () {
     // Initialize DataTable
     const table = $("#dataTable").DataTable({
         ajax: {
-            url: `/api/Company/AllServices?id=${$('#Id').val()}`,
+            url: `/api/Company/AllServices/${$('#Id').val()}`,
             dataSrc: '',
             error: DataTableErrorHandler
         },

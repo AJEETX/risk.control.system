@@ -29,13 +29,13 @@ namespace risk.control.system.Controllers.Common
             }
             try
             {
-                var applicationUser = await context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == userEmail);
+                var applicationUser = await context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(u => u.Email == userEmail);
                 if (applicationUser == null)
                 {
                     return NotFound();
                 }
 
-                var fileAttachment = await context.QueryRequest.FirstOrDefaultAsync(q => q.QueryRequestId == id);
+                var fileAttachment = await context.QueryRequest.AsNoTracking().FirstOrDefaultAsync(q => q.QueryRequestId == id);
                 if (fileAttachment == null)
                 {
                     return NotFound();
@@ -59,13 +59,13 @@ namespace risk.control.system.Controllers.Common
             }
             try
             {
-                var applicationUser = await context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefaultAsync();
+                var applicationUser = await context.ApplicationUser.AsNoTracking().Where(u => u.Email == userEmail).FirstOrDefaultAsync();
                 if (applicationUser == null)
                 {
                     return NotFound();
                 }
 
-                var fileAttachment = await context.QueryRequest.FirstOrDefaultAsync(q => q.QueryRequestId == id);
+                var fileAttachment = await context.QueryRequest.AsNoTracking().FirstOrDefaultAsync(q => q.QueryRequestId == id);
                 if (fileAttachment == null)
                 {
                     return NotFound();
@@ -89,13 +89,13 @@ namespace risk.control.system.Controllers.Common
             }
             try
             {
-                var applicationUser = await context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefaultAsync();
+                var applicationUser = await context.ApplicationUser.AsNoTracking().Where(u => u.Email == userEmail).FirstOrDefaultAsync();
                 if (applicationUser == null)
                 {
                     return NotFound();
                 }
 
-                var investigation = await context.Investigations.Include(i => i.InvestigationReport).FirstOrDefaultAsync(q => q.InvestigationReport.Id == id);
+                var investigation = await context.Investigations.AsNoTracking().Include(i => i.InvestigationReport).FirstOrDefaultAsync(q => q.InvestigationReport.Id == id);
                 if (investigation == null || investigation.InvestigationReport == null)
                 {
                     return NotFound();

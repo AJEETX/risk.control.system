@@ -121,7 +121,7 @@ namespace risk.control.system.Services.Agent
 
         public async Task<List<CaseInvestigationAgencyResponse>> GetSubmittedCases(string userEmail)
         {
-            var agentUser = await context.ApplicationUser.Include(v => v.Country).Include(u => u.Vendor).FirstOrDefaultAsync(c => c.Email == userEmail);
+            var agentUser = await context.ApplicationUser.AsNoTracking().Include(v => v.Country).Include(u => u.Vendor).FirstOrDefaultAsync(c => c.Email == userEmail);
             var claims = await GetClaims()
                     .Where(i => i.VendorId == agentUser.VendorId &&
                     i.TaskedAgentEmail == userEmail &&

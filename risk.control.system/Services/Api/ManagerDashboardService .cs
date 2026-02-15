@@ -56,7 +56,7 @@ namespace risk.control.system.Services.Api
                 data.RejectedUnderwritingCount = await undewrwritingRejectTask;
                 data.LastBlockUrl = "/Manager/Rejected";
 
-                data.FifthBlockName = "Empanelled Agencies";
+                data.FifthBlockName = "Active Agencies";
                 data.FifthBlockCount = await empanelledAgenciesCountTask;
                 data.FifthBlockUrl = "/EmpanelledAgency/Agencies";
 

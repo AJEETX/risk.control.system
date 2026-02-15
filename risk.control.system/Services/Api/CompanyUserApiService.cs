@@ -42,7 +42,7 @@ namespace risk.control.system.Services.Api
             var now = DateTime.UtcNow;
 
             // 1️⃣ Get the current company user
-            var companyUser = await context.ApplicationUser
+            var companyUser = await context.ApplicationUser.AsNoTracking()
                 .FirstOrDefaultAsync(c => c.Email == userEmail);
 
             if (companyUser == null) return new List<UserDetailResponse>();
@@ -61,7 +61,7 @@ namespace risk.control.system.Services.Api
                 .ToDictionaryAsync(x => x.Email, x => new { x.LastSeen, x.LoggedOut });
 
             // 3️⃣ Fetch company users
-            var companyUsers = await context.ApplicationUser
+            var companyUsers = await context.ApplicationUser.AsNoTracking()
                 .Where(u => u.ClientCompanyId == companyUser.ClientCompanyId && !u.Deleted && u.Email != userEmail)
                 .Include(u => u.PinCode)
                 .Include(u => u.District)
@@ -141,7 +141,7 @@ namespace risk.control.system.Services.Api
             }
 
             // 5️⃣ Bulk reset IsUpdated
-            await context.ApplicationUser
+            await context.ApplicationUser.AsNoTracking()
                 .Where(u => u.ClientCompanyId == companyUser.ClientCompanyId)
                 .ExecuteUpdateAsync(u => u.SetProperty(x => x.IsUpdated, false));
 
@@ -151,7 +151,7 @@ namespace risk.control.system.Services.Api
         public async Task<List<UserDetailResponse>> GetCompanyUsers(string userEmail, long companyId)
         {
             // Get the company user
-            var companyUser = await context.ApplicationUser
+            var companyUser = await context.ApplicationUser.AsNoTracking()
                 .FirstOrDefaultAsync(c => c.Email == userEmail);
             if (companyUser == null) return new List<UserDetailResponse>();
 
@@ -167,7 +167,7 @@ namespace risk.control.system.Services.Api
                 .ToDictionary(g => g.Key, g => g.Max(s => s.Updated));
 
             // Fetch all users for the company (excluding deleted and current user)
-            var users = await context.ApplicationUser
+            var users = await context.ApplicationUser.AsNoTracking()
                 .Include(u => u.PinCode)
                 .Include(u => u.District)
                 .Include(u => u.State)

@@ -9,27 +9,30 @@ using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services.Agency;
+using risk.control.system.Services.Common;
 using SmartBreadcrumbs.Attributes;
-using SmartBreadcrumbs.Nodes;
 
 namespace risk.control.system.Controllers.Manager
 {
-    [Breadcrumb("Manage Agency(s)")]
+    [Breadcrumb("Manage Agency")]
     [Authorize(Roles = $"{MANAGER.DISPLAY_NAME}")]
     public class AvailableAgencyServiceController : Controller
     {
         private readonly ApplicationDbContext _context;
         private readonly IAgencyServiceTypeManager vendorServiceTypeManager;
+        private readonly INavigationService navigationService;
         private readonly ILogger<AvailableAgencyServiceController> logger;
         private readonly INotyfService notifyService;
 
         public AvailableAgencyServiceController(ApplicationDbContext context,
             IAgencyServiceTypeManager vendorServiceTypeManager,
+            INavigationService navigationService,
             ILogger<AvailableAgencyServiceController> logger,
             INotyfService notifyService)
         {
             _context = context;
             this.vendorServiceTypeManager = vendorServiceTypeManager;
+            this.navigationService = navigationService;
             this.logger = logger;
             this.notifyService = notifyService;
         }
@@ -39,7 +42,6 @@ namespace risk.control.system.Controllers.Manager
             return View();
         }
 
-        [Breadcrumb("Manage Service")]
         public IActionResult Service(long id)
         {
             if (id <= 0)
@@ -48,32 +50,25 @@ namespace risk.control.system.Controllers.Manager
                 return this.RedirectToAction<DashboardController>(x => x.Index());
             }
             var model = new ServiceModel { Id = id };
-            var serviceMainLink = new MvcBreadcrumbNode("Agencies", "AvailableAgency", "Manager Agency(s)");
-            var serviceSecondLink = new MvcBreadcrumbNode("Agencies", "AvailableAgency", "Available Agencies") { Parent = serviceMainLink };
-            var serviceThirdLink = new MvcBreadcrumbNode("Details", "AvailableAgency", "Agency Profile") { Parent = serviceSecondLink, RouteValues = new { id = id } };
-            var servicesPage = new MvcBreadcrumbNode("Service", "AvailableAgencyService", $"Manager Service") { Parent = serviceThirdLink, RouteValues = new { id = id } };
-            ViewData["BreadcrumbNode"] = servicesPage;
-
+            ViewData["BreadcrumbNode"] = navigationService.GetAgencyServiceManagerPath(id, ControllerName<AvailableAgencyController>.Name, "Available Agencies");
             return View(model);
         }
 
-        [Breadcrumb(" Add", FromAction = "Service")]
         public async Task<IActionResult> Create(long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             try
             {
-                var vendor = await _context.Vendor.Include(v => v.Country).FirstOrDefaultAsync(v => v.VendorId == id);
-                ViewData["Currency"] = CustomExtensions.GetCultureByCountry(vendor.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
+                var vendor = await _context.Vendor.AsNoTracking().Include(v => v.Country).FirstOrDefaultAsync(v => v.VendorId == id);
 
-                var model = new VendorInvestigationServiceType { Country = vendor.Country, CountryId = vendor.CountryId, Vendor = vendor };
-
-                var serviceMainLink = new MvcBreadcrumbNode("Agencies", "AvailableAgency", "Manager Agency(s)");
-                var serviceSecondLink = new MvcBreadcrumbNode("Agencies", "AvailableAgency", "Available Agencies") { Parent = serviceMainLink };
-                var serviceThirdLink = new MvcBreadcrumbNode("Details", "AvailableAgency", "Agency Profile") { Parent = serviceSecondLink, RouteValues = new { id = id } };
-                var servicesFourthLink = new MvcBreadcrumbNode("Service", "AvailableAgencyService", $"Manager Service") { Parent = serviceThirdLink, RouteValues = new { id = id } };
-                var serviceAddPage = new MvcBreadcrumbNode("Create", "AvailableAgencyService", $"Add Service") { Parent = servicesFourthLink };
-                ViewData["BreadcrumbNode"] = serviceAddPage;
+                var model = new VendorInvestigationServiceType
+                {
+                    Country = vendor.Country,
+                    CountryId = vendor.CountryId,
+                    Vendor = vendor,
+                    Currency = CustomExtensions.GetCultureByCountry(vendor.Country.Code.ToUpper()).NumberFormat.CurrencySymbol
+                };
+                ViewData["BreadcrumbNode"] = navigationService.GetAgencyServiceActionPath(id, ControllerName<AvailableAgencyController>.Name, "Available Agencies", "Add Service", "Create");
                 return View(model);
             }
             catch (Exception ex)
@@ -107,10 +102,9 @@ namespace risk.control.system.Controllers.Manager
                 logger.LogError(ex, "Error creating service for {AgencyId}. {UserEmail}", VendorId, userEmail);
                 notifyService.Error("Error creating service. Try again.");
             }
-            return RedirectToAction(nameof(Service), "AvailableAgencyService", new { id = service.VendorId });
+            return RedirectToAction(nameof(Service), ControllerName<AvailableAgencyServiceController>.Name, new { id = service.VendorId });
         }
 
-        [Breadcrumb(" Edit", FromAction = "Service")]
         public async Task<IActionResult> Edit(long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
@@ -121,24 +115,25 @@ namespace risk.control.system.Controllers.Manager
                     notifyService.Error("OOPs !!!..Agency Id Not Found");
                     return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
-                var currentUser = await _context.ApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == userEmail);
-                ViewData["Currency"] = CustomExtensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
-                var serviceType = _context.VendorInvestigationServiceType
+                var serviceType = _context.VendorInvestigationServiceType.AsNoTracking()
                     .Include(v => v.InvestigationServiceType)
                     .Include(v => v.Country)
                     .Include(v => v.District)
                     .Include(v => v.State)
                     .Include(v => v.Vendor)
                     .First(v => v.VendorInvestigationServiceTypeId == id);
+                serviceType.Currency = CustomExtensions.GetCultureByCountry(serviceType.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
-                ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType.Where(i => i.InsuranceType == serviceType.InsuranceType), "InvestigationServiceTypeId", "Name", serviceType.InvestigationServiceTypeId);
+                serviceType.InvestigationServiceTypeList = await _context.InvestigationServiceType
+                    .Where(i => i.InsuranceType == serviceType.InsuranceType)
+                    .Select(i => new SelectListItem
+                    {
+                        Value = i.InvestigationServiceTypeId.ToString(),
+                        Text = i.Name,
+                        Selected = i.InvestigationServiceTypeId == serviceType.InvestigationServiceTypeId
+                    }).ToListAsync();
 
-                var serviceMainLink = new MvcBreadcrumbNode("Agencies", "AvailableAgency", "Manager Agency(s)");
-                var serviceSecondLink = new MvcBreadcrumbNode("Agencies", "AvailableAgency", "Available Agencies") { Parent = serviceMainLink };
-                var serviceThirdLink = new MvcBreadcrumbNode("Details", "AvailableAgency", "Agency Profile") { Parent = serviceSecondLink, RouteValues = new { id = serviceType.VendorId } };
-                var servicesFourthLink = new MvcBreadcrumbNode("Service", "AvailableAgencyService", $"Manager Service") { Parent = serviceThirdLink, RouteValues = new { id = serviceType.VendorId } };
-                var createPage = new MvcBreadcrumbNode("Edit", "AvailableAgencyService", $"Edit Service") { Parent = servicesFourthLink };
-                ViewData["BreadcrumbNode"] = createPage;
+                ViewData["BreadcrumbNode"] = navigationService.GetAgencyServiceActionPath(serviceType.VendorId, ControllerName<AvailableAgencyController>.Name, "Available Agencies", "Edit Service", "Edit");
 
                 return View(serviceType);
             }
@@ -152,12 +147,12 @@ namespace risk.control.system.Controllers.Manager
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(long VendorInvestigationServiceTypeId, VendorInvestigationServiceType service)
+        public async Task<IActionResult> Edit(VendorInvestigationServiceType service)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             try
             {
-                var result = await vendorServiceTypeManager.EditAsync(VendorInvestigationServiceTypeId, service, userEmail);
+                var result = await vendorServiceTypeManager.EditAsync(service, userEmail);
                 if (!result.Success)
                 {
                     notifyService.Custom(result.Message, 3, "orange", "fas fa-cog");
@@ -169,10 +164,10 @@ namespace risk.control.system.Controllers.Manager
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error editing service for {ServiceId} . {UserEmail}", VendorInvestigationServiceTypeId, userEmail);
+                logger.LogError(ex, "Error editing Service. {UserEmail}", userEmail);
                 notifyService.Custom("Error editing service. Try again.", 3, "red", "fas fa-cog");
             }
-            return RedirectToAction(nameof(Service), "AvailableAgencyService", new { id = service.VendorId });
+            return RedirectToAction(nameof(Service), ControllerName<AvailableAgencyServiceController>.Name, new { id = service.VendorId });
         }
 
         [HttpPost]

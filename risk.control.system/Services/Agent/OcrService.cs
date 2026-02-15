@@ -1,7 +1,7 @@
 ﻿using Amazon.Textract;
 using Amazon.Textract.Model;
 
-namespace risk.control.system.Services;
+namespace risk.control.system.Services.Agent;
 
 public interface IOcrService
 {

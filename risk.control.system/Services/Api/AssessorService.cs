@@ -235,7 +235,7 @@ namespace risk.control.system.Services
 
         public async Task<object> GetReviews(string userEmail, int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc")
         {
-            var companyUser = await context.ApplicationUser
+            var companyUser = await context.ApplicationUser.AsNoTracking()
                  .Include(c => c.Country)
                  .FirstOrDefaultAsync(c => c.Email == userEmail);
 

@@ -12,18 +12,19 @@ using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services.Agency;
+using risk.control.system.Services.Common;
 using SmartBreadcrumbs.Attributes;
-using SmartBreadcrumbs.Nodes;
 
 namespace risk.control.system.Controllers.Manager
 {
-    [Breadcrumb("Manage Agency(s)")]
+    [Breadcrumb("Manage Agency")]
     [Authorize(Roles = $"{MANAGER.DISPLAY_NAME}")]
     public class AvailableAgencyUserController : Controller
     {
         private readonly ApplicationDbContext _context;
         private readonly IAgencyUserCreateEditService agencyUserCreateEditService;
         private readonly INotyfService notifyService;
+        private readonly INavigationService navigationService;
         private readonly IFeatureManager featureManager;
         private readonly ILogger<AvailableAgencyUserController> logger;
         private readonly string portal_base_url = string.Empty;
@@ -32,6 +33,7 @@ namespace risk.control.system.Controllers.Manager
             ApplicationDbContext context,
             IAgencyUserCreateEditService agencyUserCreateEditService,
             INotyfService notifyService,
+            INavigationService navigationService,
             IFeatureManager featureManager,
              IHttpContextAccessor httpContextAccessor,
             ILogger<AvailableAgencyUserController> logger)
@@ -39,6 +41,7 @@ namespace risk.control.system.Controllers.Manager
             _context = context;
             this.agencyUserCreateEditService = agencyUserCreateEditService;
             this.notifyService = notifyService;
+            this.navigationService = navigationService;
             this.featureManager = featureManager;
             this.logger = logger;
             var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
@@ -51,7 +54,6 @@ namespace risk.control.system.Controllers.Manager
             return View();
         }
 
-        [Breadcrumb(" Manage Users", FromAction = "Details", FromController = typeof(AvailableAgencyController))]
         public IActionResult Users(long id)
         {
             var model = new ServiceModel
@@ -59,16 +61,11 @@ namespace risk.control.system.Controllers.Manager
                 Id = id
             };
 
-            var agencysPage = new MvcBreadcrumbNode("Agencies", "AvailableAgency", "Manager Agency(s)");
-            var agency2Page = new MvcBreadcrumbNode("Agencies", "AvailableAgency", "Available Agencies") { Parent = agencysPage, };
-            var agencyPage = new MvcBreadcrumbNode("Details", "AvailableAgency", "Agency Profile") { Parent = agency2Page, RouteValues = new { id = id } };
-            var editPage = new MvcBreadcrumbNode("Users", "AvailableAgencyUser", $"Manager Users") { Parent = agencyPage };
-            ViewData["BreadcrumbNode"] = editPage;
+            ViewData["BreadcrumbNode"] = navigationService.GetAgencyUserManagerPath(id, ControllerName<AvailableAgencyController>.Name, "Available Agencies");
 
             return View(model);
         }
 
-        [Breadcrumb(" Add User", FromAction = "Users")]
         public async Task<IActionResult> Create(long id)
         {
             if (id <= 0)
@@ -126,13 +123,7 @@ namespace risk.control.system.Controllers.Manager
                 Role = role
             };
 
-            var agencysPage = new MvcBreadcrumbNode("Agencies", "AvailableAgency", "Manager Agency(s)");
-            var agency2Page = new MvcBreadcrumbNode("Agencies", "AvailableAgency", "Available Agencies") { Parent = agencysPage, };
-            var agencyPage = new MvcBreadcrumbNode("Details", "AvailableAgency", "Agency Profile") { Parent = agency2Page, RouteValues = new { id = id } };
-            var usersPage = new MvcBreadcrumbNode("Users", "AvailableAgencyUser", $"Manager Users") { Parent = agencyPage, RouteValues = new { id = id } };
-            var editPage = new MvcBreadcrumbNode("Create", "AvailableAgencyUser", $"Add User") { Parent = usersPage };
-            ViewData["BreadcrumbNode"] = editPage;
-
+            ViewData["BreadcrumbNode"] = navigationService.GetAgencyUserActionPath(id, ControllerName<AvailableAgencyController>.Name, "Available Agencies", "Add User", "Create");
             return View(model);
         }
 
@@ -215,18 +206,17 @@ namespace risk.control.system.Controllers.Manager
                     await LoadModel(model);
                     return View(model);
                 }
-                return RedirectToAction(nameof(Users), "AvailableAgencyUser", new { id = model.VendorId });
+                return RedirectToAction(nameof(Users), ControllerName<AvailableAgencyUserController>.Name, new { id = model.VendorId });
             }
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error Creating User. {UserEmail}.", userEmail);
                 notifyService.Error("OOPS !!!..Error Creating User. Try again.");
-                return RedirectToAction(nameof(Create), "AvailableAgencyUser", new { id = model.VendorId });
+                return RedirectToAction(nameof(Create), ControllerName<AvailableAgencyUserController>.Name, new { id = model.VendorId });
             }
         }
 
-        [Breadcrumb(" Edit User", FromAction = "Users")]
-        public async Task<IActionResult> Edit(long userId)
+        public async Task<IActionResult> Edit(long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             if (!ModelState.IsValid)
@@ -236,27 +226,22 @@ namespace risk.control.system.Controllers.Manager
             }
             try
             {
-                var vendorApplicationUser = await _context.ApplicationUser.Include(v => v.Country)?.Include(v => v.Vendor)?.FirstOrDefaultAsync(v => v.Id == userId);
-                if (vendorApplicationUser == null)
+                var model = await _context.ApplicationUser.Include(v => v.Country)?.Include(v => v.Vendor)?.FirstOrDefaultAsync(v => v.Id == id);
+                if (model == null)
                 {
                     notifyService.Error("OOPS !!!..Contact Admin");
                     return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
 
-                var agencysPage = new MvcBreadcrumbNode("Agencies", "AvailableAgency", "Manager Agency(s)");
-                var agency2Page = new MvcBreadcrumbNode("Agencies", "AvailableAgency", "Available Agencies") { Parent = agencysPage, };
-                var agencyPage = new MvcBreadcrumbNode("Details", "AvailableAgency", "Agency Profile") { Parent = agency2Page, RouteValues = new { id = vendorApplicationUser.Vendor.VendorId } };
-                var usersPage = new MvcBreadcrumbNode("Users", "AvailableAgencyUser", $"Manager Users") { Parent = agencyPage, RouteValues = new { id = vendorApplicationUser.Vendor.VendorId } };
-                var editPage = new MvcBreadcrumbNode("Edit", "AvailableAgencyUser", $"Edit User") { Parent = usersPage };
-                ViewData["BreadcrumbNode"] = editPage;
+                model.IsPasswordChangeRequired = await featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION) ? !model.IsPasswordChangeRequired : true;
 
-                vendorApplicationUser.IsPasswordChangeRequired = await featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION) ? !vendorApplicationUser.IsPasswordChangeRequired : true;
+                ViewData["BreadcrumbNode"] = navigationService.GetAgencyUserActionPath(model.VendorId.Value, ControllerName<AvailableAgencyController>.Name, "Available Agencies", "Edit User", "Edit");
 
-                return View(vendorApplicationUser);
+                return View(model);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting {UserId}. {UserEmail}.", userId, userEmail);
+                logger.LogError(ex, "Error getting {UserId}. {UserEmail}.", id, userEmail);
                 notifyService.Error("Error getting User. Try again.");
                 return RedirectToAction(nameof(Users));
             }
@@ -297,11 +282,10 @@ namespace risk.control.system.Controllers.Manager
                 logger.LogError(ex, "Error editing {UserId}. {UserEmail}.", id, userEmail);
                 notifyService.Error("Error editing User. Try again.");
             }
-            return RedirectToAction(nameof(Users), "AvailableAgencyUser", new { id = model.VendorId });
+            return RedirectToAction(nameof(Users), ControllerName<AvailableAgencyUserController>.Name, new { id = model.VendorId });
         }
 
-        [Breadcrumb(title: " Delete", FromAction = "Users")]
-        public async Task<IActionResult> Delete(long userId)
+        public async Task<IActionResult> Delete(long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             try
@@ -311,7 +295,7 @@ namespace risk.control.system.Controllers.Manager
                     notifyService.Error("Error getting User. Try again.");
                     return RedirectToAction(nameof(Users));
                 }
-                var model = await _context.ApplicationUser.Include(v => v.Country).Include(v => v.State).Include(v => v.District).Include(v => v.PinCode).FirstOrDefaultAsync(c => c.Id == userId);
+                var model = await _context.ApplicationUser.Include(v => v.Country).Include(v => v.State).Include(v => v.District).Include(v => v.PinCode).FirstOrDefaultAsync(c => c.Id == id);
                 if (model == null)
                 {
                     notifyService.Error("Error getting User. Try again.");
@@ -326,24 +310,19 @@ namespace risk.control.system.Controllers.Manager
 
                 model.HasClaims = _context.Investigations.Any(c => agencySubStatuses.Contains(c.SubStatus) && c.VendorId == model.VendorId);
 
-                var agencysPage = new MvcBreadcrumbNode("Agencies", "AvailableAgency", "Manager Agency(s)");
-                var agency2Page = new MvcBreadcrumbNode("Agencies", "AvailableAgency", "Available Agencies") { Parent = agencysPage, };
-                var agencyPage = new MvcBreadcrumbNode("Details", "AvailableAgency", "Agency Profile") { Parent = agency2Page, RouteValues = new { id = model.VendorId } };
-                var usersPage = new MvcBreadcrumbNode("Users", "AvailableAgencyUser", $"Manager Users") { Parent = agencyPage, RouteValues = new { id = model.VendorId } };
-                var editPage = new MvcBreadcrumbNode("Delete", "AvailableAgencyUser", $"Delete User") { Parent = usersPage };
-                ViewData["BreadcrumbNode"] = editPage;
+                ViewData["BreadcrumbNode"] = navigationService.GetAgencyUserActionPath(model.VendorId.Value, ControllerName<AvailableAgencyController>.Name, "Available Agencies", "Delete User", "Delete");
 
                 return View(model);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error deleting {UserId}. {UserEmail}.", userId, userEmail);
+                logger.LogError(ex, "Error deleting {UserId}. {UserEmail}.", id, userEmail);
                 notifyService.Error("Error deleting User. Try again.");
                 return RedirectToAction(nameof(Users));
             }
         }
 
-        [HttpPost, ActionName("Delete")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(string email, long vendorId)
         {
@@ -368,7 +347,7 @@ namespace risk.control.system.Controllers.Manager
                 _context.ApplicationUser.Update(model);
                 await _context.SaveChangesAsync();
                 notifyService.Custom($"User <b>{model.Email}</b> Deleted successfully", 3, "red", "fas fa-user-minus");
-                return RedirectToAction(nameof(Users), "AvailableAgencyUser", new { id = vendorId });
+                return RedirectToAction(nameof(Users), ControllerName<AvailableAgencyUserController>.Name, new { id = vendorId });
             }
             catch (Exception ex)
             {

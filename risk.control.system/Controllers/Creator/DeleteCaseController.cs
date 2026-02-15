@@ -1,14 +1,12 @@
 ﻿using AspNetCoreHero.ToastNotification.Abstractions;
-
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using risk.control.system.AppConstant;
+using risk.control.system.Controllers.Common;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
-
-using risk.control.system.AppConstant;
-using risk.control.system.Controllers.Common;
 
 namespace risk.control.system.Controllers.Creator
 {
@@ -40,7 +38,7 @@ namespace risk.control.system.Controllers.Creator
             var currentUserEmail = HttpContext.User?.Identity?.Name;
             try
             {
-                var companyUser = await _context.ApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
+                var companyUser = await _context.ApplicationUser.AsNoTracking().Include(u => u.ClientCompany).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
 
                 if (id <= 0)
                 {
@@ -100,7 +98,6 @@ namespace risk.control.system.Controllers.Creator
                     claimsInvestigation.Deleted = true;
                     _context.Investigations.Update(claimsInvestigation);
                 }
-                var companyUser = await _context.ApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == currentUserEmail);
 
                 await _context.SaveChangesAsync();
 

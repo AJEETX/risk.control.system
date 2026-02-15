@@ -195,7 +195,7 @@ namespace risk.control.system.Services.Api
                 .ToDictionaryAsync(x => x.Email, x => new { x.LastSeen, x.LoggedOut });
 
             // 2️⃣ Pre-fetch vendor users
-            var vendorUsers = await context.ApplicationUser
+            var vendorUsers = await context.ApplicationUser.AsNoTracking()
                 .Where(u => u.VendorId == vendorId && !u.Deleted)
                 .Include(u => u.Country)
                 .Include(u => u.State)
