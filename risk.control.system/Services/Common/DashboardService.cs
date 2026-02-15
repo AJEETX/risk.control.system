@@ -53,16 +53,16 @@ namespace risk.control.system.Services.Common
             var vendorCaseCount = new Dictionary<string, int>();
             await using var _context = await _contextFactory.CreateDbContextAsync();
 
-            var companyUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
+            var companyUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == userEmail);
 
-            List<Vendor> existingVendors = await _context.Vendor.ToListAsync();
+            List<Vendor> existingVendors = await _context.Vendor.AsNoTracking().ToListAsync();
 
             if (companyUser == null)
             {
                 return vendorCaseCount;
             }
 
-            var claimsCases = _context.Investigations
+            var claimsCases = _context.Investigations.AsNoTracking()
                .Include(c => c.PolicyDetail).Where(c => c.PolicyDetail.InsuranceType == insuranceType &&
                !c.Deleted && c.VendorId.HasValue &&
                                 (c.SubStatus == allocatedStatus ||
@@ -105,7 +105,7 @@ namespace risk.control.system.Services.Common
             await using var _context = await _contextFactory.CreateDbContextAsync();
 
             // 1. Get the VendorId for the current user
-            var vendorId = await _context.ApplicationUser
+            var vendorId = await _context.ApplicationUser.AsNoTracking()
                 .Where(u => u.Email == userEmail)
                 .Select(u => u.VendorId)
                 .FirstOrDefaultAsync();
@@ -113,13 +113,13 @@ namespace risk.control.system.Services.Common
             if (vendorId == null) return new Dictionary<string, int>();
 
             // 2. Fetch all non-admin agent emails first (to ensure 0-count agents are included)
-            var agentEmails = await _context.ApplicationUser
+            var agentEmails = await _context.ApplicationUser.AsNoTracking()
                 .Where(u => u.VendorId == vendorId && !u.IsVendorAdmin)
                 .Select(u => u.Email)
                 .ToListAsync();
 
             // 3. Let the Database do the heavy lifting: Group by Email and Count
-            var caseCountsByAgent = await _context.Investigations
+            var caseCountsByAgent = await _context.Investigations.AsNoTracking()
                 .Where(c => c.VendorId == vendorId &&
                             !c.Deleted &&
                             c.Status == CONSTANTS.CASE_STATUS.INPROGRESS &&
@@ -149,8 +149,8 @@ namespace risk.control.system.Services.Common
         {
             Dictionary<string, (int count1, int count2)> dictMonthlySum = new Dictionary<string, (int count1, int count2)>();
             await using var _context = await _contextFactory.CreateDbContextAsync();
-            var companyUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
-            var vendorUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
+            var companyUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == userEmail);
+            var vendorUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == userEmail);
             var startDate = new DateTime(DateTime.UtcNow.Year, 1, 1);
             var months = Enumerable.Range(0, 11)
                                    .Select(startDate.AddMonths)
@@ -158,7 +158,7 @@ namespace risk.control.system.Services.Common
                        .ToList();
             if (companyUser != null)
             {
-                var tdetail = _context.Investigations
+                var tdetail = _context.Investigations.AsNoTracking()
                     .Include(i => i.PolicyDetail)
                     .Where(d =>
                         (companyUser.Role == AppRoles.ASSESSOR || companyUser.IsClientAdmin || d.UpdatedBy == userEmail) &&
@@ -196,7 +196,7 @@ namespace risk.control.system.Services.Common
             }
             else if (vendorUser != null)
             {
-                var tdetail = _context.Investigations
+                var tdetail = _context.Investigations.AsNoTracking()
                     .Include(i => i.PolicyDetail)
                     .Where(d =>
                         (vendorUser.IsVendorAdmin ? true : d.UpdatedBy == userEmail) &&
@@ -236,13 +236,13 @@ namespace risk.control.system.Services.Common
         public async Task<Dictionary<string, (int count1, int count2)>> CalculateMonthlyCaseStatus(string userEmail)
         {
             await using var _context = await _contextFactory.CreateDbContextAsync();
-            var companyUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
-            var vendorUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
+            var companyUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == userEmail);
+            var vendorUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == userEmail);
 
             Dictionary<string, (int count1, int count2)> dictWeeklyCases = new Dictionary<string, (int count1, int count2)>();
             if (companyUser != null)
             {
-                var tdetail = _context.Investigations
+                var tdetail = _context.Investigations.AsNoTracking()
                     .Include(i => i.PolicyDetail).Where(d =>
                         (companyUser.Role == AppRoles.ASSESSOR || companyUser.IsClientAdmin || d.UpdatedBy == userEmail) &&
                        d.ClientCompanyId == companyUser.ClientCompanyId &&
@@ -274,7 +274,7 @@ namespace risk.control.system.Services.Common
             }
             else if (vendorUser != null)
             {
-                var tdetail = _context.Investigations
+                var tdetail = _context.Investigations.AsNoTracking()
                     .Include(i => i.PolicyDetail)
                     .Where(d =>
                         (vendorUser.IsVendorAdmin ? true : d.UpdatedBy == userEmail) &&
@@ -314,11 +314,11 @@ namespace risk.control.system.Services.Common
             var result = new List<TatDetail>();
             int totalStatusChanged = 0;
             await using var _context = await _contextFactory.CreateDbContextAsync();
-            var companyUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
-            var vendorUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
+            var companyUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == userEmail);
+            var vendorUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == userEmail);
             if (companyUser != null)
             {
-                var tdetail = _context.Investigations
+                var tdetail = _context.Investigations.AsNoTracking()
                     .Include(i => i.PolicyDetail)
                     .Where(d =>
                     d.ClientCompanyId == companyUser.ClientCompanyId &&
@@ -356,7 +356,7 @@ namespace risk.control.system.Services.Common
             }
             else if (vendorUser != null)
             {
-                var tdetail = _context.Investigations
+                var tdetail = _context.Investigations.AsNoTracking()
                     .Include(i => i.PolicyDetail)
                     .Where(d =>
                      d.VendorId == vendorUser.VendorId &&
@@ -402,12 +402,12 @@ namespace risk.control.system.Services.Common
             Dictionary<string, (int count1, int count2)> dictWeeklyCases = new Dictionary<string, (int, int)>();
 
             await using var _context = await _contextFactory.CreateDbContextAsync();
-            var tdetailDays = _context.Investigations
+            var tdetailDays = _context.Investigations.AsNoTracking()
                     .Include(i => i.PolicyDetail)
                      .Where(d => d.Created > DateTime.UtcNow.AddDays(-28) && !d.Deleted);
 
-            var companyUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
-            var vendorUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
+            var companyUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == userEmail);
+            var vendorUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == userEmail);
 
             if (companyUser != null)
             {
@@ -490,13 +490,13 @@ namespace risk.control.system.Services.Common
             Dictionary<string, int> dictWeeklyCases = new Dictionary<string, int>();
 
             await using var _context = await _contextFactory.CreateDbContextAsync();
-            var tdetailDays = _context.Investigations
+            var tdetailDays = _context.Investigations.AsNoTracking()
                     .Include(i => i.PolicyDetail)
                      .Where(d => d.Created > DateTime.UtcNow.AddDays(-28) && !d.Deleted && d.Status == CONSTANTS.CASE_STATUS.INPROGRESS &&
                      (d.SubStatus != CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY && d.SubStatus != CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY));
 
-            var companyUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
-            var vendorUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
+            var companyUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == userEmail);
+            var vendorUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == userEmail);
 
             if (companyUser != null)
             {

@@ -1,14 +1,10 @@
 ﻿using AspNetCoreHero.ToastNotification.Abstractions;
-
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using risk.control.system.Models;
-
-using SmartBreadcrumbs.Attributes;
-
-using static risk.control.system.AppConstant.Applicationsettings;
 using risk.control.system.AppConstant;
+using risk.control.system.Models;
+using SmartBreadcrumbs.Attributes;
 
 namespace risk.control.system.Controllers.CompanyAdmin
 {
@@ -26,9 +22,10 @@ namespace risk.control.system.Controllers.CompanyAdmin
             this.notifyService = notifyService;
             this.logger = logger;
         }
+
         public IActionResult Index()
         {
-            return RedirectToAction("Profile");
+            return RedirectToAction(nameof(Profile));
         }
 
         [Breadcrumb("Occupation Type")]
@@ -50,6 +47,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
 
             return Json(new { data });
         }
+
         [Breadcrumb("Details ")]
         public async Task<IActionResult> Details(int id)
         {

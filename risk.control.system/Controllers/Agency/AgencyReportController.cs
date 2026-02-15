@@ -123,7 +123,7 @@ namespace risk.control.system.Controllers.Agency
 
                 if (success != null)
                 {
-                    var agencyUser = await _context.ApplicationUser.Include(a => a.Vendor).FirstOrDefaultAsync(c => c.Email == userEmail);
+                    var agencyUser = await _context.ApplicationUser.AsNoTracking().Include(a => a.Vendor).FirstOrDefaultAsync(c => c.Email == userEmail);
 
                     backgroundJobClient.Enqueue(() => mailboxService.NotifyCaseReportSubmitToCompany(userEmail, claimId, baseUrl));
 

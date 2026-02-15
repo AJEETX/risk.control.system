@@ -15,7 +15,7 @@ using risk.control.system.Services.Common;
 using SmartBreadcrumbs.Attributes;
 using SmartBreadcrumbs.Nodes;
 
-namespace risk.control.system.Controllers.CompanyAdmin
+namespace risk.control.system.Controllers.PortalAdmin
 {
     [Breadcrumb("Agencies")]
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME},{MANAGER.DISPLAY_NAME}")]

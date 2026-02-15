@@ -265,7 +265,7 @@ namespace risk.control.system.Services.Api
 
         private static string GetDomain(Vendor u, ApplicationUser user) =>
             user.Role == AppRoles.COMPANY_ADMIN
-                ? $"<a href='/Company/AgencyDetail?id={u.VendorId}'>{u.Email}</a>"
+                ? $"<a href='/Company/AgencyDetail/{u.VendorId}'>{u.Email}</a>"
                 : u.Email;
 
         private static void ResetVendorUpdateFlags(IEnumerable<Vendor> vendors)

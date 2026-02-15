@@ -21,7 +21,7 @@ namespace risk.control.system.Services.Report
 
         public async Task<CaseInvestigationVendorsModel> GetInvestigateReport(string userEmail, long selectedcase)
         {
-            var caseTask = await _context.Investigations
+            var caseTask = await _context.Investigations.AsNoTracking()
                .Include(c => c.InvestigationTimeline)
                .Include(c => c.InvestigationReport)
                .ThenInclude(c => c.EnquiryRequest)
@@ -59,7 +59,7 @@ namespace risk.control.system.Services.Report
                .FirstOrDefaultAsync(c => c.Id == selectedcase);
             if (caseTask is null) return null;
 
-            var beneficiaryDetails = await _context.BeneficiaryDetail
+            var beneficiaryDetails = await _context.BeneficiaryDetail.AsNoTracking()
                 .Include(c => c.PinCode)
                 .Include(c => c.BeneficiaryRelation)
                 .Include(c => c.District)

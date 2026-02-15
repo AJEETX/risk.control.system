@@ -30,8 +30,8 @@ namespace risk.control.system.Services.Agency
         {
             try
             {
-                var currentUser = await context.ApplicationUser.Include(u => u.Vendor).FirstOrDefaultAsync(u => u.Email == userEmail);
-                var caseTask = await context.Investigations
+                var currentUser = await context.ApplicationUser.AsNoTracking().Include(u => u.Vendor).FirstOrDefaultAsync(u => u.Email == userEmail);
+                var caseTask = await context.Investigations.AsNoTracking()
                     .FirstOrDefaultAsync(c => c.Id == caseId);
 
                 caseTask.IsNewAssignedToAgency = true;
@@ -58,10 +58,10 @@ namespace risk.control.system.Services.Agency
         {
             try
             {
-                var currentUser = await context.ApplicationUser.Include(u => u.Vendor).FirstOrDefaultAsync(u => u.Email == userEmail);
-                var caseTask = await context.Investigations
+                var currentUser = await context.ApplicationUser.AsNoTracking().Include(u => u.Vendor).FirstOrDefaultAsync(u => u.Email == userEmail);
+                var caseTask = await context.Investigations.AsNoTracking()
                     .FirstOrDefaultAsync(c => c.Id == caseId);
-                var company = await context.ClientCompany.FirstOrDefaultAsync(c => c.ClientCompanyId == caseTask.ClientCompanyId);
+                var company = await context.ClientCompany.AsNoTracking().FirstOrDefaultAsync(c => c.ClientCompanyId == caseTask.ClientCompanyId);
                 caseTask.CaseOwner = company.Email;
                 caseTask.IsAutoAllocated = false;
                 caseTask.IsNew = true;

@@ -6,7 +6,6 @@ using Hangfire;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using risk.control.system.AppConstant;
 using risk.control.system.Controllers.Common;
@@ -19,7 +18,7 @@ using SmartBreadcrumbs.Attributes;
 
 namespace risk.control.system.Controllers.Creator
 {
-    [Authorize(Roles = $"{CREATOR.DISPLAY_NAME}, {MANAGER.DISPLAY_NAME}")]
+    [Authorize(Roles = $"{CREATOR.DISPLAY_NAME}")]
     [Breadcrumb(" Cases")]
     public class CaseActiveController : Controller
     {
@@ -124,14 +123,6 @@ namespace risk.control.system.Controllers.Creator
             }
             try
             {
-                var currentUser = await _context.ApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == userEmail);
-                ViewData["Currency"] = CustomExtensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
-                if (id < 1)
-                {
-                    notifyService.Error("OOPS !!! Case Not Found !!!..");
-                    return this.RedirectToAction<DashboardController>(x => x.Index());
-                }
-
                 var model = await investigationDetailService.GetCaseDetails(userEmail, id);
 
                 return View(model);

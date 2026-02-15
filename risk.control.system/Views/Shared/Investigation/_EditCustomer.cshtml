@@ -1,8 +1,8 @@
 ﻿@model risk.control.system.Models.CustomerDetail
 
 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-<input type="hidden" asp-for="InvestigationTaskId" value="@Model.InvestigationTaskId" />
-<input type="hidden" asp-for="CustomerDetailId" value="@Model.CustomerDetailId" />
+<input type="hidden" asp-for="InvestigationTaskId" />
+<input type="hidden" asp-for="CustomerDetailId" />
 <div id="article" class="card shadow-lg border-1 rounded-lg">
 	<div class="card-header bg-secondary text-white text-center">
 		<h3 class="card-title">
@@ -88,7 +88,7 @@
 						<div class="input-group-prepend">
 							<span class="input-group-text"><i class="fa fa-user-plus"></i> <i class="fa fa-asterisk asterik-style"></i></span>
 						</div>
-						<select id="Gender" required asp-for="Gender" class="form-control remarks" asp-items="Html.GetEnumSelectList<Gender>()">
+						<select id="Gender" required asp-for="Gender" class="form-control remarks" asp-items="@Model.GenderList">
 							<option value="">--- SELECT ---</option>
 						</select>
 						<span asp-validation-for="Gender" class="text-danger"></span>
@@ -109,12 +109,12 @@
 			</div>
 			<div class="col-md-6">
 				<div class="form-group">
-					<label class="input-group-label" for="Income">Annual Income (@ViewBag.Currency):</label>
+					<label class="input-group-label" for="Income">Annual Income (@Model.CurrencySymbol):</label>
 					<div class="input-group mb-3">
 						<div class="input-group-prepend">
 							<span class="input-group-text"><i class="far fa-money-bill-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
 						</div>
-						<select id="Income" required asp-for="Income" class="form-control remarks" asp-items="@ViewBag.IncomeList">
+						<select id="Income" required asp-for="Income" class="form-control remarks" asp-items="@Model.IncomeList">
 							<option value="">--- SELECT ---</option>
 						</select>
 						<span asp-validation-for="Income" class="text-danger"></span>
@@ -127,7 +127,7 @@
 						<div class="input-group-prepend">
 							<span class="input-group-text"><i class="fas fa-business-time"></i> <i class="fa fa-asterisk asterik-style"></i></span>
 						</div>
-						<select id="Occupation" required asp-for="Occupation" class="form-control remarks" asp-items="@ViewBag.OccupationList">
+						<select id="Occupation" required asp-for="Occupation" class="form-control remarks" asp-items="@Model.OccupationList">
 							<option value="">--- SELECT ---</option>
 						</select>
 						<span asp-validation-for="Occupation" class="text-danger"></span>
@@ -139,7 +139,7 @@
 						<div class="input-group-prepend">
 							<span class="input-group-text"><i class="fas fa-graduation-cap"></i> <i class="fa fa-asterisk asterik-style"></i></span>
 						</div>
-						<select id="Education" required asp-for="Education" class="form-control remarks" asp-items="@ViewBag.EducationList">
+						<select id="Education" required asp-for="Education" class="form-control remarks" asp-items="@Model.EducationList">
 							<option value="">--- SELECT ---</option>
 						</select>
 						<span asp-validation-for="Education" class="text-danger"></span>
@@ -153,7 +153,7 @@
 						<div class="input-group-prepend">
 							<span class="input-group-text"><i class="fa fa-home"></i> <i class="fa fa-asterisk asterik-style"></i></span>
 						</div>
-						<input type="text" asp-for="Addressline" id="Addressline" class="form-control remarks title-name" type="text" required placeholder="Street Address..." maxlength="70" autocomplete="off" />
+						<input type="text" asp-for="Addressline" id="Addressline" class="form-control remarks title-name" required placeholder="Street Address..." maxlength="70" autocomplete="off" />
 						<span asp-validation-for="Addressline" class="text-danger"></span>
 					</div>
 				</div>

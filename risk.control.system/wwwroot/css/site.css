@@ -4156,3 +4156,10 @@ img.img-contain {
 .btn-black-color {
     color: #000 !important;
 }
+h2.lead{
+    padding:10px !important;
+    border-bottom:5px solid #ccc !important;
+    background-color:whitesmoke !important;
+    border-radius:5px !important;
+    margin-top:5px !important;
+}

@@ -21,7 +21,7 @@
             <label class="input-group-label" for="InvestigationServiceTypeId">Verification Type:</label>
             <div class="input-group mb-3">
                 <div class="input-group-prepend">
-                    <span class="input-group-text" >
+                    <span class="input-group-text">
                         <i class="fas fa-wrench"></i> <i class="fa fa-asterisk asterik-style"></i>
                     </span>
                 </div>
@@ -34,12 +34,12 @@
         </div>
 
         <div class="form-group">
-            <label class="input-group-label" for="Price"> Service Price in @Model.Country.CurrencyCode (@ViewBag.Currency):</label>
+            <label class="input-group-label" for="Price"> Service Price in @Model.Country.CurrencyCode (@Model.Currency):</label>
             <div class="input-group mb-3">
                 <div class="input-group-prepend">
                     <span class="input-group-text" for="Price"> <i class="fas fa-money-bill-wave"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                 </div>
-                <input id="Price" asp-for="Price" class="form-control remarks" type="text" placeholder="Service Price in @Model.Country.CurrencyCode (@ViewBag.Currency)"  required maxlength="10" autocomplete="off" />
+                <input id="Price" asp-for="Price" class="form-control remarks" type="text" placeholder="Service Price in @Model.Country.CurrencyCode (@Model.Currency)"  required maxlength="10" autocomplete="off" />
                 <span asp-validation-for="Price" class="text-danger"></span>
             </div>
         </div>
@@ -63,7 +63,6 @@
                 </div>
             </div>
         </div>
-
     </div>
     <div class="col-md-6">
         <div class="form-group multidistrict">
@@ -78,7 +77,6 @@
                 <label class="form-check-label" for="allDistrictsCheckbox">
                     All Districts
                 </label>
-
             </div>
 
             <div class="input-group mb-3">
@@ -89,7 +87,7 @@
                     </span>
                 </div>
                 <!-- Place this next to the district dropdown -->
-                
+
                 <select id="SelectedDistrictIds"
                         name="SelectedDistrictIds"
                         class="form-control remarks"

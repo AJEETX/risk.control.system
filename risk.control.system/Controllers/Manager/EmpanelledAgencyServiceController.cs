@@ -9,26 +9,30 @@ using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services.Agency;
+using risk.control.system.Services.Common;
 using SmartBreadcrumbs.Attributes;
-using SmartBreadcrumbs.Nodes;
 
 namespace risk.control.system.Controllers.Manager
 {
     [Authorize(Roles = $"{MANAGER.DISPLAY_NAME}")]
+    [Breadcrumb("Manage Agency")]
     public class EmpanelledAgencyServiceController : Controller
     {
         private readonly INotyfService notifyService;
         private readonly ApplicationDbContext _context;
+        private readonly INavigationService navigationService;
         private readonly IAgencyServiceTypeManager vendorServiceTypeManager;
         private readonly ILogger<EmpanelledAgencyServiceController> logger;
 
         public EmpanelledAgencyServiceController(ApplicationDbContext context,
+            INavigationService navigationService,
             IAgencyServiceTypeManager vendorServiceTypeManager,
             INotyfService notifyService,
              IHttpContextAccessor httpContextAccessor,
             ILogger<EmpanelledAgencyServiceController> logger)
         {
             this._context = context;
+            this.navigationService = navigationService;
             this.vendorServiceTypeManager = vendorServiceTypeManager;
             this.notifyService = notifyService;
             this.logger = logger;
@@ -41,7 +45,6 @@ namespace risk.control.system.Controllers.Manager
             return View();
         }
 
-        [Breadcrumb("Manage Service", FromAction = nameof(EmpanelledAgencyController.Detail), FromController = typeof(EmpanelledAgencyController))]
         public IActionResult Service(long id)
         {
             if (id <= 0)
@@ -52,31 +55,23 @@ namespace risk.control.system.Controllers.Manager
 
             var model = new ServiceModel { Id = id };
 
-            var claimsPage = new MvcBreadcrumbNode("Agencies", "EmpanelledAgency", "Manage Agency(s)");
-            var agencyPage = new MvcBreadcrumbNode("Agencies", "EmpanelledAgency", "Empanelled Agencies") { Parent = claimsPage, };
-            var detailsPage = new MvcBreadcrumbNode("Detail", "EmpanelledAgency", $"Agency Profile") { Parent = agencyPage, RouteValues = new { id = id } };
-            var editPage = new MvcBreadcrumbNode("Service", "EmpanelledAgencyService", $"Manage Service") { Parent = detailsPage, RouteValues = new { id = id } };
-            ViewData["BreadcrumbNode"] = editPage;
-
+            ViewData["BreadcrumbNode"] = navigationService.GetAgencyServiceManagerPath(id, ControllerName<EmpanelledAgencyController>.Name, "Active Agencies");
             return View(model);
         }
 
-        [Breadcrumb(" Add Service", FromAction = "Service")]
         public async Task<IActionResult> Create(long id)
         {
             try
             {
-                var vendor = await _context.Vendor.Include(v => v.Country).FirstOrDefaultAsync(v => v.VendorId == id);
-                var model = new VendorInvestigationServiceType { Country = vendor.Country, CountryId = vendor.CountryId, Vendor = vendor };
-                ViewData["Currency"] = CustomExtensions.GetCultureByCountry(vendor.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
-
-                var claimsPage = new MvcBreadcrumbNode("Agencies", "EmpanelledAgency", "Manage Agency(s)");
-                var agencyPage = new MvcBreadcrumbNode("Agencies", "EmpanelledAgency", "Empanelled Agencies") { Parent = claimsPage, };
-                var detailsPage = new MvcBreadcrumbNode("AgencyDetail", "EmpanelledAgency", $"Agency Profile") { Parent = agencyPage, RouteValues = new { id = id } };
-                var editPage = new MvcBreadcrumbNode("Service", "EmpanelledAgencyService", $"Manage Service") { Parent = detailsPage, RouteValues = new { id = id } };
-                var addPage = new MvcBreadcrumbNode("Create", "EmpanelledAgencyService", $"Add Service") { Parent = editPage };
-                ViewData["BreadcrumbNode"] = addPage;
-
+                var vendor = await _context.Vendor.AsNoTracking().Include(v => v.Country).FirstOrDefaultAsync(v => v.VendorId == id);
+                var model = new VendorInvestigationServiceType
+                {
+                    Country = vendor.Country,
+                    CountryId = vendor.CountryId,
+                    Vendor = vendor,
+                    Currency = CustomExtensions.GetCultureByCountry(vendor.Country.Code.ToUpper()).NumberFormat.CurrencySymbol
+                };
+                ViewData["BreadcrumbNode"] = navigationService.GetAgencyServiceActionPath(id, ControllerName<EmpanelledAgencyController>.Name, "Active Agencies", "Add Service", "Create");
                 return View(model);
             }
             catch (Exception ex)
@@ -111,10 +106,9 @@ namespace risk.control.system.Controllers.Manager
                 logger.LogError(ex, "Error occurred creating Service for {AgencyId} . {UserEmail}", VendorId, HttpContext.User.Identity.Name);
                 notifyService.Error("Error creating agency service. Try again.");
             }
-            return RedirectToAction(nameof(Service), "EmpanelledAgencyService", new { id = service.VendorId });
+            return RedirectToAction(nameof(Service), ControllerName<EmpanelledAgencyServiceController>.Name, new { id = service.VendorId });
         }
 
-        [Breadcrumb(" Edit Service", FromAction = "Service")]
         public async Task<IActionResult> Edit(long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
@@ -125,26 +119,26 @@ namespace risk.control.system.Controllers.Manager
                     notifyService.Error("OOPs !!!..Agency Id Not Found");
                     return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-                var currentUser = await _context.ApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
-                ViewData["Currency"] = CustomExtensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
-                var vendorInvestigationServiceType = _context.VendorInvestigationServiceType
+                var serviceType = _context.VendorInvestigationServiceType
                     .Include(v => v.InvestigationServiceType)
                     .Include(v => v.Country)
                     .Include(v => v.District)
                     .Include(v => v.State)
                     .Include(v => v.Vendor)
                     .First(v => v.VendorInvestigationServiceTypeId == id);
+                serviceType.Currency = CustomExtensions.GetCultureByCountry(serviceType.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
+                serviceType.InvestigationServiceTypeList = await _context.InvestigationServiceType
+                    .Where(i => i.InsuranceType == serviceType.InsuranceType)
+                    .Select(i => new SelectListItem
+                    {
+                        Value = i.InvestigationServiceTypeId.ToString(),
+                        Text = i.Name,
+                        Selected = i.InvestigationServiceTypeId == serviceType.InvestigationServiceTypeId
+                    }).ToListAsync();
 
-                ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType.Where(i => i.InsuranceType == vendorInvestigationServiceType.InsuranceType), "InvestigationServiceTypeId", "Name", vendorInvestigationServiceType.InvestigationServiceTypeId);
+                ViewData["BreadcrumbNode"] = navigationService.GetAgencyServiceActionPath(serviceType.VendorId, ControllerName<EmpanelledAgencyController>.Name, "Active Agencies", "Edit Service", "Edit");
 
-                var claimsPage = new MvcBreadcrumbNode("Agencies", "EmpanelledAgency", "Manage Agency(s)");
-                var agencyPage = new MvcBreadcrumbNode("Agencies", "EmpanelledAgency", "Empanelled Agencies") { Parent = claimsPage, };
-                var detailsPage = new MvcBreadcrumbNode("AgencyDetail", "EmpanelledAgency", $"Agency Profile") { Parent = agencyPage, RouteValues = new { id = vendorInvestigationServiceType.VendorId } };
-                var editPage = new MvcBreadcrumbNode("Service", "EmpanelledAgencyService", $"Manage Service") { Parent = detailsPage, RouteValues = new { id = vendorInvestigationServiceType.VendorId } };
-                var addPage = new MvcBreadcrumbNode("Edit", "EmpanelledAgencyService", $"Edit Service") { Parent = editPage };
-                ViewData["BreadcrumbNode"] = addPage;
-                return View(vendorInvestigationServiceType);
+                return View(serviceType);
             }
             catch (Exception ex)
             {
@@ -156,13 +150,12 @@ namespace risk.control.system.Controllers.Manager
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(long VendorInvestigationServiceTypeId, VendorInvestigationServiceType service, long VendorId)
+        public async Task<IActionResult> Edit(VendorInvestigationServiceType service, long VendorId)
         {
+            var userEmail = HttpContext.User?.Identity?.Name;
             try
             {
-                var email = HttpContext.User?.Identity?.Name;
-
-                var result = await vendorServiceTypeManager.EditAsync(VendorInvestigationServiceTypeId, service, email);
+                var result = await vendorServiceTypeManager.EditAsync(service, userEmail);
                 if (!result.Success)
                 {
                     notifyService.Custom(result.Message, 3, "orange", "fas fa-cog");
@@ -174,10 +167,10 @@ namespace risk.control.system.Controllers.Manager
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred editing Service for {ServiceId} . {UserEmail}", VendorInvestigationServiceTypeId, HttpContext.User.Identity.Name);
+                logger.LogError(ex, "Error occurred editing Service. {UserEmail}", userEmail);
                 notifyService.Error("Error editing agency service. Try again.");
             }
-            return RedirectToAction(nameof(Service), "EmpanelledAgencyService", new { id = service.VendorId });
+            return RedirectToAction(nameof(Service), ControllerName<EmpanelledAgencyServiceController>.Name, new { id = service.VendorId });
         }
 
         [HttpPost]

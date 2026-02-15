@@ -35,7 +35,7 @@ namespace risk.control.system.Services.Agency
         {
             try
             {
-                var vendorAgent = await _context.ApplicationUser
+                var vendorAgent = await _context.ApplicationUser.AsNoTracking()
                     .Include(a => a.Vendor)
                     .FirstOrDefaultAsync(u => u.Id.ToString() == selectedCase);
 

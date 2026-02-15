@@ -52,46 +52,46 @@
                 <div class="col-7">
                     <h2 class="lead"><b>@Model.Location?.Name</b></h2>
                     <p class="text-muted text-sm">
-                        <b>Relation: </b> @Model.Location?.BeneficiaryRelation?.Name
+                        Relation: <b> @Model.Location?.BeneficiaryRelation?.Name </b>
                     </p>
                     <ul class="ml-4 mb-0 fa-ul text-muted">
                         <li class="small">
                             <span class="fa-li">
                                 <i class="fa fa-money"></i>
                             </span>
-                            Annual Income: (@ViewBag.Currency) @Model.Location?.Income.GetEnumDisplayName()
+                            Annual Income: (@Model.Currency) <b> @Model.Location?.Income.GetEnumDisplayName()</b>
                         </li>
                         <li class="small">
                             <span class="fa-li">
                                 <i class="fas fa-user-alt"></i>
                             </span>
-                            Age: @currentBAgeinYrs
+                            Age:<b> @currentBAgeinYrs</b>
                         </li>
 
                         <li class="small">
                             <span class="fa-li">
                                 <i class="fas fa-lg fa-building"></i>
                             </span>
-                            Address: @baddress
+                            Address: <b> @baddress</b>
                         </li>
                         <li class="small">
                             <span class="fa-li">
                                 <i class="fas fa-lg fa-globe"></i>
                             </span>
-                            Country: 
+                            Country:
                             @if(!string.IsNullOrWhiteSpace(country))
                             {
-                                <img src="@imgPath" class="flag-icon" data-bs-toggle="tooltip" /> @country
+                                <img src="@imgPath" class="flag-icon" data-bs-toggle="tooltip" /> <b> @country</b>
                             }
                         </li>
                         <li class="small">
                             <span class="fa-li">
                                 <i class="fas fa-lg fa-phone"></i>
                             </span>
-                            Mobile #: 
+                            Mobile #:
                             @if(!string.IsNullOrWhiteSpace(phone))
                             {
-                                @phone
+                               <b> @phone</b>
                             }
                         </li>
                     </ul>
@@ -113,7 +113,6 @@
                             <img id="beneficiaryGoogleMap" class="img-fluid block-data" src="@map" title="Display Customer Address in map" data-bs-toggle="tooltip" />
                         }
                     </p>
-
                 </div>
             </div>
         </div>
@@ -146,7 +145,6 @@
                         </button>
                     }
             </div>
-
         </div>
     </div>
 </div>

@@ -36,7 +36,7 @@ namespace risk.control.system.Controllers.Manager
             portal_base_url = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
         }
 
-        [Breadcrumb("Manage Agency(s)")]
+        [Breadcrumb("Manage Agency")]
         public IActionResult Index()
         {
             return RedirectToAction(nameof(Create));

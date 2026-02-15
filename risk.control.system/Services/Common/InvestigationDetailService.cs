@@ -26,9 +26,9 @@ namespace risk.control.system.Services.Common
             this.context = context;
         }
 
-        public async Task<CaseTransactionModel> GetCaseDetails(string currentUserEmail, long id)
+        public async Task<CaseTransactionModel> GetCaseDetails(string userEmail, long id)
         {
-            var caseTask = await context.Investigations
+            var caseTask = await context.Investigations.AsNoTracking()
                 .Include(c => c.CaseMessages)
                 .Include(c => c.CaseNotes)
                 .Include(c => c.PolicyDetail)
@@ -70,7 +70,7 @@ namespace risk.control.system.Services.Common
                 var maskedBeneficiaryContact = new string('*', caseTask.BeneficiaryDetail.PhoneNumber.ToString().Length - 4) + caseTask.BeneficiaryDetail.PhoneNumber.ToString().Substring(caseTask.BeneficiaryDetail.PhoneNumber.ToString().Length - 4);
                 caseTask.BeneficiaryDetail.PhoneNumber = maskedBeneficiaryContact;
             }
-            var companyUser = await context.ApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == currentUserEmail);
+            var companyUser = await context.ApplicationUser.AsNoTracking().Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == userEmail);
             var lastHistory = caseTask.InvestigationTimeline.OrderByDescending(h => h.StatusChangedAt).FirstOrDefault();
 
             var timeTaken = DateTime.UtcNow - caseTask.Created;
@@ -88,7 +88,8 @@ namespace risk.control.system.Services.Common
                 Assigned = caseTask.Status == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER,
                 AutoAllocation = companyUser.ClientCompany.AutoAllocation,
                 TimeTaken = totalTimeTaken,
-                Withdrawable = (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR)
+                Withdrawable = (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR),
+                Currency = CustomExtensions.GetCultureByCountry(companyUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol
             };
 
             return model;
@@ -96,7 +97,7 @@ namespace risk.control.system.Services.Common
 
         public async Task<CaseTransactionModel> GetClaimDetailsReport(string currentUserEmail, long id)
         {
-            var caseTask = await context.Investigations
+            var caseTask = await context.Investigations.AsNoTracking()
                 .Include(c => c.CaseMessages)
                 .Include(c => c.CaseNotes)
                 .Include(c => c.InvestigationReport)
@@ -141,7 +142,7 @@ namespace risk.control.system.Services.Common
                 var maskedBeneficiaryContact = new string('*', caseTask.BeneficiaryDetail.PhoneNumber.ToString().Length - 4) + caseTask.BeneficiaryDetail.PhoneNumber.ToString().Substring(caseTask.BeneficiaryDetail.PhoneNumber.ToString().Length - 4);
                 caseTask.BeneficiaryDetail.PhoneNumber = maskedBeneficiaryContact;
             }
-            var companyUser = await context.ApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == currentUserEmail);
+            var companyUser = await context.ApplicationUser.AsNoTracking().Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == currentUserEmail);
             var lastHistory = caseTask.InvestigationTimeline.OrderByDescending(h => h.StatusChangedAt).FirstOrDefault();
             var endTIme = caseTask.Status == CONSTANTS.CASE_STATUS.FINISHED ? caseTask.ProcessedByAssessorTime.GetValueOrDefault() : DateTime.UtcNow;
             var timeTaken = endTIme - caseTask.Created;
@@ -152,8 +153,8 @@ namespace risk.control.system.Services.Common
               $"{(timeTaken.Seconds > 0 ? $"{timeTaken.Seconds}s" : "less than a sec")}"
             : "-";
 
-            var invoice = await context.VendorInvoice.FirstOrDefaultAsync(i => i.InvestigationReportId == caseTask.InvestigationReportId);
-            var templates = await context.ReportTemplates
+            var invoice = await context.VendorInvoice.AsNoTracking().FirstOrDefaultAsync(i => i.InvestigationReportId == caseTask.InvestigationReportId);
+            var templates = await context.ReportTemplates.AsNoTracking()
                .Include(r => r.LocationReport)
                   .ThenInclude(l => l.AgentIdReport)
               .Include(r => r.LocationReport)
@@ -168,7 +169,7 @@ namespace risk.control.system.Services.Common
 
             caseTask.InvestigationReport.ReportTemplate = templates;
 
-            var tracker = await context.PdfDownloadTracker
+            var tracker = await context.PdfDownloadTracker.AsNoTracking()
                           .FirstOrDefaultAsync(t => t.ReportId == id && t.UserEmail == currentUserEmail);
             bool canDownload = true;
             if (tracker != null)
@@ -194,7 +195,7 @@ namespace risk.control.system.Services.Common
 
         public async Task<CaseTransactionModel> GetClaimPdfReport(string currentUserEmail, long id)
         {
-            var caseTask = await context.Investigations
+            var caseTask = await context.Investigations.AsNoTracking()
                 .Include(c => c.CaseMessages)
                 .Include(c => c.CaseNotes)
                 .Include(c => c.InvestigationReport)
@@ -230,7 +231,7 @@ namespace risk.control.system.Services.Common
             caseTask.CustomerDetail.PhoneNumber = maskedCustomerContact;
             var maskedBeneficiaryContact = new string('*', caseTask.BeneficiaryDetail.PhoneNumber.ToString().Length - 4) + caseTask.BeneficiaryDetail.PhoneNumber.ToString().Substring(caseTask.BeneficiaryDetail.PhoneNumber.ToString().Length - 4);
             caseTask.BeneficiaryDetail.PhoneNumber = maskedBeneficiaryContact;
-            var companyUser = await context.ApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == currentUserEmail);
+            var companyUser = await context.ApplicationUser.AsNoTracking().Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == currentUserEmail);
             var lastHistory = caseTask.InvestigationTimeline.OrderByDescending(h => h.StatusChangedAt).FirstOrDefault();
 
             var timeTaken = DateTime.UtcNow - caseTask.Created;
@@ -241,8 +242,8 @@ namespace risk.control.system.Services.Common
               $"{(timeTaken.Seconds > 0 ? $"{timeTaken.Seconds}s" : "less than a sec")}"
             : "-";
 
-            var invoice = await context.VendorInvoice.FirstOrDefaultAsync(i => i.InvestigationReportId == caseTask.InvestigationReportId);
-            var templates = await context.ReportTemplates
+            var invoice = await context.VendorInvoice.AsNoTracking().FirstOrDefaultAsync(i => i.InvestigationReportId == caseTask.InvestigationReportId);
+            var templates = await context.ReportTemplates.AsNoTracking()
                .Include(r => r.LocationReport)
                   .ThenInclude(l => l.AgentIdReport)
               .Include(r => r.LocationReport)
@@ -257,7 +258,7 @@ namespace risk.control.system.Services.Common
 
             caseTask.InvestigationReport.ReportTemplate = templates;
 
-            var tracker = await context.PdfDownloadTracker
+            var tracker = await context.PdfDownloadTracker.AsNoTracking()
                           .FirstOrDefaultAsync(t => t.ReportId == id && t.UserEmail == currentUserEmail);
             bool canDownload = true;
             if (tracker != null)
@@ -307,7 +308,7 @@ namespace risk.control.system.Services.Common
                 }; // Improves lookup performance
 
             // Fetch cases that match the criteria
-            var vendorCaseCount = context.Investigations
+            var vendorCaseCount = context.Investigations.AsNoTracking()
                 .Where(c => !c.Deleted &&
                             c.VendorId.HasValue &&
                             c.AssignedToAgency &&

@@ -47,7 +47,7 @@ namespace risk.control.system.Controllers.Agency
             try
             {
                 var userEmail = HttpContext.User?.Identity?.Name;
-                var vendorUser = await _context.ApplicationUser
+                var vendorUser = await _context.ApplicationUser.AsNoTracking()
                     .Include(u => u.PinCode)
                     .Include(u => u.Country)
                     .Include(u => u.State)
@@ -75,7 +75,7 @@ namespace risk.control.system.Controllers.Agency
                     return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
 
-                var vendorApplicationUser = await _context.ApplicationUser.Include(v => v.Vendor).Include(c => c.Country).FirstOrDefaultAsync(u => u.Id == userId);
+                var vendorApplicationUser = await _context.ApplicationUser.AsNoTracking().Include(v => v.Vendor).Include(c => c.Country).FirstOrDefaultAsync(u => u.Id == userId);
                 if (vendorApplicationUser == null)
                 {
                     notifyService.Custom($"No user not found.", 3, "red", "fas fa-user");

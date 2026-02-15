@@ -16,14 +16,12 @@ namespace risk.control.system.Controllers.Common
     public class NotificationController : ControllerBase
     {
         private readonly int maxCountReached = 10;
-        private readonly INotificationService service;
-        private readonly ISmsService smsService;
+        private readonly INotificationService notificationService;
         private readonly ILogger<NotificationController> logger;
 
-        public NotificationController(INotificationService service, ISmsService smsService, ILogger<NotificationController> logger)
+        public NotificationController(INotificationService notificationService, ILogger<NotificationController> logger)
         {
-            this.service = service;
-            this.smsService = smsService;
+            this.notificationService = notificationService;
             this.logger = logger;
         }
 
@@ -39,7 +37,7 @@ namespace risk.control.system.Controllers.Common
             }
             try
             {
-                await service.ClearAll(userEmail); ;
+                await notificationService.ClearAll(userEmail); ;
                 return Ok();
             }
             catch (Exception ex)
@@ -62,7 +60,7 @@ namespace risk.control.system.Controllers.Common
             }
             try
             {
-                await service.MarkAsRead(request.Id, userEmail);
+                await notificationService.MarkAsRead(request.Id, userEmail);
                 return Ok();
             }
             catch (Exception ex)
@@ -83,7 +81,7 @@ namespace risk.control.system.Controllers.Common
             }
             try
             {
-                var notifications = await service.GetNotifications(userEmail);
+                var notifications = await notificationService.GetNotifications(userEmail);
                 var activeNotifications = notifications.Select(n => new { Id = n.StatusNotificationId, Symbol = n.Symbol, n.Message, n.Status, CreatedAt = GetTimeAgo(n.CreatedAt), user = n.NotifierUserEmail });
                 return Ok(new
                 {
