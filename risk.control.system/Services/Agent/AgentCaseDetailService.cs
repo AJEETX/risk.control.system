@@ -39,7 +39,7 @@ namespace risk.control.system.Services.Agent
         {
             _logger.LogInformation("Fetching investigation case {CaseId} for user {UserEmail}", selectedCaseId, userEmail);
 
-            var caseTask = await _context.Investigations
+            var caseTask = await _context.Investigations.AsNoTracking()
                 .Include(c => c.ClientCompany)
                     .ThenInclude(c => c.Country)
                 .Include(c => c.PolicyDetail)
@@ -85,7 +85,7 @@ namespace risk.control.system.Services.Agent
             caseTask.InvestigationReport.AgentEmail = userEmail;
 
             // Load report templates
-            var templates = await _context.ReportTemplates
+            var templates = await _context.ReportTemplates.AsNoTracking()
                 .Include(r => r.LocationReport)
                     .ThenInclude(l => l.AgentIdReport)
                 .Include(r => r.LocationReport)
@@ -128,7 +128,7 @@ namespace risk.control.system.Services.Agent
             _logger.LogInformation("Fetching investigation case {CaseId} for agent {UserEmail}", id, currentUserEmail);
 
             // Fetch case with related entities
-            var caseTask = await _context.Investigations
+            var caseTask = await _context.Investigations.AsNoTracking()
                 .Include(c => c.CaseMessages)
                 .Include(c => c.CaseNotes)
                 .Include(c => c.InvestigationReport)
@@ -170,7 +170,7 @@ namespace risk.control.system.Services.Agent
             _logger.LogInformation("Investigation case {CaseId} found. Fetching related data...", id);
 
             // Fetch company
-            var company = await _context.ClientCompany.FirstOrDefaultAsync(c => c.ClientCompanyId == caseTask.ClientCompanyId);
+            var company = await _context.ClientCompany.AsNoTracking().FirstOrDefaultAsync(c => c.ClientCompanyId == caseTask.ClientCompanyId);
             if (company == null)
             {
                 _logger.LogWarning("ClientCompany {CompanyId} not found for case {CaseId}", caseTask.ClientCompanyId, id);
@@ -186,7 +186,7 @@ namespace risk.control.system.Services.Agent
             _logger.LogInformation("Total time taken for case {CaseId}: {TotalTime}", id, totalTimeTaken);
 
             // Fetch invoice
-            var invoice = await _context.VendorInvoice
+            var invoice = await _context.VendorInvoice.AsNoTracking()
                 .FirstOrDefaultAsync(i => i.InvestigationReportId == caseTask.InvestigationReportId);
             if (invoice != null)
             {
@@ -194,7 +194,7 @@ namespace risk.control.system.Services.Agent
             }
 
             // Fetch report templates
-            var templates = await _context.ReportTemplates
+            var templates = await _context.ReportTemplates.AsNoTracking()
                 .Include(r => r.LocationReport)
                     .ThenInclude(l => l.AgentIdReport)
                 .Include(r => r.LocationReport)
@@ -240,7 +240,7 @@ namespace risk.control.system.Services.Agent
 
         public async Task<InvestigationTask> GetCaseById(long id)
         {
-            var _case = await _context.Investigations
+            var _case = await _context.Investigations.AsNoTracking()
                 .Include(c => c.InvestigationReport)
                 .ThenInclude(c => c.ReportTemplate)
                 .ThenInclude(c => c.LocationReport)
@@ -268,7 +268,7 @@ namespace risk.control.system.Services.Agent
 
         public async Task<InvestigationTask> GetCaseByIdForMedia(long id)
         {
-            var claim = await _context.Investigations
+            var claim = await _context.Investigations.AsNoTracking()
                  .Include(c => c.PolicyDetail)
                  .Include(c => c.CustomerDetail)
                  .Include(c => c.BeneficiaryDetail)
@@ -281,7 +281,7 @@ namespace risk.control.system.Services.Agent
 
         public async Task<InvestigationTask> GetCaseByIdForQuestions(long id)
         {
-            var claim = await _context.Investigations
+            var claim = await _context.Investigations.AsNoTracking()
                     .Include(c => c.InvestigationReport)
                     .ThenInclude(c => c.ReportTemplate)
                     .ThenInclude(c => c.LocationReport)
@@ -291,7 +291,7 @@ namespace risk.control.system.Services.Agent
 
         public async Task<InvestigationTask> GetCaseDetailForAgentDetail(long id)
         {
-            var caseDetail = await _context.Investigations
+            var caseDetail = await _context.Investigations.AsNoTracking()
                .Include(c => c.PolicyDetail)
                .Include(c => c.BeneficiaryDetail)
                 .Include(c => c.CustomerDetail)
@@ -302,7 +302,7 @@ namespace risk.control.system.Services.Agent
 
         public async Task<InvestigationTask> GetNotesOfCase(long id)
         {
-            var caseInvestigation = await _context.Investigations
+            var caseInvestigation = await _context.Investigations.AsNoTracking()
                .Include(c => c.CaseNotes)
                 .Where(c => !c.Deleted)
                 .FirstOrDefaultAsync(c => c.Id == id);
@@ -322,7 +322,7 @@ namespace risk.control.system.Services.Agent
         // Helper to check PDF download eligibility
         private async Task<bool> CanDownloadPdf(string userEmail, long reportId)
         {
-            var tracker = await _context.PdfDownloadTracker
+            var tracker = await _context.PdfDownloadTracker.AsNoTracking()
                 .FirstOrDefaultAsync(t => t.ReportId == reportId && t.UserEmail == userEmail);
 
             return tracker == null || tracker.DownloadCount <= 3;

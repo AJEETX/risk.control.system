@@ -139,54 +139,54 @@
 						@if (Model.Role == AppRoles.COMPANY_ADMIN)
 						{
 							<input asp-for="Active" type="hidden" value="true">
-						}
+							}
 						else
-						{
-							<div class="form-group">
-								<label class="input-group-label" for="Active"> Status:</label>
-								<div class="input-group mb-3">
-									<div class="input-group-prepend">
-										<span class="input-group-text"><i class="fa fa-toggle-on"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+							{
+								<div class="form-group">
+									<label class="input-group-label" for="Active"> Status:</label>
+									<div class="input-group mb-3">
+										<div class="input-group-prepend">
+											<span class="input-group-text"><i class="fa fa-toggle-on"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+										</div>
+										<div class="checkbox-wrapper">
+											<input asp-for="Active" type="checkbox" id="Active" class="custom-checkbox">
+												<label for="Active" class="custom-checkbox-label"></label>
+											</div>
+										</div>
 									</div>
-									<div class="checkbox-wrapper">
-										<input asp-for="Active" type="checkbox" id="Active" class="custom-checkbox">
-										<label for="Active" class="custom-checkbox-label"></label>
-									</div>
-								</div>
+								}
 							</div>
-						}
+						</div>
 					</div>
-				</div>
-			</div>
-			<div class="card-footer">
-				<div class="row">
-					<div class="col-md-12">
-						<div class="form-group text-right">
-							@* <button id="reset" type="submit" onclick="clearAllInputs()" class="btn btn-outline-secondary">
+					<div class="card-footer">
+						<div class="row">
+							<div class="col-md-12">
+								<div class="form-group text-right">
+									@* <button id="reset" type="submit" onclick="clearAllInputs()" class="btn btn-outline-secondary">
                             <i class="fas fa-undo"></i> Reset
                             </button> *@
-							<a id="cancel" asp-controller="ManageCompanyUser" asp-action="Users" class="btn btn-secondary">
-								<i class="fa fa-window-close"></i>
-								@Applicationsettings.CANCEL
-							</a>
-							<button id="edit" type="submit" class="btn btn-warning">
-								<i class="fas fa-user-plus"></i> Save  User
-							</button>
+									<a id="cancel" asp-controller="ManageCompanyUser" asp-action="Users" class="btn btn-secondary">
+										<i class="fa fa-window-close"></i>
+										@Applicationsettings.CANCEL
+									</a>
+									<button id="edit" type="submit" class="btn btn-warning">
+										<i class="fas fa-user-plus"></i> Save  User
+									</button>
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
-			</div>
-		</div>
-	</form>
-</section>
+			</form>
+		</section>
 
-@section Scripts {
-	@{
-		await Html.RenderPartialAsync("_ValidationScriptsPartial");
-	}
-	<script src="~/js/common/manage-user.js"></script>
-	<script src="~/js/company-admin/pincode.js"></script>
-	<script src="~/js/company-admin/phone-bank-validate.js"></script>
-	<script src="~/js/common/image-upload.js"></script>
-	<script src="~/js/common/form-validation.js"></script>
-}
+		@section Scripts {
+			@{
+				await Html.RenderPartialAsync("_ValidationScriptsPartial");
+			}
+			<script src="~/js/common/manage-user.js"></script>
+			<script src="~/js/company-admin/pincode.js"></script>
+			<script src="~/js/company-admin/phone-bank-validate.js"></script>
+			<script src="~/js/common/image-upload.js"></script>
+			<script src="~/js/common/form-validation.js"></script>
+		}

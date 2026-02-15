@@ -9,16 +9,16 @@ using risk.control.system.Models;
 using risk.control.system.Services.Agency;
 using risk.control.system.Services.Common;
 using SmartBreadcrumbs.Attributes;
-using SmartBreadcrumbs.Nodes;
 
 namespace risk.control.system.Controllers.Manager
 {
-    [Breadcrumb("Manage Agency(s)")]
+    [Breadcrumb("Manage Agency")]
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{MANAGER.DISPLAY_NAME}")]
     public class EmpanelledAgencyController : Controller
     {
         private readonly ApplicationDbContext _context;
         private readonly IAgencyCreateEditService agencyCreateEditService;
+        private readonly INavigationService navigationService;
         private readonly INotyfService notifyService;
         private readonly IInvestigationDetailService investigationDetailService;
         private readonly ILogger<EmpanelledAgencyController> logger;
@@ -27,6 +27,7 @@ namespace risk.control.system.Controllers.Manager
         public EmpanelledAgencyController(
             ApplicationDbContext context,
             IAgencyCreateEditService agencyCreateEditService,
+            INavigationService navigationService,
             INotyfService notifyService,
             IInvestigationDetailService investigationDetailService,
              IHttpContextAccessor httpContextAccessor,
@@ -34,6 +35,7 @@ namespace risk.control.system.Controllers.Manager
         {
             _context = context;
             this.agencyCreateEditService = agencyCreateEditService;
+            this.navigationService = navigationService;
             this.notifyService = notifyService;
             this.investigationDetailService = investigationDetailService;
             this.logger = logger;
@@ -47,7 +49,7 @@ namespace risk.control.system.Controllers.Manager
             return RedirectToAction(nameof(Agencies));
         }
 
-        [Breadcrumb("Empanelled Agencies")]
+        [Breadcrumb("Active Agencies")]
         public IActionResult Agencies()
         {
             return View();
@@ -63,7 +65,7 @@ namespace risk.control.system.Controllers.Manager
                 if (!ModelState.IsValid || vendors is null || vendors.Count == 0)
                 {
                     notifyService.Error("OOPs !!!..Not Agency Found");
-                    return RedirectToAction(nameof(Agencies), "EmpanelledAgency");
+                    return RedirectToAction(nameof(Agencies));
                 }
 
                 var companyUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
@@ -78,7 +80,7 @@ namespace risk.control.system.Controllers.Manager
                 if (company == null)
                 {
                     notifyService.Error("OOPs !!!..Company Not Found. Try again.");
-                    return RedirectToAction(nameof(Agencies), "EmpanelledAgency");
+                    return RedirectToAction(nameof(Agencies));
                 }
                 var agenciesToDepanel = company.EmpanelledVendors.Where(v => vendors.Contains(v.VendorId)).ToList();
                 foreach (var agency in agenciesToDepanel)
@@ -90,17 +92,16 @@ namespace risk.control.system.Controllers.Manager
                 _context.ClientCompany.Update(company);
                 var savedRows = await _context.SaveChangesAsync();
                 notifyService.Custom($"Agency(s) De-panelled successfully.", 3, "orange", "far fa-hand-pointer");
-                return RedirectToAction(nameof(Agencies), "EmpanelledAgency");
             }
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error occurred empanelling Agencies. {UserEmail}", userEmail);
                 notifyService.Error("Error occurred empanelling Agencies. Try again.");
-                return RedirectToAction(nameof(Agencies), "EmpanelledAgency");
             }
+            return RedirectToAction(nameof(Agencies));
         }
 
-        [Breadcrumb("Agency Profile", FromAction = "Agencies")]
+        [Breadcrumb("Agency Profile", FromAction = nameof(Agencies))]
         public async Task<IActionResult> Detail(long id)
         {
             try
@@ -150,11 +151,10 @@ namespace risk.control.system.Controllers.Manager
             {
                 logger.LogError(ex, "Error getting {AgencyId} for {UserEmail}.", id, HttpContext.User?.Identity?.Name);
                 notifyService.Error("Error getting Agency. Try again");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return RedirectToAction(nameof(Agencies));
             }
         }
 
-        [Breadcrumb(" Edit Agency", FromAction = "Detail")]
         public async Task<IActionResult> Edit(long id)
         {
             try
@@ -162,28 +162,23 @@ namespace risk.control.system.Controllers.Manager
                 if (id <= 0)
                 {
                     notifyService.Error("OOPS !!!..Invalid Agency Id");
-                    return RedirectToAction(nameof(Agencies), "EmpanelledAgency");
+                    return RedirectToAction(nameof(Agencies));
                 }
 
                 var vendor = await _context.Vendor.Include(v => v.Country).FirstOrDefaultAsync(v => v.VendorId == id);
                 if (vendor == null)
                 {
                     notifyService.Error("OOPS !!!..Agency Not Found");
-                    return RedirectToAction(nameof(Agencies), "EmpanelledAgency");
+                    return RedirectToAction(nameof(Agencies));
                 }
-                //vendor.SelectedByCompany = true; // THIS IS TO NOT SHOW EDIT PROFILE
-                var claimsPage = new MvcBreadcrumbNode("Agencies", "EmpanelledAgency", "Manage Agency(s)");
-                var agencyPage = new MvcBreadcrumbNode("Agencies", "EmpanelledAgency", "Empanelled Agencies") { Parent = claimsPage, };
-                var detailsPage = new MvcBreadcrumbNode("Detail", "EmpanelledAgency", $"Agency Profile") { Parent = agencyPage, RouteValues = new { id = id } };
-                var editPage = new MvcBreadcrumbNode("Edit", "EmpanelledAgency", $"Edit Agency") { Parent = detailsPage, RouteValues = new { id = id } };
-                ViewData["BreadcrumbNode"] = editPage;
+                ViewData["BreadcrumbNode"] = navigationService.GetAgencyActionPath(id, ControllerName<EmpanelledAgencyController>.Name, "Active Agencies", "Edit Agency", nameof(Edit));
                 return View(vendor);
             }
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error getting {AgencyId} for {UserEmail}.", id, HttpContext.User?.Identity?.Name);
                 notifyService.Error("Agency Not Found. Try again.");
-                return RedirectToAction(nameof(Agencies), "EmpanelledAgency");
+                return RedirectToAction(nameof(Agencies));
             }
         }
 
@@ -228,7 +223,7 @@ namespace risk.control.system.Controllers.Manager
                 logger.LogError(ex, "Error editing {AgencyId} for {UserEmail}.", vendorId, userEmail);
                 notifyService.Error("Error editing agency. Try again.");
             }
-            return RedirectToAction(nameof(Detail), "EmpanelledAgency", new { id = vendorId });
+            return RedirectToAction(nameof(Detail), ControllerName<EmpanelledAgencyController>.Name, new { id = vendorId });
         }
     }
 }

@@ -299,7 +299,7 @@
 
         showSpinnerOnButton(element, "Edit");
 
-        const editUrl = `/Investigation/Details?Id=${encodeURIComponent(id)}`;
+        const editUrl = `/Investigation/Details/${encodeURIComponent(id)}`;
 
         setTimeout(() => {
             window.location.href = editUrl;
@@ -312,7 +312,7 @@
 
         showSpinnerOnButton(element, "Assign");
 
-        const editUrl = `/Investigation/EmpanelledVendors?Id=${encodeURIComponent(id)}`;
+        const editUrl = `/Investigation/EmpanelledVendors/${encodeURIComponent(id)}`;
 
         setTimeout(() => {
             window.location.href = editUrl;

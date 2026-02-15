@@ -119,11 +119,7 @@ namespace risk.control.system.Controllers.Assessor
         public async Task<IActionResult> ReviewDetail(long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
-            if (string.IsNullOrWhiteSpace(userEmail))
-            {
-                notifyService.Error("OOPs !!!..Unauthenticated Access");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
-            }
+
             try
             {
                 if (!ModelState.IsValid || id < 1)
@@ -155,11 +151,7 @@ namespace risk.control.system.Controllers.Assessor
         public async Task<IActionResult> ApprovedDetail(long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
-            if (string.IsNullOrWhiteSpace(userEmail))
-            {
-                notifyService.Error("OOPs !!!..Unauthenticated Access");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
-            }
+
             try
             {
                 if (!ModelState.IsValid || id < 1)
@@ -194,11 +186,7 @@ namespace risk.control.system.Controllers.Assessor
         public async Task<IActionResult> RejectDetail(long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
-            if (string.IsNullOrWhiteSpace(userEmail))
-            {
-                notifyService.Error("OOPs !!!..Unauthenticated Access");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
-            }
+
             if (!ModelState.IsValid || id < 1)
             {
                 notifyService.Error("OOPS !!! Case Not Found !!!..");
@@ -222,11 +210,7 @@ namespace risk.control.system.Controllers.Assessor
         public async Task<IActionResult> ShowInvoice(long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
-            if (string.IsNullOrWhiteSpace(userEmail))
-            {
-                notifyService.Error("OOPs !!!..Unauthenticated Access");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
-            }
+
             if (!ModelState.IsValid || id <= 0)
             {
                 notifyService.Error("OOPS !!! Case Not Found !!!..");
@@ -256,11 +240,7 @@ namespace risk.control.system.Controllers.Assessor
         public async Task<IActionResult> PrintInvoice(long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
-            if (string.IsNullOrWhiteSpace(userEmail))
-            {
-                notifyService.Error("OOPs !!!..Unauthenticated Access");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
-            }
+
             if (!ModelState.IsValid || id <= 0)
             {
                 notifyService.Error("OOPS !!! Case Not Found !!!..");

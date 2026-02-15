@@ -117,7 +117,7 @@ namespace risk.control.system.Controllers.Api.Company
             }
         }
 
-        [HttpGet("AllServices")]
+        [HttpGet("AllServices/{id}")]
         public async Task<IActionResult> AllServices(long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name;

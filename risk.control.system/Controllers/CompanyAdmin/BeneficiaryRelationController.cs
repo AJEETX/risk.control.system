@@ -30,7 +30,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
         // GET: BeneficiaryRelation
         public IActionResult Index()
         {
-            return RedirectToAction("Profile");
+            return RedirectToAction(nameof(Profile));
         }
 
         [Breadcrumb("Beneficiary Relation ")]
@@ -53,6 +53,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
 
             return Json(new { data });
         }
+
         // GET: BeneficiaryRelation/Details/5
         [Breadcrumb("Details ")]
         public async Task<IActionResult> Details(long id)
@@ -101,7 +102,6 @@ namespace risk.control.system.Controllers.CompanyAdmin
             }
             try
             {
-
                 beneficiaryRelation.Code = beneficiaryRelation.Code?.ToUpper(CultureInfo.InvariantCulture);
 
                 // Check for duplicate code before saving
@@ -118,7 +118,6 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 await _context.SaveChangesAsync();
                 notifyService.Success("Beneficiary Relation created successfully!");
                 return RedirectToAction(nameof(Profile));
-
             }
             catch (Exception ex)
             {
@@ -139,6 +138,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
 
             return Json(exists);
         }
+
         // GET: BeneficiaryRelation/Edit/5
         [Breadcrumb("Edit ", FromAction = "Profile")]
         public async Task<IActionResult> Edit(long id)

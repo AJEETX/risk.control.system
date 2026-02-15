@@ -84,7 +84,7 @@ namespace risk.control.system.Controllers.Creator
             }
             try
             {
-                var companyUser = await context.ApplicationUser
+                var companyUser = await context.ApplicationUser.AsNoTracking()
                     .Include(u => u.ClientCompany)
                     .Include(u => u.Country)
                     .FirstOrDefaultAsync(u => u.Email == userEmail);
@@ -161,8 +161,8 @@ namespace risk.control.system.Controllers.Creator
                 return this.RedirectToAction<DashboardController>(x => x.Index());
             }
             var userEmail = HttpContext.User?.Identity?.Name;
-            var companyUser = await context.ApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == userEmail);
-            var file = await context.FilesOnFileSystem.Include(c => c.CaseIds).FirstOrDefaultAsync(f => f.Id == id);
+            var companyUser = await context.ApplicationUser.AsNoTracking().Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == userEmail);
+            var file = await context.FilesOnFileSystem.AsNoTracking().Include(c => c.CaseIds).FirstOrDefaultAsync(f => f.Id == id);
             if (file == null)
             {
                 return NotFound(new { success = false, message = "File not found." });

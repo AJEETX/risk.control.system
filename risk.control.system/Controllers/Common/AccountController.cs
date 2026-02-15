@@ -228,7 +228,6 @@ namespace risk.control.system.Controllers.Common
             model.LoginError = error;
             ModelState.AddModelError(string.Empty, error);
             model.SetPassword = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
-            ViewData["Users"] = await loginService.GetUserSelectListAsync();
             return View(model);
         }
     }

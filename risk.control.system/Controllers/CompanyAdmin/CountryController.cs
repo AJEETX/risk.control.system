@@ -33,7 +33,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
         // GET: RiskCaseStatus
         public IActionResult Index()
         {
-            return RedirectToAction("Profile");
+            return RedirectToAction(nameof(Profile));
         }
 
         [Breadcrumb("Country")]
@@ -41,7 +41,6 @@ namespace risk.control.system.Controllers.CompanyAdmin
         {
             return View();
         }
-
 
         [HttpGet]
         public async Task<IActionResult> GetCountries(int draw, int start, int length, string search, int? orderColumn, string orderDirection)

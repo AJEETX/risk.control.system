@@ -34,7 +34,7 @@ namespace risk.control.system.Services.Api
         public async Task<object> GetActiveCases(string currentUserEmail, int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc")
         {
             await using var _context = _contextFactory.CreateDbContext();
-            var companyUser = await _context.ApplicationUser
+            var companyUser = await _context.ApplicationUser.AsNoTracking()
                 .Include(u => u.Country)
                 .Include(u => u.ClientCompany)
                 .FirstOrDefaultAsync(c => c.Email == currentUserEmail);

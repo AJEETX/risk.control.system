@@ -1,7 +1,7 @@
 ﻿@model CaseTransactionModel
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Active Details";
 }
 <section class="content">
     <div id="article" class="card shadow-lg border-1 rounded-lg">
@@ -17,14 +17,11 @@
                                 <i class="far fa-file-powerpoint"></i>
                                 @Model.ClaimsInvestigation?.PolicyDetail?.ContractNumber
                             </span>
-
                         </li>
 
                         <li><i class="fas fa-clock"></i> Timeline </li>
-
                     </span>
                 </span>
-
             </h3>
         </div>
         <input type="hidden" id="customerDetailId" value="@Model.ClaimsInvestigation?.CustomerDetail?.CustomerDetailId" />
@@ -96,7 +93,6 @@
                 </div>
             </div>
         </div>
-
     </div>
 </section>
 @section Scripts {

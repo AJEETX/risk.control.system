@@ -44,7 +44,7 @@ $(document).ready(function () {
     // Initialize DataTable
     const table = $("#dataTable").DataTable({
         ajax: {
-            url: `/api/Company/AllServices?id=${$('#Id').val()}`,
+            url: `/api/Company/AllServices/${$('#Id').val()}`,
             dataSrc: '',
             error: DataTableErrorHandler
         },
@@ -170,7 +170,7 @@ $(document).ready(function () {
 
         showSpinnerOnButton(element, "Edit");
 
-        const url = `/AvailableAgencyService/Edit?id=${encodeURIComponent(id)}`;
+        const url = `/AvailableAgencyService/Edit/${encodeURIComponent(id)}`;
 
         setTimeout(() => {
             window.location.href = url;

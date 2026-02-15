@@ -28,7 +28,7 @@ namespace risk.control.system.Services.Creator
         {
             try
             {
-                var currentUser = await context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == userEmail);
+                var currentUser = await context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(u => u.Email == userEmail);
                 var caseTask = await context.Investigations
                     .FirstOrDefaultAsync(c => c.Id == caseId);
                 var vendorId = caseTask.VendorId;

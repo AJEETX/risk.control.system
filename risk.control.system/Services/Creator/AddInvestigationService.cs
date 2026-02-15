@@ -54,9 +54,14 @@ namespace risk.control.system.Services.Creator
         {
             try
             {
-                var currentUser = await context.ApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == userEmail);
+                var currentUser = await context.ApplicationUser.AsNoTracking().Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == userEmail);
+
+                var reportTemplate = await cloneService.DeepCloneReportTemplate(currentUser.ClientCompanyId.Value, model.PolicyDetailDto.InsuranceType);
+                context.ReportTemplates.Add(reportTemplate);
+                await context.SaveChangesAsync();
 
                 var (fileName, relativePath) = await fileStorageService.SaveAsync(model.Document, "Case", model.PolicyDetailDto.ContractNumber);
+
                 var caseTask = new InvestigationTask
                 {
                     PolicyDetail = new PolicyDetail
@@ -70,28 +75,23 @@ namespace risk.control.system.Services.Creator
                         DateOfIncident = model.PolicyDetailDto.DateOfIncident,
                         CauseOfLoss = model.PolicyDetailDto.CauseOfLoss,
                         CostCentreId = model.PolicyDetailDto.CostCentreId,
-                    }
+                        DocumentPath = relativePath,
+                        DocumentImageExtension = Path.GetExtension(fileName),
+                    },
+                    IsNew = true,
+                    CreatedUser = userEmail,
+                    CaseOwner = userEmail,
+                    Updated = DateTime.UtcNow,
+                    ORIGIN = ORIGIN.USER,
+                    UpdatedBy = userEmail,
+                    Status = CONSTANTS.CASE_STATUS.INITIATED,
+                    SubStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.DRAFTED_BY_CREATOR,
+                    CreatorSla = currentUser.ClientCompany.CreatorSla,
+                    ClientCompanyId = currentUser.ClientCompanyId,
+                    ReportTemplateId = reportTemplate.Id
                 };
 
-                caseTask.PolicyDetail.DocumentPath = relativePath;
-                caseTask.PolicyDetail.DocumentImageExtension = Path.GetExtension(fileName);
-
-                var reportTemplate = await cloneService.DeepCloneReportTemplate(currentUser.ClientCompanyId.Value, caseTask.PolicyDetail.InsuranceType.Value);
-
-                caseTask.IsNew = true;
-                caseTask.CreatedUser = userEmail;
-                caseTask.CaseOwner = userEmail;
-                caseTask.Updated = DateTime.UtcNow;
-                caseTask.ORIGIN = ORIGIN.USER;
-                caseTask.UpdatedBy = userEmail;
-                caseTask.Status = CONSTANTS.CASE_STATUS.INITIATED;
-                caseTask.SubStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.DRAFTED_BY_CREATOR;
-                caseTask.CreatorSla = currentUser.ClientCompany.CreatorSla;
-                caseTask.ClientCompany = currentUser.ClientCompany;
-                caseTask.ClientCompanyId = currentUser.ClientCompanyId;
-                caseTask.ReportTemplate = reportTemplate;
-                caseTask.ReportTemplateId = reportTemplate.Id;
-                var aaddedClaimId = context.Investigations.Add(caseTask);
+                context.Investigations.Add(caseTask);
                 await numberService.SaveNumberSequence("PX");
                 var saved = await context.SaveChangesAsync() > 0;
 
@@ -101,54 +101,50 @@ namespace risk.control.system.Services.Creator
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, $"Error occurred.");
+                logger.LogError(ex, "Error occurred creating Case detail. {UserEmail}", userEmail);
                 return null!;
             }
         }
 
-        public async Task<InvestigationTask> EditCase(string userEmail, EditPolicyDto dto)
+        public async Task<InvestigationTask> EditCase(string userEmail, EditPolicyDto model)
         {
             try
             {
-                var existingPolicy = await context.Investigations
-                    .Include(c => c.PolicyDetail)
-                    .Include(c => c.ClientCompany)
-                        .FirstOrDefaultAsync(c => c.Id == dto.Id);
+                var existingPolicy = await context.Investigations.Include(c => c.PolicyDetail).FirstOrDefaultAsync(c => c.Id == model.Id);
 
-                existingPolicy.PolicyDetail.ContractNumber = dto.PolicyDetailDto.ContractNumber;
-                existingPolicy.PolicyDetail.InsuranceType = dto.PolicyDetailDto.InsuranceType;
-                existingPolicy.PolicyDetail.InvestigationServiceTypeId = dto.PolicyDetailDto.InvestigationServiceTypeId;
-                existingPolicy.PolicyDetail.CaseEnablerId = dto.PolicyDetailDto.CaseEnablerId;
-                existingPolicy.PolicyDetail.SumAssuredValue = dto.PolicyDetailDto.SumAssuredValue;
-                existingPolicy.PolicyDetail.ContractIssueDate = dto.PolicyDetailDto.ContractIssueDate;
-                existingPolicy.PolicyDetail.DateOfIncident = dto.PolicyDetailDto.DateOfIncident;
-                existingPolicy.PolicyDetail.CauseOfLoss = dto.PolicyDetailDto.CauseOfLoss;
-                existingPolicy.PolicyDetail.CostCentreId = dto.PolicyDetailDto.CostCentreId;
+                var reportTemplate = await cloneService.DeepCloneReportTemplate(existingPolicy.ClientCompanyId.Value, model.PolicyDetailDto.InsuranceType);
+                context.ReportTemplates.Add(reportTemplate);
+                await context.SaveChangesAsync();
 
-                existingPolicy.IsNew = true;
-                existingPolicy.Updated = DateTime.UtcNow;
-                existingPolicy.UpdatedBy = userEmail;
-                existingPolicy.ORIGIN = ORIGIN.USER;
-                if (dto.Document is not null)
+                if (model.Document is not null)
                 {
-                    var (fileName, relativePath) = await fileStorageService.SaveAsync(dto.Document, "Case", dto.PolicyDetailDto.ContractNumber);
+                    var (fileName, relativePath) = await fileStorageService.SaveAsync(model.Document, "Case", model.PolicyDetailDto.ContractNumber);
 
                     existingPolicy.PolicyDetail.DocumentPath = relativePath;
                     existingPolicy.PolicyDetail.DocumentImageExtension = Path.GetExtension(fileName);
                 }
-                var currentUser = await context.ApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == userEmail);
-                var reportTemplate = await cloneService.DeepCloneReportTemplate(currentUser.ClientCompanyId.Value, existingPolicy.PolicyDetail.InsuranceType.Value);
-                existingPolicy.ReportTemplate = reportTemplate;
+
+                existingPolicy.PolicyDetail.ContractNumber = model.PolicyDetailDto.ContractNumber;
+                existingPolicy.PolicyDetail.InsuranceType = model.PolicyDetailDto.InsuranceType;
+                existingPolicy.PolicyDetail.InvestigationServiceTypeId = model.PolicyDetailDto.InvestigationServiceTypeId;
+                existingPolicy.PolicyDetail.CaseEnablerId = model.PolicyDetailDto.CaseEnablerId;
+                existingPolicy.PolicyDetail.SumAssuredValue = model.PolicyDetailDto.SumAssuredValue;
+                existingPolicy.PolicyDetail.ContractIssueDate = model.PolicyDetailDto.ContractIssueDate;
+                existingPolicy.PolicyDetail.DateOfIncident = model.PolicyDetailDto.DateOfIncident;
+                existingPolicy.PolicyDetail.CauseOfLoss = model.PolicyDetailDto.CauseOfLoss;
+                existingPolicy.PolicyDetail.CostCentreId = model.PolicyDetailDto.CostCentreId;
+                existingPolicy.Updated = DateTime.UtcNow;
+                existingPolicy.UpdatedBy = userEmail;
+
                 existingPolicy.ReportTemplateId = reportTemplate.Id;
                 context.Investigations.Update(existingPolicy);
-
                 var saved = await context.SaveChangesAsync() > 0;
 
                 return saved ? existingPolicy : null;
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, $"Error occurred.");
+                logger.LogError(ex, "Error occurred editing Case detail. {UserEmail}", userEmail);
                 return null!;
             }
         }
@@ -160,17 +156,14 @@ namespace risk.control.system.Services.Creator
                 var caseTask = await context.Investigations.Include(c => c.PolicyDetail)
                    .FirstOrDefaultAsync(c => c.Id == customerDetail.InvestigationTaskId);
 
-                var currentUser = await context.ApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == userEmail);
                 if (customerDetail?.ProfileImage is not null)
                 {
                     var (fileName, relativePath) = await fileStorageService.SaveAsync(customerDetail?.ProfileImage, "Case", caseTask.PolicyDetail.ContractNumber);
                     customerDetail.ProfilePictureExtension = Path.GetExtension(fileName);
                     customerDetail.ImagePath = relativePath;
                 }
-                caseTask.IsNew = true;
                 caseTask.UpdatedBy = userEmail;
                 caseTask.Updated = DateTime.UtcNow;
-                caseTask.ORIGIN = ORIGIN.USER;
 
                 customerDetail.PhoneNumber = customerDetail.PhoneNumber.TrimStart('0');
                 customerDetail.CountryId = customerDetail.SelectedCountryId;
@@ -178,7 +171,7 @@ namespace risk.control.system.Services.Creator
                 customerDetail.DistrictId = customerDetail.SelectedDistrictId;
                 customerDetail.PinCodeId = customerDetail.SelectedPincodeId;
 
-                var pincode = await context.PinCode
+                var pincode = await context.PinCode.AsNoTracking()
                     .Include(p => p.District)
                     .Include(p => p.State)
                     .Include(p => p.Country)
@@ -201,7 +194,7 @@ namespace risk.control.system.Services.Creator
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, $"Error occurred.");
+                logger.LogError(ex, "Error occurred creating Customer detail. {UserEmail}", userEmail);
                 return false;
             }
         }
@@ -212,8 +205,6 @@ namespace risk.control.system.Services.Creator
             {
                 var caseTask = await context.Investigations.Include(c => c.PolicyDetail)
                     .FirstOrDefaultAsync(c => c.Id == customerDetail.InvestigationTaskId);
-
-                var currentUser = await context.ApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == userEmail);
 
                 if (customerDetail?.ProfileImage is not null)
                 {
@@ -226,10 +217,8 @@ namespace risk.control.system.Services.Creator
                     var existingCustomer = await context.CustomerDetail.AsNoTracking().FirstOrDefaultAsync(c => c.InvestigationTaskId == customerDetail.InvestigationTaskId);
                     customerDetail.ImagePath = existingCustomer.ImagePath;
                 }
-                caseTask.IsNew = true;
                 caseTask.UpdatedBy = userEmail;
                 caseTask.Updated = DateTime.UtcNow;
-                caseTask.ORIGIN = ORIGIN.USER;
                 customerDetail.PhoneNumber = customerDetail.PhoneNumber.TrimStart('0');
 
                 customerDetail.CountryId = customerDetail.SelectedCountryId;
@@ -237,7 +226,7 @@ namespace risk.control.system.Services.Creator
                 customerDetail.DistrictId = customerDetail.SelectedDistrictId;
                 customerDetail.PinCodeId = customerDetail.SelectedPincodeId;
 
-                var pincode = await context.PinCode
+                var pincode = await context.PinCode.AsNoTracking()
                         .Include(p => p.District)
                         .Include(p => p.State)
                         .Include(p => p.Country)
@@ -255,12 +244,11 @@ namespace risk.control.system.Services.Creator
                 context.CustomerDetail.Attach(customerDetail);
                 context.Entry(customerDetail).State = EntityState.Modified;
                 context.Investigations.Update(caseTask);
-                // Save changes to the database
                 return await context.SaveChangesAsync() > 0;
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, $"Error occurred.");
+                logger.LogError(ex, "Error occurred editing Customer detail. {UserEmail}", userEmail);
                 return false;
             }
         }
@@ -269,8 +257,6 @@ namespace risk.control.system.Services.Creator
         {
             try
             {
-                var currentUser = await context.ApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == userEmail);
-
                 var caseTask = await context.Investigations.Include(c => c.PolicyDetail)
                     .FirstOrDefaultAsync(m => m.Id == beneficiary.InvestigationTaskId);
                 if (beneficiary?.ProfileImage != null)
@@ -282,11 +268,9 @@ namespace risk.control.system.Services.Creator
 
                 beneficiary.Updated = DateTime.UtcNow;
                 beneficiary.UpdatedBy = userEmail;
-                caseTask.IsNew = true;
                 caseTask.UpdatedBy = userEmail;
                 caseTask.Updated = DateTime.UtcNow;
                 caseTask.IsReady2Assign = true;
-                caseTask.ORIGIN = ORIGIN.USER;
                 beneficiary.PhoneNumber = beneficiary.PhoneNumber.TrimStart('0');
 
                 beneficiary.CountryId = beneficiary.SelectedCountryId;
@@ -294,7 +278,7 @@ namespace risk.control.system.Services.Creator
                 beneficiary.DistrictId = beneficiary.SelectedDistrictId;
                 beneficiary.PinCodeId = beneficiary.SelectedPincodeId;
 
-                var pincode = await context.PinCode
+                var pincode = await context.PinCode.AsNoTracking()
                     .Include(p => p.District)
                         .Include(p => p.State)
                         .Include(p => p.Country)
@@ -315,7 +299,7 @@ namespace risk.control.system.Services.Creator
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, $"Error occurred.");
+                logger.LogError(ex, "Error occurred creating Beneficiary detail. {UserEmail}", userEmail);
                 return false;
             }
         }
@@ -327,7 +311,6 @@ namespace risk.control.system.Services.Creator
                 var caseTask = await context.Investigations.Include(c => c.PolicyDetail)
                     .FirstOrDefaultAsync(m => m.Id == beneficiary.InvestigationTaskId);
 
-                var currentUser = await context.ApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == userEmail);
                 if (beneficiary?.ProfileImage != null)
                 {
                     var (fileName, relativePath) = await fileStorageService.SaveAsync(beneficiary?.ProfileImage, "Case", caseTask.PolicyDetail.ContractNumber);
@@ -343,10 +326,8 @@ namespace risk.control.system.Services.Creator
                     }
                 }
 
-                caseTask.IsNew = true;
                 caseTask.UpdatedBy = userEmail;
                 caseTask.Updated = DateTime.UtcNow;
-                caseTask.ORIGIN = ORIGIN.USER;
                 caseTask.SubStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR;
                 caseTask.IsReady2Assign = true;
                 beneficiary.PhoneNumber = beneficiary.PhoneNumber.TrimStart('0');
@@ -356,7 +337,7 @@ namespace risk.control.system.Services.Creator
                 beneficiary.DistrictId = beneficiary.SelectedDistrictId;
                 beneficiary.PinCodeId = beneficiary.SelectedPincodeId;
 
-                var pincode = await context.PinCode
+                var pincode = await context.PinCode.AsNoTracking()
                     .Include(p => p.District)
                         .Include(p => p.State)
                         .Include(p => p.Country)
@@ -378,7 +359,7 @@ namespace risk.control.system.Services.Creator
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, $"Error occurred.");
+                logger.LogError(ex, "Error occurred editing Beneficiary detail. {UserEmail}", userEmail);
                 return false;
             }
         }

@@ -69,7 +69,7 @@ namespace risk.control.system.Controllers.Api.Agency
             }
         }
 
-        [HttpGet("GetCompanyAgencyUser")]
+        [HttpGet("GetCompanyAgencyUser/{id}")]
         public async Task<IActionResult> GetCompanyAgencyUser(long id)
         {
             if (id <= 0)

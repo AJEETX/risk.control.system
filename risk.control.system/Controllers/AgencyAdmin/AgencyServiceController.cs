@@ -51,25 +51,25 @@ namespace risk.control.system.Controllers.AgencyAdmin
             var userEmail = HttpContext.User?.Identity?.Name;
             try
             {
-                var vendorUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
+                var vendorUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == userEmail);
                 if (vendorUser is null)
                 {
                     notifyService.Error("User Not Found!!!..Try again");
-                    return RedirectToAction(nameof(Service), "AgencyService");
+                    return RedirectToAction(nameof(Service));
                 }
                 var vendor = await _context.Vendor.Include(v => v.Country).FirstOrDefaultAsync(v => v.VendorId == vendorUser.VendorId);
                 if (vendor is null)
                 {
                     notifyService.Error("Agency Not Found!!!..Try again");
-                    return RedirectToAction(nameof(Service), "AgencyService");
+                    return RedirectToAction(nameof(Service));
                 }
-                ViewData["Currency"] = CustomExtensions.GetCultureByCountry(vendor.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 var model = new VendorInvestigationServiceType
                 {
                     Country = vendor.Country,
                     CountryId = vendor.CountryId,
-                    Vendor = vendor
+                    Vendor = vendor,
+                    Currency = CustomExtensions.GetCultureByCountry(vendor.Country.Code.ToUpper()).NumberFormat.CurrencySymbol
                 };
                 return View(model);
             }
@@ -77,7 +77,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
             {
                 logger.LogError(ex, "Error creating service for {UserEmail}", userEmail ?? "Anonymous");
                 notifyService.Error("Error creating service.Try again.");
-                return RedirectToAction(nameof(Service), "AgencyService");
+                return RedirectToAction(nameof(Service));
             }
         }
 
@@ -104,12 +104,13 @@ namespace risk.control.system.Controllers.AgencyAdmin
                 logger.LogError(ex, "Error creating service for {UserEmail}", userEmail ?? "Anonymous");
                 notifyService.Error("Error creating service. Try again.");
             }
-            return RedirectToAction(nameof(Service), "AgencyService");
+            return RedirectToAction(nameof(Service));
         }
 
         [Breadcrumb("Edit Service", FromAction = "Service")]
         public async Task<IActionResult> Edit(long id)
         {
+            var userEmail = HttpContext.User?.Identity?.Name;
             try
             {
                 if (id <= 0)
@@ -117,23 +118,27 @@ namespace risk.control.system.Controllers.AgencyAdmin
                     notifyService.Custom($"Error to edit service.", 3, "red", "fas fa-cog");
                     return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-                var currentUser = await _context.ApplicationUser.Include(c => c.Vendor).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
-                ViewData["Currency"] = CustomExtensions.GetCultureByCountry(currentUser.Vendor.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
-                var vendorInvestigationServiceType = _context.VendorInvestigationServiceType
+                var serviceType = _context.VendorInvestigationServiceType
                     .Include(v => v.Country)
                     .Include(v => v.District)
                     .Include(v => v.State)
                     .Include(v => v.Vendor)
                     .First(v => v.VendorInvestigationServiceTypeId == id);
+                serviceType.Currency = CustomExtensions.GetCultureByCountry(serviceType.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
-                ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType.Where(i => i.InsuranceType == vendorInvestigationServiceType.InsuranceType), "InvestigationServiceTypeId", "Name", vendorInvestigationServiceType.InvestigationServiceTypeId);
-
-                return View(vendorInvestigationServiceType);
+                serviceType.InvestigationServiceTypeList = await _context.InvestigationServiceType
+                    .Where(i => i.InsuranceType == serviceType.InsuranceType)
+                    .Select(i => new SelectListItem
+                    {
+                        Value = i.InvestigationServiceTypeId.ToString(),
+                        Text = i.Name,
+                        Selected = i.InvestigationServiceTypeId == serviceType.InvestigationServiceTypeId
+                    }).ToListAsync();
+                return View(serviceType);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error editing {SserviceId} for {UserEmail}", id, HttpContext.User?.Identity?.Name ?? "Anonymous");
+                logger.LogError(ex, "Error editing {SserviceId} for {UserEmail}", id, userEmail ?? "Anonymous");
                 notifyService.Custom($"Error editing service. Try again", 3, "red", "fas fa-cog");
                 return this.RedirectToAction<DashboardController>(x => x.Index());
             }
@@ -141,12 +146,12 @@ namespace risk.control.system.Controllers.AgencyAdmin
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(long vendorInvestigationServiceTypeId, VendorInvestigationServiceType service)
+        public async Task<IActionResult> Edit(VendorInvestigationServiceType service)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             try
             {
-                var result = await vendorServiceTypeManager.EditAsync(vendorInvestigationServiceTypeId, service, userEmail);
+                var result = await vendorServiceTypeManager.EditAsync(service, userEmail);
                 if (!result.Success)
                 {
                     notifyService.Custom(result.Message, 3, "orange", "fas fa-cog");
@@ -158,10 +163,10 @@ namespace risk.control.system.Controllers.AgencyAdmin
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error editing {ServiceId} for {UserEmail}", vendorInvestigationServiceTypeId, userEmail ?? "Anonymous");
+                logger.LogError(ex, "Error editing Service for {UserEmail}", userEmail ?? "Anonymous");
                 notifyService.Custom("Error editing service. Try again.", 3, "red", "fas fa-cog");
             }
-            return RedirectToAction(nameof(Service), "AgencyService");
+            return RedirectToAction(nameof(Service));
         }
 
         [HttpPost]
@@ -170,7 +175,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
         {
             try
             {
-                var service = await _context.VendorInvestigationServiceType
+                var service = await _context.VendorInvestigationServiceType.AsNoTracking()
                     .FirstOrDefaultAsync(x => x.VendorInvestigationServiceTypeId == id);
 
                 if (service == null)

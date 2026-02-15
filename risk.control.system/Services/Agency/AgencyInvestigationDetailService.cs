@@ -41,7 +41,7 @@ namespace risk.control.system.Services.Agency
 
         public async Task<CaseTransactionModel> GetClaimDetails(string currentUserEmail, long caseId)
         {
-            var caseTask = await context.Investigations
+            var caseTask = await context.Investigations.AsNoTracking()
                 .Include(c => c.CaseMessages)
                 .Include(c => c.CaseNotes)
                 .Include(c => c.PolicyDetail)
@@ -99,7 +99,7 @@ namespace risk.control.system.Services.Agency
         {
             var caseAllocate2Agent = await GetCases().Include(c => c.CaseNotes).FirstOrDefaultAsync(v => v.Id == selectedcase);
 
-            var beneficiaryDetail = await context.BeneficiaryDetail
+            var beneficiaryDetail = await context.BeneficiaryDetail.AsNoTracking()
                 .Include(c => c.PinCode)
                 .Include(c => c.BeneficiaryRelation)
                 .Include(c => c.District)
@@ -125,14 +125,14 @@ namespace risk.control.system.Services.Agency
         {
             try
             {
-                var caseTask = await context.Investigations
+                var caseTask = await context.Investigations.AsNoTracking()
                     .Include(c => c.InvestigationReport)
                     .Include(c => c.PolicyDetail)
                     .Include(c => c.CustomerDetail)
                     .Include(c => c.BeneficiaryDetail)
                     .FirstOrDefaultAsync(c => c.Id == caseId);
 
-                var agentUser = await context.ApplicationUser.Include(u => u.Vendor).FirstOrDefaultAsync(u => u.Email == vendorAgentEmail);
+                var agentUser = await context.ApplicationUser.AsNoTracking().Include(u => u.Vendor).FirstOrDefaultAsync(u => u.Email == vendorAgentEmail);
 
                 string drivingDistance, drivingDuration, drivingMap;
                 float distanceInMeters;
@@ -185,7 +185,7 @@ namespace risk.control.system.Services.Agency
         {
             try
             {
-                var agent = await context.ApplicationUser.Include(u => u.Vendor).FirstOrDefaultAsync(a => a.Email.Trim().ToLower() == userEmail.Trim().ToLower());
+                var agent = await context.ApplicationUser.AsNoTracking().Include(u => u.Vendor).FirstOrDefaultAsync(a => a.Email.Trim().ToLower() == userEmail.Trim().ToLower());
 
                 var submitted2Supervisor = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR;
 
@@ -220,7 +220,7 @@ namespace risk.control.system.Services.Agency
 
         public async Task<CaseTransactionModel> GetClaimDetailsReport(string currentUserEmail, long caseId)
         {
-            var caseTask = await context.Investigations
+            var caseTask = await context.Investigations.AsNoTracking()
                 .Include(c => c.CaseMessages)
                 .Include(c => c.CaseNotes)
                 .Include(c => c.InvestigationReport)
@@ -255,7 +255,7 @@ namespace risk.control.system.Services.Agency
                 .ThenInclude(c => c.PinCode)
                 .FirstOrDefaultAsync(m => m.Id == caseId);
 
-            var companyUser = await context.ApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == currentUserEmail);
+            var companyUser = await context.ApplicationUser.AsNoTracking().Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == currentUserEmail);
             var lastHistory = caseTask.InvestigationTimeline.OrderByDescending(h => h.StatusChangedAt).FirstOrDefault();
             var endTIme = caseTask.Status == CONSTANTS.CASE_STATUS.FINISHED ? caseTask.ProcessedByAssessorTime.GetValueOrDefault() : DateTime.UtcNow;
             var timeTaken = endTIme - caseTask.Created;
@@ -266,8 +266,8 @@ namespace risk.control.system.Services.Agency
               $"{(timeTaken.Seconds > 0 ? $"{timeTaken.Seconds}s" : "less than a sec")}"
             : "-";
 
-            var invoice = await context.VendorInvoice.FirstOrDefaultAsync(i => i.InvestigationReportId == caseTask.InvestigationReportId);
-            var templates = await context.ReportTemplates
+            var invoice = await context.VendorInvoice.AsNoTracking().FirstOrDefaultAsync(i => i.InvestigationReportId == caseTask.InvestigationReportId);
+            var templates = await context.ReportTemplates.AsNoTracking()
                .Include(r => r.LocationReport)
                   .ThenInclude(l => l.AgentIdReport)
               .Include(r => r.LocationReport)
@@ -282,7 +282,7 @@ namespace risk.control.system.Services.Agency
 
             caseTask.InvestigationReport.ReportTemplate = templates;
 
-            var tracker = await context.PdfDownloadTracker
+            var tracker = await context.PdfDownloadTracker.AsNoTracking()
                           .FirstOrDefaultAsync(t => t.ReportId == caseId && t.UserEmail == currentUserEmail);
             bool canDownload = true;
             if (tracker != null)
@@ -312,7 +312,7 @@ namespace risk.control.system.Services.Agency
 
         private IQueryable<InvestigationTask> GetCases()
         {
-            var caseTasks = context.Investigations
+            var caseTasks = context.Investigations.AsNoTracking()
                 .Include(c => c.PolicyDetail)
                 .Include(c => c.InvestigationTimeline)
                 .Include(c => c.PolicyDetail)

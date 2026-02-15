@@ -172,7 +172,7 @@
 
         showSpinnerOnButton(element, "Edit");
 
-        const url = `/AvailableAgency/Details?Id=${encodeURIComponent(id)}`;
+        const url = `/AvailableAgency/Detail/${encodeURIComponent(id)}`;
 
         setTimeout(() => {
             window.location.href = url;

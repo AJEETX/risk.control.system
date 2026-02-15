@@ -2,18 +2,13 @@
 using System.Linq.Expressions;
 using System.Net;
 using System.Text.RegularExpressions;
-
 using AspNetCoreHero.ToastNotification.Abstractions;
-
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using risk.control.system.Models;
-
-using SmartBreadcrumbs.Attributes;
-
-using static risk.control.system.AppConstant.Applicationsettings;
 using risk.control.system.AppConstant;
+using risk.control.system.Models;
+using SmartBreadcrumbs.Attributes;
 
 namespace risk.control.system.Controllers.CompanyAdmin
 {
@@ -35,7 +30,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
         // GET: District
         public IActionResult Index()
         {
-            return RedirectToAction("Profile");
+            return RedirectToAction(nameof(Profile));
         }
 
         [Breadcrumb("District")]
@@ -282,8 +277,6 @@ namespace risk.control.system.Controllers.CompanyAdmin
             }
             try
             {
-
-
                 var district = await _context.District.FindAsync(id);
                 if (district is null)
                 {

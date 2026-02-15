@@ -35,6 +35,7 @@ namespace risk.control.system.StartupExtensions
                 options.OlClasses = "breadcrumb";
                 options.LiClasses = "breadcrumb-item";
                 options.ActiveLiClasses = "breadcrumb-item active";
+                options.DontLookForDefaultNode = false;
             });
             //services.AddWorkflow();
             //services.AddTransient<InvestigationTaskWorkflow>();

@@ -59,13 +59,13 @@ namespace risk.control.system.Controllers.AgencyAdmin
             var userEmail = HttpContext.User?.Identity?.Name;
             try
             {
-                var vendorUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
+                var vendorUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == userEmail);
                 if (vendorUser == null)
                 {
                     notifyService.Error("User Not found !!!..Contact Admin");
                     return RedirectToAction(nameof(Users), "AgencyUser");
                 }
-                var vendor = await _context.Vendor.Include(v => v.Country).FirstOrDefaultAsync(v => v.VendorId == vendorUser.VendorId);
+                var vendor = await _context.Vendor.AsNoTracking().Include(v => v.Country).FirstOrDefaultAsync(v => v.VendorId == vendorUser.VendorId);
                 if (vendor == null)
                 {
                     notifyService.Custom($"No agency not found.", 3, "red", "fas fa-building");
@@ -112,7 +112,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
                             .GetCustomAttribute<DisplayAttribute>()?.Name ?? r.ToString()
                 })
                 .ToList();
-            var vendor = await _context.Vendor.Include(v => v.Country).FirstOrDefaultAsync(v => v.VendorId == model.VendorId);
+            var vendor = await _context.Vendor.AsNoTracking().Include(v => v.Country).FirstOrDefaultAsync(v => v.VendorId == model.VendorId);
             model.Country = vendor.Country;
             model.CountryId = vendor.CountryId;
             model.Vendor = vendor;
@@ -161,18 +161,18 @@ namespace risk.control.system.Controllers.AgencyAdmin
         }
 
         [Breadcrumb("Edit User", FromAction = "Users")]
-        public async Task<IActionResult> Edit(long? userId)
+        public async Task<IActionResult> Edit(long? id)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             try
             {
-                if (userId == null || userId <= 0)
+                if (id == null || id <= 0)
                 {
                     notifyService.Error("User not found!!!..Contact Admin");
                     return RedirectToAction(nameof(Users), "AgencyUser");
                 }
 
-                var user = await _context.ApplicationUser.Include(u => u.Country).Include(u => u.Vendor).FirstOrDefaultAsync(c => c.Id == userId);
+                var user = await _context.ApplicationUser.AsNoTracking().Include(u => u.Country).Include(u => u.Vendor).FirstOrDefaultAsync(c => c.Id == id);
                 if (user == null)
                 {
                     notifyService.Error("User not found!!!..Contact Admin");
@@ -184,7 +184,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting AgencyUser {Id}. {UserEmail}", userId, userEmail ?? "Anonymous");
+                logger.LogError(ex, "Error getting AgencyUser {Id}. {UserEmail}", id, userEmail ?? "Anonymous");
             }
             notifyService.Error("OOPs !!!.Error creating User. Try again");
             return RedirectToAction(nameof(Users), "AgencyUser");
@@ -229,17 +229,17 @@ namespace risk.control.system.Controllers.AgencyAdmin
         }
 
         [Breadcrumb(title: " Delete", FromAction = "Users")]
-        public async Task<IActionResult> Delete(long userId)
+        public async Task<IActionResult> Delete(long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             try
             {
-                if (userId < 1)
+                if (id < 1)
                 {
                     notifyService.Error("OOPS!!!.Invalid Data.Try Again");
                     return RedirectToAction(nameof(Users), "AgencyUser");
                 }
-                var model = await _context.ApplicationUser.Include(v => v.Country).Include(v => v.State).Include(v => v.District).Include(v => v.PinCode).FirstOrDefaultAsync(c => c.Id == userId);
+                var model = await _context.ApplicationUser.AsNoTracking().Include(v => v.Country).Include(v => v.State).Include(v => v.District).Include(v => v.PinCode).FirstOrDefaultAsync(c => c.Id == id);
                 if (model == null)
                 {
                     notifyService.Error("OOPS!!!.User Not Found.Try Again");
@@ -253,13 +253,13 @@ namespace risk.control.system.Controllers.AgencyAdmin
                     CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR,
                     CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR};
 
-                var hasClaims = _context.Investigations.Any(c => agencySubStatuses.Contains(c.SubStatus) && c.VendorId == model.VendorId);
+                var hasClaims = _context.Investigations.AsNoTracking().Any(c => agencySubStatuses.Contains(c.SubStatus) && c.VendorId == model.VendorId);
                 model.HasClaims = hasClaims;
                 return View(model);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting AgencyUser {UserId} for {UserEmail}", userId, userEmail ?? "Anonymous");
+                logger.LogError(ex, "Error getting AgencyUser {UserId} for {UserEmail}", id, userEmail ?? "Anonymous");
                 notifyService.Error("OOPS!!!..Error deleting user. Try again");
                 return RedirectToAction(nameof(Users), "AgencyUser");
             }
@@ -277,7 +277,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
                     notifyService.Error("User Not Found!!!..Try again");
                     return RedirectToAction(nameof(Users), "AgencyUser");
                 }
-                var model = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == email);
+                var model = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == email);
                 if (model == null)
                 {
                     notifyService.Error("User Not Found!!!..Try again");

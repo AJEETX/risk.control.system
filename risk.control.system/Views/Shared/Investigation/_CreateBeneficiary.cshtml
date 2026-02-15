@@ -1,142 +1,142 @@
 ﻿@model risk.control.system.Models.BeneficiaryDetail
 
 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-<input type="hidden" asp-for="InvestigationTaskId" value="@Model.InvestigationTaskId" />
+<input type="hidden" asp-for="InvestigationTaskId" />
 <div id="article" class="card shadow-lg border-1 rounded-lg">
-    <div class="card-header bg-secondary text-white text-center">
-        <h3 class="card-title">
-            <i class="fas fa-user-tie"></i> Add Beneficiary
-            <span class="hover-text">
-                <i class="fas fa-info-circle"></i>
-                <span class="tooltip-text" id="information">
-                    <li>
-                        <i class='far fa-hand-point-right'></i> Add Beneficiary details.
-                    </li>
+	<div class="card-header bg-secondary text-white text-center">
+		<h3 class="card-title">
+			<i class="fas fa-user-tie"></i> Add Beneficiary
+			<span class="hover-text">
+				<i class="fas fa-info-circle"></i>
+				<span class="tooltip-text" id="information">
+					<li>
+						<i class='far fa-hand-point-right'></i> Add Beneficiary details.
+					</li>
 
-                    <li>
+					<li>
 
-                        <i class='far fa-thumbs-up'></i> Wizard should complete.
-                    </li>
-                    <li>
-                        <i class='fa fa-hand-peace-o'></i><b> Assign</b> to Agency
-                    </li>
-                </span>
-            </span>
-        </h3>
-    </div>
-    <div class="container d-flex justify-content-center align-items-center">
-        <div class="progresses">
-            <div class="steps2">
-                <span> <i class="far fa-file-powerpoint"></i></span>
-            </div>
+						<i class='far fa-thumbs-up'></i> Wizard should complete.
+					</li>
+					<li>
+						<i class='fa fa-hand-peace-o'></i><b> Assign</b> to Agency
+					</li>
+				</span>
+			</span>
+		</h3>
+	</div>
+	<div class="container d-flex justify-content-center align-items-center">
+		<div class="progresses">
+			<div class="steps2">
+				<span> <i class="far fa-file-powerpoint"></i></span>
+			</div>
 
-            <span class="line"></span>
+			<span class="line"></span>
 
-            <div class="steps2">
-                <span class="font-weight-bold"><i class="fa fa-user-plus"></i></span>
-            </div>
+			<div class="steps2">
+				<span class="font-weight-bold"><i class="fa fa-user-plus"></i></span>
+			</div>
 
-            <span class="line"></span>
+			<span class="line"></span>
 
-            <div class="steps">
-                <span class="font-weight-bold"><i class="fas fa-user-tie"></i></span>
-            </div>
-        </div>
-    </div>
-    <div class="card-body pt-0">
-        <div class="submit-progress hidden">
-            <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
-        </div>
-        <div class="row top-margin-10">
-            <div class="col-md-6">
+			<div class="steps">
+				<span class="font-weight-bold"><i class="fas fa-user-tie"></i></span>
+			</div>
+		</div>
+	</div>
+	<div class="card-body pt-0">
+		<div class="submit-progress hidden">
+			<i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+		</div>
+		<div class="row top-margin-10">
+			<div class="col-md-6">
 
-                <div class="form-group text-center">
-                    <div class="profile-img-container">
-                        <img id="document-Image" class="form-Image  img-circle" src="@Applicationsettings.NO_USER" title="Beneficiary Photo" alt="Beneficiary" data-bs-toggle="tooltip" />
-                    </div>
-                    <label for="createImageInput" class="control-label">Beneficiary Photo <i class="fa fa-asterisk asterik-style-logo"></i></label>
-                    <input id="createImageInput" accept=".jpg,.jpeg,.png" asp-for="ProfileImage" required class="form-control remarks document-image-input" type="file" data-preview-id="documentImage" data-title-id="beneficiary-document" title="Upload Beneficiary Photo" data-bs-toggle="tooltip" />
-                    <span asp-validation-for="ProfileImage" class="text-danger"></span>
-                </div>
+				<div class="form-group text-center">
+					<div class="profile-img-container">
+						<img id="document-Image" class="form-Image  img-circle" src="@Applicationsettings.NO_USER" title="Beneficiary Photo" alt="Beneficiary" data-bs-toggle="tooltip" />
+					</div>
+					<label for="createImageInput" class="control-label">Beneficiary Photo <i class="fa fa-asterisk asterik-style-logo"></i></label>
+					<input id="createImageInput" accept=".jpg,.jpeg,.png" asp-for="ProfileImage" required class="form-control remarks document-image-input" type="file" data-preview-id="documentImage" data-title-id="beneficiary-document" title="Upload Beneficiary Photo" data-bs-toggle="tooltip" />
+					<span asp-validation-for="ProfileImage" class="text-danger"></span>
+				</div>
 
-                <div class="form-group">
-                    <label class="input-group-label" for="BeneficiaryName"> Beneficiary Name:</label>
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text"><i class="fas fa-user-tie"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                        </div>
-                        <input id="BeneficiaryName" required asp-for="Name" class="form-control remarks title-name" type="text" placeholder="Beneficiary Name" maxlength="30" autocomplete="off" />
-                        <span asp-validation-for="Name" class="text-danger"></span>
-                    </div>
-                </div>
+				<div class="form-group">
+					<label class="input-group-label" for="BeneficiaryName"> Beneficiary Name:</label>
+					<div class="input-group mb-3">
+						<div class="input-group-prepend">
+							<span class="input-group-text"><i class="fas fa-user-tie"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+						</div>
+						<input id="BeneficiaryName" required asp-for="Name" class="form-control remarks title-name" type="text" placeholder="Beneficiary Name" maxlength="30" autocomplete="off" />
+						<span asp-validation-for="Name" class="text-danger"></span>
+					</div>
+				</div>
 
-                <div class="form-group">
-                    <label class="input-group-label" for="DateOfBirth"> Date Of Birth:</label>
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text"><i class="far fa-calendar-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                        </div>
-                        <input required asp-for="DateOfBirth" id="DateOfBirth" class="form-control remarks" type="date" />
-                        <span asp-validation-for="DateOfBirth" class="text-danger"></span>
-                    </div>
-                </div>
+				<div class="form-group">
+					<label class="input-group-label" for="DateOfBirth"> Date Of Birth:</label>
+					<div class="input-group mb-3">
+						<div class="input-group-prepend">
+							<span class="input-group-text"><i class="far fa-calendar-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+						</div>
+						<input required asp-for="DateOfBirth" id="DateOfBirth" class="form-control remarks" type="date" />
+						<span asp-validation-for="DateOfBirth" class="text-danger"></span>
+					</div>
+				</div>
 
-                <partial name="Investigation/_BeneficiaryPhoneNumber" model="@Model" />
-            </div>
-            <div class="col-md-6">
+				<partial name="Investigation/_BeneficiaryPhoneNumber" model="@Model" />
+			</div>
+			<div class="col-md-6">
 
-                <div class="form-group">
-                    <label class="input-group-label" for="BeneficiaryRelationId"> Relation:</label>
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text"><i class="fas fa-user-tie"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                        </div>
-                        <select id="BeneficiaryRelationId" required asp-for="BeneficiaryRelationId" class="form-control remarks" asp-items="ViewBag.BeneficiaryRelationId">
-                            <option value="">--- SELECT ---</option>
-                        </select>
-                        <span asp-validation-for="BeneficiaryRelationId" class="text-danger"></span>
-                    </div>
-                </div>
+				<div class="form-group">
+					<label class="input-group-label" for="BeneficiaryRelationId"> Relation:</label>
+					<div class="input-group mb-3">
+						<div class="input-group-prepend">
+							<span class="input-group-text"><i class="fas fa-user-tie"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+						</div>
+						<select id="BeneficiaryRelationId" required asp-for="BeneficiaryRelationId" class="form-control remarks" asp-items="@Model.BeneficiaryRelations">
+							<option value="">--- SELECT ---</option>
+						</select>
+						<span asp-validation-for="BeneficiaryRelationId" class="text-danger"></span>
+					</div>
+				</div>
 
-                <div class="form-group">
-                    <label class="input-group-label" for="Income">Annual Income (@ViewBag.Currency):</label>
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text"><i class="far fa-money-bill-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                        </div>
-                        <select id="Income" required asp-for="Income" class="form-control remarks" asp-items="@ViewBag.IncomeList">
-                            <option value="">--- SELECT---</option>
-                        </select>
-                        <span asp-validation-for="Income" class="text-danger"></span>
-                    </div>
-                </div>
-                <partial name="Investigation/_BeneficiaryAddress" model="@Model" />
+				<div class="form-group">
+					<label class="input-group-label" for="Income">Annual Income (@Model.CurrencySymbol):</label>
+					<div class="input-group mb-3">
+						<div class="input-group-prepend">
+							<span class="input-group-text"><i class="far fa-money-bill-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+						</div>
+						<select id="Income" required asp-for="Income" class="form-control remarks" asp-items="@Model.Incomes">
+							<option value="">--- SELECT---</option>
+						</select>
+						<span asp-validation-for="Income" class="text-danger"></span>
+					</div>
+				</div>
+				<partial name="Investigation/_BeneficiaryAddress" model="@Model" />
 
-                <div class="form-group">
-                    <label class="input-group-label" for="Addressline"> Address:</label>
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text"><i class="fa fa-home"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                        </div>
-                        <input type="text" id="Addressline" asp-for="Addressline" class="form-control remarks" placeholder="Street Address..." required maxlength="70" autocomplete="off" />
-                        <span asp-validation-for="Addressline" class="text-danger"></span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="card-footer">
-        <div class="text-right">
-            @* <button type="submit" onclick="clearAllInputs()" class="btn btn-outline-secondary">
+				<div class="form-group">
+					<label class="input-group-label" for="Addressline"> Address:</label>
+					<div class="input-group mb-3">
+						<div class="input-group-prepend">
+							<span class="input-group-text"><i class="fa fa-home"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+						</div>
+						<input type="text" id="Addressline" asp-for="Addressline" class="form-control remarks" placeholder="Street Address..." required maxlength="70" autocomplete="off" />
+						<span asp-validation-for="Addressline" class="text-danger"></span>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="card-footer">
+		<div class="text-right">
+			@* <button type="submit" onclick="clearAllInputs()" class="btn btn-outline-secondary">
             <i class="fas fa-undo"></i> Reset
             </button> *@
-            <a id="cancel" asp-controller="Investigation" asp-action="Details" asp-route-id="@Model.InvestigationTaskId" class="btn btn-secondary">
-                <i class="fa fa-window-close"></i>
-                @Applicationsettings.CANCEL
-            </a>
-            <button disabled id="create" type="submit" class="btn btn-success">
-                <i class="fas fa-user-tie"></i> Add Beneficiary
-            </button>
-        </div>
-    </div>
+			<a id="cancel" asp-controller="Investigation" asp-action="Details" asp-route-id="@Model.InvestigationTaskId" class="btn btn-secondary">
+				<i class="fa fa-window-close"></i>
+				@Applicationsettings.CANCEL
+			</a>
+			<button disabled id="create" type="submit" class="btn btn-success">
+				<i class="fas fa-user-tie"></i> Add Beneficiary
+			</button>
+		</div>
+	</div>
 </div>

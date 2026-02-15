@@ -90,7 +90,7 @@ namespace risk.control.system.Services.Assessor
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred.");
+                logger.LogError(ex, "Error occurred Rejecting Case {CaseId}. {UserEmail}", caseId, userEmail);
                 throw;
             }
         }
@@ -133,7 +133,7 @@ namespace risk.control.system.Services.Assessor
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred.");
+                logger.LogError(ex, "Error occurred Approving Case {CaseId}. {UserEmail}", caseId, userEmail);
                 throw;
             }
         }

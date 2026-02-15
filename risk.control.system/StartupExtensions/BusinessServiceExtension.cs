@@ -21,6 +21,7 @@ public static class BusinessServiceExtension
     public static IServiceCollection AddBusinessServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddHttpClient();
+        services.AddScoped<INavigationService, NavigationService>();
         services.AddScoped<IAgencyAgentService, AgencyAgentService>();
         services.AddScoped<IAgencyInvestigationServiceService, AgencyInvestigationServiceService>();
         services.AddScoped<IEmpanelledAvailableAgencyService, EmpanelledAvailableAgencyService>();
@@ -95,7 +96,6 @@ public static class BusinessServiceExtension
         services.AddScoped<IPdfGenerateCaseDetailService, PdfGenerateCaseDetailService>();
         services.AddScoped<IPdfGenerateDetailService, PdfGenerateDetailService>();
         services.AddScoped<IPdfGenerativeService, PdfGenerativeService>();
-        services.AddScoped<IViewRenderService, ViewRenderService>();
         services.AddScoped<IPanCardService, PanCardService>();
         services.AddScoped<ICloneReportService, CloneReportService>();
         services.AddScoped<IFaceIdfyService, FaceIdfyService>();

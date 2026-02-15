@@ -31,7 +31,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
         // GET: PinCodes
         public IActionResult Index()
         {
-            return RedirectToAction("Profile");
+            return RedirectToAction(nameof(Profile));
         }
 
         [Breadcrumb("Pincode")]
@@ -39,6 +39,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
         {
             return View();
         }
+
         [HttpGet]
         public async Task<IActionResult> GetPincodes(int draw, int start, int length, string search, int orderColumn, string orderDirection)
         {
@@ -246,7 +247,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                     return RedirectToAction(nameof(Profile));
                 }
                 var existingPincode = await _context.PinCode.FindAsync(id);
-                if(existingPincode == null)
+                if (existingPincode == null)
                 {
                     notifyService.Error("Pincode not found!");
                     return RedirectToAction(nameof(Profile));

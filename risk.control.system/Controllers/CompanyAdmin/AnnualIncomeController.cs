@@ -27,7 +27,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
 
         public IActionResult Index()
         {
-            return RedirectToAction("Profile");
+            return RedirectToAction(nameof(Profile));
         }
 
         [Breadcrumb("Income Type")]

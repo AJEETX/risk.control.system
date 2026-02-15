@@ -44,10 +44,10 @@ namespace risk.control.system.Controllers.Agent
                 notifyService.Error("OOPs !!!.. Download error");
                 return this.RedirectToAction<DashboardController>(x => x.Index());
             }
-            var currentUserEmail = HttpContext.User.Identity.Name;
+            var userEmail = HttpContext.User.Identity.Name;
             if (Image != null && Image.Length > 0)
             {
-                var response = await agentService.PostAgentId(currentUserEmail, reportName, locationName, locationId, caseId, Id, latitude, longitude, isAgent, Image);
+                var response = await agentService.PostAgentId(userEmail, reportName, locationName, locationId, caseId, Id, latitude, longitude, isAgent, Image);
                 return Json(new { success = true, image = response.Image });
             }
             return BadRequest("Invalid image.");
@@ -62,10 +62,10 @@ namespace risk.control.system.Controllers.Agent
                 notifyService.Error("OOPs !!!.. Download error");
                 return this.RedirectToAction<DashboardController>(x => x.Index());
             }
-            var currentUserEmail = HttpContext.User.Identity.Name;
+            var userEmail = HttpContext.User.Identity.Name;
             if (Image != null && Image.Length > 0)
             {
-                var response = await agentService.PostDocumentId(currentUserEmail, reportName, locationName, locationId, caseId, Id, latitude, longitude, Image);
+                var response = await agentService.PostDocumentId(userEmail, reportName, locationName, locationId, caseId, Id, latitude, longitude, Image);
                 return Json(new { success = true, image = response.Image });
             }
             return BadRequest("Invalid image.");
@@ -82,7 +82,7 @@ namespace risk.control.system.Controllers.Agent
             }
             if (Image == null || Image.Length == 0)
                 return Json(new { success = false, message = "No file provided." });
-            var currentUserEmail = HttpContext.User.Identity.Name;
+            var userEmail = HttpContext.User.Identity.Name;
             var extension = Path.GetExtension(Image.FileName).ToLower();
 
             var supportedExtensions = new[] { ".mp4", ".webm", ".mov", ".mp3", ".wav", ".aac" };
@@ -94,7 +94,7 @@ namespace risk.control.system.Controllers.Agent
             {
                 LocationName = locationName,
                 ReportName = reportName,
-                Email = currentUserEmail,
+                Email = userEmail,
                 CaseId = caseId,
                 Image = Image,
                 LocationLatLong = locationLongLat

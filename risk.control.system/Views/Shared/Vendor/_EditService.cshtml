@@ -4,100 +4,99 @@
 <input type="hidden" asp-for="VendorInvestigationServiceTypeId" />
 <input id="vendorId" type="hidden" asp-for="VendorId" value="@Model.VendorId" />
 <div class="row">
-    <div class="col-md-6">
-        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+	<div class="col-md-6">
+		<div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-        <div class="form-group">
-            <label class="input-group-label" for="InsuranceType"> Case Type:</label>
-            <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                    <span class="input-group-text" asp-for="InsuranceType"><i class="nav-icon fas fa-tools"></i> <i class="fa fa-asterisk asterik-style"></i> </span>
-                </div>
-                <select id="InsuranceType" required asp-for="InsuranceType" class="form-control remarks" asp-items="Html.GetEnumSelectList<InsuranceType>()">
-                    <option value="">--- SELECT ---</option>
-                </select>
-                <span asp-validation-for="InsuranceType" class="text-danger"></span>
-            </div>
-        </div>
+		<div class="form-group">
+			<label class="input-group-label" for="InsuranceType"> Case Type:</label>
+			<div class="input-group mb-3">
+				<div class="input-group-prepend">
+					<span class="input-group-text" asp-for="InsuranceType"><i class="nav-icon fas fa-tools"></i> <i class="fa fa-asterisk asterik-style"></i> </span>
+				</div>
+				<select id="InsuranceType" required asp-for="InsuranceType" class="form-control remarks" asp-items="Html.GetEnumSelectList<InsuranceType>()">
+					<option value="">--- SELECT ---</option>
+				</select>
+				<span asp-validation-for="InsuranceType" class="text-danger"></span>
+			</div>
+		</div>
 
-        <div class="form-group">
-            <label class="input-group-label" for="InvestigationServiceTypeId"> Verification Type:</label>
-            <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                    <span class="input-group-text"><i class="fas fa-wrench"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                </div>
-                <select id="InvestigationServiceTypeId" name="InvestigationServiceTypeId" asp-for="InvestigationServiceTypeId" class="form-control remarks" asp-items="ViewBag.InvestigationServiceTypeId" required>
-                    <option value="">--- SELECT ---</option>
-                </select>
-                <span asp-validation-for="InvestigationServiceTypeId" class="text-danger"></span>
-            </div>
-        </div>
+		<div class="form-group">
+			<label class="input-group-label" for="InvestigationServiceTypeId"> Verification Type:</label>
+			<div class="input-group mb-3">
+				<div class="input-group-prepend">
+					<span class="input-group-text"><i class="fas fa-wrench"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+				</div>
+				<select id="InvestigationServiceTypeId" name="InvestigationServiceTypeId" asp-for="InvestigationServiceTypeId" class="form-control remarks" asp-items="Model.InvestigationServiceTypeList" required>
+					<option value="">--- SELECT ---</option>
+				</select>
+				<span asp-validation-for="InvestigationServiceTypeId" class="text-danger"></span>
+			</div>
+		</div>
 
-        <div class="form-group">
-            <label class="input-group-label" for="Price"> Service Price in @Model.Country.CurrencyCode (@ViewBag.Currency):</label>
-            <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                    <span class="input-group-text" for="Price"> <i class="fas fa-money-bill-wave"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                </div>
-                <input asp-for="Price" class="form-control remarks" type="text" placeholder="Service Price in @Model.Country.CurrencyCode (@ViewBag.Currency)" required maxlength="10" />
-                <span asp-validation-for="Price" class="text-danger"></span>
-            </div>
-        </div>
-        <div class="form-group">
-            <label class="input-group-label" for="StateId"> State:</label>
-            <div class="input-group mb-3 autocomplete-wrapper">
-                <div class="input-group-prepend">
-                    @{
-                        var imgPath = "/flags/" + @Model.Country.Code.ToLower() + ".png";
-                    }
-                    <span class="input-group-text country-code-text" data-bs-toggle="tooltip" title="Registered Country : @Model?.Country.Name">
-                        <img src="@imgPath" class="flag-icon" data-bs-toggle="tooltip" />  @Model?.Country.Code
-                    </span>
-                </div>
-                <input type="text" id="StateId" class="form-control remarks auto-dropdown" data-placeholder="state" placeholder="Search state ..." asp-for="StateId" required />
-                <span asp-validation-for="StateId" class="text-danger"></span>
-                <input asp-for="SelectedStateId" type="hidden" id="SelectedStateId" name="SelectedStateId" value="@Model?.StateId" />
-                <div id="state-loading" class="loading-spinner">
-                    <i class="fas fa-spinner fa-spin"></i>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-6">
-        <div class="form-group multi-select-district">
-            <label class="input-group-label" for="SelectedDistrictIds">Districts:</label>
-            <!-- ALL DISTRICTS checkbox -->
-            <div class="form-check mb-2">
-                <input type="checkbox"
-                       class="form-check-input"
-                       id="allDistrictsCheckbox"
-                       value="-1"
-                       @(Model.SelectedDistrictIds?.Contains(-1) == true ? "checked" : "") />
-                <label class="form-check-label" for="allDistrictsCheckbox">
-                    All Districts
-                </label>
+		<div class="form-group">
+			<label class="input-group-label" for="Price"> Service Price in @Model.Country.CurrencyCode (@Model.Currency):</label>
+			<div class="input-group mb-3">
+				<div class="input-group-prepend">
+					<span class="input-group-text" for="Price"> <i class="fas fa-money-bill-wave"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+				</div>
+				<input asp-for="Price" class="form-control remarks" type="text" placeholder="Service Price in @Model.Country.CurrencyCode (@Model.Currency)" required maxlength="10" />
+				<span asp-validation-for="Price" class="text-danger"></span>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="input-group-label" for="StateId"> State:</label>
+			<div class="input-group mb-3 autocomplete-wrapper">
+				<div class="input-group-prepend">
+					@{
+						var imgPath = "/flags/" + @Model.Country.Code.ToLower() + ".png";
+					}
+					<span class="input-group-text country-code-text" data-bs-toggle="tooltip" title="Registered Country : @Model?.Country.Name">
+						<img src="@imgPath" class="flag-icon" data-bs-toggle="tooltip" />  @Model?.Country.Code
+					</span>
+				</div>
+				<input type="text" id="StateId" class="form-control remarks auto-dropdown" data-placeholder="state" placeholder="Search state ..." asp-for="StateId" required />
+				<span asp-validation-for="StateId" class="text-danger"></span>
+				<input asp-for="SelectedStateId" type="hidden" id="SelectedStateId" name="SelectedStateId" value="@Model?.StateId" />
+				<div id="state-loading" class="loading-spinner">
+					<i class="fas fa-spinner fa-spin"></i>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="col-md-6">
+		<div class="form-group multi-select-district">
+			<label class="input-group-label" for="SelectedDistrictIds">Districts:</label>
+			<!-- ALL DISTRICTS checkbox -->
+			<div class="form-check mb-2">
+				<input type="checkbox"
+					   class="form-check-input"
+					   id="allDistrictsCheckbox"
+					   value="-1"
+				@(Model.SelectedDistrictIds?.Contains(-1) == true ? "checked" : "") />
+				<label class="form-check-label" for="allDistrictsCheckbox">
+					All Districts
+				</label>
+			</div>
+			<div class="input-group mb-3">
+				<div class="input-group-prepend">
+					<span class="input-group-text" for="SelectedDistrictIds">
+						<i class="fas fa-city"></i>
+						<i class="fa fa-asterisk asterik-style"></i>
+					</span>
+				</div>
+				<select id="SelectedDistrictIds"
+						name="SelectedDistrictIds"
+						class="form-control remarks"
+						multiple
+						required
+						data-selected="@string.Join(",", Model.SelectedDistrictIds ?? new List<long>())">
+				</select>
+				<div id="districtLoadingSpinner" class="spinner-border text-primary d-none district-spinner" role="status">
+					<span class="visually-hidden"></span>
+				</div>
 
-            </div>
-            <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                    <span class="input-group-text" for="SelectedDistrictIds">
-                        <i class="fas fa-city"></i>
-                        <i class="fa fa-asterisk asterik-style"></i>
-                    </span>
-                </div>
-                <select id="SelectedDistrictIds"
-                        name="SelectedDistrictIds"
-                        class="form-control remarks"
-                        multiple
-                        required
-                        data-selected="@string.Join(",", Model.SelectedDistrictIds ?? new List<long>())">
-                </select>
-                <div id="districtLoadingSpinner" class="spinner-border text-primary d-none district-spinner" role="status">
-                    <span class="visually-hidden"></span>
-                </div>
-
-                <span asp-validation-for="SelectedDistrictIds" class="text-danger"></span>
-            </div>
-        </div>
-    </div>
+				<span asp-validation-for="SelectedDistrictIds" class="text-danger"></span>
+			</div>
+		</div>
+	</div>
 </div>

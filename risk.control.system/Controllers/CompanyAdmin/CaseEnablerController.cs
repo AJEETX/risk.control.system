@@ -11,8 +11,6 @@ using risk.control.system.Models;
 
 using SmartBreadcrumbs.Attributes;
 
-using static risk.control.system.AppConstant.Applicationsettings;
-
 namespace risk.control.system.Controllers.CompanyAdmin
 {
     [Breadcrumb("Company Settings ")]
@@ -32,7 +30,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
 
         public IActionResult Index()
         {
-            return RedirectToAction("Profile");
+            return RedirectToAction(nameof(Profile));
         }
 
         [Breadcrumb("Reason To Verify ")]
@@ -55,6 +53,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
 
             return Json(new { data });
         }
+
         [Breadcrumb("Details ")]
         public async Task<IActionResult> Details(int id)
         {
@@ -122,7 +121,6 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 return RedirectToAction(nameof(Profile));
             }
         }
-
 
         [HttpPost]
         [ValidateAntiForgeryToken]

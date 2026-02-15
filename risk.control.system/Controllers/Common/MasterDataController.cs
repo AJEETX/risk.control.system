@@ -51,8 +51,8 @@ namespace risk.control.system.Controllers.Common
 
             var newDomain = input.Trim().ToLower(CultureInfo.InvariantCulture) + domainData.GetEnumDisplayName();
 
-            var agenccompanyCount = await context.ClientCompany.CountAsync(u => u.Email.Trim().ToLower() == newDomain && !u.Deleted);
-            var agencyCount = await context.Vendor.CountAsync(u => u.Email.Trim().ToLower() == newDomain);
+            var agenccompanyCount = await context.ClientCompany.AsNoTracking().CountAsync(u => u.Email.Trim().ToLower() == newDomain && !u.Deleted);
+            var agencyCount = await context.Vendor.AsNoTracking().CountAsync(u => u.Email.Trim().ToLower() == newDomain);
 
             return agencyCount == 0 && agenccompanyCount == 0 ? 0 : 1;
         }
@@ -65,7 +65,7 @@ namespace risk.control.system.Controllers.Common
                 return null;
             }
 
-            var userCount = await userManager.Users.CountAsync(u => u.Email == input.ToLower());
+            var userCount = await userManager.Users.AsNoTracking().CountAsync(u => u.Email == input.ToLower());
 
             return userCount == 0 ? 0 : 1;
         }
@@ -86,7 +86,7 @@ namespace risk.control.system.Controllers.Common
                 var services = new List<InvestigationServiceType>();
                 if (!string.IsNullOrWhiteSpace(insuranceType) && Enum.TryParse(insuranceType, out type))
                 {
-                    services = await context.InvestigationServiceType.Where(s => s.InsuranceType == type).ToListAsync();
+                    services = await context.InvestigationServiceType.AsNoTracking().Where(s => s.InsuranceType == type).ToListAsync();
                 }
                 return Ok(services);
             }
@@ -108,7 +108,7 @@ namespace risk.control.system.Controllers.Common
                 .Select(v => v.Id)
                 .ToListAsync();
 
-                IQueryable<ApplicationUser> query = context.ApplicationUser
+                IQueryable<ApplicationUser> query = context.ApplicationUser.AsNoTracking()
                     .Where(a => !a.Deleted && a.Email != PORTAL_ADMIN.EMAIL &&
                                 !vendorAgentIds.Contains(a.Id));
 
@@ -144,7 +144,7 @@ namespace risk.control.system.Controllers.Common
             }
             try
             {
-                var allCountries = context.Country.ToList();
+                var allCountries = context.Country.AsNoTracking().ToList();
 
                 if (string.IsNullOrEmpty(term))
                     return Ok(allCountries
@@ -190,12 +190,12 @@ namespace risk.control.system.Controllers.Common
             try
             {
                 if (string.IsNullOrEmpty(term?.Trim()))
-                    return Ok(context.State.Where(x => x.CountryId == countryId)?
+                    return Ok(context.State.AsNoTracking().Where(x => x.CountryId == countryId)?
                         .OrderBy(x => x.Name)
                      .Take(10)
                      .Select(x => new { StateId = x.StateId, StateName = x.Name })?.ToList());
 
-                var states = context.State.Where(x => x.CountryId == countryId && x.Name.ToLower().Contains(term.ToLower()))
+                var states = context.State.AsNoTracking().Where(x => x.CountryId == countryId && x.Name.ToLower().Contains(term.ToLower()))
                         .OrderBy(x => x.Name)
                      .Take(10)
                         .Select(c => new
@@ -225,7 +225,7 @@ namespace risk.control.system.Controllers.Common
             try
             {
                 var districts = string.IsNullOrEmpty(term?.Trim())
-                ? context.District
+                ? context.District.AsNoTracking()
                     .Where(x => x.CountryId == countryId && x.StateId == stateId)
                     .OrderBy(x => x.Name)
                     .Take(10)
@@ -235,7 +235,7 @@ namespace risk.control.system.Controllers.Common
                         DistrictName = $"{x.Name}"
                     })
                     .ToList()
-                : context.District
+                : context.District.AsNoTracking()
                     .Where(x => x.CountryId == countryId && x.StateId == stateId && x.Name.ToLower().Contains(term.ToLower()))
                     .OrderBy(x => x.Name)
                     .Take(10)
@@ -280,7 +280,7 @@ namespace risk.control.system.Controllers.Common
             }
             try
             {
-                var country = context.Country.Where(x => x.CountryId == id).OrderBy(x => x.Name).Take(10) // Filter based on user input
+                var country = context.Country.AsNoTracking().Where(x => x.CountryId == id).OrderBy(x => x.Name).Take(10) // Filter based on user input
                     .Select(x => new { Id = x.CountryId, Name = $"{x.Name}" }).FirstOrDefault(); // Format for jQuery UI Autocomplete
 
                 return Ok(country);
@@ -303,7 +303,7 @@ namespace risk.control.system.Controllers.Common
             }
             try
             {
-                var state = context.State.Where(x => x.StateId == id && x.CountryId == countryId).OrderBy(x => x.Name).Take(10) // Filter based on user input
+                var state = context.State.AsNoTracking().Where(x => x.StateId == id && x.CountryId == countryId).OrderBy(x => x.Name).Take(10) // Filter based on user input
                     .Select(x => new { StateId = x.StateId, StateName = $"{x.Name}" }).FirstOrDefault(); // Format for jQuery UI Autocomplete
 
                 return Ok(state);
@@ -326,7 +326,7 @@ namespace risk.control.system.Controllers.Common
             }
             try
             {
-                var states = context.State
+                var states = context.State.AsNoTracking()
                     .Where(x => x.CountryId == countryId)
                     .OrderBy(x => x.Name)
                     .Select(x => new { StateId = x.StateId, StateName = x.Name })
@@ -368,7 +368,7 @@ namespace risk.control.system.Controllers.Common
                     };
                     return Ok(result);
                 }
-                var pincode = context.District.Where(x => x.DistrictId == id && x.StateId == stateId && x.CountryId == countryId).OrderBy(x => x.Name).Take(10) // Filter based on user input
+                var pincode = context.District.AsNoTracking().Where(x => x.DistrictId == id && x.StateId == stateId && x.CountryId == countryId).OrderBy(x => x.Name).Take(10) // Filter based on user input
                     .Select(x => new { DistrictId = x.DistrictId, DistrictName = $"{x.Name}" }).FirstOrDefault(); // Format for jQuery UI Autocomplete
 
                 return Ok(pincode);
@@ -391,7 +391,7 @@ namespace risk.control.system.Controllers.Common
             }
             try
             {
-                var districts = context.District.Where(x => x.StateId == stateId && x.CountryId == countryId).OrderBy(x => x.Name)//.Take(10) // Filter based on user input
+                var districts = context.District.AsNoTracking().Where(x => x.StateId == stateId && x.CountryId == countryId).OrderBy(x => x.Name)//.Take(10) // Filter based on user input
                                 .Select(x => new { DistrictId = x.DistrictId, DistrictName = $"{x.Name}" }).ToList(); // Format for jQuery UI Autocomplete
 
                 var result = new List<object>
@@ -425,7 +425,7 @@ namespace risk.control.system.Controllers.Common
             }
             try
             {
-                var pincode = context.PinCode.FirstOrDefault(x => x.PinCodeId == id && x.CountryId == countryId); // Format for jQuery UI Autocomplete
+                var pincode = context.PinCode.AsNoTracking().FirstOrDefault(x => x.PinCodeId == id && x.CountryId == countryId); // Format for jQuery UI Autocomplete
 
                 var response = new
                 {
@@ -458,7 +458,7 @@ namespace risk.control.system.Controllers.Common
                 if (string.IsNullOrEmpty(term?.Trim()))
                 {
                     // If no search term, return all pincodes for the given district, state, and country
-                    var allpincodes = context.PinCode
+                    var allpincodes = context.PinCode.AsNoTracking()
                         .Include(x => x.State)
                         .Include(x => x.District)
                         .Where(x => x.CountryId == countryId)
@@ -491,12 +491,12 @@ namespace risk.control.system.Controllers.Common
                 // Pincode filter: The part after the hyphen (if exists)
                 var pincodeFilter = termParts.Length > 1 ? termParts[1] : string.Empty;
 
-                var pincodesQuery = context.PinCode.Where(x => x.CountryId == countryId);
+                var pincodesQuery = context.PinCode.AsNoTracking().Where(x => x.CountryId == countryId);
 
                 if (!string.IsNullOrWhiteSpace(nameFilter))
                 {
                     // Search pincodes that match either name or pincode
-                    pincodesQuery = context.PinCode
+                    pincodesQuery = context.PinCode.AsNoTracking()
                         .Where(x => x.CountryId == countryId &&
                         (x.Name.ToLower().Contains(nameFilter.ToLower()) ||
                         x.Code.ToString().Contains(nameFilter.ToLower()))
@@ -505,7 +505,7 @@ namespace risk.control.system.Controllers.Common
                 else
                 {
                     // Search pincodes that match either name or pincode
-                    pincodesQuery = context.PinCode
+                    pincodesQuery = context.PinCode.AsNoTracking()
                         .Where(x => x.CountryId == countryId &&
                         x.Code.ToString().Contains(pincodeFilter.ToLower())
                         );
@@ -550,7 +550,7 @@ namespace risk.control.system.Controllers.Common
             }
             try
             {
-                var allCountries = context.Country.ToList();
+                var allCountries = context.Country.AsNoTracking().ToList();
 
                 if (string.IsNullOrEmpty(term))
                     return Ok(allCountries
@@ -590,7 +590,7 @@ namespace risk.control.system.Controllers.Common
         {
             try
             {
-                var allCountries = context.Country.ToList();
+                var allCountries = context.Country.AsNoTracking().ToList();
 
                 if (string.IsNullOrEmpty(term))
                     return Ok(allCountries
@@ -632,7 +632,7 @@ namespace risk.control.system.Controllers.Common
         {
             try
             {
-                var allCountries = context.Country.ToList();
+                var allCountries = context.Country.AsNoTracking().ToList();
 
                 if (string.IsNullOrEmpty(term))
                     return Ok(allCountries
@@ -683,7 +683,7 @@ namespace risk.control.system.Controllers.Common
                     return Ok(new { valid = false, message = "Mobile number is required." });
                 if (await featureManager.IsEnabledAsync(FeatureFlags.VALIDATE_PHONE))
                 {
-                    var country = await context.Country.FirstOrDefaultAsync(c => c.ISDCode == countryCode);
+                    var country = await context.Country.AsNoTracking().FirstOrDefaultAsync(c => c.ISDCode == countryCode);
 
                     var phoneInfo = await phoneService.ValidateAsync(country.ISDCode.ToString() + phone);
 
@@ -727,7 +727,7 @@ namespace risk.control.system.Controllers.Common
             {
                 if (string.IsNullOrWhiteSpace(phone))
                     return Ok(new { valid = false, message = "Mobile number is required." });
-                var country = await context.Country.FirstOrDefaultAsync(c => c.ISDCode == countryCode);
+                var country = await context.Country.AsNoTracking().FirstOrDefaultAsync(c => c.ISDCode == countryCode);
 
                 var isMobile = phoneService.IsValidMobileNumber(phone, country.ISDCode.ToString());
 
@@ -763,7 +763,7 @@ namespace risk.control.system.Controllers.Common
             }
             try
             {
-                var bsbDetail = context.BsbInfo.FirstOrDefault(b => b.BSB == code);
+                var bsbDetail = context.BsbInfo.AsNoTracking().FirstOrDefault(b => b.BSB == code);
                 return Ok(bsbDetail);
             }
             catch (Exception ex)

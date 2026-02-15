@@ -48,7 +48,7 @@ namespace risk.control.system.Controllers.Assessor
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SubmitEnquiry([FromForm] CaseInvestigationVendorsModel request, [FromForm] long claimId, [FromForm] IFormFile? document)
         {
-            var currentUserEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name;
             try
             {
                 if (!ModelState.IsValid)
@@ -83,12 +83,10 @@ namespace risk.control.system.Controllers.Assessor
 
                 request.InvestigationReport.EnquiryRequest.DescriptiveQuestion = HttpUtility.HtmlEncode(request.InvestigationReport.EnquiryRequest.DescriptiveQuestion);
 
-                var model = await assessorQueryService.SubmitQueryToAgency(currentUserEmail, claimId, request.InvestigationReport.EnquiryRequest, request.InvestigationReport.EnquiryRequests, document);
+                var model = await assessorQueryService.SubmitQueryToAgency(userEmail, claimId, request.InvestigationReport.EnquiryRequest, request.InvestigationReport.EnquiryRequests, document);
                 if (model != null)
                 {
-                    var company = await context.ApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == currentUserEmail);
-
-                    backgroundJobClient.Enqueue(() => mailService.NotifySubmitQueryToAgency(currentUserEmail, claimId, baseUrl));
+                    backgroundJobClient.Enqueue(() => mailService.NotifySubmitQueryToAgency(userEmail, claimId, baseUrl));
 
                     notifyService.Success("Enquiry Sent to Agency");
                     return RedirectToAction(nameof(AssessorController.Assessor), "Assessor");
@@ -98,7 +96,7 @@ namespace risk.control.system.Controllers.Assessor
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error submitting query case {Id}", claimId, currentUserEmail);
+                logger.LogError(ex, "Error submitting query case {Id}", claimId, userEmail);
                 notifyService.Error("Error submitting query. Try again.");
                 return this.RedirectToAction<DashboardController>(x => x.Index());
             }
