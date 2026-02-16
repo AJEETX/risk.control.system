@@ -3,8 +3,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using risk.control.system.AppConstant;
-using risk.control.system.Controllers.Common;
-using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services.Agent;
@@ -41,8 +39,7 @@ namespace risk.control.system.Controllers.Agent
         {
             if (!ModelState.IsValid)
             {
-                notifyService.Error("OOPs !!!.. Download error");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return BadRequest("Invalid image.");
             }
             var userEmail = HttpContext.User.Identity.Name;
             if (Image != null && Image.Length > 0)
@@ -50,7 +47,7 @@ namespace risk.control.system.Controllers.Agent
                 var response = await agentService.PostAgentId(userEmail, reportName, locationName, locationId, caseId, Id, latitude, longitude, isAgent, Image);
                 return Json(new { success = true, image = response.Image });
             }
-            return BadRequest("Invalid image.");
+            return Json(new { success = false });
         }
 
         [HttpPost]
@@ -59,8 +56,7 @@ namespace risk.control.system.Controllers.Agent
         {
             if (!ModelState.IsValid)
             {
-                notifyService.Error("OOPs !!!.. Download error");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return BadRequest("Invalid image.");
             }
             var userEmail = HttpContext.User.Identity.Name;
             if (Image != null && Image.Length > 0)
@@ -68,7 +64,7 @@ namespace risk.control.system.Controllers.Agent
                 var response = await agentService.PostDocumentId(userEmail, reportName, locationName, locationId, caseId, Id, latitude, longitude, Image);
                 return Json(new { success = true, image = response.Image });
             }
-            return BadRequest("Invalid image.");
+            return Json(new { success = false });
         }
 
         [HttpPost]
@@ -77,8 +73,7 @@ namespace risk.control.system.Controllers.Agent
         {
             if (!ModelState.IsValid)
             {
-                notifyService.Error("OOPs !!!.. Download error");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return BadRequest("Invalid media file.");
             }
             if (Image == null || Image.Length == 0)
                 return Json(new { success = false, message = "No file provided." });
@@ -115,8 +110,7 @@ namespace risk.control.system.Controllers.Agent
             var userEmail = HttpContext.User.Identity.Name;
             if (!ModelState.IsValid)
             {
-                notifyService.Error("OOPs !!!.. Download error");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return BadRequest("Invalid data.");
             }
             foreach (var question in Questions)
             {
@@ -128,8 +122,6 @@ namespace risk.control.system.Controllers.Agent
 
             if (!ModelState.IsValid)
             {
-                // Re-load data and return view with error
-                // e.g. return View(model);
                 return BadRequest("Some answers are missing.");
             }
             var submitted = await answerService.CaptureAnswers(userEmail, locationName, CaseId, Questions);

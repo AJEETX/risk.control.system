@@ -23,6 +23,10 @@ namespace risk.control.system.Services.Common
         MvcBreadcrumbNode GetAgencyUserManagerPath(long id, string agencyController, string listTitle);
 
         MvcBreadcrumbNode GetAgencyUserActionPath(long id, string agencyController, string listTitle, string actionTitle, string actionName);
+
+        MvcBreadcrumbNode GetInvoiceBreadcrumb(long invoiceId, long caseId, string controller, string rootAction, string rootTitle, string listAction, string listTitle, string detailAction);
+
+        MvcBreadcrumbNode GetAssessorEnquiryPath(long id, string controller);
     }
 
     internal class NavigationService : INavigationService
@@ -150,6 +154,59 @@ namespace risk.control.system.Services.Common
             {
                 Parent = list,
                 RouteValues = new { id }
+            };
+        }
+
+        public MvcBreadcrumbNode GetInvoiceBreadcrumb(long invoiceId, long caseId, string controller, string rootAction, string rootTitle, string listAction, string listTitle, string detailAction)
+        {
+            // 1. Root Level (e.g., Allocate/Cases or Assessor/Cases)
+            var root = new MvcBreadcrumbNode(rootAction, controller, rootTitle);
+
+            // 2. List Level (e.g., Completed or Approved)
+            var list = new MvcBreadcrumbNode(listAction, controller, listTitle)
+            {
+                Parent = root
+            };
+
+            // 3. Details Level (e.g., CompletedDetail or ApprovedDetail)
+            var details = new MvcBreadcrumbNode(detailAction, controller, "Details")
+            {
+                Parent = list,
+                RouteValues = new { id = caseId }
+            };
+
+            // 4. Final Leaf: Invoice
+            return new MvcBreadcrumbNode("ShowInvoice", controller, "Invoice")
+            {
+                Parent = details,
+                RouteValues = new { id = invoiceId }
+            };
+        }
+
+        public MvcBreadcrumbNode GetAssessorEnquiryPath(long id, string controller)
+        {
+            // 1. Root: Cases
+            var root = new MvcBreadcrumbNode("Assessor", controller, "Cases");
+
+            // 2. List: Assess(report)
+            var list = new MvcBreadcrumbNode("Assessor", controller, "Assess(report)")
+            {
+                Parent = root
+            };
+
+            // 3. Details: GetInvestigateReport
+            // Note: Uses 'selectedcase' as the route parameter per your requirements
+            var details = new MvcBreadcrumbNode("GetInvestigateReport", controller, "Details")
+            {
+                Parent = list,
+                RouteValues = new { selectedcase = id }
+            };
+
+            // 4. Leaf: Send Enquiry
+            return new MvcBreadcrumbNode("SendEnquiry", controller, "Send Enquiry")
+            {
+                Parent = details,
+                RouteValues = new { id = id }
             };
         }
     }

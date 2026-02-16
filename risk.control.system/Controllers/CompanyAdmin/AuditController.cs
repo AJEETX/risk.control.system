@@ -1,15 +1,11 @@
 ﻿using System.Linq.Expressions;
 using System.Text.RegularExpressions;
-
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using risk.control.system.Models;
-
-using SmartBreadcrumbs.Attributes;
-
-using static risk.control.system.AppConstant.Applicationsettings;
 using risk.control.system.AppConstant;
+using risk.control.system.Models;
+using SmartBreadcrumbs.Attributes;
 
 namespace risk.control.system.Controllers.CompanyAdmin
 {
@@ -29,11 +25,13 @@ namespace risk.control.system.Controllers.CompanyAdmin
         {
             return RedirectToAction("Profile");
         }
+
         [Breadcrumb("Audit Log")]
         public IActionResult Profile()
         {
             return View();
         }
+
         [HttpGet] // keep it simple
         public async Task<IActionResult> GetAudit(int draw, int start, int length, string search, int? orderColumn, string orderDirection)
         {
@@ -133,7 +131,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
         }
 
         // GET: Audit/Details/5
-        [Breadcrumb("Detail ", FromAction = "Profile")]
+        [Breadcrumb("Detail ", FromAction = nameof(Profile))]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null || _context.AuditLogs == null)

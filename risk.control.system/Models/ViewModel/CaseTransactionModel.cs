@@ -9,9 +9,6 @@
         public bool Assigned { get; set; } = false;
         public bool AutoAllocation { get; set; } = false;
         public bool Withdrawable { get; set; }
-        public bool AllowedToCreate { get; set; } = false;
-        public int? AvailableCount { get; set; } = 0;
-        public int? TotalCount { get; set; } = 0;
         public bool CanDownload { get; set; }
         public string? ReportAiSummary { get; set; }
         public bool CaseIsValidToAssign { get; set; } = false;

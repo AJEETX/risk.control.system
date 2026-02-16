@@ -39,7 +39,7 @@ namespace risk.control.system.Services.Agent
         {
             _logger.LogInformation("Fetching investigation case {CaseId} for user {UserEmail}", selectedCaseId, userEmail);
 
-            var caseTask = await _context.Investigations.AsNoTracking()
+            var caseTask = await _context.Investigations
                 .Include(c => c.ClientCompany)
                     .ThenInclude(c => c.Country)
                 .Include(c => c.PolicyDetail)
@@ -115,8 +115,9 @@ namespace risk.control.system.Services.Agent
             var model = new CaseInvestigationVendorsModel
             {
                 InvestigationReport = caseTask.InvestigationReport,
-                Location = caseTask.BeneficiaryDetail,
-                ClaimsInvestigation = caseTask
+                Beneficiary = caseTask.BeneficiaryDetail,
+                CaseTask = caseTask,
+                Currency = CustomExtensions.GetCultureByCountry(caseTask.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol
             };
 
             _logger.LogInformation("Returning investigation model for case {CaseId}", selectedCaseId);
@@ -231,7 +232,8 @@ namespace risk.control.system.Services.Agent
                 TimeTaken = totalTimeTaken,
                 VendorInvoice = invoice,
                 CanDownload = canDownload,
-                Withdrawable = caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR
+                Withdrawable = caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR,
+                Currency = CustomExtensions.GetCultureByCountry(caseTask.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol
             };
 
             _logger.LogInformation("Returning CaseTransactionModel for case {CaseId}", id);
@@ -240,7 +242,7 @@ namespace risk.control.system.Services.Agent
 
         public async Task<InvestigationTask> GetCaseById(long id)
         {
-            var _case = await _context.Investigations.AsNoTracking()
+            var _case = await _context.Investigations
                 .Include(c => c.InvestigationReport)
                 .ThenInclude(c => c.ReportTemplate)
                 .ThenInclude(c => c.LocationReport)
@@ -268,7 +270,7 @@ namespace risk.control.system.Services.Agent
 
         public async Task<InvestigationTask> GetCaseByIdForMedia(long id)
         {
-            var claim = await _context.Investigations.AsNoTracking()
+            var claim = await _context.Investigations
                  .Include(c => c.PolicyDetail)
                  .Include(c => c.CustomerDetail)
                  .Include(c => c.BeneficiaryDetail)
@@ -281,7 +283,7 @@ namespace risk.control.system.Services.Agent
 
         public async Task<InvestigationTask> GetCaseByIdForQuestions(long id)
         {
-            var claim = await _context.Investigations.AsNoTracking()
+            var claim = await _context.Investigations
                     .Include(c => c.InvestigationReport)
                     .ThenInclude(c => c.ReportTemplate)
                     .ThenInclude(c => c.LocationReport)

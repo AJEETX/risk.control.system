@@ -46,51 +46,47 @@
                 </button>
             </div>
         </div>
-        <form id="checkboxes" asp-action="GetInvestigateReport" method="get" enctype="multipart/form-data">
-            <div class="card-body">
-                <table id="dataTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
-                    <thead>
-                        <tr>
-                            <th data-toggle="tooltip" title="Select Case to Assess"><img class="action-image" src="~/headers/arrow-down.gif" /></th>
-                            <th data-toggle="tooltip" title="Case Number" alt="Case Number"><img class="action-image" src="~/headers/policy-num.gif" /></th>
-                            <th data-toggle="tooltip" title="Asssured Amount"><img class="action-image" src="~/headers/amount.gif" /></th>
-                            <th data-toggle="tooltip" title="Agency Name"><img class="action-image" src="~/headers/agency.gif" /></th>
-                            <th data-toggle="tooltip" title="Address of Interest" alt="Address of Interest"><img class="action-image" src="~/headers/pincode.gif" /></th>
-                            <th data-toggle="tooltip" title="Driving Distance" alt="Driving Distance"><img class="action-image" src="~/headers/driving.gif" /></th>
-                            <th data-toggle="tooltip" title="Driving  Duration" alt="Driving  Duration"><img class="action-image" src="~/headers/driving-time.gif" /></th>
-                            <th data-toggle="tooltip" title="Case Document" alt="Case Document"><img class="action-image" src="~/headers/policy-doc.gif" /></th>
-                           
-                            <th data-toggle="tooltip" title="Customer Photo" alt="Customer Photo"><img class="action-image" src="~/headers/portrait.gif" /></th>
-                            <th data-toggle="tooltip" title="Customer Name" alt="Customer Name"><img class="action-image" src="~/headers/customer.gif" /></th>
-                            <th data-toggle="tooltip" title="Beneficiary Photo" alt="Beneficiary Photo"><img class="action-image" src="~/headers/portrait.gif" /></th>
-                            <th data-toggle="tooltip" title="Beneficiary Name" alt="Beneficiary Name"><img class="action-image" src="~/headers/customer.gif" /></th>
-                            <th data-toggle="tooltip" title="Case Type" alt="Case Type"><img class="action-image" src="~/headers/claim-type.gif" /></th>
+    <div class="card-body">
+        <table id="dataTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
+            <thead>
+                <tr>
+                    <th data-toggle="tooltip" title="Select Case to Assess"><img class="action-image" src="~/headers/arrow-down.gif" /></th>
+                    <th data-toggle="tooltip" title="Case Number" alt="Case Number"><img class="action-image" src="~/headers/policy-num.gif" /></th>
+                    <th data-toggle="tooltip" title="Asssured Amount"><img class="action-image" src="~/headers/amount.gif" /></th>
+                    <th data-toggle="tooltip" title="Agency Name"><img class="action-image" src="~/headers/agency.gif" /></th>
+                    <th data-toggle="tooltip" title="Address of Interest" alt="Address of Interest"><img class="action-image" src="~/headers/pincode.gif" /></th>
+                    <th data-toggle="tooltip" title="Driving Distance" alt="Driving Distance"><img class="action-image" src="~/headers/driving.gif" /></th>
+                    <th data-toggle="tooltip" title="Driving  Duration" alt="Driving  Duration"><img class="action-image" src="~/headers/driving-time.gif" /></th>
+                    <th data-toggle="tooltip" title="Case Document" alt="Case Document"><img class="action-image" src="~/headers/policy-doc.gif" /></th>
 
-                            <th data-toggle="tooltip" title="Status" alt="Status"><img class="action-image" src="~/headers/status.gif" /></th>
-                            <th data-toggle="tooltip" title="Submitted Date" alt="Submitted Date"><img class="action-image" src="~/headers/created.gif" /></th>
-                            <th data-toggle="tooltip" title="Allocated?"><img class="action-image" src="~/headers/auto.gif" /></th>
-                            <th data-toggle="tooltip" title="Duration since Submitted">
-                                <img class="action-image" src="~/headers/timer.gif" />
-                            </th>
+                    <th data-toggle="tooltip" title="Customer Photo" alt="Customer Photo"><img class="action-image" src="~/headers/portrait.gif" /></th>
+                    <th data-toggle="tooltip" title="Customer Name" alt="Customer Name"><img class="action-image" src="~/headers/customer.gif" /></th>
+                    <th data-toggle="tooltip" title="Beneficiary Photo" alt="Beneficiary Photo"><img class="action-image" src="~/headers/portrait.gif" /></th>
+                    <th data-toggle="tooltip" title="Beneficiary Name" alt="Beneficiary Name"><img class="action-image" src="~/headers/customer.gif" /></th>
+                    <th data-toggle="tooltip" title="Case Type" alt="Case Type"><img class="action-image" src="~/headers/claim-type.gif" /></th>
 
-                        </tr>
-                    </thead>
-                </table>
-        </div>
-            <div class="card-footer">
-                <div class="row">
-                    <div class="col-md-12">
-                        <a id="back" asp-controller="Dashboard" asp-action="Index" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
+                    <th data-toggle="tooltip" title="Status" alt="Status"><img class="action-image" src="~/headers/status.gif" /></th>
+                    <th data-toggle="tooltip" title="Submitted Date" alt="Submitted Date"><img class="action-image" src="~/headers/created.gif" /></th>
+                    <th data-toggle="tooltip" title="Allocated?"><img class="action-image" src="~/headers/auto.gif" /></th>
+                    <th data-toggle="tooltip" title="Duration since Submitted">
+                        <img class="action-image" src="~/headers/timer.gif" />
+                    </th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+    <div class="card-footer">
+        <div class="row">
+            <div class="col-md-12">
+                <a id="back" asp-controller="Dashboard" asp-action="Index" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
 
-                        <button disabled id="allocatedcase" type="submit" class="btn btn-danger">
-                            <span class="badge badge-danger"> <i class="fas fa-glasses" aria-hidden="true"></i> </span>
-                            Assess <sub>report</sub>
-                        </button>
-                    </div>
-                </div>
+                <button disabled id="allocatedcase" type="submit" class="btn btn-danger">
+                    <span class="badge badge-danger"> <i class="fas fa-glasses" aria-hidden="true"></i> </span>
+                    Assess <sub>report</sub>
+                </button>
             </div>
-
-        </form>
+        </div>
+    </div>
     </div>
 </section>
 

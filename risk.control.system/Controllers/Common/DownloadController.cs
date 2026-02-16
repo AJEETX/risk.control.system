@@ -23,10 +23,6 @@ namespace risk.control.system.Controllers.Common
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userEmail))
-            {
-                return Unauthorized("User not authenticated.");
-            }
             try
             {
                 var applicationUser = await context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(u => u.Email == userEmail);
@@ -53,10 +49,6 @@ namespace risk.control.system.Controllers.Common
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userEmail))
-            {
-                return Unauthorized("User not authenticated.");
-            }
             try
             {
                 var applicationUser = await context.ApplicationUser.AsNoTracking().Where(u => u.Email == userEmail).FirstOrDefaultAsync();
@@ -83,10 +75,6 @@ namespace risk.control.system.Controllers.Common
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userEmail))
-            {
-                return Unauthorized("User not authenticated.");
-            }
             try
             {
                 var applicationUser = await context.ApplicationUser.AsNoTracking().Where(u => u.Email == userEmail).FirstOrDefaultAsync();

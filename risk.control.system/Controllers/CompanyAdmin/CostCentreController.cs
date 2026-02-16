@@ -83,7 +83,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
         }
 
         // GET: CostCentre/Create
-        [Breadcrumb("Add New", FromAction = "Profile")]
+        [Breadcrumb("Add New", FromAction = nameof(Profile))]
         public IActionResult Create()
         {
             return View();
@@ -139,7 +139,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
         }
 
         // GET: CostCentre/Edit/5
-        [Breadcrumb("Edit ", FromAction = "Profile")]
+        [Breadcrumb("Edit ", FromAction = nameof(Profile))]
         public async Task<IActionResult> Edit(long id)
         {
             if (id <= 0)

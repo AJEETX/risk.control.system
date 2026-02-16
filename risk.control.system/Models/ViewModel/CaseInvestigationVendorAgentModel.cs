@@ -4,8 +4,7 @@
     {
         public InvestigationTask ClaimsInvestigation { get; set; }
         public BeneficiaryDetail CaseLocation { get; set; }
-        public List<VendorUserClaim> VendorUserClaims { get; set; }
         public bool ReSelect { get; set; }
+        public string Currency { get; set; }
     }
-
 }

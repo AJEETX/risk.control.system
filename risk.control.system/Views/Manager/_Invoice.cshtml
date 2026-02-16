@@ -11,7 +11,6 @@
                         <span>
                             <i class="fas fa-user-check"></i><b> Billing Info: @Model.ClaimsInvestigation.Vendor.Email</b>.
                         </span>
-
                     </span>
                 </span>
             </h3>
@@ -46,15 +45,14 @@
                             <span class="fa-li">
                                 <i class="fas fa-money"></i>
                             </span>
-                            Tax Amount (@ViewBag.Currency): @Model.VendorInvoice.TaxAmount
+                            Tax Amount (@Model.Currency): @Model.VendorInvoice.TaxAmount
                         </li>
                         <li class="small">
                             <span class="fa-li">
                                 <i class="fas fa-money"></i>
                             </span>
-                            Total Amount (@ViewBag.Currency): @(Model.VendorInvoice.GrandTotal + Model.VendorInvoice.TaxAmount)
+                            Total Amount (@Model.Currency): @(Model.VendorInvoice.GrandTotal + Model.VendorInvoice.TaxAmount)
                         </li>
-
                     </ul>
                 </div>
             </div>

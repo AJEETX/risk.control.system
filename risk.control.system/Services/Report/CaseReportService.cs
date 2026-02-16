@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 
@@ -94,9 +95,10 @@ namespace risk.control.system.Services.Report
             return (new CaseInvestigationVendorsModel
             {
                 InvestigationReport = caseTask.InvestigationReport,
-                Location = beneficiaryDetails,
-                ClaimsInvestigation = caseTask,
-                Address = caseTask.PolicyDetail.InsuranceType == Models.InsuranceType.CLAIM ? "Beneficiary" : "Life-Assured"
+                Beneficiary = beneficiaryDetails,
+                CaseTask = caseTask,
+                Address = caseTask.PolicyDetail.InsuranceType == Models.InsuranceType.CLAIM ? "Beneficiary" : "Life-Assured",
+                Currency = CustomExtensions.GetCultureByCountry(caseTask.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol
             });
         }
     }

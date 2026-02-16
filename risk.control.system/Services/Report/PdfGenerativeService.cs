@@ -1,22 +1,20 @@
-﻿using System.Composition;
-
-using Hangfire;
+﻿using Hangfire;
 
 using Microsoft.EntityFrameworkCore;
+using risk.control.system.Helpers;
 using risk.control.system.Models;
-
 
 namespace risk.control.system.Services.Report
 {
     public interface IPdfGenerativeService
     {
         Task<string> Generate(long investigationTaskId, string userEmail);
-        //Task<InvestigationTask> GeneratePdf(long investigationTaskId, string userEmail);
 
+        //Task<InvestigationTask> GeneratePdf(long investigationTaskId, string userEmail);
     }
+
     internal class PdfGenerativeService : IPdfGenerativeService
     {
-
         private readonly ApplicationDbContext context;
         private readonly IPdfGenerateDetailService pdfGenerate;
         private readonly IInvestigationReportPdfService generateReport;
@@ -35,6 +33,7 @@ namespace risk.control.system.Services.Report
                     .Include(c => c.CustomerDetail)
                     .Include(c => c.BeneficiaryDetail)
                     .Include(c => c.ClientCompany)
+                    .ThenInclude(c => c.Country)
                     .Include(c => c.PolicyDetail)
                     .Include(c => c.InvestigationReport)
                     .ThenInclude(c => c.EnquiryRequests)
@@ -95,7 +94,8 @@ namespace risk.control.system.Services.Report
                 SubTotal = investigationServiced.Price,
                 TaxAmount = investigationServiced.Price * (1m / 10m),
                 InvestigationServiceType = investigatService,
-                ClaimId = investigationTaskId
+                CaseId = investigationTaskId,
+                Currency = CustomExtensions.GetCultureByCountry(investigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol
             };
 
             context.VendorInvoice.Add(invoice);
@@ -142,7 +142,7 @@ namespace risk.control.system.Services.Report
         //        Console.WriteLine($"Error generating PDF for Task ID {taskId}: {ex.Message}");
         //        throw;
         //    }
-           
+
         //}
     }
 }

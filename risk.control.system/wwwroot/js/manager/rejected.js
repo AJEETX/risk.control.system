@@ -230,7 +230,7 @@
 
         showSpinnerOnButton(element, "Detail");
 
-        const editUrl = `/Manager/RejectDetail?Id=${encodeURIComponent(id)}`;
+        const editUrl = `/Manager/RejectDetail/${encodeURIComponent(id)}`;
 
         setTimeout(() => {
             window.location.href = editUrl;

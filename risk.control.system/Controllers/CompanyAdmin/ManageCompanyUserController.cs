@@ -61,7 +61,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             return View();
         }
 
-        [Breadcrumb("Add User")]
+        [Breadcrumb("Add User", FromAction = nameof(Users))]
         public async Task<IActionResult> Create()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
@@ -189,7 +189,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             return RedirectToAction(nameof(Users), ControllerName<ManageCompanyUserController>.Name);
         }
 
-        [Breadcrumb("Edit User", FromAction = "Users")]
+        [Breadcrumb("Edit User", FromAction = nameof(Users))]
         public async Task<IActionResult> Edit(long? id)
         {
             try

@@ -232,7 +232,7 @@
 
         showSpinnerOnButton(element, "Detail");
 
-        const editUrl = `/Manager/ApprovedDetail?Id=${encodeURIComponent(id)}`;
+        const editUrl = `/Manager/ApprovedDetail/${encodeURIComponent(id)}`;
 
         setTimeout(() => {
             window.location.href = editUrl;

@@ -63,13 +63,13 @@ namespace risk.control.system.Controllers.AgencyAdmin
                 if (vendorUser == null)
                 {
                     notifyService.Error("User Not found !!!..Contact Admin");
-                    return RedirectToAction(nameof(Users), "AgencyUser");
+                    return RedirectToAction(nameof(Users));
                 }
                 var vendor = await _context.Vendor.AsNoTracking().Include(v => v.Country).FirstOrDefaultAsync(v => v.VendorId == vendorUser.VendorId);
                 if (vendor == null)
                 {
                     notifyService.Custom($"No agency not found.", 3, "red", "fas fa-building");
-                    return RedirectToAction(nameof(Users), "AgencyUser");
+                    return RedirectToAction(nameof(Users));
                 }
                 var availableRoles = RoleGroups.AgencyAppRoles
                 .Where(r => r != AppRoles.AGENCY_ADMIN) // Exclude MANAGER if already taken
@@ -95,7 +95,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
             {
                 logger.LogError(ex, "Error getting Agency for {UserEmail}", userEmail ?? "Anonymous");
                 notifyService.Error("OOPS !!!..Error creating user. Try again.");
-                return RedirectToAction(nameof(Users), "AgencyUser");
+                return RedirectToAction(nameof(Users));
             }
         }
 
@@ -157,7 +157,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
                 logger.LogError(ex, "Error getting Agency {Id} user. {UserEmail}", vendorId, userEmail ?? "Anonymous");
                 notifyService.Error("OOPS !!!..Error Creating User. Try again.");
             }
-            return RedirectToAction(nameof(Users), "AgencyUser");
+            return RedirectToAction(nameof(Users));
         }
 
         [Breadcrumb("Edit User", FromAction = "Users")]
@@ -169,14 +169,14 @@ namespace risk.control.system.Controllers.AgencyAdmin
                 if (id == null || id <= 0)
                 {
                     notifyService.Error("User not found!!!..Contact Admin");
-                    return RedirectToAction(nameof(Users), "AgencyUser");
+                    return RedirectToAction(nameof(Users));
                 }
 
                 var user = await _context.ApplicationUser.AsNoTracking().Include(u => u.Country).Include(u => u.Vendor).FirstOrDefaultAsync(c => c.Id == id);
                 if (user == null)
                 {
                     notifyService.Error("User not found!!!..Contact Admin");
-                    return RedirectToAction(nameof(Users), "AgencyUser");
+                    return RedirectToAction(nameof(Users));
                 }
                 user.IsPasswordChangeRequired = await featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION) ? !user.IsPasswordChangeRequired : true;
 
@@ -187,7 +187,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
                 logger.LogError(ex, "Error getting AgencyUser {Id}. {UserEmail}", id, userEmail ?? "Anonymous");
             }
             notifyService.Error("OOPs !!!.Error creating User. Try again");
-            return RedirectToAction(nameof(Users), "AgencyUser");
+            return RedirectToAction(nameof(Users));
         }
 
         [HttpPost]
@@ -225,7 +225,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
                 logger.LogError(ex, "Error getting AgencyUser {Id}. {UserEmail}", id, userEmail ?? "Anonymous");
                 notifyService.Error("OOPS !!!..Error editing User. Try again.");
             }
-            return RedirectToAction(nameof(Users), "AgencyUser");
+            return RedirectToAction(nameof(Users));
         }
 
         [Breadcrumb(title: " Delete", FromAction = "Users")]
@@ -237,13 +237,13 @@ namespace risk.control.system.Controllers.AgencyAdmin
                 if (id < 1)
                 {
                     notifyService.Error("OOPS!!!.Invalid Data.Try Again");
-                    return RedirectToAction(nameof(Users), "AgencyUser");
+                    return RedirectToAction(nameof(Users));
                 }
                 var model = await _context.ApplicationUser.AsNoTracking().Include(v => v.Country).Include(v => v.State).Include(v => v.District).Include(v => v.PinCode).FirstOrDefaultAsync(c => c.Id == id);
                 if (model == null)
                 {
                     notifyService.Error("OOPS!!!.User Not Found.Try Again");
-                    return RedirectToAction(nameof(Users), "AgencyUser");
+                    return RedirectToAction(nameof(Users));
                 }
 
                 var agencySubStatuses = new[] {
@@ -261,7 +261,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
             {
                 logger.LogError(ex, "Error getting AgencyUser {UserId} for {UserEmail}", id, userEmail ?? "Anonymous");
                 notifyService.Error("OOPS!!!..Error deleting user. Try again");
-                return RedirectToAction(nameof(Users), "AgencyUser");
+                return RedirectToAction(nameof(Users));
             }
         }
 
@@ -275,13 +275,13 @@ namespace risk.control.system.Controllers.AgencyAdmin
                 if (string.IsNullOrWhiteSpace(email))
                 {
                     notifyService.Error("User Not Found!!!..Try again");
-                    return RedirectToAction(nameof(Users), "AgencyUser");
+                    return RedirectToAction(nameof(Users));
                 }
                 var model = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == email);
                 if (model == null)
                 {
                     notifyService.Error("User Not Found!!!..Try again");
-                    return RedirectToAction(nameof(Users), "AgencyUser");
+                    return RedirectToAction(nameof(Users));
                 }
 
                 model.Updated = DateTime.UtcNow;
@@ -296,7 +296,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
             {
                 logger.LogError(ex, "Error deleting AgencyUser {email}. {UserEmail}", email, userEmail);
                 notifyService.Error("OOPS!!!..Error deleting user. Try again");
-                return RedirectToAction(nameof(Users), "AgencyUser");
+                return RedirectToAction(nameof(Users));
             }
         }
     }

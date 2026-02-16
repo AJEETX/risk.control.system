@@ -9,7 +9,7 @@ using SmartBreadcrumbs.Attributes;
 namespace risk.control.system.Controllers.Common
 {
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME},{AGENCY_ADMIN.DISPLAY_NAME},{CREATOR.DISPLAY_NAME},{ASSESSOR.DISPLAY_NAME},{MANAGER.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME},{AGENT.DISPLAY_NAME}")]
-    [Breadcrumb(" Cases")]
+    [Breadcrumb("Cases")]
     [ApiExplorerSettings(IgnoreApi = true)]
     public class DocumentController : Controller
     {

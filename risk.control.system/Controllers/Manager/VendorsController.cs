@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using risk.control.system.AppConstant;
+using risk.control.system.Controllers.Common;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Services.Agency;
@@ -45,10 +46,18 @@ namespace risk.control.system.Controllers.Manager
         [Breadcrumb(" Add Agency")]
         public async Task<IActionResult> Create()
         {
-            var currentUserEmail = HttpContext.User?.Identity?.Name;
-            var companyUser = await _context.ApplicationUser.Include(c => c.Country).Include(c => c.ClientCompany).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
-            var vendor = new Vendor { CountryId = companyUser.ClientCompany.CountryId, Country = companyUser.ClientCompany.Country, SelectedCountryId = companyUser.ClientCompany.CountryId.Value };
-            return View(vendor);
+            var userEmail = HttpContext.User?.Identity?.Name;
+            try
+            {
+                var companyUser = await _context.ApplicationUser.Include(c => c.Country).Include(c => c.ClientCompany).FirstOrDefaultAsync(c => c.Email == userEmail);
+                var vendor = new Vendor { CountryId = companyUser.ClientCompany.CountryId, Country = companyUser.ClientCompany.Country, SelectedCountryId = companyUser.ClientCompany.CountryId.Value };
+                return View(vendor);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error loading Create Agency for {UserEmail}.", userEmail);
+                return this.RedirectToAction<DashboardController>(x => x.Index());
+            }
         }
 
         [HttpPost]
