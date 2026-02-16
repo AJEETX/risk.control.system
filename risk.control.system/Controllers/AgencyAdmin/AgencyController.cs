@@ -42,7 +42,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
             return RedirectToAction(nameof(Profile));
         }
 
-        [Breadcrumb("Agency Profile ", FromAction = "Index")]
+        [Breadcrumb("Agency Profile ", FromAction = nameof(Index))]
         public async Task<IActionResult> Profile()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
@@ -74,7 +74,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
             }
         }
 
-        [Breadcrumb("Edit Agency", FromAction = "Profile")]
+        [Breadcrumb("Edit Agency", FromAction = nameof(Profile))]
         public async Task<IActionResult> Edit()
         {
             var userEmail = HttpContext.User?.Identity?.Name;

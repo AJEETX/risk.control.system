@@ -11,7 +11,7 @@ using SmartBreadcrumbs.Attributes;
 
 namespace risk.control.system.Controllers.Agency
 {
-    [Breadcrumb(" Cases")]
+    [Breadcrumb("Cases")]
     [Authorize(Roles = AGENT.DISPLAY_NAME)]
     public class AgentController : Controller
     {
@@ -31,13 +31,13 @@ namespace risk.control.system.Controllers.Agency
             return RedirectToAction(nameof(Agent));
         }
 
-        [Breadcrumb(" Tasks")]
+        [Breadcrumb("Tasks")]
         public IActionResult Agent()
         {
             return View();
         }
 
-        [Breadcrumb("Submit", FromAction = "Agent")]
+        [Breadcrumb("Submit", FromAction = nameof(Agent))]
         public async Task<IActionResult> GetInvestigate(long selectedcase, bool uploaded = false)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
@@ -50,7 +50,6 @@ namespace risk.control.system.Controllers.Agency
                 }
 
                 var model = await agentCaseDetailService.GetInvestigate(userEmail, selectedcase, uploaded);
-                ViewData["Currency"] = CustomExtensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 return View(model);
             }
@@ -62,13 +61,13 @@ namespace risk.control.system.Controllers.Agency
             }
         }
 
-        [Breadcrumb(title: " Submitted")]
+        [Breadcrumb(title: "Submitted")]
         public IActionResult Submitted()
         {
             return View();
         }
 
-        [Breadcrumb(title: " Detail", FromAction = "Submitted")]
+        [Breadcrumb(title: "Detail", FromAction = nameof(Submitted))]
         public async Task<IActionResult> SubmittedDetail(long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
@@ -80,7 +79,6 @@ namespace risk.control.system.Controllers.Agency
             try
             {
                 var model = await agentCaseDetailService.GetInvestigatedForAgent(userEmail, id);
-                ViewData["Currency"] = CustomExtensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 return View(model);
             }

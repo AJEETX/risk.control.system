@@ -200,7 +200,7 @@
 
         showSpinnerOnButton(element, "Detail");
 
-        const url = `/VendorInvestigation/Detail?Id=${encodeURIComponent(id)}`;
+        const url = `/VendorInvestigation/Detail/${encodeURIComponent(id)}`;
 
         setTimeout(() => {
             window.location.href = url;

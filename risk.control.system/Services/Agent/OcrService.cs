@@ -5,7 +5,7 @@ namespace risk.control.system.Services.Agent;
 
 public interface IOcrService
 {
-    Task<List<Block>> ExtractTextDataAsync(byte[] bytes);
+    Task<string> ExtractTextDataAsync(byte[] bytes);
 }
 
 public class OcrService : IOcrService
@@ -19,7 +19,7 @@ public class OcrService : IOcrService
         this.amazonTextract = amazonTextract;
     }
 
-    public async Task<List<Block>> ExtractTextDataAsync(byte[] bytes)
+    public async Task<string> ExtractTextDataAsync(byte[] bytes)
     {
         try
         {
@@ -29,7 +29,9 @@ public class OcrService : IOcrService
             };
 
             var response = await amazonTextract.DetectDocumentTextAsync(request);
-            return response.Blocks;
+            var lineTexts = response.Blocks.Where(b => b.BlockType == BlockType.LINE).Select(b => b.Text);
+            var ocrText = string.Join(Environment.NewLine, lineTexts);
+            return ocrText;
         }
         catch (Exception ex)
         {

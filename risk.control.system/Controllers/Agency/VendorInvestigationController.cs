@@ -7,30 +7,33 @@ using risk.control.system.AppConstant;
 using risk.control.system.Controllers.Common;
 using risk.control.system.Helpers;
 using risk.control.system.Services.Agency;
+using risk.control.system.Services.Common;
 using risk.control.system.Services.Report;
 using SmartBreadcrumbs.Attributes;
-using SmartBreadcrumbs.Nodes;
 
 namespace risk.control.system.Controllers.Agency
 {
-    [Breadcrumb(" Cases")]
+    [Breadcrumb("Cases")]
     [Authorize(Roles = $"{AGENCY_ADMIN.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME}")]
     public class VendorInvestigationController : Controller
     {
         private readonly INotyfService notifyService;
         private readonly IInvoiceService invoiceService;
+        private readonly INavigationService navigationService;
         private readonly IAgencyInvestigationDetailService vendorInvestigationDetailService;
         private readonly ILogger<VendorInvestigationController> logger;
         private readonly ICaseReportService vendorService;
 
         public VendorInvestigationController(INotyfService notifyService,
             IInvoiceService invoiceService,
+            INavigationService navigationService,
             IAgencyInvestigationDetailService vendorInvestigationDetailService,
             ILogger<VendorInvestigationController> logger,
             ICaseReportService vendorService)
         {
             this.notifyService = notifyService;
             this.invoiceService = invoiceService;
+            this.navigationService = navigationService;
             this.vendorInvestigationDetailService = vendorInvestigationDetailService;
             this.logger = logger;
             this.vendorService = vendorService;
@@ -48,52 +51,50 @@ namespace risk.control.system.Controllers.Agency
         }
 
         [HttpGet]
-        [Breadcrumb("Agents", FromAction = "Allocate")]
-        public async Task<IActionResult> SelectVendorAgent(long selectedcase)
+        [Breadcrumb("Agents", FromAction = nameof(Allocate))]
+        public async Task<IActionResult> SelectVendorAgent(long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             try
             {
-                if (!ModelState.IsValid || selectedcase < 1)
+                if (!ModelState.IsValid || id < 1)
                 {
                     notifyService.Error("No case selected!!!. Please select case to be allocate.");
-                    return RedirectToAction(nameof(SelectVendorAgent), new { selectedcase = selectedcase });
+                    return RedirectToAction(nameof(SelectVendorAgent), new { id = id });
                 }
 
-                var model = await vendorInvestigationDetailService.SelectVendorAgent(userEmail, selectedcase);
-                ViewData["Currency"] = CustomExtensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
+                var model = await vendorInvestigationDetailService.SelectVendorAgent(userEmail, id);
 
                 return View(model);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred for {SelectedCase} for {UserEmail}.", selectedcase, userEmail ?? "Anonymous");
+                logger.LogError(ex, "Error occurred for {SelectedCase} for {UserEmail}.", id, userEmail ?? "Anonymous");
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
 
         [HttpGet]
-        [Breadcrumb("Re-Allocate", FromAction = "CaseReport")]
-        public async Task<IActionResult> ReSelectVendorAgent(long selectedcase)
+        [Breadcrumb("Re-Allocate", FromAction = nameof(CaseReport))]
+        public async Task<IActionResult> ReSelectVendorAgent(long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             try
             {
-                if (!ModelState.IsValid || selectedcase < 1)
+                if (!ModelState.IsValid || id < 1)
                 {
                     notifyService.Error("No case selected!!!. Please select case to be allocate.");
-                    return RedirectToAction(nameof(SelectVendorAgent), new { selectedcase = selectedcase });
+                    return RedirectToAction(nameof(SelectVendorAgent), new { id = id });
                 }
 
-                var model = await vendorInvestigationDetailService.SelectVendorAgent(userEmail, selectedcase);
-                ViewData["Currency"] = CustomExtensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
+                var model = await vendorInvestigationDetailService.SelectVendorAgent(userEmail, id);
 
                 return View(model);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred for {SelectedCase} for {UserEmail}.", selectedcase, userEmail ?? "Anonymous");
+                logger.LogError(ex, "Error occurred for {SelectedCase} for {UserEmail}.", id, userEmail ?? "Anonymous");
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return this.RedirectToAction<DashboardController>(x => x.Index());
             }
@@ -105,38 +106,37 @@ namespace risk.control.system.Controllers.Agency
             return View();
         }
 
-        [Breadcrumb("Submit", FromAction = "CaseReport")]
-        public async Task<IActionResult> GetInvestigateReport(long selectedcase)
+        [Breadcrumb("Submit", FromAction = nameof(CaseReport))]
+        public async Task<IActionResult> GetInvestigateReport(long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             try
             {
-                if (!ModelState.IsValid || selectedcase < 1)
+                if (!ModelState.IsValid || id < 1)
                 {
                     notifyService.Error("No case selected!!!. Please select case.");
                     return RedirectToAction(nameof(CaseReport));
                 }
 
-                var model = await vendorService.GetInvestigateReport(userEmail, selectedcase);
-                ViewData["Currency"] = CustomExtensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
+                var model = await vendorService.GetInvestigateReport(userEmail, id);
 
                 return View(model);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred for {SelectedCase} for {UserEmail}.", selectedcase, userEmail ?? "Anonymous");
+                logger.LogError(ex, "Error occurred for {SelectedCase} for {UserEmail}.", id, userEmail ?? "Anonymous");
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
 
-        [Breadcrumb(" Active")]
+        [Breadcrumb("Active")]
         public IActionResult Open()
         {
             return View();
         }
 
-        [Breadcrumb(title: " Details", FromAction = "Allocate")]
+        [Breadcrumb(title: "Details", FromAction = nameof(Allocate))]
         public async Task<IActionResult> CaseDetail(long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
@@ -145,11 +145,10 @@ namespace risk.control.system.Controllers.Agency
                 if (!ModelState.IsValid || id < 1)
                 {
                     notifyService.Error("NOT FOUND !!!..");
-                    return this.RedirectToAction<DashboardController>(x => x.Index());
+                    return RedirectToAction(nameof(Allocate));
                 }
 
                 var model = await vendorInvestigationDetailService.GetClaimDetails(userEmail, id);
-                ViewData["Currency"] = CustomExtensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
                 return View(model);
             }
             catch (Exception ex)
@@ -160,7 +159,7 @@ namespace risk.control.system.Controllers.Agency
             }
         }
 
-        [Breadcrumb(title: " Details", FromAction = "Open")]
+        [Breadcrumb(title: "Details", FromAction = nameof(Open))]
         public async Task<IActionResult> Detail(long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
@@ -169,11 +168,10 @@ namespace risk.control.system.Controllers.Agency
                 if (!ModelState.IsValid || id < 1)
                 {
                     notifyService.Error("NOT FOUND !!!..");
-                    return this.RedirectToAction<DashboardController>(x => x.Index());
+                    return RedirectToAction(nameof(Open));
                 }
 
                 var model = await vendorInvestigationDetailService.GetClaimDetails(userEmail, id);
-                ViewData["Currency"] = CustomExtensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
                 return View(model);
             }
             catch (Exception ex)
@@ -190,19 +188,18 @@ namespace risk.control.system.Controllers.Agency
             return View();
         }
 
-        [Breadcrumb(" Details", FromAction = "Completed")]
+        [Breadcrumb("Details", FromAction = nameof(Completed))]
         public async Task<IActionResult> CompletedDetail(long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             if (!ModelState.IsValid || id < 1)
             {
                 notifyService.Error("NOT FOUND !!!..");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return RedirectToAction(nameof(Completed));
             }
             try
             {
                 var model = await vendorInvestigationDetailService.GetClaimDetailsReport(userEmail, id);
-                ViewData["Currency"] = CustomExtensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 return View(model);
             }
@@ -214,7 +211,7 @@ namespace risk.control.system.Controllers.Agency
             }
         }
 
-        [Breadcrumb(" Reply Enquiry", FromAction = "Allocate")]
+        [Breadcrumb("Reply Enquiry", FromAction = nameof(Allocate))]
         public async Task<IActionResult> ReplyEnquiry(long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
@@ -222,17 +219,13 @@ namespace risk.control.system.Controllers.Agency
             if (!ModelState.IsValid || id < 1)
             {
                 notifyService.Error("NOT FOUND !!!..");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return RedirectToAction(nameof(Allocate));
             }
             var model = await vendorService.GetInvestigateReport(userEmail, id);
-            ViewData["Currency"] = CustomExtensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
-
-            ViewData["claimId"] = id;
 
             return View(model);
         }
 
-        [Breadcrumb(title: "Invoice", FromAction = "CompletedDetail")]
         public async Task<IActionResult> ShowInvoice(long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
@@ -241,16 +234,11 @@ namespace risk.control.system.Controllers.Agency
                 if (!ModelState.IsValid || id < 1)
                 {
                     notifyService.Error("NOT FOUND !!!..");
-                    return this.RedirectToAction<DashboardController>(x => x.Index());
+                    return RedirectToAction(nameof(Completed));
                 }
                 var invoice = await invoiceService.GetInvoice(id);
-                ViewData["Currency"] = CustomExtensions.GetCultureByCountry(invoice.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
-                var claimsPage = new MvcBreadcrumbNode("Allocate", "SuperVisor", "Cases");
-                var agencyPage = new MvcBreadcrumbNode("Completed", "SuperVisor", "Completed") { Parent = claimsPage, };
-                var detailsPage = new MvcBreadcrumbNode("CompletedDetail", "SuperVisor", $"Details") { Parent = agencyPage, RouteValues = new { id = invoice.ClaimId } };
-                var editPage = new MvcBreadcrumbNode("ShowInvoice", "SuperVisor", $"Invoice") { Parent = detailsPage, RouteValues = new { id = id } };
-                ViewData["BreadcrumbNode"] = editPage;
+                ViewData["BreadcrumbNode"] = navigationService.GetInvoiceBreadcrumb(id, invoice.CaseId.Value, "VendorInvestigation", "VendorInvestigation", "Cases", "Approved", "Approved", "CompletedDetail");
 
                 return View(invoice);
             }
@@ -262,7 +250,6 @@ namespace risk.control.system.Controllers.Agency
             }
         }
 
-        [Breadcrumb(title: "Print", FromAction = "ShowInvoice")]
         public async Task<IActionResult> PrintInvoice(long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
@@ -275,7 +262,6 @@ namespace risk.control.system.Controllers.Agency
                 }
 
                 var invoice = await invoiceService.GetInvoice(id);
-                ViewData["Currency"] = CustomExtensions.GetCultureByCountry(invoice.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 return View(invoice);
             }

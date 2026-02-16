@@ -76,10 +76,6 @@ namespace risk.control.system.Controllers.Common
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userEmail))
-            {
-                return Unauthorized("User not authenticated.");
-            }
             try
             {
                 InsuranceType type;
@@ -138,10 +134,6 @@ namespace risk.control.system.Controllers.Common
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userEmail))
-            {
-                return Unauthorized("User not authenticated.");
-            }
             try
             {
                 var allCountries = context.Country.AsNoTracking().ToList();
@@ -183,10 +175,6 @@ namespace risk.control.system.Controllers.Common
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userEmail))
-            {
-                return Unauthorized("User not authenticated.");
-            }
             try
             {
                 if (string.IsNullOrEmpty(term?.Trim()))
@@ -218,10 +206,6 @@ namespace risk.control.system.Controllers.Common
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userEmail))
-            {
-                return Unauthorized("User not authenticated.");
-            }
             try
             {
                 var districts = string.IsNullOrEmpty(term?.Trim())
@@ -274,10 +258,6 @@ namespace risk.control.system.Controllers.Common
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userEmail))
-            {
-                return Unauthorized("User not authenticated.");
-            }
             try
             {
                 var country = context.Country.AsNoTracking().Where(x => x.CountryId == id).OrderBy(x => x.Name).Take(10) // Filter based on user input
@@ -297,10 +277,6 @@ namespace risk.control.system.Controllers.Common
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userEmail))
-            {
-                return Unauthorized("User not authenticated.");
-            }
             try
             {
                 var state = context.State.AsNoTracking().Where(x => x.StateId == id && x.CountryId == countryId).OrderBy(x => x.Name).Take(10) // Filter based on user input
@@ -320,10 +296,6 @@ namespace risk.control.system.Controllers.Common
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userEmail))
-            {
-                return Unauthorized("User not authenticated.");
-            }
             try
             {
                 var states = context.State.AsNoTracking()
@@ -353,10 +325,6 @@ namespace risk.control.system.Controllers.Common
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userEmail))
-            {
-                return Unauthorized("User not authenticated.");
-            }
             try
             {
                 if (id == -1)
@@ -385,10 +353,6 @@ namespace risk.control.system.Controllers.Common
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userEmail))
-            {
-                return Unauthorized("User not authenticated.");
-            }
             try
             {
                 var districts = context.District.AsNoTracking().Where(x => x.StateId == stateId && x.CountryId == countryId).OrderBy(x => x.Name)//.Take(10) // Filter based on user input
@@ -416,15 +380,11 @@ namespace risk.control.system.Controllers.Common
         [HttpGet("GetPincode")]
         public IActionResult GetPincode(long id, long countryId)
         {
-            var userClaim = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userClaim) || string.IsNullOrEmpty(userEmail))
-            {
-                return Unauthorized("User not authenticated.");
-            }
             try
             {
+                var userClaim = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
                 var pincode = context.PinCode.AsNoTracking().FirstOrDefault(x => x.PinCodeId == id && x.CountryId == countryId); // Format for jQuery UI Autocomplete
 
                 var response = new
@@ -448,10 +408,6 @@ namespace risk.control.system.Controllers.Common
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userEmail))
-            {
-                return Unauthorized("User not authenticated.");
-            }
             try
             {
                 // Check if the term is empty or null
@@ -544,10 +500,6 @@ namespace risk.control.system.Controllers.Common
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userEmail))
-            {
-                return Unauthorized("User not authenticated.");
-            }
             try
             {
                 var allCountries = context.Country.AsNoTracking().ToList();
@@ -673,10 +625,6 @@ namespace risk.control.system.Controllers.Common
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userEmail))
-            {
-                return Unauthorized("User not authenticated.");
-            }
             try
             {
                 if (string.IsNullOrWhiteSpace(phone))
@@ -719,10 +667,6 @@ namespace risk.control.system.Controllers.Common
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userEmail))
-            {
-                return Unauthorized("User not authenticated.");
-            }
             try
             {
                 if (string.IsNullOrWhiteSpace(phone))
@@ -757,10 +701,6 @@ namespace risk.control.system.Controllers.Common
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userEmail))
-            {
-                return Unauthorized("User not authenticated.");
-            }
             try
             {
                 var bsbDetail = context.BsbInfo.AsNoTracking().FirstOrDefault(b => b.BSB == code);

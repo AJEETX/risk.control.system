@@ -25,10 +25,6 @@ namespace risk.control.system.Controllers.Agent
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userEmail))
-            {
-                return Unauthorized("User not authenticated.");
-            }
             try
             {
                 var response = await agentService.GetNewCases(userEmail);
@@ -46,10 +42,6 @@ namespace risk.control.system.Controllers.Agent
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userEmail))
-            {
-                return Unauthorized("User not authenticated.");
-            }
             try
             {
                 var response = await agentService.GetSubmittedCases(userEmail);

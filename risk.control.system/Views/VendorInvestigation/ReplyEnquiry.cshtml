@@ -1,11 +1,11 @@
 ﻿@model CaseInvestigationVendorsModel
 
 @{
-	ViewData["Title"] = " Send Enquiry";
+	ViewData["Title"] = " Reply Enquiry";
 }
 <section class="content">
 	<form id="query-form" method="post" asp-controller="AgencyQuery" asp-action="ReplyQuery" enctype="multipart/form-data" autocomplete="off">
-		<input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.Id" />
+		<input type="hidden" id="claimId" name="claimId" value="@Model.CaseTask.Id" />
 		<div id="article" class="shadow-lg border-1 rounded-lg">
 			<div class="card-header bg-secondary text-white text-center">
 				<h3 class="card-title">
@@ -15,7 +15,7 @@
 						<span class="tooltip-text" id="information">
 
 							<li>
-								<i class='far fa-hand-point-right'></i> <i class="far fa-file-powerpoint"></i> Policy: @Model.ClaimsInvestigation?.PolicyDetail?.ContractNumber
+								<i class='far fa-hand-point-right'></i> <i class="far fa-file-powerpoint"></i> Policy: @Model.CaseTask?.PolicyDetail?.ContractNumber
 							</li>
 							<li>
 

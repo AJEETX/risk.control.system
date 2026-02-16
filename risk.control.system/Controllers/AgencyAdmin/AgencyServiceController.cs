@@ -107,7 +107,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
             return RedirectToAction(nameof(Service));
         }
 
-        [Breadcrumb("Edit Service", FromAction = "Service")]
+        [Breadcrumb("Edit Service", FromAction = nameof(Service))]
         public async Task<IActionResult> Edit(long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name;

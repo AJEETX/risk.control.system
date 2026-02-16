@@ -58,11 +58,11 @@ namespace risk.control.system.Services.Creator
 
             return new CaseInvestigationVendorsModel
             {
-                Location = beneficiary,
+                Beneficiary = beneficiary,
                 Currency = CustomExtensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol,
                 VendorId = vendorId,
                 FromEditPage = fromEditPage,
-                ClaimsInvestigation = caseTask
+                CaseTask = caseTask
             };
         }
 

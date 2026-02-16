@@ -1,6 +1,4 @@
-﻿using System.Security.Claims;
-
-using AspNetCoreHero.ToastNotification.Abstractions;
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
 
 using Hangfire;
 
@@ -19,7 +17,7 @@ using SmartBreadcrumbs.Attributes;
 namespace risk.control.system.Controllers.Creator
 {
     [Authorize(Roles = $"{CREATOR.DISPLAY_NAME}")]
-    [Breadcrumb(" Cases")]
+    [Breadcrumb("Cases")]
     public class CaseActiveController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -43,38 +41,7 @@ namespace risk.control.system.Controllers.Creator
 
         public IActionResult Index()
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
-            if (string.IsNullOrWhiteSpace(userEmail))
-            {
-                notifyService.Error("UnAuthenticated User");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
-            }
-            try
-            {
-                var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
-                if (userRole.Value.Contains(CREATOR.DISPLAY_NAME))
-                {
-                    return RedirectToAction("Active");
-                }
-                else if (userRole.Value.Contains(ASSESSOR.DISPLAY_NAME))
-                {
-                    return RedirectToAction("Assessor");
-                }
-                else if (userRole.Value.Contains(MANAGER.DISPLAY_NAME))
-                {
-                    return RedirectToAction("Manager");
-                }
-                else
-                {
-                    return RedirectToAction("Index", "Dashboard");
-                }
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Error occurred getting active case(s). {UserEmail}", userEmail);
-                notifyService.Error("OOPs !!!..Contact Admin");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
-            }
+            return RedirectToAction(nameof(Active));
         }
 
         [HttpGet]
@@ -112,7 +79,7 @@ namespace risk.control.system.Controllers.Creator
             }
         }
 
-        [Breadcrumb(title: " Details", FromAction = "Active")]
+        [Breadcrumb(title: " Details", FromAction = nameof(Active))]
         public async Task<IActionResult> ActiveDetail(long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name;

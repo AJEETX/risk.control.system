@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using risk.control.system.AppConstant;
 using risk.control.system.Controllers.Api.PortalAdmin;
-using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Services.Api;
 using SmartBreadcrumbs.Attributes;
@@ -43,11 +42,7 @@ namespace risk.control.system.Controllers.Common
         public async Task<IActionResult> Index()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
-            if (string.IsNullOrWhiteSpace(userEmail))
-            {
-                notifyService.Error("NOT FOUND!!!..Contact Admin");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
-            }
+
             try
             {
                 var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;

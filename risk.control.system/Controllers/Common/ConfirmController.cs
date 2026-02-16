@@ -25,10 +25,7 @@ namespace risk.control.system.Controllers.Common
         public async Task<IActionResult> Sms2Customer(SmsModel model)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
-            if (string.IsNullOrWhiteSpace(userEmail))
-            {
-                return Unauthorized("Unauthorized Error !!!");
-            }
+
             try
             {
                 var customerName = await _notificationService.SendSms2Customer(userEmail, model.CaseId, model.Message);
@@ -51,10 +48,7 @@ namespace risk.control.system.Controllers.Common
         public async Task<IActionResult> Sms2Beneficiary(SmsModel model)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
-            if (string.IsNullOrWhiteSpace(userEmail))
-            {
-                return Unauthorized("Unauthorized Error !!!");
-            }
+
             try
             {
                 var beneficiaryName = await _notificationService.SendSms2Beneficiary(userEmail, model.CaseId, model.Message);
@@ -76,10 +70,6 @@ namespace risk.control.system.Controllers.Common
         public async Task<IActionResult> AddNotes(SmsModel model)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
-            if (string.IsNullOrWhiteSpace(userEmail))
-            {
-                return Unauthorized("Unauthorized Error !!!");
-            }
 
             try
             {

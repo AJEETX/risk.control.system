@@ -3,6 +3,7 @@ using Hangfire;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using risk.control.system.AppConstant;
+using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services.Creator;
@@ -46,41 +47,31 @@ namespace risk.control.system.Controllers.Creator
             var currentUserEmail = HttpContext.User?.Identity?.Name;
             try
             {
-                if (!ModelState.IsValid)
+                if (!ModelState.IsValid || Path.GetExtension(Path.GetFileName(postedFile.FileName)) != ".zip")
                 {
                     notifyService.Custom($"Invalid File Upload Error. ", 3, "red", "far fa-file-powerpoint");
-                    return RedirectToAction(nameof(CaseUploadController.Uploads), "CaseUpload");
-                }
-                if (postedFile == null || model == null ||
-                string.IsNullOrWhiteSpace(Path.GetFileName(postedFile.FileName)) ||
-                string.IsNullOrWhiteSpace(Path.GetExtension(Path.GetFileName(postedFile.FileName))) ||
-                Path.GetExtension(Path.GetFileName(postedFile.FileName)) != ".zip"
-                )
-                {
-                    notifyService.Custom($"Invalid File Upload Error. ", 3, "red", "far fa-file-powerpoint");
-                    return RedirectToAction(nameof(CaseUploadController.Uploads), "CaseUpload");
+                    return RedirectToAction(nameof(CaseUploadController.Uploads), ControllerName<CaseUploadController>.Name);
                 }
 
                 var uploadId = await zipFileService.Save(currentUserEmail, postedFile, CREATEDBY.AUTO, model.UploadAndAssign);
-                logger.LogInformation("Hangfire Job Enqueued. JobId = {JobId}", uploadId);
                 var jobId = backgroundJobClient.Enqueue<IUploadZipFileService>(service => service.StartFileUpload(currentUserEmail, uploadId, baseUrl, model.UploadAndAssign));
 
                 if (!model.UploadAndAssign)
                 {
-                    notifyService.Custom($"Uploading ...", 3, "#17A2B8", "fa fa-upload");
+                    notifyService.Custom($"Uploading ...", 2, "#17A2B8", "fa fa-upload");
                 }
                 else
                 {
-                    notifyService.Custom($"Assigning ...", 5, "#dc3545", "fa fa-upload");
+                    notifyService.Custom($"Assigning ...", 2, "#dc3545", "fa fa-upload");
                 }
 
-                return RedirectToAction(nameof(CaseUploadController.Uploads), "CaseUpload", new { uploadId = uploadId });
+                return RedirectToAction(nameof(CaseUploadController.Uploads), ControllerName<CaseUploadController>.Name, new { uploadId = uploadId });
             }
             catch (Exception ex)
             {
                 logger.LogError(ex, "File Upload Error for {User}", currentUserEmail);
                 notifyService.Custom($"File Upload Error.", 3, "red", "fa fa-upload");
-                return RedirectToAction(nameof(CaseUploadController.Uploads), "CaseUpload");
+                return RedirectToAction(nameof(CaseUploadController.Uploads), ControllerName<CaseUploadController>.Name);
             }
         }
     }

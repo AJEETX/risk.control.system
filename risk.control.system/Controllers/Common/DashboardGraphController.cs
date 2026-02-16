@@ -24,11 +24,6 @@ namespace risk.control.system.Controllers.Common
         public async Task<JsonResult> GetAgentClaim()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
-            if (string.IsNullOrEmpty(userEmail))
-            {
-                _logger.LogWarning("GetAgentClaim called with no authenticated user.");
-                return new JsonResult(null);
-            }
 
             try
             {
@@ -72,11 +67,6 @@ namespace risk.control.system.Controllers.Common
         public async Task<JsonResult> GetAgentUnderwriting()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
-            if (string.IsNullOrEmpty(userEmail))
-            {
-                _logger.LogWarning("GetAgentClaim called with no authenticated user.");
-                return new JsonResult(null);
-            }
 
             try
             {

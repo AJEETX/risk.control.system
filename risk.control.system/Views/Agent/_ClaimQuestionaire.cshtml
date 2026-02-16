@@ -14,12 +14,12 @@
             <div class="card-header text-muted border-bottom-0">
 
                 <h3 class="card-title">
-                    <i class="far fa-comment"></i> Remarks (@Model.ClaimsInvestigation?.PolicyDetail.InsuranceType.GetEnumDisplayName())
+                    <i class="far fa-comment"></i> Remarks (@Model.CaseTask?.PolicyDetail.InsuranceType.GetEnumDisplayName())
                     <span class="hover-text">
                         <i class="fas fa-info-circle"></i>
                         <span class="tooltip-text" id="information">
                             <span>
-                                <i class="fas fa-comment"></i> Fill-up Questionnaire (@Model.ClaimsInvestigation?.PolicyDetail.InsuranceType.GetEnumDisplayName())
+                                <i class="fas fa-comment"></i> Fill-up Questionnaire (@Model.CaseTask?.PolicyDetail.InsuranceType.GetEnumDisplayName())
                             </span>
                         </span>
                     </span>
@@ -38,7 +38,7 @@
                 </div>
             </div>
             <form id="create-form" asp-controller="AgencyReport" asp-action="SubmitReport" method="post">
-                <input type="hidden" name="claimId" value="@Model.ClaimsInvestigation.Id" />
+                <input type="hidden" name="claimId" value="@Model.CaseTask.Id" />
                 @Html.AntiForgeryToken()
                 <div class="card-body">
                     <div class="row">
