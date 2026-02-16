@@ -26,45 +26,46 @@
 						}
 
 						<i class='far fa-thumbs-up'></i> <b>
-							<button class='btn btn-danger btn-xs'>
-								<span class='badge badge-danger btn-xs'>
-									<i class='fas fa-undo'></i>
-								</span> <b>DECLINE</b>
-							</button>
-						</b>
-						</li>
-					</span>
-				</span>
-			</h3>
+						<button class='btn btn-danger btn-xs'>
+							<span class='badge badge-danger btn-xs'>
+								<i class='fas fa-undo'></i>
+							</span> <b>DECLINE</b>
+						</button>
+					</b>
+				</li>
+			</span>
+		</span>
+	</h3>
+</div>
+</div>
+@{
+	var data = new CaseInvestigationVendorAgentModel
+	{
+		CaseLocation = Model.Location,
+		ClaimsInvestigation = Model.ClaimsInvestigation,
+		Currency = Model.Currency
+	};
+}
+<div class="card shadow-lg border-1 rounded-lg">
+	<div class="card-body">
+		<div class="submit-progress hidden">
+			<i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
 		</div>
+		<partial name="_PolicyDetailsWithdraw" model="@data" />
 	</div>
-	@{
-		var data = new CaseInvestigationVendorsModel
-		{
-			Location = Model.Location,
-			ClaimsInvestigation = Model.ClaimsInvestigation,
-		};
-	}
-	<div class="card shadow-lg border-1 rounded-lg">
-		<div class="card-body">
-			<div class="submit-progress hidden">
-				<i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
-			</div>
-			<partial name="_PolicyDetailsWithdraw" model="@data" />
-		</div>
-		<div class="card-footer">
-			<form id="create-form" method="post" asp-action="Decline" asp-controller="DeclineCase">
-				<input type="hidden" name="claimId" asp-for="@Model.ClaimsInvestigation.Id" />
-				<input type="hidden" name="policyNumber" asp-for="@Model.ClaimsInvestigation.PolicyDetail.ContractNumber" />
-				<div class="row">
-					<div class="col-md-12">
-						<a id="back" asp-action="Allocate" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
-						<button id="submit-case" type="submit" class="btn btn-danger"><i class="fas fa-undo"></i> DECLINE</button>
-					</div>
+	<div class="card-footer">
+		<form id="create-form" method="post" asp-action="Decline" asp-controller="DeclineCase">
+			<input type="hidden" name="claimId" asp-for="@Model.ClaimsInvestigation.Id" />
+			<input type="hidden" name="policyNumber" asp-for="@Model.ClaimsInvestigation.PolicyDetail.ContractNumber" />
+			<div class="row">
+				<div class="col-md-12">
+					<a id="back" asp-action="Allocate" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
+					<button id="submit-case" type="submit" class="btn btn-danger"><i class="fas fa-undo"></i> DECLINE</button>
 				</div>
-			</form>
-		</div>
+			</div>
+		</form>
 	</div>
+</div>
 </section>
 
 @section Scripts {

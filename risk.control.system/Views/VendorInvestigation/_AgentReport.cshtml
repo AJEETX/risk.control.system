@@ -5,7 +5,7 @@
 		<div class="card shadow-lg border-1 rounded-lg">
 			<div class="card-header bg-light text-white"
 				<h3 class="card-title">
-					<i class="fas fa-user-shield"></i> Report (@Model.ClaimsInvestigation?.PolicyDetail.InsuranceType.GetEnumDisplayName()): <span class="badge badge-light"> @Model.InvestigationReport.AgentEmail </span>
+					<i class="fas fa-user-shield"></i> Report (@Model.CaseTask?.PolicyDetail.InsuranceType.GetEnumDisplayName()): <span class="badge badge-light"> @Model.InvestigationReport.AgentEmail </span>
 					<span class="hover-text">
 						<i class="fas fa-info-circle"></i>
 						<span class="tooltip-text" id="information">
@@ -17,7 +17,7 @@
 				</h3>
 
 				<div class="card-tools">
-					<span data-bs-toggle="tooltip" title="Agent report (@Model.ClaimsInvestigation?.PolicyDetail.InsuranceType.GetEnumDisplayName()): @Model.InvestigationReport.AgentEmail" class="badge badge-light">
+					<span data-bs-toggle="tooltip" title="Agent report (@Model.CaseTask?.PolicyDetail.InsuranceType.GetEnumDisplayName()): @Model.InvestigationReport.AgentEmail" class="badge badge-light">
 						<i class='far fa-hand-point-right'></i>
 					</span>
 					<button type="button" class="btn btn-tool" data-card-widget="collapse">
@@ -33,16 +33,14 @@
 
 					@{
 						var template = Model.InvestigationReport.ReportTemplate;
-						template.CaseId = Model.ClaimsInvestigation.Id;
+						template.CaseId = Model.CaseTask.Id;
 					}
-					<input type="hidden" id="caseId" value="@Model.ClaimsInvestigation.Id" />
+					<input type="hidden" id="caseId" value="@Model.CaseTask.Id" />
 					<partial name="_Location" model="@template" />
-
 				</div>
 				<div class="row">
 					<partial name="_AgencyAgentAnswer" model="@Model" />
 					<partial name="_SupervisorRemarks" model="@Model" />
-
 				</div>
 			</div>
 		</div>

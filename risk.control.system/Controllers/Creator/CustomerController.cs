@@ -13,7 +13,7 @@ using SmartBreadcrumbs.Attributes;
 
 namespace risk.control.system.Controllers.Creator
 {
-    [Breadcrumb(" Cases")]
+    [Breadcrumb("Cases")]
     [Authorize(Roles = CREATOR.DISPLAY_NAME)]
     public class CustomerController : Controller
     {

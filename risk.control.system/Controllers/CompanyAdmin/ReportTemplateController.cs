@@ -172,7 +172,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             });
         }
 
-        [Breadcrumb(" Detail", FromAction = "Profile")]
+        [Breadcrumb(" Detail", FromAction = nameof(Profile))]
         public async Task<IActionResult> Details(long id)
         {
             var template = await context.ReportTemplates

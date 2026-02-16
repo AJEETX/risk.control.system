@@ -31,10 +31,6 @@ namespace risk.control.system.Controllers.Common
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userEmail))
-            {
-                return Unauthorized("User not authenticated.");
-            }
             try
             {
                 await notificationService.ClearAll(userEmail); ;
@@ -51,15 +47,11 @@ namespace risk.control.system.Controllers.Common
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> MarkAsRead(NotificationRequest request)
         {
-            var userClaim = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userClaim) || string.IsNullOrEmpty(userEmail))
-            {
-                return Unauthorized("User not authenticated.");
-            }
             try
             {
+                var userClaim = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
                 await notificationService.MarkAsRead(request.Id, userEmail);
                 return Ok();
             }
@@ -75,10 +67,6 @@ namespace risk.control.system.Controllers.Common
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userEmail))
-            {
-                return Unauthorized("User not authenticated.");
-            }
             try
             {
                 var notifications = await notificationService.GetNotifications(userEmail);

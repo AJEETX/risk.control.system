@@ -6,7 +6,7 @@
 <section class="content">
 	<form id="query-form" method="post" asp-controller="Enquiry" asp-action="SubmitEnquiry" enctype="multipart/form-data" autocomplete="off">
 		@Html.AntiForgeryToken()
-		<input type="hidden" name="claimId" value="@Model.ClaimsInvestigation.Id" />
+		<input type="hidden" name="claimId" value="@Model.CaseTask.Id" />
 		<div id="article" class="shadow-lg border-1 rounded-lg">
 			<div class="card-header bg-secondary text-white text-center">
 				<h3 class="card-title">
@@ -94,7 +94,7 @@
 					<div class="row">
 						<div class="col-md-12">
 							<div class="float-right">
-								<a id="back" asp-controller="Assessor" asp-action="GetInvestigateReport" asp-route-selectedcase="@Model.ClaimsInvestigation.Id" class="btn btn-secondary">
+								<a id="back" asp-controller="Assessor" asp-action="GetInvestigateReport" asp-route-id="@Model.CaseTask.Id" class="btn btn-secondary">
 									<i class="fas fa-times"></i> @Applicationsettings.CANCEL
 								</a>
 								<button id="send-query" type="submit" class="btn btn-warning">

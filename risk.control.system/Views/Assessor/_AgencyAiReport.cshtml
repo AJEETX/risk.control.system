@@ -1,72 +1,68 @@
 ﻿@model CaseInvestigationVendorsModel
 
 <div class="col-12 d-flex align-items-stretch flex-column">
-    <div class="card bg-light border-success">
-        <div class="card-header">
-            <h3 class="card-title">
-                <i class="fas fa-user-edit"></i> <span class="badge badge-light"> AI comments</span>
-                <span class="hover-text">
-                    <i class="fas fa-info-circle"></i>
-                    <span class="tooltip-text" id="information">
-                        <span>
-                            <i class="fas fa-user-shield"></i><b> AI comments</b> remark
-                        </span>
+	<div class="card bg-light border-success">
+		<div class="card-header">
+			<h3 class="card-title">
+				<i class="fas fa-user-edit"></i> <span class="badge badge-light"> AI comments</span>
+				<span class="hover-text">
+					<i class="fas fa-info-circle"></i>
+					<span class="tooltip-text" id="information">
+						<span>
+							<i class="fas fa-user-shield"></i><b> AI comments</b> remark
+						</span>
+					</span>
+				</span>
+			</h3>
+			<div class="card-tools">
+				<span data-bs-toggle="tooltip" title=" AI comments" class="badge badge-light">
+					<i class="nav-icon fas fa-clock"></i> @Model.CaseTask.InvestigationReport.AiSummaryUpdated.GetValueOrDefault().ToString("dd-MMM-yy hh:mm tt")
+				</span>
+			</div>
+		</div>
+		<div class="card-body">
+			<div class="row">
+				<div class="col-12">
+					<p class="text-muted text-sm">
 
-                    </span>
-                </span>
-            </h3>
-            <div class="card-tools">
-                <span data-bs-toggle="tooltip" title=" AI comments" class="badge badge-light">
-                    <i class="nav-icon fas fa-clock"></i> @Model.ClaimsInvestigation.InvestigationReport.AiSummaryUpdated.GetValueOrDefault().ToString("dd-MMM-yy hh:mm tt")
-                </span>
-            </div>
-
-        </div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col-12">
-                    <p class="text-muted text-sm">
-
-                        <span>AI comments: </span>
-                    </p>
-                    <table id="dataTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
-                        <thead>
-                            <tr>
-                                <th>
-                                    Time
-                                </th>
-                                <th>
-                                    AI Response
-                                </th>
-                                
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>
-                                    @{
-                                        string displayTime = string.Empty;
-                                        var time = @Model.ClaimsInvestigation.InvestigationReport?.AiSummaryUpdated;
-                                        if (time is not null)
-                                        {
-                                            displayTime = time.Value.ToString("dd-MMM-yyy HH:mm");
-                                        }
-                                        if (time == null)
-                                        {
-                                            displayTime = @Model.ClaimsInvestigation.InvestigationReport.Created.ToString("dd-MMM-yyy HH:mm");
-                                        }
-                                    }
-                                    <span class="badge badge-light">@displayTime</span>
-                                </td>
-                                <td>
-                                    @Model.ReportAiSummary
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-            </div>
-        </div>
-    </div>
+						<span>AI comments: </span>
+					</p>
+					<table id="dataTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
+						<thead>
+							<tr>
+								<th>
+									Time
+								</th>
+								<th>
+									AI Response
+								</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>
+									@{
+										string displayTime = string.Empty;
+										var time = @Model.CaseTask.InvestigationReport?.AiSummaryUpdated;
+										if (time is not null)
+										{
+											displayTime = time.Value.ToString("dd-MMM-yyy HH:mm");
+										}
+										if (time == null)
+										{
+											displayTime = @Model.CaseTask.InvestigationReport.Created.ToString("dd-MMM-yyy HH:mm");
+										}
+									}
+									<span class="badge badge-light">@displayTime</span>
+								</td>
+								<td>
+									@Model.ReportAiSummary
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>

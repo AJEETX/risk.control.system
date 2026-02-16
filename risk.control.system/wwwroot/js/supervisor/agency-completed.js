@@ -182,7 +182,7 @@
 
         showSpinnerOnButton(element, "Detail");
 
-        const editUrl = `/VendorInvestigation/CompletedDetail?Id=${encodeURIComponent(id)}`;
+        const editUrl = `/VendorInvestigation/CompletedDetail/${encodeURIComponent(id)}`;
 
         setTimeout(() => {
             window.location.href = editUrl;

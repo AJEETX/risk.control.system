@@ -70,7 +70,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             return View(income);
         }
 
-        [Breadcrumb("Add  New", FromAction = "Profile")]
+        [Breadcrumb("Add  New", FromAction = nameof(Profile))]
         public ActionResult Create()
         {
             return View();
@@ -92,7 +92,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             return View(income);
         }
 
-        [Breadcrumb("Edit ", FromAction = "Profile")]
+        [Breadcrumb("Edit ", FromAction = nameof(Profile))]
         public async Task<IActionResult> Edit(long id)
         {
             if (id < 1)

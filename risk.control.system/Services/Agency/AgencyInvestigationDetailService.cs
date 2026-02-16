@@ -53,6 +53,7 @@ namespace risk.control.system.Services.Agency
                  .Include(c => c.PolicyDetail)
                 .ThenInclude(c => c.CostCentre)
                 .Include(c => c.ClientCompany)
+                .ThenInclude(c => c.Country)
                 .Include(c => c.Vendor)
                 .Include(c => c.BeneficiaryDetail)
                 .ThenInclude(c => c.PinCode)
@@ -89,7 +90,8 @@ namespace risk.control.system.Services.Agency
                 Location = caseTask.BeneficiaryDetail,
                 Assigned = caseTask.Status == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER,
                 TimeTaken = timeTaken.ToString(@"hh\:mm\:ss") ?? "-",
-                Withdrawable = (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR)
+                Withdrawable = (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR),
+                Currency = CustomExtensions.GetCultureByCountry(caseTask.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol
             };
 
             return model;
@@ -117,6 +119,7 @@ namespace risk.control.system.Services.Agency
             {
                 CaseLocation = beneficiaryDetail,
                 ClaimsInvestigation = caseAllocate2Agent,
+                Currency = CustomExtensions.GetCultureByCountry(caseAllocate2Agent.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol
             };
             return model;
         }
@@ -234,6 +237,7 @@ namespace risk.control.system.Services.Agency
                  .Include(c => c.PolicyDetail)
                 .ThenInclude(c => c.CostCentre)
                 .Include(c => c.ClientCompany)
+                .ThenInclude(c => c.Country)
                 .Include(c => c.Vendor)
                 .Include(c => c.BeneficiaryDetail)
                 .ThenInclude(c => c.PinCode)
@@ -255,7 +259,7 @@ namespace risk.control.system.Services.Agency
                 .ThenInclude(c => c.PinCode)
                 .FirstOrDefaultAsync(m => m.Id == caseId);
 
-            var companyUser = await context.ApplicationUser.AsNoTracking().Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == currentUserEmail);
+            var companyUser = await context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(u => u.Email == currentUserEmail);
             var lastHistory = caseTask.InvestigationTimeline.OrderByDescending(h => h.StatusChangedAt).FirstOrDefault();
             var endTIme = caseTask.Status == CONSTANTS.CASE_STATUS.FINISHED ? caseTask.ProcessedByAssessorTime.GetValueOrDefault() : DateTime.UtcNow;
             var timeTaken = endTIme - caseTask.Created;
@@ -300,11 +304,11 @@ namespace risk.control.system.Services.Agency
                 CaseIsValidToAssign = caseTask.IsValidCaseData(),
                 Location = caseTask.BeneficiaryDetail,
                 Assigned = caseTask.Status == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER,
-                AutoAllocation = companyUser != null ? companyUser.ClientCompany.AutoAllocation : false,
                 TimeTaken = totalTimeTaken,
                 VendorInvoice = invoice,
                 CanDownload = canDownload,
-                Withdrawable = (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR)
+                Withdrawable = (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR),
+                Currency = CustomExtensions.GetCultureByCountry(caseTask.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol
             };
 
             return model;
@@ -322,6 +326,7 @@ namespace risk.control.system.Services.Agency
                  .Include(c => c.PolicyDetail)
                 .ThenInclude(c => c.CostCentre)
                 .Include(c => c.ClientCompany)
+                .ThenInclude(c => c.Country)
                 .Include(c => c.Vendor)
                 .Include(c => c.BeneficiaryDetail)
                 .ThenInclude(c => c.PinCode)

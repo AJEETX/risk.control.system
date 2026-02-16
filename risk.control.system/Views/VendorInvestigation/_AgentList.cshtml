@@ -35,7 +35,7 @@
 			<div class="col-md-12">
 				@if (Model.ReSelect)
 				{
-					<a id="back" asp-action="GetInvestigateReport" asp-route-selectedcase="@Model.ClaimsInvestigation.Id" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
+					<a id="back" asp-action="GetInvestigateReport" asp-route-id="@Model.ClaimsInvestigation.Id" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
 					<button disabled="disabled" id="allocatedcase" type="submit" class="btn btn-danger">
 						<i class="fas fa-external-link-alt" aria-hidden="true"></i> Re-Allocate <sub>agent</sub>
 					</button>

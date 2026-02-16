@@ -54,30 +54,30 @@ namespace risk.control.system.Controllers.Assessor
                 if (!ModelState.IsValid)
                 {
                     notifyService.Error("Bad Request..");
-                    return RedirectToAction("SendEnquiry", "Assessor", new { selectedcase = claimId });
+                    return RedirectToAction(nameof(AssessorController.SendEnquiry), ControllerName<AssessorController>.Name, new { id = claimId });
                 }
                 if (document != null && document.Length > 0)
                 {
                     if (document.Length > MAX_FILE_SIZE)
                     {
                         notifyService.Error($"Document image Size exceeds the max size: 5MB");
-                        return RedirectToAction("SendEnquiry", "Assessor", new { selectedcase = claimId });
+                        return RedirectToAction(nameof(AssessorController.SendEnquiry), ControllerName<AssessorController>.Name, new { id = claimId });
                     }
                     var ext = Path.GetExtension(document.FileName).ToLowerInvariant();
                     if (!AllowedExt.Contains(ext))
                     {
                         notifyService.Error($"Invalid Document image type");
-                        return RedirectToAction("SendEnquiry", "Assessor", new { selectedcase = claimId });
+                        return RedirectToAction(nameof(AssessorController.SendEnquiry), ControllerName<AssessorController>.Name, new { id = claimId });
                     }
                     if (!AllowedMime.Contains(document.ContentType))
                     {
                         notifyService.Error($"Invalid Document Image content type");
-                        return RedirectToAction("SendEnquiry", "Assessor", new { selectedcase = claimId });
+                        return RedirectToAction(nameof(AssessorController.SendEnquiry), ControllerName<AssessorController>.Name, new { id = claimId });
                     }
                     if (!ImageSignatureValidator.HasValidSignature(document))
                     {
                         notifyService.Error($"Invalid or corrupted Document Image ");
-                        return RedirectToAction("SendEnquiry", "Assessor", new { selectedcase = claimId });
+                        return RedirectToAction(nameof(AssessorController.SendEnquiry), ControllerName<AssessorController>.Name, new { id = claimId });
                     }
                 }
 
@@ -89,7 +89,7 @@ namespace risk.control.system.Controllers.Assessor
                     backgroundJobClient.Enqueue(() => mailService.NotifySubmitQueryToAgency(userEmail, claimId, baseUrl));
 
                     notifyService.Success("Enquiry Sent to Agency");
-                    return RedirectToAction(nameof(AssessorController.Assessor), "Assessor");
+                    return RedirectToAction(nameof(AssessorController.Assessor), ControllerName<AssessorController>.Name);
                 }
                 notifyService.Error("OOPs !!!..Error sending query");
                 return this.RedirectToAction<DashboardController>(x => x.Index());

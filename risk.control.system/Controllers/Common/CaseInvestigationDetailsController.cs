@@ -38,10 +38,6 @@ namespace risk.control.system.Controllers.Common
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userEmail))
-            {
-                return Unauthorized("User not authenticated.");
-            }
             try
             {
                 var policy = await _context.PolicyDetail
@@ -78,10 +74,6 @@ namespace risk.control.system.Controllers.Common
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userEmail))
-            {
-                return Unauthorized("User not authenticated.");
-            }
             try
             {
                 var claim = await _caseService.GetNotesOfCase(claimId);
@@ -104,10 +96,6 @@ namespace risk.control.system.Controllers.Common
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userEmail))
-            {
-                return Unauthorized("User not authenticated.");
-            }
             try
             {
                 var isAgencyUser = await _context.ApplicationUser.AnyAsync(u => u.Email == userEmail);
@@ -149,10 +137,6 @@ namespace risk.control.system.Controllers.Common
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userEmail))
-            {
-                return Unauthorized("User not authenticated.");
-            }
             try
             {
                 var beneficiary = await _context.BeneficiaryDetail
@@ -187,10 +171,6 @@ namespace risk.control.system.Controllers.Common
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userEmail))
-            {
-                return Unauthorized("User not authenticated.");
-            }
             try
             {
                 var customer = await _context.CustomerDetail
@@ -228,10 +208,6 @@ namespace risk.control.system.Controllers.Common
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userEmail))
-            {
-                return Unauthorized("User not authenticated.");
-            }
             try
             {
                 var beneficiary = await _context.BeneficiaryDetail
@@ -268,10 +244,6 @@ namespace risk.control.system.Controllers.Common
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userEmail))
-            {
-                return Unauthorized("User not authenticated.");
-            }
             try
             {
                 var claim = await _caseService.GetCaseDetailForAgentDetail(caseId);
@@ -339,10 +311,6 @@ namespace risk.control.system.Controllers.Common
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userEmail))
-            {
-                return Unauthorized("User not authenticated.");
-            }
             try
             {
                 var claim = await _caseService.GetCaseDetailForAgentDetail(caseId);
@@ -410,10 +378,6 @@ namespace risk.control.system.Controllers.Common
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userEmail))
-            {
-                return Unauthorized("User not authenticated.");
-            }
             try
             {
                 var claim = await _caseService.GetCaseDetailForAgentDetail(caseId);
@@ -481,10 +445,6 @@ namespace risk.control.system.Controllers.Common
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userEmail))
-            {
-                return Unauthorized("User not authenticated.");
-            }
             try
             {
                 var agent = await _context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == userEmail);

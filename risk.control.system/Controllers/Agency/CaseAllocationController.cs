@@ -50,7 +50,7 @@ namespace risk.control.system.Controllers.Agency
                 {
                     notifyService.Error("No case selected!!! Please select a case to allocate.", 3);
 
-                    return RedirectToAction(nameof(VendorInvestigationController.Allocate), "VendorInvestigation");
+                    return RedirectToAction(nameof(VendorInvestigationController.Allocate), ControllerName<VendorInvestigationController>.Name);
                 }
 
                 var result = await vendorAgentAllocationService.AllocateAsync(selectedcase, claimId, userEmail);
@@ -66,7 +66,7 @@ namespace risk.control.system.Controllers.Agency
 
                 notifyService.Custom($"Case <b>#{result.ContractNumber}</b> Tasked to {result.VendorAgentEmail}", 3, "green", "far fa-file-powerpoint");
 
-                return RedirectToAction(nameof(VendorInvestigationController.Allocate), "VendorInvestigation");
+                return RedirectToAction(nameof(VendorInvestigationController.Allocate), ControllerName<VendorInvestigationController>.Name);
             }
             catch (Exception ex)
             {

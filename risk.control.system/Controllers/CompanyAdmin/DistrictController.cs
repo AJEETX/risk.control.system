@@ -158,7 +158,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
         }
 
         // GET: District/Create
-        [Breadcrumb("Add New", FromAction = "Profile")]
+        [Breadcrumb("Add New", FromAction = nameof(Profile))]
         public async Task<IActionResult> Create()
         {
             var userEmail = HttpContext.User.Identity.Name;
@@ -210,7 +210,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             }
         }
 
-        [Breadcrumb("Edit", FromAction = "Profile")]
+        [Breadcrumb("Edit", FromAction = nameof(Profile))]
         public async Task<IActionResult> Edit(long id)
         {
             if (id < 1)

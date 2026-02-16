@@ -142,7 +142,7 @@ namespace risk.control.system.Services.Common
                 var maskedBeneficiaryContact = new string('*', caseTask.BeneficiaryDetail.PhoneNumber.ToString().Length - 4) + caseTask.BeneficiaryDetail.PhoneNumber.ToString().Substring(caseTask.BeneficiaryDetail.PhoneNumber.ToString().Length - 4);
                 caseTask.BeneficiaryDetail.PhoneNumber = maskedBeneficiaryContact;
             }
-            var companyUser = await context.ApplicationUser.AsNoTracking().Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == currentUserEmail);
+            var companyUser = await context.ApplicationUser.AsNoTracking().Include(u => u.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(u => u.Email == currentUserEmail);
             var lastHistory = caseTask.InvestigationTimeline.OrderByDescending(h => h.StatusChangedAt).FirstOrDefault();
             var endTIme = caseTask.Status == CONSTANTS.CASE_STATUS.FINISHED ? caseTask.ProcessedByAssessorTime.GetValueOrDefault() : DateTime.UtcNow;
             var timeTaken = endTIme - caseTask.Created;
@@ -187,7 +187,8 @@ namespace risk.control.system.Services.Common
                 TimeTaken = totalTimeTaken,
                 VendorInvoice = invoice,
                 CanDownload = canDownload,
-                Withdrawable = (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR)
+                Withdrawable = (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR),
+                Currency = CustomExtensions.GetCultureByCountry(companyUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol
             };
 
             return model;

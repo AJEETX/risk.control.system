@@ -7,11 +7,11 @@
 
 <section class="content">
 	<form id="create-form" method="post" asp-controller="CaseAction" asp-action="ProcessCaseReport">
-		<input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.Id" />
-		<input type="hidden" id="CaseLocationId" name="CaseLocationId" value="@Model.Location.BeneficiaryDetailId" />
-		<input type="hidden" id="policyDetailId" value="@Model.ClaimsInvestigation?.PolicyDetail.PolicyDetailId" />
-		<input type="hidden" id="customerDetailId" value="@Model.ClaimsInvestigation?.CustomerDetail.CustomerDetailId" />
-		<input type="hidden" id="beneficiaryId" value="@Model.Location?.BeneficiaryDetailId" />
+		<input type="hidden" id="claimId" name="claimId" value="@Model.CaseTask.Id" />
+		<input type="hidden" id="CaseLocationId" name="CaseLocationId" value="@Model.Beneficiary.BeneficiaryDetailId" />
+		<input type="hidden" id="policyDetailId" value="@Model.CaseTask?.PolicyDetail.PolicyDetailId" />
+		<input type="hidden" id="customerDetailId" value="@Model.CaseTask?.CustomerDetail.CustomerDetailId" />
+		<input type="hidden" id="beneficiaryId" value="@Model.Beneficiary?.BeneficiaryDetailId" />
 		<input type="hidden" id="reportAiSummary" value="@Model.ReportAiSummary" />
 		<input type="hidden" id="assessorRemarkType" name="assessorRemarkType" value="OK" />
 		<div id="article" class="shadow-lg border-1 rounded-lg">
@@ -59,16 +59,16 @@
 		</div>
 		<partial name="_AgencyReport" model="@Model" />
 
-		@if (@Model.ClaimsInvestigation.IsQueryCase && @Model.ClaimsInvestigation.InvestigationReport.EnquiryRequest != null)
+		@if (@Model.CaseTask.IsQueryCase && @Model.CaseTask.InvestigationReport.EnquiryRequest != null)
 		{
 			var data = new CaseTransactionModel
-				{
-					ClaimsInvestigation = Model.ClaimsInvestigation,
-				};
+			{
+				ClaimsInvestigation = Model.CaseTask,
+			};
 			<partial name="_EnquiryReport" model="@data" />
 		}
 
-		@if (Model.ClaimsInvestigation.AiEnabled)
+		@if (Model.CaseTask.AiEnabled)
 		{
 			<partial name="_AgencyAiReport" model="@Model" />
 		}
@@ -124,7 +124,7 @@
 														@location.LocationName
 													</span>
 													<span>
-														@if(location.ValidationExecuted)
+														@if (location.ValidationExecuted)
 														{
 															@durationText
 														}
@@ -214,7 +214,7 @@
 							<div class="card-body scrollable-body">
 								<div class="row">
 									<div class="col-md-12">
-										@if (!locations.Where(locations=>locations.IsRequired).All(l => l.AgentValidated && l.FaceIdsValidated && l.DocumentsValidated))
+										@if (!locations.Where(locations => locations.IsRequired).All(l => l.AgentValidated && l.FaceIdsValidated && l.DocumentsValidated))
 										{
 											<div class="form-group">
 												<div class="form-check form-switch">
@@ -266,7 +266,7 @@
 													</div>
 													<textarea data-bs-toggle="tooltip" title="Enter remarks" required maxlength="1000" name="assessorRemarks" id="assessorRemarks" type="text" class="form-control remarks" autocomplete="off" placeholder="enter remarks to submit"></textarea>
 
-													<span asp-validation-for="ClaimsInvestigation.InvestigationReport.SupervisorRemarks" class="text-danger"></span>
+													<span asp-validation-for="CaseTask.InvestigationReport.SupervisorRemarks" class="text-danger"></span>
 												</div>
 											</div>
 										</div>
@@ -284,10 +284,10 @@
 						<a id="back" asp-controller="Assessor" class="btn btn-outline-secondary" asp-action="Assessor">
 							<i class="fas fa-arrow-left" aria-hidden="true"></i> Back
 						</a>
-						@if(Model.InvestigationReport.EnquiryRequest == null)
-									{
+						@if (Model.InvestigationReport.EnquiryRequest == null)
+						{
 							<a id="enquire-case" asp-controller="Assessor" asp-action="SendEnquiry"
-							   asp-route-selectedcase="@Model.ClaimsInvestigation.Id" class="btn btn-warning">
+								   asp-route-id="@Model.CaseTask.Id" class="btn btn-warning">
 								<i class="fa fa-edit"></i>  ENQUIRE
 							</a>
 						}

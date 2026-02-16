@@ -62,13 +62,13 @@ namespace risk.control.system.Controllers.Creator
 
                 notifyService.Custom($"Case <b> #{policyNumber}</b>  withdrawn successfully", 3, "orange", "far fa-file-powerpoint");
 
-                return RedirectToAction(nameof(CaseCreateEditController.New), "CaseCreateEdit");
+                return RedirectToAction(nameof(CaseCreateEditController.New), ControllerName<CaseCreateEditController>.Name);
             }
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error withdrawing case {Id}. {UserEmail}", claimId, currentUserEmail);
                 notifyService.Error("Error withdrawing case. Try again.");
-                return RedirectToAction(nameof(CaseCreateEditController.New), "CaseCreateEdit");
+                return RedirectToAction(nameof(CaseCreateEditController.New), ControllerName<CaseCreateEditController>.Name);
             }
         }
     }
