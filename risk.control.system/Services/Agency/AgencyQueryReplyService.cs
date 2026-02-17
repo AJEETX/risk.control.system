@@ -42,12 +42,12 @@ namespace risk.control.system.Services.Agency
                 caseTask.SubStatus = replyByAgency;
                 caseTask.UpdatedBy = userEmail;
                 caseTask.AssignedToAgency = false;
-                caseTask.EnquiryReplyByAgencyTime = DateTime.Now;
-                caseTask.SubmittedToAssessorTime = DateTime.Now;
+                caseTask.EnquiryReplyByAgencyTime = DateTime.UtcNow;
+                caseTask.SubmittedToAssessorTime = DateTime.UtcNow;
                 var enquiryRequest = caseTask.InvestigationReport.EnquiryRequest;
                 enquiryRequest.DescriptiveAnswer = request.DescriptiveAnswer;
 
-                enquiryRequest.Updated = DateTime.Now;
+                enquiryRequest.Updated = DateTime.UtcNow;
                 enquiryRequest.UpdatedBy = userEmail;
 
                 if (document != null)
@@ -69,7 +69,7 @@ namespace risk.control.system.Services.Agency
                     if (dbEnquiry != null)
                     {
                         dbEnquiry.AnswerSelected = enquiry.AnswerSelected;
-                        dbEnquiry.Updated = DateTime.Now;
+                        dbEnquiry.Updated = DateTime.UtcNow;
                         dbEnquiry.UpdatedBy = userEmail;
                     }
                 }

@@ -12,7 +12,7 @@ namespace risk.control.system.Seeds
             {
                 Name = "BROTHER",
                 Code = "BROTHER",
-                Updated = DateTime.Now,
+                Updated = DateTime.UtcNow,
             };
             var brotherEntity = await context.AddAsync(brother);
 
@@ -20,7 +20,7 @@ namespace risk.control.system.Seeds
             {
                 Name = "FATHER",
                 Code = "FATHER",
-                Updated = DateTime.Now,
+                Updated = DateTime.UtcNow,
             };
             var fatherEntity = await context.AddAsync(father);
 
@@ -28,7 +28,7 @@ namespace risk.control.system.Seeds
             {
                 Name = "MOTHER",
                 Code = "MOTHER",
-                Updated = DateTime.Now,
+                Updated = DateTime.UtcNow,
             };
             var motherEntity = await context.AddAsync(mother);
 
@@ -37,7 +37,7 @@ namespace risk.control.system.Seeds
             {
                 Name = "SISTER",
                 Code = "SISTER",
-                Updated = DateTime.Now,
+                Updated = DateTime.UtcNow,
             };
             var sisterEntity = await context.AddAsync(sister);
 
@@ -45,7 +45,7 @@ namespace risk.control.system.Seeds
             {
                 Name = "UNCLE",
                 Code = "UNCLE",
-                Updated = DateTime.Now,
+                Updated = DateTime.UtcNow,
             };
             var uncleEntity = await context.AddAsync(uncle);
 
@@ -53,7 +53,7 @@ namespace risk.control.system.Seeds
             {
                 Name = "AUNTY",
                 Code = "AUNTY",
-                Updated = DateTime.Now,
+                Updated = DateTime.UtcNow,
             };
             var auntyEntity = await context.AddAsync(aunty);
 
@@ -61,7 +61,7 @@ namespace risk.control.system.Seeds
             {
                 Name = "NEWPHEW",
                 Code = "NEWPHEW",
-                Updated = DateTime.Now,
+                Updated = DateTime.UtcNow,
             };
             var newphewEntity = await context.AddAsync(newphew);
 
@@ -69,7 +69,7 @@ namespace risk.control.system.Seeds
             {
                 Name = "NIECE",
                 Code = "NIECE",
-                Updated = DateTime.Now,
+                Updated = DateTime.UtcNow,
             };
             var nieceEntity = await context.AddAsync(niece);
 
@@ -77,7 +77,7 @@ namespace risk.control.system.Seeds
             {
                 Name = "INLAW",
                 Code = "INLAW",
-                Updated = DateTime.Now,
+                Updated = DateTime.UtcNow,
             };
             var inlawEntity = await context.AddAsync(inlaw);
 
@@ -85,7 +85,7 @@ namespace risk.control.system.Seeds
             {
                 Name = "UNKNOWN",
                 Code = "UNKNOWN",
-                Updated = DateTime.Now,
+                Updated = DateTime.UtcNow,
             };
             var unknownEntity = await context.AddAsync(unknown);
 
@@ -96,7 +96,7 @@ namespace risk.control.system.Seeds
             {
                 Name = "DEMO",
                 Code = "DEMO",
-                Updated = DateTime.Now,
+                Updated = DateTime.UtcNow,
             };
             var demoCaseEnablerEntity = await context.CaseEnabler.AddAsync(demoCaseEnabler);
 
@@ -104,7 +104,7 @@ namespace risk.control.system.Seeds
             {
                 Name = "DOUBT-DETAILS",
                 Code = "DOUBT",
-                Updated = DateTime.Now,
+                Updated = DateTime.UtcNow,
             };
             var doubtCaseEnablerEntity = await context.CaseEnabler.AddAsync(doubtCaseEnabler);
 
@@ -112,7 +112,7 @@ namespace risk.control.system.Seeds
             {
                 Name = "HIGH-PREMIUM",
                 Code = "HIGH",
-                Updated = DateTime.Now,
+                Updated = DateTime.UtcNow,
             };
             var highAmountCaseEnablerEntity = await context.CaseEnabler.AddAsync(highAmountCaseEnabler);
 
@@ -120,7 +120,7 @@ namespace risk.control.system.Seeds
             {
                 Name = "UNKNOWN",
                 Code = "UNKNOWN",
-                Updated = DateTime.Now,
+                Updated = DateTime.UtcNow,
             };
             var unknownCaseEnablerCaseEnablerEntity = await context.CaseEnabler.AddAsync(unknownCaseEnabler);
             #endregion
@@ -131,7 +131,7 @@ namespace risk.control.system.Seeds
             {
                 Name = "DEMO",
                 Code = "DEMO",
-                Updated = DateTime.Now,
+                Updated = DateTime.UtcNow,
             };
 
             var demoCentreEntity = await context.CostCentre.AddAsync(demoCentre);
@@ -140,7 +140,7 @@ namespace risk.control.system.Seeds
             {
                 Name = "LOANS",
                 Code = "LOANS",
-                Updated = DateTime.Now,
+                Updated = DateTime.UtcNow,
             };
 
             var loansCostCentreEntity = await context.CostCentre.AddAsync(loansCostCentre);
@@ -149,7 +149,7 @@ namespace risk.control.system.Seeds
             {
                 Name = "FINANCE",
                 Code = "FINANCE",
-                Updated = DateTime.Now,
+                Updated = DateTime.UtcNow,
             };
 
             var financeCostCentreEntity = await context.CostCentre.AddAsync(financeCostCentre);
@@ -158,7 +158,7 @@ namespace risk.control.system.Seeds
             {
                 Name = "UNKNOWN",
                 Code = "UNKNOWN",
-                Updated = DateTime.Now,
+                Updated = DateTime.UtcNow,
             };
 
             var unknownCostCentreEntity = await context.CostCentre.AddAsync(unknownCostCentre);

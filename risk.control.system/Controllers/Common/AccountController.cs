@@ -48,10 +48,19 @@ namespace risk.control.system.Controllers.Common
 
         [HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> Login()
+        public async Task<IActionResult> Login(string returnUrl = null)
         {
             var setPassword = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_PASSWORD);
-            return View(new LoginViewModel { SetPassword = setPassword });
+            if (!string.IsNullOrEmpty(returnUrl) && !Url.IsLocalUrl(returnUrl))
+            {
+                returnUrl = "/";
+            }
+
+            return View(new LoginViewModel
+            {
+                SetPassword = setPassword,
+                ReturnUrl = returnUrl ?? "/"
+            });
         }
 
         [HttpPost]
@@ -86,12 +95,15 @@ namespace risk.control.system.Controllers.Common
                 await loginService.SignInWithTimeoutAsync(user);
 
                 notifyService.Success($"Welcome <b>{displayName}</b>, Login successful");
-
+                if (!string.IsNullOrEmpty(model.ReturnUrl) && Url.IsLocalUrl(model.ReturnUrl))
+                {
+                    return Redirect(model.ReturnUrl);
+                }
                 return RedirectToAction("Index", "Dashboard");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error in KeepSessionAlive for {UserEmail}", User.Identity.Name ?? "Anonymous");
+                _logger.LogError(ex, "Error in Login for {UserEmail}", User.Identity.Name ?? "Anonymous");
                 return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred." });
             }
         }
@@ -113,9 +125,9 @@ namespace risk.control.system.Controllers.Common
             await accountService.Logout(email);
 
             _logger.LogInformation("User logged out.");
-            return RedirectToAction(nameof(Login));
-        }
 
+            return RedirectToAction("Login", "Account", new { returnUrl = "/" });
+        }
 
         [HttpGet]
         public async Task<IActionResult> ChangePassword(string email)
@@ -216,7 +228,6 @@ namespace risk.control.system.Controllers.Common
             model.LoginError = error;
             ModelState.AddModelError(string.Empty, error);
             model.SetPassword = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
-            ViewData["Users"] = await loginService.GetUserSelectListAsync();
             return View(model);
         }
     }

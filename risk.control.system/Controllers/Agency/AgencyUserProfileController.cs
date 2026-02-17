@@ -1,7 +1,6 @@
 ﻿using AspNetCoreHero.ToastNotification.Abstractions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using risk.control.system.AppConstant;
 using risk.control.system.Controllers.Common;
@@ -47,7 +46,7 @@ namespace risk.control.system.Controllers.Agency
             try
             {
                 var userEmail = HttpContext.User?.Identity?.Name;
-                var vendorUser = await _context.ApplicationUser
+                var vendorUser = await _context.ApplicationUser.AsNoTracking()
                     .Include(u => u.PinCode)
                     .Include(u => u.Country)
                     .Include(u => u.State)
@@ -69,30 +68,20 @@ namespace risk.control.system.Controllers.Agency
         {
             try
             {
-                if (userId == null || _context.ApplicationUser == null)
+                if (userId == null || userId < 1)
                 {
                     notifyService.Custom($"No user not found.", 3, "red", "fas fa-user");
                     return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
 
-                var vendorApplicationUser = await _context.ApplicationUser.Include(v => v.Vendor).Include(c => c.Country).FirstOrDefaultAsync(u => u.Id == userId);
-                if (vendorApplicationUser == null)
+                var agencyUser = await _context.ApplicationUser.AsNoTracking().Include(v => v.Vendor).Include(c => c.Country).FirstOrDefaultAsync(u => u.Id == userId);
+                if (agencyUser == null)
                 {
                     notifyService.Custom($"No user not found.", 3, "red", "fas fa-user");
                     return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
 
-                var country = _context.Country.OrderBy(o => o.Name);
-                var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == vendorApplicationUser.CountryId).OrderBy(d => d.Name);
-                var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == vendorApplicationUser.StateId).OrderBy(d => d.Name);
-                var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == vendorApplicationUser.DistrictId).OrderBy(d => d.Name);
-
-                ViewData["CountryId"] = new SelectList(country.OrderBy(c => c.Name), "CountryId", "Name", vendorApplicationUser.CountryId);
-                ViewData["StateId"] = new SelectList(relatedStates, "StateId", "Name", vendorApplicationUser.StateId);
-                ViewData["DistrictId"] = new SelectList(districts, "DistrictId", "Name", vendorApplicationUser.DistrictId);
-                ViewData["PinCodeId"] = new SelectList(pincodes, "PinCodeId", "Code", vendorApplicationUser.PinCodeId);
-
-                return View(vendorApplicationUser);
+                return View(agencyUser);
             }
             catch (Exception ex)
             {
@@ -112,6 +101,7 @@ namespace risk.control.system.Controllers.Agency
                 if (!ModelState.IsValid)
                 {
                     notifyService.Error("Please correct the errors");
+                    await LoadModel(model, userEmail);
                     return View(model);
                 }
                 if (id != model.Id.ToString())
@@ -129,6 +119,7 @@ namespace risk.control.system.Controllers.Agency
                     {
                         ModelState.AddModelError(error.Key, error.Value);
                     }
+                    await LoadModel(model, userEmail);
 
                     return View(model);
                 }
@@ -164,6 +155,19 @@ namespace risk.control.system.Controllers.Agency
             }
             notifyService.Error("OOPS !!!..Contact Admin");
             return this.RedirectToAction<DashboardController>(x => x.Index());
+        }
+
+        private async Task LoadModel(ApplicationUser model, string currentUserEmail)
+        {
+            var vendorUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == currentUserEmail);
+            var vendor = await _context.Vendor.AsNoTracking().Include(c => c.Country).FirstOrDefaultAsync(v => v.VendorId == vendorUser.VendorId);
+            model.Vendor = vendor;
+            model.Country = vendor.Country;
+            model.CountryId = vendor.CountryId;
+
+            model.StateId = model.SelectedStateId;
+            model.DistrictId = model.SelectedDistrictId;
+            model.PinCodeId = model.SelectedPincodeId;
         }
     }
 }

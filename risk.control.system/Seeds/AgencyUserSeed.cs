@@ -54,7 +54,7 @@ namespace risk.control.system.Seeds
                 PinCodeId = pinCode?.PinCodeId ?? default!,
                 ProfilePictureUrl = relativePath,
                 Role = AppRoles.AGENCY_ADMIN,
-                Updated = DateTime.Now
+                Updated = DateTime.UtcNow
             };
             if (userManager.Users.All(u => u.Id != vendorAdmin.Id))
             {

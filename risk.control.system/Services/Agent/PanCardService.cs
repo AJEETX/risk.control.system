@@ -102,7 +102,7 @@ namespace risk.control.system.Services.Agent
                 logger.LogError(ex, "Error occurred.");
                 var image = Convert.FromBase64String(maskedImage.MaskedImage);
                 await File.WriteAllBytesAsync(filePath, processImageService.ProcessCompress(image, onlyExtension));
-                doc.LongLatTime = DateTime.Now;
+                doc.LongLatTime = DateTime.UtcNow;
                 doc.LocationInfo = "no data: ";
             }
             return doc;

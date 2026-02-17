@@ -10,7 +10,8 @@
                 d.search = d.search.value; // Pass search term to the server
                 d.orderColumn = d.order[0]?.column; // Pass the column index being sorted
                 d.orderDirection = d.order[0]?.dir; // Pass the sorting directio
-            }
+            },
+            error: DataTableErrorHandler
         },
         order: [[4, 'desc'], [2, 'desc']],
         fixedHeader: true,
@@ -102,7 +103,7 @@
             $.confirm({
                 title: "Confirm Add New",
                 content: "Are you sure to add?",
-    
+
                 icon: 'fas fa-map-marked-alt',
                 type: 'green',
                 closeIcon: true,

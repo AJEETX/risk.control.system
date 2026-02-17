@@ -1,11 +1,11 @@
-﻿@model risk.control.system.Models.CustomerDetail
-
+﻿@model risk.control.system.Models.BeneficiaryDetail
 @{
-    ViewData["Title"] = @Applicationsettings.EDIT;
+    ViewData["Title"] = @Applicationsettings.CREATE;
 }
+
 <section class="content">
-    <form id="edit-form" asp-action="EditCustomer" method="post" enctype="multipart/form-data">
-        <partial name="Investigation/_EditCustomer" model="@Model" />
+    <form id="create-form" asp-action="Create" enctype="multipart/form-data">
+        <partial name="Investigation/_CreateBeneficiary" model="@Model" />
     </form>
 </section>
 
@@ -13,9 +13,10 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-    <script src="~/js/creator/customer.js"></script>
+    <script src="~/js/creator/beneficiary.js"></script>
     <script src="~/js/company-admin/pincode.js"></script>
     <script src="~/js/company-admin/phone-bank-validate.js"></script>
     <script src="~/js/common/image-upload.js"></script>
     <script src="~/js/common/form-validation.js"></script>
+
 }

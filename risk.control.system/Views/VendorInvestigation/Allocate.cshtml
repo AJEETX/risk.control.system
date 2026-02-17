@@ -1,98 +1,96 @@
 ﻿@{
-    ViewData["Title"] = "Index";
+	ViewData["Title"] = "Index";
 }
 <section class="content">
-    <div id="article" class="card shadow-lg border-1 rounded-lg">
-        <div class="card-header bg-secondary text-white text-center">
-            <h3 class="card-title">
-                <i class="fas fa-external-link-alt"></i> Allocate/Enquiry
-                <span class="hover-text">
-                    <i class="fas fa-info-circle"></i>
-                    <span class="tooltip-text" id="information">
-                        <li>
-                            <i class='far fa-hand-point-right'></i>
-                            <button class='badge badge-default xs top-info'>
-                                <b>
-                                <i class="fa fa-sync"></i> Refresh
-                            </b>
-                            </button>
-                        </li>
-                        <li>
-                            <i class='far fa-hand-point-left'></i> Select <input name="case" type='radio' /> case
-                        </li>
-                        
-                        <li>
-                            <i class='far fa-hand-point-right'></i>  <button class='badge badge-info xs'>
-                                <span class="badge badge-info"><i class='fas fa-search'></i> </span> Detail
-                            </button>
-                        </li>
-                        <li>
-                            <i class='far fa-hand-point-right'></i>  <button class='badge badge-warning xs'>
-                                <span class="badge badge-warning"><i class='fas fa-question'></i> </span> Enquiry
-                            </button>
-                        </li>
-                        <li>
-                            <i class='far fa-thumbs-up'></i> <b>
-                                <button class='btn btn-danger btn-xs'>
-                                    <span class='badge badge-danger btn-xs'>
-                                        <i class='fas fa-external-link-alt'></i>
-                                    </span> <b>Allocate</b> <sub>new</sub>
-                                </button>
-                            </b>
-                        </li>
-                    </span>
-                </span>
-            </h3>
-        </div>
-        <div class="card shadow-lg border-1 rounded-lg">
-            <div class="submit-progress hidden">
-                <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
-            </div>
-            <button id="refreshTable" class="btn btn-default"> <i id="refreshIcon" class="fas fa-sync"></i> Refresh</button>
-        </div>
-        <form id="radioButtons" asp-action="SelectVendorAgent" method="get">
-            <div class="card-body">
-                <table id="dataTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
-                    <thead>
-                        <tr>
-                            <th data-toggle="tooltip" title="Select Case to Allocate"><img class="action-image" src="~/headers/arrow-down.gif" /></th>
-                            <th data-toggle="tooltip" title="Case Number" alt="Case Number"><img class="action-image" src="~/headers/policy-num.gif" /></th>
-                            <th data-toggle="tooltip" title="Assured Amount"><img class="action-image" src="~/headers/amount.gif" /></th>
-                            <th data-toggle="tooltip" title="Insurance Company"><img class="action-image" src="~/headers/company.gif" /></th>
-                            <th data-toggle="tooltip" title="Address of Interest" alt="Address of Interest"><img class="action-image" src="~/headers/pincode.gif" /></th>
-                            <th data-toggle="tooltip" title="Case Document" alt="Case Document"><img class="action-image" src="~/headers/policy-doc.gif" /></th>
-                            <th data-toggle="tooltip" title="Person Photo"><img class="action-image" src="~/headers/portrait.gif" /></th>
-                            <th data-toggle="tooltip" title="Person Name"><img class="action-image" src="~/headers/customer.gif" /></th>
-                            <th data-toggle="tooltip" title="Case Type"><img class="action-image" src="~/headers/claim-type.gif" /></th>
-                            <th data-toggle="tooltip" title="Investigative Service"><img class="action-image" src="~/headers/service.gif" /></th>
-                            <th data-toggle="tooltip" title="Address Weather info"><img class="action-image" src="~/headers/information.gif" /></th>
-                            <th data-toggle="tooltip" title="Allocated Date"><img class="action-image" src="~/headers/created.gif" /></th>
-                            <th data-toggle="tooltip" title="Duration since Allocated">
-                                <img class="action-image" src="~/headers/timer.gif" />
-                            </th>
-                            <th data-toggle="tooltip" title="Action"><img class="action-image" src="~/headers/action.gif" /></th>
-                        </tr>
-                    </thead>
-                </table>
-        </div>
-            <div class="card-footer">
-                <div class="row">
-                    <div class="col-md-12">
-                        <a id="back" asp-controller="Dashboard" asp-action="Index" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
+	<div id="article" class="card shadow-lg border-1 rounded-lg">
+		<div class="card-header bg-secondary text-white text-center">
+			<h3 class="card-title">
+				<i class="fas fa-external-link-alt"></i> Allocate/Enquiry
+				<span class="hover-text">
+					<i class="fas fa-info-circle"></i>
+					<span class="tooltip-text" id="information">
+						<li>
+							<i class='far fa-hand-point-right'></i>
+							<button class='badge badge-default xs top-info'>
+								<b>
+									<i class="fa fa-sync"></i> Refresh
+								</b>
+							</button>
+						</li>
+						<li>
+							<i class='far fa-hand-point-left'></i> Select <input name="case" type='radio' /> case
+						</li>
 
-                        <button disabled id="allocatedcase" type="submit" class="btn btn-danger">
-                            <span class="badge badge-danger"> <i class="fas fa-external-link-alt"></i> </span>
-                            Allocate
-                        </button>
+						<li>
+							<i class='far fa-hand-point-right'></i>  <button class='badge badge-info xs'>
+							<span class="badge badge-info"><i class='fas fa-search'></i> </span> Detail
+						</button>
+					</li>
+					<li>
+						<i class='far fa-hand-point-right'></i>  <button class='badge badge-warning xs'>
+						<span class="badge badge-warning"><i class='fas fa-question'></i> </span> Enquiry
+					</button>
+				</li>
+				<li>
+					<i class='far fa-thumbs-up'></i>
+					<b>
+						<button class='btn btn-danger btn-xs'>
+							<span class='badge badge-danger btn-xs'>
+								<i class='fas fa-external-link-alt'></i>
+							</span> <b>Allocate</b> <sub>new</sub>
+						</button>
+					</b>
+				</li>
+			</span>
+		</span>
+	</h3>
+</div>
+<div class="card shadow-lg border-1 rounded-lg">
+	<div class="submit-progress hidden">
+		<i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+	</div>
+	<button id="refreshTable" class="btn btn-default"> <i id="refreshIcon" class="fas fa-sync"></i> Refresh</button>
+</div>
+<div class="card-body">
+	<table id="dataTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
+		<thead>
+			<tr>
+				<th data-toggle="tooltip" title="Select Case to Allocate"><img class="action-image" src="~/headers/arrow-down.gif" /></th>
+				<th data-toggle="tooltip" title="Case Number" alt="Case Number"><img class="action-image" src="~/headers/policy-num.gif" /></th>
+				<th data-toggle="tooltip" title="Assured Amount"><img class="action-image" src="~/headers/amount.gif" /></th>
+				<th data-toggle="tooltip" title="Insurance Company"><img class="action-image" src="~/headers/company.gif" /></th>
+				<th data-toggle="tooltip" title="Address of Interest" alt="Address of Interest"><img class="action-image" src="~/headers/pincode.gif" /></th>
+				<th data-toggle="tooltip" title="Case Document" alt="Case Document"><img class="action-image" src="~/headers/policy-doc.gif" /></th>
+				<th data-toggle="tooltip" title="Person Photo"><img class="action-image" src="~/headers/portrait.gif" /></th>
+				<th data-toggle="tooltip" title="Person Name"><img class="action-image" src="~/headers/customer.gif" /></th>
+				<th data-toggle="tooltip" title="Case Type"><img class="action-image" src="~/headers/claim-type.gif" /></th>
+				<th data-toggle="tooltip" title="Investigative Service"><img class="action-image" src="~/headers/service.gif" /></th>
+				<th data-toggle="tooltip" title="Address Weather info"><img class="action-image" src="~/headers/information.gif" /></th>
+				<th data-toggle="tooltip" title="Allocated Date"><img class="action-image" src="~/headers/created.gif" /></th>
+				<th data-toggle="tooltip" title="Duration since Allocated">
+					<img class="action-image" src="~/headers/timer.gif" />
+				</th>
+				<th data-toggle="tooltip" title="Action"><img class="action-image" src="~/headers/action.gif" /></th>
+			</tr>
+		</thead>
+	</table>
+</div>
+<div class="card-footer">
+	<div class="row">
+		<div class="col-md-12">
+			<a id="back" asp-controller="Dashboard" asp-action="Index" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
 
-                    </div>
-                </div>
-            </div>
-        </form>
-    </div>
+			<button disabled id="allocatedcase" type="submit" class="btn btn-danger">
+				<span class="badge badge-danger"> <i class="fas fa-external-link-alt"></i> </span>
+				Allocate
+			</button>
+		</div>
+	</div>
+</div>
+</div>
 </section>
 <partial name="_DisplayPopUp" />
 
 @section Scripts {
-    <script src="~/js/supervisor/agency-cases.js"></script>
+	<script src="~/js/supervisor/agency-cases.js"></script>
 }

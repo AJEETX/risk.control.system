@@ -7,10 +7,10 @@ namespace risk.control.system.Models
     {
         public VendorInvoice()
         {
-            this.InvoiceNumber = DateTime.Now.Date.Year.ToString() +
-                DateTime.Now.Date.Month.ToString() +
-                DateTime.Now.Date.Day.ToString() + Guid.NewGuid().ToString().Substring(0, 4).ToUpper() + "INV";
-            this.DueDate = DateTime.Now.Date.AddMonths(1);
+            this.InvoiceNumber = DateTime.UtcNow.Date.Year.ToString() +
+                DateTime.UtcNow.Date.Month.ToString() +
+                DateTime.UtcNow.Date.Day.ToString() + Guid.NewGuid().ToString().Substring(0, 4).ToUpper() + "INV";
+            this.DueDate = DateTime.UtcNow.Date.AddMonths(1);
             this.SubTotal = 0;
             this.TaxAmount = 0;
             this.GrandTotal = 0;
@@ -26,11 +26,11 @@ namespace risk.control.system.Models
 
         [Display(Name = "Invoice Date")]
         [Required]
-        public DateTime InvoiceDate { get; set; } = DateTime.Now;
+        public DateTime InvoiceDate { get; set; } = DateTime.UtcNow;
 
         [Display(Name = "Due Date")]
         [Required]
-        public DateTime DueDate { get; set; } = DateTime.Now.AddMonths(1);
+        public DateTime DueDate { get; set; } = DateTime.UtcNow.AddMonths(1);
 
         [Display(Name = "Agency")]
         public long? VendorId { get; set; }
@@ -58,6 +58,8 @@ namespace risk.control.system.Models
         public long? InvestigationReportId { get; set; }
         public virtual InvestigationReport? InvestigationReport { get; set; }
         public virtual InvestigationServiceType? InvestigationServiceType { get; set; }
-        public long? ClaimId { get; set; }
+        public long? CaseId { get; set; }
+
+        public string? Currency { get; set; }
     }
 }

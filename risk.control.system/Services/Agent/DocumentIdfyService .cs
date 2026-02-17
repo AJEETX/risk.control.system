@@ -86,14 +86,14 @@ internal class DocumentIdfyService : IDocumentIdfyService
             documentReport.DurationInSeconds = durS;
             documentReport.LocationAddress = await addressTask;
             documentReport.LongLat = $"Latitude = {lat}, Longitude = {lon}";
-            documentReport.LongLatTime = DateTime.Now;
+            documentReport.LongLatTime = DateTime.UtcNow;
 
             var detectedText = await googleTask;
             await ProcessOcrResults(documentReport, docImage, detectedText, claim);
 
             // 4. Persistence
             locationTemplate.ValidationExecuted = true;
-            locationTemplate.Updated = DateTime.Now;
+            locationTemplate.Updated = DateTime.UtcNow;
             locationTemplate.UpdatedBy = data.Email;
 
             context.DocumentIdReport.Update(documentReport);

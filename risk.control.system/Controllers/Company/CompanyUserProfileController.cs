@@ -42,7 +42,7 @@ namespace risk.control.system.Controllers.Company
             var userEmail = HttpContext.User?.Identity?.Name;
             try
             {
-                var companyUser = await _context.ApplicationUser
+                var companyUser = await _context.ApplicationUser.AsNoTracking()
                     .Include(u => u.PinCode)
                     .Include(u => u.Country)
                     .Include(u => u.State)
@@ -71,14 +71,14 @@ namespace risk.control.system.Controllers.Company
                     return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
 
-                var clientCompanyApplicationUser = await _context.ApplicationUser.Include(u => u.ClientCompany).Include(c => c.Country).FirstOrDefaultAsync(u => u.Id == userId);
-                if (clientCompanyApplicationUser == null)
+                var companyUser = await _context.ApplicationUser.AsNoTracking().Include(u => u.ClientCompany).Include(c => c.Country).FirstOrDefaultAsync(u => u.Id == userId);
+                if (companyUser == null)
                 {
                     notifyService.Error("USER NOT FOUND");
                     return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
 
-                return View(clientCompanyApplicationUser);
+                return View(companyUser);
             }
             catch (Exception ex)
             {
@@ -126,8 +126,8 @@ namespace risk.control.system.Controllers.Company
 
         private async Task LoadModel(ApplicationUser model, string currentUserEmail)
         {
-            var companyUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == currentUserEmail);
-            var company = await _context.ClientCompany.Include(c => c.Country).FirstOrDefaultAsync(v => v.ClientCompanyId == companyUser.ClientCompanyId);
+            var companyUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == currentUserEmail);
+            var company = await _context.ClientCompany.AsNoTracking().Include(c => c.Country).FirstOrDefaultAsync(v => v.ClientCompanyId == companyUser.ClientCompanyId);
             model.ClientCompany = company;
             model.Country = company.Country;
             model.CountryId = company.CountryId;
@@ -141,28 +141,7 @@ namespace risk.control.system.Controllers.Company
         [HttpGet]
         public async Task<IActionResult> ChangePassword()
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
-            try
-            {
-                if (string.IsNullOrEmpty(userEmail))
-                {
-                    notifyService.Error("OOPS !!!..Contact Admin");
-                    return this.RedirectToAction<DashboardController>(x => x.Index());
-                }
-                var companyUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
-                if (companyUser == null)
-                {
-                    notifyService.Error("OOPS !!!..Contact Admin");
-                    return this.RedirectToAction<DashboardController>(x => x.Index());
-                }
-                return View();
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Error to user password. {UserEmail}", userEmail);
-                notifyService.Error("Error occurred. Try again.");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
-            }
+            return View();
         }
     }
 }

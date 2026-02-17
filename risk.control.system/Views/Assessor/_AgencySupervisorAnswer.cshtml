@@ -1,9 +1,6 @@
 ﻿@model CaseInvestigationVendorsModel
 
-
 <div class="col-12 col-md-6">
-
-
 
     <div class="card bg-light border-success">
 
@@ -14,18 +11,16 @@
                     <i class="fas fa-info-circle"></i>
                     <span class="tooltip-text" id="information">
                         <span>
-                            <i class="fas fa-user-shield"></i><b> @Model?.ClaimsInvestigation.InvestigationReport?.SupervisorEmail</b> comments.
+                            <i class="fas fa-user-shield"></i><b> @Model?.CaseTask.InvestigationReport?.SupervisorEmail</b> comments.
                         </span>
-
                     </span>
                 </span>
             </h3>
             <div class="card-tools">
-                <span data-bs-toggle="tooltip" title=" Supervisor :  @Model?.ClaimsInvestigation.InvestigationReport?.SupervisorEmail" class="badge badge-light">
-                    <i class="nav-icon fas fa-clock"></i> @Model.ClaimsInvestigation.InvestigationReport?.SupervisorRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt")
+                <span data-bs-toggle="tooltip" title=" Supervisor :  @Model?.CaseTask.InvestigationReport?.SupervisorEmail" class="badge badge-light">
+                    <i class="nav-icon fas fa-clock"></i> @Model.CaseTask.InvestigationReport?.SupervisorRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt")
                 </span>
             </div>
-
         </div>
         <div class="progress">
             <i class="far fa-bookmark bookmark-green"></i>
@@ -34,12 +29,12 @@
             </div>
         </div>
         <div class="card-footer text-muted border-bottom-0">
-            <i class="fas fa-user-shield"></i>  Supervisor :<span class="badge badge-light">  @Model?.ClaimsInvestigation.InvestigationReport.SupervisorEmail </span>
+            <i class="fas fa-user-shield"></i>  Supervisor :<span class="badge badge-light">  @Model?.CaseTask.InvestigationReport.SupervisorEmail </span>
         </div>
         <div class="card-body">
             <div class="row">
                 <div class="col-12">
-                   
+
                     <div class="table-responsive">
                         <table class="table table-bordered table-sm table-hover">
                             <thead class="thead-light">
@@ -52,18 +47,18 @@
                                 <tr>
                                     <td class="text-start">
                                         <div class="bg-light rounded p-2 text-muted">
-                                            @Model.ClaimsInvestigation.InvestigationReport?.SupervisorRemarks
+                                            @Model.CaseTask.InvestigationReport?.SupervisorRemarks
                                         </div>
                                     </td>
 
                                     <td>
-                                        @if (Model.ClaimsInvestigation.InvestigationReport?.SupervisorAttachment != null)
+                                        @if (Model.CaseTask.InvestigationReport?.SupervisorAttachment != null)
                                         {
-                                            <img class="img-fluid doc-profile-image" src="data:image/*;base64,@(Convert.ToBase64String(Model.ClaimsInvestigation.InvestigationReport.SupervisorAttachment))" alt="Attachment">
+                                            <img class="img-fluid doc-profile-image" src="data:image/*;base64,@(Convert.ToBase64String(Model.CaseTask.InvestigationReport.SupervisorAttachment))" alt="Attachment">
 
                                                 <a asp-controller="Download"
                                                    asp-action="SupervisorFileAttachment"
-                                                   asp-route-id="@Model.ClaimsInvestigation.InvestigationReport.Id"
+                                                   asp-route-id="@Model.CaseTask.InvestigationReport.Id"
                                                    class="mailbox-attachment-name">
                                                     <i class="fas fa-paperclip"></i>
                                                 </a>
@@ -77,11 +72,8 @@
                             </tbody>
                         </table>
                     </div>
-
                 </div>
-
             </div>
         </div>
     </div>
-
 </div>

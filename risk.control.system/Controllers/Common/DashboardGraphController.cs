@@ -7,13 +7,14 @@ using risk.control.system.Services.Common;
 namespace risk.control.system.Controllers.Common
 {
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME},{AGENCY_ADMIN.DISPLAY_NAME},{CREATOR.DISPLAY_NAME},{ASSESSOR.DISPLAY_NAME},{MANAGER.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME},{AGENT.DISPLAY_NAME}")]
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class DashboardGraphController : Controller
     {
         private readonly IDashboardService dashboardService;
-        private readonly ILogger<DashboardController> _logger;
+        private readonly ILogger<DashboardGraphController> _logger;
 
         public DashboardGraphController(IDashboardService dashboardService,
-            ILogger<DashboardController> logger
+            ILogger<DashboardGraphController> logger
             )
         {
             this.dashboardService = dashboardService;
@@ -23,11 +24,6 @@ namespace risk.control.system.Controllers.Common
         public async Task<JsonResult> GetAgentClaim()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
-            if (string.IsNullOrEmpty(userEmail))
-            {
-                _logger.LogWarning("GetAgentClaim called with no authenticated user.");
-                return new JsonResult(null);
-            }
 
             try
             {
@@ -71,11 +67,6 @@ namespace risk.control.system.Controllers.Common
         public async Task<JsonResult> GetAgentUnderwriting()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
-            if (string.IsNullOrEmpty(userEmail))
-            {
-                _logger.LogWarning("GetAgentClaim called with no authenticated user.");
-                return new JsonResult(null);
-            }
 
             try
             {

@@ -4,20 +4,21 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.FeatureManagement;
 using risk.control.system.AppConstant;
+using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Services.Agency;
 using risk.control.system.Services.Common;
 using SmartBreadcrumbs.Attributes;
-using SmartBreadcrumbs.Nodes;
 
 namespace risk.control.system.Controllers.Manager
 {
-    [Breadcrumb("Manage Agency(s)")]
+    [Breadcrumb("Manage Agency")]
     [Authorize(Roles = $"{MANAGER.DISPLAY_NAME}")]
     public class AvailableAgencyController : Controller
     {
         private readonly ApplicationDbContext _context;
         private readonly IAgencyCreateEditService agencyCreateEditService;
+        private readonly INavigationService navigationService;
         private readonly INotyfService notifyService;
         private readonly IInvestigationDetailService investigationDetailService;
         private readonly ILogger<AvailableAgencyController> logger;
@@ -26,6 +27,7 @@ namespace risk.control.system.Controllers.Manager
         public AvailableAgencyController(
             ApplicationDbContext context,
             IAgencyCreateEditService agencyCreateEditService,
+            INavigationService navigationService,
             INotyfService notifyService,
             IInvestigationDetailService investigationDetailService,
             IFeatureManager featureManager,
@@ -34,6 +36,7 @@ namespace risk.control.system.Controllers.Manager
         {
             _context = context;
             this.agencyCreateEditService = agencyCreateEditService;
+            this.navigationService = navigationService;
             this.notifyService = notifyService;
             this.investigationDetailService = investigationDetailService;
             this.logger = logger;
@@ -66,7 +69,7 @@ namespace risk.control.system.Controllers.Manager
                     return RedirectToAction(nameof(Agencies));
                 }
 
-                var companyUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
+                var companyUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == userEmail);
                 if (companyUser == null)
                 {
                     notifyService.Error("OOPs !!!..User Not Found");
@@ -83,23 +86,21 @@ namespace risk.control.system.Controllers.Manager
                 var vendors2Empanel = await _context.Vendor.AsNoTracking().Where(v => vendors.Contains(v.VendorId)).ToListAsync();
                 company.EmpanelledVendors.AddRange(vendors2Empanel);
 
-                company.Updated = DateTime.Now;
+                company.Updated = DateTime.UtcNow;
                 company.UpdatedBy = userEmail;
                 _context.ClientCompany.Update(company);
                 var savedRows = await _context.SaveChangesAsync();
 
                 notifyService.Custom($"Agency(s) empanelled successfully", 3, "green", "fas fa-thumbs-up");
-                return RedirectToAction(nameof(Agencies));
             }
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error occurred depanelling Agencies. {UserEmail}", userEmail);
                 notifyService.Error("Error occurred depanelling Agencies. Try again.");
-                return RedirectToAction(nameof(Agencies));
             }
+            return RedirectToAction(nameof(Agencies));
         }
 
-        [Breadcrumb(" Edit Agency", FromAction = "Details")]
         public async Task<IActionResult> Edit(long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
@@ -111,17 +112,15 @@ namespace risk.control.system.Controllers.Manager
                     return RedirectToAction(nameof(Agencies));
                 }
 
-                var vendor = await _context.Vendor.Include(v => v.Country).FirstOrDefaultAsync(v => v.VendorId == id);
+                var vendor = await _context.Vendor.AsNoTracking().Include(v => v.Country).FirstOrDefaultAsync(v => v.VendorId == id);
                 if (vendor == null)
                 {
                     notifyService.Error("Error getting Agency. Try again.");
                     return RedirectToAction(nameof(Agencies));
                 }
-                vendor.SelectedByCompany = await _context.ApplicationUser.AnyAsync(u => u.Email.ToLower() == userEmail.ToLower() && u.IsSuperAdmin);
-                var agencysPage = new MvcBreadcrumbNode("Agencies", "AvailableAgency", "Manager Agency(s)");
-                var agency2Page = new MvcBreadcrumbNode("Agencies", "AvailableAgency", "Available Agencies") { Parent = agencysPage, };
-                var agencyPage = new MvcBreadcrumbNode("Details", "AvailableAgency", "Agency Profile") { Parent = agency2Page, RouteValues = new { id = id } };
-                ViewData["BreadcrumbNode"] = new MvcBreadcrumbNode("Edit", "AvailableAgency", $"Edit Agency") { Parent = agencyPage };
+                vendor.SelectedByCompany = await _context.ApplicationUser.AsNoTracking().AnyAsync(u => u.Email.ToLower() == userEmail.ToLower() && u.IsSuperAdmin);
+
+                ViewData["BreadcrumbNode"] = navigationService.GetAgencyActionPath(id, ControllerName<AvailableAgencyController>.Name, "Available Agencies", "Edit Agency", nameof(Edit));
 
                 return View(vendor);
             }
@@ -165,11 +164,11 @@ namespace risk.control.system.Controllers.Manager
                 logger.LogError(ex, "Error editing {AgencyId}. {UserEmail}.", vendorId, User?.Identity?.Name);
                 notifyService.Error("Error editing Agency. Try again.");
             }
-            return RedirectToAction(nameof(Details), "AvailableAgency", new { id = vendorId });
+            return RedirectToAction(nameof(Detail), ControllerName<AvailableAgencyController>.Name, new { id = vendorId });
         }
 
-        [Breadcrumb("Agency Profile", FromAction = "Agencies")]
-        public async Task<IActionResult> Details(long id)
+        [Breadcrumb("Agency Profile", FromAction = nameof(Agencies))]
+        public async Task<IActionResult> Detail(long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             try
@@ -238,12 +237,12 @@ namespace risk.control.system.Controllers.Manager
 
                 foreach (var user in vendorUsers)
                 {
-                    user.Updated = DateTime.Now;
+                    user.Updated = DateTime.UtcNow;
                     user.UpdatedBy = userEmail;
                     user.Deleted = true;
                 }
 
-                vendor.Updated = DateTime.Now;
+                vendor.Updated = DateTime.UtcNow;
                 vendor.UpdatedBy = userEmail;
                 vendor.Deleted = true;
 

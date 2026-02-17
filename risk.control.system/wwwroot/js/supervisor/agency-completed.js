@@ -18,62 +18,7 @@
                     orderDir: d.order?.[0]?.dir || "desc"
                 };
             },
-            error: function (xhr, status, error) {
-                console.error("AJAX Error:", status, error);
-                console.error("Response:", xhr.responseText);
-                if (xhr.status === 401 || xhr.status === 403) {
-                    $.confirm({
-                        title: 'Session Expired!',
-                        content: 'Your session has expired or you are unauthorized. You will be redirected to the login page.',
-                        type: 'red',
-                        typeAnimated: true,
-                        buttons: {
-                            Ok: {
-                                text: 'Login',
-                                btnClass: 'btn-red',
-                                action: function () {
-                                    window.location.href = '/Account/Login';
-                                }
-                            }
-                        },
-                        onClose: function () {
-                            window.location.href = '/Account/Login';
-                        }
-                    });
-                }
-                else if (xhr.status === 500) {
-                    $.confirm({
-                        title: 'Server Error!',
-                        content: 'An unexpected server error occurred. You will be redirected to Completed case page.',
-                        type: 'orange',
-                        typeAnimated: true,
-                        buttons: {
-                            Ok: function () {
-                                window.location.href = '/VendorInvestigation/Completed';
-                            }
-                        },
-                        onClose: function () {
-                            window.location.href = '/VendorInvestigation/Completed';
-                        }
-                    });
-                }
-                else if (xhr.status === 400) {
-                    $.confirm({
-                        title: 'Bad Request!',
-                        content: 'Try with valid data.You will be redirected to Completed case page',
-                        type: 'orange',
-                        typeAnimated: true,
-                        buttons: {
-                            Ok: function () {
-                                window.location.href = '/VendorInvestigation/Completed';
-                            }
-                        },
-                        onClose: function () {
-                            window.location.href = '/VendorInvestigation/Completed';
-                        }
-                    });
-                }
-            }
+            error: DataTableErrorHandler
         },
         columnDefs: [
             {
@@ -237,7 +182,7 @@
 
         showSpinnerOnButton(element, "Detail");
 
-        const editUrl = `/VendorInvestigation/CompletedDetail?Id=${encodeURIComponent(id)}`;
+        const editUrl = `/VendorInvestigation/CompletedDetail/${encodeURIComponent(id)}`;
 
         setTimeout(() => {
             window.location.href = editUrl;

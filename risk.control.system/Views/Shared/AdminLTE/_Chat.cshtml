@@ -40,7 +40,7 @@
                             <div class="direct-chat-msg">
                                 <div class="direct-chat-infos clearfix">
                                     <span class="direct-chat-name float-left">You</span>
-                                    <span class="direct-chat-timestamp float-right">@DateTime.Now.ToString("dd MMM hh:mm")</span>
+                                    <span class="direct-chat-timestamp float-right">@DateTime.UtcNow.ToString("dd MMM hh:mm")</span>
                                 </div>
                                 <img class="direct-chat-img" src="/img/company-admin.jpeg" alt="sender image">
                                 <label class="form-label">@Model.FromUserEmail </label>

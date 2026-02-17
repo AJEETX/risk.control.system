@@ -1,9 +1,7 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using risk.control.system.AppConstant;
-using risk.control.system.Models;
 using risk.control.system.Services.Api;
 
 namespace risk.control.system.Controllers.Api.Company
@@ -14,18 +12,15 @@ namespace risk.control.system.Controllers.Api.Company
     [ApiController]
     public class CompanyController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
         private readonly ILogger<CompanyController> logger;
         private readonly ICompanyUserApiService companyUserApiService;
         private readonly IAgencyService agencyService;
 
-        public CompanyController(ApplicationDbContext context,
-            ILogger<CompanyController> logger,
+        public CompanyController(ILogger<CompanyController> logger,
             ICompanyUserApiService companyUserApiService,
             IAgencyService agencyService
             )
         {
-            _context = context;
             this.logger = logger;
             this.companyUserApiService = companyUserApiService;
             this.agencyService = agencyService;
@@ -65,13 +60,7 @@ namespace risk.control.system.Controllers.Api.Company
             }
             try
             {
-                var companyUser = await _context.ApplicationUser
-                    .FirstOrDefaultAsync(c => c.Email == userEmail);
-                if (companyUser == null)
-                {
-                    return NotFound("Company user not found.");
-                }
-                var vendors = await agencyService.GetEmpanelledVendorsAsync(companyUser);
+                var vendors = await agencyService.GetAllEmpanelledAgenciesAsync(userEmail);
 
                 return Ok(vendors);
             }
@@ -97,14 +86,7 @@ namespace risk.control.system.Controllers.Api.Company
             }
             try
             {
-                var companyUser = await _context.ApplicationUser
-                    .FirstOrDefaultAsync(c => c.Email == userEmail);
-                if (companyUser == null)
-                {
-                    return NotFound("Company user not found.");
-                }
-
-                var result = await agencyService.GetEmpanelledAgency(companyUser, caseId);
+                var result = await agencyService.GetEmpanelledAgency(userEmail, caseId);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -125,7 +107,7 @@ namespace risk.control.system.Controllers.Api.Company
             }
             try
             {
-                var result = await agencyService.GetAvailableVendors(userEmail);
+                var result = await agencyService.GetAvailableAgencies(userEmail);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -135,7 +117,7 @@ namespace risk.control.system.Controllers.Api.Company
             }
         }
 
-        [HttpGet("AllServices")]
+        [HttpGet("AllServices/{id}")]
         public async Task<IActionResult> AllServices(long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name;

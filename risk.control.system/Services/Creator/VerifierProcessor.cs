@@ -17,21 +17,21 @@ namespace risk.control.system.Services.Creator
 
     internal class VerifierProcessor : IVerifierProcessor
     {
-        private readonly ApplicationDbContext context;
+        private readonly IDbContextFactory<ApplicationDbContext> _contextFactory;
         private readonly ICaseImageCreationService caseImageCreationService;
         private readonly IPhoneService phoneService;
         private readonly IFileStorageService fileStorageService;
         private readonly IFeatureManager featureManager;
 
         public VerifierProcessor(
-            ApplicationDbContext context,
+            IDbContextFactory<ApplicationDbContext> contextFactory,
             ICaseImageCreationService caseImageCreationService,
             IPhoneService phoneService,
             IFileStorageService fileStorageService,
             IFeatureManager featureManager
             )
         {
-            this.context = context;
+            _contextFactory = contextFactory;
             this.caseImageCreationService = caseImageCreationService;
             this.phoneService = phoneService;
             this.fileStorageService = fileStorageService;
@@ -69,7 +69,7 @@ namespace risk.control.system.Services.Creator
         {
             if (!await featureManager.IsEnabledAsync(FeatureFlags.VALIDATE_PHONE)) return;
 
-            // We assume the repository can also provide Country, or we query it here
+            using var context = await _contextFactory.CreateDbContextAsync();
             var country = await context.Country.FirstOrDefaultAsync(c => c.CountryId == user.ClientCompany.CountryId);
 
             if (country == null || !phoneService.IsValidMobileNumber(contactNumber, country.ISDCode.ToString()))

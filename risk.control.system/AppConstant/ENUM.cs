@@ -8,6 +8,7 @@ namespace risk.control.system.Models
         Trial,
         Standard
     }
+
     public enum Income
     {
         [Display(Name = "UNKNOWN")]
@@ -36,7 +37,7 @@ namespace risk.control.system.Models
 
         [Display(Name = "15 - 30 Lac")]
         [Description("Higher income level")]
-        HIGHER_INCOMEv = 6,
+        HIGHER_INCOME = 6,
 
         [Display(Name = "30 - 50 Lac")]
         [Description("Top higher-income bracket")]
@@ -114,6 +115,7 @@ namespace risk.control.system.Models
         [Display(Name = "File Upload")]
         [Description("Data upload type through file")]
         FILE
+
         //    ,
 
         //[Display(Name = "FTP Upload")]
@@ -162,6 +164,7 @@ namespace risk.control.system.Models
     {
         [Display(Name = "UNKNOWN")]
         UNKNOWN,
+
         [Display(Name = "HNI")]
         [Description("High Net Worth Individual")]
         HNI,
@@ -170,6 +173,7 @@ namespace risk.control.system.Models
         [Description("Non-High Net Worth Individual")]
         NONHNI,
     }
+
     public enum SupervisorRemarkType
     {
         OK,
@@ -187,9 +191,11 @@ namespace risk.control.system.Models
     {
         [Description("Data was entered through auto-allocation")]
         AUTO,
+
         [Description("Data was entered through manual-allocation")]
         MANUAL
     }
+
     public enum ORIGIN
     {
         [Display(Name = "User")]

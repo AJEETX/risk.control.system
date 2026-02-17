@@ -3,6 +3,7 @@ using Hangfire;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using risk.control.system.AppConstant;
+using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services.Agency;
@@ -55,7 +56,7 @@ namespace risk.control.system.Controllers.Agency
             if (!ModelState.IsValid || model == null || claimId < 1)
             {
                 notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(VendorInvestigationController.Allocate), "VendorInvestigation");
+                return RedirectToAction(nameof(VendorInvestigationController.Allocate), ControllerName<VendorInvestigationController>.Name);
             }
             try
             {
@@ -65,13 +66,13 @@ namespace risk.control.system.Controllers.Agency
 
                 notifyService.Custom($"Case <b> #{policyNumber}</b> Declined successfully", 3, "red", "far fa-file-powerpoint");
 
-                return RedirectToAction(nameof(VendorInvestigationController.Allocate), "VendorInvestigation");
+                return RedirectToAction(nameof(VendorInvestigationController.Allocate), ControllerName<VendorInvestigationController>.Name);
             }
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error occurred for Case {Id}. {UserEmail}.", claimId, userEmail ?? "Anonymous");
                 notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(VendorInvestigationController.Allocate), "VendorInvestigation");
+                return RedirectToAction(nameof(VendorInvestigationController.Allocate), ControllerName<VendorInvestigationController>.Name);
             }
         }
 
@@ -83,7 +84,7 @@ namespace risk.control.system.Controllers.Agency
             if (!ModelState.IsValid || claimId < 1)
             {
                 notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(VendorInvestigationController.Allocate), "VendorInvestigation");
+                return RedirectToAction(nameof(VendorInvestigationController.Allocate), ControllerName<VendorInvestigationController>.Name);
             }
 
             try
@@ -94,13 +95,13 @@ namespace risk.control.system.Controllers.Agency
 
                 notifyService.Custom($"Case <b> #{policyNumber}</b> Withdrawn from Agent successfully", 3, "green", "far fa-file-powerpoint");
 
-                return RedirectToAction(nameof(VendorInvestigationController.Allocate), "VendorInvestigation");
+                return RedirectToAction(nameof(VendorInvestigationController.Allocate), ControllerName<VendorInvestigationController>.Name);
             }
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error occurred for Case {Id}. {UserEmail}.", claimId, userEmail ?? "Anonymous");
                 notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(VendorInvestigationController.Allocate), "VendorInvestigation");
+                return RedirectToAction(nameof(VendorInvestigationController.Allocate), ControllerName<VendorInvestigationController>.Name);
             }
         }
     }

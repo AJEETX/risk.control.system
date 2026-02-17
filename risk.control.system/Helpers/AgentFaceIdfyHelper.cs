@@ -9,13 +9,13 @@ namespace risk.control.system.Helpers
         {
             face.FilePath = path;
             face.ImageExtension = Path.GetExtension(name);
-            face.Updated = DateTime.Now;
+            face.Updated = DateTime.UtcNow;
             face.UpdatedBy = data.Email;
-            face.LongLatTime = DateTime.Now;
+            face.LongLatTime = DateTime.UtcNow;
             face.LongLat = $"Latitude = {lat}, Longitude = {lon}";
             face.ValidationExecuted = true;
 
-            loc.Updated = DateTime.Now;
+            loc.Updated = DateTime.UtcNow;
             loc.AgentEmail = data.Email;
             loc.ValidationExecuted = true;
         }

@@ -33,7 +33,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
         // GET: RiskCaseStatus
         public IActionResult Index()
         {
-            return RedirectToAction("Profile");
+            return RedirectToAction(nameof(Profile));
         }
 
         [Breadcrumb("Country")]
@@ -41,7 +41,6 @@ namespace risk.control.system.Controllers.CompanyAdmin
         {
             return View();
         }
-
 
         [HttpGet]
         public async Task<IActionResult> GetCountries(int draw, int start, int length, string search, int? orderColumn, string orderDirection)
@@ -129,7 +128,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             return View(country);
         }
 
-        [Breadcrumb("Add New", FromAction = "Profile")]
+        [Breadcrumb("Add New", FromAction = nameof(Profile))]
         public IActionResult Create()
         {
             return View();
@@ -147,7 +146,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             try
             {
                 country.IsUpdated = true;
-                country.Updated = DateTime.Now;
+                country.Updated = DateTime.UtcNow;
                 country.Code = WebUtility.HtmlEncode(country.Code?.ToUpper(CultureInfo.InvariantCulture));
                 country.Name = WebUtility.HtmlEncode(country.Name);
                 country.UpdatedBy = HttpContext.User?.Identity?.Name;
@@ -164,7 +163,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
         }
 
         // GET: RiskCaseStatus/Edit/5
-        [Breadcrumb("Edit ", FromAction = "Profile")]
+        [Breadcrumb("Edit ", FromAction = nameof(Profile))]
         public async Task<IActionResult> Edit(long id)
         {
             if (id < 1)
@@ -201,7 +200,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 {
                     country.Code = WebUtility.HtmlEncode(country.Code?.ToUpper(CultureInfo.InvariantCulture));
                     country.Name = WebUtility.HtmlEncode(country.Name);
-                    country.Updated = DateTime.Now;
+                    country.Updated = DateTime.UtcNow;
                     country.IsUpdated = true;
                     country.UpdatedBy = HttpContext.User?.Identity?.Name;
                     _context.Update(country);
@@ -220,7 +219,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
         }
 
         // GET: RiskCaseStatus/Delete/5
-        [Breadcrumb("Delete ", FromAction = "Profile")]
+        [Breadcrumb("Delete ", FromAction = nameof(Profile))]
         public async Task<IActionResult> Delete(long id)
         {
             if (id < 1)
@@ -253,7 +252,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             var country = await _context.Country.FindAsync(id);
             if (country != null)
             {
-                country.Updated = DateTime.Now;
+                country.Updated = DateTime.UtcNow;
                 country.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Country.Remove(country);
             }

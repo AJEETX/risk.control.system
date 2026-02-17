@@ -30,7 +30,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
         // GET: BeneficiaryRelation
         public IActionResult Index()
         {
-            return RedirectToAction("Profile");
+            return RedirectToAction(nameof(Profile));
         }
 
         [Breadcrumb("Beneficiary Relation ")]
@@ -53,6 +53,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
 
             return Json(new { data });
         }
+
         // GET: BeneficiaryRelation/Details/5
         [Breadcrumb("Details ")]
         public async Task<IActionResult> Details(long id)
@@ -81,7 +82,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
         }
 
         // GET: BeneficiaryRelation/Create
-        [Breadcrumb("Add  New", FromAction = "Profile")]
+        [Breadcrumb("Add  New", FromAction = nameof(Profile))]
         public IActionResult Create()
         {
             return View();
@@ -101,7 +102,6 @@ namespace risk.control.system.Controllers.CompanyAdmin
             }
             try
             {
-
                 beneficiaryRelation.Code = beneficiaryRelation.Code?.ToUpper(CultureInfo.InvariantCulture);
 
                 // Check for duplicate code before saving
@@ -112,13 +112,12 @@ namespace risk.control.system.Controllers.CompanyAdmin
                     notifyService.Error("Beneficiary Relation Code already exists!");
                     return View(beneficiaryRelation);
                 }
-                beneficiaryRelation.Updated = DateTime.Now;
+                beneficiaryRelation.Updated = DateTime.UtcNow;
                 beneficiaryRelation.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Add(beneficiaryRelation);
                 await _context.SaveChangesAsync();
                 notifyService.Success("Beneficiary Relation created successfully!");
                 return RedirectToAction(nameof(Profile));
-
             }
             catch (Exception ex)
             {
@@ -139,8 +138,9 @@ namespace risk.control.system.Controllers.CompanyAdmin
 
             return Json(exists);
         }
+
         // GET: BeneficiaryRelation/Edit/5
-        [Breadcrumb("Edit ", FromAction = "Profile")]
+        [Breadcrumb("Edit ", FromAction = nameof(Profile))]
         public async Task<IActionResult> Edit(long id)
         {
             if (id < 1)
@@ -182,7 +182,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                     notifyService.Error("Beneficiary Relation Code already exists!");
                     return View(beneficiaryRelation);
                 }
-                beneficiaryRelation.Updated = DateTime.Now;
+                beneficiaryRelation.Updated = DateTime.UtcNow;
                 beneficiaryRelation.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Update(beneficiaryRelation);
                 await _context.SaveChangesAsync();
@@ -213,7 +213,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 {
                     return Json(new { success = false, message = "Beneficiary Relation Not found!" });
                 }
-                beneficiaryRelation.Updated = DateTime.Now;
+                beneficiaryRelation.Updated = DateTime.UtcNow;
                 beneficiaryRelation.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.BeneficiaryRelation.Remove(beneficiaryRelation);
                 await _context.SaveChangesAsync();

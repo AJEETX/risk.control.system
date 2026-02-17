@@ -1,119 +1,115 @@
 ﻿@model CaseInvestigationVendorsModel
 
 @{
-    string address = string.Empty;
-    int currentAgeinYrs = 0;
-    if (Model.ClaimsInvestigation != null && Model.ClaimsInvestigation.CustomerDetail != null)
-    {
-        address = @Model.ClaimsInvestigation?.CustomerDetail.Addressline + " " + @Model.ClaimsInvestigation?.CustomerDetail.District.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.State.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.Country.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.PinCode.Code;
-      
-        if (Model.ClaimsInvestigation?.CustomerDetail.DateOfBirth != null)
-        {
-            var age = DateTime.Now.Subtract(Model.ClaimsInvestigation.CustomerDetail.DateOfBirth.GetValueOrDefault()).TotalDays;
-            currentAgeinYrs = (int)age / 365;
-        }
-    }
-    var map = string.Format(Model.ClaimsInvestigation.CustomerDetail.CustomerLocationMap, "400", "400");
+	string address = string.Empty;
+	int currentAgeinYrs = 0;
+	if (Model.CaseTask != null && Model.CaseTask.CustomerDetail != null)
+	{
+		address = @Model.CaseTask?.CustomerDetail.Addressline + " " + @Model.CaseTask?.CustomerDetail.District.Name + " " + @Model.CaseTask?.CustomerDetail.State.Name + " " + @Model.CaseTask?.CustomerDetail.Country.Name + " " + @Model.CaseTask?.CustomerDetail.PinCode.Code;
 
-    <div class="col-12 col-sm-6 d-flex align-items-stretch flex-column">
-        <div class="card bg-light d-flex flex-fill">
-            <div class="card-header text-muted border-bottom-0">
-                <i class="fa fa-user-plus"></i> Customer Details
-                <span class="hover-text">
-                    <i class="fas fa-info-circle"></i>
-                    <span class="tooltip-text" id="customer-information">
-                        <li>
+		if (Model.CaseTask?.CustomerDetail.DateOfBirth != null)
+		{
+			var age = DateTime.UtcNow.Subtract(Model.CaseTask.CustomerDetail.DateOfBirth.GetValueOrDefault()).TotalDays;
+			currentAgeinYrs = (int)age / 365;
+		}
+	}
+	var map = string.Format(Model.CaseTask.CustomerDetail.CustomerLocationMap, "400", "400");
 
-                            <i class='fa fa-user-plus'></i> Customer details
-                        </li>
-                        <li>
-                            <i class='far fa-hand-point-right'></i>
-                            <div class="btn btn-xs bg-teal">
-                                <i class="fas fa-comments"></i>
-                            </div> Send SMS to Customer
+	<div class="col-12 col-sm-6 d-flex align-items-stretch flex-column">
+		<div class="card bg-light d-flex flex-fill">
+			<div class="card-header text-muted border-bottom-0">
+				<i class="fa fa-user-plus"></i> Customer Details
+				<span class="hover-text">
+					<i class="fas fa-info-circle"></i>
+					<span class="tooltip-text" id="customer-information">
+						<li>
 
-                        </li>
-                        <li>
-                            <i class='far fa-hand-point-right'></i>
-                            <div class="btn btn-xs btn-warning">
-                                <i class="fa fa-user-plus"></i> ...
-                            </div> Show Customer Details
+							<i class='fa fa-user-plus'></i> Customer details
+						</li>
+						<li>
+							<i class='far fa-hand-point-right'></i>
+							<div class="btn btn-xs bg-teal">
+								<i class="fas fa-comments"></i>
+							</div> Send SMS to Customer
+						</li>
+						<li>
+							<i class='far fa-hand-point-right'></i>
+							<div class="btn btn-xs btn-warning">
+								<i class="fa fa-user-plus"></i> ...
+							</div> Show Customer Details
+						</li>
+					</span>
+				</span>
+			</div>
+			<div class="progress">
+				<i class="far fa-bookmark bookmark-green"></i>
+				<div class="progress-bar progress-bar-green" role="progressbar">
+					<i class="fa fa-user-plus"></i>
+				</div>
+			</div>
+			<div class="card-body">
+				<div class="row">
+					<div class="col-7">
+						<h2 class="lead"><b>@Model.CaseTask.CustomerDetail.Name</b></h2>
+						<p class="text-muted text-sm">
+							<b>Occupation: </b> @Model.CaseTask.CustomerDetail.Occupation
+						</p>
+						<ul class="ml-4 mb-0 fa-ul text-muted">
+							<li class="small">
+								<span class="fa-li">
+									<i class="fa fa-money"></i>
+								</span>
+								Annual Income: (@Model.Currency) @Model.CaseTask.CustomerDetail.Income
+							</li>
+							<li class="small">
+								<span class="fa-li">
+									<i class="fas fa-user-alt"></i>
+								</span>
+								Age: (years) @currentAgeinYrs
+							</li>
+							<li class="small">
+								<span class="fa-li">
+									<i class="fas fa-lg fa-building"></i>
+								</span>
+								Address: @address
+							</li>
 
-                        </li>
-                    </span>
-                </span>
-            </div>
-            <div class="progress">
-                <i class="far fa-bookmark bookmark-green"></i>
-                <div class="progress-bar progress-bar-green" role="progressbar">
-                    <i class="fa fa-user-plus"></i>
-                </div>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-7">
-                        <h2 class="lead"><b>@Model.ClaimsInvestigation.CustomerDetail.Name</b></h2>
-                        <p class="text-muted text-sm">
-                            <b>Occupation: </b> @Model.ClaimsInvestigation.CustomerDetail.Occupation
-                        </p>
-                        <ul class="ml-4 mb-0 fa-ul text-muted">
-                            <li class="small">
-                                <span class="fa-li">
-                                    <i class="fa fa-money"></i>
-                                </span>
-                                Annual Income: (@ViewBag.Currency) @Model.ClaimsInvestigation.CustomerDetail.Income
-                            </li>
-                            <li class="small">
-                                <span class="fa-li">
-                                    <i class="fas fa-user-alt"></i>
-                                </span>
-                                Age: (years) @currentAgeinYrs
-                            </li>
-                            <li class="small">
-                                <span class="fa-li">
-                                    <i class="fas fa-lg fa-building"></i>
-                                </span>
-                                Address: @address
-                            </li>
+							<li class="small">
+								<span class="fa-li">
+									<i class="fas fa-lg fa-phone"></i>
+								</span>
+								Mobile #: + @Model.CaseTask.CustomerDetail.PhoneNumber
+							</li>
+						</ul>
+					</div>
+					<div class="col-5 text-center">
+						<p class="text-muted text-sm">
+							@if (Model?.CaseTask?.CustomerDetail?.ImagePath is not null)
+							{
+								<img id="profileImage" class="img-fluid block-data" src="/Document/GetCustomerDocument/@Model?.CaseTask?.CustomerDetail?.CustomerDetailId" data-bs-toggle="tooltip" title="Customer Photo">
+							}
+							else
+							{
+								<img id="profileImage" class="img-fluid block-data" src="@Applicationsettings.NO_USER" data-bs-toggle="tooltip" title="No Customer Photo">
+							}
+						</p>
+						<p class="text-muted text-sm">
+							<img id="customerGoogleMap" class="img-fluid block-data" src="@map" data-bs-toggle="tooltip" title="Display Customer Address in map">
+						</p>
+					</div>
+				</div>
+			</div>
+			<div class="card-footer">
+				<div class="text-right">
+					<a id="customer-comments" class="btn btn-sm bg-teal" data-bs-toggle="tooltip" title="Send SMS to Customer">
+						<i class="fas fa-comments"></i>
+					</a>
 
-                            <li class="small">
-                                <span class="fa-li">
-                                    <i class="fas fa-lg fa-phone"></i>
-                                </span>
-                                Mobile #: + @Model.ClaimsInvestigation.CustomerDetail.PhoneNumber
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="col-5 text-center">
-                        <p class="text-muted text-sm">
-                            @if (Model?.ClaimsInvestigation?.CustomerDetail?.ImagePath is not null)
-                            {
-                                <img id="profileImage" class="img-fluid block-data" src="/Document/GetCustomerDocument/@Model?.ClaimsInvestigation?.CustomerDetail?.CustomerDetailId" data-bs-toggle="tooltip" title="Customer Photo">
-                            }
-                            else
-                            {
-                                <img id="profileImage" class="img-fluid block-data" src="@Applicationsettings.NO_USER" data-bs-toggle="tooltip" title="No Customer Photo">
-                            }
-                        </p>
-                        <p class="text-muted text-sm">
-                            <img id="customerGoogleMap" class="img-fluid block-data" src="@map" data-bs-toggle="tooltip" title="Display Customer Address in map">
-                        </p>
-
-                    </div>
-                </div>
-            </div>
-            <div class="card-footer">
-                <div class="text-right">
-                    <a id="customer-comments" class="btn btn-sm bg-teal" data-bs-toggle="tooltip" title="Send SMS to Customer">
-                        <i class="fas fa-comments"></i>
-                    </a>
-
-                    <a id="customer-detail" class="btn btn-sm btn-warning" data-bs-toggle="tooltip" title="Show Customer Details">
-                        <i class="fa fa-user-plus"></i> ...
-                    </a>
-                </div>
-
-            </div>
-        </div>
-    </div>
+					<a id="customer-detail" class="btn btn-sm btn-warning" data-bs-toggle="tooltip" title="Show Customer Details">
+						<i class="fa fa-user-plus"></i> ...
+					</a>
+				</div>
+			</div>
+		</div>
+	</div>
 }

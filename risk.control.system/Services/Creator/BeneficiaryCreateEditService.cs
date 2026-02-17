@@ -90,7 +90,7 @@ namespace risk.control.system.Services.Creator
             {
                 InvestigationTaskId = id,
                 Addressline = "10 Main Road",
-                DateOfBirth = DateTime.Now.AddYears(-25).AddMonths(3),
+                DateOfBirth = DateTime.UtcNow.AddYears(-25).AddMonths(3),
                 Income = Income.MEDIUM_INCOME,
                 Name = NameGenerator.GenerateName(),
                 BeneficiaryRelationId = beneRelation.BeneficiaryRelationId,

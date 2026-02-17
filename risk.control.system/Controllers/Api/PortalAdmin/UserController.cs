@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using risk.control.system.AppConstant;
 using risk.control.system.Services.Api;
 
-namespace risk.control.system.Controllers.CompanyAdmin
+namespace risk.control.system.Controllers.Api.PortalAdmin
 {
     [ApiExplorerSettings(IgnoreApi = true)]
     [Route("api/[controller]")]

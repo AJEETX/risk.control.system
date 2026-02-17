@@ -1,14 +1,10 @@
 ﻿using AspNetCoreHero.ToastNotification.Abstractions;
-
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using risk.control.system.Models;
-
-using SmartBreadcrumbs.Attributes;
-
-using static risk.control.system.AppConstant.Applicationsettings;
 using risk.control.system.AppConstant;
+using risk.control.system.Models;
+using SmartBreadcrumbs.Attributes;
 
 namespace risk.control.system.Controllers.CompanyAdmin
 {
@@ -26,9 +22,10 @@ namespace risk.control.system.Controllers.CompanyAdmin
             this.notifyService = notifyService;
             this.logger = logger;
         }
+
         public IActionResult Index()
         {
-            return RedirectToAction("Profile");
+            return RedirectToAction(nameof(Profile));
         }
 
         [Breadcrumb("Education Type")]
@@ -50,6 +47,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
 
             return Json(new { data });
         }
+
         [Breadcrumb("Details ")]
         public async Task<IActionResult> Details(int id)
         {
@@ -70,7 +68,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             return View(income);
         }
 
-        [Breadcrumb("Add  New", FromAction = "Profile")]
+        [Breadcrumb("Add  New", FromAction = nameof(Profile))]
         public ActionResult Create()
         {
             return View();
@@ -82,7 +80,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
         {
             if (education is not null)
             {
-                education.Updated = DateTime.Now;
+                education.Updated = DateTime.UtcNow;
                 education.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.EducationType.Add(education);
                 await _context.SaveChangesAsync();
@@ -92,7 +90,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             return View(education);
         }
 
-        [Breadcrumb("Edit ", FromAction = "Profile")]
+        [Breadcrumb("Edit ", FromAction = nameof(Profile))]
         public async Task<IActionResult> Edit(long id)
         {
             if (id < 1)
@@ -121,7 +119,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             }
             try
             {
-                education.Updated = DateTime.Now;
+                education.Updated = DateTime.UtcNow;
                 education.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.EducationType.Update(education);
                 await _context.SaveChangesAsync();
@@ -147,7 +145,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             var education = await _context.EducationType.FindAsync(id);
             if (education != null)
             {
-                education.Updated = DateTime.Now;
+                education.Updated = DateTime.UtcNow;
                 education.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.EducationType.Remove(education);
             }

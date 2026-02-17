@@ -16,14 +16,14 @@ namespace risk.control.system.Helpers
         {
             face.FilePath = path;
             face.ImageExtension = ext;
-            face.Updated = DateTime.Now;
+            face.Updated = DateTime.UtcNow;
             face.UpdatedBy = data.Email;
-            face.LongLatTime = DateTime.Now;
+            face.LongLatTime = DateTime.UtcNow;
             face.LongLat = $"Latitude = {lat}, Longitude = {lon}";
             face.ValidationExecuted = true;
 
             loc.AgentEmail = data.Email;
-            loc.Updated = DateTime.Now;
+            loc.Updated = DateTime.UtcNow;
             loc.ValidationExecuted = true;
         }
 

@@ -5,16 +5,17 @@ using Amazon.Runtime;
 using Amazon.S3;
 using Amazon.Textract;
 using Amazon.TranscribeService;
+using risk.control.system.Helpers;
+
 namespace risk.control.system.StartupExtensions;
+
 public static class AwsServiceExtension
 {
     public static IServiceCollection AddAwsServices(this IServiceCollection services, IConfiguration configuration)
     {
         var awsOptions = new Amazon.Extensions.NETCore.Setup.AWSOptions
         {
-            Credentials = new BasicAWSCredentials(
-                Environment.GetEnvironmentVariable("aws_id"),
-                Environment.GetEnvironmentVariable("aws_secret")),
+            Credentials = new BasicAWSCredentials(EnvHelper.Get("AWS_ID"), EnvHelper.Get("AWS_SECRET")),
             Region = RegionEndpoint.APSoutheast2
         };
 

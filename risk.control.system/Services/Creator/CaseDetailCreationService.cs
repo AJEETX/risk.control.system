@@ -39,42 +39,43 @@ namespace risk.control.system.Services.Creator
 
             try
             {
-                // Parallel Execution for Speed
+                // 1. Kick off all major tasks in parallel immediately
                 var customerTask = customerCreationService.AddCustomer(user, uc, data);
                 var beneficiaryTask = beneficiaryCreationService.AddBeneficiary(user, uc, data);
+                var policyTask = policyProcessor.ProcessPolicy(uc, user, data);
 
-                await Task.WhenAll(customerTask, beneficiaryTask);
+                // 2. Wait for all core data to be processed
+                await Task.WhenAll(customerTask, beneficiaryTask, policyTask);
 
-                // Extract Results
+                // 3. Destructure results (awaiting completed tasks is instant and safe)
                 var (cust, custErrs, custSums) = await customerTask;
                 var (bene, beneErrs, beneSums) = await beneficiaryTask;
-
-                var (policy, polyErrs, polySums) = await policyProcessor.ProcessPolicy(uc, user, data);
+                var (policy, polyErrs, polySums) = await policyTask;
 
                 // Aggregate Errors
                 AggregateErrors(resultErrors, resultSummaries, custErrs, custSums, beneErrs, beneSums, polyErrs, polySums);
 
-                // Deep Clone Template based on Insurance Type
+                // 4. Sequential logic that depends on previous results
+                if (policy?.InsuranceType == null)
+                    throw new Exception("Policy or Insurance Type missing.");
+
                 var template = await cloneService.DeepCloneReportTemplate(user.ClientCompanyId.Value, policy.InsuranceType.Value);
 
-                // Assemble the InvestigationTask
                 var task = new InvestigationTask
                 {
                     ORIGIN = origin,
                     PolicyDetail = policy,
                     CustomerDetail = cust,
                     BeneficiaryDetail = bene,
-                    ReportTemplateId = template.Id,
+                    ReportTemplateId = template?.Id,
                     ReportTemplate = template,
                     Status = CASE_STATUS.INITIATED,
                     SubStatus = CASE_STATUS.CASE_SUBSTATUS.UPLOAD_COMPLETED,
                     ClientCompanyId = user.ClientCompanyId,
                     CaseOwner = user.Email,
                     CreatedUser = user.Email,
-                    CreatorSla = user.ClientCompany.CreatorSla,
-                    Updated = DateTime.Now,
-                    UpdatedBy = user.Email,
-                    IsNew = true
+                    Updated = DateTime.UtcNow,
+                    UpdatedBy = user.Email
                 };
 
                 task.IsReady2Assign = task.IsValidCaseData();

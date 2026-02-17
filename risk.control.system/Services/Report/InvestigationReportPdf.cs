@@ -85,7 +85,7 @@ namespace risk.control.system.Services.Report
     //            page.Footer().AlignCenter().Text(x =>
     //            {
     //                x.Span("Generated on ");
-    //                x.Span(DateTime.Now.ToString("dd-MMM-yyyy HH:mm"));
+    //                x.Span(DateTime.UtcNow.ToString("dd-MMM-yyyy HH:mm"));
     //            });
     //        });
     //    }

@@ -4,6 +4,7 @@ using Hangfire;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using risk.control.system.AppConstant;
+using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Services.Assessor;
 using risk.control.system.Services.Common;
@@ -53,9 +54,9 @@ namespace risk.control.system.Controllers.Assessor
             if (!ModelState.IsValid || string.IsNullOrWhiteSpace(assessorRemarks) || claimId < 1 || string.IsNullOrWhiteSpace(assessorRemarkType))
             {
                 notifyService.Custom($"Error!!! Try again", 3, "red", "far fa-file-powerpoint");
-                return RedirectToAction(nameof(AssessorController.Assessor), "Assessor");
+                return RedirectToAction(nameof(AssessorController.Assessor), ControllerName<AssessorController>.Name);
             }
-            var currentUserEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name;
             try
             {
                 if (Enum.TryParse<AssessorRemarkType>(assessorRemarkType, true, out var reportUpdateStatus))
@@ -63,9 +64,9 @@ namespace risk.control.system.Controllers.Assessor
                     assessorRemarks = WebUtility.HtmlEncode(assessorRemarks);
                     reportAiSummary = WebUtility.HtmlEncode(reportAiSummary);
 
-                    var (company, contract) = await processCaseService.ProcessCaseReport(currentUserEmail, assessorRemarks, claimId, reportUpdateStatus, reportAiSummary);
+                    var (company, contract) = await processCaseService.ProcessCaseReport(userEmail, assessorRemarks, claimId, reportUpdateStatus, reportAiSummary);
 
-                    backgroundJobClient.Enqueue(() => mailboxService.NotifyCaseReportProcess(currentUserEmail, claimId, baseUrl));
+                    backgroundJobClient.Enqueue(() => mailboxService.NotifyCaseReportProcess(userEmail, claimId, baseUrl));
                     if (reportUpdateStatus == AssessorRemarkType.OK)
                     {
                         notifyService.Custom($"Case <b> #{contract}</b> Approved", 3, "green", "far fa-file-powerpoint");
@@ -78,19 +79,19 @@ namespace risk.control.system.Controllers.Assessor
                     {
                         notifyService.Custom($"Case <b> #{contract}</b> Re-Assigned", 3, "yellow", "far fa-file-powerpoint");
                     }
-                    return RedirectToAction(nameof(AssessorController.Assessor), "Assessor");
+                    return RedirectToAction(nameof(AssessorController.Assessor), ControllerName<AssessorController>.Name);
                 }
                 else
                 {
                     notifyService.Custom($"Error!!! Try again", 3, "red", "far fa-file-powerpoint");
-                    return RedirectToAction(nameof(AssessorController.Assessor), "Assessor");
+                    return RedirectToAction(nameof(AssessorController.Assessor), ControllerName<AssessorController>.Name);
                 }
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error withdrawing case {Id}. {UserEmail}", claimId, currentUserEmail);
+                logger.LogError(ex, "Error withdrawing case {Id}. {UserEmail}", claimId, userEmail);
                 notifyService.Error("Error processing case. Try again.");
-                return RedirectToAction(nameof(AssessorController.Assessor), "Assessor");
+                return RedirectToAction(nameof(AssessorController.Assessor), ControllerName<AssessorController>.Name);
             }
         }
     }

@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using risk.control.system.Models.ViewModel;
 
 namespace risk.control.system.Models
@@ -13,7 +13,22 @@ namespace risk.control.system.Models
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+            // Automatically convert all DateTime properties to UTC on save
+            foreach (var entityType in builder.Model.GetEntityTypes())
+            {
+                var properties = entityType.GetProperties()
+                    .Where(p => p.ClrType == typeof(DateTime) || p.ClrType == typeof(DateTime?));
+
+                foreach (var property in properties)
+                {
+                    property.SetValueConverter(new ValueConverter<DateTime, DateTime>(
+                        v => v.Kind == DateTimeKind.Utc ? v : DateTime.SpecifyKind(v, DateTimeKind.Utc),
+                        v => v.Kind == DateTimeKind.Utc ? v : DateTime.SpecifyKind(v, DateTimeKind.Utc)
+                    ));
+                }
+            }
         }
+
         public virtual DbSet<BsbInfo> BsbInfo { get; set; }
         public virtual DbSet<EducationType> EducationType { get; set; }
         public virtual DbSet<OccupationType> OccupationType { get; set; }

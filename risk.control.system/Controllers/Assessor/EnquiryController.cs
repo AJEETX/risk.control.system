@@ -48,57 +48,55 @@ namespace risk.control.system.Controllers.Assessor
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SubmitEnquiry([FromForm] CaseInvestigationVendorsModel request, [FromForm] long claimId, [FromForm] IFormFile? document)
         {
-            var currentUserEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name;
             try
             {
                 if (!ModelState.IsValid)
                 {
                     notifyService.Error("Bad Request..");
-                    return RedirectToAction("SendEnquiry", "Assessor", new { selectedcase = claimId });
+                    return RedirectToAction(nameof(AssessorController.SendEnquiry), ControllerName<AssessorController>.Name, new { id = claimId });
                 }
                 if (document != null && document.Length > 0)
                 {
                     if (document.Length > MAX_FILE_SIZE)
                     {
                         notifyService.Error($"Document image Size exceeds the max size: 5MB");
-                        return RedirectToAction("SendEnquiry", "Assessor", new { selectedcase = claimId });
+                        return RedirectToAction(nameof(AssessorController.SendEnquiry), ControllerName<AssessorController>.Name, new { id = claimId });
                     }
                     var ext = Path.GetExtension(document.FileName).ToLowerInvariant();
                     if (!AllowedExt.Contains(ext))
                     {
                         notifyService.Error($"Invalid Document image type");
-                        return RedirectToAction("SendEnquiry", "Assessor", new { selectedcase = claimId });
+                        return RedirectToAction(nameof(AssessorController.SendEnquiry), ControllerName<AssessorController>.Name, new { id = claimId });
                     }
                     if (!AllowedMime.Contains(document.ContentType))
                     {
                         notifyService.Error($"Invalid Document Image content type");
-                        return RedirectToAction("SendEnquiry", "Assessor", new { selectedcase = claimId });
+                        return RedirectToAction(nameof(AssessorController.SendEnquiry), ControllerName<AssessorController>.Name, new { id = claimId });
                     }
                     if (!ImageSignatureValidator.HasValidSignature(document))
                     {
                         notifyService.Error($"Invalid or corrupted Document Image ");
-                        return RedirectToAction("SendEnquiry", "Assessor", new { selectedcase = claimId });
+                        return RedirectToAction(nameof(AssessorController.SendEnquiry), ControllerName<AssessorController>.Name, new { id = claimId });
                     }
                 }
 
                 request.InvestigationReport.EnquiryRequest.DescriptiveQuestion = HttpUtility.HtmlEncode(request.InvestigationReport.EnquiryRequest.DescriptiveQuestion);
 
-                var model = await assessorQueryService.SubmitQueryToAgency(currentUserEmail, claimId, request.InvestigationReport.EnquiryRequest, request.InvestigationReport.EnquiryRequests, document);
+                var model = await assessorQueryService.SubmitQueryToAgency(userEmail, claimId, request.InvestigationReport.EnquiryRequest, request.InvestigationReport.EnquiryRequests, document);
                 if (model != null)
                 {
-                    var company = await context.ApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == currentUserEmail);
-
-                    backgroundJobClient.Enqueue(() => mailService.NotifySubmitQueryToAgency(currentUserEmail, claimId, baseUrl));
+                    backgroundJobClient.Enqueue(() => mailService.NotifySubmitQueryToAgency(userEmail, claimId, baseUrl));
 
                     notifyService.Success("Enquiry Sent to Agency");
-                    return RedirectToAction(nameof(AssessorController.Assessor), "Assessor");
+                    return RedirectToAction(nameof(AssessorController.Assessor), ControllerName<AssessorController>.Name);
                 }
                 notifyService.Error("OOPs !!!..Error sending query");
                 return this.RedirectToAction<DashboardController>(x => x.Index());
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error submitting query case {Id}", claimId, currentUserEmail);
+                logger.LogError(ex, "Error submitting query case {Id}", claimId, userEmail);
                 notifyService.Error("Error submitting query. Try again.");
                 return this.RedirectToAction<DashboardController>(x => x.Index());
             }

@@ -7,28 +7,30 @@ using risk.control.system.Helpers;
 using risk.control.system.Services.Common;
 using risk.control.system.Services.Report;
 using SmartBreadcrumbs.Attributes;
-using SmartBreadcrumbs.Nodes;
 
 namespace risk.control.system.Controllers.Assessor
 {
-    [Breadcrumb(" Cases")]
+    [Breadcrumb("Cases")]
     [Authorize(Roles = ASSESSOR.DISPLAY_NAME)]
     public class AssessorController : Controller
     {
         private readonly INotyfService notifyService;
         private readonly ICaseReportService caseVendorService;
+        private readonly INavigationService navigationService;
         private readonly IInvoiceService invoiceService;
         private readonly IInvestigationDetailService investigationService;
         private readonly ILogger<AssessorController> logger;
 
         public AssessorController(INotyfService notifyService,
             ICaseReportService caseVendorService,
+            INavigationService navigationService,
             IInvoiceService invoiceService,
             IInvestigationDetailService investigationService,
             ILogger<AssessorController> logger)
         {
             this.notifyService = notifyService;
             this.caseVendorService = caseVendorService;
+            this.navigationService = navigationService;
             this.invoiceService = invoiceService;
             this.investigationService = investigationService;
             this.logger = logger;
@@ -39,71 +41,56 @@ namespace risk.control.system.Controllers.Assessor
             return RedirectToAction(nameof(Assessor));
         }
 
-        [Breadcrumb(" Assess(report)")]
+        [Breadcrumb("Assess(report)")]
         public IActionResult Assessor()
         {
             return View();
         }
 
-        [Breadcrumb(title: "Report", FromAction = "Assessor")]
-        public async Task<IActionResult> GetInvestigateReport(long selectedcase)
+        [Breadcrumb(title: "Report", FromAction = nameof(Assessor))]
+        public async Task<IActionResult> GetInvestigateReport(long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
-            if (string.IsNullOrWhiteSpace(userEmail))
-            {
-                notifyService.Error("OOPs !!!..Unauthenticated Access");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
-            }
+
             try
             {
-                if (!ModelState.IsValid || selectedcase < 1)
+                if (!ModelState.IsValid || id < 1)
                 {
                     notifyService.Error("OOPS !!! Case Not Found !!!..");
-                    return this.RedirectToAction<DashboardController>(x => x.Index());
+                    return RedirectToAction(nameof(Assessor));
                 }
-                var model = await caseVendorService.GetInvestigateReport(userEmail, selectedcase);
-
-                ViewData["Currency"] = CustomExtensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
+                var model = await caseVendorService.GetInvestigateReport(userEmail, id);
 
                 return View(model);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred getting the case {Id}. {UserEmail}", selectedcase, userEmail);
+                logger.LogError(ex, "Error occurred getting the case {Id}. {UserEmail}", id, userEmail);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
 
-        public async Task<IActionResult> SendEnquiry(long selectedcase)
+        public async Task<IActionResult> SendEnquiry(long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
-            if (string.IsNullOrWhiteSpace(userEmail))
-            {
-                notifyService.Error("OOPs !!!..Unauthenticated Access");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
-            }
+
             try
             {
-                if (!ModelState.IsValid || selectedcase < 1)
+                if (!ModelState.IsValid || id < 1)
                 {
                     notifyService.Error("OOPS !!! Case Not Found !!!..");
-                    return RedirectToAction(nameof(Index));
+                    return RedirectToAction(nameof(Assessor));
                 }
-                var model = await caseVendorService.GetInvestigateReport(userEmail, selectedcase);
-                ViewData["Currency"] = CustomExtensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
+                var model = await caseVendorService.GetInvestigateReport(userEmail, id);
 
-                var claimsPage = new MvcBreadcrumbNode("Assessor", "Assessor", "Cases");
-                var agencyPage = new MvcBreadcrumbNode("Assessor", "Assessor", "Assess(report)") { Parent = claimsPage, };
-                var detailsPage = new MvcBreadcrumbNode("GetInvestigateReport", "Assessor", $"Details") { Parent = agencyPage, RouteValues = new { selectedcase = selectedcase } };
-                var editPage = new MvcBreadcrumbNode("SendEnquiry", "Assessor", $"Send Enquiry") { Parent = detailsPage, RouteValues = new { id = selectedcase } };
-                ViewData["BreadcrumbNode"] = editPage;
+                ViewData["BreadcrumbNode"] = navigationService.GetAssessorEnquiryPath(id, "Assessor"); ;
 
                 return View(model);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred getting the enquiry case {Id}. {UserEmail}", selectedcase, userEmail);
+                logger.LogError(ex, "Error occurred getting the enquiry case {Id}. {UserEmail}", id, userEmail);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return this.RedirectToAction<DashboardController>(x => x.Index());
             }
@@ -115,25 +102,20 @@ namespace risk.control.system.Controllers.Assessor
             return View();
         }
 
-        [Breadcrumb(title: " Details", FromAction = "Review")]
+        [Breadcrumb(title: "Details", FromAction = nameof(Review))]
         public async Task<IActionResult> ReviewDetail(long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
-            if (string.IsNullOrWhiteSpace(userEmail))
-            {
-                notifyService.Error("OOPs !!!..Unauthenticated Access");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
-            }
+
             try
             {
                 if (!ModelState.IsValid || id < 1)
                 {
                     notifyService.Error("OOPS !!! Case Not Found !!!..");
-                    return this.RedirectToAction<DashboardController>(x => x.Index());
+                    return RedirectToAction(nameof(Review));
                 }
 
                 var model = await investigationService.GetClaimDetailsReport(userEmail, id);
-                ViewData["Currency"] = CustomExtensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 return View(model);
             }
@@ -145,27 +127,23 @@ namespace risk.control.system.Controllers.Assessor
             }
         }
 
-        [Breadcrumb(title: " Approved")]
+        [Breadcrumb(title: nameof(Approved))]
         public IActionResult Approved()
         {
             return View();
         }
 
-        [Breadcrumb(" Details", FromAction = "Approved")]
+        [Breadcrumb("Details", FromAction = nameof(Approved))]
         public async Task<IActionResult> ApprovedDetail(long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
-            if (string.IsNullOrWhiteSpace(userEmail))
-            {
-                notifyService.Error("OOPs !!!..Unauthenticated Access");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
-            }
+
             try
             {
                 if (!ModelState.IsValid || id < 1)
                 {
                     notifyService.Error("OOPS !!! Case Not Found !!!..");
-                    return this.RedirectToAction<DashboardController>(x => x.Index());
+                    return RedirectToAction(nameof(Approved));
                 }
 
                 var model = await investigationService.GetClaimDetailsReport(userEmail, id);
@@ -173,7 +151,6 @@ namespace risk.control.system.Controllers.Assessor
                 //{
                 //    model = await investigationService.GetClaimDetailsAiReportSummary(model);
                 //}
-                ViewData["Currency"] = CustomExtensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
                 return View(model);
             }
             catch (Exception ex)
@@ -184,30 +161,25 @@ namespace risk.control.system.Controllers.Assessor
             }
         }
 
-        [Breadcrumb(title: " Rejected")]
+        [Breadcrumb(title: nameof(Rejected))]
         public IActionResult Rejected()
         {
             return View();
         }
 
-        [Breadcrumb(" Details", FromAction = "Rejected")]
+        [Breadcrumb("Details", FromAction = nameof(Rejected))]
         public async Task<IActionResult> RejectDetail(long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
-            if (string.IsNullOrWhiteSpace(userEmail))
-            {
-                notifyService.Error("OOPs !!!..Unauthenticated Access");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
-            }
+
             if (!ModelState.IsValid || id < 1)
             {
                 notifyService.Error("OOPS !!! Case Not Found !!!..");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return RedirectToAction(nameof(Rejected));
             }
             try
             {
                 var model = await investigationService.GetClaimDetailsReport(userEmail, id);
-                ViewData["Currency"] = CustomExtensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
                 return View(model);
             }
             catch (Exception ex)
@@ -218,29 +190,19 @@ namespace risk.control.system.Controllers.Assessor
             }
         }
 
-        [Breadcrumb(title: "Invoice", FromAction = "ApprovedDetail")]
         public async Task<IActionResult> ShowInvoice(long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
-            if (string.IsNullOrWhiteSpace(userEmail))
-            {
-                notifyService.Error("OOPs !!!..Unauthenticated Access");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
-            }
+
             if (!ModelState.IsValid || id <= 0)
             {
                 notifyService.Error("OOPS !!! Case Not Found !!!..");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return RedirectToAction(nameof(Approved));
             }
             try
             {
                 var invoice = await invoiceService.GetInvoice(id);
-                ViewData["Currency"] = CustomExtensions.GetCultureByCountry(invoice.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
-                var claimsPage = new MvcBreadcrumbNode("Assessor", "Assessor", "Cases");
-                var agencyPage = new MvcBreadcrumbNode("Approved", "Assessor", "Approved") { Parent = claimsPage, };
-                var detailsPage = new MvcBreadcrumbNode("ApprovedDetail", "Assessor", $"Details") { Parent = agencyPage, RouteValues = new { id = invoice.ClaimId } };
-                var editPage = new MvcBreadcrumbNode("ShowInvoice", "Assessor", $"Invoice") { Parent = detailsPage, RouteValues = new { id = id } };
-                ViewData["BreadcrumbNode"] = editPage;
+                ViewData["BreadcrumbNode"] = navigationService.GetInvoiceBreadcrumb(id, invoice.CaseId.Value, "Assessor", "Assessor", "Cases", "Approved", "Approved", "ApprovedDetail");
 
                 return View(invoice);
             }
@@ -252,15 +214,10 @@ namespace risk.control.system.Controllers.Assessor
             }
         }
 
-        [Breadcrumb(title: "Print", FromAction = "ShowInvoice")]
         public async Task<IActionResult> PrintInvoice(long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
-            if (string.IsNullOrWhiteSpace(userEmail))
-            {
-                notifyService.Error("OOPs !!!..Unauthenticated Access");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
-            }
+
             if (!ModelState.IsValid || id <= 0)
             {
                 notifyService.Error("OOPS !!! Case Not Found !!!..");
@@ -270,7 +227,6 @@ namespace risk.control.system.Controllers.Assessor
             try
             {
                 var invoice = await invoiceService.GetInvoice(id);
-                ViewData["Currency"] = CustomExtensions.GetCultureByCountry(invoice.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 return View(invoice);
             }

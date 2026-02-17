@@ -19,62 +19,7 @@
                     orderDir: d.order?.[0]?.dir || "desc"
                 };
             },
-            error: function (xhr, status, error) {
-                console.error("AJAX Error:", status, error);
-                console.error("Response:", xhr.responseText);
-                if (xhr.status === 401 || xhr.status === 403) {
-                    $.confirm({
-                        title: 'Session Expired!',
-                        content: 'Your session has expired or you are unauthorized. You will be redirected to the login page.',
-                        type: 'red',
-                        typeAnimated: true,
-                        buttons: {
-                            Ok: {
-                                text: 'Login',
-                                btnClass: 'btn-red',
-                                action: function () {
-                                    window.location.href = '/Account/Login';
-                                }
-                            }
-                        },
-                        onClose: function () {
-                            window.location.href = '/Account/Login';
-                        }
-                    });
-                }
-                else if (xhr.status === 500) {
-                    $.confirm({
-                        title: 'Server Error!',
-                        content: 'An unexpected server error occurred. You will be redirected to Enquiry page.',
-                        type: 'orange',
-                        typeAnimated: true,
-                        buttons: {
-                            Ok: function () {
-                                window.location.href = '/Assessor/Review';
-                            }
-                        },
-                        onClose: function () {
-                            window.location.href = '/Assessor/Review';
-                        }
-                    });
-                }
-                else if (xhr.status === 400) {
-                    $.confirm({
-                        title: 'Bad Request!',
-                        content: 'Try with valid data.You will be redirected to Enquiry page',
-                        type: 'orange',
-                        typeAnimated: true,
-                        buttons: {
-                            Ok: function () {
-                                window.location.href = '/Assessor/Review';
-                            }
-                        },
-                        onClose: function () {
-                            window.location.href = '/Assessor/Review';
-                        }
-                    });
-                }
-            }
+            error: DataTableErrorHandler
         },
         columnDefs: [
             {
@@ -268,12 +213,9 @@
             { "data": "policy", bVisible: false }
         ],
         rowCallback: function (row, data, index) {
-            
             $('.btn-info', row).addClass('btn-white-color');
-
         },
         "drawCallback": function (settings, start, end, max, total, pre) {
-            
             // Reinitialize Bootstrap 5 tooltips
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
             tooltipTriggerList.map(function (el) {
@@ -296,7 +238,7 @@
 
         showSpinnerOnButton(element, "Detail");
 
-        const url = `/Assessor/ReviewDetail?Id=${encodeURIComponent(id)}`;
+        const url = `/Assessor/ReviewDetail/${encodeURIComponent(id)}`;
 
         setTimeout(() => {
             window.location.href = url;
@@ -336,42 +278,3 @@
             $this.find('.full-map').hide();
         });
 });
-
-function getdetails(id) {
-    $("body").addClass("submit-progress-bg");
-    // Wrap in setTimeout so the UI
-    // can update the spinners
-    setTimeout(function () {
-        $(".submit-progress").removeClass("hidden");
-    }, 1);
-
-    $('a#details' + id + '.btn.btn-xs.btn-info').html("<i class='fas fa-sync fa-spin'></i> Detail");
-    disableAllInteractiveElements();
-
-    var article = document.getElementById("article");
-    if (article) {
-        var nodes = article.getElementsByTagName('*');
-        for (var i = 0; i < nodes.length; i++) {
-            nodes[i].disabled = true;
-        }
-    }
-}
-function showedit(id) {
-    $("body").addClass("submit-progress-bg");
-    // Wrap in setTimeout so the UI
-    // can update the spinners
-    setTimeout(function () {
-        $(".submit-progress").removeClass("hidden");
-    }, 1);
-
-    $('a#edit' + id + '.btn.btn-xs.btn-warning').html("<i class='fas fa-sync fa-spin'></i> Edit");
-    disableAllInteractiveElements();
-
-    var article = document.getElementById("article");
-    if (article) {
-        var nodes = article.getElementsByTagName('*');
-        for (var i = 0; i < nodes.length; i++) {
-            nodes[i].disabled = true;
-        }
-    }
-}

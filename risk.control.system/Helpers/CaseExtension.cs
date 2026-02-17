@@ -14,7 +14,7 @@ namespace risk.control.system.Helpers
                 policyDetail.SumAssuredValue != null &&
                 policyDetail.SumAssuredValue > 0 &&
                 policyDetail.ContractIssueDate != null &&
-                DateTime.Now > policyDetail.ContractIssueDate &&
+                DateTime.UtcNow > policyDetail.ContractIssueDate &&
                 policyDetail.DateOfIncident != null &&
                 policyDetail.DateOfIncident > policyDetail.ContractIssueDate &&
                 policyDetail.CaseEnablerId > 0 &&

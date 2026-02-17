@@ -21,32 +21,9 @@ $(document).ready(function () {
 
     var table = $("#dataTable").DataTable({
         ajax: {
-            url: '/api/Company/AllServices?id=' + $('#Id').val(),
+            url: '/api/Company/AllServices/' + $('#Id').val(),
             dataSrc: '',
-            error: function (xhr, status, error) {
-                console.error("AJAX Error:", status, error);
-                console.error("Response:", xhr.responseText);
-                if (xhr.status === 401 || xhr.status === 403) {
-                    $.confirm({
-                        title: 'Session Expired!',
-                        content: 'Your session has expired or you are unauthorized. You will be redirected to the login page.',
-                        type: 'red',
-                        typeAnimated: true,
-                        buttons: {
-                            Ok: {
-                                text: 'Login',
-                                btnClass: 'btn-red',
-                                action: function () {
-                                    window.location.href = '/Account/Login';
-                                }
-                            }
-                        },
-                        onClose: function () {
-                            window.location.href = '/Account/Login';
-                        }
-                    });
-                }
-            }
+            error: DataTableErrorHandler
         },
         order: [[10, 'desc'], [11, 'desc']], // Sort by `isUpdated` and `lastModified`,
         columnDefs: [
@@ -141,7 +118,7 @@ $(document).ready(function () {
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    buttons += `<a data-id="${row.id}" class="btn btn-xs btn-warning"><i class="fas fa-edit"></i> Edit</a> &nbsp;` ;
+                    buttons += `<a data-id="${row.id}" class="btn btn-xs btn-warning"><i class="fas fa-edit"></i> Edit</a> &nbsp;`;
                     buttons += `
                         <button
                            class="btn btn-xs btn-danger js-delete"
@@ -183,7 +160,7 @@ $(document).ready(function () {
 
         showSpinnerOnButton(element, "Edit");
 
-        const url = `/EmpanelledAgencyService/Edit?id=${encodeURIComponent(id)}`;
+        const url = `/EmpanelledAgencyService/Edit/${encodeURIComponent(id)}`;
 
         setTimeout(() => {
             window.location.href = url;

@@ -42,7 +42,6 @@
     });
 
     $('#beneficiaryGoogleMap').on('click', function () {
-
         const beneficiaryId = $('#beneficiaryId').val();
 
         if (!beneficiaryId) {
@@ -89,11 +88,9 @@
     });
 
     $('#policy-detail').on('click', function () {
-
         const policyId = $('#policyDetailId').val();
-        const claimId = $('#claimId').val();
 
-        if (!policyId || !claimId) {
+        if (!policyId) {
             $.alert('Policy details not found.');
             return;
         }
@@ -114,7 +111,7 @@
                     data: { id: policyId }
                 })
                     .done(function (res) {
-                        self.setContent(renderPolicyDetailHtml(res, claimId));
+                        self.setContent(renderPolicyDetailHtml(res, policyId));
                     })
                     .fail(function (xhr) {
                         if (xhr.status === 401 || xhr.status === 403) {
@@ -135,7 +132,6 @@
     });
 
     $('#customer-detail').on('click', function () {
-
         const customerId = $('#customerDetailId').val();
 
         if (!customerId) {
@@ -153,7 +149,6 @@
     });
 
     $('#beneficiary-detail').on('click', function () {
-
         const beneficiaryId = $('#beneficiaryId').val();
 
         if (!beneficiaryId) {
@@ -171,7 +166,6 @@
     });
 
     $('#notesDetail').on('click', function () {
-
         const claimId = $('#claimId').val();
 
         if (!claimId) {
@@ -191,141 +185,71 @@
 
     $('#policy-comments').click(function () {
         var claimId = $('#claimId').val();
-        const imgElement = document.getElementById("notesDetail-disabled");
+
         $.confirm({
             title: 'Policy Note!!!',
             closeIcon: true,
             type: 'green',
             icon: 'far fa-file-powerpoint',
-            content: '' +
-                '<form class="formName">' +
-                '<div class="form-group">' +
-                '<hr>' +
-                '<label>Enter note on Policy</label>' +
-                '<input type="text" placeholder="Enter note" class="name form-control remarks" required />' +
-                '</div>' +
-                '</form>',
+            content: `
+            <form class="formName">
+                <div class="form-group">
+                    <hr>
+                    <label>Enter note on Policy</label>
+                    <input type="text" placeholder="Enter note" class="name form-control remarks" required />
+                </div>
+            </form>`,
             buttons: {
                 formSubmit: {
                     text: 'Add Note',
                     btnClass: 'btn-green',
                     action: function () {
-                        var name = this.$content.find('.name').val();
-                        if (!name) {
-                            $.alert({
-                                title: 'Provide Policy note !!!',
-                                closeIcon: true,
-                                type: 'red',
-                                icon: 'far fa-file-powerpoint',
-                                content: 'Provide Policy note !!!'
-                            });
+                        var noteText = this.$content.find('.name').val();
+                        if (!noteText) {
+                            $.alert({ title: 'Error', type: 'red', content: 'Please enter a note.' });
                             return false;
                         }
-                        else {
-                            return $.ajax({
-                                url: '/Confirm/AddNotes',
-                                method: 'POST',
-                                data: {
-                                    __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val(),
-                                    caseId: claimId,
-                                    message: name
-                                }
-                            }).done(function (response) {
-                                $.alert({
-                                    title: 'Policy notes added!',
-                                    closeIcon: true,
-                                    type: 'green',
-                                    icon: 'far fa-comments',
-                                    content: 'Status: ' + response.message,
-                                    buttons: {
-                                        ok: {
-                                            text: 'Close',
-                                        }
-                                    }
-                                });
-                            }).fail(function (response) {
-                                $.alert({
-                                    title: 'Message Status!',
-                                    content: 'Status: failed',
-                                });
-                            }).always(function () {
-                                if (imgElement) {
-                                    imgElement.title = "Display notes"
-                                    imgElement.id = "notesDetail";
-                                    imgElement.src = "/img/blank-document.png";
-                                    imgElement.addEventListener("click", function () {
-                                        $.confirm({
-                                            title: 'Policy Note!!!',
-                                            closeIcon: true,
-                                            type: 'green',
-                                            icon: 'far fa-file-powerpoint',
-                                            buttons: {
-                                                confirm: {
-                                                    text: "Close",
-                                                    btnClass: 'btn-secondary',
-                                                    action: function () {
-                                                        askConfirmation = false;
-                                                    }
-                                                }
-                                            },
-                                            content: function () {
-                                                var self = this;
-                                                const date = new Date();
-                                                const day = String(date.getDate()).padStart(2, '0');
-                                                const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
-                                                const year = date.getFullYear();
-                                                const formattedDate = `${day}-${month}-${year}`;
 
-                                                const hours = String(date.getHours()).padStart(2, '0');
-                                                const minutes = String(date.getMinutes()).padStart(2, '0');
-                                                const seconds = String(date.getSeconds()).padStart(2, '0');
-                                                const formattedTime = `${hours}:${minutes}:${seconds}`;
-
-                                                return $.ajax({
-                                                    url: '/api/CaseInvestigationDetails/GetPolicyNotes?claimId=' + $('#claimId').val(),
-                                                    dataType: 'json',
-                                                    method: 'get'
-                                                }).done(function (response) {
-                                                    self.setContent('<header>');
-                                                    self.setContentAppend('</header>');
-                                                    $.each(response.notes, function (index, note) {
-                                                        self.setContentAppend('<hr>');
-                                                        self.setContentAppend('<b><i class="fas fa-clock"></i> Notes added date</b>: ' + formattedDate);
-                                                        self.setContentAppend('<br><b><i class="fas fa-clock"></i> Notes added time</b>: ' + formattedTime);
-                                                        self.setContentAppend('<br><b><i class="fas fa-user-tag"></i>  Sender</b> : ' + note.sender);
-                                                        self.setContentAppend('<br><b><i class="far fa-id-badge"></i> Note</b>: ' + note.comment);
-                                                        self.setContentAppend('<hr>');
-                                                    })
-                                                }).fail(function (err) {
-                                                    console.log(err);
-                                                    self.setContent('Something went wrong.');
-                                                }).always(function () {
-                                                });
-                                            }
-                                        });
-                                    });
-                                }
+                        return $.ajax({
+                            url: '/Confirm/AddNotes',
+                            method: 'POST',
+                            data: {
+                                __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val(),
+                                caseId: claimId,
+                                message: noteText
+                            }
+                        }).done(function (response) {
+                            $.alert({
+                                title: 'Policy notes added!',
+                                content: 'Status: ' + response.message,
+                                type: 'green'
                             });
-                        }
+                            if (response.newCount !== undefined) {
+                                updateNotesUI(response.newCount);
+                            }
+                        }).fail(function () {
+                            $.alert('Failed to save note.');
+                        });
                     }
                 },
-                cancel: function () {
-                    //close
-                },
+                cancel: function () { /* Close */ },
             },
             onContentReady: function () {
-                // bind to events
                 var jc = this;
-                var input = this.$content.find('.name.form-control.remarks');
-                input.focus();
-                this.$content.find('form').on('submit', function (e) {
-                    // if the user submits the form by pressing enter in the field.
+                var $input = jc.$content.find('.name.form-control.remarks');
+
+                // Use a tiny timeout to ensure the modal animation is finished
+                // and the DOM is fully interactive
+                setTimeout(function () {
+                    $input.focus();
+                }, 100);
+                this.$content.find('form').on('submit', (e) => {
                     e.preventDefault();
-                    jc.$$formSubmit.trigger('click'); // reference the button and click it
+                    jc.$$formSubmit.trigger('click');
                 });
             }
         });
-    })
+    });
 
     var ready = false;
     $('#customer-comments').click(function (e) {
@@ -530,9 +454,58 @@
         }
     });
 });
+function updateNotesUI(newCount) {
+    // Select both possible IDs to ensure we find the element
+    const $badge = $('#notesBadge');
+    const $img = $('#notesDetail');
 
+    // Update the number
+    $badge.text(newCount);
+
+    if (newCount > 0) {
+        // Change Badge Color
+        $badge.removeClass('bg-secondary').addClass('bg-danger');
+
+        // Update Image State
+        $img.addClass('notes-active')
+            .attr('title', 'Display notes')
+            .attr('data-bs-original-title', 'Display notes'); // For Bootstrap tooltips
+    }
+}
+
+// Logic to show existing notes (Extracted from your 'always' block)
+function showNotesModal() {
+    $.confirm({
+        title: 'Policy Notes',
+        columnClass: 'medium',
+        closeIcon: true,
+        type: 'blue',
+        icon: 'fas fa-list',
+        buttons: { close: { text: "Close", btnClass: 'btn-secondary' } },
+        content: function () {
+            var self = this;
+            return $.ajax({
+                url: '/api/CaseInvestigationDetails/GetPolicyNotes?claimId=' + $('#claimId').val(),
+                method: 'GET'
+            }).done(function (response) {
+                let html = '<div class="notes-wrapper">';
+                $.each(response.notes, function (index, note) {
+                    // Use your detailRow style or manual formatting
+                    html += `
+                        <div class="note-item mb-3">
+                            <small class="text-muted"><i class="fas fa-clock"></i> ${note.created || 'N/A'}</small><br>
+                            <strong><i class="fas fa-user"></i> ${note.senderEmail}:</strong>
+                            <p class="border-left pl-2">${note.comment}</p>
+                            <hr>
+                        </div>`;
+                });
+                html += '</div>';
+                self.setContent(html || 'No notes found.');
+            }).fail(() => self.setContent('Failed to load notes.'));
+        }
+    });
+}
 function renderPolicyNotesHtml(data) {
-
     if (!data || !data.notes || data.notes.length === 0) {
         return `<div class="text-muted text-center">No notes available.</div>`;
     }
@@ -545,7 +518,6 @@ function renderPolicyNotesHtml(data) {
 }
 
 function renderSingleNote(note) {
-
     const created = note.created
         ? formatDateTime(note.created)
         : { date: '-', time: '-' };
@@ -565,7 +537,6 @@ function renderSingleNote(note) {
 }
 
 function formatDateTime(dateValue) {
-
     const date = new Date(dateValue);
 
     const day = String(date.getDate()).padStart(2, '0');
@@ -583,7 +554,6 @@ function formatDateTime(dateValue) {
 }
 
 function renderBeneficiaryDetailHtml(data, beneficiaryId) {
-
     const beneficiaryImageUrl = `/Document/GetBeneficiaryDocument/${beneficiaryId}`;
 
     return `
@@ -613,7 +583,6 @@ function renderBeneficiaryDetailHtml(data, beneficiaryId) {
 }
 
 function openDetailPopup(options) {
-
     $.confirm({
         title: options.title,
         type: options.type || 'blue',
@@ -649,7 +618,6 @@ function openDetailPopup(options) {
 }
 
 function renderCustomerDetailHtml(data, customerId) {
-
     const customerImageUrl = `/Document/GetCustomerDocument/${customerId}`;
 
     return `
@@ -691,9 +659,8 @@ function detailRow(icon, label, value) {
     `;
 }
 
-function renderPolicyDetailHtml(data, claimId) {
-
-    const policyDocUrl = `/Document/GetPolicyDocument/${claimId}`;
+function renderPolicyDetailHtml(data, policyId) {
+    const policyDocUrl = `/Document/GetPolicyDocument/${policyId}`;
 
     return `
     <article>
@@ -740,6 +707,7 @@ function renderPolicyRow(icon, label, value) {
         </div>
     `;
 }
+
 function renderMapHtml(data) {
     return `
         <div class="mb-2">

@@ -27,6 +27,7 @@ namespace risk.control.system.Controllers.Common
         [HttpGet]
         public async Task<IActionResult> PrintPdfReport(long id)
         {
+            var userEmail = HttpContext.User?.Identity?.Name;
             try
             {
                 if (id < 1)
@@ -34,15 +35,8 @@ namespace risk.control.system.Controllers.Common
                     notifyService.Error("NOT FOUND !!!..");
                     return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
 
-                if (string.IsNullOrWhiteSpace(currentUserEmail))
-                {
-                    notifyService.Error("OOPs !!!..Contact Admin");
-                    return this.RedirectToAction<DashboardController>(x => x.Index());
-                }
-
-                var claim = await investigationService.GetClaimPdfReport(currentUserEmail, id);
+                var claim = await investigationService.GetClaimPdfReport(userEmail, id);
 
                 var fileName = Path.GetFileName(claim.ClaimsInvestigation.InvestigationReport.PdfReportFilePath);
                 var memory = new MemoryStream();

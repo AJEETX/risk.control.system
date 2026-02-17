@@ -1,13 +1,17 @@
 ﻿using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+using risk.control.system.Helpers;
+
 namespace risk.control.system.Services.Tool;
 
 public interface ITextAnalyticsService
 {
     Task<string> AbstractiveSummarizeAsync(string content);
+
     Task<string> CategorizeDocumentAsync(string content);
 }
+
 internal class TextAnalyticsService : ITextAnalyticsService
 {
     //private readonly string _huggingFaceApiUrl = "https://router.huggingface.co/v1/facebook/bart-large-cnn"; // Hugging Face endpoint for summarization
@@ -17,6 +21,7 @@ internal class TextAnalyticsService : ITextAnalyticsService
     {
         this.httpClientFactory = httpClientFactory;
     }
+
     public async Task<string> AbstractiveSummarizeAsync(string content)
     {
         if (string.IsNullOrWhiteSpace(content))
@@ -28,7 +33,7 @@ internal class TextAnalyticsService : ITextAnalyticsService
         {
             var httpClient = httpClientFactory.CreateClient();
             httpClient.BaseAddress = new Uri("https://router.huggingface.co/"); ;
-            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Environment.GetEnvironmentVariable("HUGING_FACE"));
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", EnvHelper.Get("HUGING_FACE"));
 
             var requestBody = new
             {
@@ -119,5 +124,4 @@ internal class TextAnalyticsService : ITextAnalyticsService
             return "Uncategorized";
         }
     }
-
 }

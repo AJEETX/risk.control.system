@@ -103,7 +103,7 @@ namespace risk.control.system.Controllers
             var companyAddress = clientCompany.Addressline + ", " + pinCode.District.Name + ", " + pinCode.State.Name + ", " + pinCode.Country.Code;
             var companyCoordinates = await customApiCLient.GetCoordinatesFromAddressAsync(companyAddress);
             var companyLatLong = companyCoordinates.Latitude + "," + companyCoordinates.Longitude;
-            var url = $"https://maps.googleapis.com/maps/api/staticmap?center={companyLatLong}&zoom=14&size={vendorMapSize}&maptype=roadmap&markers=color:red%7Clabel:S%7C{companyLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+            var url = $"https://maps.googleapis.com/maps/api/staticmap?center={companyLatLong}&zoom=14&size={vendorMapSize}&maptype=roadmap&markers=color:red%7Clabel:S%7C{companyLatLong}&key={EnvHelper.Get("GOOGLE_MAP_KEY")}";
             clientCompany.AddressLatitude = companyCoordinates.Latitude;
             clientCompany.AddressLongitude = companyCoordinates.Longitude;
             clientCompany.AddressMapLocation = url;
@@ -111,14 +111,14 @@ namespace risk.control.system.Controllers
             await smsService.DoSendSmsAsync(pinCode.Country.Code, isdCode + clientCompany.PhoneNumber, "Company account created. \n\nDomain : " + clientCompany.Email);
 
             //clientCompany.Description = "New company added.";
-            clientCompany.AgreementDate = DateTime.Now;
+            clientCompany.AgreementDate = DateTime.UtcNow;
             clientCompany.Status = CompanyStatus.ACTIVE;
             clientCompany.PinCodeId = clientCompany.SelectedPincodeId;
             clientCompany.DistrictId = clientCompany.SelectedDistrictId;
             clientCompany.StateId = clientCompany.SelectedStateId;
             clientCompany.CountryId = clientCompany.SelectedCountryId;
             clientCompany.PhoneNumber = clientCompany.PhoneNumber.TrimStart('0');
-            clientCompany.Updated = DateTime.Now;
+            clientCompany.Updated = DateTime.UtcNow;
             clientCompany.UpdatedBy = HttpContext.User?.Identity?.Name;
             var addedCompany = _context.Add(clientCompany);
             await _context.SaveChangesAsync();
@@ -167,7 +167,7 @@ namespace risk.control.system.Controllers
             var clientCompany = await _context.ClientCompany.Include(c => c.Country).FirstOrDefaultAsync(c => c.ClientCompanyId == ClientCompanyId);
             if (clientCompany != null)
             {
-                clientCompany.Updated = DateTime.Now;
+                clientCompany.Updated = DateTime.UtcNow;
                 clientCompany.UpdatedBy = HttpContext.User?.Identity?.Name;
                 clientCompany.Deleted = true;
                 _context.ClientCompany.Update(clientCompany);
@@ -176,7 +176,7 @@ namespace risk.control.system.Controllers
                 foreach (var companyUser in companyUsers)
                 {
                     companyUser.Deleted = true;
-                    companyUser.Updated = DateTime.Now;
+                    companyUser.Updated = DateTime.UtcNow;
                     companyUser.UpdatedBy = HttpContext.User?.Identity?.Name;
                     _context.ApplicationUser.Update(companyUser);
                 }
@@ -277,7 +277,7 @@ namespace risk.control.system.Controllers
                 var companyAddress = clientCompany.Addressline + ", " + pinCode.District.Name + ", " + pinCode.State.Name + ", " + pinCode.Country.Code;
                 var companyCoordinates = await customApiCLient.GetCoordinatesFromAddressAsync(companyAddress);
                 var companyLatLong = companyCoordinates.Latitude + "," + companyCoordinates.Longitude;
-                var url = $"https://maps.googleapis.com/maps/api/staticmap?center={companyLatLong}&zoom=14&size={vendorMapSize}&maptype=roadmap&markers=color:red%7Clabel:S%7C{companyLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+                var url = $"https://maps.googleapis.com/maps/api/staticmap?center={companyLatLong}&zoom=14&size={vendorMapSize}&maptype=roadmap&markers=color:red%7Clabel:S%7C{companyLatLong}&key={EnvHelper.Get("GOOGLE_MAP_KEY")}";
                 clientCompany.AddressLatitude = companyCoordinates.Latitude;
                 clientCompany.AddressLongitude = companyCoordinates.Longitude;
                 clientCompany.AddressMapLocation = url;
@@ -288,7 +288,7 @@ namespace risk.control.system.Controllers
                 clientCompany.CountryId = clientCompany.SelectedCountryId;
                 clientCompany.PhoneNumber = clientCompany.PhoneNumber.TrimStart('0');
 
-                clientCompany.Updated = DateTime.Now;
+                clientCompany.Updated = DateTime.UtcNow;
                 clientCompany.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.ClientCompany.Update(clientCompany);
                 await _context.SaveChangesAsync();
@@ -547,7 +547,7 @@ namespace risk.control.system.Controllers
                         empanelledVendor.Clients.Add(company);
                         _context.Vendor.Update(empanelledVendor);
                     }
-                    company.Updated = DateTime.Now;
+                    company.Updated = DateTime.UtcNow;
                     company.UpdatedBy = HttpContext.User?.Identity?.Name;
                     _context.ClientCompany.Update(company);
                     var savedRows = await _context.SaveChangesAsync();
@@ -581,7 +581,7 @@ namespace risk.control.system.Controllers
                 _context.Vendor.Update(v);
             }
             _context.ClientCompany.Update(company);
-            company.Updated = DateTime.Now;
+            company.Updated = DateTime.UtcNow;
             company.UpdatedBy = HttpContext.User?.Identity?.Name;
             var savedRows = await _context.SaveChangesAsync();
             notifyService.Custom($"Agency(s) de-panelled.", 3, "red", "far fa-thumbs-down");

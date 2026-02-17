@@ -3,30 +3,7 @@
         ajax: {
             url: '/api/Company/AllUsers',
             dataSrc: '',
-            error: function (xhr, status, error) {
-                console.error("AJAX Error:", status, error);
-                console.error("Response:", xhr.responseText);
-                if (xhr.status === 401 || xhr.status === 403) {
-                    $.confirm({
-                        title: 'Session Expired!',
-                        content: 'Your session has expired or you are unauthorized. You will be redirected to the login page.',
-                        type: 'red',
-                        typeAnimated: true,
-                        buttons: {
-                            Ok: {
-                                text: 'Login',
-                                btnClass: 'btn-red',
-                                action: function () {
-                                    window.location.href = '/Account/Login';
-                                }
-                            }
-                        },
-                        onClose: function () {
-                            window.location.href = '/Account/Login';
-                        }
-                    });
-                }
-            }
+            error: DataTableErrorHandler
         },
         order: [[1, 'desc'], [12, 'desc'], [13, 'desc']], // Sort by `isUpdated` and `lastModified`,
         columnDefs: [{
@@ -222,7 +199,7 @@
 
         showSpinnerOnButton(element, "Edit");
 
-        const url = `/ManageCompanyUser/Edit?userId=${encodeURIComponent(id)}`;
+        const url = `/ManageCompanyUser/Edit/${encodeURIComponent(id)}`;
 
         setTimeout(() => {
             window.location.href = url;

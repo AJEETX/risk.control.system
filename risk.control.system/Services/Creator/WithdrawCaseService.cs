@@ -28,14 +28,14 @@ namespace risk.control.system.Services.Creator
         {
             try
             {
-                var currentUser = await context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == userEmail);
+                var currentUser = await context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(u => u.Email == userEmail);
                 var caseTask = await context.Investigations
                     .FirstOrDefaultAsync(c => c.Id == caseId);
                 var vendorId = caseTask.VendorId;
                 var company = await context.ClientCompany.FirstOrDefaultAsync(c => c.ClientCompanyId == caseTask.ClientCompanyId);
 
                 caseTask.IsNew = true;
-                caseTask.Updated = DateTime.Now;
+                caseTask.Updated = DateTime.UtcNow;
                 caseTask.UpdatedBy = currentUser.Email;
                 caseTask.AssignedToAgency = false;
                 caseTask.CaseOwner = company.Email;

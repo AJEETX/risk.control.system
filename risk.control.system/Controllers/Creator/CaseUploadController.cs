@@ -1,6 +1,4 @@
-﻿using System.Security.Claims;
-
-using AspNetCoreHero.ToastNotification.Abstractions;
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -8,8 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using risk.control.system.AppConstant;
-using risk.control.system.Controllers.Common;
-using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services.Creator;
@@ -18,7 +14,7 @@ using SmartBreadcrumbs.Attributes;
 namespace risk.control.system.Controllers.Creator
 {
     [Authorize(Roles = $"{CREATOR.DISPLAY_NAME},{MANAGER.DISPLAY_NAME}")]
-    [Breadcrumb(" Cases")]
+    [Breadcrumb("Cases")]
     public class CaseUploadController : Controller
     {
         private readonly ApplicationDbContext context;
@@ -45,56 +41,28 @@ namespace risk.control.system.Controllers.Creator
 
         public IActionResult Index()
         {
-            try
-            {
-                var userEmail = User?.Identity?.Name;
-                if (string.IsNullOrWhiteSpace(userEmail))
-                {
-                    return HandleUnauthorizedAccess("User identity not found.");
-                }
-
-                var role = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
-
-                return role switch
-                {
-                    var r when r.Contains(CREATOR.DISPLAY_NAME) => RedirectToAction("Uploads"),
-                    var r when r.Contains(MANAGER.DISPLAY_NAME) => RedirectToAction("Manager"),
-                    _ => RedirectToAction("Index", "Dashboard")
-                };
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Routing error for user: {User}", User?.Identity?.Name);
-                notifyService.Error("An unexpected error occurred. Please contact the administrator.");
-                return RedirectToAction("Index", "Dashboard");
-            }
+            return RedirectToAction(nameof(Uploads));
         }
 
         [Breadcrumb(" Upload File")]
         public async Task<IActionResult> Uploads(int uploadId = 0)
         {
             var userEmail = User.Identity?.Name;
-            if (string.IsNullOrWhiteSpace(userEmail))
-            {
-                return HandleUnauthorizedAccess("User identity not found.");
-            }
             if (!ModelState.IsValid)
             {
                 return RedirectToDashboard("Invalid request.");
             }
             try
             {
-                var companyUser = await context.ApplicationUser
+                var companyUser = await context.ApplicationUser.AsNoTracking()
                     .Include(u => u.ClientCompany)
                     .Include(u => u.Country)
                     .FirstOrDefaultAsync(u => u.Email == userEmail);
 
                 if (companyUser == null) return RedirectToDashboard("User not found.");
 
-                // Move business logic to a specialized service
                 var licenseStatus = await licenseService.GetUploadPermissionsAsync(companyUser);
 
-                // Handle Notifications only if this isn't a post-upload redirect (uploadId == 0)
                 if (uploadId == 0 && companyUser.ClientCompany.LicenseType == LicenseType.Trial)
                 {
                     SendLicenseNotifications(licenseStatus);
@@ -121,34 +89,50 @@ namespace risk.control.system.Controllers.Creator
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DownloadLog(long id)
         {
-            var file = await context.FilesOnFileSystem.FirstOrDefaultAsync(x => x.Id == id);
-            if (file == null || string.IsNullOrWhiteSpace(file.FilePath))
-                return NotFound("File not found");
+            try
+            {
+                var file = await context.FilesOnFileSystem.FirstOrDefaultAsync(x => x.Id == id);
+                if (file == null || string.IsNullOrWhiteSpace(file.FilePath))
+                    return NotFound("File not found");
 
-            var fullPath = Path.Combine(env.ContentRootPath, file.FilePath);
-            if (!System.IO.File.Exists(fullPath))
-                return NotFound("File missing on server");
+                var fullPath = Path.Combine(env.ContentRootPath, file.FilePath);
+                if (!System.IO.File.Exists(fullPath))
+                    return NotFound("File missing on server");
 
-            var stream = new FileStream(fullPath, FileMode.Open, FileAccess.Read, FileShare.Read);
+                var stream = new FileStream(fullPath, FileMode.Open, FileAccess.Read, FileShare.Read);
 
-            Response.Headers.Append("X-File-Name", file.Name);
-            Response.Headers.Append("Access-Control-Expose-Headers", "X-File-Name");
+                Response.Headers.Append("X-File-Name", file.Name);
+                Response.Headers.Append("Access-Control-Expose-Headers", "X-File-Name");
 
-            return File(stream, "application/zip", file.Name);
+                return File(stream, "application/zip", file.Name);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error downloading log file with ID {Id}", id);
+                return BadRequest(new { success = false, message = "Error downloading file: " + ex.Message });
+            }
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DownloadErrorLog(long id)
         {
-            var file = await context.FilesOnFileSystem.FirstOrDefaultAsync(x => x.Id == id);
-            if (file == null || file.ErrorByteData == null)
-                return NotFound();
+            try
+            {
+                var file = await context.FilesOnFileSystem.FirstOrDefaultAsync(x => x.Id == id);
+                if (file == null || file.ErrorByteData == null)
+                    return NotFound("File not found");
 
-            var fileName = $"{file.Name}_UploadError_{id}.csv";
-            Response.Headers.Append("X-File-Name", fileName);
-            Response.Headers.Append("Access-Control-Expose-Headers", "X-File-Name");
-            return File(file.ErrorByteData, "text/csv", fileName);
+                var fileName = $"{file.Name}_UploadError_{id}.csv";
+                Response.Headers.Append("X-File-Name", fileName);
+                Response.Headers.Append("Access-Control-Expose-Headers", "X-File-Name");
+                return File(file.ErrorByteData, "text/csv", fileName);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error downloading error log file with ID {Id}", id);
+                return BadRequest(new { success = false, message = "Error downloading file: " + ex.Message });
+            }
         }
 
         [HttpPost]
@@ -157,19 +141,19 @@ namespace risk.control.system.Controllers.Creator
         {
             if (!ModelState.IsValid)
             {
-                notifyService.Error("OOPs !!!.. Download error");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return BadRequest(new { success = false, message = "Error deleting file" });
             }
             var userEmail = HttpContext.User?.Identity?.Name;
-            var companyUser = await context.ApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == userEmail);
-            var file = await context.FilesOnFileSystem.Include(c => c.CaseIds).FirstOrDefaultAsync(f => f.Id == id);
-            if (file == null)
-            {
-                return NotFound(new { success = false, message = "File not found." });
-            }
 
             try
             {
+                var companyUser = await context.ApplicationUser.AsNoTracking().Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == userEmail);
+                var file = await context.FilesOnFileSystem.AsNoTracking().Include(c => c.CaseIds).FirstOrDefaultAsync(f => f.Id == id);
+                if (file == null)
+                {
+                    return NotFound(new { success = false, message = "File not found." });
+                }
+
                 if (System.IO.File.Exists(file.FilePath))
                 {
                     System.IO.File.Delete(file.FilePath); // Delete the file from storage
@@ -185,13 +169,6 @@ namespace risk.control.system.Controllers.Creator
                 logger.LogError(ex, "Error deleting file");
                 return BadRequest(new { success = false, message = "Error deleting file: " + ex.Message });
             }
-        }
-
-        private IActionResult HandleUnauthorizedAccess(string logMessage)
-        {
-            logger.LogWarning(logMessage);
-            notifyService.Error("OOPs !!!..Contact Admin");
-            return RedirectToAction("Index", "Dashboard");
         }
 
         private void SendLicenseNotifications(LicenseStatus status)

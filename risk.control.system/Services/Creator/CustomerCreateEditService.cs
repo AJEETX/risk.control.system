@@ -89,7 +89,7 @@ namespace risk.control.system.Services.Creator
                 InvestigationTaskId = id,
                 Addressline = "12 Main Road",
                 PhoneNumber = pinCode.Country.Code.ToLower() == "au" ? Applicationsettings.SAMPLE_MOBILE_AUSTRALIA : Applicationsettings.SAMPLE_MOBILE_INDIA,
-                DateOfBirth = DateTime.Now.AddYears(-30).AddDays(20),
+                DateOfBirth = DateTime.UtcNow.AddYears(-30).AddDays(20),
                 Education = Education.PROFESSIONAL,
                 Income = Income.UPPER_INCOME,
                 Name = NameGenerator.GenerateName(),

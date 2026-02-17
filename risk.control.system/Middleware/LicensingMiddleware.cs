@@ -82,7 +82,7 @@ namespace risk.control.system.Middleware
                                     context.Response.Redirect("/page/error.html");
                                     return;
                                 }
-                                if (company.LicenseType == LicenseType.Trial && company.ExpiryDate.HasValue && DateTime.Now.Subtract(company.ExpiryDate.Value).Ticks > 0)
+                                if (company.LicenseType == LicenseType.Trial && company.ExpiryDate.HasValue && DateTime.UtcNow.Subtract(company.ExpiryDate.Value).Ticks > 0)
                                 {
                                     context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
                                     context.Response.Redirect("/page/trial.html");

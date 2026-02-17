@@ -9,7 +9,7 @@ namespace risk.control.system.Services.Agency
     {
         Task<ServiceCreateEditResult> CreateAsync(VendorInvestigationServiceType service, string currentUserEmail);
 
-        Task<ServiceCreateEditResult> EditAsync(long id, VendorInvestigationServiceType service, string currentUserEmail);
+        Task<ServiceCreateEditResult> EditAsync(VendorInvestigationServiceType service, string currentUserEmail);
     }
 
     public class AgencyServiceTypeManager : IAgencyServiceTypeManager
@@ -111,9 +111,9 @@ namespace risk.control.system.Services.Agency
             service.UpdatedBy = email;
         }
 
-        public async Task<ServiceCreateEditResult> EditAsync(long id, VendorInvestigationServiceType service, string currentUserEmail)
+        public async Task<ServiceCreateEditResult> EditAsync(VendorInvestigationServiceType service, string currentUserEmail)
         {
-            if (service == null || id != service.VendorInvestigationServiceTypeId || service.SelectedCountryId < 1 || service.SelectedStateId < 1 || service.SelectedDistrictIds == null || service.SelectedDistrictIds.Count == 0)
+            if (service == null || service.SelectedCountryId < 1 || service.SelectedStateId < 1 || service.SelectedDistrictIds == null || service.SelectedDistrictIds.Count == 0)
             {
                 return FailEdit("Invalid service data.");
             }

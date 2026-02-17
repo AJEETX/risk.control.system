@@ -45,7 +45,7 @@ namespace risk.control.system.Controllers.Company
                 if (user == null)
                     return Unauthorized(new { message = "User not found." });
 
-                var now = DateTime.Now;
+                var now = DateTime.UtcNow;
 
                 // Update user's last activity
                 user.LastActivityDate = now;

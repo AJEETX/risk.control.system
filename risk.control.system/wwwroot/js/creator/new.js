@@ -58,62 +58,7 @@
                     orderDir: d.order?.[0]?.dir || "desc"
                 };
             },
-            error: function (xhr, status, error) {
-                console.error("AJAX Error:", status, error);
-                console.error("Response:", xhr.responseText);
-                if (xhr.status === 401 || xhr.status === 403) {
-                    $.confirm({
-                        title: 'Session Expired!',
-                        content: 'Your session has expired or you are unauthorized. You will be redirected to the login page.',
-                        type: 'red',
-                        typeAnimated: true,
-                        buttons: {
-                            Ok: {
-                                text: 'Login',
-                                btnClass: 'btn-red',
-                                action: function () {
-                                    window.location.href = '/Account/Login';
-                                }
-                            }
-                        },
-                        onClose: function () {
-                            window.location.href = '/Account/Login';
-                        }
-                    });
-                }
-                else if (xhr.status === 500) {
-                    $.confirm({
-                        title: 'Server Error!',
-                        content: 'An unexpected server error occurred. You will be redirected to the Main page.',
-                        type: 'orange',
-                        typeAnimated: true,
-                        buttons: {
-                            Ok: function () {
-                                window.location.href = '/CaseCreateEdit/New';
-                            }
-                        },
-                        onClose: function () {
-                            window.location.href = '/CaseCreateEdit/New';
-                        }
-                    });
-                }
-                else if (xhr.status === 400) {
-                    $.confirm({
-                        title: 'Bad Request!',
-                        content: 'Try with valid data.You will be redirected to the Main page',
-                        type: 'orange',
-                        typeAnimated: true,
-                        buttons: {
-                            Ok: function () {
-                                window.location.href = '/CaseCreateEdit/New';
-                            }
-                        },
-                        onClose: function () {
-                            window.location.href = '/CaseCreateEdit/New';
-                        }
-                    });
-                }
-            }
+            error: DataTableErrorHandler
         },
 
         columnDefs: [{
@@ -204,12 +149,12 @@
                         return `
                         <div class="map-thumbnail profile-image doc-profile-image">
                             <img src="${formattedUrl}"
-                                 title="${row.pincodeCode}"
+                                 title="${row.pincodeAddress}"
                                  class="thumbnail profile-image doc-profile-image preview-map-image open-map-modal"
                                  data-bs-toggle="tooltip"
                                  data-bs-placement="top"
                                  data-img='${formattedUrl}'
-                                 data-title='Addresss: ${row.pincodeCode}' />
+                                 data-title='Addresss: ${row.pincodeAddress}' />
                         </div>`;
                     }
                 }
@@ -322,7 +267,6 @@
                 }, 3000);
             }
             $('.btn-info', row).addClass('btn-white-color');
-
         },
         "drawCallback": function (settings) {
             var api = this.api();
@@ -355,7 +299,7 @@
 
         showSpinnerOnButton(element, "Edit");
 
-        const editUrl = `/Investigation/Details?Id=${encodeURIComponent(id)}`;
+        const editUrl = `/Investigation/Details/${encodeURIComponent(id)}`;
 
         setTimeout(() => {
             window.location.href = editUrl;
@@ -368,7 +312,7 @@
 
         showSpinnerOnButton(element, "Assign");
 
-        const editUrl = `/Investigation/EmpanelledVendors?Id=${encodeURIComponent(id)}`;
+        const editUrl = `/Investigation/EmpanelledVendors/${encodeURIComponent(id)}`;
 
         setTimeout(() => {
             window.location.href = editUrl;

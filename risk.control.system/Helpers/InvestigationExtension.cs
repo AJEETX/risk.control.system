@@ -74,34 +74,34 @@ namespace risk.control.system.Helpers
             if (open)
             {
                 timeToCompare = caseTask.SubmittedToSupervisorTime.Value;
-                if (DateTime.Now.Subtract(timeToCompare).Days >= caseTask.AgentSla)
-                    return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(timeToCompare).Days} day</span>");
-                else if (DateTime.Now.Subtract(timeToCompare).Days >= 3 || DateTime.Now.Subtract(timeToCompare).Days >= caseTask.AgentSla)
-                    return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(timeToCompare).Days} day</span>");
+                if (DateTime.UtcNow.Subtract(timeToCompare).Days >= caseTask.AgentSla)
+                    return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(timeToCompare).Days} day</span>");
+                else if (DateTime.UtcNow.Subtract(timeToCompare).Days >= 3 || DateTime.UtcNow.Subtract(timeToCompare).Days >= caseTask.AgentSla)
+                    return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(timeToCompare).Days} day</span>");
             }
             else
             {
-                if (DateTime.Now.Subtract(timeToCompare).Days >= caseTask.AgentSla)
-                    return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(timeToCompare).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Hurry up, {DateTime.Now.Subtract(caseTask.Created).Days} days since created!\"></i>");
-                else if (DateTime.Now.Subtract(timeToCompare).Days >= 3 || DateTime.Now.Subtract(timeToCompare).Days >= caseTask.AgentSla)
-                    return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(timeToCompare).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Caution : {DateTime.Now.Subtract(caseTask.Created).Days} day since created.\"></i>");
+                if (DateTime.UtcNow.Subtract(timeToCompare).Days >= caseTask.AgentSla)
+                    return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(timeToCompare).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Hurry up, {DateTime.UtcNow.Subtract(caseTask.Created).Days} days since created!\"></i>");
+                else if (DateTime.UtcNow.Subtract(timeToCompare).Days >= 3 || DateTime.UtcNow.Subtract(timeToCompare).Days >= caseTask.AgentSla)
+                    return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(timeToCompare).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Caution : {DateTime.UtcNow.Subtract(caseTask.Created).Days} day since created.\"></i>");
             }
 
-            if (DateTime.Now.Subtract(timeToCompare).Days >= 1)
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(timeToCompare).Days} day</span>");
+            if (DateTime.UtcNow.Subtract(timeToCompare).Days >= 1)
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(timeToCompare).Days} day</span>");
 
-            if (DateTime.Now.Subtract(timeToCompare).Hours < 24 &&
-                DateTime.Now.Subtract(timeToCompare).Hours > 0)
+            if (DateTime.UtcNow.Subtract(timeToCompare).Hours < 24 &&
+                DateTime.UtcNow.Subtract(timeToCompare).Hours > 0)
             {
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(timeToCompare).Hours} hr </span>");
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(timeToCompare).Hours} hr </span>");
             }
-            if (DateTime.Now.Subtract(timeToCompare).Hours == 0 && DateTime.Now.Subtract(timeToCompare).Minutes > 0)
+            if (DateTime.UtcNow.Subtract(timeToCompare).Hours == 0 && DateTime.UtcNow.Subtract(timeToCompare).Minutes > 0)
             {
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(timeToCompare).Minutes} min </span>");
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(timeToCompare).Minutes} min </span>");
             }
-            if (DateTime.Now.Subtract(timeToCompare).Minutes == 0 && DateTime.Now.Subtract(timeToCompare).Seconds > 0)
+            if (DateTime.UtcNow.Subtract(timeToCompare).Minutes == 0 && DateTime.UtcNow.Subtract(timeToCompare).Seconds > 0)
             {
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(timeToCompare).Seconds} sec </span>");
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(timeToCompare).Seconds} sec </span>");
             }
             return string.Join("", "<span class='badge badge-light'>now</span>");
         }

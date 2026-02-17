@@ -66,7 +66,7 @@ namespace risk.control.system.Services.Report
                 .FirstOrDefaultAsync(r => r.Id == templateId);
 
             string baseName = Regex.Replace(originalTemplate.Name, @"_\d{8}_\d{6,9}$", "");
-            string newName = $"{baseName}_{DateTime.Now:yyyyMMdd_HHmmss}";
+            string newName = $"{baseName}_{DateTime.UtcNow:yyyyMMdd_HHmmss}";
 
             var clone = new ReportTemplate
             {
@@ -75,7 +75,7 @@ namespace risk.control.system.Services.Report
                 InsuranceType = originalTemplate.InsuranceType,
                 Basetemplate = false, // Set to false for the cloned template
                 OriginalTemplateId = originalTemplate.Id, // Reference to the original template
-                Created = DateTime.Now,
+                Created = DateTime.UtcNow,
                 UpdatedBy = currentUserEmail, // Or current user
                 LocationReport = originalTemplate.LocationReport.Select(loc => new LocationReport
                 {
@@ -151,7 +151,7 @@ namespace risk.control.system.Services.Report
                 InsuranceType = originalTemplate.InsuranceType,
                 Basetemplate = false, // Set to false for the cloned template
                 OriginalTemplateId = originalTemplate.Id, // Reference to the original template
-                Created = DateTime.Now,
+                Created = DateTime.UtcNow,
                 UpdatedBy = "system", // Or current user
                 LocationReport = originalTemplate.LocationReport.Select(loc => new LocationReport
                 {

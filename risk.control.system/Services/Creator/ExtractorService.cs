@@ -12,12 +12,12 @@ namespace risk.control.system.Services.Creator
 
     internal class ExtractorService : IExtractorService
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IDbContextFactory<ApplicationDbContext> _contextFactory;
         private readonly ILogger<ExtractorService> logger;
 
-        public ExtractorService(ApplicationDbContext context, ILogger<ExtractorService> logger)
+        public ExtractorService(IDbContextFactory<ApplicationDbContext> contextFactory, ILogger<ExtractorService> logger)
         {
-            _context = context;
+            _contextFactory = contextFactory;
             this.logger = logger;
         }
 
@@ -25,11 +25,13 @@ namespace risk.control.system.Services.Creator
         {
             try
             {
-                return await _context.PinCode
+                using var _context = await _contextFactory.CreateDbContextAsync();
+                var pincodeDetils = await _context.PinCode.AsNoTracking()
                 .Include(p => p.District).Include(p => p.State).Include(p => p.Country)
                 .FirstOrDefaultAsync(p => p.Code == code &&
                     p.District.Name.ToLower().Contains(district.ToLower()) &&
                     p.CountryId == countryId);
+                return pincodeDetils;
             }
             catch (Exception ex)
             {
@@ -42,9 +44,12 @@ namespace risk.control.system.Services.Creator
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(code)) return await _context.BeneficiaryRelation.FirstOrDefaultAsync();
-                return await _context.BeneficiaryRelation.FirstOrDefaultAsync(b => b.Code.ToLower() == code.ToLower())
-                       ?? await _context.BeneficiaryRelation.FirstOrDefaultAsync();
+                using var _context = await _contextFactory.CreateDbContextAsync();
+
+                var allRelations = await _context.BeneficiaryRelation.AsNoTracking().ToListAsync();
+                var relations = allRelations.FirstOrDefault(b => b.Code.Equals(code, StringComparison.OrdinalIgnoreCase))
+                       ?? allRelations.FirstOrDefault();
+                return relations;
             }
             catch (Exception ex)
             {

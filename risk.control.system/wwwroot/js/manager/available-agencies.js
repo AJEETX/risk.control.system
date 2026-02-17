@@ -10,62 +10,7 @@
             data: function (result) {
                 console.log("Data before sending:", result); // Debugging
             },
-            error: function (xhr, status, error) {
-                console.error("AJAX Error:", status, error);
-                console.error("Response:", xhr.responseText);
-                if (xhr.status === 401 || xhr.status === 403) {
-                    $.confirm({
-                        title: 'Session Expired!',
-                        content: 'Your session has expired or you are unauthorized. You will be redirected to the login page.',
-                        type: 'red',
-                        typeAnimated: true,
-                        buttons: {
-                            Ok: {
-                                text: 'Login',
-                                btnClass: 'btn-red',
-                                action: function () {
-                                    window.location.href = '/Account/Login';
-                                }
-                            }
-                        },
-                        onClose: function () {
-                            window.location.href = '/Account/Login';
-                        }
-                    });
-                }
-                else if (xhr.status === 500) {
-                    $.confirm({
-                        title: 'Server Error!',
-                        content: 'An unexpected server error occurred. You will be redirected to Available Agencies page.',
-                        type: 'orange',
-                        typeAnimated: true,
-                        buttons: {
-                            Ok: function () {
-                                window.location.href = '/AvailableAgency/Agencies';
-                            }
-                        },
-                        onClose: function () {
-                            window.location.href = '/AvailableAgency/Agencies';
-                        }
-                    });
-                }
-                else if (xhr.status === 400) {
-                    $.confirm({
-                        title: 'Agencies!',
-                        content: 'Try with valid data. You will be redirected to Available Agencies page.',
-                        type: 'orange',
-                        typeAnimated: true,
-                        buttons: {
-                            Ok: function () {
-                                window.location.href = '/AvailableAgency/Agencies';
-                            }
-                        },
-                        onClose: function () {
-                            window.location.href = '/AvailableAgency/Agencies';
-                        }
-                    });
-                }
-            }
+            error: DataTableErrorHandler
         },
         columnDefs: [{
             'targets': 0,
@@ -181,7 +126,7 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    buttons += `<a data-id="${row.id}" class="btn btn-xs btn-warning" data-bs-toggle="tooltip" title="Edit"><i class="fas fa-edit"></i> Edit</a> &nbsp;` ;
+                    buttons += `<a data-id="${row.id}" class="btn btn-xs btn-warning" data-bs-toggle="tooltip" title="Edit"><i class="fas fa-edit"></i> Edit</a> &nbsp;`;
                     if (data) {
                         buttons += '<button id="' + row.id + '" class="btn btn-xs btn-danger"><i class="fa fa-trash "></i> Delete </button>';
                     }
@@ -227,7 +172,7 @@
 
         showSpinnerOnButton(element, "Edit");
 
-        const url = `/AvailableAgency/Details?Id=${encodeURIComponent(id)}`;
+        const url = `/AvailableAgency/Detail/${encodeURIComponent(id)}`;
 
         setTimeout(() => {
             window.location.href = url;
@@ -236,7 +181,6 @@
     function showSpinnerOnButton(selector, spinnerText) {
         $(selector).html(`<i class='fas fa-sync fa-spin'></i> ${spinnerText}`);
     }
-
 
     $('#dataTable tbody').on('click', '.btn-danger', function (e) {
         e.preventDefault();

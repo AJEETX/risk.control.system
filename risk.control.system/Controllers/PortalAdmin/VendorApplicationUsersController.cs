@@ -15,7 +15,7 @@ using risk.control.system.Services.Common;
 using SmartBreadcrumbs.Attributes;
 using SmartBreadcrumbs.Nodes;
 
-namespace risk.control.system.Controllers.CompanyAdmin
+namespace risk.control.system.Controllers.PortalAdmin
 {
     [Breadcrumb("Agencies")]
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME},{MANAGER.DISPLAY_NAME}")]
@@ -157,7 +157,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 user.Email = userFullEmail;
                 user.EmailConfirmed = true;
                 user.UserName = userFullEmail;
-                user.Updated = DateTime.Now;
+                user.Updated = DateTime.UtcNow;
                 user.UpdatedBy = currentUserEmail;
                 IdentityResult result = await userManager.CreateAsync(user, user.Password);
 
@@ -274,12 +274,12 @@ namespace risk.control.system.Controllers.CompanyAdmin
                     user.StateId = applicationUser.StateId;
                     user.PinCode = applicationUser.PinCode;
                     user.PinCodeId = applicationUser.PinCodeId;
-                    user.Updated = DateTime.Now;
+                    user.Updated = DateTime.UtcNow;
                     user.IsUpdated = true;
                     user.Comments = applicationUser.Comments;
                     user.PhoneNumber = applicationUser.PhoneNumber.TrimStart('0');
                     user.UpdatedBy = currentUserEmail;
-                    user.SecurityStamp = DateTime.Now.ToString();
+                    user.SecurityStamp = DateTime.UtcNow.ToString();
                     var result = await userManager.UpdateAsync(user);
                     if (result.Succeeded)
                     {
@@ -300,7 +300,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                         {
                             var createdUser = await userManager.FindByEmailAsync(user.Email);
                             var lockUser = await userManager.SetLockoutEnabledAsync(createdUser, true);
-                            var lockDate = await userManager.SetLockoutEndDateAsync(createdUser, DateTime.Now);
+                            var lockDate = await userManager.SetLockoutEndDateAsync(createdUser, DateTime.UtcNow);
 
                             if (lockUser.Succeeded && lockDate.Succeeded)
                             {
@@ -365,7 +365,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                     notifyService.Error($"Err User delete. Try again", 3);
                     return RedirectToAction(nameof(Index));
                 }
-                vendorApplicationUser.Updated = DateTime.Now;
+                vendorApplicationUser.Updated = DateTime.UtcNow;
                 vendorApplicationUser.UpdatedBy = currentUserEmail;
                 _context.ApplicationUser.Remove(vendorApplicationUser);
                 notifyService.Error($"User deleted successfully.", 3);

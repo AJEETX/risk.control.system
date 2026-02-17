@@ -14,7 +14,7 @@ namespace risk.control.system.Seeds
                 Name = "COMPREHENSIVE",
                 Code = "COMP",
                 MasterData = true,
-                Updated = DateTime.Now,
+                Updated = DateTime.UtcNow,
                 InsuranceType = InsuranceType.CLAIM
             };
 
@@ -26,7 +26,7 @@ namespace risk.control.system.Seeds
                 Code = "STD",
                 InsuranceType = InsuranceType.CLAIM,
                 MasterData = true,
-                Updated = DateTime.Now
+                Updated = DateTime.UtcNow
             };
 
             var claimNonComprehensiveService = await context.InvestigationServiceType.AddAsync(claimNonComprehensive);
@@ -37,7 +37,7 @@ namespace risk.control.system.Seeds
                 Code = "PRE",
                 InsuranceType = InsuranceType.UNDERWRITING,
                 MasterData = true,
-                Updated = DateTime.Now
+                Updated = DateTime.UtcNow
             };
 
             var underWritingPreVerificationService = await context.InvestigationServiceType.AddAsync(underWritingPreVerification);

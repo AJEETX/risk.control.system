@@ -32,19 +32,10 @@ namespace risk.control.system.Models
         public bool AllDistrictsCheckbox { get; set; }
         public List<long> SelectedDistrictIds { get; set; } = new List<long>();
 
-        [NotMapped]
-        public List<SelectListItem> DistrictList { get; set; } = new();
         [Display(Name = "District")]
         public long? DistrictId { get; set; } = default!;
 
         public District? District { get; set; } = default!;
-
-        [NotMapped]
-        public long SelectedDistrictId { get; set; }
-        [NotMapped]
-        public long SelectedStateId { get; set; }
-        [NotMapped]
-        public long SelectedCountryId { get; set; }
 
         [Column(TypeName = "decimal(10,2)")]
         public decimal Price { get; set; }
@@ -52,6 +43,25 @@ namespace risk.control.system.Models
         public long VendorId { get; set; }
         public Vendor? Vendor { get; set; }
         public bool Deleted { get; set; } = false;
+
+        [NotMapped]
+        public long SelectedDistrictId { get; set; }
+
+        [NotMapped]
+        public long SelectedStateId { get; set; }
+
+        [NotMapped]
+        public long SelectedCountryId { get; set; }
+
+        [NotMapped]
+        public List<SelectListItem> DistrictList { get; set; } = new();
+
+        [NotMapped]
+        public string? Currency { get; set; }
+
+        [NotMapped]
+        public List<SelectListItem> InvestigationServiceTypeList { get; set; } = new();
+
         public override string ToString()
         {
             return $"Agency Investigation Service Type Information:\n" +

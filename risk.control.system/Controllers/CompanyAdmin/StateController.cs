@@ -2,18 +2,13 @@
 using System.Linq.Expressions;
 using System.Net;
 using System.Text.RegularExpressions;
-
 using AspNetCoreHero.ToastNotification.Abstractions;
-
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using risk.control.system.Models;
-
-using SmartBreadcrumbs.Attributes;
-
-using static risk.control.system.AppConstant.Applicationsettings;
 using risk.control.system.AppConstant;
+using risk.control.system.Models;
+using SmartBreadcrumbs.Attributes;
 
 namespace risk.control.system.Controllers.CompanyAdmin
 {
@@ -35,13 +30,15 @@ namespace risk.control.system.Controllers.CompanyAdmin
         // GET: RiskCaseStatus
         public IActionResult Index()
         {
-            return RedirectToAction("Profile");
+            return RedirectToAction(nameof(Profile));
         }
+
         [Breadcrumb("State")]
         public IActionResult Profile()
         {
             return View();
         }
+
         [HttpGet]
         public async Task<IActionResult> GetStates(int draw, int start, int length, string search, int? orderColumn, string orderDirection)
         {
@@ -166,7 +163,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             return View(state);
         }
 
-        [Breadcrumb("Add New", FromAction = "Profile")]
+        [Breadcrumb("Add New", FromAction = nameof(Profile))]
         public async Task<IActionResult> Create()
         {
             var userEmail = HttpContext.User.Identity.Name;
@@ -201,7 +198,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 }
                 var textInfo = CultureInfo.CurrentCulture.TextInfo;
                 state.Name = textInfo.ToTitleCase(state.Name.ToLower());
-                state.Updated = DateTime.Now;
+                state.Updated = DateTime.UtcNow;
                 state.CountryId = state.SelectedCountryId;
                 state.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.State.Add(state);
@@ -218,7 +215,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
         }
 
         // GET: RiskCaseStatus/Edit/5
-        [Breadcrumb("Edit", FromAction = "Profile")]
+        [Breadcrumb("Edit", FromAction = nameof(Profile))]
         public async Task<IActionResult> Edit(long id)
         {
             if (id < 1)
@@ -261,7 +258,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 existingState.Code = state.Code;
                 var textInfo = CultureInfo.CurrentCulture.TextInfo;
                 existingState.Name = textInfo.ToTitleCase(state.Name.ToLower());
-                existingState.Updated = DateTime.Now;
+                existingState.Updated = DateTime.UtcNow;
                 existingState.CountryId = state.SelectedCountryId;
                 existingState.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Update(existingState);
@@ -298,7 +295,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 {
                     return Json(new { success = false, message = $"Cannot delete State {state.Name}. It has associated districts." });
                 }
-                state.Updated = DateTime.Now;
+                state.Updated = DateTime.UtcNow;
                 state.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.State.Remove(state);
                 await _context.SaveChangesAsync();

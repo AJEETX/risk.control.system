@@ -27,7 +27,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
 
         public IActionResult Index()
         {
-            return RedirectToAction("Profile");
+            return RedirectToAction(nameof(Profile));
         }
 
         [Breadcrumb("Income Type")]
@@ -70,7 +70,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             return View(income);
         }
 
-        [Breadcrumb("Add  New", FromAction = "Profile")]
+        [Breadcrumb("Add  New", FromAction = nameof(Profile))]
         public ActionResult Create()
         {
             return View();
@@ -82,7 +82,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
         {
             if (income is not null)
             {
-                income.Updated = DateTime.Now;
+                income.Updated = DateTime.UtcNow;
                 income.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Add(income);
                 await _context.SaveChangesAsync();
@@ -92,7 +92,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             return View(income);
         }
 
-        [Breadcrumb("Edit ", FromAction = "Profile")]
+        [Breadcrumb("Edit ", FromAction = nameof(Profile))]
         public async Task<IActionResult> Edit(long id)
         {
             if (id < 1)
@@ -121,7 +121,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             }
             try
             {
-                income.Updated = DateTime.Now;
+                income.Updated = DateTime.UtcNow;
                 income.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Update(income);
                 await _context.SaveChangesAsync();
@@ -147,7 +147,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             var income = await _context.AnnualIncome.FindAsync(id);
             if (income != null)
             {
-                income.Updated = DateTime.Now;
+                income.Updated = DateTime.UtcNow;
                 income.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.AnnualIncome.Remove(income);
             }

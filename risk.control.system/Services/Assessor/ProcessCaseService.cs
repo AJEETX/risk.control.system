@@ -67,14 +67,14 @@ namespace risk.control.system.Services.Assessor
                 caseTask.InvestigationReport.AiSummary = reportAiSummary;
                 caseTask.InvestigationReport.AssessorRemarkType = assessorRemarkType;
                 caseTask.InvestigationReport.AssessorRemarks = assessorRemarks;
-                caseTask.InvestigationReport.AssessorRemarksUpdated = DateTime.Now;
+                caseTask.InvestigationReport.AssessorRemarksUpdated = DateTime.UtcNow;
                 caseTask.InvestigationReport.AssessorEmail = userEmail;
 
                 caseTask.Status = finished;
                 caseTask.SubStatus = rejected;
-                caseTask.Updated = DateTime.Now;
+                caseTask.Updated = DateTime.UtcNow;
                 caseTask.UpdatedBy = userEmail;
-                caseTask.ProcessedByAssessorTime = DateTime.Now;
+                caseTask.ProcessedByAssessorTime = DateTime.UtcNow;
                 caseTask.SubmittedAssessordEmail = userEmail;
                 caseTask.CaseOwner = caseTask.ClientCompany.Email;
                 context.Investigations.Update(caseTask);
@@ -90,7 +90,7 @@ namespace risk.control.system.Services.Assessor
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred.");
+                logger.LogError(ex, "Error occurred Rejecting Case {CaseId}. {UserEmail}", caseId, userEmail);
                 throw;
             }
         }
@@ -111,15 +111,15 @@ namespace risk.control.system.Services.Assessor
                 caseTask.InvestigationReport.AiSummary = reportAiSummary;
                 caseTask.InvestigationReport.AssessorRemarkType = assessorRemarkType;
                 caseTask.InvestigationReport.AssessorRemarks = assessorRemarks;
-                caseTask.InvestigationReport.AssessorRemarksUpdated = DateTime.Now;
+                caseTask.InvestigationReport.AssessorRemarksUpdated = DateTime.UtcNow;
                 caseTask.InvestigationReport.AssessorEmail = userEmail;
 
                 caseTask.Status = finished;
                 caseTask.SubStatus = approved;
-                caseTask.Updated = DateTime.Now;
+                caseTask.Updated = DateTime.UtcNow;
                 caseTask.UpdatedBy = userEmail;
                 caseTask.CaseOwner = caseTask.ClientCompany.Email;
-                caseTask.ProcessedByAssessorTime = DateTime.Now;
+                caseTask.ProcessedByAssessorTime = DateTime.UtcNow;
                 caseTask.SubmittedAssessordEmail = userEmail;
                 context.Investigations.Update(caseTask);
 
@@ -133,7 +133,7 @@ namespace risk.control.system.Services.Assessor
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred.");
+                logger.LogError(ex, "Error occurred Approving Case {CaseId}. {UserEmail}", caseId, userEmail);
                 throw;
             }
         }

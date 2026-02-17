@@ -39,14 +39,12 @@ namespace risk.control.system.Controllers
         public async Task<IActionResult> Index(string userId)
         {
             var userRoles = new List<UserRoleViewModel>();
-            //ViewBag.userId = userId;
             var user = await userManager.FindByIdAsync(userId);
             if (user == null)
             {
                 notifyService.Error("user not found!");
                 return NotFound();
             }
-            //ViewBag.UserName = user.UserName;
             foreach (var role in roleManager.Roles)
             {
                 var userRoleViewModel = new UserRoleViewModel
@@ -83,7 +81,7 @@ namespace risk.control.system.Controllers
                 return NotFound();
             }
             user.SecurityStamp = Guid.NewGuid().ToString();
-            user.Updated = DateTime.Now;
+            user.Updated = DateTime.UtcNow;
             user.UpdatedBy = HttpContext.User?.Identity?.Name;
             var roles = await userManager.GetRolesAsync(user);
             var result = await userManager.RemoveFromRolesAsync(user, roles);

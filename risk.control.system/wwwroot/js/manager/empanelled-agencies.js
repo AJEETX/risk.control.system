@@ -3,30 +3,7 @@
         ajax: {
             url: '/api/Company/GetEmpanelledVendors',
             dataSrc: '',
-            error: function (xhr, status, error) {
-                console.error("AJAX Error:", status, error);
-                console.error("Response:", xhr.responseText);
-                if (xhr.status === 401 || xhr.status === 403) {
-                    $.confirm({
-                        title: 'Session Expired!',
-                        content: 'Your session has expired or you are unauthorized. You will be redirected to the login page.',
-                        type: 'red',
-                        typeAnimated: true,
-                        buttons: {
-                            Ok: {
-                                text: 'Login',
-                                btnClass: 'btn-red',
-                                action: function () {
-                                    window.location.href = '/Account/Login';
-                                }
-                            }
-                        },
-                        onClose: function () {
-                            window.location.href = '/Account/Login';
-                        }
-                    });
-                }
-            }
+            error: DataTableErrorHandler
         },
         columnDefs: [{
             'targets': 0,
@@ -105,7 +82,7 @@
                     img += '<br /> <span class="result"></span>';
 
                     // Return the domain with the appended rating images and information
-                    return '<span title="' + row.name + '" data-bs-toggle="tooltip"><a id="edit' + row.id + '" href="/EmpanelledAgency/Detail?Id=' + row.id + '"> ' + data + '</a></span>' + '<br /> ' + img;
+                    return '<span title="' + row.name + '" data-bs-toggle="tooltip"><a id="edit' + row.id + '" href="/EmpanelledAgency/Detail/' + row.id + '"> ' + data + '</a></span>' + '<br /> ' + img;
                 }
             },
             //{

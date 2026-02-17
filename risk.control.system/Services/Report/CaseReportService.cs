@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 
@@ -21,7 +22,7 @@ namespace risk.control.system.Services.Report
 
         public async Task<CaseInvestigationVendorsModel> GetInvestigateReport(string userEmail, long selectedcase)
         {
-            var caseTask = await _context.Investigations
+            var caseTask = await _context.Investigations.AsNoTracking()
                .Include(c => c.InvestigationTimeline)
                .Include(c => c.InvestigationReport)
                .ThenInclude(c => c.EnquiryRequest)
@@ -59,7 +60,7 @@ namespace risk.control.system.Services.Report
                .FirstOrDefaultAsync(c => c.Id == selectedcase);
             if (caseTask is null) return null;
 
-            var beneficiaryDetails = await _context.BeneficiaryDetail
+            var beneficiaryDetails = await _context.BeneficiaryDetail.AsNoTracking()
                 .Include(c => c.PinCode)
                 .Include(c => c.BeneficiaryRelation)
                 .Include(c => c.District)
@@ -94,9 +95,10 @@ namespace risk.control.system.Services.Report
             return (new CaseInvestigationVendorsModel
             {
                 InvestigationReport = caseTask.InvestigationReport,
-                Location = beneficiaryDetails,
-                ClaimsInvestigation = caseTask,
-                Address = caseTask.PolicyDetail.InsuranceType == Models.InsuranceType.CLAIM ? "Beneficiary" : "Life-Assured"
+                Beneficiary = beneficiaryDetails,
+                CaseTask = caseTask,
+                Address = caseTask.PolicyDetail.InsuranceType == Models.InsuranceType.CLAIM ? "Beneficiary" : "Life-Assured",
+                Currency = CustomExtensions.GetCultureByCountry(caseTask.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol
             });
         }
     }

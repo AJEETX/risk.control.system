@@ -85,7 +85,7 @@ namespace risk.control.system.Services.Agent
             caseTask.InvestigationReport.AgentEmail = userEmail;
 
             // Load report templates
-            var templates = await _context.ReportTemplates
+            var templates = await _context.ReportTemplates.AsNoTracking()
                 .Include(r => r.LocationReport)
                     .ThenInclude(l => l.AgentIdReport)
                 .Include(r => r.LocationReport)
@@ -115,8 +115,9 @@ namespace risk.control.system.Services.Agent
             var model = new CaseInvestigationVendorsModel
             {
                 InvestigationReport = caseTask.InvestigationReport,
-                Location = caseTask.BeneficiaryDetail,
-                ClaimsInvestigation = caseTask
+                Beneficiary = caseTask.BeneficiaryDetail,
+                CaseTask = caseTask,
+                Currency = CustomExtensions.GetCultureByCountry(caseTask.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol
             };
 
             _logger.LogInformation("Returning investigation model for case {CaseId}", selectedCaseId);
@@ -128,7 +129,7 @@ namespace risk.control.system.Services.Agent
             _logger.LogInformation("Fetching investigation case {CaseId} for agent {UserEmail}", id, currentUserEmail);
 
             // Fetch case with related entities
-            var caseTask = await _context.Investigations
+            var caseTask = await _context.Investigations.AsNoTracking()
                 .Include(c => c.CaseMessages)
                 .Include(c => c.CaseNotes)
                 .Include(c => c.InvestigationReport)
@@ -170,7 +171,7 @@ namespace risk.control.system.Services.Agent
             _logger.LogInformation("Investigation case {CaseId} found. Fetching related data...", id);
 
             // Fetch company
-            var company = await _context.ClientCompany.FirstOrDefaultAsync(c => c.ClientCompanyId == caseTask.ClientCompanyId);
+            var company = await _context.ClientCompany.AsNoTracking().FirstOrDefaultAsync(c => c.ClientCompanyId == caseTask.ClientCompanyId);
             if (company == null)
             {
                 _logger.LogWarning("ClientCompany {CompanyId} not found for case {CaseId}", caseTask.ClientCompanyId, id);
@@ -180,13 +181,13 @@ namespace risk.control.system.Services.Agent
             var lastHistory = caseTask.InvestigationTimeline.OrderByDescending(h => h.StatusChangedAt).FirstOrDefault();
             var endTime = caseTask.Status == CONSTANTS.CASE_STATUS.FINISHED
                 ? caseTask.ProcessedByAssessorTime.GetValueOrDefault()
-                : DateTime.Now;
+                : DateTime.UtcNow;
             var totalTimeTaken = FormatTime(endTime - caseTask.Created);
 
             _logger.LogInformation("Total time taken for case {CaseId}: {TotalTime}", id, totalTimeTaken);
 
             // Fetch invoice
-            var invoice = await _context.VendorInvoice
+            var invoice = await _context.VendorInvoice.AsNoTracking()
                 .FirstOrDefaultAsync(i => i.InvestigationReportId == caseTask.InvestigationReportId);
             if (invoice != null)
             {
@@ -194,7 +195,7 @@ namespace risk.control.system.Services.Agent
             }
 
             // Fetch report templates
-            var templates = await _context.ReportTemplates
+            var templates = await _context.ReportTemplates.AsNoTracking()
                 .Include(r => r.LocationReport)
                     .ThenInclude(l => l.AgentIdReport)
                 .Include(r => r.LocationReport)
@@ -231,7 +232,8 @@ namespace risk.control.system.Services.Agent
                 TimeTaken = totalTimeTaken,
                 VendorInvoice = invoice,
                 CanDownload = canDownload,
-                Withdrawable = caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR
+                Withdrawable = caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR,
+                Currency = CustomExtensions.GetCultureByCountry(caseTask.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol
             };
 
             _logger.LogInformation("Returning CaseTransactionModel for case {CaseId}", id);
@@ -291,7 +293,7 @@ namespace risk.control.system.Services.Agent
 
         public async Task<InvestigationTask> GetCaseDetailForAgentDetail(long id)
         {
-            var caseDetail = await _context.Investigations
+            var caseDetail = await _context.Investigations.AsNoTracking()
                .Include(c => c.PolicyDetail)
                .Include(c => c.BeneficiaryDetail)
                 .Include(c => c.CustomerDetail)
@@ -302,7 +304,7 @@ namespace risk.control.system.Services.Agent
 
         public async Task<InvestigationTask> GetNotesOfCase(long id)
         {
-            var caseInvestigation = await _context.Investigations
+            var caseInvestigation = await _context.Investigations.AsNoTracking()
                .Include(c => c.CaseNotes)
                 .Where(c => !c.Deleted)
                 .FirstOrDefaultAsync(c => c.Id == id);
@@ -322,7 +324,7 @@ namespace risk.control.system.Services.Agent
         // Helper to check PDF download eligibility
         private async Task<bool> CanDownloadPdf(string userEmail, long reportId)
         {
-            var tracker = await _context.PdfDownloadTracker
+            var tracker = await _context.PdfDownloadTracker.AsNoTracking()
                 .FirstOrDefaultAsync(t => t.ReportId == reportId && t.UserEmail == userEmail);
 
             return tracker == null || tracker.DownloadCount <= 3;

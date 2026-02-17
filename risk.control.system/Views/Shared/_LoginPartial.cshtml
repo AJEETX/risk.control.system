@@ -13,6 +13,7 @@
     <form id="login-form" asp-controller="Account" method="post">
         @Html.AntiForgeryToken()
         <input name="agent_login" title="agent_login" type="text" id="agent_login" value="">
+        <input type="hidden" asp-for="ReturnUrl" />
         <div class="input-boxes">
             <div class="input-box autocomplete-wrapper">
                 <i class="fas fa-envelope left-padd"></i>

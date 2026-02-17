@@ -79,7 +79,7 @@ namespace risk.control.system.Controllers.PortalAdmin
             var clientCompanyApplicationUser = await _context.ApplicationUser.FindAsync(id);
             if (clientCompanyApplicationUser != null)
             {
-                clientCompanyApplicationUser.Updated = DateTime.Now;
+                clientCompanyApplicationUser.Updated = DateTime.UtcNow;
                 clientCompanyApplicationUser.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.ApplicationUser.Remove(clientCompanyApplicationUser);
             }

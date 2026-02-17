@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 
@@ -6,7 +7,7 @@ namespace risk.control.system.Services.Creator
 {
     public interface IEmpanelledAgencyService
     {
-        Task<CaseInvestigationVendorsModel> GetEmpanelledVendors(long selectedcase);
+        Task<CaseInvestigationVendorsModel> GetEmpanelledVendors(long selectedcase, string userEmail, long vendorId, bool fromEditPage = false);
 
         Task<ReportTemplate> GetReportTemplate(long caseId);
     }
@@ -20,9 +21,9 @@ namespace risk.control.system.Services.Creator
             this._context = context;
         }
 
-        public async Task<CaseInvestigationVendorsModel> GetEmpanelledVendors(long selectedcase)
+        public async Task<CaseInvestigationVendorsModel> GetEmpanelledVendors(long selectedcase, string userEmail, long vendorId, bool fromEditPage = false)
         {
-            var claimsInvestigation = await _context.Investigations
+            var caseTask = await _context.Investigations
                 .Include(c => c.CaseNotes)
                 .Include(c => c.PolicyDetail)
                 .Include(c => c.ClientCompany)
@@ -41,6 +42,7 @@ namespace risk.control.system.Services.Creator
                 .Include(c => c.CustomerDetail)
                 .ThenInclude(c => c.State)
                 .FirstOrDefaultAsync(m => m.Id == selectedcase);
+
             var beneficiary = await _context.BeneficiaryDetail
                .Include(c => c.PinCode)
                .Include(c => c.BeneficiaryRelation)
@@ -48,11 +50,19 @@ namespace risk.control.system.Services.Creator
                .Include(c => c.State)
                .Include(c => c.Country)
                .FirstOrDefaultAsync(c => c.InvestigationTaskId == selectedcase);
+
+            var currentUser = await _context.ApplicationUser.AsNoTracking().Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == userEmail);
+
+            _context.Investigations.Update(caseTask);
+            await _context.SaveChangesAsync();
+
             return new CaseInvestigationVendorsModel
             {
-                Location = beneficiary,
-                //Vendors = vendorWithCaseCounts,
-                ClaimsInvestigation = claimsInvestigation
+                Beneficiary = beneficiary,
+                Currency = CustomExtensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol,
+                VendorId = vendorId,
+                FromEditPage = fromEditPage,
+                CaseTask = caseTask
             };
         }
 

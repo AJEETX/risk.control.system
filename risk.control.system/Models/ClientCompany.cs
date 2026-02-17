@@ -48,10 +48,10 @@ namespace risk.control.system.Models
         public string? IFSCCode { get; set; } = default!;
 
         [DataType(DataType.Date)]
-        public DateTime? AgreementDate { get; set; } = DateTime.Now;
+        public DateTime? AgreementDate { get; set; } = DateTime.UtcNow;
 
         [DataType(DataType.Date)]
-        public DateTime? ActivatedDate { get; set; } = DateTime.Now;
+        public DateTime? ActivatedDate { get; set; } = DateTime.UtcNow;
 
         public CompanyStatus? Status { get; set; } = CompanyStatus.ACTIVE;
 
@@ -78,7 +78,7 @@ namespace risk.control.system.Models
         public LicenseType LicenseType { get; set; } = LicenseType.Trial;
 
         [DataType(DataType.DateTime)]
-        public DateTime? ExpiryDate { get; set; } = DateTime.Now.AddDays(10);
+        public DateTime? ExpiryDate { get; set; } = DateTime.UtcNow.AddDays(10);
 
         [Range(1, 500)]
         public int TotalCreatedClaimAllowed { get; set; } = 100;

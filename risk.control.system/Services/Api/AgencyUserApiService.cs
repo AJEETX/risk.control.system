@@ -17,8 +17,7 @@ namespace risk.control.system.Services.Api
 
     internal class AgencyUserApiService : IAgencyUserApiService
     {
-        private readonly ApplicationDbContext context;
-        private readonly IWebHostEnvironment env;
+        private readonly IDbContextFactory<ApplicationDbContext> _contextFactory;
         private readonly IDashboardService dashboardService;
         private readonly IBase64FileService base64FileService;
         private readonly DateTime cutoffTime;
@@ -26,15 +25,13 @@ namespace risk.control.system.Services.Api
 
         public AgencyUserApiService(
             IConfiguration config,
-            ApplicationDbContext context,
-            IWebHostEnvironment env,
+            IDbContextFactory<ApplicationDbContext> contextFactory,
             IDashboardService dashboardService,
             IBase64FileService base64FileService,
             IFeatureManager featureManager)
         {
-            cutoffTime = DateTime.Now.AddMinutes(double.Parse(config["LOGIN_SESSION_TIMEOUT_MIN"]));
-            this.context = context;
-            this.env = env;
+            cutoffTime = DateTime.UtcNow.AddMinutes(double.Parse(config["LOGIN_SESSION_TIMEOUT_MIN"]));
+            _contextFactory = contextFactory;
             this.dashboardService = dashboardService;
             this.base64FileService = base64FileService;
             this.featureManager = featureManager;
@@ -43,7 +40,7 @@ namespace risk.control.system.Services.Api
         public async Task<List<UserDetailResponse>> GetAgencyUsers(string userEmail)
         {
             var now = DateTime.UtcNow;
-
+            await using var context = await _contextFactory.CreateDbContextAsync();
             // 1. Get vendorId
             var vendor = await context.ApplicationUser
                 .AsNoTracking()
@@ -112,25 +109,15 @@ namespace risk.control.system.Services.Api
             // 6. Map to response
             var responseTasks = users.Select(async u =>
             {
-                sessionLookup.TryGetValue(u.Email, out var session);
                 caseCounts.TryGetValue(u.Email, out var count);
-                var lastSession = await context.UserSessionAlive
-                    .Where(s => s.ActiveUser.Email == u.Email && !s.LoggedOut)
-                    .OrderByDescending(s => s.Updated ?? s.Created)
-                    .FirstOrDefaultAsync();
 
-                string status, statusName, icon;
+                string status = "#DED5D5", statusName = "Offline", icon = "fa fa-circle-o";
 
-                if (lastSession == null)
+                // Use the lookup you already fetched in Step 2!
+                if (sessionLookup.TryGetValue(u.Email, out var session) && !session.LoggedOut)
                 {
-                    status = "#DED5D5";
-                    statusName = "Offline";
-                    icon = "fa fa-circle-o";
-                }
-                else
-                {
-                    var lastSeen = lastSession.Updated ?? lastSession.Created;
-                    var minutesAway = (int)(DateTime.Now - lastSeen).TotalMinutes;
+                    var lastSeen = session.LastSeen ?? u.Created; // Fallback to created if null
+                    var minutesAway = (int)(DateTime.UtcNow - lastSeen).TotalMinutes;
 
                     (status, statusName, icon) = minutesAway switch
                     {
@@ -192,8 +179,8 @@ namespace risk.control.system.Services.Api
 
         public async Task<List<UserDetailResponse>> GetCompanyAgencyUsers(string userEmail, long vendorId)
         {
-            var now = DateTime.Now;
-
+            var now = DateTime.UtcNow;
+            await using var context = await _contextFactory.CreateDbContextAsync();
             // 1️⃣ Pre-fetch active sessions (latest per user) as a dictionary
             var latestSessions = await context.UserSessionAlive
                 .Where(s => s.Updated >= cutoffTime || s.Created >= cutoffTime)
@@ -208,7 +195,7 @@ namespace risk.control.system.Services.Api
                 .ToDictionaryAsync(x => x.Email, x => new { x.LastSeen, x.LoggedOut });
 
             // 2️⃣ Pre-fetch vendor users
-            var vendorUsers = await context.ApplicationUser
+            var vendorUsers = await context.ApplicationUser.AsNoTracking()
                 .Where(u => u.VendorId == vendorId && !u.Deleted)
                 .Include(u => u.Country)
                 .Include(u => u.State)

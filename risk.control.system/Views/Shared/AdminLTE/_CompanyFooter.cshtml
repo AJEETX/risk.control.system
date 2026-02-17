@@ -5,7 +5,7 @@
 
     @*  @if (Model.LicenseType == Standard.Licensing.LicenseType.Trial)
     {
-    var expires = Model.ExpiryDate.Value.Subtract(DateTime.Now).Days;
+    var expires = Model.ExpiryDate.Value.Subtract(DateTime.UtcNow).Days;
     <marquee behavior="scroll" direction="left">
     <span class="trial-banner"> Trial Version with limited features</span> !
     <b> MAX Allowed Claim Creation = @Model.TotalCreatedClaimAllowed.</b>

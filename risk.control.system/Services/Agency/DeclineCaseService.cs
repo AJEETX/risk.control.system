@@ -30,14 +30,14 @@ namespace risk.control.system.Services.Agency
         {
             try
             {
-                var currentUser = await context.ApplicationUser.Include(u => u.Vendor).FirstOrDefaultAsync(u => u.Email == userEmail);
-                var caseTask = await context.Investigations
+                var currentUser = await context.ApplicationUser.AsNoTracking().Include(u => u.Vendor).FirstOrDefaultAsync(u => u.Email == userEmail);
+                var caseTask = await context.Investigations.AsNoTracking()
                     .FirstOrDefaultAsync(c => c.Id == caseId);
 
                 caseTask.IsNewAssignedToAgency = true;
                 caseTask.CaseOwner = currentUser.Vendor.Email;
                 caseTask.TaskedAgentEmail = null;
-                caseTask.Updated = DateTime.Now;
+                caseTask.Updated = DateTime.UtcNow;
                 caseTask.UpdatedBy = currentUser.Email;
                 caseTask.SubStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR;
                 context.Investigations.Update(caseTask);
@@ -58,16 +58,16 @@ namespace risk.control.system.Services.Agency
         {
             try
             {
-                var currentUser = await context.ApplicationUser.Include(u => u.Vendor).FirstOrDefaultAsync(u => u.Email == userEmail);
-                var caseTask = await context.Investigations
+                var currentUser = await context.ApplicationUser.AsNoTracking().Include(u => u.Vendor).FirstOrDefaultAsync(u => u.Email == userEmail);
+                var caseTask = await context.Investigations.AsNoTracking()
                     .FirstOrDefaultAsync(c => c.Id == caseId);
-                var company = await context.ClientCompany.FirstOrDefaultAsync(c => c.ClientCompanyId == caseTask.ClientCompanyId);
+                var company = await context.ClientCompany.AsNoTracking().FirstOrDefaultAsync(c => c.ClientCompanyId == caseTask.ClientCompanyId);
                 caseTask.CaseOwner = company.Email;
                 caseTask.IsAutoAllocated = false;
                 caseTask.IsNew = true;
                 caseTask.IsNewAssignedToAgency = true;
                 caseTask.IsNewSubmittedToAgent = true;
-                caseTask.Updated = DateTime.Now;
+                caseTask.Updated = DateTime.UtcNow;
                 caseTask.UpdatedBy = currentUser.Email;
                 caseTask.AssignedToAgency = false;
                 caseTask.VendorId = null;

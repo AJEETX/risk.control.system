@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
-
+using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Services.Common;
 
@@ -7,7 +7,8 @@ namespace risk.control.system.Seeds
 {
     public static class StartCountryWiseSeed
     {
-        static int randomPinCode;
+        private static int randomPinCode;
+
         public static async Task Seed(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, UserManager<ApplicationUser> userManager, ICustomApiClient customApiCLient, IFileStorageService fileStorageService)
         {
             var globalSetting = new GlobalSettings
@@ -20,7 +21,7 @@ namespace risk.control.system.Seeds
             await PinCodeStateSeed.CurrenciesCode(context);
             await PinCodeStateSeed.Currencies(context);
             var countries = await PinCodeStateSeed.Countries(context);
-            var country = Environment.GetEnvironmentVariable("COUNTRY");
+            var country = EnvHelper.Get("COUNTRY");
             if (country == "IN")
             {
                 randomPinCode = await IndiaSeed.Seed(context, webHostEnvironment, userManager, customApiCLient, countries, servicesTypes, fileStorageService);

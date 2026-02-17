@@ -61,25 +61,25 @@ namespace risk.control.system.Controllers.CompanyAdmin
             return View();
         }
 
-        [Breadcrumb("Add User")]
+        [Breadcrumb("Add User", FromAction = nameof(Users))]
         public async Task<IActionResult> Create()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             try
             {
-                var companyUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
+                var companyUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == userEmail);
                 if (companyUser is null)
                 {
                     notifyService.Error("OOPs !!!..User Not Found");
                     return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
-                var company = await _context.ClientCompany.Include(c => c.Country).FirstOrDefaultAsync(v => v.ClientCompanyId == companyUser.ClientCompanyId);
+                var company = await _context.ClientCompany.AsNoTracking().Include(c => c.Country).FirstOrDefaultAsync(v => v.ClientCompanyId == companyUser.ClientCompanyId);
                 if (company == null)
                 {
                     notifyService.Error("OOPs !!!..Contact Admin");
                     return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
-                var usersInCompany = _context.ApplicationUser.Where(c => !c.Deleted && c.ClientCompanyId == companyUser.ClientCompanyId);
+                var usersInCompany = _context.ApplicationUser.AsNoTracking().Where(c => !c.Deleted && c.ClientCompanyId == companyUser.ClientCompanyId);
                 bool isManagerTaken = false;
 
                 foreach (var user in usersInCompany)
@@ -116,9 +116,9 @@ namespace risk.control.system.Controllers.CompanyAdmin
 
         private async Task LoadModel(ApplicationUser model, string userEmail)
         {
-            var companyUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
-            var company = await _context.ClientCompany.Include(c => c.Country).FirstOrDefaultAsync(v => v.ClientCompanyId == companyUser.ClientCompanyId);
-            var usersInCompany = _context.ApplicationUser.Where(c => !c.Deleted && c.ClientCompanyId == companyUser.ClientCompanyId);
+            var companyUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == userEmail);
+            var company = await _context.ClientCompany.AsNoTracking().Include(c => c.Country).FirstOrDefaultAsync(v => v.ClientCompanyId == companyUser.ClientCompanyId);
+            var usersInCompany = _context.ApplicationUser.AsNoTracking().Where(c => !c.Deleted && c.ClientCompanyId == companyUser.ClientCompanyId);
             bool isManagerTaken = false;
 
             foreach (var user in usersInCompany)
@@ -186,33 +186,33 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 logger.LogError(ex, "Error creating user for {Company}. {UserEmail}.", emailSuffix, userEmail);
                 notifyService.Error("Error creating user. Try again");
             }
-            return RedirectToAction(nameof(Users), "ManageCompanyUser");
+            return RedirectToAction(nameof(Users), ControllerName<ManageCompanyUserController>.Name);
         }
 
-        [Breadcrumb("Edit User", FromAction = "Users")]
-        public async Task<IActionResult> Edit(long? userId)
+        [Breadcrumb("Edit User", FromAction = nameof(Users))]
+        public async Task<IActionResult> Edit(long? id)
         {
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
 
-                if (userId == null || _context.ApplicationUser == null)
+                if (id == null || _context.ApplicationUser == null)
                 {
                     notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Users));
                 }
 
-                var clientCompanyApplicationUser = await _context.ApplicationUser
+                var companyUser = await _context.ApplicationUser.AsNoTracking()
                     .Include(u => u.Country).
                     Include(u => u.ClientCompany)
-                    .FirstOrDefaultAsync(c => c.Id == userId);
+                    .FirstOrDefaultAsync(c => c.Id == id);
 
-                if (clientCompanyApplicationUser == null)
+                if (companyUser == null)
                 {
                     notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Users));
                 }
-                var usersInCompany = _context.ApplicationUser.Where(c => !c.Deleted && c.ClientCompanyId == clientCompanyApplicationUser.ClientCompanyId && c.Id != clientCompanyApplicationUser.Id);
+                var usersInCompany = _context.ApplicationUser.AsNoTracking().Where(c => !c.Deleted && c.ClientCompanyId == companyUser.ClientCompanyId && c.Id != companyUser.Id);
                 bool isManagerTaken = false;
 
                 foreach (var user in usersInCompany)
@@ -236,16 +236,16 @@ namespace risk.control.system.Controllers.CompanyAdmin
                     })
                     .ToList();
 
-                clientCompanyApplicationUser.IsPasswordChangeRequired = await featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION) ? !clientCompanyApplicationUser.IsPasswordChangeRequired : true;
-                clientCompanyApplicationUser.AvailableRoles = availableRoles;
-                return View(clientCompanyApplicationUser);
+                companyUser.IsPasswordChangeRequired = await featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION) ? !companyUser.IsPasswordChangeRequired : true;
+                companyUser.AvailableRoles = availableRoles;
+                return View(companyUser);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error editing {UserId} for {UserEmail}.", userId, HttpContext.User?.Identity?.Name);
+                logger.LogError(ex, "Error editing {UserId} for {UserEmail}.", id, HttpContext.User?.Identity?.Name);
                 notifyService.Error("Error editing user. Try again");
             }
-            return RedirectToAction(nameof(Users), "ManageCompanyUser");
+            return RedirectToAction(nameof(Users), ControllerName<ManageCompanyUserController>.Name);
         }
 
         [HttpPost]
@@ -282,7 +282,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 logger.LogError(ex, "Error editing {UserId} for {UserEmail}.", id, userEmail);
                 notifyService.Error($"Error to create Company user. Try again.", 3);
             }
-            return RedirectToAction(nameof(Users), "ManageCompanyUser");
+            return RedirectToAction(nameof(Users), ControllerName<ManageCompanyUserController>.Name);
         }
 
         [HttpPost]

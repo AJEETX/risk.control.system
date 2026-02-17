@@ -23,7 +23,7 @@ namespace risk.control.system.Middleware
                 var user = await db.ApplicationUser.FirstOrDefaultAsync(u => u.Email == email);
                 if (user != null)
                 {
-                    user.LastActivityDate = DateTime.Now;
+                    user.LastActivityDate = DateTime.UtcNow;
 
                     var session = await db.UserSessionAlive
                         .Where(x => x.ActiveUser.Id == user.Id && !x.LoggedOut)
@@ -32,7 +32,7 @@ namespace risk.control.system.Middleware
 
                     if (session != null)
                     {
-                        session.Updated = DateTime.Now;
+                        session.Updated = DateTime.UtcNow;
                         session.CurrentPage = context.Request.Path;
                     }
                     else

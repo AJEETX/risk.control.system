@@ -82,8 +82,8 @@ namespace risk.control.system.Services.Creator
                 InvestigationServiceTypeId = service.InvestigationServiceTypeId,
                 CaseEnablerId = caseEnabler.CaseEnablerId,
                 SumAssuredValue = 99999,
-                ContractIssueDate = DateTime.Now.AddDays(-10),
-                DateOfIncident = DateTime.Now.AddDays(-3),
+                ContractIssueDate = DateTime.UtcNow.AddDays(-10),
+                DateOfIncident = DateTime.UtcNow.AddDays(-3),
                 CauseOfLoss = "LOST IN ACCIDENT",
                 CostCentreId = costCentre.CostCentreId
             };
@@ -165,7 +165,7 @@ namespace risk.control.system.Services.Creator
 
         public async Task<EditPolicyDto> GetEditPolicyDetail(long id)
         {
-            var caseTask = await context.Investigations
+            var caseTask = await context.Investigations.AsNoTracking()
                     .Include(c => c.PolicyDetail)
                     .FirstOrDefaultAsync(i => i.Id == id);
 

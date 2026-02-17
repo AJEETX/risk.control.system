@@ -53,7 +53,7 @@ namespace risk.control.system.Services.Report
         public async Task<SectionBuilder> Build(SectionBuilder section, LocationReport loc, bool isClaim)
         {
             var imagePath = webHostEnvironment.WebRootPath;
-            string googlePhotoImagePath = Path.Combine(imagePath, "report", $"google-agent-map-{DateTime.Now.ToString("ddMMMyyyHHmmsss")}.png");
+            string googlePhotoImagePath = Path.Combine(imagePath, "report", $"google-agent-map-{DateTime.UtcNow.ToString("ddMMMyyyHHmmsss")}.png");
             // =================== AGENT ID REPORT ====================
             if (loc.AgentIdReport != null && loc.AgentIdReport.ValidationExecuted)
             {

@@ -26,64 +26,9 @@
 
     var table = $("#dataTable").DataTable({
         ajax: {
-            url: '/api/Agency/GetCompanyAgencyUser?id=' + $('#Id').val(),
+            url: '/api/Agency/GetCompanyAgencyUser/' + $('#Id').val(),
             dataSrc: '',
-            error: function (xhr, status, error) {
-                console.error("AJAX Error:", status, error);
-                console.error("Response:", xhr.responseText);
-                if (xhr.status === 401 || xhr.status === 403) {
-                    $.confirm({
-                        title: 'Session Expired!',
-                        content: 'Your session has expired or you are unauthorized. You will be redirected to the login page.',
-                        type: 'red',
-                        typeAnimated: true,
-                        buttons: {
-                            Ok: {
-                                text: 'Login',
-                                btnClass: 'btn-red',
-                                action: function () {
-                                    window.location.href = '/Account/Login';
-                                }
-                            }
-                        },
-                        onClose: function () {
-                            window.location.href = '/Account/Login';
-                        }
-                    });
-                }
-                else if (xhr.status === 500) {
-                    $.confirm({
-                        title: 'Server Error!',
-                        content: 'An unexpected server error occurred. You will be redirected to Empanelled Agency User page.',
-                        type: 'orange',
-                        typeAnimated: true,
-                        buttons: {
-                            Ok: function () {
-                                window.location.href = '/EmpanelledAgencyUser/AgencyUsers?id=' + $('#Id').val(); // Server error. Try again
-                            }
-                        },
-                        onClose: function () {
-                            window.location.href = '/EmpanelledAgencyUser/AgencyUsers?id=' + $('#Id').val(); // Server error. Try again
-                        }
-                    });
-                }
-                else if (xhr.status === 400) {
-                    $.confirm({
-                        title: 'Agencies!',
-                        content: 'Try with valid data. You will be redirected to Available Agencies page.',
-                        type: 'orange',
-                        typeAnimated: true,
-                        buttons: {
-                            Ok: function () {
-                                window.location.href = '/EmpanelledAgencyUser/AgencyUsers?id=' + $('#Id').val(); // Bad request. Try with valid data
-                            }
-                        },
-                        onClose: function () {
-                            window.location.href = '/EmpanelledAgencyUser/AgencyUsers?id=' + $('#Id').val(); // Bad request. Try with valid data
-                        }
-                    });
-                }
-            }
+            error: DataTableErrorHandler
         },
         order: [[11, 'desc'], [12, 'desc']], // Sort by `isUpdated` and `lastModified`,
         columnDefs: [
@@ -205,7 +150,7 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    buttons += `<a data-id="${row.id}" class="btn btn-xs btn-warning"><i class="fas fa-edit"></i> Edit</a> &nbsp;` ;
+                    buttons += `<a data-id="${row.id}" class="btn btn-xs btn-warning"><i class="fas fa-edit"></i> Edit</a> &nbsp;`;
                     if (row.role != "AGENCY_ADMIN") {
                         buttons += `<a data-id="${row.id}" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i> Delete</a>`;
                     } else {
@@ -232,10 +177,8 @@
             }
             $('.btn-warning', row).addClass('btn-black-color');
             $('.btn-danger', row).addClass('btn-white-color');
-
         },
         "drawCallback": function (settings, start, end, max, total, pre) {
-            
             // Reinitialize Bootstrap 5 tooltips
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
             tooltipTriggerList.map(function (el) {
@@ -263,7 +206,7 @@
 
         showSpinnerOnButton(element, "Delete");
 
-        const editUrl = `/EmpanelledAgencyUser/Delete?userId=${encodeURIComponent(id)}`;
+        const editUrl = `/EmpanelledAgencyUser/Delete/${encodeURIComponent(id)}`;
 
         setTimeout(() => {
             window.location.href = editUrl;
@@ -276,7 +219,7 @@
 
         showSpinnerOnButton(element, "Edit");
 
-        const url = `/EmpanelledAgencyUser/Edit?userId=${encodeURIComponent(id)}`;
+        const url = `/EmpanelledAgencyUser/Edit/${encodeURIComponent(id)}`;
 
         setTimeout(() => {
             window.location.href = url;

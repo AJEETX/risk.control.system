@@ -19,50 +19,7 @@
 				<div class="submit-progress hidden">
 					<i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
 				</div>
-				@* <div class="row">
-                    <div class="col-sm-6">
-                        <div class="form-group">
-                            <label class="input-group-label"> Domain:</label>
-                            <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text" id="email"><i class="fa fa-globe"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                </div>
-                                <input readonly asp-for="Email" class="form-control readonly-input valid-border" />
-                            </div>
-                        </div>
-                    </div>
-                    @if(Model.SelectedByCompany)
-                    {
-                    <div class="col-sm-6">
-                        <div class="form-group">
-                            <label class="input-group-label"> App Url: </label>
-                            <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text"><i class="fas fa-tool"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                </div>
-                                <input type="text" id="MobileAppUrl" asp-for="MobileAppUrl" class="form-control remarks title-name" required placeholder="Enter App download Url" maxlength="150">
-                                <span asp-validation-for="MobileAppUrl" class="text-danger"></span>
-                            </div>
-                        </div>
-                        </div>
-                    }
-                    else
-                    {
-                    <input type="hidden" asp-for="MobileAppUrl" />
-                    <div class="col-sm-6">
-                        <div class="form-group">
-                            <label class="input-group-label"> Activated Date: </label>
-                            <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text"> <i class="fas fa-calendar-check"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                </div>
-                                    <input readonly type="date" id="ActivatedDate" asp-for="ActivatedDate" class="form-control remarks valid-border" required placeholder="Activated Date">
-                                <span asp-validation-for="ActivatedDate" class="text-danger"></span>
-                            </div>
-                        </div>
-                    </div>
-                    }
-                </div> *@
+				
 				<partial name="Vendor/_Edit" model="Model" />
 			</div>
 			<div class="card-footer">
@@ -72,7 +29,7 @@
 							@* <button id="reset" type="submit" onclick="clearAllInputs()" class="btn btn-outline-secondary">
                         <i class="fas fa-undo"></i> Reset
                         </button> *@
-							<a id="cancel" asp-action="Details" asp-route-id="@Model.VendorId" class="btn btn-secondary">
+							<a id="cancel" asp-action="Detail" asp-route-id="@Model.VendorId" class="btn btn-secondary">
 								<i class="fa fa-window-close"></i>
 								@Applicationsettings.CANCEL
 							</a>

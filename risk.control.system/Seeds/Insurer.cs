@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 
 using risk.control.system.AppConstant;
+using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services.Common;
@@ -11,6 +12,7 @@ namespace risk.control.system.Seeds
     public static class Insurer
     {
         private const string companyMapSize = "800x800";
+
         public static async Task<ClientCompany> Seed(ApplicationDbContext context, List<Vendor> vendors, IWebHostEnvironment webHostEnvironment,
                     ICustomApiClient customApiCLient, UserManager<ApplicationUser> userManager, SeedInput input, IFileStorageService fileStorageService)
         {
@@ -23,7 +25,7 @@ namespace risk.control.system.Seeds
             var companyAddress = input.ADDRESSLINE + ", " + companyPinCode.District.Name + ", " + companyPinCode.State.Name + ", " + companyPinCode.Country.Code;
             var companyAddressCoordinates = await customApiCLient.GetCoordinatesFromAddressAsync(companyAddress);
             var companyAddressCoordinatesLatLong = companyAddressCoordinates.Latitude + "," + companyAddressCoordinates.Longitude;
-            var companyAddressUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={companyAddressCoordinatesLatLong}&zoom=14&size={companyMapSize}&maptype=roadmap&markers=color:red%7Clabel:S%7C{companyAddressCoordinatesLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+            var companyAddressUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={companyAddressCoordinatesLatLong}&zoom=14&size={companyMapSize}&maptype=roadmap&markers=color:red%7Clabel:S%7C{companyAddressCoordinatesLatLong}&key={EnvHelper.Get("GOOGLE_MAP_KEY")}";
 
             //CREATE COMPANY1
             string insurerImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", Path.GetFileName(input.PHOTO));
@@ -42,8 +44,8 @@ namespace risk.control.system.Seeds
                 Name = input.NAME,
                 Addressline = input.ADDRESSLINE,
                 Branch = input.BRANCH,
-                ActivatedDate = DateTime.Now,
-                AgreementDate = DateTime.Now,
+                ActivatedDate = DateTime.UtcNow,
+                AgreementDate = DateTime.UtcNow,
                 BankName = input.BANK,
                 BankAccountNumber = "1234567890",
                 IFSCCode = input.IFSC,
@@ -57,12 +59,12 @@ namespace risk.control.system.Seeds
                 Email = input.DOMAIN,
                 DocumentUrl = relativePath,
                 PhoneNumber = input.PHONE,
-                ExpiryDate = DateTime.Now.AddDays(10),
+                ExpiryDate = DateTime.UtcNow.AddDays(10),
                 EmpanelledVendors = vendors,
                 Status = CompanyStatus.ACTIVE,
                 AutoAllocation = globalSettings.AutoAllocation,
                 BulkUpload = globalSettings.BulkUpload,
-                Updated = DateTime.Now,
+                Updated = DateTime.UtcNow,
                 Deleted = false,
                 VerifyPan = globalSettings.VerifyPan,
                 VerifyPassport = globalSettings.VerifyPassport,

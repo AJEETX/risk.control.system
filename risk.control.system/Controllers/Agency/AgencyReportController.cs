@@ -55,7 +55,7 @@ namespace risk.control.system.Controllers.Agency
             if (!ModelState.IsValid)
             {
                 notifyService.Error("OOPs !!!..Error in submitting report");
-                return RedirectToAction(nameof(AgentController.GetInvestigate), "Agent", new { selectedcase = model.ClaimsInvestigation.Id });
+                return RedirectToAction(nameof(AgentController.GetInvestigate), ControllerName<AgentController>.Name, new { selectedcase = model.CaseTask.Id });
             }
 
             try
@@ -65,19 +65,19 @@ namespace risk.control.system.Controllers.Agency
                 if (vendor == null)
                 {
                     notifyService.Error("OOPs !!!..Error submitting.");
-                    return RedirectToAction(nameof(AgentController.GetInvestigate), "Agent", new { selectedcase = claimId });
+                    return RedirectToAction(nameof(AgentController.GetInvestigate), ControllerName<AgentController>.Name, new { selectedcase = claimId });
                 }
                 backgroundJobClient.Enqueue(() => mailboxService.NotifyCaseReportSubmitToVendorSupervisor(userEmail, claimId, baseUrl));
 
                 notifyService.Custom($"Case <b> #{contract}</b> report submitted", 3, "green", "far fa-file-powerpoint");
 
-                return RedirectToAction(nameof(AgentController.Agent), "Agent");
+                return RedirectToAction(nameof(AgentController.Agent), ControllerName<AgentController>.Name);
             }
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error occurred for CaseId {Id}. {UserEmail}.", claimId, userEmail ?? "Anonymous");
                 notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(AgentController.GetInvestigate), "Agent", new { selectedcase = claimId });
+                return RedirectToAction(nameof(AgentController.GetInvestigate), ControllerName<AgentController>.Name, new { selectedcase = claimId });
             }
         }
 
@@ -89,7 +89,7 @@ namespace risk.control.system.Controllers.Agency
             if (!ModelState.IsValid || claimId < 1)
             {
                 notifyService.Error("Error in submitting report");
-                return RedirectToAction(nameof(VendorInvestigationController.GetInvestigateReport), "VendorInvestigation", new { selectedcase = claimId });
+                return RedirectToAction(nameof(VendorInvestigationController.GetInvestigateReport), ControllerName<VendorInvestigationController>.Name, new { selectedcase = claimId });
             }
             try
             {
@@ -98,23 +98,23 @@ namespace risk.control.system.Controllers.Agency
                     if (supervisorAttachment.Length > MAX_FILE_SIZE)
                     {
                         notifyService.Error($"Document image Size exceeds the max size: 5MB");
-                        return RedirectToAction(nameof(VendorInvestigationController.GetInvestigateReport), "VendorInvestigation", new { selectedcase = claimId });
+                        return RedirectToAction(nameof(VendorInvestigationController.GetInvestigateReport), ControllerName<VendorInvestigationController>.Name, new { selectedcase = claimId });
                     }
                     var ext = Path.GetExtension(supervisorAttachment.FileName).ToLowerInvariant();
                     if (!AllowedExt.Contains(ext))
                     {
                         notifyService.Error($"Invalid Document image type");
-                        return RedirectToAction(nameof(VendorInvestigationController.GetInvestigateReport), "VendorInvestigation", new { selectedcase = claimId });
+                        return RedirectToAction(nameof(VendorInvestigationController.GetInvestigateReport), ControllerName<VendorInvestigationController>.Name, new { selectedcase = claimId });
                     }
                     if (!AllowedMime.Contains(supervisorAttachment.ContentType))
                     {
                         notifyService.Error($"Invalid Document Image content type");
-                        return RedirectToAction(nameof(VendorInvestigationController.GetInvestigateReport), "VendorInvestigation", new { selectedcase = claimId });
+                        return RedirectToAction(nameof(VendorInvestigationController.GetInvestigateReport), ControllerName<VendorInvestigationController>.Name, new { selectedcase = claimId });
                     }
                     if (!ImageSignatureValidator.HasValidSignature(supervisorAttachment))
                     {
                         notifyService.Error($"Invalid or corrupted Document Image ");
-                        return RedirectToAction(nameof(VendorInvestigationController.GetInvestigateReport), "VendorInvestigation", new { selectedcase = claimId });
+                        return RedirectToAction(nameof(VendorInvestigationController.GetInvestigateReport), ControllerName<VendorInvestigationController>.Name, new { selectedcase = claimId });
                     }
                 }
                 var reportUpdateStatus = SupervisorRemarkType.OK;
@@ -123,7 +123,7 @@ namespace risk.control.system.Controllers.Agency
 
                 if (success != null)
                 {
-                    var agencyUser = await _context.ApplicationUser.Include(a => a.Vendor).FirstOrDefaultAsync(c => c.Email == userEmail);
+                    var agencyUser = await _context.ApplicationUser.AsNoTracking().Include(a => a.Vendor).FirstOrDefaultAsync(c => c.Email == userEmail);
 
                     backgroundJobClient.Enqueue(() => mailboxService.NotifyCaseReportSubmitToCompany(userEmail, claimId, baseUrl));
 
@@ -133,13 +133,13 @@ namespace risk.control.system.Controllers.Agency
                 {
                     notifyService.Custom($"Case <b> #{success.PolicyDetail.ContractNumber}</b>  Report sent to review", 3, "orange", "far fa-file-powerpoint");
                 }
-                return RedirectToAction(nameof(VendorInvestigationController.CaseReport), "VendorInvestigation");
+                return RedirectToAction(nameof(VendorInvestigationController.CaseReport), ControllerName<VendorInvestigationController>.Name);
             }
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error occurred for Case {Id}. {UserEmail}.", claimId, userEmail ?? "Anonymous");
                 notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(VendorInvestigationController.GetInvestigateReport), "VendorInvestigation", new { selectedcase = claimId });
+                return RedirectToAction(nameof(VendorInvestigationController.GetInvestigateReport), ControllerName<VendorInvestigationController>.Name, new { selectedcase = claimId });
             }
         }
     }

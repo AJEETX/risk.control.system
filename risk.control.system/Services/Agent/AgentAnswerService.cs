@@ -50,12 +50,12 @@ internal class AgentAnswerService : IAgentAnswerService
                     IsRequired = q.IsRequired,
                     Options = q.Options?.Trim(),
                     AnswerText = q.AnswerText?.Trim(),
-                    Updated = DateTime.Now,
+                    Updated = DateTime.UtcNow,
                 });
             }
             locationTemplate.ValidationExecuted = true;
             locationTemplate.UpdatedBy = agentEmail;
-            locationTemplate.Updated = DateTime.Now;
+            locationTemplate.Updated = DateTime.UtcNow;
             context.LocationReport.Update(locationTemplate);
             var rowsAffected = await context.SaveChangesAsync(null, false);
             return rowsAffected > 0;

@@ -20,62 +20,7 @@
                     orderDir: d.order?.[0]?.dir || "asc"
                 };
             },
-            error: function (xhr, status, error) {
-                console.error("AJAX Error:", status, error);
-                console.error("Response:", xhr.responseText);
-                if (xhr.status === 401 || xhr.status === 403) {
-                    $.confirm({
-                        title: 'Session Expired!',
-                        content: 'Your session has expired or you are unauthorized. You will be redirected to the login page.',
-                        type: 'red',
-                        typeAnimated: true,
-                        buttons: {
-                            Ok: {
-                                text: 'Login',
-                                btnClass: 'btn-red',
-                                action: function () {
-                                    window.location.href = '/Account/Login';
-                                }
-                            }
-                        },
-                        onClose: function () {
-                            window.location.href = '/Account/Login';
-                        }
-                    });
-                }
-                else if (xhr.status === 500) {
-                    $.confirm({
-                        title: 'Server Error!',
-                        content: 'An unexpected server error occurred. You will be redirected to Active page.',
-                        type: 'orange',
-                        typeAnimated: true,
-                        buttons: {
-                            Ok: function () {
-                                window.location.href = '/Manager/Active';
-                            }
-                        },
-                        onClose: function () {
-                            window.location.href = '/Manager/Active';
-                        }
-                    });
-                }
-                else if (xhr.status === 400) {
-                    $.confirm({
-                        title: 'Bad Request!',
-                        content: 'Try with valid data.You will be redirected to Active page',
-                        type: 'orange',
-                        typeAnimated: true,
-                        buttons: {
-                            Ok: function () {
-                                window.location.href = '/Manager/Active';
-                            }
-                        },
-                        onClose: function () {
-                            window.location.href = '/Manager/Active';
-                        }
-                    });
-                }
-            }
+            error: DataTableErrorHandler
         },
         columnDefs: [
             {
@@ -269,7 +214,6 @@
                 }, 3000);
             }
             $('.btn-info', row).addClass('btn-white-color');
-
         },
         "drawCallback": function (settings, start, end, max, total, pre) {
             // Reinitialize Bootstrap 5 tooltips
@@ -294,7 +238,7 @@
 
         showSpinnerOnButton(element, "Detail");
 
-        const url = `/Manager/ActiveDetail?Id=${encodeURIComponent(id)}`;
+        const url = `/Manager/ActiveDetail/${encodeURIComponent(id)}`;
 
         setTimeout(() => {
             window.location.href = url;

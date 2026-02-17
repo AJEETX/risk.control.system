@@ -42,14 +42,13 @@ namespace risk.control.system.Controllers.AgencyAdmin
             return RedirectToAction(nameof(Profile));
         }
 
-        [Breadcrumb("Agency Profile ", FromAction = "Index")]
+        [Breadcrumb("Agency Profile ", FromAction = nameof(Index))]
         public async Task<IActionResult> Profile()
         {
+            var userEmail = HttpContext.User?.Identity?.Name;
             try
             {
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-
-                var vendorUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == currentUserEmail);
+                var vendorUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == userEmail);
 
                 var vendor = await _context.Vendor
                     .Include(v => v.ratings)
@@ -69,20 +68,19 @@ namespace risk.control.system.Controllers.AgencyAdmin
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting Agency for {UserEmail}", HttpContext.User?.Identity?.Name ?? "Anonymous");
+                logger.LogError(ex, "Error getting Agency for {UserEmail}", userEmail ?? "Anonymous");
                 notifyService.Error("OOPs !!!...Contact Admin");
                 return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
 
-        [Breadcrumb("Edit Agency", FromAction = "Profile")]
+        [Breadcrumb("Edit Agency", FromAction = nameof(Profile))]
         public async Task<IActionResult> Edit()
         {
+            var userEmail = HttpContext.User?.Identity?.Name;
             try
             {
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-
-                var vendorUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == currentUserEmail);
+                var vendorUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
                 if (vendorUser == null)
                 {
                     notifyService.Error("User Not found !!!..Contact Admin");
@@ -102,7 +100,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting Agency for {UserEmail}", HttpContext.User?.Identity?.Name ?? "Anonymous");
+                logger.LogError(ex, "Error getting Agency for {UserEmail}", userEmail ?? "Anonymous");
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Profile));
             }
@@ -112,17 +110,16 @@ namespace risk.control.system.Controllers.AgencyAdmin
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(Vendor model)
         {
+            var userEmail = HttpContext.User?.Identity?.Name;
+            if (!ModelState.IsValid)
+            {
+                notifyService.Error("Please correct the errors");
+                await Load(model);
+                return View(model);
+            }
+
             try
             {
-                if (!ModelState.IsValid)
-                {
-                    notifyService.Error("Please correct the errors");
-                    await Load(model);
-                    return View(model);
-                }
-
-                var userEmail = HttpContext.User?.Identity?.Name;
-
                 var result = await agencyCreateEditService.EditAsync(userEmail, model, portal_base_url);
                 if (!result.Success)
                 {
@@ -138,7 +135,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting Agency for {UserEmail}", HttpContext.User?.Identity?.Name ?? "Anonymous");
+                logger.LogError(ex, "Error getting Agency for {UserEmail}", userEmail ?? "Anonymous");
                 notifyService.Error("OOPS !!!..Error Editing Agency. Try again.");
                 return RedirectToAction(nameof(AgencyController.Profile), "Agency");
             }
@@ -146,7 +143,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
 
         private async Task Load(Vendor model)
         {
-            var country = await _context.Country.FirstOrDefaultAsync(c => c.CountryId == model.SelectedCountryId);
+            var country = await _context.Country.AsNoTracking().FirstOrDefaultAsync(c => c.CountryId == model.SelectedCountryId);
             model.Country = country;
             model.CountryId = model.SelectedCountryId;
             model.StateId = model.SelectedStateId;
@@ -154,7 +151,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
             model.PinCodeId = model.SelectedPincodeId;
             var currentUserEmail = HttpContext.User?.Identity?.Name;
 
-            var vendorUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == currentUserEmail);
+            var vendorUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == currentUserEmail);
             if (vendorUser.IsVendorAdmin)
             {
                 model.SelectedByCompany = true;

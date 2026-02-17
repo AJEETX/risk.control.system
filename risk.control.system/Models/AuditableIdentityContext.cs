@@ -14,7 +14,8 @@ namespace risk.control.system.Models
             httpContext = context;
             this.services = services;
         }
-        protected ApplicationDbContext _context => services.GetRequiredService<ApplicationDbContext>();
+
+        protected IDbContextFactory<ApplicationDbContext> _contextFactory => services.GetRequiredService<IDbContextFactory<ApplicationDbContext>>();
         public DbSet<Audit> AuditLogs { get; set; }
 
         public virtual async Task<int> SaveChangesAsync(string userId = null, bool notseed = true)
@@ -30,7 +31,8 @@ namespace risk.control.system.Models
         private async Task OnBeforeSaveChanges(string userId)
         {
             var userEmail = userId ?? httpContext?.HttpContext?.User?.Identity.Name;
-            var companyUser = await _context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == userEmail);
+            await using var _context = await _contextFactory.CreateDbContextAsync();
+            var companyUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(u => u.Email == userEmail);
             ChangeTracker.DetectChanges();
             var auditEntries = new List<AuditEntry>();
             foreach (var entry in ChangeTracker.Entries())
@@ -72,6 +74,7 @@ namespace risk.control.system.Models
                                 auditEntry.NewValues[propertyName] = property.CurrentValue;
                             }
                             break;
+
                         default:
                             break;
                     }
