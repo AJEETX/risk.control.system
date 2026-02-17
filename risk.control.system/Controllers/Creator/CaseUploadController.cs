@@ -1,12 +1,8 @@
 ﻿using AspNetCoreHero.ToastNotification.Abstractions;
 
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.CodeAnalysis;
-using Microsoft.EntityFrameworkCore;
 using risk.control.system.AppConstant;
-using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services.Creator;
 using SmartBreadcrumbs.Attributes;
@@ -17,26 +13,18 @@ namespace risk.control.system.Controllers.Creator
     [Breadcrumb("Cases")]
     public class CaseUploadController : Controller
     {
-        private readonly ApplicationDbContext context;
-        private readonly IWebHostEnvironment env;
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly ILicenseService licenseService;
-        private readonly ILogger<CaseUploadController> logger;
-        private readonly INotyfService notifyService;
+        private readonly ICaseUploadService _caseUploadService;
+        private readonly ILogger<CaseUploadController> _logger;
+        private readonly INotyfService _notifyService;
 
-        public CaseUploadController(ApplicationDbContext context,
-            IWebHostEnvironment env,
-            UserManager<ApplicationUser> userManager,
-            ILicenseService licenseService,
+        public CaseUploadController(
+            ICaseUploadService caseUploadService,
             ILogger<CaseUploadController> logger,
             INotyfService notifyService)
         {
-            this.context = context;
-            this.env = env;
-            _userManager = userManager;
-            this.licenseService = licenseService;
-            this.logger = logger;
-            this.notifyService = notifyService;
+            _caseUploadService = caseUploadService;
+            _logger = logger;
+            _notifyService = notifyService;
         }
 
         public IActionResult Index()
@@ -54,33 +42,26 @@ namespace risk.control.system.Controllers.Creator
             }
             try
             {
-                var companyUser = await context.ApplicationUser.AsNoTracking()
-                    .Include(u => u.ClientCompany)
-                    .Include(u => u.Country)
-                    .FirstOrDefaultAsync(u => u.Email == userEmail);
+                var result = await _caseUploadService.GetUploadViewDataAsync(userEmail, uploadId);
 
-                if (companyUser == null) return RedirectToDashboard("User not found.");
+                if (result == null) return RedirectToDashboard("File Upload failed.");
 
-                var licenseStatus = await licenseService.GetUploadPermissionsAsync(companyUser);
-
-                if (uploadId == 0 && companyUser.ClientCompany.LicenseType == LicenseType.Trial)
+                if (result.ShouldSendTrialNotification)
                 {
-                    SendLicenseNotifications(licenseStatus);
+                    SendLicenseNotifications(result.LicenseStatus);
                 }
-                var isManager = await _userManager.IsInRoleAsync(companyUser, MANAGER.DISPLAY_NAME);
+
                 return View(new CreateClaims
                 {
-                    IsManager = isManager,
-                    BulkUpload = companyUser.ClientCompany.BulkUpload,
-                    UserCanCreate = licenseStatus.CanCreate,
-                    HasClaims = licenseStatus.HasClaimsPending,
-                    FileSampleIdentifier = companyUser.Country?.Code?.ToLower() ?? "default",
-                    AutoAllocation = companyUser.ClientCompany.AutoAllocation
+                    IsManager = result.IsManager,
+                    UserCanCreate = result.UserCanCreate,
+                    HasClaims = result.HasClaims,
+                    FileSampleIdentifier = result.FileSampleIdentifier,
                 });
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error loading Uploads page for {User}", userEmail);
+                _logger.LogError(ex, "Error loading Uploads page for {User}", userEmail);
                 return RedirectToDashboard("An unexpected error occurred.");
             }
         }
@@ -91,24 +72,24 @@ namespace risk.control.system.Controllers.Creator
         {
             try
             {
-                var file = await context.FilesOnFileSystem.FirstOrDefaultAsync(x => x.Id == id);
-                if (file == null || string.IsNullOrWhiteSpace(file.FilePath))
-                    return NotFound("File not found");
+                var result = await _caseUploadService.GetDownloadLogAsync(id);
 
-                var fullPath = Path.Combine(env.ContentRootPath, file.FilePath);
-                if (!System.IO.File.Exists(fullPath))
-                    return NotFound("File missing on server");
+                if (!result.Success)
+                {
+                    return NotFound(result.ErrorMessage);
+                }
 
-                var stream = new FileStream(fullPath, FileMode.Open, FileAccess.Read, FileShare.Read);
-
-                Response.Headers.Append("X-File-Name", file.Name);
+                // Add custom headers for the client-side filename extraction
+                Response.Headers.Append("X-File-Name", result.FileName);
                 Response.Headers.Append("Access-Control-Expose-Headers", "X-File-Name");
 
-                return File(stream, "application/zip", file.Name);
+                // The 'File' method automatically handles the disposal of the stream
+                // once the download is complete.
+                return File(result.FileStream, result.ContentType, result.FileName);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error downloading log file with ID {Id}", id);
+                _logger.LogError(ex, "Error downloading log file with ID {Id}", id);
                 return BadRequest(new { success = false, message = "Error downloading file: " + ex.Message });
             }
         }
@@ -119,18 +100,22 @@ namespace risk.control.system.Controllers.Creator
         {
             try
             {
-                var file = await context.FilesOnFileSystem.FirstOrDefaultAsync(x => x.Id == id);
-                if (file == null || file.ErrorByteData == null)
-                    return NotFound("File not found");
+                var result = await _caseUploadService.GetDownloadErrorLogAsync(id);
 
-                var fileName = $"{file.Name}_UploadError_{id}.csv";
-                Response.Headers.Append("X-File-Name", fileName);
+                if (!result.Success)
+                {
+                    return NotFound(result.ErrorMessage);
+                }
+
+                // Standardize headers for frontend consumption
+                Response.Headers.Append("X-File-Name", result.FileName);
                 Response.Headers.Append("Access-Control-Expose-Headers", "X-File-Name");
-                return File(file.ErrorByteData, "text/csv", fileName);
+
+                return File(result.FileBytes, result.ContentType, result.FileName);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error downloading error log file with ID {Id}", id);
+                _logger.LogError(ex, "Error downloading error log file with ID {Id}", id);
                 return BadRequest(new { success = false, message = "Error downloading file: " + ex.Message });
             }
         }
@@ -147,26 +132,18 @@ namespace risk.control.system.Controllers.Creator
 
             try
             {
-                var companyUser = await context.ApplicationUser.AsNoTracking().Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == userEmail);
-                var file = await context.FilesOnFileSystem.AsNoTracking().Include(c => c.CaseIds).FirstOrDefaultAsync(f => f.Id == id);
-                if (file == null)
+                var (success, message) = await _caseUploadService.DeleteLogAsync(id, userEmail);
+
+                if (!success)
                 {
-                    return NotFound(new { success = false, message = "File not found." });
+                    return NotFound(new { success, message });
                 }
 
-                if (System.IO.File.Exists(file.FilePath))
-                {
-                    System.IO.File.Delete(file.FilePath); // Delete the file from storage
-                }
-                file.Deleted = true;
-                context.FilesOnFileSystem.Update(file);
-                await context.SaveChangesAsync();
-
-                return Ok(new { success = true, message = "File deleted successfully." });
+                return Ok(new { success, message });
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error deleting file");
+                _logger.LogError(ex, "Error deleting file");
                 return BadRequest(new { success = false, message = "Error deleting file: " + ex.Message });
             }
         }
@@ -174,19 +151,19 @@ namespace risk.control.system.Controllers.Creator
         private void SendLicenseNotifications(LicenseStatus status)
         {
             if (!status.CanCreate)
-                notifyService.Warning($"MAX Case limit = <b>{status.MaxAllowed}</b> reached");
+                _notifyService.Warning($"MAX Case limit = <b>{status.MaxAllowed}</b> reached");
             else
-                notifyService.Information($"Limit available = <b>{status.AvailableCount}</b>");
+                _notifyService.Information($"Limit available = <b>{status.AvailableCount}</b>");
         }
 
         private IActionResult RedirectToDashboard(string errorMessage, string logDetail = null)
         {
             if (!string.IsNullOrEmpty(logDetail))
             {
-                logger.LogWarning(logDetail);
+                _logger.LogWarning(logDetail);
             }
 
-            notifyService.Error(errorMessage);
+            _notifyService.Error(errorMessage);
             return RedirectToAction("Index", "Dashboard");
         }
     }

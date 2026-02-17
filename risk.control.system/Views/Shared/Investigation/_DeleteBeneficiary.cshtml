@@ -13,16 +13,16 @@
     {
         customerExist = true;
     }
-    if (Model.Location?.BeneficiaryDetailId > 0)
+    if (Model.Beneficiary?.BeneficiaryDetailId > 0)
     {
         beneficiaryExist = true;
-        baddress = @Model.Location?.Addressline + " " + @Model.Location?.District?.Name + " " + @Model.Location?.State?.Name + " " + @Model.Location?.PinCode?.Code;
-        var age = DateTime.UtcNow.Subtract(Model.Location.DateOfBirth.GetValueOrDefault()).TotalDays;
+        baddress = @Model.Beneficiary?.Addressline + " " + @Model.Beneficiary?.District?.Name + " " + @Model.Beneficiary?.State?.Name + " " + @Model.Beneficiary?.PinCode?.Code;
+        var age = DateTime.UtcNow.Subtract(Model.Beneficiary.DateOfBirth.GetValueOrDefault()).TotalDays;
         currentBAgeinYrs =$"{(int)(age/ 365 )} years";
-        country = @Model.Location?.Country?.Name;
-        phone = +@Model.Location?.Country.ISDCode +" (0) "+ @Model.Location?.PhoneNumber;
-        imgPath = "/flags/" + @Model.Location.Country.Code.ToLower() + ".png";
-        map = string.Format(Model.Location.BeneficiaryLocationMap, "200", "200");
+        country = @Model.Beneficiary?.Country?.Name;
+        phone = +@Model.Beneficiary?.Country.ISDCode +" (0) "+ @Model.Beneficiary?.PhoneNumber;
+        imgPath = "/flags/" + @Model.Beneficiary.Country.Code.ToLower() + ".png";
+        map = string.Format(Model.Beneficiary.BeneficiaryLocationMap, "200", "200");
     }
     string benficiaryProgressClass = "progress-bar-lightgrey"; // Default class
 
@@ -50,16 +50,16 @@
         <div class="card-body pt-0">
             <div class="row">
                 <div class="col-7">
-                    <h2 class="lead"><b>@Model.Location?.Name</b></h2>
+                    <h2 class="lead"><b>@Model.Beneficiary?.Name</b></h2>
                     <p class="text-muted text-sm">
-                        Relation: <b> @Model.Location?.BeneficiaryRelation?.Name </b>
+                        Relation: <b> @Model.Beneficiary?.BeneficiaryRelation?.Name </b>
                     </p>
                     <ul class="ml-4 mb-0 fa-ul text-muted">
                         <li class="small">
                             <span class="fa-li">
                                 <i class="fa fa-money"></i>
                             </span>
-                            Annual Income: (@Model.Currency) <b> @Model.Location?.Income.GetEnumDisplayName()</b>
+                            Annual Income: (@Model.Currency) <b> @Model.Beneficiary?.Income.GetEnumDisplayName()</b>
                         </li>
                         <li class="small">
                             <span class="fa-li">
@@ -98,9 +98,9 @@
                 </div>
                 <div class="col-5 text-center">
                     <p class="text-muted text-sm">
-                        @if (Model?.Location?.ImagePath is not null)
+                        @if (Model?.Beneficiary?.ImagePath is not null)
                         {
-                            <img id="bImage" class="img-fluid block-data" src="/Document/GetBeneficiaryDocument/@Model?.Location.BeneficiaryDetailId" title="@Model.Location?.Name Photo" data-bs-toggle="tooltip" />
+                            <img id="bImage" class="img-fluid block-data" src="/Document/GetBeneficiaryDocument/@Model?.Beneficiary.BeneficiaryDetailId" title="@Model.Beneficiary?.Name Photo" data-bs-toggle="tooltip" />
                         }
                         else
                         {
@@ -108,7 +108,7 @@
                         }
                     </p>
                     <p class="text-muted text-sm">
-                        @if (Model?.Location?.BeneficiaryLocationMap != null)
+                        @if (Model?.Beneficiary?.BeneficiaryLocationMap != null)
                         {
                             <img id="beneficiaryGoogleMap" class="img-fluid block-data" src="@map" title="Display Customer Address in map" data-bs-toggle="tooltip" />
                         }

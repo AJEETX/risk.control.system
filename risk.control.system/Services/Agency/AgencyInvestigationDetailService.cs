@@ -11,7 +11,7 @@ namespace risk.control.system.Services.Agency
     {
         Task<CaseTransactionModel> GetClaimDetails(string currentUserEmail, long caseId);
 
-        Task<CaseInvestigationVendorAgentModel> SelectVendorAgent(string userEmail, long selectedcase);
+        Task<CaseAgencyAgentModel> SelectVendorAgent(string userEmail, long selectedcase);
 
         Task<InvestigationTask> AssignToVendorAgent(string vendorAgentEmail, string currentUser, long vendorId, long caseId);
 
@@ -87,7 +87,7 @@ namespace risk.control.system.Services.Agency
             {
                 ClaimsInvestigation = caseTask,
                 CaseIsValidToAssign = caseTask.IsValidCaseData(),
-                Location = caseTask.BeneficiaryDetail,
+                Beneficiary = caseTask.BeneficiaryDetail,
                 Assigned = caseTask.Status == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER,
                 TimeTaken = timeTaken.ToString(@"hh\:mm\:ss") ?? "-",
                 Withdrawable = (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR),
@@ -97,7 +97,7 @@ namespace risk.control.system.Services.Agency
             return model;
         }
 
-        public async Task<CaseInvestigationVendorAgentModel> SelectVendorAgent(string userEmail, long selectedcase)
+        public async Task<CaseAgencyAgentModel> SelectVendorAgent(string userEmail, long selectedcase)
         {
             var caseAllocate2Agent = await GetCases().Include(c => c.CaseNotes).FirstOrDefaultAsync(v => v.Id == selectedcase);
 
@@ -115,9 +115,9 @@ namespace risk.control.system.Services.Agency
             caseAllocate2Agent.BeneficiaryDetail.PhoneNumber = maskedBeneficiaryContact;
             beneficiaryDetail.PhoneNumber = maskedBeneficiaryContact;
 
-            var model = new CaseInvestigationVendorAgentModel
+            var model = new CaseAgencyAgentModel
             {
-                CaseLocation = beneficiaryDetail,
+                Beneficiary = beneficiaryDetail,
                 ClaimsInvestigation = caseAllocate2Agent,
                 Currency = CustomExtensions.GetCultureByCountry(caseAllocate2Agent.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol
             };
@@ -302,7 +302,7 @@ namespace risk.control.system.Services.Agency
             {
                 ClaimsInvestigation = caseTask,
                 CaseIsValidToAssign = caseTask.IsValidCaseData(),
-                Location = caseTask.BeneficiaryDetail,
+                Beneficiary = caseTask.BeneficiaryDetail,
                 Assigned = caseTask.Status == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER,
                 TimeTaken = totalTimeTaken,
                 VendorInvoice = invoice,

@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using risk.control.system.AppConstant;
 using risk.control.system.Helpers;
-using risk.control.system.Models;
 using risk.control.system.Services;
 using risk.control.system.Services.Common;
 using risk.control.system.Services.Creator;
@@ -14,31 +13,31 @@ namespace risk.control.system.Controllers.Creator
 {
     [Breadcrumb("Cases")]
     [Authorize(Roles = CREATOR.DISPLAY_NAME)]
-    public class InvestigationController : Controller
+    public class CreatorController : Controller
     {
-        private readonly ILogger<InvestigationController> logger;
-        private readonly ApplicationDbContext context;
-        private readonly IAgencyDetailService vendorDetailService;
-        private readonly INotyfService notifyService;
-        private readonly INavigationService navigationService;
-        private readonly IInvestigationDetailService investigationDetailService;
-        private readonly IEmpanelledAgencyService empanelledAgencyService;
+        private readonly ILogger<CreatorController> _logger;
+        private readonly IAgencyDetailService _agencyDetailService;
+        private readonly IReportTemplateService _reportTemplateService;
+        private readonly INotyfService _notifyService;
+        private readonly INavigationService _navigationService;
+        private readonly ICaseActiveService _caseActiveService;
+        private readonly IEmpanelledAgencyService _empanelledAgencyService;
 
-        public InvestigationController(ILogger<InvestigationController> logger,
-            ApplicationDbContext context,
-            IAgencyDetailService vendorDetailService,
+        public CreatorController(ILogger<CreatorController> logger,
+            IAgencyDetailService agencyDetailService,
+            IReportTemplateService reportTemplateService,
             INotyfService notifyService,
             INavigationService navigationService,
-            IInvestigationDetailService investigationDetailService,
+            ICaseActiveService caseActiveService,
             IEmpanelledAgencyService empanelledAgencyService)
         {
-            this.logger = logger;
-            this.context = context;
-            this.vendorDetailService = vendorDetailService;
-            this.notifyService = notifyService;
-            this.navigationService = navigationService;
-            this.investigationDetailService = investigationDetailService;
-            this.empanelledAgencyService = empanelledAgencyService;
+            _logger = logger;
+            _agencyDetailService = agencyDetailService;
+            _reportTemplateService = reportTemplateService;
+            _notifyService = notifyService;
+            _navigationService = navigationService;
+            _caseActiveService = caseActiveService;
+            _empanelledAgencyService = empanelledAgencyService;
         }
 
         [HttpGet]
@@ -51,7 +50,7 @@ namespace risk.control.system.Controllers.Creator
 
             try
             {
-                var template = await empanelledAgencyService.GetReportTemplate(caseId);
+                var template = await _reportTemplateService.GetReportTemplate(caseId);
 
                 if (template == null)
                 {
@@ -62,7 +61,7 @@ namespace risk.control.system.Controllers.Creator
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting report template. CaseId: {CaseId}, User: {UserEmail}", caseId, User.Identity?.Name ?? "Anonymous");
+                _logger.LogError(ex, "Error getting report template. CaseId: {CaseId}, User: {UserEmail}", caseId, User.Identity?.Name ?? "Anonymous");
 
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
@@ -76,20 +75,20 @@ namespace risk.control.system.Controllers.Creator
             {
                 if (!ModelState.IsValid || id < 1)
                 {
-                    notifyService.Error("No Case selected!!!. Please select Case to allocate.");
+                    _notifyService.Error("No Case selected!!!. Please select Case to allocate.");
                     return RedirectToAction(nameof(CaseCreateEditController.New), ControllerName<CaseCreateEditController>.Name);
                 }
 
-                var model = await empanelledAgencyService.GetEmpanelledVendors(id, userEmail, vendorId, fromEditPage);
+                var model = await _empanelledAgencyService.GetEmpanelledVendors(id, userEmail, vendorId, fromEditPage);
 
-                ViewData["BreadcrumbNode"] = navigationService.GetEmpanelledVendorsPath(id, vendorId, fromEditPage);
+                ViewData["BreadcrumbNode"] = _navigationService.GetEmpanelledVendorsPath(id, vendorId, fromEditPage);
 
                 return View(model);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting Empanelled Agencies of case {Id}. {UserEmail}", id, userEmail);
-                notifyService.Error("Error getting Agencies. Try again.");
+                _logger.LogError(ex, "Error getting Empanelled Agencies of case {Id}. {UserEmail}", id, userEmail);
+                _notifyService.Error("Error getting Agencies. Try again.");
                 return RedirectToAction(nameof(CaseCreateEditController.New), ControllerName<CaseCreateEditController>.Name);
             }
         }
@@ -100,18 +99,18 @@ namespace risk.control.system.Controllers.Creator
             var userEmail = HttpContext.User?.Identity?.Name;
             if (!ModelState.IsValid || id < 1)
             {
-                notifyService.Error("Case Not Found.Try Again");
+                _notifyService.Error("Case Not Found.Try Again");
                 return RedirectToAction(nameof(CaseCreateEditController.New), ControllerName<CaseCreateEditController>.Name);
             }
             try
             {
-                var model = await investigationDetailService.GetCaseDetails(userEmail, id);
+                var model = await _caseActiveService.GetActiveCaseDetails(userEmail, id);
                 return View(model);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting case details {Id}. {UserEmail}", id, userEmail);
-                notifyService.Error("Error getting case details. Try again.");
+                _logger.LogError(ex, "Error getting case details {Id}. {UserEmail}", id, userEmail);
+                _notifyService.Error("Error getting case details. Try again.");
                 return RedirectToAction(nameof(CaseCreateEditController.New), ControllerName<CaseCreateEditController>.Name);
             }
         }
@@ -120,7 +119,7 @@ namespace risk.control.system.Controllers.Creator
         {
             if (id <= 0 || selectedcase <= 0)
             {
-                notifyService.Error("Invalid request.");
+                _notifyService.Error("Invalid request.");
                 return RedirectToAction(nameof(CaseCreateEditController.New), ControllerName<CaseCreateEditController>.Name);
             }
 
@@ -128,22 +127,22 @@ namespace risk.control.system.Controllers.Creator
 
             try
             {
-                var vendor = await vendorDetailService.GetVendorDetailAsync(id, selectedcase);
+                var vendor = await _agencyDetailService.GetVendorDetailAsync(id, selectedcase);
 
                 if (vendor == null)
                 {
-                    notifyService.Error("Agency not found.");
+                    _notifyService.Error("Agency not found.");
                     return RedirectToAction(nameof(CaseCreateEditController.New), ControllerName<CaseCreateEditController>.Name);
                 }
 
-                ViewData["BreadcrumbNode"] = navigationService.GetVendorDetailPath(selectedcase, id);
+                ViewData["BreadcrumbNode"] = _navigationService.GetVendorDetailPath(selectedcase, id);
 
                 return View(vendor);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting agency details. VendorId: {VendorId}, User: {UserEmail}", id, userEmail ?? "Anonymous");
-                notifyService.Error("Error getting agency details. Try again.");
+                _logger.LogError(ex, "Error getting agency details. VendorId: {VendorId}, User: {UserEmail}", id, userEmail ?? "Anonymous");
+                _notifyService.Error("Error getting agency details. Try again.");
                 return RedirectToAction(nameof(CaseCreateEditController.New), ControllerName<CaseCreateEditController>.Name);
             }
         }

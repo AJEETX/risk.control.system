@@ -419,7 +419,7 @@ $(document).ready(function () {
                         $(".submit-progress").removeClass("hidden");
 
                         $('#send-query')
-                            .html("<i class='fas fa-sync fa-spin'></i> Enquiring...")
+                            .html("<i class='fas fa-sync fa-spin'></i> Send Enquiry")
                             .prop("disabled", true);
 
                         document.getElementById('query-form').submit();

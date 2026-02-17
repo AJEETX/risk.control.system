@@ -46,7 +46,7 @@ namespace risk.control.system.Controllers.Assessor
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SubmitEnquiry([FromForm] CaseInvestigationVendorsModel request, [FromForm] long claimId, [FromForm] IFormFile? document)
+        public async Task<IActionResult> SubmitEnquiry([FromForm] CaseAgencyModel request, [FromForm] long claimId, [FromForm] IFormFile? document)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             try

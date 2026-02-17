@@ -49,7 +49,7 @@ namespace risk.control.system.Controllers.Agency
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SubmitReport(CaseInvestigationVendorsModel model, string remarks, long claimId)
+        public async Task<IActionResult> SubmitReport(CaseAgencyModel model, string remarks, long claimId)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             if (!ModelState.IsValid)

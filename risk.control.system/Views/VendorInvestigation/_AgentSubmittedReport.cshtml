@@ -1,4 +1,4 @@
-﻿@model CaseInvestigationVendorAgentModel
+﻿@model CaseAgencyAgentModel
 
 @{
 	var cardView = "expanding-card";
@@ -61,7 +61,7 @@
 		<form id="withdraw-form" method="post" asp-action="WithdrawCaseFromAgent" asp-controller="DeclineCase">
 			<input type="hidden" name="claimId" asp-for="@Model.ClaimsInvestigation.Id" />
 			<input type="hidden" name="policyNumber" asp-for="@Model.ClaimsInvestigation.PolicyDetail.ContractNumber" />
-			<div class="row">
+			<div class="row float-right">
 				<div class="col-md-12">
 					<a id="back" asp-action="Open" class="btn btn-outline-secondary">
 						<i class="fas fa-arrow-left"></i>

@@ -54,7 +54,7 @@ namespace risk.control.system.Controllers.Agency
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ReplyQuery(long claimId, CaseInvestigationVendorsModel request, IFormFile? document)
+        public async Task<IActionResult> ReplyQuery(long claimId, CaseAgencyModel request, IFormFile? document)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             if (!ModelState.IsValid)

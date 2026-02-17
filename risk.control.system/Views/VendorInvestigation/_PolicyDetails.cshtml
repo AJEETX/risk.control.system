@@ -1,4 +1,4 @@
-﻿@model CaseInvestigationVendorsModel
+﻿@model CaseAgencyModel
 
 @{
 	<input type="hidden" id="policyDetailId" value="@Model.CaseTask?.PolicyDetail.PolicyDetailId" />
@@ -45,10 +45,10 @@
 
 		<div class="row">
 			@{
-				var pmodel = new CaseInvestigationVendorAgentModel
+				var pmodel = new CaseAgencyAgentModel
 				{
 					ClaimsInvestigation = Model.CaseTask,
-					CaseLocation = Model.Beneficiary
+					Beneficiary = Model.Beneficiary
 				};
 
 				<partial name="_ClaimPolicyDetails" model="@pmodel" />

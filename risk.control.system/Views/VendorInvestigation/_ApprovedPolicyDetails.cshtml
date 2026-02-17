@@ -144,16 +144,16 @@
 
 			@{
 				var address = @Model.ClaimsInvestigation?.CustomerDetail.Addressline + " " + @Model.ClaimsInvestigation?.CustomerDetail.District.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.State.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.Country.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.PinCode.Code;
-				var baddress = @Model.Location != null ? @Model.Location?.Addressline + " " +
-				@Model.Location?.District?.Name + " " + @Model.Location?.State?.Name + " " +
-				@Model.Location?.Country?.Name + " " + @Model.Location?.PinCode?.Code : string.Empty;
+				var baddress = @Model.Beneficiary != null ? @Model.Beneficiary?.Addressline + " " +
+				@Model.Beneficiary?.District?.Name + " " + @Model.Beneficiary?.State?.Name + " " +
+				@Model.Beneficiary?.Country?.Name + " " + @Model.Beneficiary?.PinCode?.Code : string.Empty;
 				var age = DateTime.UtcNow.Subtract(Model.ClaimsInvestigation.CustomerDetail.DateOfBirth.GetValueOrDefault()).TotalDays;
 				var currentAgeinYrs = (int)age / 365;
 				int beneficaryAge = 0;
 
-				if (Model.Location.DateOfBirth != null)
+				if (Model.Beneficiary.DateOfBirth != null)
 				{
-					var bage = DateTime.UtcNow.Subtract(Model.Location.DateOfBirth.GetValueOrDefault()).TotalDays;
+					var bage = DateTime.UtcNow.Subtract(Model.Beneficiary.DateOfBirth.GetValueOrDefault()).TotalDays;
 					beneficaryAge = (int)bage / 365;
 				}
 				@if (Model.ClaimsInvestigation.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING)
@@ -243,7 +243,7 @@
 					}
 					@if (Model.ClaimsInvestigation.PolicyDetail.InsuranceType == InsuranceType.CLAIM)
 					{
-						var map = string.Format(Model.Location.BeneficiaryLocationMap, "200", "200");
+						var map = string.Format(Model.Beneficiary.BeneficiaryLocationMap, "200", "200");
 
 						<div class="col-12 col-sm-6 col-md-6 d-flex align-items-stretch flex-column">
 							<div class="card bg-light d-flex flex-fill">
@@ -266,9 +266,9 @@
 								<div class="card-body">
 									<div class="row">
 										<div class="col-7">
-											<h2 class="lead"><b>@Model.Location?.Name</b></h2>
+											<h2 class="lead"><b>@Model.Beneficiary?.Name</b></h2>
 											<p class="text-muted text-sm">
-												<b>Relation: </b> @Model.Location?.BeneficiaryRelation.Name
+												<b>Relation: </b> @Model.Beneficiary?.BeneficiaryRelation.Name
 											</p>
 											<ul class="ml-4 mb-0 fa-ul text-muted">
 												<li class="small">
@@ -281,7 +281,7 @@
 													<span class="fa-li">
 														<i class="fa fa-money"></i>
 													</span>
-													Annual Income: (@Model.Currency) @Model.Location?.Income
+													Annual Income: (@Model.Currency) @Model.Beneficiary?.Income
 												</li>
 												<li class="small">
 													<span class="fa-li">
@@ -293,15 +293,15 @@
 													<span class="fa-li">
 														<i class="fas fa-lg fa-phone"></i>
 													</span>
-													Mobile #: + @Model.Location?.PhoneNumber
+													Mobile #: + @Model.Beneficiary?.PhoneNumber
 												</li>
 											</ul>
 										</div>
 										<div class="col-5 text-center">
 											<p class="text-muted text-sm">
-												@if (Model?.Location?.ImagePath is not null)
+												@if (Model?.Beneficiary?.ImagePath is not null)
 												{
-													<img id="bImage" class="img-fluid block-data" src="/Document/GetBeneficiaryDocument/@Model?.Location.BeneficiaryDetailId" data-bs-toggle="tooltip" title="Beneficiary Photo" />
+													<img id="bImage" class="img-fluid block-data" src="/Document/GetBeneficiaryDocument/@Model?.Beneficiary.BeneficiaryDetailId" data-bs-toggle="tooltip" title="Beneficiary Photo" />
 												}
 												else
 												{

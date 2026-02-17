@@ -42,12 +42,26 @@ namespace risk.control.system.Models.ViewModel
         [Required]
         [DataType(DataType.Date)]
         [Display(Name = "Case issue date")]
-        public DateTime ContractIssueDate { get; set; }
+        public DateTime? ContractIssueDate { get; set; }
 
         [Required]
         [DataType(DataType.Date)]
         [Display(Name = "Date of incident")]
-        public DateTime DateOfIncident { get; set; }
+        public DateTime? DateOfIncident { get; set; }
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (ContractIssueDate.HasValue && DateOfIncident.HasValue)
+            {
+                if (DateOfIncident < ContractIssueDate)
+                {
+                    yield return new ValidationResult(
+                        "Date of incident cannot be before the case issue date.",
+                        new[] { nameof(DateOfIncident), nameof(ContractIssueDate) }
+                    );
+                }
+            }
+        }
 
         [Required]
         [StringLength(70)]

@@ -13,11 +13,11 @@ namespace risk.control.system.Controllers.Common
     [ApiExplorerSettings(IgnoreApi = true)]
     public class DocumentController : Controller
     {
-        private readonly ILogger<InvestigationController> logger;
+        private readonly ILogger<CreatorController> logger;
         private readonly ApplicationDbContext context;
         private readonly IWebHostEnvironment webHostEnvironment;
 
-        public DocumentController(ILogger<InvestigationController> logger,
+        public DocumentController(ILogger<CreatorController> logger,
             ApplicationDbContext context,
             IWebHostEnvironment webHostEnvironment)
         {

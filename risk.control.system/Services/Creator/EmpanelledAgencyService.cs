@@ -7,9 +7,7 @@ namespace risk.control.system.Services.Creator
 {
     public interface IEmpanelledAgencyService
     {
-        Task<CaseInvestigationVendorsModel> GetEmpanelledVendors(long selectedcase, string userEmail, long vendorId, bool fromEditPage = false);
-
-        Task<ReportTemplate> GetReportTemplate(long caseId);
+        Task<CaseTransactionModel> GetEmpanelledVendors(long selectedcase, string userEmail, long vendorId, bool fromEditPage = false);
     }
 
     internal class EmpanelledAgencyService : IEmpanelledAgencyService
@@ -21,7 +19,7 @@ namespace risk.control.system.Services.Creator
             this._context = context;
         }
 
-        public async Task<CaseInvestigationVendorsModel> GetEmpanelledVendors(long selectedcase, string userEmail, long vendorId, bool fromEditPage = false)
+        public async Task<CaseTransactionModel> GetEmpanelledVendors(long selectedcase, string userEmail, long vendorId, bool fromEditPage = false)
         {
             var caseTask = await _context.Investigations
                 .Include(c => c.CaseNotes)
@@ -56,36 +54,13 @@ namespace risk.control.system.Services.Creator
             _context.Investigations.Update(caseTask);
             await _context.SaveChangesAsync();
 
-            return new CaseInvestigationVendorsModel
+            return new CaseTransactionModel
             {
+                ClaimsInvestigation = caseTask,
                 Beneficiary = beneficiary,
-                Currency = CustomExtensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol,
-                VendorId = vendorId,
                 FromEditPage = fromEditPage,
-                CaseTask = caseTask
+                Currency = CustomExtensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol,
             };
-        }
-
-        public async Task<ReportTemplate> GetReportTemplate(long caseId)
-        {
-            var claimsInvestigation = await _context.Investigations
-                .AsNoTracking()
-                .FirstOrDefaultAsync(c => c.Id == caseId);
-
-            var template = await _context.ReportTemplates
-                .Include(r => r.LocationReport)
-                    .ThenInclude(l => l.AgentIdReport)
-                .Include(r => r.LocationReport)
-                    .ThenInclude(l => l.MediaReports)
-                .Include(r => r.LocationReport)
-                    .ThenInclude(l => l.FaceIds)
-                .Include(r => r.LocationReport)
-                    .ThenInclude(l => l.DocumentIds)
-                .Include(r => r.LocationReport)
-                    .ThenInclude(l => l.Questions)
-                .FirstOrDefaultAsync(r => r.Id == claimsInvestigation.ReportTemplateId);
-
-            return template;
         }
     }
 }

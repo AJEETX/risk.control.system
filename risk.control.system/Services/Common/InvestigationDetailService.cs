@@ -8,8 +8,6 @@ namespace risk.control.system.Services.Common
 {
     public interface IInvestigationDetailService
     {
-        Task<CaseTransactionModel> GetCaseDetails(string currentUserEmail, long id);
-
         List<VendorIdWithCases> GetAgencyIdsLoad(List<long> existingVendors);
 
         Task<CaseTransactionModel> GetClaimDetailsReport(string currentUserEmail, long id);
@@ -24,75 +22,6 @@ namespace risk.control.system.Services.Common
         public InvestigationDetailService(ApplicationDbContext context)
         {
             this.context = context;
-        }
-
-        public async Task<CaseTransactionModel> GetCaseDetails(string userEmail, long id)
-        {
-            var caseTask = await context.Investigations.AsNoTracking()
-                .Include(c => c.CaseMessages)
-                .Include(c => c.CaseNotes)
-                .Include(c => c.PolicyDetail)
-                .Include(c => c.InvestigationTimeline)
-                .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.CaseEnabler)
-                 .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.InvestigationServiceType)
-                 .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.CostCentre)
-                .Include(c => c.ClientCompany)
-                .Include(c => c.Vendor)
-                .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.PinCode)
-                .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.District)
-                .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.State)
-                .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.Country)
-                .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.BeneficiaryRelation)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.Country)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.State)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.District)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.PinCode)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (caseTask.CustomerDetail != null)
-            {
-                var maskedCustomerContact = new string('*', caseTask.CustomerDetail.PhoneNumber.ToString().Length - 4) + caseTask.CustomerDetail.PhoneNumber.ToString().Substring(caseTask.CustomerDetail.PhoneNumber.ToString().Length - 4);
-                caseTask.CustomerDetail.PhoneNumber = maskedCustomerContact;
-            }
-            if (caseTask.BeneficiaryDetail != null)
-            {
-                var maskedBeneficiaryContact = new string('*', caseTask.BeneficiaryDetail.PhoneNumber.ToString().Length - 4) + caseTask.BeneficiaryDetail.PhoneNumber.ToString().Substring(caseTask.BeneficiaryDetail.PhoneNumber.ToString().Length - 4);
-                caseTask.BeneficiaryDetail.PhoneNumber = maskedBeneficiaryContact;
-            }
-            var companyUser = await context.ApplicationUser.AsNoTracking().Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == userEmail);
-            var lastHistory = caseTask.InvestigationTimeline.OrderByDescending(h => h.StatusChangedAt).FirstOrDefault();
-
-            var timeTaken = DateTime.UtcNow - caseTask.Created;
-            var totalTimeTaken = timeTaken != TimeSpan.Zero
-                ? $"{(timeTaken.Days > 0 ? $"{timeTaken.Days}d " : "")}" +
-              $"{(timeTaken.Hours > 0 ? $"{timeTaken.Hours}h " : "")}" +
-              $"{(timeTaken.Minutes > 0 ? $"{timeTaken.Minutes}m " : "")}" +
-              $"{(timeTaken.Seconds > 0 ? $"{timeTaken.Seconds}s" : "less than a sec")}"
-            : "-";
-            var model = new CaseTransactionModel
-            {
-                ClaimsInvestigation = caseTask,
-                CaseIsValidToAssign = caseTask.IsValidCaseData(),
-                Location = caseTask.BeneficiaryDetail,
-                Assigned = caseTask.Status == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER,
-                AutoAllocation = companyUser.ClientCompany.AutoAllocation,
-                TimeTaken = totalTimeTaken,
-                Withdrawable = (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR),
-                Currency = CustomExtensions.GetCultureByCountry(companyUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol
-            };
-
-            return model;
         }
 
         public async Task<CaseTransactionModel> GetClaimDetailsReport(string currentUserEmail, long id)
@@ -181,9 +110,8 @@ namespace risk.control.system.Services.Common
             {
                 ClaimsInvestigation = caseTask,
                 CaseIsValidToAssign = caseTask.IsValidCaseData(),
-                Location = caseTask.BeneficiaryDetail,
+                Beneficiary = caseTask.BeneficiaryDetail,
                 Assigned = caseTask.Status == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER,
-                AutoAllocation = companyUser != null ? companyUser.ClientCompany.AutoAllocation : false,
                 TimeTaken = totalTimeTaken,
                 VendorInvoice = invoice,
                 CanDownload = canDownload,
@@ -285,9 +213,8 @@ namespace risk.control.system.Services.Common
             {
                 ClaimsInvestigation = caseTask,
                 CaseIsValidToAssign = caseTask.IsValidCaseData(),
-                Location = caseTask.BeneficiaryDetail,
+                Beneficiary = caseTask.BeneficiaryDetail,
                 Assigned = caseTask.Status == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER,
-                AutoAllocation = companyUser != null ? companyUser.ClientCompany.AutoAllocation : false,
                 TimeTaken = totalTimeTaken,
                 VendorInvoice = invoice,
                 CanDownload = canDownload,

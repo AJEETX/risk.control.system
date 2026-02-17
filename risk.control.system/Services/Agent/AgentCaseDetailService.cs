@@ -9,7 +9,7 @@ namespace risk.control.system.Services.Agent
 {
     public interface IAgentCaseDetailService
     {
-        Task<CaseInvestigationVendorsModel> GetInvestigate(string userEmail, long selectedcase, bool uploaded = false);
+        Task<CaseAgencyModel> GetInvestigate(string userEmail, long selectedcase, bool uploaded = false);
 
         Task<CaseTransactionModel> GetInvestigatedForAgent(string currentUserEmail, long id);
 
@@ -35,7 +35,7 @@ namespace risk.control.system.Services.Agent
             _logger = logger;
         }
 
-        public async Task<CaseInvestigationVendorsModel> GetInvestigate(string userEmail, long selectedCaseId, bool uploaded = false)
+        public async Task<CaseAgencyModel> GetInvestigate(string userEmail, long selectedCaseId, bool uploaded = false)
         {
             _logger.LogInformation("Fetching investigation case {CaseId} for user {UserEmail}", selectedCaseId, userEmail);
 
@@ -112,7 +112,7 @@ namespace risk.control.system.Services.Agent
             var rowsAffected = await _context.SaveChangesAsync();
             _logger.LogInformation("{RowsAffected} rows updated for case {CaseId}", rowsAffected, selectedCaseId);
 
-            var model = new CaseInvestigationVendorsModel
+            var model = new CaseAgencyModel
             {
                 InvestigationReport = caseTask.InvestigationReport,
                 Beneficiary = caseTask.BeneficiaryDetail,
@@ -226,9 +226,8 @@ namespace risk.control.system.Services.Agent
             {
                 ClaimsInvestigation = caseTask,
                 CaseIsValidToAssign = caseTask.IsValidCaseData(),
-                Location = caseTask.BeneficiaryDetail,
+                Beneficiary = caseTask.BeneficiaryDetail,
                 Assigned = caseTask.Status == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER,
-                AutoAllocation = company?.AutoAllocation ?? false,
                 TimeTaken = totalTimeTaken,
                 VendorInvoice = invoice,
                 CanDownload = canDownload,

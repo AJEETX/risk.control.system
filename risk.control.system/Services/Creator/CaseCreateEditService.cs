@@ -1,14 +1,20 @@
 ﻿using System.Net;
-
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
+using risk.control.system.Services.Api;
 using risk.control.system.Services.Common;
 
 namespace risk.control.system.Services.Creator
 {
     public interface ICaseCreateEditService
     {
+        Task<ClaimCreationState> GetCreationStateAsync(string userEmail);
+
+        Task<CreateCaseViewModel> GetCreateViewModelAsync(string userEmail);
+
         Task<InvestigationCreateModel> Create(string userEmail);
 
         Task<CreateCaseViewModel> AddCaseDetail(string userEmail);
@@ -18,26 +24,84 @@ namespace risk.control.system.Services.Creator
         Task<EditPolicyDto> GetEditPolicyDetail(long id);
 
         Task<(bool Success, string? CaseId, Dictionary<string, string> Errors)> EditAsync(string userEmail, EditPolicyDto model);
+
+        Task LoadDropDowns(PolicyDetailDto model, string userEmail);
     }
 
     internal class CaseCreateEditService : ICaseCreateEditService
     {
         private readonly IAddInvestigationService _addInvestigationService;
-        private readonly ApplicationDbContext context;
+        private readonly ApplicationDbContext _context;
         private readonly INumberSequenceService numberService;
-        private readonly IValidateImageService validateImageService;
+        private readonly IInvestigationService _investigationService;
+        private readonly IValidateImageService _validateImageService;
 
-        public CaseCreateEditService(IAddInvestigationService addInvestigationService, ApplicationDbContext context, INumberSequenceService numberService, IValidateImageService validateImageService)
+        public CaseCreateEditService(
+            IAddInvestigationService addInvestigationService,
+            ApplicationDbContext context,
+            INumberSequenceService numberService,
+            IInvestigationService investigationService,
+            IValidateImageService validateImageService)
         {
             _addInvestigationService = addInvestigationService;
-            this.context = context;
+            this._context = context;
             this.numberService = numberService;
-            this.validateImageService = validateImageService;
+            this._investigationService = investigationService;
+            this._validateImageService = validateImageService;
+        }
+
+        public async Task LoadDropDowns(PolicyDetailDto model, string userEmail)
+        {
+            var currentUser = await _context.ApplicationUser.AsNoTracking().Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == userEmail);
+
+            model.CurrencySymbol = CustomExtensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
+
+            model.CaseEnablers = new SelectList(_context.CaseEnabler.AsNoTracking().OrderBy(s => s.Code), "CaseEnablerId", "Name", model.CaseEnablerId);
+
+            model.CostCentres = new SelectList(_context.CostCentre.AsNoTracking().OrderBy(s => s.Code), "CostCentreId", "Name", model.CostCentreId);
+
+            model.InsuranceTypes = new SelectList(Enum.GetValues(typeof(InsuranceType)).Cast<InsuranceType>(), model.InsuranceType);
+
+            model.InvestigationServiceTypes = new SelectList(_context.InvestigationServiceType.AsNoTracking().Where(i => i.InsuranceType == model.InsuranceType).OrderBy(s => s.Code), "InvestigationServiceTypeId", "Name", model.InvestigationServiceTypeId);
+        }
+
+        public async Task<ClaimCreationState> GetCreationStateAsync(string userEmail)
+        {
+            var user = await _context.ApplicationUser
+                .AsNoTracking()
+                .Include(u => u.ClientCompany)
+                .Include(u => u.Country)
+                .FirstOrDefaultAsync(u => u.Email == userEmail)
+                ?? throw new KeyNotFoundException("User not found");
+
+            var state = new ClaimCreationState
+            {
+                UserCanCreate = true,
+                HasClaims = true,
+                FileSampleIdentifier = user.Country.Code.ToLower(),
+                IsTrial = user.ClientCompany.LicenseType == LicenseType.Trial
+            };
+
+            if (state.IsTrial)
+            {
+                var totalReadyToAssign = await _investigationService.GetAutoCount(userEmail);
+                var totalClaimsCreated = await _context.Investigations.AsNoTracking()
+                    .CountAsync(c => !c.Deleted && c.ClientCompanyId == user.ClientCompanyId);
+
+                state.HasClaims = totalReadyToAssign > 0;
+                state.MaxAllowed = user.ClientCompany.TotalCreatedClaimAllowed;
+                state.AvailableCount = state.MaxAllowed - totalClaimsCreated;
+
+                // Logic check: Can they create more?
+                state.UserCanCreate = user.ClientCompany.TotalToAssignMaxAllowed > totalReadyToAssign;
+            }
+
+            return state;
         }
 
         public async Task<InvestigationCreateModel> Create(string userEmail)
         {
-            var companyUser = await context.ApplicationUser.Include(c => c.ClientCompany).FirstOrDefaultAsync(c => c.Email == userEmail);
+            var companyUser = await _context.ApplicationUser.Include(c => c.ClientCompany).FirstOrDefaultAsync(c => c.Email == userEmail);
             var caseTask = new InvestigationTask
             {
                 ClientCompany = companyUser.ClientCompany
@@ -47,7 +111,7 @@ namespace risk.control.system.Services.Creator
             var trial = companyUser.ClientCompany.LicenseType == LicenseType.Trial;
             if (trial)
             {
-                var totalClaimsCreated = context.Investigations.Include(c => c.PolicyDetail).Where(c => !c.Deleted &&
+                var totalClaimsCreated = _context.Investigations.Include(c => c.PolicyDetail).Where(c => !c.Deleted &&
                     c.ClientCompanyId == companyUser.ClientCompanyId)?.ToList();
                 availableCount = companyUser.ClientCompany.TotalCreatedClaimAllowed - totalClaimsCreated.Count;
 
@@ -60,7 +124,6 @@ namespace risk.control.system.Services.Creator
             {
                 InvestigationTask = caseTask,
                 AllowedToCreate = userCanCreate,
-                AutoAllocation = companyUser.ClientCompany.AutoAllocation,
                 BeneficiaryDetail = new BeneficiaryDetail { },
                 AvailableCount = availableCount,
                 TotalCount = companyUser.ClientCompany.TotalCreatedClaimAllowed,
@@ -72,9 +135,9 @@ namespace risk.control.system.Services.Creator
         public async Task<CreateCaseViewModel> AddCaseDetail(string userEmail)
         {
             var contractNumber = await numberService.GetNumberSequence("PX");
-            var caseEnabler = await context.CaseEnabler.FirstOrDefaultAsync();
-            var costCentre = await context.CostCentre.FirstOrDefaultAsync();
-            var service = await context.InvestigationServiceType.FirstOrDefaultAsync(i => i.InsuranceType == InsuranceType.CLAIM);
+            var caseEnabler = await _context.CaseEnabler.FirstOrDefaultAsync();
+            var costCentre = await _context.CostCentre.FirstOrDefaultAsync();
+            var service = await _context.InvestigationServiceType.FirstOrDefaultAsync(i => i.InsuranceType == InsuranceType.CLAIM);
             var policy = new PolicyDetail
             {
                 ContractNumber = contractNumber,
@@ -108,7 +171,7 @@ namespace risk.control.system.Services.Creator
         {
             var errors = new Dictionary<string, string>();
 
-            validateImageService.ValidateImage(model.Document, errors);
+            _validateImageService.ValidateImage(model.Document, errors);
 
             ValidateDates(model.PolicyDetailDto, errors);
 
@@ -148,7 +211,7 @@ namespace risk.control.system.Services.Creator
             var errors = new Dictionary<string, string>();
             if (model.Document != null && model.Document.Length > 0)
             {
-                validateImageService.ValidateImage(model.Document, errors);
+                _validateImageService.ValidateImage(model.Document, errors);
             }
             ValidateDates(model.PolicyDetailDto, errors);
 
@@ -165,7 +228,7 @@ namespace risk.control.system.Services.Creator
 
         public async Task<EditPolicyDto> GetEditPolicyDetail(long id)
         {
-            var caseTask = await context.Investigations.AsNoTracking()
+            var caseTask = await _context.Investigations.AsNoTracking()
                     .Include(c => c.PolicyDetail)
                     .FirstOrDefaultAsync(i => i.Id == id);
 
@@ -191,6 +254,61 @@ namespace risk.control.system.Services.Creator
                 ExistingDocumentPath = caseTask.PolicyDetail.DocumentPath
             };
             return model;
+        }
+
+        public async Task<CreateCaseViewModel> GetCreateViewModelAsync(string userEmail)
+        {
+            var user = await _context.ApplicationUser
+                .AsNoTracking()
+                .Include(c => c.ClientCompany)
+                .ThenInclude(c => c.Country)
+                .FirstOrDefaultAsync(c => c.Email == userEmail)
+                ?? throw new KeyNotFoundException("User not found");
+
+            CreateCaseViewModel model;
+
+            if (user.ClientCompany.HasSampleData)
+            {
+                model = await AddCaseDetail(userEmail);
+                // We reuse the mapping logic here
+                await PopulateMetadataAsync(model.PolicyDetailDto, user);
+            }
+            else
+            {
+                model = new CreateCaseViewModel();
+                await PopulateMetadataAsync(model.PolicyDetailDto, user);
+            }
+
+            return model;
+        }
+
+        private async Task PopulateMetadataAsync(PolicyDetailDto dto, ApplicationUser user)
+        {
+            // Set Currency
+            dto.CurrencySymbol = CustomExtensions
+                .GetCultureByCountry(user.ClientCompany.Country.Code.ToUpper())
+                .NumberFormat.CurrencySymbol;
+
+            // Fetch Dropdowns (Parallelized for performance)
+            var enablersTask = _context.CaseEnabler.AsNoTracking().OrderBy(s => s.Code).ToListAsync();
+            var costCentresTask = _context.CostCentre.AsNoTracking().OrderBy(s => s.Code).ToListAsync();
+            var serviceTypesTask = _context.InvestigationServiceType.AsNoTracking().OrderBy(s => s.Code).ToListAsync();
+
+            await Task.WhenAll(enablersTask, costCentresTask, serviceTypesTask);
+
+            dto.CaseEnablers = enablersTask.Result.Select(s => new SelectListItem
+            { Text = s.Name, Value = s.CaseEnablerId.ToString(), Selected = s.CaseEnablerId == dto.CaseEnablerId });
+
+            dto.CostCentres = costCentresTask.Result.Select(s => new SelectListItem
+            { Text = s.Name, Value = s.CostCentreId.ToString(), Selected = s.CostCentreId == dto.CostCentreId });
+
+            dto.InvestigationServiceTypes = serviceTypesTask.Result
+                .Where(i => dto.InsuranceType == null || i.InsuranceType == dto.InsuranceType)
+                .Select(s => new SelectListItem { Text = s.Name, Value = s.InvestigationServiceTypeId.ToString(), Selected = s.InvestigationServiceTypeId == dto.InvestigationServiceTypeId });
+
+            dto.InsuranceTypes = Enum.GetValues(typeof(InsuranceType))
+                .Cast<InsuranceType>()
+                .Select(e => new SelectListItem { Text = e.ToString(), Value = e.ToString(), Selected = e == dto.InsuranceType });
         }
     }
 }
