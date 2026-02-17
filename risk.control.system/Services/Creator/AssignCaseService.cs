@@ -10,7 +10,7 @@ using risk.control.system.Services.Common;
 
 namespace risk.control.system.Services
 {
-    public interface ICaseAllocationService
+    public interface IAssignCaseService
     {
         Task<int> UpdateCaseAllocationStatus(string userEmail, List<long> caseIds);
 
@@ -21,16 +21,16 @@ namespace risk.control.system.Services
         Task<(string, string)> AllocateToVendor(string userEmail, long caseId, long vendorId, bool autoAllocated = true);
     }
 
-    internal class CaseAllocationService : ICaseAllocationService
+    internal class AssignCaseService : IAssignCaseService
     {
         private readonly IDbContextFactory<ApplicationDbContext> _contextFactory;
-        private readonly ILogger<CaseAllocationService> logger;
+        private readonly ILogger<AssignCaseService> logger;
         private readonly IMailService mailboxService;
         private readonly ITimelineService timelineService;
         private readonly IBackgroundJobClient backgroundJobClient;
 
-        public CaseAllocationService(IDbContextFactory<ApplicationDbContext> contextFactory,
-            ILogger<CaseAllocationService> logger,
+        public AssignCaseService(IDbContextFactory<ApplicationDbContext> contextFactory,
+            ILogger<AssignCaseService> logger,
             IMailService mailboxService,
             ITimelineService timelineService,
             IBackgroundJobClient backgroundJobClient)

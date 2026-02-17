@@ -1,5 +1,4 @@
-﻿using System.Security.Claims;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using risk.control.system.AppConstant;
 using risk.control.system.Services.Api;
@@ -26,16 +25,11 @@ namespace risk.control.system.Controllers.Api.Company
             this.agencyService = agencyService;
         }
 
-        [HttpGet("AllUsers")]
-        public async Task<IActionResult> AllUsers()
+        [HttpGet("Users")]
+        public async Task<IActionResult> Users()
         {
-            var userClaim = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userClaim) || string.IsNullOrEmpty(userEmail))
-            {
-                return Unauthorized("User not authenticated.");
-            }
             try
             {
                 var result = await companyUserApiService.GetCompanyUsers(userEmail);
@@ -54,10 +48,6 @@ namespace risk.control.system.Controllers.Api.Company
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userEmail))
-            {
-                return Unauthorized("User not authenticated.");
-            }
             try
             {
                 var vendors = await agencyService.GetAllEmpanelledAgenciesAsync(userEmail);
@@ -80,10 +70,6 @@ namespace risk.control.system.Controllers.Api.Company
             }
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userEmail))
-            {
-                return Unauthorized("User not authenticated.");
-            }
             try
             {
                 var result = await agencyService.GetEmpanelledAgency(userEmail, caseId);
@@ -101,10 +87,6 @@ namespace risk.control.system.Controllers.Api.Company
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userEmail))
-            {
-                return Unauthorized("User not authenticated.");
-            }
             try
             {
                 var result = await agencyService.GetAvailableAgencies(userEmail);
@@ -122,10 +104,6 @@ namespace risk.control.system.Controllers.Api.Company
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userEmail))
-            {
-                return Unauthorized("User not authenticated.");
-            }
             try
             {
                 var result = await agencyService.GetAgencyService(id);

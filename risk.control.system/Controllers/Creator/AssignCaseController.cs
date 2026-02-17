@@ -14,16 +14,16 @@ namespace risk.control.system.Controllers.Creator
     [Authorize(Roles = $"{CREATOR.DISPLAY_NAME}")]
     public class AssignCaseController : Controller
     {
-        private readonly string baseUrl;
+        private readonly string _baseUrl;
         private readonly ApplicationDbContext _context;
-        private readonly ICaseAllocationService caseAllocationService;
-        private readonly IMailService mailboxService;
-        private readonly INotyfService notifyService;
-        private readonly ILogger<AssignCaseController> logger;
-        private readonly IBackgroundJobClient backgroundJobClient;
+        private readonly IAssignCaseService _assignCaseService;
+        private readonly IMailService _mailService;
+        private readonly INotyfService _notifyService;
+        private readonly ILogger<AssignCaseController> _logger;
+        private readonly IBackgroundJobClient _backgroundJobClient;
 
         public AssignCaseController(ApplicationDbContext context,
-            ICaseAllocationService caseAllocationService,
+            IAssignCaseService assignCaseService,
             IMailService mailboxService,
             INotyfService notifyService,
             IHttpContextAccessor httpContextAccessor,
@@ -31,14 +31,14 @@ namespace risk.control.system.Controllers.Creator
             IBackgroundJobClient backgroundJobClient)
         {
             _context = context;
-            this.caseAllocationService = caseAllocationService;
-            this.mailboxService = mailboxService;
-            this.notifyService = notifyService;
-            this.logger = logger;
-            this.backgroundJobClient = backgroundJobClient;
+            _assignCaseService = assignCaseService;
+            _mailService = mailboxService;
+            _notifyService = notifyService;
+            _logger = logger;
+            _backgroundJobClient = backgroundJobClient;
             var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
             var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
-            baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
+            _baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
         }
 
         [HttpPost]
@@ -50,26 +50,26 @@ namespace risk.control.system.Controllers.Creator
             {
                 if (!ModelState.IsValid || claims == null || claims.Count == 0)
                 {
-                    notifyService.Custom($"No Case selected!!!. Please select Case to be assigned.", 3, "red", "far fa-file-powerpoint");
+                    _notifyService.Custom($"No Case selected!!!. Please select Case to be assigned.", 3, "red", "far fa-file-powerpoint");
                     return RedirectToAction(nameof(CaseCreateEditController.New), ControllerName<CaseCreateEditController>.Name);
                 }
 
                 // AUTO ALLOCATION COUNT
                 var distinctClaims = claims.Distinct().ToList();
-                var affectedRows = await caseAllocationService.UpdateCaseAllocationStatus(userEmail, distinctClaims);
+                var affectedRows = await _assignCaseService.UpdateCaseAllocationStatus(userEmail, distinctClaims);
                 if (affectedRows < distinctClaims.Count)
                 {
-                    notifyService.Custom($"Case(s) assignment error", 3, "orange", "far fa-file-powerpoint");
+                    _notifyService.Custom($"Case(s) assignment error", 3, "orange", "far fa-file-powerpoint");
                     return RedirectToAction(nameof(CaseCreateEditController.New), ControllerName<CaseCreateEditController>.Name);
                 }
-                var jobId = backgroundJobClient.Enqueue(() => caseAllocationService.BackgroundAutoAllocation(distinctClaims, userEmail, baseUrl));
-                notifyService.Custom($"Assignment of <b> {distinctClaims.Count}</b> Case(s) started", 3, "orange", "far fa-file-powerpoint");
+                var jobId = _backgroundJobClient.Enqueue(() => _assignCaseService.BackgroundAutoAllocation(distinctClaims, userEmail, _baseUrl));
+                _notifyService.Custom($"Assignment of <b> {distinctClaims.Count}</b> Case(s) started", 3, "orange", "far fa-file-powerpoint");
                 return RedirectToAction(nameof(CaseActiveController.Active), ControllerName<CaseActiveController>.Name, new { jobId });
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error deleting case(s). {UserEmail}", userEmail);
-                notifyService.Error("Error assigning case. Try again.");
+                _logger.LogError(ex, "Error deleting case(s). {UserEmail}", userEmail);
+                _notifyService.Error("Error assigning case. Try again.");
             }
             return RedirectToAction(nameof(CaseCreateEditController.New), ControllerName<CaseCreateEditController>.Name);
         }
@@ -83,30 +83,30 @@ namespace risk.control.system.Controllers.Creator
             {
                 if (!ModelState.IsValid || selectedcase < 1 || caseId < 1)
                 {
-                    notifyService.Custom($"Error!!! Try again", 3, "red", "far fa-file-powerpoint");
+                    _notifyService.Custom($"Error!!! Try again", 3, "red", "far fa-file-powerpoint");
                     return RedirectToAction(nameof(CaseCreateEditController.New), ControllerName<CaseCreateEditController>.Name);
                 }
 
-                var (policy, status) = await caseAllocationService.AllocateToVendor(userEmail, caseId, selectedcase, false);
+                var (policy, status) = await _assignCaseService.AllocateToVendor(userEmail, caseId, selectedcase, false);
 
                 if (string.IsNullOrEmpty(policy) || string.IsNullOrEmpty(status))
                 {
-                    notifyService.Custom($"Error!!! Try again", 3, "red", "far fa-file-powerpoint");
+                    _notifyService.Custom($"Error!!! Try again", 3, "red", "far fa-file-powerpoint");
                     return RedirectToAction(nameof(CaseCreateEditController.New), ControllerName<CaseCreateEditController>.Name);
                 }
 
                 var vendor = await _context.Vendor.FirstOrDefaultAsync(v => v.VendorId == selectedcase);
 
-                var jobId = backgroundJobClient.Enqueue(() => mailboxService.NotifyCaseAllocationToVendorAndManager(userEmail, policy, caseId, selectedcase, baseUrl));
+                var jobId = _backgroundJobClient.Enqueue(() => _mailService.NotifyCaseAllocationToVendorAndManager(userEmail, policy, caseId, selectedcase, _baseUrl));
 
-                notifyService.Custom($"Case <b>#{policy}</b> <i>{status}</i> to {vendor.Name}", 3, "green", "far fa-file-powerpoint");
+                _notifyService.Custom($"Case <b>#{policy}</b> <i>{status}</i> to {vendor.Name}", 3, "green", "far fa-file-powerpoint");
 
                 return RedirectToAction(nameof(CaseActiveController.Active), ControllerName<CaseActiveController>.Name);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error assigning case {Id} to {Agency}. {UserEmail}", caseId, selectedcase, userEmail);
-                notifyService.Error("Error assigning case. Try again.");
+                _logger.LogError(ex, "Error assigning case {Id} to {Agency}. {UserEmail}", caseId, selectedcase, userEmail);
+                _notifyService.Error("Error assigning case. Try again.");
                 return RedirectToAction(nameof(CaseCreateEditController.New), ControllerName<CaseCreateEditController>.Name);
             }
         }
@@ -120,22 +120,22 @@ namespace risk.control.system.Controllers.Creator
             {
                 if (!ModelState.IsValid || claims < 1)
                 {
-                    notifyService.Custom($"No case selected!!!. Please select case to be assigned.", 3, "red", "far fa-file-powerpoint");
+                    _notifyService.Custom($"No case selected!!!. Please select case to be assigned.", 3, "red", "far fa-file-powerpoint");
                     return RedirectToAction(nameof(CaseCreateEditController.New), ControllerName<CaseCreateEditController>.Name);
                 }
 
-                var allocatedCaseNumber = await caseAllocationService.ProcessAutoSingleAllocation(claims, userEmail, baseUrl);
+                var allocatedCaseNumber = await _assignCaseService.ProcessAutoSingleAllocation(claims, userEmail, _baseUrl);
                 if (string.IsNullOrWhiteSpace(allocatedCaseNumber))
                 {
-                    notifyService.Custom($"Case #:{allocatedCaseNumber} Not Assigned", 3, "orange", "far fa-file-powerpoint");
+                    _notifyService.Custom($"Case #:{allocatedCaseNumber} Not Assigned", 3, "orange", "far fa-file-powerpoint");
                     return RedirectToAction(nameof(CaseCreateEditController.New), ControllerName<CaseCreateEditController>.Name);
                 }
-                notifyService.Custom($"Case <b>#:{allocatedCaseNumber}</b> Assigned<sub>auto</b>", 3, "green", "far fa-file-powerpoint");
+                _notifyService.Custom($"Case <b>#:{allocatedCaseNumber}</b> Assigned<sub>auto</b>", 3, "green", "far fa-file-powerpoint");
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error assigning case {Id}. {UserEmail}", claims, userEmail);
-                notifyService.Error("Error assigning case. Try again.");
+                _logger.LogError(ex, "Error assigning case {Id}. {UserEmail}", claims, userEmail);
+                _notifyService.Error("Error assigning case. Try again.");
                 return RedirectToAction(nameof(CaseCreateEditController.New), ControllerName<CaseCreateEditController>.Name);
             }
             return RedirectToAction(nameof(CaseActiveController.Active), ControllerName<CaseActiveController>.Name);

@@ -2,20 +2,15 @@
 {
     public class DashboardData
     {
-        public bool AutoAllocation { get; set; } = false;
-        public bool BulkUpload { get; set; } = false;
         public string FirstBlockName { get; set; }
         public int FirstBlockCount { get; set; }
-        public string FirstBlock2Count { get; set; }
         public string FirstBlockUrl { get; set; } = string.Empty;
 
         public string SecondBlockName { get; set; }
         public int SecondBlockCount { get; set; }
-        public string SecondBlock2Count { get; set; }
         public string SecondBlockUrl { get; set; } = string.Empty;
         public string SecondBBlockName { get; set; }
         public int SecondBBlockCount { get; set; }
-        public string SecondBBlockCountBoth { get; set; }
         public string SecondBBlockUrl { get; set; } = string.Empty;
         public string ThirdBlockName { get; set; }
         public int ThirdBlockCount { get; set; }
@@ -43,6 +38,5 @@
         public int? ApprovedClaimgCount { get; set; }
         public int? RejectedUnderwritingCount { get; set; }
         public int? RejectedClaimCount { get; set; }
-
     }
 }

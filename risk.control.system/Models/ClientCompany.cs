@@ -62,7 +62,6 @@ namespace risk.control.system.Models
         public string? AddressLatitude { get; set; }
         public string? AddressLongitude { get; set; }
         public List<Vendor>? EmpanelledVendors { get; set; } = new();
-        public bool AutoAllocation { get; set; } = false;
         public bool VerifyPan { get; set; } = false;
         public bool VerifyPassport { get; set; } = false;
         public bool EnablePassport { get; set; } = false;
@@ -74,7 +73,6 @@ namespace risk.control.system.Models
         public string? PassportApiData { get; set; } = "327fd8beb9msh8a441504790e80fp142ea8jsnf74b9208776a";
         public string? PassportApiHost { get; set; } = "document-ocr1.p.rapidapi.com";
         public bool CanChangePassword { get; set; } = false;
-        public bool BulkUpload { get; set; } = false;
         public LicenseType LicenseType { get; set; } = LicenseType.Trial;
 
         [DataType(DataType.DateTime)]
@@ -131,7 +129,6 @@ namespace risk.control.system.Models
                 $"- Status: {Status}\n" +
                 $"- Document URL: {DocumentUrl}\n" +
                 $"- Empanelled Vendors: {EmpanelledVendors}\n" +
-                $"- Auto Allocation: {AutoAllocation}\n" +
                 $"- Verify Pan: {VerifyPan}\n" +
                 $"- Verify Passport: {VerifyPassport}\n" +
                 $"- Enable Passport: {EnablePassport}\n" +

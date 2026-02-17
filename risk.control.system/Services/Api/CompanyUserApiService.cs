@@ -66,28 +66,15 @@ namespace risk.control.system.Services.Api
                 .Include(u => u.PinCode)
                 .Include(u => u.District)
                 .Include(u => u.State)
-                .ThenInclude(u => u.Country)
+                .Include(u => u.Country)
                 .OrderBy(u => u.FirstName)
                 .ThenBy(u => u.LastName)
                 .ToListAsync();
 
-            var photoTasks = new List<Task<byte[]>>();
-            foreach (var user in companyUsers)
-            {
-                photoTasks.Add(user.ProfilePictureUrl != null
-                    ? System.IO.File.ReadAllBytesAsync(Path.Combine(webHostEnvironment.ContentRootPath, user.ProfilePictureUrl))
-                    : Task.FromResult(Array.Empty<byte>()));
-            }
-            var photoResults = await Task.WhenAll(photoTasks);
-
-            // 4️⃣ Map users to UserDetailResponse
             var activeUsersDetails = new List<UserDetailResponse>();
             for (int i = 0; i < companyUsers.Count; i++)
             {
                 var user = companyUsers[i];
-                var photoBytes = photoResults[i];
-
-                // Lookup last session
                 latestSessions.TryGetValue(user.Email, out var session);
 
                 string status, statusName, icon;
@@ -108,7 +95,7 @@ namespace risk.control.system.Services.Api
                         _ => ("#DED5D5", "Offline", "fa fa-circle-o")
                     };
                 }
-
+                var photo = (await base64FileService.GetBase64FileAsync(user.ProfilePictureUrl)) ?? Applicationsettings.NO_USER;
                 activeUsersDetails.Add(new UserDetailResponse
                 {
                     Id = user.Id,
@@ -116,7 +103,7 @@ namespace risk.control.system.Services.Api
                     Email = $"<a href=/Company/EditUser?userId={user.Id}>{user.Email}</a>",
                     RawEmail = user.Email,
                     Phone = $"(+{user.Country.ISDCode}) {user.PhoneNumber}",
-                    Photo = photoBytes.Length > 0 ? $"data:image/*;base64,{Convert.ToBase64String(photoBytes)}" : Applicationsettings.NO_USER,
+                    Photo = photo,
                     Active = user.Active,
                     Addressline = $"{user.Addressline}, {user.District.Name}",
                     District = user.District.Name,

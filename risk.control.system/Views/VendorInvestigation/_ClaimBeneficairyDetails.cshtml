@@ -1,122 +1,122 @@
-﻿@model CaseInvestigationVendorAgentModel
+﻿@model CaseAgencyAgentModel
 @{
-    string address = string.Empty;
-    string baddress = string.Empty;
-    int currentAgeinYrs = 0;
-    int currentBAgeinYrs = 0;
-    if (Model.ClaimsInvestigation != null)
-    {
-        address = @Model.ClaimsInvestigation?.CustomerDetail.Addressline + " " + @Model.ClaimsInvestigation?.CustomerDetail.District.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.State.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.Country.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.PinCode.Code;
-        baddress = @Model.CaseLocation != null ? @Model.CaseLocation?.Addressline + " " +
-        @Model.CaseLocation?.District?.Name + " " + @Model.CaseLocation?.State?.Name + " " +
-        @Model.CaseLocation?.Country?.Name + " " + @Model.CaseLocation?.PinCode?.Code : string.Empty;
-        if (Model.ClaimsInvestigation?.CustomerDetail.DateOfBirth != null)
-        {
-            var age = DateTime.UtcNow.Subtract(Model.ClaimsInvestigation.CustomerDetail.DateOfBirth.GetValueOrDefault()).TotalDays;
-            currentAgeinYrs = (int)age / 365;
-        }
-        if (Model.CaseLocation?.DateOfBirth != null)
-        {
-            var age = DateTime.UtcNow.Subtract(Model.CaseLocation.DateOfBirth.GetValueOrDefault()).TotalDays;
-            currentBAgeinYrs = (int)age / 365;
-        }
-    }
-    var map = string.Format(Model.CaseLocation.BeneficiaryLocationMap, "400", "400");
+	string address = string.Empty;
+	string baddress = string.Empty;
+	int currentAgeinYrs = 0;
+	int currentBAgeinYrs = 0;
+	if (Model.ClaimsInvestigation != null)
+	{
+		address = @Model.ClaimsInvestigation?.CustomerDetail.Addressline + " " + @Model.ClaimsInvestigation?.CustomerDetail.District.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.State.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.Country.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.PinCode.Code;
+		baddress = @Model.Beneficiary != null ? @Model.Beneficiary?.Addressline + " " +
+		@Model.Beneficiary?.District?.Name + " " + @Model.Beneficiary?.State?.Name + " " +
+		@Model.Beneficiary?.Country?.Name + " " + @Model.Beneficiary?.PinCode?.Code : string.Empty;
+		if (Model.ClaimsInvestigation?.CustomerDetail.DateOfBirth != null)
+		{
+			var age = DateTime.UtcNow.Subtract(Model.ClaimsInvestigation.CustomerDetail.DateOfBirth.GetValueOrDefault()).TotalDays;
+			currentAgeinYrs = (int)age / 365;
+		}
+		if (Model.Beneficiary?.DateOfBirth != null)
+		{
+			var age = DateTime.UtcNow.Subtract(Model.Beneficiary.DateOfBirth.GetValueOrDefault()).TotalDays;
+			currentBAgeinYrs = (int)age / 365;
+		}
+	}
+	var map = string.Format(Model.Beneficiary.BeneficiaryLocationMap, "400", "400");
 }
 <div class="col-12 col-sm-6 d-flex align-items-stretch flex-column">
-    <div class="card bg-light d-flex flex-fill">
-        <div class="card-header text-muted border-bottom-0">
-            <i class="fas fa-user-tie"></i>  Beneficiary Details
-            <span class="hover-text">
-                <i class="fas fa-info-circle"></i>
-                <span class="tooltip-text" id="beneficiary-information">
-                    <li>
-                        <i class='fas fa-user-tie'></i> Beneficiary details
-                    </li>
-                    <li>
-                        <i class='far fa-hand-point-right'></i>
-                        <div class="btn btn-xs bg-teal">
-                            <i class="fas fa-comments"></i>
-                        </div> Send SMS to Beneficiary
-                    </li>
-                    <li>
-                        <i class='far fa-hand-point-right'></i>
-                        <div class="btn btn-xs btn-success">
-                            <i class="fas fa-user-tie"></i> ...
-                        </div> Show Beneficiary Details
-                    </li>
-                </span>
-            </span>
-        </div>
-        <div class="progress">
-            <i class="far fa-bookmark bookmark-green"></i>
-            <div class="progress-bar progress-bar-green" role="progressbar">
-                <i class="fas fa-user-tie"></i>
-            </div>
-        </div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col-7">
-                    <h2 class="lead"><b>@Model?.CaseLocation.Name</b></h2>
-                    <p class="text-muted text-sm">
-                        Relation: <b> @Model.CaseLocation?.BeneficiaryRelation.Name</b>
-                    </p>
-                    <ul class="ml-4 mb-0 fa-ul text-muted">
-                        <li class="small">
-                            <span class="fa-li">
-                                <i class="fa fa-money"></i>
-                            </span>
-                            Annual Income:(@Model.Currency) <b> @Model.CaseLocation?.Income</b>
-                        </li>
-                        <li class="small">
-                            <span class="fa-li">
-                                <i class="fas fa-user-alt"></i>
-                            </span>
-                            Age:<b> @currentBAgeinYrs</b>
-                        </li>
+	<div class="card bg-light d-flex flex-fill">
+		<div class="card-header text-muted border-bottom-0">
+			<i class="fas fa-user-tie"></i>  Beneficiary Details
+			<span class="hover-text">
+				<i class="fas fa-info-circle"></i>
+				<span class="tooltip-text" id="beneficiary-information">
+					<li>
+						<i class='fas fa-user-tie'></i> Beneficiary details
+					</li>
+					<li>
+						<i class='far fa-hand-point-right'></i>
+						<div class="btn btn-xs bg-teal">
+							<i class="fas fa-comments"></i>
+						</div> Send SMS to Beneficiary
+					</li>
+					<li>
+						<i class='far fa-hand-point-right'></i>
+						<div class="btn btn-xs btn-success">
+							<i class="fas fa-user-tie"></i> ...
+						</div> Show Beneficiary Details
+					</li>
+				</span>
+			</span>
+		</div>
+		<div class="progress">
+			<i class="far fa-bookmark bookmark-green"></i>
+			<div class="progress-bar progress-bar-green" role="progressbar">
+				<i class="fas fa-user-tie"></i>
+			</div>
+		</div>
+		<div class="card-body">
+			<div class="row">
+				<div class="col-7">
+					<h2 class="lead"><b>@Model?.Beneficiary.Name</b></h2>
+					<p class="text-muted text-sm">
+						Relation: <b> @Model.Beneficiary?.BeneficiaryRelation.Name</b>
+					</p>
+					<ul class="ml-4 mb-0 fa-ul text-muted">
+						<li class="small">
+							<span class="fa-li">
+								<i class="fa fa-money"></i>
+							</span>
+							Annual Income:(@Model.Currency) <b> @Model.Beneficiary?.Income</b>
+						</li>
+						<li class="small">
+							<span class="fa-li">
+								<i class="fas fa-user-alt"></i>
+							</span>
+							Age:<b> @currentBAgeinYrs</b>
+						</li>
 
-                        <li class="small">
-                            <span class="fa-li">
-                                <i class="fas fa-lg fa-building"></i>
-                            </span>
-                            Address:<b> @baddress</b>
-                        </li>
-                        <li class="small">
-                            <span class="fa-li">
-                                <i class="fas fa-lg fa-phone"></i>
-                            </span>
-                            Mobile #: + <b> @Model.CaseLocation?.PhoneNumber</b>
-                        </li>
-                    </ul>
-                </div>
-                <div class="col-5 text-center">
-                    <p class="text-muted text-sm">
-                        @if (Model?.CaseLocation?.ImagePath is not null)
-                        {
-                            <img id="bImage" class="img-fluid block-data" src="/Document/GetBeneficiaryDocument/@Model?.CaseLocation?.BeneficiaryDetailId" data-bs-toggle="tooltip" title="Beneficiary Photo" />
-                        }
-                        else
-                        {
-                            <img id="bImage" class="img-fluid block-data" src="@Applicationsettings.NO_USER" data-bs-toggle="tooltip" title="No Beneficiary Photo" />
-                        }
-                    </p>
-                    <p class="text-muted text-sm">
-                        <img id="beneficiaryGoogleMap" class="img-fluid block-data" src="@map" data-bs-toggle="tooltip" title="Display Beneficiary Address in map" />
-                    </p>
-                </div>
-            </div>
-        </div>
+						<li class="small">
+							<span class="fa-li">
+								<i class="fas fa-lg fa-building"></i>
+							</span>
+							Address:<b> @baddress</b>
+						</li>
+						<li class="small">
+							<span class="fa-li">
+								<i class="fas fa-lg fa-phone"></i>
+							</span>
+							Mobile #: + <b> @Model.Beneficiary?.PhoneNumber</b>
+						</li>
+					</ul>
+				</div>
+				<div class="col-5 text-center">
+					<p class="text-muted text-sm">
+						@if (Model?.Beneficiary?.ImagePath is not null)
+						{
+							<img id="bImage" class="img-fluid block-data" src="/Document/GetBeneficiaryDocument/@Model?.Beneficiary?.BeneficiaryDetailId" data-bs-toggle="tooltip" title="Beneficiary Photo" />
+						}
+						else
+						{
+							<img id="bImage" class="img-fluid block-data" src="@Applicationsettings.NO_USER" data-bs-toggle="tooltip" title="No Beneficiary Photo" />
+						}
+					</p>
+					<p class="text-muted text-sm">
+						<img id="beneficiaryGoogleMap" class="img-fluid block-data" src="@map" data-bs-toggle="tooltip" title="Display Beneficiary Address in map" />
+					</p>
+				</div>
+			</div>
+		</div>
 
-        <div class="card-footer">
-            <div class="text-right">
-                <a id="beneficiary-comments" class="btn btn-sm bg-teal" data-bs-toggle="tooltip" title="Send SMS to Beneficiary">
-                    <i class="fas fa-comments"></i>
-                </a>
+		<div class="card-footer">
+			<div class="text-right">
+				<a id="beneficiary-comments" class="btn btn-sm bg-teal" data-bs-toggle="tooltip" title="Send SMS to Beneficiary">
+					<i class="fas fa-comments"></i>
+				</a>
 
-                <a id="beneficiary-detail" class="btn btn-sm btn-success" data-bs-toggle="tooltip" title="Show Beneficiary Details">
-                    <i class="fas fa-user-tie"></i> ...
-                </a>
-            </div>
-        </div>
-    </div>
+				<a id="beneficiary-detail" class="btn btn-sm btn-success" data-bs-toggle="tooltip" title="Show Beneficiary Details">
+					<i class="fas fa-user-tie"></i> ...
+				</a>
+			</div>
+		</div>
+	</div>
 </div>

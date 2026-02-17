@@ -53,7 +53,7 @@
 				</table>
 			</div>
 			<div class="card-footer">
-				<div class="row">
+				<div class="row float-right">
 					<div class="col-md-12">
 						@if (@Model.UserCanCreate)
 						{
@@ -63,12 +63,9 @@
 						{
 							<button disabled class="create-policy btn btn-success"><i class="far fa-edit"></i> @Applicationsettings.CREATE</button>
 						}
-						@if (Model.AutoAllocation)
-						{
-							<button disabled id="allocatedcase" type="submit" class="btn btn-warning">
-								<i class="fas fa-random"></i> Assign<sub>auto</sub>
-							</button>
-						}
+						<button disabled id="allocatedcase" type="submit" class="btn btn-warning">
+							<i class="fas fa-random"></i> Assign<sub>auto</sub>
+						</button>
 						<button disabled id="deletecase" type="submit" class="btn btn-danger">
 							<i class="fas fa-trash"></i> Delete
 						</button>

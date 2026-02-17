@@ -1,9 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
-using ControllerBase = Microsoft.AspNetCore.Mvc.ControllerBase;
 using risk.control.system.AppConstant;
 using risk.control.system.Services.Api;
+using ControllerBase = Microsoft.AspNetCore.Mvc.ControllerBase;
 
 namespace risk.control.system.Controllers.Api.Company
 {
@@ -13,7 +12,6 @@ namespace risk.control.system.Controllers.Api.Company
     [Authorize(Roles = $"{CREATOR.DISPLAY_NAME},{MANAGER.DISPLAY_NAME}")]
     public class InvestigationController : ControllerBase
     {
-
         private readonly IInvestigationService service;
         private readonly ILogger<InvestigationController> logger;
 
@@ -29,10 +27,6 @@ namespace risk.control.system.Controllers.Api.Company
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userEmail))
-            {
-                return Unauthorized("User not authenticated.");
-            }
             try
             {
                 var response = await service.GetAuto(userEmail, draw, start, length, search, caseType, orderColumn, orderDir);
@@ -52,13 +46,8 @@ namespace risk.control.system.Controllers.Api.Company
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userEmail))
-            {
-                return Unauthorized("User not authenticated.");
-            }
             try
             {
-
                 var response = await service.GetActive(userEmail, draw, start, length, search, caseType, orderColumn, orderDir);
 
                 return Ok(response);
@@ -75,14 +64,10 @@ namespace risk.control.system.Controllers.Api.Company
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userEmail))
-            {
-                return Unauthorized("User not authenticated.");
-            }
             try
             {
                 var isManager = HttpContext.User.IsInRole(MANAGER.DISPLAY_NAME);
-                var result = await service.GetFilesData(userEmail, isManager, draw,start, length,orderColumn, orderDir, uploadId, searchTerm);
+                var result = await service.GetFilesData(userEmail, isManager, draw, start, length, orderColumn, orderDir, uploadId, searchTerm);
                 return Ok(new
                 {
                     draw = result.Draw,
@@ -109,10 +94,6 @@ namespace risk.control.system.Controllers.Api.Company
             }
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userEmail))
-            {
-                return Unauthorized("User not authenticated.");
-            }
             try
             {
                 var isManager = HttpContext.User.IsInRole(MANAGER.DISPLAY_NAME);

@@ -222,7 +222,7 @@ namespace risk.control.system.Services.Api
             return new
             {
                 draw,
-                AutoAllocatopn = companyUser.ClientCompany.AutoAllocation,
+                AutoAllocatopn = true,
                 recordsTotal = totalRecords,
                 recordsFiltered,
                 data = finalData

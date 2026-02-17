@@ -3,12 +3,12 @@
 
 @{
 	<li class="nav-item">
-		<a is-active-page class="navlink-border nav-link  @Url.MakeActiveClass("Investigation", "")
-																								@Url.MakeActiveClass("CaseCreateEdit", "")
-																								@Url.MakeActiveClass("Customer", "")
-																									@Url.MakeActiveClass("Beneficiary", "")
-																								@Url.MakeActiveClass("CaseActive", "")
-																								@Url.MakeActiveClass("CaseUpload", "")">
+		<a is-active-page class="navlink-border nav-link  @Url.MakeActiveClass("Creator", "")
+			@Url.MakeActiveClass("CaseCreateEdit", "")
+			@Url.MakeActiveClass("Customer", "")
+			@Url.MakeActiveClass("Beneficiary", "")
+			@Url.MakeActiveClass("CaseActive", "")
+			@Url.MakeActiveClass("CaseUpload", "")">
 			<i class="nav-icon far fa-money-bill-alt"></i>
 			<p class="sidebar-menu-header-label">
 				CASES
@@ -16,30 +16,27 @@
 			</p>
 		</a>
 	</li>
-	if (Model.BulkUpload)
-	{
-		<li class="nav-item">
-			<a is-active-page asp-controller="CaseUpload" asp-action="Uploads" class="actual-link nav-link @Url.MakeActiveClass("CaseUpload", "Uploads")">
-				<i class="nav-icon fa fa-upload"></i>
-				<p>
-					<span class="badge badge-secondary"> UPLOAD <sub>file</sub></span>
-				</p>
-			</a>
-		</li>
-	}
+	<li class="nav-item">
+		<a is-active-page asp-controller="CaseUpload" asp-action="Uploads" class="actual-link nav-link @Url.MakeActiveClass("CaseUpload", "Uploads")">
+			<i class="nav-icon fa fa-upload"></i>
+			<p>
+				<span class="badge badge-secondary"> UPLOAD <sub>file</sub></span>
+			</p>
+		</a>
+	</li>
 	<li class="nav-item">
 		<a is-active-page asp-controller="CaseCreateEdit" asp-action="New" class="actual-link nav-link
-																												@Url.MakeActiveClass("CaseCreateEdit", "New")
-																													@Url.MakeActiveClass("CaseCreateEdit", "Add")
-																												@Url.MakeActiveClass("CaseCreateEdit", "Create")
-																											@Url.MakeActiveClass("CaseCreateEdit", "Edit")
-																													@Url.MakeActiveClass("Customer", "Create")
-																												@Url.MakeActiveClass("Customer", "Edit")
-																													@Url.MakeActiveClass("Beneficiary", "Create")
-																													@Url.MakeActiveClass("Beneficiary", "Edit")
-																											@Url.MakeActiveClass("Investigation", "Details")
-																												@Url.MakeActiveClass("Investigation", "EmpanelledVendors")
-																													@Url.MakeActiveClass("Investigation", "VendorDetail") ">
+			@Url.MakeActiveClass("CaseCreateEdit", "New")
+			@Url.MakeActiveClass("CaseCreateEdit", "Add")
+			@Url.MakeActiveClass("CaseCreateEdit", "Create")
+			@Url.MakeActiveClass("CaseCreateEdit", "Edit")
+			@Url.MakeActiveClass("Customer", "Create")
+			@Url.MakeActiveClass("Customer", "Edit")
+			@Url.MakeActiveClass("Beneficiary", "Create")
+			@Url.MakeActiveClass("Beneficiary", "Edit")
+			@Url.MakeActiveClass("Creator", "Details")
+			@Url.MakeActiveClass("Creator", "EmpanelledVendors")
+			@Url.MakeActiveClass("Creator", "VendorDetail") ">
 
 			<i class="fas fa-random nav-icon"></i>
 			<p>
@@ -50,7 +47,7 @@
 
 	<li class="nav-item">
 		<a is-active-page asp-controller="CaseActive" asp-action="Active" class="actual-link nav-link @Url.MakeActiveClass("CaseActive", "Active")
-																													                                                    @Url.MakeActiveClass("CaseActive", "ActiveDetail") ">
+			@Url.MakeActiveClass("CaseActive", "ActiveDetail") ">
 			<i class="fa fa-toggle-on nav-icon"></i>
 			<p>
 				<span class="badge badge-primary">ACTIVE</span>

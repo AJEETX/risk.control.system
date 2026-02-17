@@ -1,5 +1,4 @@
-﻿
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 using risk.control.system.AppConstant;
@@ -29,10 +28,6 @@ namespace risk.control.system.Controllers.Api.Company
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userEmail))
-            {
-                return Unauthorized("User not authenticated.");
-            }
             try
             {
                 var response = await managerService.GetActiveCases(userEmail, draw, start, length, search, caseType, orderColumn, orderDir);
@@ -45,15 +40,12 @@ namespace risk.control.system.Controllers.Api.Company
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
+
         [HttpGet("GetApprovedCases")]
         public async Task<IActionResult> GetApprovedCases(int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc")
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userEmail))
-            {
-                return Unauthorized("User not authenticated.");
-            }
             try
             {
                 var response = await managerService.GetApprovedCases(userEmail, draw, start, length, search, caseType, orderColumn, orderDir);
@@ -72,10 +64,6 @@ namespace risk.control.system.Controllers.Api.Company
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userEmail))
-            {
-                return Unauthorized("User not authenticated.");
-            }
             try
             {
                 var response = await managerService.GetRejectedCases(userEmail, draw, start, length, search, caseType, orderColumn, orderDir);

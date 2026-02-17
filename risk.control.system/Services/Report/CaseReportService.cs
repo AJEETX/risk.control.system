@@ -7,7 +7,7 @@ namespace risk.control.system.Services.Report
 {
     public interface ICaseReportService
     {
-        Task<CaseInvestigationVendorsModel> GetInvestigateReport(string userEmail, long selectedcase);
+        Task<CaseAgencyModel> GetInvestigateReport(string userEmail, long selectedcase);
     }
 
     internal class CaseReportService : ICaseReportService
@@ -20,7 +20,7 @@ namespace risk.control.system.Services.Report
             this._context = context;
         }
 
-        public async Task<CaseInvestigationVendorsModel> GetInvestigateReport(string userEmail, long selectedcase)
+        public async Task<CaseAgencyModel> GetInvestigateReport(string userEmail, long selectedcase)
         {
             var caseTask = await _context.Investigations.AsNoTracking()
                .Include(c => c.InvestigationTimeline)
@@ -92,7 +92,7 @@ namespace risk.control.system.Services.Report
 
             caseTask.InvestigationReport.ReportTemplate = caseReportTemplate;
 
-            return (new CaseInvestigationVendorsModel
+            return (new CaseAgencyModel
             {
                 InvestigationReport = caseTask.InvestigationReport,
                 Beneficiary = beneficiaryDetails,

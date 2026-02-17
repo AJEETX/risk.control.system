@@ -104,8 +104,6 @@ namespace risk.control.system.Services.Api
             // Build dashboard
             return new DashboardData
             {
-                AutoAllocation = company.AutoAllocation,
-                BulkUpload = company.BulkUpload,
                 FirstBlockName = "ADD/ASSIGN",
                 FirstBlockUrl = "/CaseCreateEdit/New",
                 FirstBlockCount = claimAssign,
