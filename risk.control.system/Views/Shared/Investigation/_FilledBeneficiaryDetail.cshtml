@@ -4,7 +4,7 @@
 @{
 	// Progress and existence flags
 	bool customerExists = Model.ClaimsInvestigation?.CustomerDetail != null;
-	bool beneficiaryExists = Model.Location?.BeneficiaryDetailId > 0;
+	bool beneficiaryExists = Model.Beneficiary?.BeneficiaryDetailId > 0;
 
 	// Default progress bar colors
 	string beneficiaryProgressColor = "progress-bar-lightgrey";
@@ -15,10 +15,10 @@
 		beneficiaryProgressColor = beneficiaryExists ? "progress-bar-green" : "progress-bar-grey";
 	}
 
-	var beneficiaryAddress = $"{Model.Location.Addressline} {Model.Location.District?.Name} {Model.Location.State?.Name} {Model.Location.Country?.Name} {Model.Location.PinCode?.Code}";
-	var beneficiaryAgeInYears = $"{(int)(DateTime.UtcNow.Subtract(Model.Location.DateOfBirth.GetValueOrDefault()).TotalDays / 365)} years";
-	var imgPath = "/flags/" + @Model.Location.Country.Code.ToLower() + ".png";
-	var map = string.Format(Model.Location?.BeneficiaryLocationMap, "200", "200");
+	var beneficiaryAddress = $"{Model.Beneficiary.Addressline} {Model.Beneficiary.District?.Name} {Model.Beneficiary.State?.Name} {Model.Beneficiary.Country?.Name} {Model.Beneficiary.PinCode?.Code}";
+	var beneficiaryAgeInYears = $"{(int)(DateTime.UtcNow.Subtract(Model.Beneficiary.DateOfBirth.GetValueOrDefault()).TotalDays / 365)} years";
+	var imgPath = "/flags/" + @Model.Beneficiary.Country.Code.ToLower() + ".png";
+	var map = string.Format(Model.Beneficiary?.BeneficiaryLocationMap, "200", "200");
 
 }
 
@@ -48,14 +48,14 @@
 			<div class="row">
 				<!-- Beneficiary Details -->
 				<div class="col-7">
-					<h2 class="lead"><b>@Model.Location?.Name</b></h2>
+					<h2 class="lead"><b>@Model.Beneficiary?.Name</b></h2>
 					<p class="text-muted text-sm">
-						<b>Relation: </b> @Model.Location?.BeneficiaryRelation?.Name
+						<b>Relation: </b> @Model.Beneficiary?.BeneficiaryRelation?.Name
 					</p>
 					<ul class="ml-4 mb-0 fa-ul text-muted">
 						<li class="small">
 							<span class="fa-li"><i class="fa fa-money"></i></span>
-							Annual Income: (@Model.Currency)<b> @Model.Location?.Income.GetEnumDisplayName()</b>
+							Annual Income: (@Model.Currency)<b> @Model.Beneficiary?.Income.GetEnumDisplayName()</b>
 						</li>
 						<li class="small">
 							<span class="fa-li"><i class="fas fa-user-alt"></i></span>
@@ -67,11 +67,11 @@
 						</li>
 						<li class="small">
 							<span class="fa-li"><i class="fas fa-lg fa-globe"></i></span>
-							Country:<img src="@imgPath" class="flag-icon" data-bs-toggle="tooltip" /> @Model.Location?.Country.Name
+							Country:<img src="@imgPath" class="flag-icon" data-bs-toggle="tooltip" /> @Model.Beneficiary?.Country.Name
 						</li>
 						<li class="small">
 							<span class="fa-li"><i class="fas fa-lg fa-phone"></i></span>
-							Mobile #: (+@Model.Location?.Country.ISDCode)<b> @Model.Location?.PhoneNumber</b>
+							Mobile #: (+@Model.Beneficiary?.Country.ISDCode)<b> @Model.Beneficiary?.PhoneNumber</b>
 						</li>
 					</ul>
 				</div>
@@ -79,7 +79,7 @@
 				<!-- Beneficiary Image and Map -->
 				<div class="col-5 text-center">
 					<p class="text-muted text-sm">
-						<img id="bImage" class="img-fluid block-data" src="/Document/GetBeneficiaryDocument/@Model.Location.BeneficiaryDetailId" data-bs-toggle="tooltip" title="@Model.Location?.Name Photo" alt="@Model.Location?.Name" />
+						<img id="bImage" class="img-fluid block-data" src="/Document/GetBeneficiaryDocument/@Model.Beneficiary.BeneficiaryDetailId" data-bs-toggle="tooltip" title="@Model.Beneficiary?.Name Photo" alt="@Model.Beneficiary?.Name" />
 					</p>
 					<p class="text-muted text-sm">
 						<img id="beneficiaryGoogleMap" class="img-fluid block-data" src="@map" title="Display Beneficiary Address on Map" data-bs-toggle="tooltip" alt="Beneficiary Address " />

@@ -2,8 +2,6 @@
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
 using risk.control.system.AppConstant;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
@@ -17,23 +15,23 @@ namespace risk.control.system.Controllers.Creator
     [Authorize(Roles = CREATOR.DISPLAY_NAME)]
     public class BeneficiaryController : Controller
     {
-        private readonly ILogger<BeneficiaryController> logger;
-        private readonly IBeneficiaryCreateEditService beneficiaryCreateEditService;
-        private readonly INavigationService navigationService;
-        private readonly ApplicationDbContext context;
-        private readonly INotyfService notifyService;
+        private readonly ILogger<BeneficiaryController> _logger;
+        private readonly IBeneficiaryService _beneficiaryService;
+        private readonly IErrorNotifyService _errorNotifyService;
+        private readonly INavigationService _navigationService;
+        private readonly INotyfService _notifyService;
 
         public BeneficiaryController(ILogger<BeneficiaryController> logger,
-            IBeneficiaryCreateEditService beneficiaryCreateEditService,
+            IBeneficiaryService beneficiaryService,
+            IErrorNotifyService errorNotifyService,
             INavigationService navigationService,
-            ApplicationDbContext context,
             INotyfService notifyService)
         {
-            this.logger = logger;
-            this.beneficiaryCreateEditService = beneficiaryCreateEditService;
-            this.navigationService = navigationService;
-            this.context = context;
-            this.notifyService = notifyService;
+            _logger = logger;
+            _beneficiaryService = beneficiaryService;
+            this._errorNotifyService = errorNotifyService;
+            _navigationService = navigationService;
+            _notifyService = notifyService;
         }
 
         public async Task<IActionResult> Create(long id)
@@ -43,52 +41,22 @@ namespace risk.control.system.Controllers.Creator
             {
                 if (!ModelState.IsValid || id < 1)
                 {
-                    notifyService.Error("OOPS!!!.Case Not Found.Try Again");
+                    _errorNotifyService.ShowErrorNotification(ModelState, "OOPS!!!.Case Not Found.Try Again");
                     return RedirectToAction(nameof(CaseCreateEditController.New), ControllerName<CaseCreateEditController>.Name);
                 }
-                var currentUser = await context.ApplicationUser.AsNoTracking().Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == userEmail);
 
-                ViewData["BreadcrumbNode"] = navigationService.GetInvestigationPath(id, "Add Beneficiary", nameof(Create), ControllerName<BeneficiaryController>.Name);
+                ViewData["BreadcrumbNode"] = _navigationService.GetInvestigationPath(id, "Add Beneficiary", nameof(Create), ControllerName<BeneficiaryController>.Name);
 
-                if (currentUser.ClientCompany.HasSampleData)
-                {
-                    var model = await beneficiaryCreateEditService.GetBeneficiaryDetailAsync(id, currentUser.ClientCompany.CountryId.Value);
-                    await LoadDropDowns(model, currentUser);
-                    return View(model);
-                }
-                var modelWithoutSampleData = new BeneficiaryDetail { InvestigationTaskId = id, Country = currentUser.ClientCompany.Country, CountryId = currentUser.ClientCompany.CountryId };
+                var model = await _beneficiaryService.GetViewModelAsync(id, userEmail);
 
-                await PopulateBeneficiaryMetadata(modelWithoutSampleData, currentUser);
-
-                return View(modelWithoutSampleData);
+                return View(model);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting case {Id}. {UserEmail}", id, userEmail);
-                notifyService.Error("Error creating beneficiary. Try again.");
-                return RedirectToAction(nameof(InvestigationController.Details), ControllerName<InvestigationController>.Name, new { id = id });
+                _logger.LogError(ex, "Error getting case {Id}. {UserEmail}", id, userEmail);
+                _notifyService.Error("Error creating beneficiary. Try again.");
+                return RedirectToAction(nameof(CreatorController.Details), ControllerName<CreatorController>.Name, new { id = id });
             }
-        }
-
-        private async Task PopulateBeneficiaryMetadata(BeneficiaryDetail model, ApplicationUser user)
-        {
-            model.CurrencySymbol = CustomExtensions.GetCultureByCountry(user.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
-
-            model.BeneficiaryRelations = await context.BeneficiaryRelation
-                .Select(r => new SelectListItem
-                {
-                    Text = r.Name,
-                    Value = r.BeneficiaryRelationId.ToString(),
-                    Selected = r.BeneficiaryRelationId == model.BeneficiaryRelationId
-                }).ToListAsync();
-
-            model.Incomes = Enum.GetValues(typeof(Income)).Cast<Income>()
-                .Select(i => new SelectListItem
-                {
-                    Text = i.ToString(),
-                    Value = i.ToString(),
-                    Selected = i == model.Income
-                });
         }
 
         [HttpPost]
@@ -98,64 +66,32 @@ namespace risk.control.system.Controllers.Creator
             var userEmail = HttpContext.User?.Identity?.Name;
             try
             {
-                var currentUser = await context.ApplicationUser.AsNoTracking().Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == userEmail);
-
                 if (!ModelState.IsValid)
                 {
-                    notifyService.Error("Please correct the errors and try again.");
-                    await LoadDropDowns(model, currentUser);
+                    _errorNotifyService.ShowErrorNotification(ModelState);
+                    await _beneficiaryService.PrepareFailedPostModelAsync(model, userEmail);
                     return View(model);
                 }
-                var result = await beneficiaryCreateEditService.CreateAsync(userEmail, model);
+                var result = await _beneficiaryService.CreateAsync(userEmail, model);
 
                 if (!result.Success)
                 {
                     foreach (var error in result.Errors)
                         ModelState.AddModelError(error.Key, error.Value);
 
-                    notifyService.Error("Please fix validation errors.");
-                    await LoadDropDowns(model, currentUser);
+                    _errorNotifyService.ShowErrorNotification(ModelState);
+                    await _beneficiaryService.PrepareFailedPostModelAsync(model, userEmail);
                     return View(model);
                 }
-                notifyService.Custom($"Beneficiary <b>{model.Name}</b> added successfully", 3, "green", "fas fa-user-tie");
-                return RedirectToAction(nameof(InvestigationController.Details), ControllerName<InvestigationController>.Name, new { id = model.InvestigationTaskId });
+                _notifyService.Custom($"Beneficiary <b>{model.Name}</b> added successfully", 3, "green", "fas fa-user-tie");
+                return RedirectToAction(nameof(CreatorController.Details), ControllerName<CreatorController>.Name, new { id = model.InvestigationTaskId });
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error creating Beneficiary for Case {Id}. {UserEmail}", model.InvestigationTaskId, userEmail);
-                notifyService.Warning("Error creating Beneficiary. Try again. ");
-                return RedirectToAction(nameof(InvestigationController.Details), ControllerName<InvestigationController>.Name, new { id = model.InvestigationTaskId });
+                _logger.LogError(ex, "Error creating Beneficiary for Case {Id}. {UserEmail}", model.InvestigationTaskId, userEmail);
+                _notifyService.Warning("Error creating Beneficiary. Try again. ");
+                return RedirectToAction(nameof(CreatorController.Details), ControllerName<CreatorController>.Name, new { id = model.InvestigationTaskId });
             }
-        }
-
-        private async Task LoadDropDowns(BeneficiaryDetail model, ApplicationUser currentUser)
-        {
-            var country = await context.Country.AsNoTracking().FirstOrDefaultAsync(c => c.CountryId == model.SelectedCountryId || c.CountryId == model.CountryId);
-            model.Country = country;
-            model.CountryId = country.CountryId;
-
-            model.StateId = model.SelectedStateId;
-            model.DistrictId = model.SelectedDistrictId;
-            model.PinCodeId = model.SelectedPincodeId;
-
-            // Enum dropdowns
-            model.CurrencySymbol = CustomExtensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
-
-            model.BeneficiaryRelations = await context.BeneficiaryRelation
-                .Select(r => new SelectListItem
-                {
-                    Text = r.Name,
-                    Value = r.BeneficiaryRelationId.ToString(),
-                    Selected = r.BeneficiaryRelationId == model.BeneficiaryRelationId
-                }).ToListAsync();
-
-            model.Incomes = Enum.GetValues(typeof(Income)).Cast<Income>()
-                .Select(i => new SelectListItem
-                {
-                    Text = i.ToString(),
-                    Value = i.ToString(),
-                    Selected = i == model.Income
-                });
         }
 
         public async Task<IActionResult> Edit(long id)
@@ -165,29 +101,20 @@ namespace risk.control.system.Controllers.Creator
             {
                 if (!ModelState.IsValid || id < 1)
                 {
-                    notifyService.Error("OOPS!!!.Case Not Found.Try Again");
+                    _notifyService.Error("OOPS!!!.Case Not Found.Try Again");
                     return RedirectToAction(nameof(CaseCreateEditController.Create), ControllerName<CaseCreateEditController>.Name);
                 }
-                var model = await context.BeneficiaryDetail
-                    .Include(v => v.PinCode)
-                    .Include(v => v.District)
-                    .Include(v => v.State)
-                    .Include(v => v.Country)
-                    .Include(v => v.BeneficiaryRelation)
-                    .FirstOrDefaultAsync(v => v.InvestigationTaskId == id);
-                var currentUser = await context.ApplicationUser.AsNoTracking().Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == userEmail);
+                var model = await _beneficiaryService.GetEditViewModelAsync(id, userEmail);
 
-                await PopulateBeneficiaryMetadata(model, currentUser);
-
-                ViewData["BreadcrumbNode"] = navigationService.GetInvestigationPath(id, "Edit Beneficiary", nameof(Edit), ControllerName<BeneficiaryController>.Name);
+                ViewData["BreadcrumbNode"] = _navigationService.GetInvestigationPath(id, "Edit Beneficiary", nameof(Edit), ControllerName<BeneficiaryController>.Name);
 
                 return View(model);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting Beneficiary {Id}. {UserEmail}", id, userEmail);
-                notifyService.Error("Error editing Beneficiary. Try again.");
-                return RedirectToAction(nameof(InvestigationController.Details), ControllerName<InvestigationController>.Name, new { id = id });
+                _logger.LogError(ex, "Error getting Beneficiary {Id}. {UserEmail}", id, userEmail);
+                _notifyService.Error("Error editing Beneficiary. Try again.");
+                return RedirectToAction(nameof(CreatorController.Details), ControllerName<CreatorController>.Name, new { id = id });
             }
         }
 
@@ -198,33 +125,32 @@ namespace risk.control.system.Controllers.Creator
             var userEmail = HttpContext.User?.Identity?.Name;
             try
             {
-                var currentUser = await context.ApplicationUser.AsNoTracking().Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == userEmail);
                 if (!ModelState.IsValid)
                 {
-                    notifyService.Error("Please correct the errors and try again.");
-                    await LoadDropDowns(model, currentUser);
+                    _errorNotifyService.ShowErrorNotification(ModelState);
+                    await _beneficiaryService.PrepareFailedPostModelAsync(model, userEmail);
                     return View(model);
                 }
 
-                var result = await beneficiaryCreateEditService.EditAsync(userEmail, model);
+                var result = await _beneficiaryService.EditAsync(userEmail, model);
 
                 if (!result.Success)
                 {
                     foreach (var error in result.Errors)
                         ModelState.AddModelError(error.Key, error.Value);
 
-                    notifyService.Error("Please fix validation errors.");
-                    await LoadDropDowns(model, currentUser);
+                    _errorNotifyService.ShowErrorNotification(ModelState);
+                    await _beneficiaryService.PrepareFailedPostModelAsync(model, userEmail);
                     return View(model);
                 }
-                notifyService.Custom($"Beneficiary <b>{model.Name}</b> edited successfully", 3, "orange", "fas fa-user-tie");
+                _notifyService.Custom($"Beneficiary <b>{model.Name}</b> edited successfully", 3, "orange", "fas fa-user-tie");
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error editing Beneficiary Case {Id}. {UserEmail}", model.InvestigationTaskId, userEmail);
-                notifyService.Error("Error editing Beneficiary. Try again.");
+                _logger.LogError(ex, "Error editing Beneficiary Case {Id}. {UserEmail}", model.InvestigationTaskId, userEmail);
+                _notifyService.Error("Error editing Beneficiary. Try again.");
             }
-            return RedirectToAction(nameof(InvestigationController.Details), ControllerName<InvestigationController>.Name, new { id = model.InvestigationTaskId });
+            return RedirectToAction(nameof(CreatorController.Details), ControllerName<CreatorController>.Name, new { id = model.InvestigationTaskId });
         }
     }
 }

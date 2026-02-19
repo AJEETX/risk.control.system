@@ -1,7 +1,7 @@
 ﻿$(document).ready(function () {
     var table = $("#dataTable").DataTable({
         ajax: {
-            url: '/api/Company/AllUsers',
+            url: '/api/Company/Users',
             dataSrc: '',
             error: DataTableErrorHandler
         },

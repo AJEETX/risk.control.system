@@ -1,0 +1,179 @@
+﻿@using risk.control.system.Helpers;
+@model ReportTemplate
+<input type="hidden" id="latitude" />
+<input type="hidden" id="longitude" />
+<input type="hidden" name="caseId" value="@Model.CaseId" />
+@foreach (var location in Model.LocationReport)
+{
+	location.SetStatus();
+	var agent = location.AgentIdReport;
+		location.Address = Model.InsuranceType == InsuranceType.CLAIM ? "Beneficiary" : location.Address;
+
+	<div class="col-12 mb-4 location-container">
+		<div class="card mb-2 border @location.StatusClass @location.LocationStatus">
+			<div class="card-header bg-light text-white d-flex">
+				<h5 class="mb-0 flex-grow-1 @location.LocationStatus">
+					<i class="fas fa-map-marker-alt me-2"></i> @location.LocationName
+					@if (location.IsRequired)
+					{
+						<span class="required-asterisk" title="Mandatory Location">*</span>
+					}
+				</h5>
+
+				<button class="btn btn-sm @location.LocationStatusButton  mb-2" type="button"
+						data-toggle="collapse"
+						data-target="#location-@location.Id"
+						aria-expanded="false"
+						aria-controls="location-@location.Id">
+					 <i class="fas fa-chevron-down"></i>
+				</button>
+			</div>
+			
+
+			<div id="location-@location.Id" class="collapse">
+
+				<div class="card-body bg-light">
+					@* Insert all the current content here (the agent table, face/doc/questions) *@
+
+					@Html.AntiForgeryToken()
+					<button class="btn btn-sm @location.AgentStatus mb-2" type="button"
+							data-toggle="collapse"
+							data-target="#agent-@location.Id"
+							aria-expanded="false"
+							aria-controls="agent-@location.Id">
+						Agent ID <i class="fas fa-chevron-down"></i>
+					</button>
+					<div class="collapse" id="agent-@location.Id">
+						<div class="table-responsive mb-4">
+							<table class="table table-bordered table-hover dt-responsive nowrap w-100">
+								<thead class="thead-light">
+									<tr>
+										<th class="col-verifier-name" title="Verifier Name">
+											<img class="action-image" src="~/headers/customer.gif" />Agent ID
+										</th>
+										<th class="col-face-photo">
+											<i class="far fa-user text-primary" title="This Image has Verifier photo at the location" data-bs-toggle="tooltip"></i> Photo
+										</th>
+											<th class="col-pin-img" title="Indicative Map Route">
+												<img class="action-image" src="~/headers/pincode.gif" /> Indicative Map
+											</th>
+																					<th class="col-address" title="Indicative Address Info">Indicative Address Info</th>
+											<th class="col-weather" title="Location Info">
+												<img class="action-image" src="~/headers/information.gif" /> Location Info
+											</th>
+															<th class="col-match">Match</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<!-- Email or Report Type -->
+										<td>
+											<small>
+											@if (agent.ValidationExecuted)
+											{
+												@location.AgentEmail
+											}
+											else
+											{
+												@agent.ReportType.GetEnumDisplayName()
+											}
+											</small>
+											@if (agent.IsRequired)
+											{
+												<span class="required-asterisk" title="Mandatory Location">*</span>
+											}
+										</td>
+
+										<!-- ID Photo -->
+										<td>
+											@if (agent.ValidationExecuted)
+											{
+												<img id="face-img-@agent.Id"
+													src="/Document/GetAgentDocument/@agent.Id"
+													 class="mobile-capture-info"
+													 title="@location.AgentEmail photo" />
+											}
+											else
+											{
+												<img src="~/img/no-user.png" class="img-thumbnail img-fluid profile-image" />
+											}
+										</td>
+
+										<!-- Map Image -->
+										<td>
+											@if (agent.ValidationExecuted && agent.LocationMapUrl != null)
+											{
+												<img src="@string.Format(@agent.LocationMapUrl, "500","500")"
+													 class="mobile-capture-info"
+													 data-faceid="@agent.Id"
+													 data-locationid="@location.Id"
+													 data-caseid="@Model.CaseId"
+													 data-source="agent"
+													 title="Captured map route" />
+													 
+											}
+											else
+											{
+												<img src="~/img/no-map.jpeg" class="img-thumbnail img-fluid profile-image" />
+											}
+										</td>
+
+										<!-- Address or fallback -->
+										<td>
+											@if (agent.ValidationExecuted)
+											{
+															<div>@agent.LongLat</div>
+												<small>@agent.LocationAddress</small>
+												<span class="badge badge-light">
+														Indicative Distance from @location.Address Address  @agent.Distance
+													</span>
+											}
+											else
+											{
+												<img src="~/img/no-map-image.jpeg" class="img-thumbnail img-fluid profile-image" />
+											}
+										</td>
+										<td>
+												<small>@agent.LocationInfo</small>
+
+											</td>
+										<!-- Match status -->
+										<td>
+											@if (agent.ValidationExecuted)
+											{
+												@if (agent.ImageValid.HasValue && agent.ImageValid.Value)
+												{
+													<i class="fa fa-check-circle text-success" title="Matched" data-bs-toggle="tooltip"></i>
+												}
+												else
+												{
+													<i class="fa fa-times-circle text-danger" title="Not matched" data-bs-toggle="tooltip"></i>
+												}
+											}
+											else
+											{
+												<i class="fa fa-times-circle text-muted" title="Not validated" data-bs-toggle="tooltip"></i>
+											}
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+					<!-- FaceIds Table -->
+					<partial name="Agent/_LocationFaceId" model="@location" />
+
+					<!-- DocumentIds Table -->
+
+					<partial name="Agent/_LocationDocId" model="@location" />
+
+					<!-- Media Table -->
+					<partial name="Agent/_LocationMedia" model="@location" />
+					<!-- Questions Table -->
+					<partial name="Agent/_LocationQuestion" model="@location" />
+				</div> <!-- card-body -->
+			</div> <!-- collapse -->
+		</div> <!-- card -->
+	</div> <!-- col-12 -->
+}
+<partial name="_ReportModal" />

@@ -10,12 +10,9 @@ namespace risk.control.system.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long GlobalSettingsId { get; set; }
 
-        // system wide settings
-        public bool AutoAllocation { get; set; } = true;
-
         public bool SendSMS { get; set; } = false;
+
         public bool CanChangePassword { get; set; } = false;
-        public bool BulkUpload { get; set; } = true;
         public bool VerifyPan { get; set; } = false;
         public bool VerifyPassport { get; set; } = false;
         public bool EnablePassport { get; set; } = false;

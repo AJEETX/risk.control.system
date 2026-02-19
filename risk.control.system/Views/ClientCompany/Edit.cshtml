@@ -1,65 +1,64 @@
 ﻿@model risk.control.system.Models.ClientCompany
 
 @{
-    ViewData["Title"] = @Applicationsettings.EDIT;
+	ViewData["Title"] = @Applicationsettings.EDIT;
 }
 
 <section class="content">
-    <form id="edit-form" asp-action="Edit" enctype="multipart/form-data">
-        <div class="card card-secondary">
-            <div class="card-header">
-                <h3 class="card-title"><i class="fas fa-building"></i> @Applicationsettings.EDIT Company</h3>
-            </div>
-            <article>
-                <div class="bb-blog-inner">
-                    <div class="submit-progress hidden">
-                        <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
-                    </div>
-                    <div class="card card-light direct-chat-warning collapsed-card">
-                        <div class="card-header">
-                            <h3 class="card-title"><i class="fas fa-building"></i> <span class="badge badge-light"> Company Detail</span></h3>
+	<form id="edit-form" asp-action="Edit" enctype="multipart/form-data">
+		<div class="card card-secondary">
+			<div class="card-header">
+				<h3 class="card-title"><i class="fas fa-building"></i> @Applicationsettings.EDIT Company</h3>
+			</div>
+			<article>
+				<div class="bb-blog-inner">
+					<div class="submit-progress hidden">
+						<i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+					</div>
+					<div class="card card-light direct-chat-warning collapsed-card">
+						<div class="card-header">
+							<h3 class="card-title"><i class="fas fa-building"></i> <span class="badge badge-light"> Company Detail</span></h3>
 
-                            <div class="card-tools">
-                                <span data-bs-toggle="tooltip" title="Company Profile @Model.Name" class="badge badge-light">  <i class='far fa-hand-point-right'></i> </span>
-                                <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                                    <i class="fas fa-plus"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="card-body pb-0">
-                            <input type="hidden" asp-for="ClientCompanyId" id="ClientCompanyId" />
-                            <input type="hidden" asp-for="AddressLatitude" />
-                            <input type="hidden" asp-for="AddressLongitude" />
-                            <input type="hidden" asp-for="AddressMapLocation" />
-                            <input asp-for="SelectedCountryId" type="hidden" id="SelectedCountryId" name="SelectedCountryId" value="@Model?.CountryId" />
-                            <input type="hidden" id="Isd" value="@Model?.Country.ISDCode" />
-                            <input type="hidden" id="countryCode" value="@Model?.Country.Code" />
-                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                            <div class="row">
-                                <div class="col-sm-6">
+							<div class="card-tools">
+								<span data-bs-toggle="tooltip" title="Company Profile @Model.Name" class="badge badge-light">  <i class='far fa-hand-point-right'></i> </span>
+								<button type="button" class="btn btn-tool" data-card-widget="collapse">
+									<i class="fas fa-plus"></i>
+								</button>
+							</div>
+						</div>
+						<div class="card-body pb-0">
+							<input type="hidden" asp-for="ClientCompanyId" id="ClientCompanyId" />
+							<input type="hidden" asp-for="AddressLatitude" />
+							<input type="hidden" asp-for="AddressLongitude" />
+							<input type="hidden" asp-for="AddressMapLocation" />
+							<input asp-for="SelectedCountryId" type="hidden" id="SelectedCountryId" name="SelectedCountryId" value="@Model?.CountryId" />
+							<input type="hidden" id="Isd" value="@Model?.Country.ISDCode" />
+							<input type="hidden" id="countryCode" value="@Model?.Country.Code" />
+							<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+							<div class="row">
+								<div class="col-sm-6">
 
-                                    <div class="form-group">
-                                        <label class="input-group-label"> Domain:</label>
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text" id="email"> <i class="fa fa-globe"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                            </div>
-                                            <input readonly asp-for="Email" class="form-control remarks" />
-                                        </div>
-                                    </div>
+									<div class="form-group">
+										<label class="input-group-label"> Domain:</label>
+										<div class="input-group mb-3">
+											<div class="input-group-prepend">
+												<span class="input-group-text" id="email"> <i class="fa fa-globe"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+											</div>
+											<input readonly asp-for="Email" class="form-control remarks" />
+										</div>
+									</div>
 
-
-                                    <div class="form-group">
-                                        <label class="input-group-label"> Name: </label>
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text"><i class="fas fa-business-time"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                            </div>
-                                            <input type="text" id="Name" asp-for="Name" class="form-control title-name remarks" required placeholder="Company Name" maxlength="20" />
-                                            <span asp-validation-for="Name" class="text-danger"></span>
-                                        </div>
-                                    </div>
-                                    @* <div class="form-group">
+									<div class="form-group">
+										<label class="input-group-label"> Name: </label>
+										<div class="input-group mb-3">
+											<div class="input-group-prepend">
+												<span class="input-group-text"><i class="fas fa-business-time"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+											</div>
+											<input type="text" id="Name" asp-for="Name" class="form-control title-name remarks" required placeholder="Company Name" maxlength="20" />
+											<span asp-validation-for="Name" class="text-danger"></span>
+										</div>
+									</div>
+									@* <div class="form-group">
                                     <span class="input-group-label"> Code: </span>
                                     <div class="input-group mb-3">
                                     <div class="input-group-prepend">
@@ -70,74 +69,73 @@
                                     </div>
                                     </div>
                                     *@
-                                    <div class="form-group">
-                                        <label class="input-group-label"> Mobile #: </label>
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text"><i class="fas fa-phone"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                            </div>
-                                            <input id="PhoneNumber" type="text" asp-for="PhoneNumber" class="form-control remarks" required maxlength="14" placeholder="Mobile # only (9876543210)" data-bs-toggle="tooltip" />
-                                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
-                                        </div>
-                                    </div>
+									<div class="form-group">
+										<label class="input-group-label"> Mobile #: </label>
+										<div class="input-group mb-3">
+											<div class="input-group-prepend">
+												<span class="input-group-text"><i class="fas fa-phone"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+											</div>
+											<input id="PhoneNumber" type="text" asp-for="PhoneNumber" class="form-control remarks" required maxlength="14" placeholder="Mobile # only (9876543210)" data-bs-toggle="tooltip" />
+											<span asp-validation-for="PhoneNumber" class="text-danger"></span>
+										</div>
+									</div>
 
+									<div class="form-group">
+										<label class="input-group-label"> Branch Name: </label>
+										<div class="input-group mb-3">
+											<div class="input-group-prepend">
+												<span class="input-group-text"><i class="far fa-building"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+											</div>
+											<input type="text" id="Branch" asp-for="Branch" class="form-control  title-name remarks" required placeholder="Branch Name" maxlength="30" />
+											<span asp-validation-for="Branch" class="text-danger"></span>
+										</div>
+									</div>
 
-                                    <div class="form-group">
-                                        <label class="input-group-label"> Branch Name: </label>
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text"><i class="far fa-building"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                            </div>
-                                            <input type="text" id="Branch" asp-for="Branch" class="form-control  title-name remarks" required placeholder="Branch Name" maxlength="30" />
-                                            <span asp-validation-for="Branch" class="text-danger"></span>
-                                        </div>
-                                    </div>
+									<div class="form-group">
+										<label class="input-group-label"> Bank Name: </label>
+										<div class="input-group mb-3">
+											<div class="input-group-prepend">
+												<span class="input-group-text"> <i class="fas fa-landmark"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+											</div>
+											<input type="text" id="BankName" asp-for="BankName" class="form-control title-name remarks" required placeholder="Bank Name" maxlength="20" />
+											<span asp-validation-for="BankName" class="text-danger"></span>
+										</div>
+									</div>
 
-                                    <div class="form-group">
-                                        <label class="input-group-label"> Bank Name: </label>
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text"> <i class="fas fa-landmark"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                            </div>
-                                            <input type="text" id="BankName" asp-for="BankName" class="form-control title-name remarks" required placeholder="Bank Name" maxlength="20" />
-                                            <span asp-validation-for="BankName" class="text-danger"></span>
-                                        </div>
-                                    </div>
+									<div class="form-group">
+										<label class="input-group-label"> IFSC Code: </label>
+										<div class="input-group mb-3">
+											<div class="input-group-prepend">
+												<span class="input-group-text"><i class="fas fa-code"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+											</div>
+											<input type="text" id="IFSCCode" asp-for="IFSCCode" class="form-control remarks asterikx" required placeholder="IFSC Code" maxlength="20" />
+											<span asp-validation-for="IFSCCode" class="text-danger"></span>
+										</div>
+									</div>
 
-                                    <div class="form-group">
-                                        <label class="input-group-label"> IFSC Code: </label>
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text"><i class="fas fa-code"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                            </div>
-                                            <input type="text" id="IFSCCode" asp-for="IFSCCode" class="form-control remarks asterikx" required placeholder="IFSC Code" maxlength="20" />
-                                            <span asp-validation-for="IFSCCode" class="text-danger"></span>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label class="input-group-label"> Bank Account #: </label>
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text"><i class="fab fa-btc"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                            </div>
-                                            <input type="text" id="BankAccountNumber" asp-for="BankAccountNumber" class="form-control remarks" required placeholder="Bank Account #" maxlength="20" />
-                                            <span asp-validation-for="BankAccountNumber" class="text-danger"></span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6">
-                                    <div class="form-group">
-                                        <label class="input-group-label"> Agreement Date: </label>
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text"><i class="far fa-calendar-check"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                            </div>
-                                            <input readonly type="text" id="AgreementDate" asp-for="AgreementDate" class="form-control remarks" required placeholder="Agreement Date" />
-                                            <span asp-validation-for="AgreementDate" class="text-danger"></span>
-                                        </div>
-                                    </div>
-                                    @*
+									<div class="form-group">
+										<label class="input-group-label"> Bank Account #: </label>
+										<div class="input-group mb-3">
+											<div class="input-group-prepend">
+												<span class="input-group-text"><i class="fab fa-btc"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+											</div>
+											<input type="text" id="BankAccountNumber" asp-for="BankAccountNumber" class="form-control remarks" required placeholder="Bank Account #" maxlength="20" />
+											<span asp-validation-for="BankAccountNumber" class="text-danger"></span>
+										</div>
+									</div>
+								</div>
+								<div class="col-sm-6">
+									<div class="form-group">
+										<label class="input-group-label"> Agreement Date: </label>
+										<div class="input-group mb-3">
+											<div class="input-group-prepend">
+												<span class="input-group-text"><i class="far fa-calendar-check"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+											</div>
+											<input readonly type="text" id="AgreementDate" asp-for="AgreementDate" class="form-control remarks" required placeholder="Agreement Date" />
+											<span asp-validation-for="AgreementDate" class="text-danger"></span>
+										</div>
+									</div>
+									@*
                                     <div class="form-group">
                                     <span class="input-group-label"> Activated Date: </span>
                                     <div class="input-group mb-3">
@@ -149,67 +147,67 @@
                                     </div>
                                     </div> *@
 
-                                    <div class="form-group">
-                                        <label class="input-group-label" for="PinCodeText">Pincode:</label>
-                                        <div class="input-group mb-3 autocomplete-wrapper">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text" for="PinCodeId">
-                                                    <i class="fas fa-map-pin"></i>
-                                                    <i class="fa fa-asterisk asterik-style"></i>
-                                                </span>
-                                            </div>
-                                            <input type="text" id="PinCodeText" class="form-control remarks auto-dropdown" data-placeholder="pincode" placeholder="Type pincode or name" autocomplete="off" />
-                                            <span asp-validation-for="PinCodeId" class="text-danger"></span>
-                                            <input asp-for="SelectedPincodeId" type="hidden" id="SelectedPincodeId" name="SelectedPincodeId" value="@Model?.PinCodeId" />
-                                            <input type="hidden" asp-for="PinCodeId" id="PinCodeId" />
-                                            <div id="pincode-loading" class="loading-spinner">
-                                                <i class="fas fa-spinner fa-spin"></i>
-                                            </div>
-                                        </div>
-                                    </div>
+									<div class="form-group">
+										<label class="input-group-label" for="PinCodeText">Pincode:</label>
+										<div class="input-group mb-3 autocomplete-wrapper">
+											<div class="input-group-prepend">
+												<span class="input-group-text" for="PinCodeId">
+													<i class="fas fa-map-pin"></i>
+													<i class="fa fa-asterisk asterik-style"></i>
+												</span>
+											</div>
+											<input type="text" id="PinCodeText" class="form-control remarks auto-dropdown" data-placeholder="pincode" placeholder="Type pincode or name" autocomplete="off" />
+											<span asp-validation-for="PinCodeId" class="text-danger"></span>
+											<input asp-for="SelectedPincodeId" type="hidden" id="SelectedPincodeId" name="SelectedPincodeId" value="@Model?.PinCodeId" />
+											<input type="hidden" asp-for="PinCodeId" id="PinCodeId" />
+											<div id="pincode-loading" class="loading-spinner">
+												<i class="fas fa-spinner fa-spin"></i>
+											</div>
+										</div>
+									</div>
 
-                                    <div class="form-group">
-                                        <label class="input-group-label" for="DistrictText">District:</label>
-                                        <div class="input-group mb-3 autocomplete-wrapper">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text" for="DistrictId">
-                                                    <i class="fas fa-city"></i>
-                                                    <i class="fa fa-asterisk asterik-style-disabled"></i>
-                                                </span>
-                                            </div>
-                                            <input readonly type="text" id="DistrictText" class="form-control remarks" data-placeholder="district" data-bs-toggle="tooltip" placeholder="..."  tabindex="-1" />
-                                            <span asp-validation-for="DistrictId" class="text-danger"></span>
-                                            <input asp-for="SelectedDistrictId" type="hidden" id="SelectedDistrictId" name="SelectedDistrictId" value="@Model?.DistrictId" title="Auto-selected based on Pincode" />
-                                            <input type="hidden" asp-for="DistrictId" id="DistrictId" />
-                                            <div id="district-loading" class="loading-spinner">
-                                                <i class="fas fa-spinner fa-spin"></i>
-                                            </div>
-                                        </div>
-                                    </div>
+									<div class="form-group">
+										<label class="input-group-label" for="DistrictText">District:</label>
+										<div class="input-group mb-3 autocomplete-wrapper">
+											<div class="input-group-prepend">
+												<span class="input-group-text" for="DistrictId">
+													<i class="fas fa-city"></i>
+													<i class="fa fa-asterisk asterik-style-disabled"></i>
+												</span>
+											</div>
+											<input readonly type="text" id="DistrictText" class="form-control remarks" data-placeholder="district" data-bs-toggle="tooltip" placeholder="..." tabindex="-1" />
+											<span asp-validation-for="DistrictId" class="text-danger"></span>
+											<input asp-for="SelectedDistrictId" type="hidden" id="SelectedDistrictId" name="SelectedDistrictId" value="@Model?.DistrictId" title="Auto-selected based on Pincode" />
+											<input type="hidden" asp-for="DistrictId" id="DistrictId" />
+											<div id="district-loading" class="loading-spinner">
+												<i class="fas fa-spinner fa-spin"></i>
+											</div>
+										</div>
+									</div>
 
-                                    <div class="form-group">
-                                        <label class="input-group-label" for="StateText"> State:</label>
-                                        <div class="input-group mb-3 autocomplete-wrapper">
-                                            @{
-                                                var img = "/flags/" + @Model.Country.Code.ToLower() + ".png";
-                                            }
-                                            <div class="input-group-prepend">
+									<div class="form-group">
+										<label class="input-group-label" for="StateText"> State:</label>
+										<div class="input-group mb-3 autocomplete-wrapper">
+											@{
+												var img = "/flags/" + @Model.Country.Code.ToLower() + ".png";
+											}
+											<div class="input-group-prepend">
 
-                                                <span class="input-group-text country-code-text" data-bs-toggle="tooltip" title="Registered Country: @Model?.Country.Name">
-                                                    <img src="@img" class="flag-icon" data-bs-toggle="tooltip" /> @Model?.Country.Code<i class="fa fa-asterisk asterik-style-info"></i>
-                                                </span>
-                                            </div>
-                                            <input readonly type="text" id="StateText" class="form-control remarks" data-placeholder="state" data-bs-toggle="tooltip" placeholder="..." tabindex="-1" />
-                                            <span asp-validation-for="StateId" class="text-danger"></span>
-                                            <input asp-for="SelectedStateId" type="hidden" id="SelectedStateId" name="SelectedStateId" value="@Model?.StateId" title="Auto-selected based on Pincode" />
-                                            <input type="hidden" asp-for="StateId" id="StateId" />
-                                            <div id="state-loading" class="loading-spinner">
-                                                <i class="fas fa-spinner fa-spin"></i>
-                                            </div>
-                                        </div>
-                                    </div>
+												<span class="input-group-text country-code-text" data-bs-toggle="tooltip" title="Registered Country: @Model?.Country.Name">
+													<img src="@img" class="flag-icon" data-bs-toggle="tooltip" /> @Model?.Country.Code<i class="fa fa-asterisk asterik-style-info"></i>
+												</span>
+											</div>
+											<input readonly type="text" id="StateText" class="form-control remarks" data-placeholder="state" data-bs-toggle="tooltip" placeholder="..." tabindex="-1" />
+											<span asp-validation-for="StateId" class="text-danger"></span>
+											<input asp-for="SelectedStateId" type="hidden" id="SelectedStateId" name="SelectedStateId" value="@Model?.StateId" title="Auto-selected based on Pincode" />
+											<input type="hidden" asp-for="StateId" id="StateId" />
+											<div id="state-loading" class="loading-spinner">
+												<i class="fas fa-spinner fa-spin"></i>
+											</div>
+										</div>
+									</div>
 
-                                    @* <div class="form-group">
+									@* <div class="form-group">
                                         <label class="input-group-label" for="CountryId" data-bs-toggle="tooltip" title="Registered Country"> Country:</label>
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
@@ -223,35 +221,34 @@
                                         </div>
                                     </div>
  *@
-                                    <div class="form-group">
-                                        <label class="input-group-label" for="Addressline"> Address:</label>
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text"><i class="fa fa-home"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
-                                            </div>
-                                            <input type="text" id="Addressline" asp-for="Addressline" class="form-control remarks" placeholder="Street Address..." maxlength="70" />
-                                            <span asp-validation-for="Addressline" class="text-danger"></span>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="input-group-label" for="Document"> Document: </label>
-                                        <div class="input-group mb-3">
-                                            @if (Model?.DocumentUrl is not null)
-                                            {
-                                                <img id="companyImage" class="form-Image valid-border" src="/Document/GetCompanyDocument/@Model.ClientCompanyId">
-                                                <i class="fa fa-asterisk asterik-style"></i>
-                                                <input asp-for="Document" type="file" class="form-control remarks valid-border" id="documentImageInput" />
-                                            }
-                                            else
-                                            {
-                                                <img id="companyImage" class="form-Image invalid-border" src="@Applicationsettings.NO_IMAGE">
-                                                <i class="fa fa-asterisk asterik-style"></i>
-                                                <input asp-for="Document" type="file" class="form-control remarks invalid-border" id="documentImageInput" />
-                                            }
-                                            
-                                        </div>
-                                    </div>
-                                    @* <div class="form-group">
+									<div class="form-group">
+										<label class="input-group-label" for="Addressline"> Address:</label>
+										<div class="input-group mb-3">
+											<div class="input-group-prepend">
+												<span class="input-group-text"><i class="fa fa-home"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
+											</div>
+											<input type="text" id="Addressline" asp-for="Addressline" class="form-control remarks" placeholder="Street Address..." maxlength="70" />
+											<span asp-validation-for="Addressline" class="text-danger"></span>
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="input-group-label" for="Document"> Document: </label>
+										<div class="input-group mb-3">
+											@if (Model?.DocumentUrl is not null)
+											{
+												<img id="companyImage" class="form-Image valid-border" src="/Document/GetCompanyDocument/@Model.ClientCompanyId">
+												<i class="fa fa-asterisk asterik-style"></i>
+												<input asp-for="Document" type="file" class="form-control remarks valid-border" id="documentImageInput" />
+											}
+											else
+											{
+												<img id="companyImage" class="form-Image invalid-border" src="@Applicationsettings.NO_IMAGE">
+												<i class="fa fa-asterisk asterik-style"></i>
+												<input asp-for="Document" type="file" class="form-control remarks invalid-border" id="documentImageInput" />
+											}
+										</div>
+									</div>
+									@* <div class="form-group">
                                     <span class="input-group-label"> Note:</span>
                                     <div class="input-group mb-3">
                                     <div class="input-group-prepend">
@@ -261,41 +258,40 @@
                                     <span asp-validation-for="Description" class="text-danger"></span>
                                     </div>
                                     </div> *@
-                                    <div class="form-group">
-                                        <label class="input-group-label" for="Status"> Status:</label>
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text" ><i class="fa fa-toggle-on"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                            </div>
-                                            <select required id="Status" asp-for="Status" class="form-control remarks" asp-items="Html.GetEnumSelectList<CompanyStatus>()">
-                                                <option value="">--- SELECT ---</option>
-                                            </select>
-                                            <span asp-validation-for="Status" class="text-danger"></span>
+									<div class="form-group">
+										<label class="input-group-label" for="Status"> Status:</label>
+										<div class="input-group mb-3">
+											<div class="input-group-prepend">
+												<span class="input-group-text"><i class="fa fa-toggle-on"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+											</div>
+											<select required id="Status" asp-for="Status" class="form-control remarks" asp-items="Html.GetEnumSelectList<CompanyStatus>()">
+												<option value="">--- SELECT ---</option>
+											</select>
+											<span asp-validation-for="Status" class="text-danger"></span>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</article>
+			<article>
+				<div class="bb-blog-inner">
+					<div class="card card-light direct-chat-warning expand-card">
 
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </article>
-            <article>
-                <div class="bb-blog-inner">
-                    <div class="card card-light direct-chat-warning expand-card">
+						<div class="card-header">
+							<h3 class="card-title"><i class="fas fa-sitemap"></i> <span class="badge badge-light"> Config Detail</span></h3>
 
-                        <div class="card-header">
-                            <h3 class="card-title"><i class="fas fa-sitemap"></i> <span class="badge badge-light"> Config Detail</span></h3>
-
-                            <div class="card-tools">
-                                <span data-bs-toggle="tooltip" title="Company Api Detail" class="badge badge-light">  <i class='far fa-hand-point-right'></i> </span>
-                                <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                                    <i class="fas fa-minus"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="card-body pb-0">
-                            @* <div class="row">
+							<div class="card-tools">
+								<span data-bs-toggle="tooltip" title="Company Api Detail" class="badge badge-light">  <i class='far fa-hand-point-right'></i> </span>
+								<button type="button" class="btn btn-tool" data-card-widget="collapse">
+									<i class="fas fa-minus"></i>
+								</button>
+							</div>
+						</div>
+						<div class="card-body pb-0">
+							@* <div class="row">
                                 <div class="col-md-12">
 
                                     <div class="form-group">
@@ -320,356 +316,354 @@
                                     </div>
                                 </div>
                             </div> *@
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="card card-light">
-                                        <div class="col-md-12">
-                                            <div class="form-group">
-                                                <span class="input-group-label"> Pan API:</span>
-                                                <div class="input-group mb-3">
-                                                    <div class="input-group-prepend">
-                                                        <span class="input-group-text"><i class="fas fa-code-branch"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                                    </div>
-                                                    <input type="text" id="PanIdfyUrl" asp-for="PanIdfyUrl" class="form-control remarks" placeholder="pan verify url" />
-                                                    <span asp-validation-for="PanIdfyUrl" class="text-danger"></span>
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <span class="input-group-label"> PAN API Key:</span>
-                                                <div class="input-group mb-3">
-                                                    <div class="input-group-prepend">
-                                                        <span class="input-group-text"><i class="fa fa-key"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                                    </div>
-                                                    <input type="text" id="PanAPIKey" asp-for="PanAPIData" class="form-control remarks" placeholder="pan verify url" />
-                                                    <span asp-validation-for="PanAPIData" class="text-danger"></span>
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <span class="input-group-label"> PAN API Host:</span>
-                                                <div class="input-group mb-3">
-                                                    <div class="input-group-prepend">
-                                                        <span class="input-group-text"><i class="fa fa-key"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                                    </div>
-                                                    <input type="text" id="PanAPIHost" asp-for="PanAPIHost" class="form-control remarks" placeholder="pan verify url" />
-                                                    <span asp-validation-for="PanAPIHost" class="text-danger"></span>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <span class="input-group-label"> Verify Pan:</span>
-                                                        <div class="input-group mb-3">
-                                                            <div class="input-group-prepend">
-                                                                <span class="input-group-text"><i class="fas fa-crosshairs"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                                            </div>
+							<div class="row">
+								<div class="col-md-6">
+									<div class="card card-light">
+										<div class="col-md-12">
+											<div class="form-group">
+												<span class="input-group-label"> Pan API:</span>
+												<div class="input-group mb-3">
+													<div class="input-group-prepend">
+														<span class="input-group-text"><i class="fas fa-code-branch"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+													</div>
+													<input type="text" id="PanIdfyUrl" asp-for="PanIdfyUrl" class="form-control remarks" placeholder="pan verify url" />
+													<span asp-validation-for="PanIdfyUrl" class="text-danger"></span>
+												</div>
+											</div>
+											<div class="form-group">
+												<span class="input-group-label"> PAN API Key:</span>
+												<div class="input-group mb-3">
+													<div class="input-group-prepend">
+														<span class="input-group-text"><i class="fa fa-key"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+													</div>
+													<input type="text" id="PanAPIKey" asp-for="PanAPIData" class="form-control remarks" placeholder="pan verify url" />
+													<span asp-validation-for="PanAPIData" class="text-danger"></span>
+												</div>
+											</div>
+											<div class="form-group">
+												<span class="input-group-label"> PAN API Host:</span>
+												<div class="input-group mb-3">
+													<div class="input-group-prepend">
+														<span class="input-group-text"><i class="fa fa-key"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+													</div>
+													<input type="text" id="PanAPIHost" asp-for="PanAPIHost" class="form-control remarks" placeholder="pan verify url" />
+													<span asp-validation-for="PanAPIHost" class="text-danger"></span>
+												</div>
+											</div>
+											<div class="row">
+												<div class="col-md-6">
+													<div class="form-group">
+														<span class="input-group-label"> Verify Pan:</span>
+														<div class="input-group mb-3">
+															<div class="input-group-prepend">
+																<span class="input-group-text"><i class="fas fa-crosshairs"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+															</div>
 
-                                                            <span class="checkbox">
-                                                                <input id="VerifyPan" asp-for="VerifyPan" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
+															<span class="checkbox">
+																<input id="VerifyPan" asp-for="VerifyPan" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
+																</span>
+															</div>
+														</div>
+													</div>
+													<div class="col-md-6">
 
-                                                    <div class="form-group">
-                                                        <span class="input-group-label"> Enable Media:</span>
-                                                        <div class="input-group mb-3">
-                                                            <div class="input-group-prepend">
-                                                                <span class="input-group-text"><i class="fas fa-crosshairs"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                                            </div>
+														<div class="form-group">
+															<span class="input-group-label"> Enable Media:</span>
+															<div class="input-group mb-3">
+																<div class="input-group-prepend">
+																	<span class="input-group-text"><i class="fas fa-crosshairs"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+																</div>
 
-                                                            <span class="checkbox">
-                                                                <input id="EnableMedia" asp-for="EnableMedia" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="card card-light">
-                                        <div class="col-md-12">
-                                            <div class="form-group">
-                                                <span class="input-group-label"> Passport API:</span>
-                                                <div class="input-group mb-3">
-                                                    <div class="input-group-prepend">
-                                                        <span class="input-group-text"><i class="fas fa-code-branch"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                                    </div>
-                                                    <input type="text" id="PassportApiUrl" asp-for="PassportApiUrl" class="form-control remarks" placeholder="passport verify url" />
-                                                    <span asp-validation-for="PassportApiUrl" class="text-danger"></span>
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <span class="input-group-label"> Passport API Key:</span>
-                                                <div class="input-group mb-3">
-                                                    <div class="input-group-prepend">
-                                                        <span class="input-group-text"><i class="fa fa-key"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                                    </div>
-                                                    <input type="text" id="PassportAPIKey" asp-for="PassportApiData" class="form-control remarks" placeholder="pan verify url" />
-                                                    <span asp-validation-for="PassportApiData" class="text-danger"></span>
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <span class="input-group-label"> Passport API Host:</span>
-                                                <div class="input-group mb-3">
-                                                    <div class="input-group-prepend">
-                                                        <span class="input-group-text" id="PassportAPIHost"><i class="fa fa-key"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                                    </div>
-                                                    <input type="text" asp-for="PassportApiHost" class="form-control remarks" placeholder="Passport verify url" />
-                                                    <span asp-validation-for="PassportApiHost" class="text-danger"></span>
-                                                </div>
-                                            </div>
+																<span class="checkbox">
+																	<input id="EnableMedia" asp-for="EnableMedia" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
+																	</span>
+																</div>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="col-md-6">
+											<div class="card card-light">
+												<div class="col-md-12">
+													<div class="form-group">
+														<span class="input-group-label"> Passport API:</span>
+														<div class="input-group mb-3">
+															<div class="input-group-prepend">
+																<span class="input-group-text"><i class="fas fa-code-branch"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+															</div>
+															<input type="text" id="PassportApiUrl" asp-for="PassportApiUrl" class="form-control remarks" placeholder="passport verify url" />
+															<span asp-validation-for="PassportApiUrl" class="text-danger"></span>
+														</div>
+													</div>
+													<div class="form-group">
+														<span class="input-group-label"> Passport API Key:</span>
+														<div class="input-group mb-3">
+															<div class="input-group-prepend">
+																<span class="input-group-text"><i class="fa fa-key"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+															</div>
+															<input type="text" id="PassportAPIKey" asp-for="PassportApiData" class="form-control remarks" placeholder="pan verify url" />
+															<span asp-validation-for="PassportApiData" class="text-danger"></span>
+														</div>
+													</div>
+													<div class="form-group">
+														<span class="input-group-label"> Passport API Host:</span>
+														<div class="input-group mb-3">
+															<div class="input-group-prepend">
+																<span class="input-group-text" id="PassportAPIHost"><i class="fa fa-key"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+															</div>
+															<input type="text" asp-for="PassportApiHost" class="form-control remarks" placeholder="Passport verify url" />
+															<span asp-validation-for="PassportApiHost" class="text-danger"></span>
+														</div>
+													</div>
 
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <span class="input-group-label"> Verify Passport:</span>
-                                                        <div class="input-group mb-3">
-                                                            <div class="input-group-prepend">
-                                                                <span class="input-group-text"><i class="fas fa-crosshairs"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                                            </div>
+													<div class="row">
+														<div class="col-md-6">
+															<div class="form-group">
+																<span class="input-group-label"> Verify Passport:</span>
+																<div class="input-group mb-3">
+																	<div class="input-group-prepend">
+																		<span class="input-group-text"><i class="fas fa-crosshairs"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+																	</div>
 
-                                                            <span class="checkbox">
-                                                                <input id="VerifyPassport" asp-for="VerifyPassport" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <span class="input-group-label"> Enable Passport:</span>
-                                                        <div class="input-group mb-3">
-                                                            <div class="input-group-prepend">
-                                                                <span class="input-group-text"><i class="fas fa-crosshairs"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                                            </div>
+																	<span class="checkbox">
+																		<input id="VerifyPassport" asp-for="VerifyPassport" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
+																		</span>
+																	</div>
+																</div>
+															</div>
+															<div class="col-md-6">
+																<div class="form-group">
+																	<span class="input-group-label"> Enable Passport:</span>
+																	<div class="input-group mb-3">
+																		<div class="input-group-prepend">
+																			<span class="input-group-text"><i class="fas fa-crosshairs"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+																		</div>
 
-                                                            <span class="checkbox">
-                                                                <input id="EnablePassport" asp-for="EnablePassport" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <span class="input-group-label">Auto Allocation:</span>
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text"><i class="fas fa-file-export"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                            </div>
+																		<span class="checkbox">
+																			<input id="EnablePassport" asp-for="EnablePassport" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
+																			</span>
+																		</div>
+																	</div>
+																</div>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+											<div class="row">
+												<div class="col-md-3">
+													<div class="form-group">
+														<span class="input-group-label">Auto Allocation:</span>
+														<div class="input-group mb-3">
+															<div class="input-group-prepend">
+																<span class="input-group-text"><i class="fas fa-file-export"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+															</div>
 
-                                            <span class="checkbox">
-                                                <input id="AutoAllocation" asp-for="AutoAllocation" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <span class="input-group-label"> Profile edit:</span>
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text"><i class="fas fa-portrait"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                            </div>
+															<span class="checkbox">
+																<input type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-onstyle="success" data-width="120">
+															</span>
+														</div>
+													</div>
+													<div class="form-group">
+														<span class="input-group-label"> Profile edit:</span>
+														<div class="input-group mb-3">
+															<div class="input-group-prepend">
+																<span class="input-group-text"><i class="fas fa-portrait"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+															</div>
 
-                                            <span class="checkbox">
-                                                <input id="CanChangePassword" asp-for="CanChangePassword" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
+															<span class="checkbox">
+																<input id="CanChangePassword" asp-for="CanChangePassword" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
+																</span>
+															</div>
+														</div>
+													</div>
+													<div class="col-md-3">
+														<div class="form-group">
+															<span class="input-group-label">BulkUpload:</span>
+															<div class="input-group mb-3">
+																<div class="input-group-prepend">
+																	<span class="input-group-text"><i class="fa fa-upload"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+																</div>
 
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <span class="input-group-label">BulkUpload:</span>
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text"><i class="fa fa-upload"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                            </div>
+																<span class="checkbox">
+																	<input type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-onstyle="success" data-width="120">
+																</span>
+															</div>
+														</div>
+														<div class="form-group">
 
-                                            <span class="checkbox">
-                                                <input id="BulkUpload" asp-for="BulkUpload" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
+															<span class="input-group-label"> Max Assign-Ready Case [ max 50]:</span>
+															<div class="input-group mb-3">
+																<div class="input-group-prepend">
+																	<span class="input-group-text" asp-for="TotalToAssignMaxAllowed"><i class="fas fa-coins"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
+																</div>
+																<input required asp-for="TotalToAssignMaxAllowed" class="form-control remarks" type="text" placeholder="Max Assign-Ready Cases" min="5" maxlength="50" />
+																<span asp-validation-for="TotalToAssignMaxAllowed" class="text-danger"></span>
+															</div>
+														</div>
+													</div>
+													<div class="col-md-3">
 
-                                        <span class="input-group-label"> Max Assign-Ready Case [ max 50]:</span>
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text" asp-for="TotalToAssignMaxAllowed"><i class="fas fa-coins"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
-                                            </div>
-                                            <input required asp-for="TotalToAssignMaxAllowed" class="form-control remarks" type="text" placeholder="Max Assign-Ready Cases"  min="5" maxlength="50" />
-                                            <span asp-validation-for="TotalToAssignMaxAllowed" class="text-danger"></span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
+														<div class="form-group">
+															<span class="input-group-label"> License Type:</span>
+															<div class="input-group mb-3">
+																<div class="input-group-prepend">
+																	<span class="input-group-text" asp-for="LicenseType"><i class="nav-icon fas fa-file-invoice"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+																</div>
+																<select required asp-for="LicenseType" class="form-control remarks ipaddress" asp-items="Html.GetEnumSelectList<LicenseType>()">
+																	<option value="">--- SELECT ---</option>
+																</select>
+																<span asp-validation-for="LicenseType" class="text-danger"></span>
+															</div>
+														</div>
+														<div class="form-group">
 
-                                    <div class="form-group">
-                                        <span class="input-group-label"> License Type:</span>
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text" asp-for="LicenseType"><i class="nav-icon fas fa-file-invoice"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                            </div>
-                                            <select required asp-for="LicenseType" class="form-control remarks ipaddress" asp-items="Html.GetEnumSelectList<LicenseType>()">
-                                                <option value="">--- SELECT ---</option>
-                                            </select>
-                                            <span asp-validation-for="LicenseType" class="text-danger"></span>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
+															<span class="input-group-label"> Expiry Date:</span>
+															<div class="input-group mb-3">
+																<div class="input-group-prepend">
+																	<span class="input-group-text" asp-for="ExpiryDate"><i class="nav-icon far fa-calendar-check"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+																</div>
+																<input asp-for="ExpiryDate" id="ExpiryDate" class="form-control remarks date-width" type="date" />
+																<span asp-validation-for="ExpiryDate" class="text-danger"></span>
+															</div>
+														</div>
+													</div>
+													<div class="col-md-3">
+														<div class="form-group">
 
-                                        <span class="input-group-label"> Expiry Date:</span>
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text" asp-for="ExpiryDate"><i class="nav-icon far fa-calendar-check"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                            </div>
-                                            <input asp-for="ExpiryDate" id="ExpiryDate" class="form-control remarks date-width" type="date" />
-                                            <span asp-validation-for="ExpiryDate" class="text-danger"></span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="form-group">
+															<span class="input-group-label"> Max Allowed Case [ max 50]:</span>
+															<div class="input-group mb-3">
+																<div class="input-group-prepend">
+																	<span class="input-group-text" asp-for="TotalCreatedClaimAllowed"><i class="fas fa-coins"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
+																</div>
+																<input required asp-for="TotalCreatedClaimAllowed" class="form-control remarks" type="text" placeholder="Max Allowed Cases" min="5" maxlength="50" />
+																<span asp-validation-for="TotalCreatedClaimAllowed" class="text-danger"></span>
+															</div>
+														</div>
+														<div class="form-group">
+															<span class="input-group-label"> Enable AI:</span>
+															<div class="input-group mb-3">
+																<div class="input-group-prepend">
+																	<span class="input-group-text"><i class="fas fa-crosshairs"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+																</div>
 
-                                        <span class="input-group-label"> Max Allowed Case [ max 50]:</span>
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text" asp-for="TotalCreatedClaimAllowed"><i class="fas fa-coins"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
-                                            </div>
-                                            <input required asp-for="TotalCreatedClaimAllowed" class="form-control remarks" type="text" placeholder="Max Allowed Cases" min="5" maxlength="50" />
-                                            <span asp-validation-for="TotalCreatedClaimAllowed" class="text-danger"></span>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <span class="input-group-label"> Enable AI:</span>
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text"><i class="fas fa-crosshairs"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                            </div>
+																<span class="checkbox">
+																	<input id="AiEnabled" asp-for="AiEnabled" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
+																	</span>
+																</div>
+															</div>
+														</div>
+													</div>
+													<div class="row">
+														<div class="col-md-3">
+															<div class="form-group">
+																<span class="input-group-label"> Creator SLA (day(s):</span>
+																<div class="input-group mb-3">
+																	<div class="input-group-prepend">
+																		<span class="input-group-text"><i class="fas fa-clock"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+																	</div>
+																	<input type="text" id="CreatorSla" asp-for="CreatorSla" class="form-control remarks" placeholder="Creator sla (day(s)" />
+																	<span asp-validation-for="CreatorSla" class="text-danger"></span>
+																</div>
+															</div>
+														</div>
+														<div class="col-md-3">
 
-                                            <span class="checkbox">
-                                                <input id="AiEnabled" asp-for="AiEnabled" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <span class="input-group-label"> Creator SLA (day(s):</span>
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text"><i class="fas fa-clock"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                            </div>
-                                            <input type="text" id="CreatorSla" asp-for="CreatorSla" class="form-control remarks" placeholder="Creator sla (day(s)" />
-                                            <span asp-validation-for="CreatorSla" class="text-danger"></span>
-                                        </div>
-                                    </div>
+															<div class="form-group">
+																<span class="input-group-label"> Assessor SLA (day(s):</span>
+																<div class="input-group mb-3">
+																	<div class="input-group-prepend">
+																		<span class="input-group-text"><i class="fas fa-clock"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+																	</div>
+																	<input type="text" id="AssessorSla" asp-for="AssessorSla" class="form-control remarks" placeholder="Assessor Sla (day(s)" />
+																	<span asp-validation-for="AssessorSla" class="text-danger"></span>
+																</div>
+															</div>
+														</div>
+														<div class="col-md-3">
 
-                                </div>
-                                <div class="col-md-3">
+															<div class="form-group">
+																<span class="input-group-label"> Supervisor SLA (day(s)):</span>
+																<div class="input-group mb-3">
+																	<div class="input-group-prepend">
+																		<span class="input-group-text"><i class="fas fa-clock"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+																	</div>
+																	<input type="text" id="SupervisorSla" asp-for="SupervisorSla" class="form-control remarks" placeholder="Supervisor Sla (day(s)" />
+																	<span asp-validation-for="SupervisorSla" class="text-danger"></span>
+																</div>
+															</div>
+														</div>
+														<div class="col-md-3">
+															<div class="form-group">
+																<span class="input-group-label"> Agent SLA (day(s):</span>
+																<div class="input-group mb-3">
+																	<div class="input-group-prepend">
+																		<span class="input-group-text"><i class="fas fa-clock"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+																	</div>
+																	<input type="text" id="AgentSla" asp-for="AgentSla" class="form-control remarks" placeholder="Agent Sla (day(s)" />
+																	<span asp-validation-for="AgentSla" class="text-danger"></span>
+																</div>
+															</div>
+														</div>
+													</div>
+													<div class="row">
+														<div class="col-md-3">
 
-                                    <div class="form-group">
-                                        <span class="input-group-label"> Assessor SLA (day(s):</span>
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text"><i class="fas fa-clock"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                            </div>
-                                            <input type="text" id="AssessorSla" asp-for="AssessorSla" class="form-control remarks" placeholder="Assessor Sla (day(s)" />
-                                            <span asp-validation-for="AssessorSla" class="text-danger"></span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
+															<div class="form-group">
+																<span class="input-group-label"> Enable Agent Answer update(Supervisor):</span>
+																<div class="input-group mb-3">
+																	<div class="input-group-prepend">
+																		<span class="input-group-text"><i class="fas fa-crosshairs"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+																	</div>
 
-                                    <div class="form-group">
-                                        <span class="input-group-label"> Supervisor SLA (day(s)):</span>
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text"><i class="fas fa-clock"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                            </div>
-                                            <input type="text" id="SupervisorSla" asp-for="SupervisorSla" class="form-control remarks" placeholder="Supervisor Sla (day(s)" />
-                                            <span asp-validation-for="SupervisorSla" class="text-danger"></span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <span class="input-group-label"> Agent SLA (day(s):</span>
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text"><i class="fas fa-clock"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                            </div>
-                                            <input type="text" id="AgentSla" asp-for="AgentSla" class="form-control remarks" placeholder="Agent Sla (day(s)" />
-                                            <span asp-validation-for="AgentSla" class="text-danger"></span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-3">
+																	<span class="checkbox">
+																		<input id="UpdateAgentAnswer" asp-for="UpdateAgentAnswer" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
+																		</span>
+																	</div>
+																</div>
+															</div>
+															<div class="col-md-3">
+																<div class="form-group">
+																	<span class="input-group-label"> Set Prefilled data:</span>
+																	<div class="input-group mb-3">
+																		<div class="input-group-prepend">
+																			<span class="input-group-text"><i class="fas fa-crosshairs"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+																		</div>
 
-                                    <div class="form-group">
-                                        <span class="input-group-label"> Enable Agent Answer update(Supervisor):</span>
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text"><i class="fas fa-crosshairs"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                            </div>
+																		<span class="checkbox">
+																			<input id="HasSampleData" asp-for="HasSampleData" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
+																			</span>
+																		</div>
+																	</div>
+																</div>
+															</div>
+														</div>
+													</div>
+												</div>
+											</article>
+											<div class="card-footer">
+												<div class="row float-right">
+													<div class="col-md-12">
+														<a id="cancel" asp-controller="ClientCompany" asp-action="Details" asp-route-id="@Model.ClientCompanyId" class="btn btn-secondary">
+															<i class="fa fa-window-close"></i>
+															@Applicationsettings.CANCEL
+														</a>
+														<button id="edit" type="submit" class="btn btn-warning">
+															<i class="fas fa-building"></i>  Save Company
+														</button>
+													</div>
+												</div>
+											</div>
+										</div>
+									</form>
+								</section>
 
-                                            <span class="checkbox">
-                                                <input id="UpdateAgentAnswer" asp-for="UpdateAgentAnswer" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <span class="input-group-label"> Set Prefilled data:</span>
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text"><i class="fas fa-crosshairs"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                            </div>
-
-                                            <span class="checkbox">
-                                                <input id="HasSampleData" asp-for="HasSampleData" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </article>
-            <div class="card-footer">
-                <div class="row float-right">
-                    <div class="col-md-12">
-                        <a id="cancel" asp-controller="ClientCompany" asp-action="Details" asp-route-id="@Model.ClientCompanyId" class="btn btn-secondary">
-                            <i class="fa fa-window-close"></i>
-                            @Applicationsettings.CANCEL
-                        </a>
-                        <button id="edit" type="submit" class="btn btn-warning">
-                            <i class="fas fa-building"></i>  Save Company
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </form>
-</section>
-
-@section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-    <script src="~/js/company-admin/edit-company.js"></script>
-    <script src="~/js/company-admin/pincode.js"></script>
-}
+								@section Scripts {
+									@{
+										await Html.RenderPartialAsync("_ValidationScriptsPartial");
+									}
+									<script src="~/js/company-admin/edit-company.js"></script>
+									<script src="~/js/company-admin/pincode.js"></script>
+								}

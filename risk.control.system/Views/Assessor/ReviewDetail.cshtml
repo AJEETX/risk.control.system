@@ -7,7 +7,7 @@
 <section class="content">
     <input type="hidden" id="policyDetailId" value="@Model.ClaimsInvestigation?.PolicyDetail.PolicyDetailId" />
     <input type="hidden" id="customerDetailId" value="@Model.ClaimsInvestigation?.CustomerDetail.CustomerDetailId" />
-    <input type="hidden" id="beneficiaryId" value="@Model.Location?.BeneficiaryDetailId" />
+    <input type="hidden" id="beneficiaryId" value="@Model.Beneficiary?.BeneficiaryDetailId" />
     <input type="hidden" id="claimId" value="@Model.ClaimsInvestigation?.Id" />
     <div id="article" class="card shadow-lg border-1 rounded-lg">
         <div class="card-header bg-secondary text-white text-center">
@@ -41,30 +41,24 @@
                 </div>
             </div>
         </div>
-        
-        
+
         <partial name="Investigation/_AgencySubmittedReport" model="@Model" />
 
         <div class="card-footer">
             <div class="submit-progress hidden">
                 <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
             </div>
-            <div class="row">
+            <div class="row float-right">
                 <div class="col-md-12">
-
-                    <form id="create-form">
-
-                        <a id="back" asp-action="Review" class="btn btn-outline-secondary">
-                            <i class="fas fa-arrow-left"></i>
-                            <span class="badge badge-light"> <i class="fa fa-toggle-on"></i> </span> Back
-                        </a>
-                    </form>
+                    <a id="back" asp-action="Review" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i>
+                        <span class="badge badge-light"> <i class="fas fa-question"></i> </span> Back
+                    </a>
                 </div>
             </div>
         </div>
     </div>
 </section>
-
 
 @section Scripts {
     @{
