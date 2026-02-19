@@ -50,12 +50,17 @@
 				</table>
 			</div>
 			<div class="card-footer">
-				<div class="col-md-12">
-					<a id="back" asp-controller="Dashboard" asp-action="Index" class="btn btn-default"><i class="fas fa-arrow-left"></i> Back</a>
+				<div class="row float-right">
+					<div class="col-md-12">
+						<a id="back" asp-controller="Dashboard" asp-action="Index" class="btn btn-outline-secondary">
+							<i class="fas fa-arrow-left"></i>
+							<span class="badge badge-light"> <i class="fa fa-home"></i> </span>	Back
+						</a>
 
-					<button id="empanel-vendors" disabled type="submit" class="btn btn-warning">
-						<i class="fas fa-hand-pointer" aria-hidden="true"></i> Depanel
-					</button>
+						<button id="empanel-vendors" disabled type="submit" class="btn btn-warning">
+							<i class="fas fa-hand-pointer" aria-hidden="true"></i> Depanel
+						</button>
+					</div>
 				</div>
 			</div>
 		</form>

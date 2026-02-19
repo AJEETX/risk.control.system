@@ -281,19 +281,20 @@
 			<div class="card-footer">
 				<div class="row  float-right">
 					<div class="col-md-12">
-						<a id="back" asp-controller="Assessor" class="btn btn-outline-secondary" asp-action="Assessor">
-							<i class="fas fa-arrow-left" aria-hidden="true"></i> Back
+						<a id="back" asp-controller="Assessor" class="btn btn-outline-secondary" asp-action="Assessor" data-bs-toggle="tooltip" title="Back to Assess cases">
+							
+							<i class="fas fa-arrow-left" aria-hidden="true"></i> <span class="badge badge-light"> <i class="fas fa-glasses"></i> </span> Back
 						</a>
 						@if (Model.InvestigationReport.EnquiryRequest == null)
 						{
 							<a id="enquire-case" asp-controller="Assessor" asp-action="SendEnquiry"
 								   asp-route-id="@Model.CaseTask.Id" class="btn btn-warning">
-								<i class="fa fa-edit"></i>  ENQUIRE
+								<i class="fa fa-edit"></i>  Enquire
 							</a>
 						}
 
 						<button id="approve-case" type="submit" class="btn btn-info">
-							<i class="fas fa-glasses" aria-hidden="true"></i> SUBMIT
+							<i class="fas fa-glasses" aria-hidden="true"></i> Submit
 						</button>
 					</div>
 				</div>

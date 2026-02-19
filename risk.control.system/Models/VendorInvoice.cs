@@ -7,13 +7,13 @@ namespace risk.control.system.Models
     {
         public VendorInvoice()
         {
-            this.InvoiceNumber = DateTime.UtcNow.Date.Year.ToString() +
+            InvoiceNumber = DateTime.UtcNow.Date.Year.ToString() +
                 DateTime.UtcNow.Date.Month.ToString() +
                 DateTime.UtcNow.Date.Day.ToString() + Guid.NewGuid().ToString().Substring(0, 4).ToUpper() + "INV";
-            this.DueDate = DateTime.UtcNow.Date.AddMonths(1);
-            this.SubTotal = 0;
-            this.TaxAmount = 0;
-            this.GrandTotal = 0;
+            DueDate = DateTime.UtcNow.Date.AddMonths(1);
+            SubTotal = 0;
+            TaxAmount = 0;
+            GrandTotal = 0;
         }
 
         [Key]

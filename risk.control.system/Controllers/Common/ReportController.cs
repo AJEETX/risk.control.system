@@ -19,9 +19,9 @@ namespace risk.control.system.Controllers.Common
             IInvestigationReportPdfService reportPdfService
             )
         {
-            this._notifyService = notifyService;
-            this._logger = logger;
-            this._reportPdfService = reportPdfService;
+            _notifyService = notifyService;
+            _logger = logger;
+            _reportPdfService = reportPdfService;
         }
 
         [HttpGet]

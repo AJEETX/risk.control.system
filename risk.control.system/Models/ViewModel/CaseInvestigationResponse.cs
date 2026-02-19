@@ -31,7 +31,6 @@
         public double TimeElapsed { get; set; }
         public string? Company { get; set; }
         public bool AutoAllocated { get; set; }
-        public bool? IsNewAssigned { get; set; }
         public string OwnerDetail { get; set; }
         public bool CaseWithPerson { get; set; } = false;
         public string? PersonMapAddressUrl { get; set; }
@@ -39,6 +38,5 @@
         public string? Duration { get; set; }
         public bool CanDownload { get; set; } = true;
         public bool IsNewSubmittedToCompany { get; set; }
-
     }
 }

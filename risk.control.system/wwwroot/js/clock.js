@@ -94,12 +94,12 @@ function userIsIdle() {
     $.confirm({
         title: '<i class="fas fa-exclamation-triangle text-danger"></i> Session Expired',
         content: `You have been inactive for ${idleMinutes} minutes. Please login again.`,
-        type: 'red',
+        type: 'orange',
         closeIcon: false,
         buttons: {
             login: {
                 text: 'Login',
-                btnClass: 'btn-danger',
+                btnClass: 'btn-warning',
                 action: function () {
                     window.location.href = '/Account/Login';
                 }
