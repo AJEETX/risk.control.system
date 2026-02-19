@@ -171,29 +171,11 @@ namespace risk.control.system.Services.Agent
             _logger.LogInformation("Investigation case {CaseId} found. Fetching related data...", id);
 
             // Fetch company
-            var company = await _context.ClientCompany.AsNoTracking().FirstOrDefaultAsync(c => c.ClientCompanyId == caseTask.ClientCompanyId);
+            var company = await _context.ClientCompany.AsNoTracking().Include(c => c.Country).FirstOrDefaultAsync(c => c.ClientCompanyId == caseTask.ClientCompanyId);
             if (company == null)
             {
                 _logger.LogWarning("ClientCompany {CompanyId} not found for case {CaseId}", caseTask.ClientCompanyId, id);
             }
-
-            // Calculate last timeline and total time
-            var lastHistory = caseTask.InvestigationTimeline.OrderByDescending(h => h.StatusChangedAt).FirstOrDefault();
-            var endTime = caseTask.Status == CONSTANTS.CASE_STATUS.FINISHED
-                ? caseTask.ProcessedByAssessorTime.GetValueOrDefault()
-                : DateTime.UtcNow;
-            var totalTimeTaken = FormatTime(endTime - caseTask.Created);
-
-            _logger.LogInformation("Total time taken for case {CaseId}: {TotalTime}", id, totalTimeTaken);
-
-            // Fetch invoice
-            var invoice = await _context.VendorInvoice.AsNoTracking()
-                .FirstOrDefaultAsync(i => i.InvestigationReportId == caseTask.InvestigationReportId);
-            if (invoice != null)
-            {
-                _logger.LogInformation("Vendor invoice {InvoiceId} found for case {CaseId}", invoice.VendorInvoiceId, id);
-            }
-
             // Fetch report templates
             var templates = await _context.ReportTemplates.AsNoTracking()
                 .Include(r => r.LocationReport)
@@ -218,21 +200,14 @@ namespace risk.control.system.Services.Agent
                 _logger.LogWarning("Report template {TemplateId} not found for case {CaseId}", caseTask.ReportTemplateId, id);
             }
 
-            // Check PDF download permissions
-            bool canDownload = await CanDownloadPdf(currentUserEmail, id);
-            _logger.LogInformation("User {UserEmail} can download PDF for case {CaseId}: {CanDownload}", currentUserEmail, id, canDownload);
-
             var model = new CaseTransactionModel
             {
                 ClaimsInvestigation = caseTask,
                 CaseIsValidToAssign = caseTask.IsValidCaseData(),
                 Beneficiary = caseTask.BeneficiaryDetail,
                 Assigned = caseTask.Status == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER,
-                TimeTaken = totalTimeTaken,
-                VendorInvoice = invoice,
-                CanDownload = canDownload,
                 Withdrawable = caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR,
-                Currency = CustomExtensions.GetCultureByCountry(caseTask.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol
+                Currency = CustomExtensions.GetCultureByCountry(company.Country.Code.ToUpper()).NumberFormat.CurrencySymbol
             };
 
             _logger.LogInformation("Returning CaseTransactionModel for case {CaseId}", id);

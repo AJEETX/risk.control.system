@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using risk.control.system.AppConstant;
 using risk.control.system.Controllers.Common;
 using risk.control.system.Helpers;
+using risk.control.system.Services.Assessor;
 using risk.control.system.Services.Common;
 using risk.control.system.Services.Report;
 using SmartBreadcrumbs.Attributes;
@@ -14,26 +15,23 @@ namespace risk.control.system.Controllers.Assessor
     [Authorize(Roles = ASSESSOR.DISPLAY_NAME)]
     public class AssessorController : Controller
     {
-        private readonly INotyfService notifyService;
-        private readonly ICaseReportService caseVendorService;
-        private readonly INavigationService navigationService;
-        private readonly IInvoiceService invoiceService;
-        private readonly IInvestigationDetailService investigationService;
-        private readonly ILogger<AssessorController> logger;
+        private readonly INotyfService _notifyService;
+        private readonly INavigationService _navigationService;
+        private readonly IInvoiceService _invoiceService;
+        private readonly ICaseDetailReportService _caseDetailReportService;
+        private readonly ILogger<AssessorController> _logger;
 
         public AssessorController(INotyfService notifyService,
-            ICaseReportService caseVendorService,
             INavigationService navigationService,
             IInvoiceService invoiceService,
-            IInvestigationDetailService investigationService,
+            ICaseDetailReportService caseDetailReportService,
             ILogger<AssessorController> logger)
         {
-            this.notifyService = notifyService;
-            this.caseVendorService = caseVendorService;
-            this.navigationService = navigationService;
-            this.invoiceService = invoiceService;
-            this.investigationService = investigationService;
-            this.logger = logger;
+            _notifyService = notifyService;
+            _navigationService = navigationService;
+            _invoiceService = invoiceService;
+            _caseDetailReportService = caseDetailReportService;
+            _logger = logger;
         }
 
         public IActionResult Index()
@@ -56,17 +54,17 @@ namespace risk.control.system.Controllers.Assessor
             {
                 if (!ModelState.IsValid || id < 1)
                 {
-                    notifyService.Error("OOPS !!! Case Not Found !!!..");
+                    _notifyService.Error("OOPS !!! Case Not Found !!!..");
                     return RedirectToAction(nameof(Assessor));
                 }
-                var model = await caseVendorService.GetInvestigateReport(userEmail, id);
+                var model = await _caseDetailReportService.GetInvestigateReport(userEmail, id);
 
                 return View(model);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred getting the case {Id}. {UserEmail}", id, userEmail);
-                notifyService.Error("OOPs !!!..Contact Admin");
+                _logger.LogError(ex, "Error occurred getting the case {Id}. {UserEmail}", id, userEmail);
+                _notifyService.Error("OOPs !!!..Contact Admin");
                 return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
@@ -79,19 +77,19 @@ namespace risk.control.system.Controllers.Assessor
             {
                 if (!ModelState.IsValid || id < 1)
                 {
-                    notifyService.Error("OOPS !!! Case Not Found !!!..");
+                    _notifyService.Error("OOPS !!! Case Not Found !!!..");
                     return RedirectToAction(nameof(Assessor));
                 }
-                var model = await caseVendorService.GetInvestigateReport(userEmail, id);
+                var model = await _caseDetailReportService.GetInvestigateReport(userEmail, id);
 
-                ViewData["BreadcrumbNode"] = navigationService.GetAssessorEnquiryPath(id, "Assessor"); ;
+                ViewData["BreadcrumbNode"] = _navigationService.GetAssessorEnquiryPath(id, "Assessor"); ;
 
                 return View(model);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred getting the enquiry case {Id}. {UserEmail}", id, userEmail);
-                notifyService.Error("OOPs !!!..Contact Admin");
+                _logger.LogError(ex, "Error occurred getting the enquiry case {Id}. {UserEmail}", id, userEmail);
+                _notifyService.Error("OOPs !!!..Contact Admin");
                 return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
@@ -111,18 +109,18 @@ namespace risk.control.system.Controllers.Assessor
             {
                 if (!ModelState.IsValid || id < 1)
                 {
-                    notifyService.Error("OOPS !!! Case Not Found !!!..");
+                    _notifyService.Error("OOPS !!! Case Not Found !!!..");
                     return RedirectToAction(nameof(Review));
                 }
 
-                var model = await investigationService.GetClaimDetailsReport(userEmail, id);
+                var model = await _caseDetailReportService.GetClaimDetailsReport(userEmail, id);
 
                 return View(model);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred getting the review case detail {Id}. {UserEmail}", id, userEmail);
-                notifyService.Error("OOPs !!!..Contact Admin");
+                _logger.LogError(ex, "Error occurred getting the review case detail {Id}. {UserEmail}", id, userEmail);
+                _notifyService.Error("OOPs !!!..Contact Admin");
                 return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
@@ -142,11 +140,11 @@ namespace risk.control.system.Controllers.Assessor
             {
                 if (!ModelState.IsValid || id < 1)
                 {
-                    notifyService.Error("OOPS !!! Case Not Found !!!..");
+                    _notifyService.Error("OOPS !!! Case Not Found !!!..");
                     return RedirectToAction(nameof(Approved));
                 }
 
-                var model = await investigationService.GetClaimDetailsReport(userEmail, id);
+                var model = await _caseDetailReportService.GetClaimDetailsReport(userEmail, id);
                 //if (model != null && model.ReportAiSummary == null && model.ClaimsInvestigation.AiEnabled)
                 //{
                 //    model = await investigationService.GetClaimDetailsAiReportSummary(model);
@@ -155,8 +153,8 @@ namespace risk.control.system.Controllers.Assessor
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred getting the approved case detail {Id}. {UserEmail}", id, userEmail);
-                notifyService.Error("OOPs !!!..Contact Admin");
+                _logger.LogError(ex, "Error occurred getting the approved case detail {Id}. {UserEmail}", id, userEmail);
+                _notifyService.Error("OOPs !!!..Contact Admin");
                 return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
@@ -174,18 +172,18 @@ namespace risk.control.system.Controllers.Assessor
 
             if (!ModelState.IsValid || id < 1)
             {
-                notifyService.Error("OOPS !!! Case Not Found !!!..");
+                _notifyService.Error("OOPS !!! Case Not Found !!!..");
                 return RedirectToAction(nameof(Rejected));
             }
             try
             {
-                var model = await investigationService.GetClaimDetailsReport(userEmail, id);
+                var model = await _caseDetailReportService.GetClaimDetailsReport(userEmail, id);
                 return View(model);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred getting the rejected case detail {Id}. {UserEmail}", id, userEmail);
-                notifyService.Error("OOPs !!!..Contact Admin");
+                _logger.LogError(ex, "Error occurred getting the rejected case detail {Id}. {UserEmail}", id, userEmail);
+                _notifyService.Error("OOPs !!!..Contact Admin");
                 return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
@@ -196,20 +194,20 @@ namespace risk.control.system.Controllers.Assessor
 
             if (!ModelState.IsValid || id <= 0)
             {
-                notifyService.Error("OOPS !!! Case Not Found !!!..");
+                _notifyService.Error("OOPS !!! Case Not Found !!!..");
                 return RedirectToAction(nameof(Approved));
             }
             try
             {
-                var invoice = await invoiceService.GetInvoice(id);
-                ViewData["BreadcrumbNode"] = navigationService.GetInvoiceBreadcrumb(id, invoice.CaseId.Value, "Assessor", "Assessor", "Cases", "Approved", "Approved", "ApprovedDetail");
+                var invoice = await _invoiceService.GetInvoice(id);
+                ViewData["BreadcrumbNode"] = _navigationService.GetInvoiceBreadcrumb(id, invoice.CaseId.Value, "Assessor", "Assessor", "Cases", "Approved", "Approved", "ApprovedDetail");
 
                 return View(invoice);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred getting the invoice case detail {Id}. {UserEmail}", id, userEmail);
-                notifyService.Error("OOPs !!!..Contact Admin");
+                _logger.LogError(ex, "Error occurred getting the invoice case detail {Id}. {UserEmail}", id, userEmail);
+                _notifyService.Error("OOPs !!!..Contact Admin");
                 return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
@@ -220,20 +218,20 @@ namespace risk.control.system.Controllers.Assessor
 
             if (!ModelState.IsValid || id <= 0)
             {
-                notifyService.Error("OOPS !!! Case Not Found !!!..");
+                _notifyService.Error("OOPS !!! Case Not Found !!!..");
                 return this.RedirectToAction<DashboardController>(x => x.Index());
             }
 
             try
             {
-                var invoice = await invoiceService.GetInvoice(id);
+                var invoice = await _invoiceService.GetInvoice(id);
 
                 return View(invoice);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred priting the invoice case detail {Id}. {UserEmail}", id, userEmail);
-                notifyService.Error("OOPs !!!..Contact Admin");
+                _logger.LogError(ex, "Error occurred priting the invoice case detail {Id}. {UserEmail}", id, userEmail);
+                _notifyService.Error("OOPs !!!..Contact Admin");
                 return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }

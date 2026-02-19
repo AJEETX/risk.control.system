@@ -17,16 +17,19 @@ namespace risk.control.system.Controllers.Creator
     {
         private readonly ILogger<BeneficiaryController> _logger;
         private readonly IBeneficiaryService _beneficiaryService;
+        private readonly IErrorNotifyService _errorNotifyService;
         private readonly INavigationService _navigationService;
         private readonly INotyfService _notifyService;
 
         public BeneficiaryController(ILogger<BeneficiaryController> logger,
             IBeneficiaryService beneficiaryService,
+            IErrorNotifyService errorNotifyService,
             INavigationService navigationService,
             INotyfService notifyService)
         {
             _logger = logger;
             _beneficiaryService = beneficiaryService;
+            this._errorNotifyService = errorNotifyService;
             _navigationService = navigationService;
             _notifyService = notifyService;
         }
@@ -38,7 +41,7 @@ namespace risk.control.system.Controllers.Creator
             {
                 if (!ModelState.IsValid || id < 1)
                 {
-                    ShowErrorNotification();
+                    _errorNotifyService.ShowErrorNotification(ModelState, "OOPS!!!.Case Not Found.Try Again");
                     return RedirectToAction(nameof(CaseCreateEditController.New), ControllerName<CaseCreateEditController>.Name);
                 }
 
@@ -65,7 +68,7 @@ namespace risk.control.system.Controllers.Creator
             {
                 if (!ModelState.IsValid)
                 {
-                    ShowErrorNotification();
+                    _errorNotifyService.ShowErrorNotification(ModelState);
                     await _beneficiaryService.PrepareFailedPostModelAsync(model, userEmail);
                     return View(model);
                 }
@@ -76,7 +79,7 @@ namespace risk.control.system.Controllers.Creator
                     foreach (var error in result.Errors)
                         ModelState.AddModelError(error.Key, error.Value);
 
-                    ShowErrorNotification();
+                    _errorNotifyService.ShowErrorNotification(ModelState);
                     await _beneficiaryService.PrepareFailedPostModelAsync(model, userEmail);
                     return View(model);
                 }
@@ -124,7 +127,7 @@ namespace risk.control.system.Controllers.Creator
             {
                 if (!ModelState.IsValid)
                 {
-                    ShowErrorNotification();
+                    _errorNotifyService.ShowErrorNotification(ModelState);
                     await _beneficiaryService.PrepareFailedPostModelAsync(model, userEmail);
                     return View(model);
                 }
@@ -136,7 +139,7 @@ namespace risk.control.system.Controllers.Creator
                     foreach (var error in result.Errors)
                         ModelState.AddModelError(error.Key, error.Value);
 
-                    ShowErrorNotification();
+                    _errorNotifyService.ShowErrorNotification(ModelState);
                     await _beneficiaryService.PrepareFailedPostModelAsync(model, userEmail);
                     return View(model);
                 }
@@ -148,12 +151,6 @@ namespace risk.control.system.Controllers.Creator
                 _notifyService.Error("Error editing Beneficiary. Try again.");
             }
             return RedirectToAction(nameof(CreatorController.Details), ControllerName<CreatorController>.Name, new { id = model.InvestigationTaskId });
-        }
-
-        private void ShowErrorNotification()
-        {
-            var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).Distinct();
-            _notifyService.Error($"<b>Please fix:</b><br/>{string.Join("<br/>", errors)}");
         }
     }
 }

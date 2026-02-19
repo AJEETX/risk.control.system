@@ -15,16 +15,19 @@ namespace risk.control.system.Controllers.Creator
     public class CaseCreateEditController : Controller
     {
         private readonly ILogger<CaseCreateEditController> _logger;
+        private readonly IErrorNotifyService _errorNotifyService;
         private readonly ICaseCreateEditService _caseCreateEditService;
         private readonly INavigationService _navigationService;
         private readonly INotyfService _notifyService;
 
         public CaseCreateEditController(ILogger<CaseCreateEditController> logger,
+            IErrorNotifyService errorNotifyService,
             ICaseCreateEditService createCreateEditService,
             INavigationService navigationService,
             INotyfService notifyService)
         {
             _logger = logger;
+            this._errorNotifyService = errorNotifyService;
             _caseCreateEditService = createCreateEditService;
             _navigationService = navigationService;
             _notifyService = notifyService;
@@ -120,7 +123,7 @@ namespace risk.control.system.Controllers.Creator
             {
                 if (!ModelState.IsValid)
                 {
-                    ShowErrorNotification();
+                    _errorNotifyService.ShowErrorNotification(ModelState);
                     await _caseCreateEditService.LoadDropDowns(model.PolicyDetailDto, userEmail);
                     return View(model);
                 }
@@ -138,7 +141,7 @@ namespace risk.control.system.Controllers.Creator
 
                         ModelState.AddModelError(stateKey, error.Value);
                     }
-                    ShowErrorNotification();
+                    _errorNotifyService.ShowErrorNotification(ModelState);
 
                     await _caseCreateEditService.LoadDropDowns(model.PolicyDetailDto, userEmail);
                     return View(model);
@@ -194,7 +197,7 @@ namespace risk.control.system.Controllers.Creator
             {
                 if (!ModelState.IsValid)
                 {
-                    ShowErrorNotification();
+                    _errorNotifyService.ShowErrorNotification(ModelState);
                     await _caseCreateEditService.LoadDropDowns(model.PolicyDetailDto, userEmail);
                     return View(model);
                 }
@@ -212,7 +215,7 @@ namespace risk.control.system.Controllers.Creator
 
                         ModelState.AddModelError(stateKey, error.Value);
                     }
-                    ShowErrorNotification();
+                    _errorNotifyService.ShowErrorNotification(ModelState);
 
                     await _caseCreateEditService.LoadDropDowns(model.PolicyDetailDto, userEmail);
                     return View(model);
@@ -226,12 +229,6 @@ namespace risk.control.system.Controllers.Creator
                 _notifyService.Error("OOPs !!!..Error editing Case detail. Try again.");
                 return RedirectToAction(nameof(CreatorController.Details), ControllerName<CreatorController>.Name, new { id = model.Id });
             }
-        }
-
-        private void ShowErrorNotification()
-        {
-            var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).Distinct();
-            _notifyService.Error($"<b>Please fix:</b><br/>{string.Join("<br/>", errors)}");
         }
     }
 }

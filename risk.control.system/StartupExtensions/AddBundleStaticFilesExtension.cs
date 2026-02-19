@@ -8,8 +8,7 @@
             {
                 try
                 {
-                    pipeline.AddCssBundle("/dist/app.min.css",
-                        "plugins/fontawesome-free/css/all.css",
+                    var cssBundle = pipeline.AddCssBundle("/dist/app.min.css",
                         "css/adminlte.css",
                         "plugins/icheck-bootstrap/icheck-bootstrap.css",
                         "css/jquery-ui.css",
@@ -21,8 +20,10 @@
                         "plugins/datatables-responsive/css/responsive.bootstrap4.css",
                         "plugins/datatables-buttons/css/buttons.bootstrap4.css"
                     );
+                    cssBundle.AdjustRelativePaths(); // If this still errors, try: .MinifyCss() only
+                    cssBundle.MinifyCss();
 
-                    pipeline.AddJavaScriptBundle("/dist/app.min.js",
+                    var jsBundle = pipeline.AddJavaScriptBundle("/dist/app.min.js",
                         "js/jquery-3.7.1.js",
                         "plugins/bootstrap/js/bootstrap.bundle.js",
                         "js/adminlte.js",
@@ -47,6 +48,7 @@
                         "js/clock.js",
                         "js/common/datatable-error.js"
                         );
+                    jsBundle.MinifyJavaScript();
                 }
                 catch (Exception ex)
                 {
@@ -54,7 +56,7 @@
                 }
             }, options =>
             {
-                options.EnableCaching = false; // Disables the server-side memory cache for assets
+                options.EnableCaching = true; // Disables the server-side memory cache for assets
             });
 
             services.AddResponseCompression();

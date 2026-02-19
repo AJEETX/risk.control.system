@@ -1,15 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Reflection;
-using AspNetCoreHero.ToastNotification.Abstractions;
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.FeatureManagement;
 using risk.control.system.AppConstant;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
-using risk.control.system.Services.Agency;
+using risk.control.system.Services.AgencyAdmin;
 using SmartBreadcrumbs.Attributes;
 
 namespace risk.control.system.Controllers.AgencyAdmin
@@ -18,286 +13,145 @@ namespace risk.control.system.Controllers.AgencyAdmin
     [Authorize(Roles = $"{AGENCY_ADMIN.DISPLAY_NAME}")]
     public class AgencyUserController : Controller
     {
-        private readonly ApplicationDbContext _context;
-        private readonly IAgencyUserCreateEditService agencyUserCreateEditService;
-        private readonly INotyfService notifyService;
-        private readonly IFeatureManager featureManager;
-        private readonly ILogger<AgencyUserController> logger;
-        private string portal_base_url = string.Empty;
+        private readonly IAgencyAdminUserService _service;
+        private readonly IAgencyUserCreateEditService _createEditService;
+        private readonly INotyfService _notifyService;
+        private readonly ILogger<AgencyUserController> _logger;
+        private readonly string _baseUrl;
 
-        public AgencyUserController(ApplicationDbContext context,
-            IAgencyUserCreateEditService agencyUserCreateEditService,
+        public AgencyUserController(
+            IAgencyAdminUserService service,
+            IAgencyUserCreateEditService createEditService,
             INotyfService notifyService,
-            IFeatureManager featureManager,
             IHttpContextAccessor httpContextAccessor,
             ILogger<AgencyUserController> logger)
         {
-            _context = context;
-            this.agencyUserCreateEditService = agencyUserCreateEditService;
-            this.notifyService = notifyService;
-            this.featureManager = featureManager;
-            this.logger = logger;
-            var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
-            var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
-            portal_base_url = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
+            _service = service;
+            _createEditService = createEditService;
+            _notifyService = notifyService;
+            _logger = logger;
+
+            var req = httpContextAccessor?.HttpContext?.Request;
+            _baseUrl = $"{req?.Scheme}://{req?.Host.ToUriComponent()}{req?.PathBase.ToUriComponent()}";
         }
 
-        public IActionResult Index()
-        {
-            return RedirectToAction(nameof(Users));
-        }
+        public IActionResult Index() => RedirectToAction(nameof(Users));
 
-        [Breadcrumb("Manage Users ")]
-        public IActionResult Users()
-        {
-            return View();
-        }
+        [Breadcrumb("Manage Users")]
+        public IActionResult Users() => View();
 
         [Breadcrumb("Add User")]
         public async Task<IActionResult> Create()
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
             try
             {
-                var vendorUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == userEmail);
-                if (vendorUser == null)
+                var model = await _service.PrepareCreateModelAsync(User.Identity?.Name);
+                if (model == null)
                 {
-                    notifyService.Error("User Not found !!!..Contact Admin");
+                    _notifyService.Error("User or Agency not found.");
                     return RedirectToAction(nameof(Users));
                 }
-                var vendor = await _context.Vendor.AsNoTracking().Include(v => v.Country).FirstOrDefaultAsync(v => v.VendorId == vendorUser.VendorId);
-                if (vendor == null)
-                {
-                    notifyService.Custom($"No agency not found.", 3, "red", "fas fa-building");
-                    return RedirectToAction(nameof(Users));
-                }
-                var availableRoles = RoleGroups.AgencyAppRoles
-                .Where(r => r != AppRoles.AGENCY_ADMIN) // Exclude MANAGER if already taken
-                .Select(r => new SelectListItem
-                {
-                    Value = r.ToString(),
-                    Text = r.GetType()
-                            .GetMember(r.ToString())
-                            .First()
-                            .GetCustomAttribute<DisplayAttribute>()?.Name ?? r.ToString()
-                })
-                .ToList();
-                var model = new ApplicationUser
-                {
-                    Country = vendor.Country,
-                    CountryId = vendor.CountryId,
-                    Vendor = vendor,
-                    AvailableRoles = availableRoles
-                };
                 return View(model);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting Agency for {UserEmail}", userEmail ?? "Anonymous");
-                notifyService.Error("OOPS !!!..Error creating user. Try again.");
+                _logger.LogError(ex, "Error loading Create User view.");
                 return RedirectToAction(nameof(Users));
             }
         }
 
-        private async Task LoadModel(ApplicationUser model)
-        {
-            var availableRoles = RoleGroups.AgencyAppRoles
-                .Where(r => r != AppRoles.AGENCY_ADMIN) // Exclude MANAGER if already taken
-                .Select(r => new SelectListItem
-                {
-                    Value = r.ToString(),
-                    Text = r.GetType()
-                            .GetMember(r.ToString())
-                            .First()
-                            .GetCustomAttribute<DisplayAttribute>()?.Name ?? r.ToString()
-                })
-                .ToList();
-            var vendor = await _context.Vendor.AsNoTracking().Include(v => v.Country).FirstOrDefaultAsync(v => v.VendorId == model.VendorId);
-            model.Country = vendor.Country;
-            model.CountryId = vendor.CountryId;
-            model.Vendor = vendor;
-            model.StateId = model.SelectedStateId;
-            model.DistrictId = model.SelectedDistrictId;
-            model.PinCodeId = model.SelectedPincodeId;
-            model.AvailableRoles = availableRoles;
-        }
-
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(ApplicationUser model, string emailSuffix, string vendorId)
+        public async Task<IActionResult> Create(ApplicationUser model, string emailSuffix)
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
-            try
+            if (!ModelState.IsValid)
             {
-                if (!ModelState.IsValid)
-                {
-                    notifyService.Error($"Correct the error(s)");
-                    await LoadModel(model);
-                    return View(model);
-                }
-                var vendorUserModel = new CreateVendorUserRequest
-                {
-                    User = model,
-                    EmailSuffix = emailSuffix,
-                    CreatedBy = userEmail
-                };
-                var result = await agencyUserCreateEditService.CreateVendorUserAsync(vendorUserModel, ModelState, portal_base_url);
+                await _service.LoadMetadataAsync(model);
+                return View(model);
+            }
 
-                if (!result.Success)
-                {
-                    foreach (var error in result.Errors)
-                        ModelState.AddModelError(error.Key, error.Value);
-                    notifyService.Error(result.Message);
-                    await LoadModel(model);
-                    return View(model);
-                }
-            }
-            catch (Exception ex)
+            var result = await _createEditService.CreateVendorUserAsync(new CreateVendorUserRequest
             {
-                logger.LogError(ex, "Error getting Agency {Id} user. {UserEmail}", vendorId, userEmail ?? "Anonymous");
-                notifyService.Error("OOPS !!!..Error Creating User. Try again.");
+                User = model,
+                EmailSuffix = emailSuffix,
+                CreatedBy = User.Identity?.Name
+            }, ModelState, _baseUrl);
+
+            if (!result.Success)
+            {
+                _notifyService.Error(result.Message);
+                await _service.LoadMetadataAsync(model);
+                return View(model);
             }
+
             return RedirectToAction(nameof(Users));
         }
 
         [Breadcrumb("Edit User", FromAction = "Users")]
-        public async Task<IActionResult> Edit(long? id)
+        public async Task<IActionResult> Edit(long id)
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
-            try
+            var model = await _service.PrepareEditModelAsync(id);
+            if (model == null)
             {
-                if (id == null || id <= 0)
-                {
-                    notifyService.Error("User not found!!!..Contact Admin");
-                    return RedirectToAction(nameof(Users));
-                }
-
-                var user = await _context.ApplicationUser.AsNoTracking().Include(u => u.Country).Include(u => u.Vendor).FirstOrDefaultAsync(c => c.Id == id);
-                if (user == null)
-                {
-                    notifyService.Error("User not found!!!..Contact Admin");
-                    return RedirectToAction(nameof(Users));
-                }
-                user.IsPasswordChangeRequired = await featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION) ? !user.IsPasswordChangeRequired : true;
-
-                return View(user);
+                _notifyService.Error("User not found.");
+                return RedirectToAction(nameof(Users));
             }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Error getting AgencyUser {Id}. {UserEmail}", id, userEmail ?? "Anonymous");
-            }
-            notifyService.Error("OOPs !!!.Error creating User. Try again");
-            return RedirectToAction(nameof(Users));
+            return View(model);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(string id, ApplicationUser model)
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
-            try
+            if (!ModelState.IsValid)
             {
-                if (!ModelState.IsValid)
-                {
-                    notifyService.Error($"Correct the error(s)");
-                    await LoadModel(model);
-                    return View(model);
-                }
-                var result = await agencyUserCreateEditService.EditVendorUserAsync(new EditVendorUserRequest
-                {
-                    UserId = id,
-                    Model = model,
-                    UpdatedBy = userEmail
-                },
-                ModelState, portal_base_url);
+                await _service.LoadMetadataAsync(model);
+                return View(model);
+            }
 
-                if (!result.Success)
-                {
-                    foreach (var error in result.Errors)
-                        ModelState.AddModelError(error.Key, error.Value);
-                    notifyService.Error(result.Message);
-                    await LoadModel(model);
-                    return View(model);
-                }
-            }
-            catch (Exception ex)
+            var result = await _createEditService.EditVendorUserAsync(new EditVendorUserRequest
             {
-                logger.LogError(ex, "Error getting AgencyUser {Id}. {UserEmail}", id, userEmail ?? "Anonymous");
-                notifyService.Error("OOPS !!!..Error editing User. Try again.");
+                UserId = id,
+                Model = model,
+                UpdatedBy = User.Identity?.Name
+            }, ModelState, _baseUrl);
+
+            if (!result.Success)
+            {
+                _notifyService.Error(result.Message);
+                await _service.LoadMetadataAsync(model);
+                return View(model);
             }
+
             return RedirectToAction(nameof(Users));
         }
 
-        [Breadcrumb(title: " Delete", FromAction = "Users")]
+        [Breadcrumb("Delete", FromAction = "Users")]
         public async Task<IActionResult> Delete(long id)
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
-            try
+            var model = await _service.GetUserForDeleteAsync(id);
+            if (model == null)
             {
-                if (id < 1)
-                {
-                    notifyService.Error("OOPS!!!.Invalid Data.Try Again");
-                    return RedirectToAction(nameof(Users));
-                }
-                var model = await _context.ApplicationUser.AsNoTracking().Include(v => v.Country).Include(v => v.State).Include(v => v.District).Include(v => v.PinCode).FirstOrDefaultAsync(c => c.Id == id);
-                if (model == null)
-                {
-                    notifyService.Error("OOPS!!!.User Not Found.Try Again");
-                    return RedirectToAction(nameof(Users));
-                }
-
-                var agencySubStatuses = new[] {
-                    CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR,
-                    CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR,
-                    CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT,
-                    CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR,
-                    CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR};
-
-                var hasClaims = _context.Investigations.AsNoTracking().Any(c => agencySubStatuses.Contains(c.SubStatus) && c.VendorId == model.VendorId);
-                model.HasClaims = hasClaims;
-                return View(model);
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Error getting AgencyUser {UserId} for {UserEmail}", id, userEmail ?? "Anonymous");
-                notifyService.Error("OOPS!!!..Error deleting user. Try again");
+                _notifyService.Error("User Not Found.");
                 return RedirectToAction(nameof(Users));
             }
+            return View(model);
         }
 
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(string email)
+        public async Task<IActionResult> DeleteConfirmed(string email)
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
-            try
+            var success = await _service.SoftDeleteUserAsync(email, User.Identity?.Name);
+            if (success)
             {
-                if (string.IsNullOrWhiteSpace(email))
-                {
-                    notifyService.Error("User Not Found!!!..Try again");
-                    return RedirectToAction(nameof(Users));
-                }
-                var model = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == email);
-                if (model == null)
-                {
-                    notifyService.Error("User Not Found!!!..Try again");
-                    return RedirectToAction(nameof(Users));
-                }
-
-                model.Updated = DateTime.UtcNow;
-                model.UpdatedBy = userEmail;
-                model.Deleted = true;
-                _context.ApplicationUser.Update(model);
-                await _context.SaveChangesAsync();
-                notifyService.Custom($"User <b> {model.Email}</b> deleted successfully", 3, "red", "fas fa-user-minus");
-                return RedirectToAction(nameof(Users), "AgencyUser", new { id = model.VendorId });
+                _notifyService.Custom($"User <b> {email} </b> deleted.", 3, "red", "fas fa-user-minus");
             }
-            catch (Exception ex)
+            else
             {
-                logger.LogError(ex, "Error deleting AgencyUser {email}. {UserEmail}", email, userEmail);
-                notifyService.Error("OOPS!!!..Error deleting user. Try again");
-                return RedirectToAction(nameof(Users));
+                _notifyService.Error($"Delete  <b> {email} </b>failed.");
             }
+            return RedirectToAction(nameof(Users));
         }
     }
 }

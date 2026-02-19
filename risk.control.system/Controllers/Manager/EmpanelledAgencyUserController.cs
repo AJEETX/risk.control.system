@@ -1,18 +1,14 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Reflection;
-using AspNetCoreHero.ToastNotification.Abstractions;
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.FeatureManagement;
 using risk.control.system.AppConstant;
 using risk.control.system.Controllers.Common;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
-using risk.control.system.Services.Agency;
 using risk.control.system.Services.Common;
+using risk.control.system.Services.Manager;
 using SmartBreadcrumbs.Attributes;
 
 namespace risk.control.system.Controllers.Manager
@@ -21,16 +17,17 @@ namespace risk.control.system.Controllers.Manager
     [Authorize(Roles = $"{MANAGER.DISPLAY_NAME}")]
     public class EmpanelledAgencyUserController : Controller
     {
-        private readonly INotyfService notifyService;
-        private readonly ApplicationDbContext _context;
-        private readonly IAgencyUserCreateEditService agencyUserCreateEditService;
-        private readonly INavigationService navigationService;
-        private readonly IFeatureManager featureManager;
-        private readonly ILogger<EmpanelledAgencyUserController> logger;
-        private readonly string portal_base_url;
+        private readonly IManageAgencyUserService _manageAgencyUserService;
+        private readonly IErrorNotifyService _errorNotifyService;
+        private readonly INotyfService _notifyService;
+        private readonly INavigationService _navigationService;
+        private readonly IFeatureManager _featureManager;
+        private readonly ILogger<EmpanelledAgencyUserController> _logger;
+        private readonly string _baseUrl;
 
-        public EmpanelledAgencyUserController(ApplicationDbContext context,
-            IAgencyUserCreateEditService agencyUserCreateEditService,
+        public EmpanelledAgencyUserController(
+            IManageAgencyUserService manageAgencyUserService,
+            IErrorNotifyService errorNotifyService,
             INavigationService navigationService,
             INotyfService notifyService,
             IFeatureManager featureManager,
@@ -38,15 +35,15 @@ namespace risk.control.system.Controllers.Manager
             ILogger<EmpanelledAgencyUserController> logger,
             ISmsService SmsService)
         {
-            this._context = context;
-            this.agencyUserCreateEditService = agencyUserCreateEditService;
-            this.navigationService = navigationService;
-            this.notifyService = notifyService;
-            this.featureManager = featureManager;
-            this.logger = logger;
+            this._manageAgencyUserService = manageAgencyUserService;
+            this._errorNotifyService = errorNotifyService;
+            this._navigationService = navigationService;
+            this._notifyService = notifyService;
+            this._featureManager = featureManager;
+            this._logger = logger;
             var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
             var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
-            portal_base_url = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
+            _baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
         }
 
         public IActionResult Index()
@@ -61,7 +58,7 @@ namespace risk.control.system.Controllers.Manager
                 Id = id
             };
 
-            ViewData["BreadcrumbNode"] = navigationService.GetAgencyUserManagerPath(id, ControllerName<EmpanelledAgencyController>.Name, "Available Agencies");
+            ViewData["BreadcrumbNode"] = _navigationService.GetAgencyUserManagerPath(id, ControllerName<EmpanelledAgencyController>.Name, "Available Agencies");
             return View(model);
         }
 
@@ -69,36 +66,16 @@ namespace risk.control.system.Controllers.Manager
         {
             if (id <= 0)
             {
-                notifyService.Error("OOPS !!!..Error creating user");
+                _notifyService.Error("OOPS !!!..Error creating user");
                 return this.RedirectToAction<DashboardController>(x => x.Index());
             }
-            var availableRoles = RoleGroups.AgencyAppRoles
-                .Where(r => r != AppRoles.AGENCY_ADMIN) // Exclude MANAGER if already taken
-                .Select(r => new SelectListItem
-                {
-                    Value = r.ToString(),
-                    Text = r.GetType()
-                            .GetMember(r.ToString())
-                            .First()
-                            .GetCustomAttribute<DisplayAttribute>()?.Name ?? r.ToString()
-                })
-                .ToList();
-            var vendor = await _context.Vendor.AsNoTracking().Include(v => v.Country).FirstOrDefaultAsync(v => v.VendorId == id);
-            if (vendor == null)
+            var model = await _manageAgencyUserService.GetUserCreationModelAsync(id);
+            if (model == null)
             {
-                notifyService.Error("OOPS !!!..Agency Not Found. Try again.");
-                return RedirectToAction(nameof(Users), ControllerName<EmpanelledAgencyUserController>.Name, new { id = id });
+                _notifyService.Error("OOPS !!!..Agency Not Found. Try again.");
+                return RedirectToAction(nameof(Users), new { id = id });
             }
-
-            var model = new ApplicationUser
-            {
-                Country = vendor.Country,
-                CountryId = vendor.CountryId,
-                Vendor = vendor,
-                AvailableRoles = availableRoles
-            };
-
-            ViewData["BreadcrumbNode"] = navigationService.GetAgencyUserActionPath(id, ControllerName<EmpanelledAgencyController>.Name, "Active Agencies", "Add User", "Create");
+            ViewData["BreadcrumbNode"] = _navigationService.GetAgencyUserActionPath(id, ControllerName<EmpanelledAgencyController>.Name, "Active Agencies", "Add User", "Create");
             return View(model);
         }
 
@@ -111,87 +88,58 @@ namespace risk.control.system.Controllers.Manager
             {
                 if (!ModelState.IsValid)
                 {
-                    notifyService.Error($"Correct the error(s)");
-                    await LoadModel(model);
+                    _errorNotifyService.ShowErrorNotification(ModelState);
+                    await _manageAgencyUserService.LoadModelAsync(model);
                     return View(model);
                 }
-                model.Id = 0; // Ensure Id is 0 for new user
-                var vendorUserModel = new CreateVendorUserRequest
-                {
-                    User = model,
-                    EmailSuffix = emailSuffix,
-                    CreatedBy = User?.Identity?.Name
-                };
-                var result = await agencyUserCreateEditService.CreateVendorUserAsync(vendorUserModel, ModelState, portal_base_url);
+
+                var result = await _manageAgencyUserService.CreateAgencyUserAsync(ModelState, model, emailSuffix, userEmail, _baseUrl);
 
                 if (!result.Success)
                 {
                     foreach (var error in result.Errors)
                         ModelState.AddModelError(error.Key, error.Value);
-                    notifyService.Error(result.Message);
-                    await LoadModel(model);
+                    _errorNotifyService.ShowErrorNotification(ModelState);
+
+                    await _manageAgencyUserService.LoadModelAsync(model);
                     return View(model);
                 }
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error Creating AgencyUser {Id}. {UserEmail}.", model.Id, userEmail);
-                notifyService.Error("OOPS !!!..Error Creating User. Try again.");
+                _logger.LogError(ex, "Error Creating AgencyUser {Id}. {UserEmail}.", model.Id, userEmail);
+                _notifyService.Error("OOPS !!!..Error Creating User. Try again.");
             }
             return RedirectToAction(nameof(Users), ControllerName<EmpanelledAgencyUserController>.Name, new { id = model.VendorId });
         }
 
-        private async Task LoadModel(ApplicationUser model)
-        {
-            var vendor = await _context.Vendor.Include(v => v.Country).FirstOrDefaultAsync(v => v.VendorId == model.VendorId);
-            var availableRoles = RoleGroups.AgencyAppRoles
-                .Where(r => r != AppRoles.AGENCY_ADMIN) // Exclude MANAGER if already taken
-                .Select(r => new SelectListItem
-                {
-                    Value = r.ToString(),
-                    Text = r.GetType()
-                            .GetMember(r.ToString())
-                            .First()
-                            .GetCustomAttribute<DisplayAttribute>()?.Name ?? r.ToString()
-                })
-                .ToList();
-            model.Country = vendor.Country;
-            model.CountryId = vendor.CountryId;
-            model.StateId = model.SelectedStateId;
-            model.DistrictId = model.SelectedDistrictId;
-            model.PinCodeId = model.SelectedPincodeId;
-            model.Vendor = vendor;
-            model.AvailableRoles = availableRoles;
-        }
-
-        public async Task<IActionResult> Edit(long? id)
+        public async Task<IActionResult> Edit(long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             try
             {
-                if (id == null || id <= 0)
+                if (id <= 0)
                 {
-                    notifyService.Error("OOPS !!!..Contact Admin");
+                    _notifyService.Error("OOPS !!!..Contact Admin");
                     return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
 
-                var agencyUser = await _context.ApplicationUser.Include(u => u.Vendor).Include(v => v.Country).FirstOrDefaultAsync(v => v.Id == id);
+                var agencyUser = await _manageAgencyUserService.GetUserForEditAsync(id);
 
                 if (agencyUser == null)
                 {
-                    notifyService.Error("OOPS !!!..Contact Admin");
+                    _notifyService.Error("OOPS !!!..Contact Admin");
                     return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
-                agencyUser.IsPasswordChangeRequired = await featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION) ? !agencyUser.IsPasswordChangeRequired : true;
 
-                ViewData["BreadcrumbNode"] = navigationService.GetAgencyUserActionPath(agencyUser.VendorId.Value, ControllerName<EmpanelledAgencyController>.Name, "Active Agencies", "Edit User", "Edit");
+                ViewData["BreadcrumbNode"] = _navigationService.GetAgencyUserActionPath(agencyUser.VendorId.Value, ControllerName<EmpanelledAgencyController>.Name, "Active Agencies", "Edit User", "Edit");
 
                 return View(agencyUser);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting {AgencyId}. {UserEmail}.", id, userEmail);
-                notifyService.Error("Error getting user. Try again");
+                _logger.LogError(ex, "Error getting {AgencyId}. {UserEmail}.", id, userEmail);
+                _notifyService.Error("Error getting user. Try again");
                 return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
@@ -205,31 +153,28 @@ namespace risk.control.system.Controllers.Manager
             {
                 if (!ModelState.IsValid)
                 {
-                    notifyService.Error($"Correct the error(s)");
-                    await LoadModel(model);
+                    _errorNotifyService.ShowErrorNotification(ModelState);
+                    await _manageAgencyUserService.LoadModelAsync(model);
                     return View(model);
                 }
-                var result = await agencyUserCreateEditService.EditVendorUserAsync(new EditVendorUserRequest
-                {
-                    UserId = id,
-                    Model = model,
-                    UpdatedBy = userEmail
-                },
-                ModelState, portal_base_url);
+
+                var result = await _manageAgencyUserService.EditAgencyUserAsync(ModelState, id, model, userEmail, _baseUrl);
 
                 if (!result.Success)
                 {
                     foreach (var error in result.Errors)
                         ModelState.AddModelError(error.Key, error.Value);
-                    notifyService.Error(result.Message);
-                    await LoadModel(model);
+
+                    _errorNotifyService.ShowErrorNotification(ModelState);
+
+                    await _manageAgencyUserService.LoadModelAsync(model);
                     return View(model);
                 }
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error editing {AgencyId}. {UserEmail}.", id, userEmail);
-                notifyService.Error("OOPS !!!..Error editing User. Try again.");
+                _logger.LogError(ex, "Error editing {AgencyId}. {UserEmail}.", id, userEmail);
+                _notifyService.Error("OOPS !!!..Error editing User. Try again.");
             }
             return RedirectToAction(nameof(Users), ControllerName<EmpanelledAgencyUserController>.Name, new { id = model.VendorId });
         }
@@ -241,35 +186,25 @@ namespace risk.control.system.Controllers.Manager
             {
                 if (id < 1)
                 {
-                    notifyService.Error("OOPS!!!.Id Not Found.Try Again");
+                    _notifyService.Error("OOPS!!!.Id Not Found.Try Again");
                     return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
 
-                var model = await _context.ApplicationUser.Include(v => v.Country).Include(v => v.State).Include(v => v.District).Include(v => v.PinCode).FirstOrDefaultAsync(c => c.Id == id);
+                var model = await _manageAgencyUserService.GetUserForDeleteAsync(id);
                 if (model == null)
                 {
-                    notifyService.Error("OOPS!!!.Case Not Found.Try Again");
+                    _notifyService.Error("OOPS!!!. User Not Found.");
                     return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
 
-                var agencySubStatuses = new[]{
-                    CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR,
-                    CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR,
-                    CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT,
-                    CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR,
-                    CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR};
-
-                var hasClaims = _context.Investigations.Any(c => agencySubStatuses.Contains(c.SubStatus) && c.VendorId == model.VendorId);
-                model.HasClaims = hasClaims;
-
-                ViewData["BreadcrumbNode"] = navigationService.GetAgencyUserActionPath(model.VendorId.Value, ControllerName<EmpanelledAgencyController>.Name, "Active Agencies", "Edit User", "Edit");
+                ViewData["BreadcrumbNode"] = _navigationService.GetAgencyUserActionPath(model.VendorId.Value, ControllerName<EmpanelledAgencyController>.Name, "Active Agencies", "Edit User", "Edit");
 
                 return View(model);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting {AgencyId}. {UserEmail}.", id, userEmail);
-                notifyService.Error("Error getting user. Try again");
+                _logger.LogError(ex, "Error getting {AgencyId}. {UserEmail}.", id, userEmail);
+                _notifyService.Error("Error getting user. Try again");
                 return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
@@ -281,31 +216,23 @@ namespace risk.control.system.Controllers.Manager
             var userEmail = HttpContext.User?.Identity?.Name;
             try
             {
-                if (string.IsNullOrWhiteSpace(email))
-                {
-                    notifyService.Error("Not Found!!!..Contact Admin");
-                    return this.RedirectToAction<DashboardController>(x => x.Index());
-                }
-                var model = await _context.ApplicationUser.Include(v => v.Country).Include(v => v.State).Include(v => v.District).Include(v => v.PinCode).FirstOrDefaultAsync(c => c.Email == email);
-                if (model == null)
-                {
-                    notifyService.Error("Not Found!!!..Contact Admin");
-                    return this.RedirectToAction<DashboardController>(x => x.Index());
-                }
+                var (result, message) = await _manageAgencyUserService.SoftDeleteUserAsync(email, User.Identity?.Name);
 
-                model.Updated = DateTime.UtcNow;
-                model.UpdatedBy = userEmail;
-                model.Deleted = true;
-                _context.ApplicationUser.Update(model);
-                await _context.SaveChangesAsync();
-                notifyService.Custom($"User <b>{model.Email}</b> deleted successfully", 3, "orange", "fas fa-user-minus");
+                if (result)
+                {
+                    _notifyService.Custom(message, 3, "orange", "fas fa-user-minus");
+                }
+                else
+                {
+                    _notifyService.Error(message);
+                }
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error deleting {AgencyUser}. {UserEmail}.", email, userEmail);
-                notifyService.Error("Error deleting user. Try again");
+                _logger.LogError(ex, "Error deleting {AgencyUser}. {UserEmail}.", email, userEmail);
+                _notifyService.Error("Error deleting user. Try again");
             }
-            return RedirectToAction(nameof(Users), ControllerName<EmpanelledAgencyUserController>.Name, new { id = vendorId });
+            return RedirectToAction(nameof(Users), new { id = vendorId });
         }
     }
 }

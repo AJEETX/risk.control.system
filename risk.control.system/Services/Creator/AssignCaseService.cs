@@ -5,7 +5,6 @@ using Microsoft.EntityFrameworkCore;
 using risk.control.system.AppConstant;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
-using risk.control.system.Models.ViewModel;
 using risk.control.system.Services.Common;
 
 namespace risk.control.system.Services
@@ -18,24 +17,27 @@ namespace risk.control.system.Services
 
         Task<string> ProcessAutoSingleAllocation(long caseId, string userEmail, string url = "");
 
-        Task<(string, string)> AllocateToVendor(string userEmail, long caseId, long vendorId, bool autoAllocated = true);
+        Task<(string, string, string)> AllocateToVendor(string userEmail, long caseId, long vendorId, bool autoAllocated = true);
     }
 
     internal class AssignCaseService : IAssignCaseService
     {
         private readonly IDbContextFactory<ApplicationDbContext> _contextFactory;
+        private readonly IAgencyCaseLoadService _agencyCaseLoadService;
         private readonly ILogger<AssignCaseService> logger;
         private readonly IMailService mailboxService;
         private readonly ITimelineService timelineService;
         private readonly IBackgroundJobClient backgroundJobClient;
 
         public AssignCaseService(IDbContextFactory<ApplicationDbContext> contextFactory,
+            IAgencyCaseLoadService agencyCaseLoadService,
             ILogger<AssignCaseService> logger,
             IMailService mailboxService,
             ITimelineService timelineService,
             IBackgroundJobClient backgroundJobClient)
         {
             _contextFactory = contextFactory;
+            this._agencyCaseLoadService = agencyCaseLoadService;
             this.logger = logger;
             this.mailboxService = mailboxService;
             this.timelineService = timelineService;
@@ -108,7 +110,7 @@ namespace risk.control.system.Services
 
             // 1. Pre-fetch initial load for ALL eligible vendors once to save DB hits
             var allVendorIds = company.EmpanelledVendors.Select(v => v.VendorId).ToList();
-            var initialLoads = await GetAgencyIdsLoad(allVendorIds);
+            var initialLoads = await _agencyCaseLoadService.GetAgencyIdsLoad(allVendorIds);
 
             // Create a local thread-safe dictionary to track "Work-in-Progress" load
             var localLoadTracker = initialLoads.ToDictionary(v => v.VendorId, v => v.CaseCount);
@@ -160,7 +162,7 @@ namespace risk.control.system.Services
                 }
 
                 // 4. Perform the actual DB update
-                var (policy, status) = await AllocateToVendor(userEmail, caseTask.Id, selectedVendorId);
+                var (policy, status, _) = await AllocateToVendor(userEmail, caseTask.Id, selectedVendorId);
 
                 if (!string.IsNullOrEmpty(policy))
                 {
@@ -225,7 +227,7 @@ namespace risk.control.system.Services
                 if (!distinctVendorIds.Any()) return null; // No vendors found, skip this claim
 
                 // 3. Get Vendor Load & Allocate
-                var vendorsWithCases = await GetAgencyIdsLoad(distinctVendorIds);
+                var vendorsWithCases = await _agencyCaseLoadService.GetAgencyIdsLoad(distinctVendorIds);
                 var vendorsWithCaseLoad = vendorsWithCases
                     .OrderBy(o => o.CaseCount)
                     .ToList();
@@ -233,7 +235,7 @@ namespace risk.control.system.Services
                 var selectedVendorId = vendorsWithCaseLoad.FirstOrDefault();
                 if (selectedVendorId == null) return null; // No vendors available
 
-                var (policy, status) = await AllocateToVendor(userEmail, caseTask.Id, selectedVendorId.VendorId);
+                var (policy, status, _) = await AllocateToVendor(userEmail, caseTask.Id, selectedVendorId.VendorId);
 
                 if (string.IsNullOrEmpty(policy) || string.IsNullOrEmpty(status))
                 {
@@ -294,7 +296,7 @@ namespace risk.control.system.Services
             }
         }
 
-        public async Task<(string, string)> AllocateToVendor(string userEmail, long caseId, long vendorId, bool autoAllocated = true)
+        public async Task<(string, string, string)> AllocateToVendor(string userEmail, long caseId, long vendorId, bool autoAllocated = true)
         {
             try
             {
@@ -307,15 +309,6 @@ namespace risk.control.system.Services
                 // Fetch case
                 var caseTask = await context.Investigations
                     .Include(c => c.PolicyDetail)
-                    .Include(c => c.ReportTemplate)
-                    .ThenInclude(c => c.LocationReport)
-                    .ThenInclude(c => c.FaceIds)
-                    .Include(c => c.ReportTemplate)
-                    .ThenInclude(c => c.LocationReport)
-                    .ThenInclude(c => c.DocumentIds)
-                    .Include(c => c.ReportTemplate)
-                    .ThenInclude(c => c.LocationReport)
-                    .ThenInclude(c => c.Questions)
                     .FirstOrDefaultAsync(v => v.Id == caseId);
 
                 var vendor = await context.Vendor.FindAsync(vendorId);
@@ -343,14 +336,12 @@ namespace risk.control.system.Services
                 var investigationReport = new InvestigationReport
                 {
                     ReportTemplateId = caseTask.ReportTemplateId,
-                    ReportTemplate = caseTask.ReportTemplate, // Optional
                 };
 
                 // Save InvestigationReport
                 context.InvestigationReport.Add(investigationReport);
 
                 // Link the InvestigationReport back to the InvestigationTask
-                caseTask.InvestigationReportId = investigationReport.Id;
                 caseTask.InvestigationReport = investigationReport;
 
                 context.Investigations.Update(caseTask);
@@ -359,50 +350,11 @@ namespace risk.control.system.Services
 
                 await timelineService.UpdateTaskStatus(caseTask.Id, currentUser.Email);
 
-                return (caseTask.PolicyDetail.ContractNumber, caseTask.SubStatus);
+                return (caseTask.PolicyDetail.ContractNumber, caseTask.SubStatus, vendor.Name);
             }
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error occurred Case {CasId}. {UserEmail}", caseId, userEmail);
-                throw;
-            }
-        }
-
-        private async Task<List<VendorIdWithCases>> GetAgencyIdsLoad(List<long> existingVendors)
-        {
-            try
-            {
-                // Get relevant status IDs in one query
-                var relevantStatuses = new[]
-                    {
-                    CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR,
-                    CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT,
-                    CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR,
-                    CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR
-                }; // Improves lookup performance
-
-                await using var context = await _contextFactory.CreateDbContextAsync();
-                // Fetch cases that match the criteria
-                var vendorCaseCount = context.Investigations.AsNoTracking()
-                    .Where(c => !c.Deleted &&
-                                c.VendorId.HasValue &&
-                                c.AssignedToAgency &&
-                                relevantStatuses.Contains(c.SubStatus))
-                    .GroupBy(c => c.VendorId.Value)
-                    .ToDictionary(g => g.Key, g => g.Count());
-
-                // Create the list of VendorIdWithCases
-                return existingVendors
-                    .Select(vendorId => new VendorIdWithCases
-                    {
-                        VendorId = vendorId,
-                        CaseCount = vendorCaseCount.GetValueOrDefault(vendorId, 0)
-                    })
-                    .ToList();
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Error occurred getting Existing Agencies {Count}", existingVendors.Count);
                 throw;
             }
         }

@@ -57,6 +57,7 @@ namespace risk.control.system.Controllers.Creator
                     UserCanCreate = result.UserCanCreate,
                     HasClaims = result.HasClaims,
                     FileSampleIdentifier = result.FileSampleIdentifier,
+                    HasFileUploads = result.HasClaims
                 });
             }
             catch (Exception ex)

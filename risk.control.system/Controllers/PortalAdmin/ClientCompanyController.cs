@@ -10,7 +10,7 @@ using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Seeds;
-using risk.control.system.Services.Agency;
+using risk.control.system.Services.AgencyAdmin;
 using risk.control.system.Services.Common;
 using SmartBreadcrumbs.Attributes;
 using SmartBreadcrumbs.Nodes;
@@ -24,8 +24,8 @@ namespace risk.control.system.Controllers
         private readonly string portal_base_url = string.Empty;
         private const string vendorMapSize = "800x800";
         private readonly ILogger<ClientCompanyController> logger;
-        private readonly IAgencyCreateEditService agencyCreateEditService;
-        private readonly IInvestigationDetailService service;
+        private readonly IManageAgencyService agencyCreateEditService;
+        private readonly IAgencyCaseLoadService service;
         private readonly ApplicationDbContext _context;
         private readonly IFileStorageService fileStorageService;
         private readonly INotyfService notifyService;
@@ -36,9 +36,9 @@ namespace risk.control.system.Controllers
 
         public ClientCompanyController(
             ILogger<ClientCompanyController> logger,
-            IAgencyCreateEditService agencyCreateEditService,
+            IManageAgencyService agencyCreateEditService,
              IHttpContextAccessor httpContextAccessor,
-             IInvestigationDetailService service,
+             IAgencyCaseLoadService service,
             ApplicationDbContext context,
             IFileStorageService fileStorageService,
             INotyfService notifyService,
@@ -367,7 +367,7 @@ namespace risk.control.system.Controllers
                 var vendorUserCount = await _context.ApplicationUser.CountAsync(c => c.VendorId == vendor.VendorId && !c.Deleted);
 
                 // HACKY
-                var currentCases = service.GetAgencyIdsLoad(new List<long> { vendor.VendorId });
+                var currentCases = await service.GetAgencyIdsLoad(new List<long> { vendor.VendorId });
                 vendor.SelectedCountryId = vendorUserCount;
                 vendor.SelectedStateId = currentCases.FirstOrDefault().CaseCount;
                 vendor.SelectedDistrictId = vendorAllCasesCount;

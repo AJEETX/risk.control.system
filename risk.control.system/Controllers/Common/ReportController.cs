@@ -3,25 +3,25 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using risk.control.system.AppConstant;
 using risk.control.system.Helpers;
-using risk.control.system.Services.Common;
+using risk.control.system.Services.Report;
 
 namespace risk.control.system.Controllers.Common
 {
     [Authorize(Roles = $"{AGENCY_ADMIN.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME},{ASSESSOR.DISPLAY_NAME},{MANAGER.DISPLAY_NAME}")]
     public class ReportController : Controller
     {
-        private readonly INotyfService notifyService;
-        private readonly ILogger<ReportController> logger;
-        private readonly IInvestigationDetailService investigationService;
+        private readonly INotyfService _notifyService;
+        private readonly ILogger<ReportController> _logger;
+        private readonly IInvestigationReportPdfService _reportPdfService;
 
         public ReportController(INotyfService notifyService,
             ILogger<ReportController> logger,
-            IInvestigationDetailService investigationService
+            IInvestigationReportPdfService reportPdfService
             )
         {
-            this.notifyService = notifyService;
-            this.logger = logger;
-            this.investigationService = investigationService;
+            this._notifyService = notifyService;
+            this._logger = logger;
+            this._reportPdfService = reportPdfService;
         }
 
         [HttpGet]
@@ -32,11 +32,11 @@ namespace risk.control.system.Controllers.Common
             {
                 if (id < 1)
                 {
-                    notifyService.Error("NOT FOUND !!!..");
+                    _notifyService.Error("NOT FOUND !!!..");
                     return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
 
-                var claim = await investigationService.GetClaimPdfReport(userEmail, id);
+                var claim = await _reportPdfService.GetClaimPdfReport(userEmail, id);
 
                 var fileName = Path.GetFileName(claim.ClaimsInvestigation.InvestigationReport.PdfReportFilePath);
                 var memory = new MemoryStream();
@@ -48,8 +48,8 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred to Print Pdf for {CaseId} . {UserEmail}", id, HttpContext.User.Identity.Name);
-                notifyService.Error("Error occurred. Try again.");
+                _logger.LogError(ex, "Error occurred to Print Pdf for {CaseId} . {UserEmail}", id, HttpContext.User.Identity.Name);
+                _notifyService.Error("Error occurred. Try again.");
                 return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }

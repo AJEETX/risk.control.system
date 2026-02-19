@@ -7,8 +7,7 @@ using risk.control.system.Controllers.Common;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
-using risk.control.system.Services.Agency;
-using risk.control.system.Services.Common;
+using risk.control.system.Services.AgencyAdmin;
 using SmartBreadcrumbs.Attributes;
 
 namespace risk.control.system.Controllers.Agency
@@ -19,21 +18,18 @@ namespace risk.control.system.Controllers.Agency
     {
         private readonly ApplicationDbContext _context;
         private readonly IAgencyUserService vendorUserService;
-        private readonly IAccountService accountService;
         private readonly INotyfService notifyService;
         private readonly ILogger<AgencyUserProfileController> logger;
         private readonly string portal_base_url = string.Empty;
 
         public AgencyUserProfileController(ApplicationDbContext context,
             IAgencyUserService vendorUserService,
-            IAccountService accountService,
              IHttpContextAccessor httpContextAccessor,
             INotyfService notifyService,
             ILogger<AgencyUserProfileController> logger)
         {
             _context = context;
             this.vendorUserService = vendorUserService;
-            this.accountService = accountService;
             this.notifyService = notifyService;
             this.logger = logger;
             var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
