@@ -69,7 +69,10 @@
 
 					<div class="row">
 						<div class="col-md-12">
-							<a id="back" asp-controller="AvailableAgency" asp-action="Agencies" class="btn btn-sm btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
+							<a id="back" asp-controller="AvailableAgency" asp-action="Agencies" class="btn btn-sm btn-outline-secondary" data-bs-toggle="tooltip" title="Back to Available Agencies">
+								<i class="fas fa-arrow-left"></i>
+								<span class="badge badge-light"> <i class="fas fa-hand-pointer"></i> </span>	@Applicationsettings.BACK
+							</a>
 
 							<a asp-controller="AvailableAgencyUser" asp-action="Users" asp-route-id="@Model.VendorId" class="btn btn-sm btn-success" data-bs-toggle="tooltip" title="User count = @Model.SelectedCountryId"><i class="fas fa-user-friends"></i>  Users (@Model.SelectedCountryId)</a>
 							<a asp-controller="AvailableAgencyService" asp-action="Service" asp-route-id="@Model.VendorId" class="btn btn-sm btn-danger" data-bs-toggle="tooltip" title="Agency Services count = @Model.VendorInvestigationServiceTypes.Count"><i class="fas fa-cogs"></i>  @Applicationsettings.SERVICE (@Model.VendorInvestigationServiceTypes.Count)</a>

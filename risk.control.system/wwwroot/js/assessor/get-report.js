@@ -143,7 +143,7 @@ $(document).ready(function () {
                                 $(".submit-progress").removeClass("hidden");
                             }, 1);
 
-                            $('#approve-case').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> APPROVE");
+                            $('#approve-case').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Submit");
                             disableAllInteractiveElements();
 
                             $('#create-form').submit();
@@ -164,50 +164,7 @@ $(document).ready(function () {
                 }
             });
         }
-        else if (!askConfirmation && review && $('#assessorRemarkType').val() == 'REVIEW') {
-            e.preventDefault();
-            $.confirm({
-                title: "Confirm REVIEW",
-                content: "Are you sure?",
-                icon: 'fas fa-sync',
-
-                type: 'orange',
-                closeIcon: true,
-                buttons: {
-                    confirm: {
-                        text: "REVIEW",
-                        btnClass: 'btn-warning',
-                        action: function () {
-                            askConfirmation = true;
-                            review = false;
-                            $("body").addClass("submit-progress-bg");
-                            // Wrap in setTimeout so the UI
-                            // can update the spinners
-                            setTimeout(function () {
-                                $(".submit-progress").removeClass("hidden");
-                            }, 1);
-
-                            $('#approve-case').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i>  REVIEW");
-                            disableAllInteractiveElements();
-
-                            $('#create-form').submit();
-
-                            var createForm = document.getElementById("create-form");
-                            if (createForm) {
-                                var nodes = createForm.getElementsByTagName('*');
-                                for (var i = 0; i < nodes.length; i++) {
-                                    nodes[i].disabled = true;
-                                }
-                            }
-                        }
-                    },
-                    cancel: {
-                        text: "Cancel",
-                        btnClass: 'btn-default'
-                    }
-                }
-            });
-        }
+        
         else if (!askConfirmation && reject && $('#assessorRemarkType').val() == 'REJECT') {
             e.preventDefault();
             $.confirm({
@@ -231,7 +188,7 @@ $(document).ready(function () {
                                 $(".submit-progress").removeClass("hidden");
                             }, 1);
 
-                            $('#approve-case').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i>  REJECT");
+                            $('#approve-case').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i>  Submit");
                             disableAllInteractiveElements();
 
                             $('#create-form').submit();
@@ -467,7 +424,7 @@ function showenquiry() {
         $(".submit-progress").removeClass("hidden");
     }, 1);
 
-    $('#enquire-case').html("<i class='fas fa-sync fa-spin'></i> ENQUIRE");
+    $('#enquire-case').html("<i class='fas fa-sync fa-spin'></i> Enquire");
     disableAllInteractiveElements();
 
     var createForm = document.getElementById("create-form");

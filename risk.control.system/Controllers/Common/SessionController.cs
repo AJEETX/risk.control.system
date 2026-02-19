@@ -10,10 +10,10 @@ namespace risk.control.system.Controllers.Company
 {
     public class SessionController : Controller
     {
-        private readonly ApplicationDbContext context;
-        private readonly UserManager<ApplicationUser> userManager;
-        private readonly SignInManager<ApplicationUser> signInManager;
-        private readonly ILogger<RatingController> logger;
+        private readonly ApplicationDbContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly ILogger<RatingController> _logger;
 
         public SessionController(
             ApplicationDbContext context,
@@ -21,10 +21,10 @@ namespace risk.control.system.Controllers.Company
             SignInManager<ApplicationUser> signInManager,
             ILogger<RatingController> logger)
         {
-            this.context = context;
-            this.userManager = userManager;
-            this.signInManager = signInManager;
-            this.logger = logger;
+            _context = context;
+            _userManager = userManager;
+            _signInManager = signInManager;
+            _logger = logger;
         }
 
         [ValidateAntiForgeryToken]
@@ -40,7 +40,7 @@ namespace risk.control.system.Controllers.Company
                     return Unauthorized(new { message = "User is logged out due to inactivity or authentication failure." });
 
                 var email = User.Identity.Name;
-                var user = await signInManager.UserManager.Users
+                var user = await _signInManager.UserManager.Users
                     .FirstOrDefaultAsync(u => u.Email == email);
 
                 if (user == null)
@@ -52,7 +52,7 @@ namespace risk.control.system.Controllers.Company
                 user.LastActivityDate = now;
 
                 // Update or create UserSessionAlive
-                var session = await context.UserSessionAlive
+                var session = await _context.UserSessionAlive
                     .Where(s => s.ActiveUser.Id == user.Id && !s.LoggedOut)
                     .OrderByDescending(s => s.Updated ?? s.Created)
                     .FirstOrDefaultAsync();
@@ -64,7 +64,7 @@ namespace risk.control.system.Controllers.Company
                 }
                 else
                 {
-                    context.UserSessionAlive.Add(new UserSessionAlive
+                    _context.UserSessionAlive.Add(new UserSessionAlive
                     {
                         ActiveUser = user,
                         CreatedUser = email,
@@ -73,10 +73,10 @@ namespace risk.control.system.Controllers.Company
                     });
                 }
 
-                await context.SaveChangesAsync();
+                await _context.SaveChangesAsync();
 
                 // Optionally refresh the cookie sign-in
-                await signInManager.RefreshSignInAsync(user);
+                await _signInManager.RefreshSignInAsync(user);
 
                 // Return minimal user info
                 var userDetails = new
@@ -91,7 +91,7 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error in KeepSessionAlive for {UserEmail}", User?.Identity?.Name ?? "Anonymous");
+                _logger.LogError(ex, "Error in KeepSessionAlive for {UserEmail}", User?.Identity?.Name ?? "Anonymous");
                 return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred." });
             }
         }
@@ -102,7 +102,7 @@ namespace risk.control.system.Controllers.Company
             Response.ContentType = "text/event-stream";
 
             // Fetch user details for password change
-            var user = await userManager.FindByEmailAsync(email);
+            var user = await _userManager.FindByEmailAsync(email);
             if (user == null)
             {
                 await Response.WriteAsync($"data: ERROR_UserNotFound\n");

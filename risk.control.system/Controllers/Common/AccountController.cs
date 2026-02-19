@@ -16,13 +16,13 @@ namespace risk.control.system.Controllers.Common
     public class AccountController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly IFeatureManager featureManager;
-        private readonly ILoginService loginService;
+        private readonly IFeatureManager _featureManager;
+        private readonly ILoginService _loginService;
         private readonly SignInManager<ApplicationUser> _signInManager;
-        private readonly IAccountService accountService;
+        private readonly IAccountService _accountService;
         private readonly ILogger<AccountController> _logger;
-        private readonly INotyfService notifyService;
-        private readonly string BaseUrl;
+        private readonly INotyfService _notifyService;
+        private readonly string _baseUrl;
 
         public AccountController(
             UserManager<ApplicationUser> userManager,
@@ -35,22 +35,22 @@ namespace risk.control.system.Controllers.Common
             INotyfService notifyService)
         {
             _userManager = userManager ?? throw new ArgumentNullException();
-            this.featureManager = featureManager;
-            this.loginService = loginService;
+            this._featureManager = featureManager;
+            this._loginService = loginService;
             _signInManager = signInManager ?? throw new ArgumentNullException();
-            this.accountService = accountService;
+            this._accountService = accountService;
             _logger = logger;
-            this.notifyService = notifyService;
+            this._notifyService = notifyService;
             var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
             var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
-            BaseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
+            _baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
         }
 
         [HttpGet]
         [AllowAnonymous]
         public async Task<IActionResult> Login(string returnUrl = null)
         {
-            var setPassword = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_PASSWORD);
+            var setPassword = await _featureManager.IsEnabledAsync(FeatureFlags.SHOW_PASSWORD);
             if (!string.IsNullOrEmpty(returnUrl) && !Url.IsLocalUrl(returnUrl))
             {
                 returnUrl = "/";
@@ -75,31 +75,31 @@ namespace risk.control.system.Controllers.Common
                 var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false);
 
                 if (!result.Succeeded)
-                    return await PrepareInvalidView(model, loginService.GetErrorMessage(result));
+                    return await PrepareInvalidView(model, _loginService.GetErrorMessage(result));
 
                 var user = await _userManager.FindByEmailAsync(model.Email);
                 if (user == null)
                     return await PrepareInvalidView(model, "User can't login.");
-                var (isAuthorized, displayName, isAdmin) = await loginService.GetUserStatusAsync(user, agent_login);
+                var (isAuthorized, displayName, isAdmin) = await _loginService.GetUserStatusAsync(user, agent_login);
 
                 if (!isAuthorized)
                     return await PrepareInvalidView(model, "Account inactive or unauthorized.");
 
-                bool forceChangeEnabled = await featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION);
+                bool forceChangeEnabled = await _featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION);
 
                 if (!isAdmin && forceChangeEnabled && user.IsPasswordChangeRequired)
                 {
                     return RedirectToAction("ChangePassword", "Account", new { email = user.Email });
                 }
 
-                await loginService.SignInWithTimeoutAsync(user);
+                await _loginService.SignInWithTimeoutAsync(user);
 
-                notifyService.Success($"Welcome <b>{displayName}</b>, Login successful");
+                _notifyService.Success($"Welcome <b>{displayName}</b>, Login successful");
                 if (!string.IsNullOrEmpty(model.ReturnUrl) && Url.IsLocalUrl(model.ReturnUrl))
                 {
                     return Redirect(model.ReturnUrl);
                 }
-                return RedirectToAction("Index", "Dashboard");
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
             catch (Exception ex)
             {
@@ -122,11 +122,11 @@ namespace risk.control.system.Controllers.Common
         {
             var email = User?.Identity?.Name;
 
-            await accountService.Logout(email);
+            await _accountService.Logout(email);
 
             _logger.LogInformation("User logged out.");
 
-            return RedirectToAction("Login", "Account", new { returnUrl = "/" });
+            return RedirectToAction(nameof(Login), ControllerName<AccountController>.Name, new { returnUrl = "/" });
         }
 
         [HttpGet]
@@ -136,9 +136,9 @@ namespace risk.control.system.Controllers.Common
 
             if (user == null)
             {
-                notifyService.Custom($"Password update Error", 3, "red", "fa fa-lock");
+                _notifyService.Custom($"Password update Error", 3, "red", "fa fa-lock");
 
-                return RedirectToAction("Login");
+                return RedirectToAction(nameof(Login));
             }
             var model = new ChangePasswordViewModel
             {
@@ -154,17 +154,17 @@ namespace risk.control.system.Controllers.Common
         {
             if (!ModelState.IsValid)
             {
-                notifyService.Custom($"Password update Error", 3, "red", "fa fa-lock");
+                _notifyService.Custom($"Password update Error", 3, "red", "fa fa-lock");
 
                 return View(model);
             }
             try
             {
-                var result = await accountService.ChangePasswordAsync(model, User, HttpContext.User.Identity.IsAuthenticated, BaseUrl);
+                var result = await _accountService.ChangePasswordAsync(model, User, HttpContext.User.Identity.IsAuthenticated, _baseUrl);
 
                 if (!result.Success)
                 {
-                    notifyService.Error(result.Message);
+                    _notifyService.Error(result.Message);
 
                     foreach (var error in result.Errors)
                         ModelState.AddModelError(error.Key, error.Value);
@@ -172,13 +172,13 @@ namespace risk.control.system.Controllers.Common
                     return View(model);
                 }
 
-                notifyService.Custom($"Password update successful", 3, "orange", "fa fa-unlock");
-                return RedirectToAction("Index", "Dashboard");
+                _notifyService.Custom($"Password update successful", 3, "orange", "fa fa-unlock");
+                return this.RedirectToAction<DashboardController>(x => x.Index());
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error occurred while changing password for {UserEmail}", User.Identity.Name ?? "Anonymous");
-                notifyService.Error("OOPS !!!..Contact Admin");
+                _notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Login));
             }
         }
@@ -191,16 +191,16 @@ namespace risk.control.system.Controllers.Common
             ForgotPassword model;
             if (!ModelState.IsValid)
             {
-                model = await accountService.CreateDefaultForgotPasswordModel(input?.Email);
+                model = await _accountService.CreateDefaultForgotPasswordModel(input?.Email);
                 return View(model);
             }
             try
             {
-                var smsResult = await accountService.ForgotPassword(input.Email, input.Mobile, input.CountryId);
+                var smsResult = await _accountService.ForgotPassword(input.Email, input.Mobile, input.CountryId);
 
                 if (smsResult == null)
                 {
-                    model = await accountService.CreateDefaultForgotPasswordModel(input?.Email);
+                    model = await _accountService.CreateDefaultForgotPasswordModel(input?.Email);
                     return View(model);
                 }
                 var successModel = new ForgotPassword
@@ -227,7 +227,7 @@ namespace risk.control.system.Controllers.Common
         {
             model.LoginError = error;
             ModelState.AddModelError(string.Empty, error);
-            model.SetPassword = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
+            model.SetPassword = await _featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
             return View(model);
         }
     }
