@@ -11,7 +11,13 @@ namespace risk.control.system.Services.AgencyAdmin
 {
     public interface IAgencyUserService
     {
+        Task<ApplicationUser> GetUserAsync(long id);
+
+        Task<ApplicationUser> GetChangePasswordUserAsync(string userEmail);
+
         Task<ServiceResult> UpdateUserAsync(string id, ApplicationUser model, string updatedBy, string portal_base_url);
+
+        Task LoadModel(ApplicationUser model, string currentUserEmail);
     }
 
     internal class AgencyUserService : IAgencyUserService
@@ -75,6 +81,31 @@ namespace risk.control.system.Services.AgencyAdmin
 
             result.Success = true;
             return result;
+        }
+
+        public async Task LoadModel(ApplicationUser model, string currentUserEmail)
+        {
+            var vendorUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == currentUserEmail);
+            var vendor = await _context.Vendor.AsNoTracking().Include(c => c.Country).FirstOrDefaultAsync(v => v.VendorId == vendorUser.VendorId);
+            model.Vendor = vendor;
+            model.Country = vendor.Country;
+            model.CountryId = vendor.CountryId;
+
+            model.StateId = model.SelectedStateId;
+            model.DistrictId = model.SelectedDistrictId;
+            model.PinCodeId = model.SelectedPincodeId;
+        }
+
+        public async Task<ApplicationUser> GetUserAsync(long id)
+        {
+            var agencyUser = await _context.ApplicationUser.AsNoTracking().Include(u => u.ClientCompany).Include(c => c.Country).FirstOrDefaultAsync(u => u.Id == id);
+            return agencyUser;
+        }
+
+        public async Task<ApplicationUser> GetChangePasswordUserAsync(string userEmail)
+        {
+            var agencyUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(u => u.Email == userEmail);
+            return agencyUser;
         }
 
         private static ServiceResult ValidateProfileImage(IFormFile file)

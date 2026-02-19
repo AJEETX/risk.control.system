@@ -13,29 +13,29 @@ namespace risk.control.system.Controllers.Common
     [ApiExplorerSettings(IgnoreApi = true)]
     public class DocumentController : Controller
     {
-        private readonly ILogger<CreatorController> logger;
-        private readonly ApplicationDbContext context;
-        private readonly IWebHostEnvironment webHostEnvironment;
+        private readonly ILogger<CreatorController> _logger;
+        private readonly ApplicationDbContext _context;
+        private readonly IWebHostEnvironment _env;
 
         public DocumentController(ILogger<CreatorController> logger,
             ApplicationDbContext context,
-            IWebHostEnvironment webHostEnvironment)
+            IWebHostEnvironment env)
         {
-            this.logger = logger;
-            this.context = context;
-            this.webHostEnvironment = webHostEnvironment;
+            _logger = logger;
+            _context = context;
+            _env = env;
         }
 
         public async Task<IActionResult> GetPolicyDocument(long id)
         {
             try
             {
-                var policyDetail = await context.PolicyDetail.AsNoTracking().FirstOrDefaultAsync(x => x.PolicyDetailId == id);
+                var policyDetail = await _context.PolicyDetail.AsNoTracking().FirstOrDefaultAsync(x => x.PolicyDetailId == id);
 
                 if (policyDetail?.DocumentPath == null)
                     return NotFound();
 
-                var fullPath = Path.Combine(webHostEnvironment.ContentRootPath, policyDetail.DocumentPath);
+                var fullPath = Path.Combine(_env.ContentRootPath, policyDetail.DocumentPath);
 
                 if (!System.IO.File.Exists(fullPath))
                     return NotFound();
@@ -55,7 +55,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error retrieving policy document for investigation {InvestigationId}", id);
+                _logger.LogError(ex, "Error retrieving policy document for investigation {InvestigationId}", id);
                 throw;
             }
         }
@@ -64,13 +64,13 @@ namespace risk.control.system.Controllers.Common
         {
             try
             {
-                var customer = await context.CustomerDetail.AsNoTracking()
+                var customer = await _context.CustomerDetail.AsNoTracking()
                                 .FirstOrDefaultAsync(x => x.CustomerDetailId == id);
 
                 if (customer?.ImagePath == null)
                     return NotFound();
 
-                var fullPath = Path.Combine(webHostEnvironment.ContentRootPath, customer.ImagePath);
+                var fullPath = Path.Combine(_env.ContentRootPath, customer.ImagePath);
 
                 if (!System.IO.File.Exists(fullPath))
                     return NotFound();
@@ -90,7 +90,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error retrieving customer document for customer {CustomerId}", id);
+                _logger.LogError(ex, "Error retrieving customer document for customer {CustomerId}", id);
                 throw;
             }
         }
@@ -99,13 +99,13 @@ namespace risk.control.system.Controllers.Common
         {
             try
             {
-                var customer = await context.BeneficiaryDetail.AsNoTracking()
+                var customer = await _context.BeneficiaryDetail.AsNoTracking()
                 .FirstOrDefaultAsync(x => x.BeneficiaryDetailId == id);
 
                 if (customer?.ImagePath == null)
                     return NotFound();
 
-                var fullPath = Path.Combine(webHostEnvironment.ContentRootPath, customer.ImagePath);
+                var fullPath = Path.Combine(_env.ContentRootPath, customer.ImagePath);
 
                 if (!System.IO.File.Exists(fullPath))
                     return NotFound();
@@ -125,7 +125,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error retrieving beneficiary document for beneficiary {BeneficiaryId}", id);
+                _logger.LogError(ex, "Error retrieving beneficiary document for beneficiary {BeneficiaryId}", id);
                 throw;
             }
         }
@@ -134,13 +134,13 @@ namespace risk.control.system.Controllers.Common
         {
             try
             {
-                var company = await context.ClientCompany.AsNoTracking()
+                var company = await _context.ClientCompany.AsNoTracking()
                 .FirstOrDefaultAsync(x => x.ClientCompanyId == id);
 
                 if (company.DocumentUrl == null)
                     return NotFound();
 
-                var fullPath = Path.Combine(webHostEnvironment.ContentRootPath, company.DocumentUrl);
+                var fullPath = Path.Combine(_env.ContentRootPath, company.DocumentUrl);
 
                 if (!System.IO.File.Exists(fullPath))
                     return NotFound();
@@ -160,7 +160,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error retrieving company document for company {CompanyId}", id);
+                _logger.LogError(ex, "Error retrieving company document for company {CompanyId}", id);
                 throw;
             }
         }
@@ -169,13 +169,13 @@ namespace risk.control.system.Controllers.Common
         {
             try
             {
-                var vendor = await context.Vendor.AsNoTracking()
+                var vendor = await _context.Vendor.AsNoTracking()
                 .FirstOrDefaultAsync(x => x.VendorId == id);
 
                 if (vendor.DocumentUrl == null)
                     return NotFound();
 
-                var fullPath = Path.Combine(webHostEnvironment.ContentRootPath, vendor.DocumentUrl);
+                var fullPath = Path.Combine(_env.ContentRootPath, vendor.DocumentUrl);
 
                 if (!System.IO.File.Exists(fullPath))
                     return NotFound();
@@ -195,7 +195,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error retrieving Agency document for agency {AgencyId}", id);
+                _logger.LogError(ex, "Error retrieving Agency document for agency {AgencyId}", id);
                 throw;
             }
         }
@@ -204,16 +204,16 @@ namespace risk.control.system.Controllers.Common
         {
             try
             {
-                var user = await context.ApplicationUser.AsNoTracking()
+                var user = await _context.ApplicationUser.AsNoTracking()
                                 .FirstOrDefaultAsync(x => x.Id == id);
                 string fullPath = string.Empty;
                 if (user.ProfilePictureUrl != null)
                 {
-                    fullPath = Path.Combine(webHostEnvironment.ContentRootPath, user.ProfilePictureUrl);
+                    fullPath = Path.Combine(_env.ContentRootPath, user.ProfilePictureUrl);
                 }
                 else
                 {
-                    fullPath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-user.png");
+                    fullPath = Path.Combine(_env.WebRootPath, "img", "no-user.png");
                 }
 
                 var ext = Path.GetExtension(fullPath).ToLowerInvariant();
@@ -231,7 +231,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error retrieving User Profile image {Id}", id);
+                _logger.LogError(ex, "Error retrieving User Profile image {Id}", id);
 
                 throw;
             }
@@ -241,13 +241,13 @@ namespace risk.control.system.Controllers.Common
         {
             try
             {
-                var agent = await context.AgentIdReport.AsNoTracking()
+                var agent = await _context.AgentIdReport.AsNoTracking()
                 .FirstOrDefaultAsync(x => x.Id == id);
 
                 if (agent.FilePath == null)
                     return NotFound();
 
-                var fullPath = Path.Combine(webHostEnvironment.ContentRootPath, agent.FilePath);
+                var fullPath = Path.Combine(_env.ContentRootPath, agent.FilePath);
 
                 if (!System.IO.File.Exists(fullPath))
                     return NotFound();
@@ -267,7 +267,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error retrieving Agent Profile image {Id}", id);
+                _logger.LogError(ex, "Error retrieving Agent Profile image {Id}", id);
 
                 throw;
             }
@@ -277,13 +277,13 @@ namespace risk.control.system.Controllers.Common
         {
             try
             {
-                var agent = await context.DigitalIdReport.AsNoTracking()
+                var agent = await _context.DigitalIdReport.AsNoTracking()
                 .FirstOrDefaultAsync(x => x.Id == id);
 
                 if (agent.FilePath == null)
                     return NotFound();
 
-                var fullPath = Path.Combine(webHostEnvironment.ContentRootPath, agent.FilePath);
+                var fullPath = Path.Combine(_env.ContentRootPath, agent.FilePath);
 
                 if (!System.IO.File.Exists(fullPath))
                     return NotFound();
@@ -303,7 +303,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error retrieving Person Profile image {Id}", id);
+                _logger.LogError(ex, "Error retrieving Person Profile image {Id}", id);
 
                 throw;
             }
@@ -313,13 +313,13 @@ namespace risk.control.system.Controllers.Common
         {
             try
             {
-                var agent = await context.DocumentIdReport.AsNoTracking()
+                var agent = await _context.DocumentIdReport.AsNoTracking()
                     .FirstOrDefaultAsync(x => x.Id == id);
 
                 if (agent.FilePath == null)
                     return NotFound();
 
-                var fullPath = Path.Combine(webHostEnvironment.ContentRootPath, agent.FilePath);
+                var fullPath = Path.Combine(_env.ContentRootPath, agent.FilePath);
 
                 if (!System.IO.File.Exists(fullPath))
                     return NotFound();
@@ -339,7 +339,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error retrieving OCR image {Id}", id);
+                _logger.LogError(ex, "Error retrieving OCR image {Id}", id);
 
                 throw;
             }
@@ -349,13 +349,13 @@ namespace risk.control.system.Controllers.Common
         {
             try
             {
-                var media = await context.MediaReport.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+                var media = await _context.MediaReport.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
 
                 if (media == null || string.IsNullOrWhiteSpace(media.FilePath))
                     return NotFound();
 
                 // Always force root to be inside your Document folder
-                var fullPath = Path.Combine(webHostEnvironment.ContentRootPath, media.FilePath);
+                var fullPath = Path.Combine(_env.ContentRootPath, media.FilePath);
 
                 if (!System.IO.File.Exists(fullPath))
                     return NotFound();
@@ -384,7 +384,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error retrieving Media File {Id}", id);
+                _logger.LogError(ex, "Error retrieving Media File {Id}", id);
 
                 throw;
             }

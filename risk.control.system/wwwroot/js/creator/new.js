@@ -508,7 +508,7 @@
                 closeIcon: true,
                 buttons: {
                     cancel: {
-                        text: "OK",
+                        text: "Close",
                         btnClass: 'btn-warning'
                     }
                 }
@@ -574,7 +574,7 @@
                 icon: 'fas fa-trash',
                 buttons: {
                     cancel: {
-                        text: "OK",
+                        text: "Close",
                         btnClass: 'btn-danger'
                     }
                 }
