@@ -42,15 +42,15 @@
     </div>
     <div class="card-footer">
         <div class="text-right">
-            <a id="cancel" asp-controller="VendorInvestigation" class="btn btn-outline-secondary" asp-action="CaseReport">
-                <i class="fas fa-arrow-left" aria-hidden="true"></i> Back
+            <a id="cancel" asp-controller="VendorInvestigation" class="btn btn-sm btn-outline-secondary" asp-action="CaseReport" data-bs-toggle="tooltip" title="Back to Submited reports">
+                <i class="fas fa-arrow-left" aria-hidden="true"></i> <span class="badge badge-light"> <i class="far fa-file-archive"></i> </span> Back
             </a>
             <a id="reselect-case" asp-controller="VendorInvestigation" asp-action="ReSelectVendorAgent"
-               asp-route-id="@Model.CaseTask.Id" class="btn btn-danger">
+               asp-route-id="@Model.CaseTask.Id" class="btn btn-sm btn-danger">
                 <i class="fas fa-sync" aria-hidden="true"></i> Re-Allocate
             </a>
-            <button disabled id="allocate-case" type="submit" class="btn btn-success">
-                <i class="far fa-file-alt" aria-hidden="true"></i> SUBMIT
+            <button disabled id="allocate-case" type="submit" class="btn btn-sm btn-success">
+                <i class="far fa-file-alt" aria-hidden="true"></i> Submit
             </button>
         </div>
     </div>

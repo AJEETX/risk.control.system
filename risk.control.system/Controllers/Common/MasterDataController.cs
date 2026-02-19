@@ -20,11 +20,11 @@ namespace risk.control.system.Controllers.Common
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME},{AGENCY_ADMIN.DISPLAY_NAME},{CREATOR.DISPLAY_NAME},{ASSESSOR.DISPLAY_NAME},{MANAGER.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME},{AGENT.DISPLAY_NAME}")]
     public class MasterDataController : ControllerBase
     {
-        private readonly ApplicationDbContext context;
-        private readonly IPhoneService phoneService;
-        private readonly IFeatureManager featureManager;
-        private readonly UserManager<ApplicationUser> userManager;
-        private readonly ILogger<MasterDataController> logger;
+        private readonly ApplicationDbContext _context;
+        private readonly IPhoneService _phoneService;
+        private readonly IFeatureManager _featureManager;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly ILogger<MasterDataController> _logger;
 
         public MasterDataController(
             ApplicationDbContext context,
@@ -33,11 +33,11 @@ namespace risk.control.system.Controllers.Common
             UserManager<ApplicationUser> userManager,
             ILogger<MasterDataController> logger)
         {
-            this.context = context;
-            this.phoneService = phoneService;
-            this.featureManager = featureManager;
-            this.userManager = userManager;
-            this.logger = logger;
+            this._context = context;
+            this._phoneService = phoneService;
+            this._featureManager = featureManager;
+            this._userManager = userManager;
+            this._logger = logger;
         }
 
         [HttpGet("CheckAgencyName")]
@@ -51,8 +51,8 @@ namespace risk.control.system.Controllers.Common
 
             var newDomain = input.Trim().ToLower(CultureInfo.InvariantCulture) + domainData.GetEnumDisplayName();
 
-            var agenccompanyCount = await context.ClientCompany.AsNoTracking().CountAsync(u => u.Email.Trim().ToLower() == newDomain && !u.Deleted);
-            var agencyCount = await context.Vendor.AsNoTracking().CountAsync(u => u.Email.Trim().ToLower() == newDomain);
+            var agenccompanyCount = await _context.ClientCompany.AsNoTracking().CountAsync(u => u.Email.Trim().ToLower() == newDomain && !u.Deleted);
+            var agencyCount = await _context.Vendor.AsNoTracking().CountAsync(u => u.Email.Trim().ToLower() == newDomain);
 
             return agencyCount == 0 && agenccompanyCount == 0 ? 0 : 1;
         }
@@ -65,7 +65,7 @@ namespace risk.control.system.Controllers.Common
                 return null;
             }
 
-            var userCount = await userManager.Users.AsNoTracking().CountAsync(u => u.Email == input.ToLower());
+            var userCount = await _userManager.Users.AsNoTracking().CountAsync(u => u.Email == input.ToLower());
 
             return userCount == 0 ? 0 : 1;
         }
@@ -82,13 +82,13 @@ namespace risk.control.system.Controllers.Common
                 var services = new List<InvestigationServiceType>();
                 if (!string.IsNullOrWhiteSpace(insuranceType) && Enum.TryParse(insuranceType, out type))
                 {
-                    services = await context.InvestigationServiceType.AsNoTracking().Where(s => s.InsuranceType == type).ToListAsync();
+                    services = await _context.InvestigationServiceType.AsNoTracking().Where(s => s.InsuranceType == type).ToListAsync();
                 }
                 return Ok(services);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred while getting investigation types for user {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error occurred while getting investigation types for user {UserEmail}", userEmail);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -99,12 +99,12 @@ namespace risk.control.system.Controllers.Common
         {
             try
             {
-                var vendorAgentIds = await context.Set<ApplicationUser>()
+                var vendorAgentIds = await _context.Set<ApplicationUser>()
                 .Where(v => v.Role == AppRoles.AGENT)
                 .Select(v => v.Id)
                 .ToListAsync();
 
-                IQueryable<ApplicationUser> query = context.ApplicationUser.AsNoTracking()
+                IQueryable<ApplicationUser> query = _context.ApplicationUser.AsNoTracking()
                     .Where(a => !a.Deleted && a.Email != PORTAL_ADMIN.EMAIL &&
                                 !vendorAgentIds.Contains(a.Id));
 
@@ -124,7 +124,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred while getting users");
+                _logger.LogError(ex, "Error occurred while getting users");
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -136,7 +136,7 @@ namespace risk.control.system.Controllers.Common
 
             try
             {
-                var allCountries = context.Country.AsNoTracking().ToList();
+                var allCountries = _context.Country.AsNoTracking().ToList();
 
                 if (string.IsNullOrEmpty(term))
                     return Ok(allCountries
@@ -165,7 +165,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred while getting countries for user {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error occurred while getting countries for user {UserEmail}", userEmail);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -178,12 +178,12 @@ namespace risk.control.system.Controllers.Common
             try
             {
                 if (string.IsNullOrEmpty(term?.Trim()))
-                    return Ok(context.State.AsNoTracking().Where(x => x.CountryId == countryId)?
+                    return Ok(_context.State.AsNoTracking().Where(x => x.CountryId == countryId)?
                         .OrderBy(x => x.Name)
                      .Take(10)
                      .Select(x => new { StateId = x.StateId, StateName = x.Name })?.ToList());
 
-                var states = context.State.AsNoTracking().Where(x => x.CountryId == countryId && x.Name.ToLower().Contains(term.ToLower()))
+                var states = _context.State.AsNoTracking().Where(x => x.CountryId == countryId && x.Name.ToLower().Contains(term.ToLower()))
                         .OrderBy(x => x.Name)
                      .Take(10)
                         .Select(c => new
@@ -196,7 +196,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred while getting states for user {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error occurred while getting states for user {UserEmail}", userEmail);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -209,7 +209,7 @@ namespace risk.control.system.Controllers.Common
             try
             {
                 var districts = string.IsNullOrEmpty(term?.Trim())
-                ? context.District.AsNoTracking()
+                ? _context.District.AsNoTracking()
                     .Where(x => x.CountryId == countryId && x.StateId == stateId)
                     .OrderBy(x => x.Name)
                     .Take(10)
@@ -219,7 +219,7 @@ namespace risk.control.system.Controllers.Common
                         DistrictName = $"{x.Name}"
                     })
                     .ToList()
-                : context.District.AsNoTracking()
+                : _context.District.AsNoTracking()
                     .Where(x => x.CountryId == countryId && x.StateId == stateId && x.Name.ToLower().Contains(term.ToLower()))
                     .OrderBy(x => x.Name)
                     .Take(10)
@@ -248,7 +248,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred while getting districts for user {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error occurred while getting districts for user {UserEmail}", userEmail);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -260,14 +260,14 @@ namespace risk.control.system.Controllers.Common
 
             try
             {
-                var country = context.Country.AsNoTracking().Where(x => x.CountryId == id).OrderBy(x => x.Name).Take(10) // Filter based on user input
+                var country = _context.Country.AsNoTracking().Where(x => x.CountryId == id).OrderBy(x => x.Name).Take(10) // Filter based on user input
                     .Select(x => new { Id = x.CountryId, Name = $"{x.Name}" }).FirstOrDefault(); // Format for jQuery UI Autocomplete
 
                 return Ok(country);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred while getting countries for user {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error occurred while getting countries for user {UserEmail}", userEmail);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -279,14 +279,14 @@ namespace risk.control.system.Controllers.Common
 
             try
             {
-                var state = context.State.AsNoTracking().Where(x => x.StateId == id && x.CountryId == countryId).OrderBy(x => x.Name).Take(10) // Filter based on user input
+                var state = _context.State.AsNoTracking().Where(x => x.StateId == id && x.CountryId == countryId).OrderBy(x => x.Name).Take(10) // Filter based on user input
                     .Select(x => new { StateId = x.StateId, StateName = $"{x.Name}" }).FirstOrDefault(); // Format for jQuery UI Autocomplete
 
                 return Ok(state);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred while getting states for user {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error occurred while getting states for user {UserEmail}", userEmail);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -298,7 +298,7 @@ namespace risk.control.system.Controllers.Common
 
             try
             {
-                var states = context.State.AsNoTracking()
+                var states = _context.State.AsNoTracking()
                     .Where(x => x.CountryId == countryId)
                     .OrderBy(x => x.Name)
                     .Select(x => new { StateId = x.StateId, StateName = x.Name })
@@ -315,7 +315,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred while getting states for country for user {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error occurred while getting states for country for user {UserEmail}", userEmail);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -336,14 +336,14 @@ namespace risk.control.system.Controllers.Common
                     };
                     return Ok(result);
                 }
-                var pincode = context.District.AsNoTracking().Where(x => x.DistrictId == id && x.StateId == stateId && x.CountryId == countryId).OrderBy(x => x.Name).Take(10) // Filter based on user input
+                var pincode = _context.District.AsNoTracking().Where(x => x.DistrictId == id && x.StateId == stateId && x.CountryId == countryId).OrderBy(x => x.Name).Take(10) // Filter based on user input
                     .Select(x => new { DistrictId = x.DistrictId, DistrictName = $"{x.Name}" }).FirstOrDefault(); // Format for jQuery UI Autocomplete
 
                 return Ok(pincode);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred while getting districts for user {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error occurred while getting districts for user {UserEmail}", userEmail);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -355,7 +355,7 @@ namespace risk.control.system.Controllers.Common
 
             try
             {
-                var districts = context.District.AsNoTracking().Where(x => x.StateId == stateId && x.CountryId == countryId).OrderBy(x => x.Name)//.Take(10) // Filter based on user input
+                var districts = _context.District.AsNoTracking().Where(x => x.StateId == stateId && x.CountryId == countryId).OrderBy(x => x.Name)//.Take(10) // Filter based on user input
                                 .Select(x => new { DistrictId = x.DistrictId, DistrictName = $"{x.Name}" }).ToList(); // Format for jQuery UI Autocomplete
 
                 var result = new List<object>
@@ -372,7 +372,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred while getting districts for agency for user {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error occurred while getting districts for agency for user {UserEmail}", userEmail);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -385,7 +385,7 @@ namespace risk.control.system.Controllers.Common
             try
             {
                 var userClaim = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
-                var pincode = context.PinCode.AsNoTracking().FirstOrDefault(x => x.PinCodeId == id && x.CountryId == countryId); // Format for jQuery UI Autocomplete
+                var pincode = _context.PinCode.AsNoTracking().FirstOrDefault(x => x.PinCodeId == id && x.CountryId == countryId); // Format for jQuery UI Autocomplete
 
                 var response = new
                 {
@@ -398,7 +398,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred while getting investigations for user {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error occurred while getting investigations for user {UserEmail}", userEmail);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -414,7 +414,7 @@ namespace risk.control.system.Controllers.Common
                 if (string.IsNullOrEmpty(term?.Trim()))
                 {
                     // If no search term, return all pincodes for the given district, state, and country
-                    var allpincodes = context.PinCode.AsNoTracking()
+                    var allpincodes = _context.PinCode.AsNoTracking()
                         .Include(x => x.State)
                         .Include(x => x.District)
                         .Where(x => x.CountryId == countryId)
@@ -447,12 +447,12 @@ namespace risk.control.system.Controllers.Common
                 // Pincode filter: The part after the hyphen (if exists)
                 var pincodeFilter = termParts.Length > 1 ? termParts[1] : string.Empty;
 
-                var pincodesQuery = context.PinCode.AsNoTracking().Where(x => x.CountryId == countryId);
+                var pincodesQuery = _context.PinCode.AsNoTracking().Where(x => x.CountryId == countryId);
 
                 if (!string.IsNullOrWhiteSpace(nameFilter))
                 {
                     // Search pincodes that match either name or pincode
-                    pincodesQuery = context.PinCode.AsNoTracking()
+                    pincodesQuery = _context.PinCode.AsNoTracking()
                         .Where(x => x.CountryId == countryId &&
                         (x.Name.ToLower().Contains(nameFilter.ToLower()) ||
                         x.Code.ToString().Contains(nameFilter.ToLower()))
@@ -461,7 +461,7 @@ namespace risk.control.system.Controllers.Common
                 else
                 {
                     // Search pincodes that match either name or pincode
-                    pincodesQuery = context.PinCode.AsNoTracking()
+                    pincodesQuery = _context.PinCode.AsNoTracking()
                         .Where(x => x.CountryId == countryId &&
                         x.Code.ToString().Contains(pincodeFilter.ToLower())
                         );
@@ -490,7 +490,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred while getting pincodes for user {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error occurred while getting pincodes for user {UserEmail}", userEmail);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -502,7 +502,7 @@ namespace risk.control.system.Controllers.Common
 
             try
             {
-                var allCountries = context.Country.AsNoTracking().ToList();
+                var allCountries = _context.Country.AsNoTracking().ToList();
 
                 if (string.IsNullOrEmpty(term))
                     return Ok(allCountries
@@ -531,7 +531,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred while getting country for user {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error occurred while getting country for user {UserEmail}", userEmail);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -542,7 +542,7 @@ namespace risk.control.system.Controllers.Common
         {
             try
             {
-                var allCountries = context.Country.AsNoTracking().ToList();
+                var allCountries = _context.Country.AsNoTracking().ToList();
 
                 if (string.IsNullOrEmpty(term))
                     return Ok(allCountries
@@ -573,7 +573,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred while getting isd code");
+                _logger.LogError(ex, "Error occurred while getting isd code");
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -584,7 +584,7 @@ namespace risk.control.system.Controllers.Common
         {
             try
             {
-                var allCountries = context.Country.AsNoTracking().ToList();
+                var allCountries = _context.Country.AsNoTracking().ToList();
 
                 if (string.IsNullOrEmpty(term))
                     return Ok(allCountries
@@ -615,7 +615,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred while getting isd code");
+                _logger.LogError(ex, "Error occurred while getting isd code");
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -629,11 +629,11 @@ namespace risk.control.system.Controllers.Common
             {
                 if (string.IsNullOrWhiteSpace(phone))
                     return Ok(new { valid = false, message = "Mobile number is required." });
-                if (await featureManager.IsEnabledAsync(FeatureFlags.VALIDATE_PHONE))
+                if (await _featureManager.IsEnabledAsync(FeatureFlags.VALIDATE_PHONE))
                 {
-                    var country = await context.Country.AsNoTracking().FirstOrDefaultAsync(c => c.ISDCode == countryCode);
+                    var country = await _context.Country.AsNoTracking().FirstOrDefaultAsync(c => c.ISDCode == countryCode);
 
-                    var phoneInfo = await phoneService.ValidateAsync(country.ISDCode.ToString() + phone);
+                    var phoneInfo = await _phoneService.ValidateAsync(country.ISDCode.ToString() + phone);
 
                     if (phoneInfo == null || !phoneInfo.IsValidNumber || phoneInfo.CountryCode != country.ISDCode.ToString() || phoneInfo.PhoneNumberRegion.ToLower() != country.Code.ToLower() || phoneInfo.NumberType.ToLower() != "mobile")
                     {
@@ -657,7 +657,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred while validating mobile for user {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error occurred while validating mobile for user {UserEmail}", userEmail);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -671,9 +671,9 @@ namespace risk.control.system.Controllers.Common
             {
                 if (string.IsNullOrWhiteSpace(phone))
                     return Ok(new { valid = false, message = "Mobile number is required." });
-                var country = await context.Country.AsNoTracking().FirstOrDefaultAsync(c => c.ISDCode == countryCode);
+                var country = await _context.Country.AsNoTracking().FirstOrDefaultAsync(c => c.ISDCode == countryCode);
 
-                var isMobile = phoneService.IsValidMobileNumber(phone, country.ISDCode.ToString());
+                var isMobile = _phoneService.IsValidMobileNumber(phone, country.ISDCode.ToString());
 
                 if (!isMobile)
                 {
@@ -691,7 +691,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred while checking mobile for user {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error occurred while checking mobile for user {UserEmail}", userEmail);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -703,12 +703,12 @@ namespace risk.control.system.Controllers.Common
 
             try
             {
-                var bsbDetail = context.BsbInfo.AsNoTracking().FirstOrDefault(b => b.BSB == code);
+                var bsbDetail = _context.BsbInfo.AsNoTracking().FirstOrDefault(b => b.BSB == code);
                 return Ok(bsbDetail);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred while getting bsb details for user {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error occurred while getting bsb details for user {UserEmail}", userEmail);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }

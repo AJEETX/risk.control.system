@@ -16,13 +16,13 @@ namespace risk.control.system.Controllers.Common
     public class NotificationController : ControllerBase
     {
         private readonly int maxCountReached = 10;
-        private readonly INotificationService notificationService;
-        private readonly ILogger<NotificationController> logger;
+        private readonly INotificationService _notificationService;
+        private readonly ILogger<NotificationController> _logger;
 
         public NotificationController(INotificationService notificationService, ILogger<NotificationController> logger)
         {
-            this.notificationService = notificationService;
-            this.logger = logger;
+            _notificationService = notificationService;
+            _logger = logger;
         }
 
         [HttpPost("ClearAll")]
@@ -33,12 +33,12 @@ namespace risk.control.system.Controllers.Common
 
             try
             {
-                await notificationService.ClearAll(userEmail); ;
+                await _notificationService.ClearAll(userEmail); ;
                 return Ok();
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred while clear notifications for user {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error occurred while clear notifications for user {UserEmail}", userEmail);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -52,12 +52,12 @@ namespace risk.control.system.Controllers.Common
             try
             {
                 var userClaim = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
-                await notificationService.MarkAsRead(request.Id, userEmail);
+                await _notificationService.MarkAsRead(request.Id, userEmail);
                 return Ok();
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred while marking notifications for user {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error occurred while marking notifications for user {UserEmail}", userEmail);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -69,7 +69,7 @@ namespace risk.control.system.Controllers.Common
 
             try
             {
-                var notifications = await notificationService.GetNotifications(userEmail);
+                var notifications = await _notificationService.GetNotifications(userEmail);
                 var activeNotifications = notifications.Select(n => new { Id = n.StatusNotificationId, Symbol = n.Symbol, n.Message, n.Status, CreatedAt = GetTimeAgo(n.CreatedAt), user = n.NotifierUserEmail });
                 return Ok(new
                 {
@@ -81,7 +81,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred while getting notifications for user {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error occurred while getting notifications for user {UserEmail}", userEmail);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
