@@ -118,23 +118,40 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    buttons += '<a id="details' + row.id + '" href="/Agent/SubmittedDetail?Id=' + row.id + '" class="btn btn-xs btn-info"><i class="fa fa-search"></i> Detail</a>&nbsp;';
+                    buttons += `<a data-id="${row.id}" class="btn btn-xs btn-info"><i class="fas fa-search"></i> Detail</a>`
                     return buttons;
                 }
             },
             { "data": "timeElapsed", "bVisible": false }
-        ]
+        ],
+
+        "rowCallback": function (row, data, index) {
+            
+            $('.btn-info', row).addClass('btn-white-color');
+        }
     });
 
-    // Event delegation for 'Detail' button click
-    $(document).on('click', 'a[id^="details"]', function (e) {
-        e.preventDefault(); // Prevent default link behavior
-
-        var id = $(this).attr('id').replace('details', ''); // Get the ID from the button's ID
-        getdetails(id); // Call the function with the ID
-        window.location.href = $(this).attr('href'); // Navigate to the detail page
+    function showSpinnerOnButton(selector, spinnerText) {
+        $(selector).html(`<i class='fas fa-sync fa-spin'></i> ${spinnerText}`);
+    }
+    $('body').on('click', 'a.btn-info', function (e) {
+        e.preventDefault();
+        const id = $(this).data('id');
+        showdetail(id, this);
     });
+    function showdetail(id, element) {
+        id = String(id).replace(/[^a-zA-Z0-9_-]/g, "");
+        $("body").addClass("submit-progress-bg");
+        setTimeout(() => $(".submit-progress").removeClass("hidden"), 1);
 
+        showSpinnerOnButton(element, "Detail");
+
+        const url = `/Agent/SubmittedDetail/${encodeURIComponent(id)}`;
+
+        setTimeout(() => {
+            window.location.href = url;
+        }, 1000);
+    }
     // Function to show loading state
 
     table.on('mouseenter', '.map-thumbnail', function () {
@@ -173,7 +190,3 @@
         table.ajax.reload(null, false); // false => Retains current page
     });
 });
-function getdetails(id) {
-    $('a#details' + id + '.btn.btn-xs.btn-info').html("<i class='fas fa-sync fa-spin'></i> Detail");
-    disableAllInteractiveElements();
-}

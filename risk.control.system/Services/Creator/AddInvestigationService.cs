@@ -71,8 +71,8 @@ namespace risk.control.system.Services.Creator
                         InvestigationServiceTypeId = model.PolicyDetailDto.InvestigationServiceTypeId,
                         CaseEnablerId = model.PolicyDetailDto.CaseEnablerId,
                         SumAssuredValue = model.PolicyDetailDto.SumAssuredValue,
-                        ContractIssueDate = model.PolicyDetailDto.ContractIssueDate,
-                        DateOfIncident = model.PolicyDetailDto.DateOfIncident,
+                        ContractIssueDate = model.PolicyDetailDto.ContractIssueDate.Value,
+                        DateOfIncident = model.PolicyDetailDto.DateOfIncident.Value,
                         CauseOfLoss = model.PolicyDetailDto.CauseOfLoss,
                         CostCentreId = model.PolicyDetailDto.CostCentreId,
                         DocumentPath = relativePath,
@@ -129,8 +129,8 @@ namespace risk.control.system.Services.Creator
                 existingPolicy.PolicyDetail.InvestigationServiceTypeId = model.PolicyDetailDto.InvestigationServiceTypeId;
                 existingPolicy.PolicyDetail.CaseEnablerId = model.PolicyDetailDto.CaseEnablerId;
                 existingPolicy.PolicyDetail.SumAssuredValue = model.PolicyDetailDto.SumAssuredValue;
-                existingPolicy.PolicyDetail.ContractIssueDate = model.PolicyDetailDto.ContractIssueDate;
-                existingPolicy.PolicyDetail.DateOfIncident = model.PolicyDetailDto.DateOfIncident;
+                existingPolicy.PolicyDetail.ContractIssueDate = model.PolicyDetailDto.ContractIssueDate.Value;
+                existingPolicy.PolicyDetail.DateOfIncident = model.PolicyDetailDto.DateOfIncident.Value;
                 existingPolicy.PolicyDetail.CauseOfLoss = model.PolicyDetailDto.CauseOfLoss;
                 existingPolicy.PolicyDetail.CostCentreId = model.PolicyDetailDto.CostCentreId;
                 existingPolicy.Updated = DateTime.UtcNow;

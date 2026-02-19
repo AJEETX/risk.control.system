@@ -39,58 +39,25 @@ document.addEventListener("DOMContentLoaded", function () {
 
 function checkFormCompletion(formSelector, create = false) {
     let isFormComplete = true;
-
+    const $form = $(formSelector);
+    var elements = create ? 'select[required], input[required], input[type="file"]' : 'select[required], input[required]';
     // Check all required fields (select, input fields, and file inputs)
-    $(formSelector).find('select[required], input[required], input[type="file"]').each(function () {
-        const fieldType = $(this).attr('type');
+    $form.find(elements).each(function () {
+        const $el = $(this);
 
-        // Skip file input validation in edit mode
-        if (fieldType === 'file' && !create) {
-            return; // Skip to the next field
-        }
-
-        // Check if the field has a value
-        var inputValue = $(this).val();
-        if (!inputValue) {
+        // Check if empty
+        if (!$el.val()) {
             isFormComplete = false;
-            return false; // Exit loop early if a required field is empty
+            return false;
         }
 
-        //Check email address
-        const emailAddress = document.getElementById("emailAddress");
-        if (emailAddress) {
-            const emailData = emailAddress.value;
-            if (!emailData) {
-                isFormComplete = false;
-                return false; // Exit loop early if a required field is empty
-            }
-            const resultSpan = document.querySelector('#result span');
-            if (!resultSpan.classList.contains('available')) {
-                isFormComplete = false;
-                return false; // Exit loop early if a required field is empty
-            } 
-        }
-
-        //Check phone number
-        const phone = $('#PhoneNumber');
-        if (phone && phone.hasClass("is-invalid")) {
+        // NEW: Check if the element has been flagged as invalid by jQuery Validate
+        if ($el.hasClass('input-validation-error') || $el.hasClass('is-invalid')) {
             isFormComplete = false;
-            return false; // Exit loop early if a required field is empty
-        }
-        // Validate file input type in create mode
-        if (fieldType === 'file' && create) {
-            const allowedExtensions = ['jpg', 'png', 'jpeg']; // Define your allowed extensions here
-            if (!validateFileInput(this, allowedExtensions)) {
-                isFormComplete = false;
-                return false; // Exit loop if the file type is invalid
-            }
+            return false;
         }
     });
 
-    // Additional check for PinCodeId field
-    if ($('#PinCodeText').length > 0 && ($('#PinCodeText').val() || []).length === 0) {
-        isFormComplete = false;
-    }
     // Enable or disable the submit button
     $(formSelector).find('button[type="submit"]').prop('disabled', !isFormComplete);
 }
@@ -417,6 +384,7 @@ function clearAllNotifications() {
 }
 
 $(document).ready(function () {
+
     $("#PhoneNumber").on("keydown", function (e) {
         // Prevent first character being 0 (also covers numpad 0)
         if (this.selectionStart === 0 && (e.key === "0" || e.code === "Numpad0")) {

@@ -186,7 +186,7 @@
 
         showSpinnerOnButton(element, "Agency Info");
 
-        const url = `/Investigation/VendorDetail?Id=${encodeURIComponent(id)}&selectedcase=${claimId}`;
+        const url = `/Creator/VendorDetail/${encodeURIComponent(id)}?selectedcase=${claimId}`;
 
         setTimeout(() => {
             window.location.href = url;
@@ -400,7 +400,7 @@
             if ($container.children().length === 0) {
                 $container.html("<div class='text-center p-3'><i class='fas fa-sync fa-spin fa-2x'></i></div>");
 
-                $.get("/Investigation/GetReportTemplate", { caseId: caseId })
+                $.get("/Creator/GetReportTemplate", { caseId: caseId })
                     .done(function (html) {
                         const safe = DOMPurify.sanitize(html, { RETURN_TRUSTED_TYPE: false });
                         $container.html(safe);

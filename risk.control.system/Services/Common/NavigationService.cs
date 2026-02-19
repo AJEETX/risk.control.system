@@ -40,7 +40,7 @@ namespace risk.control.system.Services.Common
 
         private MvcBreadcrumbNode GetCaseDetailsBase(long id)
         {
-            return new MvcBreadcrumbNode(nameof(InvestigationController.Details), ControllerName<InvestigationController>.Name, "Details")
+            return new MvcBreadcrumbNode(nameof(CreatorController.Details), ControllerName<CreatorController>.Name, "Details")
             {
                 Parent = GetCaseBasePath(id),
                 RouteValues = new { id }
@@ -49,7 +49,7 @@ namespace risk.control.system.Services.Common
 
         public MvcBreadcrumbNode GetInvestigationPath(long id, string title, string action, string controller)
         {
-            if (action == nameof(InvestigationController.Details))
+            if (action == nameof(CreatorController.Details))
             {
                 return GetCaseDetailsBase(id);
             }
@@ -73,7 +73,7 @@ namespace risk.control.system.Services.Common
 
         public MvcBreadcrumbNode GetEmpanelledVendorsPath(long id, long vendorId, bool fromEditPage = false)
         {
-            return new MvcBreadcrumbNode(nameof(InvestigationController.EmpanelledVendors), ControllerName<InvestigationController>.Name, "Empanelled Agencies")
+            return new MvcBreadcrumbNode(nameof(CreatorController.EmpanelledVendors), ControllerName<CreatorController>.Name, "Empanelled Agencies")
             {
                 Parent = fromEditPage ? GetCaseDetailsBase(id) : GetCaseBasePath(id),
                 RouteValues = new { id, vendorId }
@@ -82,7 +82,7 @@ namespace risk.control.system.Services.Common
 
         public MvcBreadcrumbNode GetVendorDetailPath(long caseId, long vendorId)
         {
-            return new MvcBreadcrumbNode(nameof(InvestigationController.VendorDetail), ControllerName<InvestigationController>.Name, "Agency Detail")
+            return new MvcBreadcrumbNode(nameof(CreatorController.VendorDetail), ControllerName<CreatorController>.Name, "Agency Detail")
             {
                 Parent = GetEmpanelledVendorsPath(caseId, vendorId),
                 RouteValues = new { id = vendorId, selectedcase = caseId }

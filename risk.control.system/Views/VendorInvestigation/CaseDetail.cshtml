@@ -39,9 +39,9 @@
 </div>
 </div>
 @{
-	var data = new CaseInvestigationVendorAgentModel
+	var data = new CaseAgencyAgentModel
 	{
-		CaseLocation = Model.Location,
+		Beneficiary = Model.Beneficiary,
 		ClaimsInvestigation = Model.ClaimsInvestigation,
 		Currency = Model.Currency
 	};
@@ -54,16 +54,19 @@
 		<partial name="_PolicyDetailsWithdraw" model="@data" />
 	</div>
 	<div class="card-footer">
-		<form id="create-form" method="post" asp-action="Decline" asp-controller="DeclineCase">
-			<input type="hidden" name="claimId" asp-for="@Model.ClaimsInvestigation.Id" />
-			<input type="hidden" name="policyNumber" asp-for="@Model.ClaimsInvestigation.PolicyDetail.ContractNumber" />
-			<div class="row">
-				<div class="col-md-12">
+		<div class="row float-right">
+			<div class="col-md-12">
+		
+				<form id="create-form" method="post" asp-action="Decline" asp-controller="DeclineCase">
+					<input type="hidden" name="claimId" asp-for="@Model.ClaimsInvestigation.Id" />
+					<input type="hidden" name="policyNumber" asp-for="@Model.ClaimsInvestigation.PolicyDetail.ContractNumber" />
+			
 					<a id="back" asp-action="Allocate" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
 					<button id="submit-case" type="submit" class="btn btn-danger"><i class="fas fa-undo"></i> DECLINE</button>
-				</div>
+				
+				</form>
 			</div>
-		</form>
+		</div>
 	</div>
 </div>
 </section>

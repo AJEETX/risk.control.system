@@ -1,106 +1,106 @@
 ﻿@model CaseTransactionModel
 
 @{
-    ViewData["Title"] = "Active Details";
+	ViewData["Title"] = "Active Details";
 }
 <section class="content">
-    <div id="article" class="card shadow-lg border-1 rounded-lg">
-        <div class="card-header bg-secondary text-white text-center">
-            <h3 class="card-title">
-                <i class="fas fa-newspaper"></i> Details
-                <span class="hover-text">
-                    <i class="fas fa-info-circle"></i>
-                    <span class="tooltip-text" id="information">
-                        <li>
-                            <i class='far fa-file-powerpoint'></i>
-                            Claim: <span class="badge badge-light">
-                                <i class="far fa-file-powerpoint"></i>
-                                @Model.ClaimsInvestigation?.PolicyDetail?.ContractNumber
-                            </span>
-                        </li>
+	<div id="article" class="card shadow-lg border-1 rounded-lg">
+		<div class="card-header bg-secondary text-white text-center">
+			<h3 class="card-title">
+				<i class="fas fa-newspaper"></i> Details
+				<span class="hover-text">
+					<i class="fas fa-info-circle"></i>
+					<span class="tooltip-text" id="information">
+						<li>
+							<i class='far fa-file-powerpoint'></i>
+							Claim: <span class="badge badge-light">
+							<i class="far fa-file-powerpoint"></i>
+							@Model.ClaimsInvestigation?.PolicyDetail?.ContractNumber
+						</span>
+					</li>
 
-                        <li><i class="fas fa-clock"></i> Timeline </li>
-                    </span>
-                </span>
-            </h3>
-        </div>
-        <input type="hidden" id="customerDetailId" value="@Model.ClaimsInvestigation?.CustomerDetail?.CustomerDetailId" />
-        <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.Id" />
-        <input type="hidden" id="beneficiaryId" value="@Model.Location?.BeneficiaryDetailId" />
-        <input type="hidden" id="policyDetailId" value="@Model.ClaimsInvestigation?.PolicyDetail.PolicyDetailId" />
-    </div>
+					<li><i class="fas fa-clock"></i> Timeline </li>
+				</span>
+			</span>
+		</h3>
+	</div>
+	<input type="hidden" id="customerDetailId" value="@Model.ClaimsInvestigation?.CustomerDetail?.CustomerDetailId" />
+	<input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.Id" />
+	<input type="hidden" id="beneficiaryId" value="@Model.Beneficiary?.BeneficiaryDetailId" />
+	<input type="hidden" id="policyDetailId" value="@Model.ClaimsInvestigation?.PolicyDetail.PolicyDetailId" />
+</div>
 
-    <div class="card shadow-lg border-1 rounded-lg">
-        <div class="card-header bg-light text-white text-center">
-            <h3 class="card-title">
-                <span class="badge badge-info" data-bs-toggle="tooltip" title="Status : @Model.ClaimsInvestigation?.SubStatus">
-                    <b>   @Model.ClaimsInvestigation?.SubStatus</b>
-                </span>
-                <b> <i class='far fa-hand-point-right'></i> </b>
-                <span class="badge badge-info" data-bs-toggle="tooltip"
-                      title="Owner : @Model.ClaimsInvestigation.CaseOwner">
-                    <b>
-                        @Model.ClaimsInvestigation.CaseOwner
-                    </b>
-                </span>
-                <span class="hover-text">
-                    <i class="fas fa-info-circle"></i>
-                    <span class="tooltip-text" id="information">
-                        <li>
-                            <i class='far fa-hand-point-right'></i> Claim <i class='far fa-file-powerpoint'></i> <strong>@Model.ClaimsInvestigation?.PolicyDetail?.ContractNumber </strong>
-                        </li>
-                    </span>
-                </span>
-            </h3>
-        </div>
-        <div class="card-body">
-            <div class="submit-progress hidden">
-                <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
-            </div>
-            <div class="row">
-                <partial name="Investigation/_DeleteCase" model="Model" />
-                <partial name="Investigation/_DeleteCustomer" model="Model" />
-                <partial name="Investigation/_DeleteBeneficiary" model="Model" />
-            </div>
-            <div class="card shadow-lg border-1 rounded-lg collapsed-card">
-                <div class="card-header bg-light">
-                    <h3 class="card-title">
-                        <span class="badge badge-light"><i class="far fa-file-powerpoint"></i> Report  Template</span>
-                    </h3>
-                    <div class="card-tools">
-                        <span data-bs-toggle="tooltip" title="Report Template"><i class='far fa-hand-point-right'></i></span>
-                        <button id="loadTemplate" type="button" class="btn btn-tool" data-card-widget="collapse">
-                            <i class="fas fa-plus"></i>
-                        </button>
-                    </div>
-                </div>
+<div class="card shadow-lg border-1 rounded-lg">
+	<div class="card-header bg-light text-white text-center">
+		<h3 class="card-title">
+			<span class="badge badge-info" data-bs-toggle="tooltip" title="Status : @Model.ClaimsInvestigation?.SubStatus">
+				<b>   @Model.ClaimsInvestigation?.SubStatus</b>
+			</span>
+			<b> <i class='far fa-hand-point-right'></i> </b>
+			<span class="badge badge-info" data-bs-toggle="tooltip"
+				  title="Owner : @Model.ClaimsInvestigation.CaseOwner">
+				<b>
+					@Model.ClaimsInvestigation.CaseOwner
+				</b>
+			</span>
+			<span class="hover-text">
+				<i class="fas fa-info-circle"></i>
+				<span class="tooltip-text" id="information">
+					<li>
+						<i class='far fa-hand-point-right'></i> Claim <i class='far fa-file-powerpoint'></i> <strong>@Model.ClaimsInvestigation?.PolicyDetail?.ContractNumber </strong>
+					</li>
+				</span>
+			</span>
+		</h3>
+	</div>
+	<div class="card-body">
+		<div class="submit-progress hidden">
+			<i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+		</div>
+		<div class="row">
+			<partial name="Investigation/_DeleteCase" model="Model" />
+			<partial name="Investigation/_DeleteCustomer" model="Model" />
+			<partial name="Investigation/_DeleteBeneficiary" model="Model" />
+		</div>
+		<div class="card shadow-lg border-1 rounded-lg collapsed-card">
+			<div class="card-header bg-light">
+				<h3 class="card-title">
+					<span class="badge badge-light"><i class="far fa-file-powerpoint"></i> Report  Template</span>
+				</h3>
+				<div class="card-tools">
+					<span data-bs-toggle="tooltip" title="Report Template"><i class='far fa-hand-point-right'></i></span>
+					<button id="loadTemplate" type="button" class="btn btn-tool" data-card-widget="collapse">
+						<i class="fas fa-plus"></i>
+					</button>
+				</div>
+			</div>
 
-                <div class="card-body" id="reportTemplateContainer">
-                    <!-- Report template will load here -->
-                </div>
-            </div>
+			<div class="card-body" id="reportTemplateContainer">
+				<!-- Report template will load here -->
+			</div>
+		</div>
 
-            <input type="hidden" id="caseIdHidden" value="@Model.ClaimsInvestigation.Id" />
-            <partial name="Investigation/_TimelineReport" model="@Model" />
-        </div>
-        <div class="card-footer">
-            <div class="row">
-                <div class="col-md-12">
-                    <a id="back" asp-controller="Manager" asp-action="Active" class="btn btn-outline-secondary">
-                        <i class="fas fa-arrow-left"></i>
-                        <span class="badge badge-light"> <i class="fa fa-toggle-on"></i> </span> Back
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
+		<input type="hidden" id="caseIdHidden" value="@Model.ClaimsInvestigation.Id" />
+		<partial name="Investigation/_TimelineReport" model="@Model" />
+	</div>
+	<div class="card-footer">
+		<div class="row float-right">
+			<div class="col-md-12">
+				<a id="back" asp-controller="Manager" asp-action="Active" class="btn btn-outline-secondary">
+					<i class="fas fa-arrow-left"></i>
+					<span class="badge badge-light"> <i class="fa fa-toggle-on"></i> </span> Back
+				</a>
+			</div>
+		</div>
+	</div>
+</div>
 </section>
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-    <script src="~/js/purify.min.js"></script>
-    <script src="~/js/company/policy-detail.js"></script>
-    <script src="~/js/common/case-details.js"></script>
-    <script src="~/js/creator/report-template.js"></script>
+	@{
+		await Html.RenderPartialAsync("_ValidationScriptsPartial");
+	}
+	<script src="~/js/purify.min.js"></script>
+	<script src="~/js/company/policy-detail.js"></script>
+	<script src="~/js/common/case-details.js"></script>
+	<script src="~/js/creator/report-template.js"></script>
 }

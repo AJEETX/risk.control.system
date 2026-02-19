@@ -62,8 +62,6 @@ namespace risk.control.system.Seeds
                 ExpiryDate = DateTime.UtcNow.AddDays(10),
                 EmpanelledVendors = vendors,
                 Status = CompanyStatus.ACTIVE,
-                AutoAllocation = globalSettings.AutoAllocation,
-                BulkUpload = globalSettings.BulkUpload,
                 Updated = DateTime.UtcNow,
                 Deleted = false,
                 VerifyPan = globalSettings.VerifyPan,
