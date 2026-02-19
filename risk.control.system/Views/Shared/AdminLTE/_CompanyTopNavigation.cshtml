@@ -1,114 +1,114 @@
 ﻿@model TopNavigation
 <!-- Navbar -->
 <nav class="main-header navbar navbar-expand navbar-light bg-light">
-    <!-- Left navbar links -->
-    <ul class="navbar-nav">
-        <li class="">
-            <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars">&nbsp;&nbsp; </i></a>
-        </li>
-    </ul>
+	<!-- Left navbar links -->
+	<ul class="navbar-nav">
+		<li class="">
+			<a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars">&nbsp;&nbsp; </i></a>
+		</li>
+	</ul>
 
-    <!-- Right navbar links -->
-    <ul class="navbar-nav ml-auto">
-        <li class="nav-item dropdown top-nav-logout-border">
-            <a class="nav-link dropdown-toggle info-toggle-btn" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
-                <i class="fa fa-info-circle"></i>
-            </a>
+	<!-- Right navbar links -->
+	<ul class="navbar-nav ml-auto">
+		<li class="nav-item dropdown top-nav-logout-border">
+			<a class="nav-link dropdown-toggle info-toggle-btn" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+				<i class="fa fa-info-circle"></i>
+			</a>
 
-            <div class="dropdown-menu dropdown-menu-right custom-info-menu shadow-sm">
-                @{
-                    var img = "/flags/" + Model?.CountryCode?.ToLower() + ".png";
-                }
+			<div class="dropdown-menu dropdown-menu-right custom-info-menu shadow-sm">
+				@{
+					var img = "/flags/" + Model?.CountryCode?.ToLower() + ".png";
+				}
 
-                <div class="dropdown-item info-row">
-                    <div class="info-icon-wrapper">
-                        <img src="@img" class="flag-icon" alt="Flag" />
-                    </div>
-                    <div class="info-content">
-                        <small class="info-label">Country</small>
-                        <span class="info-value">@Model?.Country</span>
-                    </div>
-                </div>
+				<div class="dropdown-item info-row">
+					<div class="info-icon-wrapper">
+						<img src="@img" class="flag-icon" alt="Flag" />
+					</div>
+					<div class="info-content">
+						<small class="info-label">Country</small>
+						<span class="info-value">@Model?.Country</span>
+					</div>
+				</div>
 
-                <div class="dropdown-divider"></div>
+				<div class="dropdown-divider"></div>
 
-                <div class="dropdown-item info-row">
-                    <div class="info-icon-wrapper">
-                        <i class="fas fa-money-bill-wave text-success"></i>
-                    </div>
-                    <div class="info-content">
-                        <small class="info-label">Currency</small>
-                        <span class="info-value">@Model?.CurrencyName</span>
-                    </div>
-                </div>
+				<div class="dropdown-item info-row">
+					<div class="info-icon-wrapper">
+						<i class="fas fa-money-bill-wave text-success"></i>
+					</div>
+					<div class="info-content">
+						<small class="info-label">Currency</small>
+						<span class="info-value">@Model?.CurrencyName</span>
+					</div>
+				</div>
 
-                <div class="dropdown-divider"></div>
+				<div class="dropdown-divider"></div>
 
-                <div class="dropdown-item info-row">
-                    <div class="info-icon-wrapper">
-                        <i class="fas fa-phone-alt text-primary"></i>
-                    </div>
-                    <div class="info-content">
-                        <small class="info-label">ISD Code</small>
-                        <span class="info-value">@Model?.IsdCode</span>
-                    </div>
-                </div>
-            </div>
-        </li>
+				<div class="dropdown-item info-row">
+					<div class="info-icon-wrapper">
+						<i class="fas fa-phone-alt text-primary"></i>
+					</div>
+					<div class="info-content">
+						<small class="info-label">ISD Code</small>
+						<span class="info-value">@Model?.IsdCode</span>
+					</div>
+				</div>
+			</div>
+		</li>
 
-        <!-- Notifications Dropdown Menu -->
-        <li class="nav-item dropdown top-nav-logout-border">
-            <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false" id="notificationToggle">
-                <i class="far fa-bell" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Notifications"></i>
-                <span class="badge badge-warning" id="notificationCount">0</span>
-            </a>
-            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right" id="notificationDropdown">
-                <span class="dropdown-header">
-                    Notifications
-                    <span class="notification-actions">
-                        <i id="notification-refresh" class="fas fa-sync" title="Refresh" data-bs-toggle="tooltip"></i>
-                        <i id="clearNotifications" class="fa fa-trash" title="Clear All" data-bs-toggle="tooltip"></i>
-                    </span>
-                </span>
-                <div id="notificationList"></div>
-            </div>
-        </li>
+		<!-- Notifications Dropdown Menu -->
+		<li class="nav-item dropdown top-nav-logout-border">
+			<a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false" id="notificationToggle">
+				<i class="far fa-bell" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Notifications"></i>
+				<span class="badge badge-warning" id="notificationCount">0</span>
+			</a>
+			<div class="dropdown-menu dropdown-menu-lg dropdown-menu-right" id="notificationDropdown">
+				<span class="dropdown-header">
+					Notifications
+					<span class="notification-actions">
+						<i id="notification-refresh" class="fas fa-sync" title="Refresh" data-bs-toggle="tooltip"></i>
+						<i id="clearNotifications" class="fa fa-trash" title="Clear All" data-bs-toggle="tooltip"></i>
+					</span>
+				</span>
+				<div id="notificationList"></div>
+			</div>
+		</li>
 
-        <li class="nav-item dropdown top-nav-logout-border">
-            <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
-                <i class="fas fa-cog fa-lg" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Settings"></i>
-            </a>
+		<li class="nav-item dropdown top-nav-logout-border">
+			<a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+				<i class="fas fa-cog fa-lg" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Settings"></i>
+			</a>
 
-            <div class="dropdown-menu dropdown-menu-right shadow-lg rounded-lg border-0 settings-dropdown">
-                <!-- Profile Section -->
-                <div class="text-center profile-section">
-                    <img src="/Document/GetUserProfileImage/@Model.UserId"
-                         class="rounded-circle shadow-sm border sidebar-profile"
-                         alt="User Profile" title="@Model.Email" data-bs-toggle="tooltip" />
-                    <p class="text-muted user-email">@Model.Email</p>
-                    @if (Model.CanChangePassword)
-                    {
-                        <div class="text-center profile-inner-section">
+			<div class="dropdown-menu dropdown-menu-right shadow-lg rounded-lg border-0 settings-dropdown">
+				<!-- Profile Section -->
+				<div class="text-center profile-section">
+					<img src="/Document/GetUserProfileImage/@Model.UserId"
+						 class="rounded-circle shadow-sm border sidebar-profile"
+						 alt="User Profile" title="@Model.Email" data-bs-toggle="tooltip" />
+					<p class="text-muted user-email">@Model.Email</p>
+					@if (Model.CanChangePassword)
+					{
+						<div class="text-center profile-inner-section">
 
-                            <a href="/CompanyUserProfile/Edit?userid=@Model.UserId" class="btn btn-sm btn-outline-warning">
-                                <i class="fas fa-user-edit"></i> Edit Profile
-                            </a>
-                        </div>
-                        <div class="text-center profile-inner-section">
-                            <a href="/CompanyUserProfile/ChangePassword" class="btn btn-sm btn-outline-secondary">
-                                <i class="fa fa-key"></i> Change Password
-                            </a>
-                        </div>
-                    }
-                    <!-- Logout Link -->
-                    <div class="text-center profile-inner-section">
-                        <a class="font-weight-bold btn btn-sm btn-outline-danger"
-                           href="#" data-toggle="modal" data-target="#logoutModal">
-                            <i class="fas fa-sign-out-alt mr-2"></i> Logout
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </li>
-    </ul>
+							<a href="/CompanyUserProfile/Edit/@Model.UserId" class="btn btn-sm btn-outline-warning">
+								<i class="fas fa-user-edit"></i> Edit Profile
+							</a>
+						</div>
+						<div class="text-center profile-inner-section">
+							<a href="/CompanyUserProfile/ChangePassword" class="btn btn-sm btn-outline-secondary">
+								<i class="fa fa-key"></i> Change Password
+							</a>
+						</div>
+					}
+					<!-- Logout Link -->
+					<div class="text-center profile-inner-section">
+						<a class="font-weight-bold btn btn-sm btn-outline-danger"
+							   href="#" data-toggle="modal" data-target="#logoutModal">
+							<i class="fas fa-sign-out-alt mr-2"></i> Logout
+						</a>
+					</div>
+				</div>
+			</div>
+		</li>
+	</ul>
 </nav>

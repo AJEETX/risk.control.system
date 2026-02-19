@@ -10,14 +10,14 @@ namespace risk.control.system.Controllers.Common
     [ApiExplorerSettings(IgnoreApi = true)]
     public class DashboardGraphController : Controller
     {
-        private readonly IDashboardService dashboardService;
+        private readonly IDashboardService _dashboardService;
         private readonly ILogger<DashboardGraphController> _logger;
 
         public DashboardGraphController(IDashboardService dashboardService,
             ILogger<DashboardGraphController> logger
             )
         {
-            this.dashboardService = dashboardService;
+            _dashboardService = dashboardService;
             _logger = logger;
         }
 
@@ -43,12 +43,12 @@ namespace risk.control.system.Controllers.Common
                     userRole.Contains(CREATOR.DISPLAY_NAME))
                 {
                     _logger.LogInformation("User {UserEmail} is Manager/Assessor/CompanyAdmin/Creator. Calculating agency claim status.", userEmail);
-                    monthlyExpense = await dashboardService.CalculateAgencyClaimStatus(userEmail);
+                    monthlyExpense = await _dashboardService.CalculateAgencyClaimStatus(userEmail);
                 }
                 else if (userRole.Contains(AGENCY_ADMIN.DISPLAY_NAME) || userRole.Contains(SUPERVISOR.DISPLAY_NAME))
                 {
                     _logger.LogInformation("User {UserEmail} is AgencyAdmin/Supervisor. Calculating agent case status.", userEmail);
-                    monthlyExpense = await dashboardService.CalculateAgentCaseStatus(userEmail);
+                    monthlyExpense = await _dashboardService.CalculateAgentCaseStatus(userEmail);
                 }
                 else
                 {
@@ -82,12 +82,12 @@ namespace risk.control.system.Controllers.Common
                                                 || userRole.Contains(CREATOR.DISPLAY_NAME)
                                                 )
                 {
-                    Dictionary<string, int> monthlyExpense = await dashboardService.CalculateAgencyUnderwritingStatus(userEmail);
+                    Dictionary<string, int> monthlyExpense = await _dashboardService.CalculateAgencyUnderwritingStatus(userEmail);
                     return new JsonResult(monthlyExpense);
                 }
                 else if (userRole.Contains(AGENCY_ADMIN.DISPLAY_NAME) || userRole.Contains(SUPERVISOR.DISPLAY_NAME))
                 {
-                    Dictionary<string, int> monthlyExpense = await dashboardService.CalculateAgentCaseStatus(userEmail);
+                    Dictionary<string, int> monthlyExpense = await _dashboardService.CalculateAgentCaseStatus(userEmail);
                     return new JsonResult(monthlyExpense);
                 }
             }
@@ -104,7 +104,7 @@ namespace risk.control.system.Controllers.Common
             var userEmail = HttpContext.User?.Identity?.Name;
             try
             {
-                var monthlyExpense = await dashboardService.CalculateMonthlyCaseStatus(userEmail);
+                var monthlyExpense = await _dashboardService.CalculateMonthlyCaseStatus(userEmail);
                 return new JsonResult(monthlyExpense);
             }
             catch (Exception ex)
@@ -119,7 +119,7 @@ namespace risk.control.system.Controllers.Common
             var userEmail = HttpContext.User?.Identity?.Name;
             try
             {
-                var monthlyExpense = await dashboardService.CalculateWeeklyCaseStatus(userEmail);
+                var monthlyExpense = await _dashboardService.CalculateWeeklyCaseStatus(userEmail);
                 return new JsonResult(monthlyExpense);
             }
             catch (Exception ex)
@@ -134,7 +134,7 @@ namespace risk.control.system.Controllers.Common
             var userEmail = HttpContext.User?.Identity?.Name;
             try
             {
-                var monthlyExpense = await dashboardService.CalculateWeeklyCaseStatusPieClaims(userEmail);
+                var monthlyExpense = await _dashboardService.CalculateWeeklyCaseStatusPieClaims(userEmail);
                 return new JsonResult(monthlyExpense);
             }
             catch (Exception ex)
@@ -149,7 +149,7 @@ namespace risk.control.system.Controllers.Common
             var userEmail = HttpContext.User?.Identity?.Name;
             try
             {
-                var monthlyExpense = await dashboardService.CalculateWeeklyCaseStatusPieUnderwritings(userEmail);
+                var monthlyExpense = await _dashboardService.CalculateWeeklyCaseStatusPieUnderwritings(userEmail);
                 return new JsonResult(monthlyExpense);
             }
             catch (Exception ex)
@@ -164,7 +164,7 @@ namespace risk.control.system.Controllers.Common
             var userEmail = HttpContext.User?.Identity?.Name;
             try
             {
-                var monthlyExpense = await dashboardService.CalculateCaseChart(userEmail);
+                var monthlyExpense = await _dashboardService.CalculateCaseChart(userEmail);
                 return new JsonResult(monthlyExpense);
             }
             catch (Exception ex)
@@ -179,7 +179,7 @@ namespace risk.control.system.Controllers.Common
             var userEmail = HttpContext.User?.Identity?.Name;
             try
             {
-                var monthlyExpense = await dashboardService.CalculateTimespan(userEmail);
+                var monthlyExpense = await _dashboardService.CalculateTimespan(userEmail);
                 return new JsonResult(monthlyExpense);
             }
             catch (Exception ex)

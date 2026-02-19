@@ -55,7 +55,7 @@
 <div class="card shadow-lg border-1 rounded-lg">
 	<div class="card-header bg-light text-white text-center">
 		<h3 class="card-title">
-			<span class="badge badge-info" data-bs-toggle="tooltip" title="Status : @Model.ClaimsInvestigation?.SubStatus?">
+			<span class="badge badge-info" data-bs-toggle="tooltip" title="Status : @Model.ClaimsInvestigation?.SubStatus">
 				<b>@Model.ClaimsInvestigation?.SubStatus</b>
 			</span>
 			<b><i class='far fa-hand-point-right'></i></b>
@@ -111,7 +111,7 @@
 				<input type="hidden" name="caseId" asp-for="@Model.ClaimsInvestigation.Id" />
 				<div class="row float-right">
 					<div class="col-md-12">
-						<a id="back" asp-action="Active" class="btn btn-outline-secondary">
+						<a id="back" asp-action="Active" class="btn btn-outline-secondary" data-bs-toggle="tooltip" title="Back to Active cases">
 							<i class="fas fa-arrow-left"></i>
 							<span class="badge badge-light"> <i class="fa fa-toggle-on"></i> </span> Back
 						</a>
@@ -127,7 +127,7 @@
 				<div class="col-md-12">
 					<span class="text-maroon text-muted">The case cannot be withdrawn. See the <b>Timeline</b> section above <i class="far fa-hand-point-up"></i> for more info.</span>
 
-					<a id="back" asp-action="Active" class="btn btn-outline-secondary">
+					<a id="back" asp-action="Active" class="btn btn-outline-secondary" data-bs-toggle="tooltip" title="Back to Active cases">
 						<i class="fas fa-arrow-left"></i>
 						<span class="badge badge-light"> <i class="fa fa-toggle-on"></i> </span> Back
 					</a>

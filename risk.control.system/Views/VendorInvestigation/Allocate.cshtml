@@ -78,7 +78,10 @@
 <div class="card-footer">
 	<div class="row float-right">
 		<div class="col-md-12">
-			<a id="back" asp-controller="Dashboard" asp-action="Index" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
+			<a id="back" asp-controller="Dashboard" asp-action="Index" class="btn btn-outline-secondary">
+				<i class="fas fa-arrow-left"></i>
+				<span class="badge badge-light"> <i class="fas fa-home"></i> </span>
+				@Applicationsettings.BACK</a>
 
 			<button disabled id="allocatedcase" type="submit" class="btn btn-danger">
 				<span class="badge badge-danger"> <i class="fas fa-external-link-alt"></i> </span>

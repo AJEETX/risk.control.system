@@ -154,8 +154,9 @@
 					   asp-controller="@(Model.FromEditPage ? "Creator" : "CaseCreateEdit")"
 					   asp-action="@(Model.FromEditPage ? "Details" : "New")"
 					   asp-route-id="@(Model.FromEditPage? Model.ClaimsInvestigation.Id : null)"
-					   class="btn btn-outline-secondary">
-					<i class="fas fa-arrow-left"></i> Back
+					   class="btn btn-outline-secondary"
+					   data-bs-toggle="tooltip" title="@(Model.FromEditPage ? "Back to Case detail" : "Back to Add/Assign cases")">
+					<i class="fas fa-arrow-left"></i><span class="badge badge-light"> <i class="fa fa-random"></i> </span> Back
 				</a>
 				<button disabled="disabled" id="allocatedcase" type="submit" class="btn btn-info">
 					<i class="fas fa-external-link-alt" aria-hidden="true"></i> <b> Assign </b><sub>manual</sub>

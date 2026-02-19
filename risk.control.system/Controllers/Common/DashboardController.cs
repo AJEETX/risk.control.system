@@ -17,11 +17,11 @@ namespace risk.control.system.Controllers.Common
     public class DashboardController : Controller
     {
         private readonly ILogger<DashboardController> _logger;
-        private readonly IAgencyDashboardService agencyDashboardService;
-        private readonly IAdminDashBoardService adminDashBoardService;
-        private readonly ICompanyDashboardService companyDashboardService;
-        private readonly SignInManager<ApplicationUser> signInManager;
-        private readonly INotyfService notifyService;
+        private readonly IAgencyDashboardService _agencyDashboardService;
+        private readonly IAdminDashBoardService _adminDashBoardService;
+        private readonly ICompanyDashboardService _companyDashboardService;
+        private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly INotyfService _notifyService;
 
         public DashboardController(ILogger<DashboardController> logger,
             IAgencyDashboardService agencyDashboardService,
@@ -32,11 +32,11 @@ namespace risk.control.system.Controllers.Common
             )
         {
             _logger = logger;
-            this.agencyDashboardService = agencyDashboardService;
-            this.adminDashBoardService = adminDashBoardService;
-            this.companyDashboardService = companyDashboardService;
-            this.signInManager = signInManager;
-            this.notifyService = notifyService;
+            _agencyDashboardService = agencyDashboardService;
+            _adminDashBoardService = adminDashBoardService;
+            _companyDashboardService = companyDashboardService;
+            _signInManager = signInManager;
+            _notifyService = notifyService;
         }
 
         public async Task<IActionResult> Index()
@@ -54,37 +54,37 @@ namespace risk.control.system.Controllers.Common
 
                 if (userRole.Contains(CREATOR.DISPLAY_NAME))
                 {
-                    var model = await companyDashboardService.GetCreatorCount(userEmail, userRole);
+                    var model = await _companyDashboardService.GetCreatorCount(userEmail, userRole);
                     return View(model);
                 }
                 else if (userRole.Contains(PORTAL_ADMIN.DISPLAY_NAME))
                 {
-                    var model = await adminDashBoardService.GetSuperAdminCount(userEmail, userRole);
+                    var model = await _adminDashBoardService.GetSuperAdminCount(userEmail, userRole);
                     return View(model);
                 }
                 else if (userRole.Contains(COMPANY_ADMIN.DISPLAY_NAME))
                 {
-                    var model = await companyDashboardService.GetCompanyAdminCount(userEmail, userRole);
+                    var model = await _companyDashboardService.GetCompanyAdminCount(userEmail, userRole);
                     return View(model);
                 }
                 else if (userRole.Contains(ASSESSOR.DISPLAY_NAME))
                 {
-                    var model = await companyDashboardService.GetAssessorCount(userEmail, userRole);
+                    var model = await _companyDashboardService.GetAssessorCount(userEmail, userRole);
                     return View(model);
                 }
                 else if (userRole.Contains(MANAGER.DISPLAY_NAME))
                 {
-                    var model = await companyDashboardService.GetManagerCount(userEmail, userRole);
+                    var model = await _companyDashboardService.GetManagerCount(userEmail, userRole);
                     return View(model);
                 }
                 else if (userRole.Contains(AGENCY_ADMIN.DISPLAY_NAME) || userRole.Contains(SUPERVISOR.DISPLAY_NAME))
                 {
-                    var model = await agencyDashboardService.GetSupervisorCount(userEmail, userRole);
+                    var model = await _agencyDashboardService.GetSupervisorCount(userEmail, userRole);
                     return View(model);
                 }
                 else if (userRole.Contains(AGENT.DISPLAY_NAME))
                 {
-                    var model = await agencyDashboardService.GetAgentCount(userEmail, userRole);
+                    var model = await _agencyDashboardService.GetAgentCount(userEmail, userRole);
                     return View(model);
                 }
                 else
@@ -95,8 +95,8 @@ namespace risk.control.system.Controllers.Common
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error occurred.");
-                notifyService.Error("OOPs !!!...Contact Admin");
-                await signInManager.SignOutAsync();
+                _notifyService.Error("OOPs !!!...Contact Admin");
+                await _signInManager.SignOutAsync();
                 return RedirectToAction(nameof(AccountController.Login), "Account");
             }
         }

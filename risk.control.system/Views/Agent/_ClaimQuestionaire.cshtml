@@ -73,7 +73,10 @@
 				<div class="card-footer">
 
 					<div class="text-right">
-						<a id="back" asp-controller="Agent" asp-action="Agent" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a> &nbsp;
+						<a id="back" asp-controller="Agent" asp-action="Agent" class="btn btn-outline-secondary" data-bs-toggle="tooltip" title="Back to Investigate cases">
+						<i class="fas fa-arrow-left"></i> 
+							<span class="badge badge-light"> <i class="fa fa-binoculars"></i> </span>  @Applicationsettings.BACK
+						</a> &nbsp;
 						<button disabled id="submit-case" type="submit" class="btn btn-danger">
 							<i class="fa fa-binoculars" aria-hidden="true"></i> SUBMIT
 						</button>
