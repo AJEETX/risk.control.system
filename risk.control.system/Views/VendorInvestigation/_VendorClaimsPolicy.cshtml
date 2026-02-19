@@ -1,4 +1,4 @@
-﻿@model CaseInvestigationVendorAgentModel
+﻿@model CaseAgencyAgentModel
 
 <div id="article" class="card shadow-lg border-1 rounded-lg">
     <div class="card-header bg-secondary text-white text-center">
@@ -50,7 +50,6 @@
                         {
                             <li> <i class='fas fa-user-tie'></i> Beneficiary details </li>
                         }
-
                     </span>
                 </span>
             </h3>
@@ -76,7 +75,6 @@
                 {
                     <partial name="_ClaimBeneficairyDetails" model="@Model" />
                 }
-
             </div>
         </div>
     </div>
@@ -84,5 +82,4 @@
         Model.ReSelect = false;
     }
     <partial name="_AgentList" model="@Model" />
-
 </div>

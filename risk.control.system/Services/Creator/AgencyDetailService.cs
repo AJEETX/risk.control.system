@@ -13,14 +13,14 @@ namespace risk.control.system.Services
     internal class AgencyDetailService : IAgencyDetailService
     {
         private readonly ApplicationDbContext context;
-        private readonly IInvestigationDetailService investigationDetailService;
+        private readonly IAgencyCaseLoadService _agencyCaseLoadService;
 
         public AgencyDetailService(
             ApplicationDbContext context,
-            IInvestigationDetailService investigationDetailService)
+            IAgencyCaseLoadService agencyCaseLoadService)
         {
             this.context = context;
-            this.investigationDetailService = investigationDetailService;
+            this._agencyCaseLoadService = agencyCaseLoadService;
         }
 
         public async Task<Vendor> GetVendorDetailAsync(long vendorId, long selectedCaseId)
@@ -50,8 +50,8 @@ namespace risk.control.system.Services
                 !u.Deleted &&
                 u.Role == AppRoles.AGENT);
 
-            var currentCases = investigationDetailService
-                .GetAgencyIdsLoad(new List<long> { vendor.VendorId })
+            var currentCases = (await _agencyCaseLoadService
+                .GetAgencyIdsLoad(new List<long> { vendor.VendorId }))
                 .FirstOrDefault();
 
             // ⚠️ Legacy hack preserved

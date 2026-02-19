@@ -134,7 +134,7 @@ namespace risk.control.system.Controllers.Agent
             {
                 notifyService.Error("Error in submitting Answer(s).");
             }
-            return Redirect("/Agent/GetInvestigate?selectedcase=" + CaseId);
+            return Redirect("/Agent/GetInvestigate/" + CaseId);
         }
     }
 }

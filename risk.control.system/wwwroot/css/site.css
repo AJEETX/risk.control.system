@@ -4163,3 +4163,9 @@ h2.lead{
     border-radius:5px !important;
     margin-top:5px !important;
 }
+.input-validation-error,
+.is-invalid {
+    border: 2px solid #dc3545 !important;
+    background-color: #fff8f8 !important;
+    box-shadow: 0 0 5px rgba(220, 53, 69, 0.5) !important;
+}

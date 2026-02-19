@@ -1,13 +1,12 @@
 ﻿using AspNetCoreHero.ToastNotification.Abstractions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using risk.control.system.AppConstant;
-using risk.control.system.Controllers.Common;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
-using risk.control.system.Services.Agency;
+using risk.control.system.Services.AgencyAdmin;
 using risk.control.system.Services.Common;
+using risk.control.system.Services.Manager;
 using SmartBreadcrumbs.Attributes;
 
 namespace risk.control.system.Controllers.Manager
@@ -16,32 +15,35 @@ namespace risk.control.system.Controllers.Manager
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{MANAGER.DISPLAY_NAME}")]
     public class EmpanelledAgencyController : Controller
     {
-        private readonly ApplicationDbContext _context;
-        private readonly IAgencyCreateEditService agencyCreateEditService;
-        private readonly INavigationService navigationService;
-        private readonly INotyfService notifyService;
-        private readonly IInvestigationDetailService investigationDetailService;
-        private readonly ILogger<EmpanelledAgencyController> logger;
-        private readonly string portal_base_url = string.Empty;
+        private readonly IManageAgencyService _manageAgencyService;
+        private readonly IErrorNotifyService _errorNotifyService;
+        private readonly IManageAgencyService _agencyCreateEditService;
+        private readonly INavigationService _navigationService;
+        private readonly INotyfService _notifyService;
+        private readonly ILogger<EmpanelledAgencyController> _logger;
+        private readonly string _baseUrl;
+        private readonly ICompanyAgencyService _companyAgencyService;
 
         public EmpanelledAgencyController(
-            ApplicationDbContext context,
-            IAgencyCreateEditService agencyCreateEditService,
+            IManageAgencyService manageAgencyService,
+            IErrorNotifyService errorNotifyService,
+            IManageAgencyService agencyCreateEditService,
+            ICompanyAgencyService companyAgencyService,
             INavigationService navigationService,
             INotyfService notifyService,
-            IInvestigationDetailService investigationDetailService,
              IHttpContextAccessor httpContextAccessor,
             ILogger<EmpanelledAgencyController> logger)
         {
-            _context = context;
-            this.agencyCreateEditService = agencyCreateEditService;
-            this.navigationService = navigationService;
-            this.notifyService = notifyService;
-            this.investigationDetailService = investigationDetailService;
-            this.logger = logger;
+            _manageAgencyService = manageAgencyService;
+            this._errorNotifyService = errorNotifyService;
+            _companyAgencyService = companyAgencyService;
+            _agencyCreateEditService = agencyCreateEditService;
+            _navigationService = navigationService;
+            _notifyService = notifyService;
+            _logger = logger;
             var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
             var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
-            portal_base_url = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
+            _baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
         }
 
         public IActionResult Index()
@@ -59,45 +61,26 @@ namespace risk.control.system.Controllers.Manager
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Agencies(List<long> vendors)
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
-            try
-            {
-                if (!ModelState.IsValid || vendors is null || vendors.Count == 0)
-                {
-                    notifyService.Error("OOPs !!!..Not Agency Found");
-                    return RedirectToAction(nameof(Agencies));
-                }
+            var userEmail = User.Identity?.Name;
 
-                var companyUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
-                if (companyUser == null)
-                {
-                    notifyService.Error("OOPs !!!..User Not Found. Try again.");
-                    return this.RedirectToAction<DashboardController>(x => x.Index());
-                }
-                var company = await _context.ClientCompany
-                    .Include(c => c.EmpanelledVendors)
-                    .FirstOrDefaultAsync(c => c.ClientCompanyId == companyUser.ClientCompanyId);
-                if (company == null)
-                {
-                    notifyService.Error("OOPs !!!..Company Not Found. Try again.");
-                    return RedirectToAction(nameof(Agencies));
-                }
-                var agenciesToDepanel = company.EmpanelledVendors.Where(v => vendors.Contains(v.VendorId)).ToList();
-                foreach (var agency in agenciesToDepanel)
-                {
-                    company.EmpanelledVendors.Remove(agency);
-                }
-                company.Updated = DateTime.UtcNow;
-                company.UpdatedBy = userEmail;
-                _context.ClientCompany.Update(company);
-                var savedRows = await _context.SaveChangesAsync();
-                notifyService.Custom($"Agency(s) De-panelled successfully.", 3, "orange", "far fa-hand-pointer");
-            }
-            catch (Exception ex)
+            // Basic validation
+            if (!ModelState.IsValid || vendors == null || vendors.Count == 0)
             {
-                logger.LogError(ex, "Error occurred empanelling Agencies. {UserEmail}", userEmail);
-                notifyService.Error("Error occurred empanelling Agencies. Try again.");
+                _notifyService.Error("No agency selected !!!");
+                return RedirectToAction(nameof(Agencies));
             }
+
+            var result = await _companyAgencyService.DepanelAgenciesAsync(userEmail, vendors);
+
+            if (result.Success)
+            {
+                _notifyService.Custom(result.Message, 3, "orange", "far fa-hand-pointer");
+            }
+            else
+            {
+                _notifyService.Error(result.Message);
+            }
+
             return RedirectToAction(nameof(Agencies));
         }
 
@@ -108,88 +91,52 @@ namespace risk.control.system.Controllers.Manager
             {
                 if (id <= 0)
                 {
-                    notifyService.Error("OOPS !!!..Contact Admin");
-                    return this.RedirectToAction<DashboardController>(x => x.Index());
+                    _notifyService.Error("Error getting Agency");
+                    return RedirectToAction(nameof(Agencies));
                 }
-                var userEmail = HttpContext.User?.Identity?.Name;
 
-                var vendor = await _context.Vendor
-                    .Include(v => v.ratings)
-                    .Include(v => v.Country)
-                    .Include(v => v.PinCode)
-                    .Include(v => v.State)
-                    .Include(v => v.District)
-                    .Include(v => v.VendorInvestigationServiceTypes)
-                    .FirstOrDefaultAsync(m => m.VendorId == id);
+                var vendor = await _manageAgencyService.GetVendorDetailAsync(id);
                 if (vendor == null)
                 {
-                    notifyService.Error("OOPS !!!..Contact Admin");
-                    return this.RedirectToAction<DashboardController>(x => x.Index());
-                }
-                var vendorUserCount = await _context.ApplicationUser.CountAsync(c => c.VendorId == vendor.VendorId && !c.Deleted);
-                var superAdminUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
-
-                var approvedStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR;
-                var rejectedStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR;
-
-                var vendorAllCasesCount = await _context.Investigations.CountAsync(c => c.VendorId == vendor.VendorId && !c.Deleted &&
-                          (c.SubStatus == approvedStatus ||
-                          c.SubStatus == rejectedStatus));
-
-                // HACKY
-                var currentCases = investigationDetailService.GetAgencyIdsLoad(new List<long> { vendor.VendorId });
-                vendor.SelectedCountryId = vendorUserCount;
-                vendor.SelectedStateId = currentCases.FirstOrDefault().CaseCount;
-                vendor.SelectedDistrictId = vendorAllCasesCount;
-                if (superAdminUser.IsSuperAdmin)
-                {
-                    vendor.SelectedByCompany = true;
+                    _notifyService.Error("Error getting Agency");
+                    return RedirectToAction(nameof(Agencies));
                 }
                 return View(vendor);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting {AgencyId} for {UserEmail}.", id, HttpContext.User?.Identity?.Name);
-                notifyService.Error("Error getting Agency. Try again");
+                _logger.LogError(ex, "Error getting {AgencyId} for {UserEmail}.", id, HttpContext.User?.Identity?.Name);
+                _notifyService.Error("Error getting Agency. Try again");
                 return RedirectToAction(nameof(Agencies));
             }
         }
 
         public async Task<IActionResult> Edit(long id)
         {
+            var userEmail = HttpContext.User?.Identity?.Name;
             try
             {
-                if (id <= 0)
+                if (!ModelState.IsValid)
                 {
-                    notifyService.Error("OOPS !!!..Invalid Agency Id");
+                    _errorNotifyService.ShowErrorNotification(ModelState);
                     return RedirectToAction(nameof(Agencies));
                 }
 
-                var vendor = await _context.Vendor.Include(v => v.Country).FirstOrDefaultAsync(v => v.VendorId == id);
+                var vendor = await _manageAgencyService.GetVendorAsync(userEmail, id);
                 if (vendor == null)
                 {
-                    notifyService.Error("OOPS !!!..Agency Not Found");
+                    _notifyService.Error("Error getting Agency. Try again.");
                     return RedirectToAction(nameof(Agencies));
                 }
-                ViewData["BreadcrumbNode"] = navigationService.GetAgencyActionPath(id, ControllerName<EmpanelledAgencyController>.Name, "Active Agencies", "Edit Agency", nameof(Edit));
+                ViewData["BreadcrumbNode"] = _navigationService.GetAgencyActionPath(id, ControllerName<EmpanelledAgencyController>.Name, "Active Agencies", "Edit Agency", nameof(Edit));
                 return View(vendor);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting {AgencyId} for {UserEmail}.", id, HttpContext.User?.Identity?.Name);
-                notifyService.Error("Agency Not Found. Try again.");
+                _logger.LogError(ex, "Error getting {AgencyId} for {UserEmail}.", id, HttpContext.User?.Identity?.Name);
+                _notifyService.Error("Agency Not Found. Try again.");
                 return RedirectToAction(nameof(Agencies));
             }
-        }
-
-        private async Task Load(Vendor model)
-        {
-            var vendor = await _context.Vendor.Include(c => c.Country).FirstOrDefaultAsync(v => v.VendorId == model.VendorId);
-            model.Country = vendor.Country;
-            model.CountryId = vendor.CountryId;
-            model.StateId = model.SelectedStateId;
-            model.DistrictId = model.SelectedDistrictId;
-            model.PinCodeId = model.SelectedPincodeId;
         }
 
         [HttpPost]
@@ -201,29 +148,35 @@ namespace risk.control.system.Controllers.Manager
             {
                 if (!ModelState.IsValid)
                 {
-                    notifyService.Error("Please correct the errors");
-                    await Load(model);
+                    _notifyService.Error("Please correct the errors");
+                    await _manageAgencyService.LoadModel(model);
                     return View(model);
                 }
 
-                var result = await agencyCreateEditService.EditAsync(userEmail, model, portal_base_url);
+                var result = await _agencyCreateEditService.EditAsync(userEmail, model, _baseUrl);
                 if (!result.Success)
                 {
                     foreach (var error in result.Errors)
                         ModelState.AddModelError(error.Key, error.Value);
 
-                    notifyService.Error("Please fix validation errors");
-                    await Load(model);
+                    _errorNotifyService.ShowErrorNotification(ModelState); ;
+                    await _manageAgencyService.LoadModel(model);
                     return View(model);
                 }
-                notifyService.Custom($"Agency <b>{model.Email}</b> edited successfully.", 3, "orange", "fas fa-building");
+                _notifyService.Custom($"Agency <b>{model.Email}</b> edited successfully.", 3, "orange", "fas fa-building");
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error editing {AgencyId} for {UserEmail}.", vendorId, userEmail);
-                notifyService.Error("Error editing agency. Try again.");
+                _logger.LogError(ex, "Error editing {AgencyId} for {UserEmail}.", vendorId, userEmail);
+                _notifyService.Error("Error editing agency. Try again.");
             }
             return RedirectToAction(nameof(Detail), ControllerName<EmpanelledAgencyController>.Name, new { id = vendorId });
+        }
+
+        private void ShowErrorNotification()
+        {
+            var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).Distinct();
+            _notifyService.Error($"<b>Please fix:</b><br/>{string.Join("<br/>", errors)}");
         }
     }
 }

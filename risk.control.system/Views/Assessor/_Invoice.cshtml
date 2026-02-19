@@ -23,7 +23,7 @@
         <div class="card-body pt-0">
             <div class="row">
                 <div class="col-7">
-                    <h2 class="lead"><b>Insurance Type: </b>@Model.ClaimsInvestigation?.PolicyDetail.InsuranceType.GetEnumDisplayName()</h2>
+                    <h2 class="lead"><b>Case Type: </b>@Model.ClaimsInvestigation?.PolicyDetail.InsuranceType.GetEnumDisplayName()</h2>
 
                     <ul class="ml-4 mb-0 fa-ul text-muted">
                         <li class="small">
@@ -58,13 +58,13 @@
         </div>
         <div class="card-footer">
             <div class="text-right">
-                <a id="back" asp-controller="Assessor" asp-action="Approved" class="btn  btn-xs btn-outline-secondary">
+                <a id="back" asp-controller="Assessor" asp-action="Approved" class="btn  btn-sm btn-outline-secondary">
                     <i class="fas fa-arrow-left"></i>
                     Back
                 </a>
-                <a id="printInvoiceButton" class="btn btn-xs btn-danger"><i class="far fa-file-pdf"></i> PDF</a>
+                <a id="printInvoiceButton" class="btn btn-sm btn-danger text-white"><i class="fas fa-file-pdf"></i> PDF</a>
                 @* <a href="/Report/PrintPdfReport?Id=@Model.ClaimsInvestigation.Id" class="btn btn-xs btn-danger"><i class="far fa-file-pdf"></i> PDF</a> *@
-                <a class="btn  btn-xs  bg-teal" asp-controller="Assessor" asp-action="ShowInvoice" asp-route-id="@Model.VendorInvoice.VendorInvoiceId">
+                <a class="btn  btn-sm  bg-teal" asp-controller="Assessor" asp-action="ShowInvoice" asp-route-id="@Model.VendorInvoice.VendorInvoiceId">
                     <i class="fa fa-print"> Invoice</i>
                 </a>
             </div>

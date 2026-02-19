@@ -6,6 +6,7 @@ using risk.control.system.AppConstant;
 using risk.control.system.Controllers.Common;
 using risk.control.system.Helpers;
 using risk.control.system.Services.Common;
+using risk.control.system.Services.Manager;
 using risk.control.system.Services.Report;
 using SmartBreadcrumbs.Attributes;
 
@@ -15,23 +16,23 @@ namespace risk.control.system.Controllers.Manager
     [Authorize(Roles = MANAGER.DISPLAY_NAME)]
     public class ManagerController : Controller
     {
-        private readonly INotyfService notifyService;
-        private readonly IInvoiceService invoiceService;
-        private readonly INavigationService navigationService;
-        private readonly ILogger<ManagerController> logger;
-        private readonly IInvestigationDetailService investigativeService;
+        private readonly INotyfService _notifyService;
+        private readonly IInvoiceService _invoiceService;
+        private readonly INavigationService _navigationService;
+        private readonly ILogger<ManagerController> _logger;
+        private readonly ICaseDetailService _caseDetailService;
 
         public ManagerController(INotyfService notifyService,
             IInvoiceService invoiceService,
             INavigationService navigationService,
             ILogger<ManagerController> logger,
-            IInvestigationDetailService investigativeService)
+            ICaseDetailService caseDetailService)
         {
-            this.notifyService = notifyService;
-            this.invoiceService = invoiceService;
-            this.navigationService = navigationService;
-            this.logger = logger;
-            this.investigativeService = investigativeService;
+            _notifyService = notifyService;
+            _invoiceService = invoiceService;
+            _navigationService = navigationService;
+            _logger = logger;
+            _caseDetailService = caseDetailService;
         }
 
         public IActionResult Index()
@@ -50,7 +51,7 @@ namespace risk.control.system.Controllers.Manager
         {
             if (!ModelState.IsValid || id <= 0)
             {
-                notifyService.Error("Case not found.");
+                _notifyService.Error("Case not found.");
                 return RedirectToAction(nameof(Active));
             }
 
@@ -58,14 +59,14 @@ namespace risk.control.system.Controllers.Manager
 
             try
             {
-                var model = await investigativeService.GetClaimDetailsReport(userEmail, id);
+                var model = await _caseDetailService.GetClaimDetailsReport(userEmail, id);
 
                 return View(model);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting active case {CaseId}. {UserEmail}", id, userEmail);
-                notifyService.Error("Error getting case detail. Please try again.");
+                _logger.LogError(ex, "Error getting active case {CaseId}. {UserEmail}", id, userEmail);
+                _notifyService.Error("Error getting case detail. Please try again.");
                 return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
@@ -81,22 +82,22 @@ namespace risk.control.system.Controllers.Manager
         {
             if (!ModelState.IsValid || id < 1)
             {
-                notifyService.Error("Case Not Found !!!..");
+                _notifyService.Error("Case Not Found !!!..");
                 return RedirectToAction(nameof(Approved));
             }
             var userEmail = HttpContext.User?.Identity?.Name;
             try
             {
-                var model = await investigativeService.GetClaimDetailsReport(userEmail, id);
+                var model = await _caseDetailService.GetClaimDetailsReport(userEmail, id);
 
                 return View(model);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting approved case detail.User: {UserEmail}, CaseId: {CaseId}",
+                _logger.LogError(ex, "Error getting approved case detail.User: {UserEmail}, CaseId: {CaseId}",
                     userEmail,
                     id);
-                notifyService.Error("Error getting case detail. Try again.");
+                _notifyService.Error("Error getting case detail. Try again.");
                 return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
@@ -114,21 +115,21 @@ namespace risk.control.system.Controllers.Manager
 
             if (!ModelState.IsValid || id < 1)
             {
-                notifyService.Error("Case Not Found !!!..");
+                _notifyService.Error("Case Not Found !!!..");
                 return RedirectToAction(nameof(Rejected));
             }
             try
             {
-                var model = await investigativeService.GetClaimDetailsReport(userEmail, id);
+                var model = await _caseDetailService.GetClaimDetailsReport(userEmail, id);
 
                 return View(model);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting rejected case detail.User: {UserEmail}, CaseId: {CaseId}",
+                _logger.LogError(ex, "Error getting rejected case detail.User: {UserEmail}, CaseId: {CaseId}",
                     userEmail,
                     id);
-                notifyService.Error("Error getting case detail. Try again.");
+                _notifyService.Error("Error getting case detail. Try again.");
                 return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
@@ -139,22 +140,22 @@ namespace risk.control.system.Controllers.Manager
 
             if (!ModelState.IsValid || id < 1)
             {
-                notifyService.Error("Case Not Found !!!..");
+                _notifyService.Error("Case Not Found !!!..");
                 return RedirectToAction(nameof(Approved));
             }
             try
             {
-                var invoice = await invoiceService.GetInvoice(id);
-                ViewData["BreadcrumbNode"] = navigationService.GetInvoiceBreadcrumb(id, invoice.CaseId.Value, "Manager", "Manager", "Cases", "Approved", "Approved", "ApprovedDetail");
+                var invoice = await _invoiceService.GetInvoice(id);
+                ViewData["BreadcrumbNode"] = _navigationService.GetInvoiceBreadcrumb(id, invoice.CaseId.Value, "Manager", "Manager", "Cases", "Approved", "Approved", "ApprovedDetail");
 
                 return View(invoice);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting invoice case detail.User: {UserEmail}, CaseId: {CaseId}",
+                _logger.LogError(ex, "Error getting invoice case detail.User: {UserEmail}, CaseId: {CaseId}",
                    userEmail,
                    id);
-                notifyService.Error("Error getting invoice detail. Try again.");
+                _notifyService.Error("Error getting invoice detail. Try again.");
                 return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
@@ -165,22 +166,22 @@ namespace risk.control.system.Controllers.Manager
 
             if (!ModelState.IsValid || id <= 0)
             {
-                notifyService.Error("Case Not Found !!!..");
+                _notifyService.Error("Case Not Found !!!..");
                 return this.RedirectToAction<DashboardController>(x => x.Index());
             }
 
             try
             {
-                var invoice = await invoiceService.GetInvoice(id);
+                var invoice = await _invoiceService.GetInvoice(id);
 
                 return View(invoice);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting printing invoice case detail.User: {UserEmail}, CaseId: {CaseId}",
+                _logger.LogError(ex, "Error getting printing invoice case detail.User: {UserEmail}, CaseId: {CaseId}",
                    userEmail,
                    id);
-                notifyService.Error("Error printing invoice. Try again.");
+                _notifyService.Error("Error printing invoice. Try again.");
                 return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
