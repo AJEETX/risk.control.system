@@ -16,16 +16,19 @@ namespace risk.control.system.Controllers.Creator
     public class CustomerController : Controller
     {
         private readonly ILogger<CustomerController> _logger;
+        private readonly IErrorNotifyService _errorNotifyService;
         private readonly INavigationService _navigationService;
         private readonly ICustomerService _customerService;
         private readonly INotyfService _notifyService;
 
         public CustomerController(ILogger<CustomerController> logger,
+            IErrorNotifyService errorNotifyService,
             INavigationService navigationService,
             ICustomerService customerService,
             INotyfService notifyService)
         {
             _logger = logger;
+            _errorNotifyService = errorNotifyService;
             _navigationService = navigationService;
             _customerService = customerService;
             _notifyService = notifyService;
@@ -39,7 +42,7 @@ namespace risk.control.system.Controllers.Creator
             {
                 if (!ModelState.IsValid || id < 1)
                 {
-                    _notifyService.Error("OOPS!!!.Case Not Found.Try Again");
+                    _errorNotifyService.ShowErrorNotification(ModelState, "OOPS!!!.Case Not Found.Try Again");
                     return RedirectToAction(nameof(CaseCreateEditController.Create), ControllerName<CaseCreateEditController>.Name);
                 }
                 ViewData["BreadcrumbNode"] = _navigationService.GetInvestigationPath(id, "Add Customer", nameof(Create), ControllerName<CustomerController>.Name);
@@ -64,7 +67,7 @@ namespace risk.control.system.Controllers.Creator
             {
                 if (!ModelState.IsValid)
                 {
-                    ShowErrorNotification();
+                    _errorNotifyService.ShowErrorNotification(ModelState);
                     await _customerService.PrepareMetadataAsync(model, userEmail);
                     return View(model);
                 }
@@ -76,7 +79,7 @@ namespace risk.control.system.Controllers.Creator
                     foreach (var error in result.Errors)
                         ModelState.AddModelError(error.Key, error.Value);
 
-                    ShowErrorNotification();
+                    _errorNotifyService.ShowErrorNotification(ModelState);
                     await _customerService.PrepareMetadataAsync(model, userEmail);
                     return View(model);
                 }
@@ -126,7 +129,7 @@ namespace risk.control.system.Controllers.Creator
             {
                 if (!ModelState.IsValid)
                 {
-                    ShowErrorNotification();
+                    _errorNotifyService.ShowErrorNotification(ModelState);
                     await _customerService.PrepareMetadataAsync(model, userEmail);
                     return View(model);
                 }
@@ -137,7 +140,7 @@ namespace risk.control.system.Controllers.Creator
                     foreach (var error in result.Errors)
                         ModelState.AddModelError(error.Key, error.Value);
 
-                    ShowErrorNotification();
+                    _errorNotifyService.ShowErrorNotification(ModelState);
                     await _customerService.PrepareMetadataAsync(model, userEmail);
                     return View(model);
                 }
@@ -151,12 +154,6 @@ namespace risk.control.system.Controllers.Creator
                 _notifyService.Error("Error edting customer. Try again.");
                 return RedirectToAction(nameof(CreatorController.Details), ControllerName<CreatorController>.Name, new { id = model.InvestigationTaskId });
             }
-        }
-
-        private void ShowErrorNotification()
-        {
-            var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).Distinct();
-            _notifyService.Error($"<b>Please fix:</b><br/>{string.Join("<br/>", errors)}");
         }
     }
 }

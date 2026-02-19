@@ -5,12 +5,14 @@ using risk.control.system.Controllers.Api.PortalAdmin;
 using risk.control.system.Permission;
 using risk.control.system.Services;
 using risk.control.system.Services.Agency;
+using risk.control.system.Services.AgencyAdmin;
 using risk.control.system.Services.Agent;
 using risk.control.system.Services.Api;
 using risk.control.system.Services.Assessor;
 using risk.control.system.Services.Common;
 using risk.control.system.Services.Company;
 using risk.control.system.Services.Creator;
+using risk.control.system.Services.Manager;
 using risk.control.system.Services.Report;
 using risk.control.system.Services.Tool;
 
@@ -21,6 +23,15 @@ public static class BusinessServiceExtension
     public static IServiceCollection AddBusinessServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddHttpClient();
+        services.AddScoped<IManageAgencyUserService, ManageAgencyUserService>();
+        services.AddScoped<IErrorNotifyService, ErrorNotifyService>();
+        services.AddScoped<IManageCompanyUserService, ManageCompanyUserService>();
+        services.AddScoped<ICompanyAgencyService, CompanyAgencyService>();
+        services.AddScoped<ICaseDetailService, CaseDetailService>();
+        services.AddScoped<ICaseDetailReportService, CaseDetailReportService>();
+        services.AddScoped<IAgencyAdminUserService, AgencyAdminUserService>();
+        services.AddScoped<IAgencyServiceService, AgencyServiceService>();
+        services.AddScoped<IAgencyProfileService, AgencyProfileService>();
         services.AddScoped<IDeleteCaseService, DeleteCaseService>();
         services.AddScoped<ICaseUploadService, CaseUploadService>();
         services.AddScoped<ICaseActiveService, CaseActiveService>();
@@ -49,7 +60,7 @@ public static class BusinessServiceExtension
         services.AddScoped<IDateParserService, DateParserService>();
         services.AddScoped<IBase64FileService, Base64FileService>();
         services.AddScoped<IAgencyInvestigationDetailService, AgencyInvestigationDetailService>();
-        services.AddScoped<IInvestigationDetailService, InvestigationDetailService>();
+        services.AddScoped<IAgencyCaseLoadService, AgencyCaseLoadService>();
         services.AddScoped<IPolicyProcessor, PolicyProcessor>();
         services.AddScoped<IVerifierProcessor, VerifierProcessor>();
         services.AddScoped<ICustomerValidator, CustomerValidator>();
@@ -76,7 +87,7 @@ public static class BusinessServiceExtension
         services.AddScoped<ICompanyUserService, CompanyUserService>();
         services.AddScoped<IAgencyServiceTypeManager, AgencyServiceTypeManager>();
         services.AddScoped<IAgencyUserCreateEditService, AgencyUserCreateEditService>();
-        services.AddScoped<IAgencyCreateEditService, AgencyCreateEditService>();
+        services.AddScoped<IManageAgencyService, ManageAgencyService>();
         services.AddScoped<IValidateImageService, ValidateImageService>();
         services.AddScoped<IBeneficiaryService, BeneficiaryService>();
         services.AddScoped<ICustomerService, CustomerService>();

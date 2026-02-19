@@ -1,0 +1,110 @@
+﻿@using risk.control.system.Helpers;
+@model LocationReport
+@{
+	var location = Model;
+}
+
+@if (location.DocumentIds?.Any(d => d.Selected) == true)
+{
+	<div class="table-responsive mb-4">
+
+		<table class="table table-bordered table-hover dt-responsive nowrap w-100">
+			<thead class="thead-light">
+				<tr>
+					<th class="col-verifier-name"><i class="far fa-file text-muted ms-2" title="Document"></i> Document</th>
+					<th class="col-face-photo">
+						<i class="fas fa-copy text-muted ms-2" title="Scanned Document Image"></i> Document Image
+					</th>
+					<th class="col-pin-img" title="Indicative Map Route"><img class="action-image" src="~/headers/pincode.gif" />  Indicative Map</th>
+					<th class="col-address" title="Indicative Address Info">Indicative Address Info</th>
+					<th class="col-weather" title="Scanned Data">
+						<img class="action-image" src="~/headers/information.gif" /> Scanned Data
+					</th>
+					<th class="col-match">Valid</th>
+				</tr>
+			</thead>
+			<tbody>
+				@foreach (var doc in location.DocumentIds.Where(d => d.Selected))
+				{
+
+					<tr>
+						<td>
+							<small>
+							@doc.ReportName
+								</small>
+							@if (doc.IsRequired)
+							{
+								<span class="required-asterisk" title="Mandatory Image">*</span>
+							}
+						</td>
+
+						<td>
+							@if (doc.ValidationExecuted)
+							{
+								<img id="doc-img-@doc.Id"
+									 src="/Document/GetOcrDocument/@doc.Id"
+									 class="mobile-capture-info  preview-image"
+									 title="@doc.ReportName" />
+							}
+							else
+							{
+								<img id="doc-img-@doc.Id" src="~/img/no-policy.jpg" class="thumbnail profile-image doc-profile-image" />
+							}
+
+						</td>
+						<td>
+							@if (doc.ValidationExecuted && doc.LocationMapUrl !=  null)
+							{
+								<img id="face-img-@doc.Id"
+									 src="@string.Format(doc.LocationMapUrl, "500","500")"
+									 class="mobile-capture-map map-image"
+									 data-faceid="@doc.Id"
+									 data-locationid="@location.Id"
+									 data-source="document"
+									 title="Click to view map" />
+								
+							}
+							else
+							{
+								<img src="~/img/no-map.jpeg" class="img-thumbnail rounded" />
+							}
+						</td>
+						<td>
+									<div>@doc.LongLat</div>
+
+							<small>
+							@doc.LocationAddress
+								</small>
+							<span class="badge badge-light">
+								Indicative Distance from @location.Address Address @doc.Distance
+							</span>
+						</td>
+						<td>
+							<small>
+							@doc.LocationInfo
+								</small>
+						</td>
+						<td>
+							@if (doc.ValidationExecuted)
+							{
+								@if (doc.ImageValid.HasValue && doc.ImageValid.Value)
+								{
+									<i class='fas fa-check-circle i-green'></i>
+								}
+								else
+								{
+									<i class='fa fa-times i-orangered' aria-hidden='true'></i>
+								}
+							}
+							else
+							{
+								<i class='fa fa-times i-grey' aria-hidden='true'></i>
+							}
+
+						</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+	</div>
+}

@@ -2,85 +2,85 @@
 @model CaseAgencyModel
 
 @{
-    var questionTime = @Model.InvestigationReport.AgentRemarksUpdated != null ? @Model.InvestigationReport.AgentRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt") : null;
+	var questionTime = @Model.InvestigationReport.AgentRemarksUpdated != null ? @Model.InvestigationReport.AgentRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt") : null;
 
-    string questionaire = "progress-bar-grey";
-    if (Model.InvestigationReport.AgentRemarks != null)
-    {
-        questionaire = "progress-bar-green";
-    }
-    <div class="col-12 col-sm-4 col-md-12 d-flex align-items-stretch flex-column">
-        <div id="questionaire-border" class="card bg-light d-flex flex-fill">
-            <div class="card-header text-muted border-bottom-0">
+	string questionaire = "progress-bar-grey";
+	if (Model.InvestigationReport.AgentRemarks != null)
+	{
+		questionaire = "progress-bar-green";
+	}
+	<div class="col-12 col-sm-4 col-md-12 d-flex align-items-stretch flex-column">
+		<div id="questionaire-border" class="card bg-light d-flex flex-fill">
+			<div class="card-header text-muted border-bottom-0">
 
-                <h3 class="card-title">
-                    <i class="far fa-comment"></i> Remarks (@Model.CaseTask?.PolicyDetail.InsuranceType.GetEnumDisplayName())
-                    <span class="hover-text">
-                        <i class="fas fa-info-circle"></i>
-                        <span class="tooltip-text" id="information">
-                            <span>
-                                <i class="fas fa-comment"></i> Fill-up Questionnaire (@Model.CaseTask?.PolicyDetail.InsuranceType.GetEnumDisplayName())
-                            </span>
-                        </span>
-                    </span>
-                </h3>
-                <div class="card-tools">
-                    <span data-toggle="tooltip" title="Report time" class="badge badge-light"> <i class="nav-icon fas fa-clock"></i> @questionTime </span>
-                </div>
-            </div>
-            <div class="card-footer text-muted border-bottom-0">
-                <i class="fas fa-user-shield"></i>  Agent :<span class="badge badge-light">  @Model.InvestigationReport.AgentEmail </span>
-            </div>
-            <div class="progress">
-                <i class="far fa-bookmark bookmark-green"></i>
-                <div id="questionaire" class="progress-bar @questionaire" role="progressbar">
-                    agent remarks
-                </div>
-            </div>
-            <form id="create-form" asp-controller="AgencyReport" asp-action="SubmitReport" method="post">
-                <input type="hidden" name="claimId" value="@Model.CaseTask.Id" />
-                @Html.AntiForgeryToken()
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-12 col-md-6">
-                            <div class="form-group">
-                                <span class="input-group-label"> Remarks :</span>
-                                <div class="input-group mb-3">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text" asp-for="InvestigationReport.AgentRemarks"><i class="fas fa-comment"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
-                                    </div>
-                                    <textarea required name="remarks" id="remarks" asp-for="InvestigationReport.AgentRemarks" class="form-control remarks" data-toggle="tooltip" title="Enter remarks"
-                                              type="text" placeholder="Remarks" rows="3"></textarea>
-                                    <span asp-validation-for="InvestigationReport.AgentRemarks" class="text-danger"></span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-12 col-md-6">
+				<h3 class="card-title">
+					<i class="far fa-comment"></i> Remarks (@Model.CaseTask?.PolicyDetail.InsuranceType.GetEnumDisplayName())
+					<span class="hover-text">
+						<i class="fas fa-info-circle"></i>
+						<span class="tooltip-text" id="information">
+							<span>
+								<i class="fas fa-comment"></i> Fill-up Questionnaire (@Model.CaseTask?.PolicyDetail.InsuranceType.GetEnumDisplayName())
+							</span>
+						</span>
+					</span>
+				</h3>
+				<div class="card-tools">
+					<span data-toggle="tooltip" title="Report time" class="badge badge-light"> <i class="nav-icon fas fa-clock"></i> @questionTime </span>
+				</div>
+			</div>
+			<div class="card-footer text-muted border-bottom-0">
+				<i class="fas fa-user-shield"></i>  Agent :<span class="badge badge-light">  @Model.InvestigationReport.AgentEmail </span>
+			</div>
+			<div class="progress">
+				<i class="far fa-bookmark bookmark-green"></i>
+				<div id="questionaire" class="progress-bar @questionaire" role="progressbar">
+					agent remarks
+				</div>
+			</div>
+			<form id="create-form" asp-controller="AgencyReport" asp-action="SubmitReport" method="post">
+				<input type="hidden" name="caseId" value="@Model.CaseTask.Id" />
+				@Html.AntiForgeryToken()
+				<div class="card-body">
+					<div class="row">
+						<div class="col-12 col-md-6">
+							<div class="form-group">
+								<span class="input-group-label"> Remarks :</span>
+								<div class="input-group mb-3">
+									<div class="input-group-prepend">
+										<span class="input-group-text" asp-for="InvestigationReport.AgentRemarks"><i class="fas fa-comment"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
+									</div>
+									<textarea required name="remarks" id="remarks" asp-for="InvestigationReport.AgentRemarks" class="form-control remarks" data-toggle="tooltip" title="Enter remarks"
+											  type="text" placeholder="Remarks" rows="3"></textarea>
+									<span asp-validation-for="InvestigationReport.AgentRemarks" class="text-danger"></span>
+								</div>
+							</div>
+						</div>
+						<div class="col-12 col-md-6">
 
-                            <div class="col-12 d-flex justify-content-center align-items-center">
-                                <div class="ml-4 mb-0 fa-ul text-muted">
+							<div class="col-12 d-flex justify-content-center align-items-center">
+								<div class="ml-4 mb-0 fa-ul text-muted">
 
-                                    <div class="form-group">
-                                        <input type="checkbox" id="terms_and_conditions" value="1" />
-                                        <label class="account" for="terms_and_conditions" data-toggle="tooltip" title="I agree to the Terms & Conditions"> I agree to the <a class="termsLink" href="#">Terms & Conditions</a></label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+									<div class="form-group">
+										<input type="checkbox" id="terms_and_conditions" value="1" />
+										<label class="account" for="terms_and_conditions" data-toggle="tooltip" title="I agree to the Terms & Conditions"> I agree to the <a class="termsLink" href="#">Terms & Conditions</a></label>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
 
-                <div class="card-footer">
+				<div class="card-footer">
 
-                    <div class="text-right">
-                        <a id="back" asp-controller="Agent" asp-action="Agent" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a> &nbsp;
-                        <button disabled id="submit-case" type="submit" class="btn btn-danger">
-                            <i class="fa fa-binoculars" aria-hidden="true"></i> SUBMIT
-                        </button>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
+					<div class="text-right">
+						<a id="back" asp-controller="Agent" asp-action="Agent" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a> &nbsp;
+						<button disabled id="submit-case" type="submit" class="btn btn-danger">
+							<i class="fa fa-binoculars" aria-hidden="true"></i> SUBMIT
+						</button>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
 
 }

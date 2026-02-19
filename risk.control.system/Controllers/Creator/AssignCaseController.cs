@@ -2,10 +2,8 @@
 using Hangfire;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using risk.control.system.AppConstant;
 using risk.control.system.Helpers;
-using risk.control.system.Models;
 using risk.control.system.Services;
 using risk.control.system.Services.Common;
 
@@ -15,14 +13,13 @@ namespace risk.control.system.Controllers.Creator
     public class AssignCaseController : Controller
     {
         private readonly string _baseUrl;
-        private readonly ApplicationDbContext _context;
         private readonly IAssignCaseService _assignCaseService;
         private readonly IMailService _mailService;
         private readonly INotyfService _notifyService;
         private readonly ILogger<AssignCaseController> _logger;
         private readonly IBackgroundJobClient _backgroundJobClient;
 
-        public AssignCaseController(ApplicationDbContext context,
+        public AssignCaseController(
             IAssignCaseService assignCaseService,
             IMailService mailboxService,
             INotyfService notifyService,
@@ -30,7 +27,6 @@ namespace risk.control.system.Controllers.Creator
             ILogger<AssignCaseController> logger,
             IBackgroundJobClient backgroundJobClient)
         {
-            _context = context;
             _assignCaseService = assignCaseService;
             _mailService = mailboxService;
             _notifyService = notifyService;
@@ -87,7 +83,7 @@ namespace risk.control.system.Controllers.Creator
                     return RedirectToAction(nameof(CaseCreateEditController.New), ControllerName<CaseCreateEditController>.Name);
                 }
 
-                var (policy, status) = await _assignCaseService.AllocateToVendor(userEmail, caseId, selectedcase, false);
+                var (policy, status, agencyName) = await _assignCaseService.AllocateToVendor(userEmail, caseId, selectedcase, false);
 
                 if (string.IsNullOrEmpty(policy) || string.IsNullOrEmpty(status))
                 {
@@ -95,11 +91,9 @@ namespace risk.control.system.Controllers.Creator
                     return RedirectToAction(nameof(CaseCreateEditController.New), ControllerName<CaseCreateEditController>.Name);
                 }
 
-                var vendor = await _context.Vendor.FirstOrDefaultAsync(v => v.VendorId == selectedcase);
-
                 var jobId = _backgroundJobClient.Enqueue(() => _mailService.NotifyCaseAllocationToVendorAndManager(userEmail, policy, caseId, selectedcase, _baseUrl));
 
-                _notifyService.Custom($"Case <b>#{policy}</b> <i>{status}</i> to {vendor.Name}", 3, "green", "far fa-file-powerpoint");
+                _notifyService.Custom($"Case <b>#{policy}</b> <i>{status}</i> to {agencyName}", 3, "green", "far fa-file-powerpoint");
 
                 return RedirectToAction(nameof(CaseActiveController.Active), ControllerName<CaseActiveController>.Name);
             }

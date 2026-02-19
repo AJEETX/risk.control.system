@@ -14,19 +14,18 @@ namespace risk.control.system.Controllers.Assessor
     [Authorize(Roles = ASSESSOR.DISPLAY_NAME)]
     public class CaseActionController : Controller
     {
-        private readonly string baseUrl;
+        private readonly string _baseUrl;
         private const long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
         private static readonly string[] AllowedExt = new[] { ".jpg", ".jpeg", ".png" };
         private static readonly string[] AllowedMime = new[] { "image/jpeg", "image/png" };
-        private readonly ApplicationDbContext _context;
-        private readonly IProcessCaseService processCaseService;
-        private readonly IAssessorQueryService assessorQueryService;
-        private readonly IMailService mailboxService;
-        private readonly INotyfService notifyService;
-        private readonly ILogger<CaseActionController> logger;
+        private readonly IProcessCaseService _processCaseService;
+        private readonly IAssessorQueryService _assessorQueryService;
+        private readonly IMailService _mailService;
+        private readonly INotyfService _notifyService;
+        private readonly ILogger<CaseActionController> _logger;
         private readonly IBackgroundJobClient backgroundJobClient;
 
-        public CaseActionController(ApplicationDbContext context,
+        public CaseActionController(
             IProcessCaseService processCaseService,
             IAssessorQueryService assessorQueryService,
             IMailService mailboxService,
@@ -35,16 +34,15 @@ namespace risk.control.system.Controllers.Assessor
             ILogger<CaseActionController> logger,
             IBackgroundJobClient backgroundJobClient)
         {
-            _context = context;
-            this.processCaseService = processCaseService;
-            this.assessorQueryService = assessorQueryService;
-            this.mailboxService = mailboxService;
-            this.notifyService = notifyService;
-            this.logger = logger;
+            _processCaseService = processCaseService;
+            _assessorQueryService = assessorQueryService;
+            _mailService = mailboxService;
+            _notifyService = notifyService;
+            _logger = logger;
             this.backgroundJobClient = backgroundJobClient;
             var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
             var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
-            baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
+            _baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
         }
 
         [ValidateAntiForgeryToken]
@@ -53,7 +51,7 @@ namespace risk.control.system.Controllers.Assessor
         {
             if (!ModelState.IsValid || string.IsNullOrWhiteSpace(assessorRemarks) || claimId < 1 || string.IsNullOrWhiteSpace(assessorRemarkType))
             {
-                notifyService.Custom($"Error!!! Try again", 3, "red", "far fa-file-powerpoint");
+                _notifyService.Custom($"Error!!! Try again", 3, "red", "far fa-file-powerpoint");
                 return RedirectToAction(nameof(AssessorController.Assessor), ControllerName<AssessorController>.Name);
             }
             var userEmail = HttpContext.User?.Identity?.Name;
@@ -64,33 +62,33 @@ namespace risk.control.system.Controllers.Assessor
                     assessorRemarks = WebUtility.HtmlEncode(assessorRemarks);
                     reportAiSummary = WebUtility.HtmlEncode(reportAiSummary);
 
-                    var (company, contract) = await processCaseService.ProcessCaseReport(userEmail, assessorRemarks, claimId, reportUpdateStatus, reportAiSummary);
+                    var (company, contract) = await _processCaseService.ProcessCaseReport(userEmail, assessorRemarks, claimId, reportUpdateStatus, reportAiSummary);
 
-                    backgroundJobClient.Enqueue(() => mailboxService.NotifyCaseReportProcess(userEmail, claimId, baseUrl));
+                    backgroundJobClient.Enqueue(() => _mailService.NotifyCaseReportProcess(userEmail, claimId, _baseUrl));
                     if (reportUpdateStatus == AssessorRemarkType.OK)
                     {
-                        notifyService.Custom($"Case <b> #{contract}</b> Approved", 3, "green", "far fa-file-powerpoint");
+                        _notifyService.Custom($"Case <b> #{contract}</b> Approved", 3, "green", "far fa-file-powerpoint");
                     }
                     else if (reportUpdateStatus == AssessorRemarkType.REJECT)
                     {
-                        notifyService.Custom($"Case <b>#{contract}</b> Rejected", 3, "red", "far fa-file-powerpoint");
+                        _notifyService.Custom($"Case <b>#{contract}</b> Rejected", 3, "red", "far fa-file-powerpoint");
                     }
                     else
                     {
-                        notifyService.Custom($"Case <b> #{contract}</b> Re-Assigned", 3, "yellow", "far fa-file-powerpoint");
+                        _notifyService.Custom($"Case <b> #{contract}</b> Re-Assigned", 3, "yellow", "far fa-file-powerpoint");
                     }
                     return RedirectToAction(nameof(AssessorController.Assessor), ControllerName<AssessorController>.Name);
                 }
                 else
                 {
-                    notifyService.Custom($"Error!!! Try again", 3, "red", "far fa-file-powerpoint");
+                    _notifyService.Custom($"Error!!! Try again", 3, "red", "far fa-file-powerpoint");
                     return RedirectToAction(nameof(AssessorController.Assessor), ControllerName<AssessorController>.Name);
                 }
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error withdrawing case {Id}. {UserEmail}", claimId, userEmail);
-                notifyService.Error("Error processing case. Try again.");
+                _logger.LogError(ex, "Error withdrawing case {Id}. {UserEmail}", claimId, userEmail);
+                _notifyService.Error("Error processing case. Try again.");
                 return RedirectToAction(nameof(AssessorController.Assessor), ControllerName<AssessorController>.Name);
             }
         }

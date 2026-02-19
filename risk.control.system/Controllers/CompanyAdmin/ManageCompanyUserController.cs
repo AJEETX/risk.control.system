@@ -1,19 +1,13 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Reflection;
-
-using AspNetCoreHero.ToastNotification.Abstractions;
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.FeatureManagement;
 using risk.control.system.AppConstant;
 using risk.control.system.Controllers.Common;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
-using risk.control.system.Models.ViewModel;
+using risk.control.system.Services.Common;
 using risk.control.system.Services.Company;
 using SmartBreadcrumbs.Attributes;
 
@@ -23,31 +17,29 @@ namespace risk.control.system.Controllers.CompanyAdmin
     [Breadcrumb("Manage Company")]
     public class ManageCompanyUserController : Controller
     {
-        private readonly INotyfService notifyService;
-        private readonly ApplicationDbContext _context;
-        private readonly UserManager<ApplicationUser> userManager;
-        private readonly ICompanyUserService companyUserService;
-        private readonly IFeatureManager featureManager;
-        private readonly ILogger<ManageCompanyUserController> logger;
-        private readonly string portal_base_url;
+        private readonly INotyfService _notifyService;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IManageCompanyUserService _manageCompanyUserService;
+        private readonly IErrorNotifyService _errorNotifyService;
+        private readonly ILogger<ManageCompanyUserController> _logger;
+        private readonly string _baseUrl;
 
-        public ManageCompanyUserController(ApplicationDbContext context,
+        public ManageCompanyUserController(
             UserManager<ApplicationUser> userManager,
-            ICompanyUserService companyUserService,
+            IManageCompanyUserService manageCompanyUserService,
+            IErrorNotifyService errorNotifyService,
             INotyfService notifyService,
-            IFeatureManager featureManager,
              IHttpContextAccessor httpContextAccessor,
             ILogger<ManageCompanyUserController> logger)
         {
-            this._context = context;
-            this.userManager = userManager;
-            this.companyUserService = companyUserService;
-            this.notifyService = notifyService;
-            this.featureManager = featureManager;
-            this.logger = logger;
+            _userManager = userManager;
+            _manageCompanyUserService = manageCompanyUserService;
+            _errorNotifyService = errorNotifyService;
+            _notifyService = notifyService;
+            _logger = logger;
             var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
             var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
-            portal_base_url = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
+            _baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
         }
 
         public IActionResult Index()
@@ -67,89 +59,20 @@ namespace risk.control.system.Controllers.CompanyAdmin
             var userEmail = HttpContext.User?.Identity?.Name;
             try
             {
-                var companyUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == userEmail);
-                if (companyUser is null)
+                var model = await _manageCompanyUserService.GetUserCreationModelAsync(User.Identity.Name);
+                if (model == null)
                 {
-                    notifyService.Error("OOPs !!!..User Not Found");
-                    return this.RedirectToAction<DashboardController>(x => x.Index());
+                    _notifyService.Error("User or Company not found.");
+                    return RedirectToAction("Index", "Dashboard");
                 }
-                var company = await _context.ClientCompany.AsNoTracking().Include(c => c.Country).FirstOrDefaultAsync(v => v.ClientCompanyId == companyUser.ClientCompanyId);
-                if (company == null)
-                {
-                    notifyService.Error("OOPs !!!..Contact Admin");
-                    return this.RedirectToAction<DashboardController>(x => x.Index());
-                }
-                var usersInCompany = _context.ApplicationUser.AsNoTracking().Where(c => !c.Deleted && c.ClientCompanyId == companyUser.ClientCompanyId);
-                bool isManagerTaken = false;
-
-                foreach (var user in usersInCompany)
-                {
-                    if (await userManager.IsInRoleAsync(user, MANAGER.DISPLAY_NAME))
-                    {
-                        isManagerTaken = true;
-                        break;
-                    }
-                }
-
-                var availableRoles = RoleGroups.CompanyAppRoles
-                    .Where(r => r != AppRoles.COMPANY_ADMIN && r != AppRoles.MANAGER || !isManagerTaken) // Exclude MANAGER if already taken
-                    .Select(r => new SelectListItem
-                    {
-                        Value = r.ToString(),
-                        Text = r.GetType()
-                                .GetMember(r.ToString())
-                                .First()
-                                .GetCustomAttribute<DisplayAttribute>()?.Name ?? r.ToString()
-                    })
-                    .ToList();
-
-                var model = new ApplicationUser { Country = company.Country, ClientCompany = company, CountryId = company.CountryId, AvailableRoles = availableRoles };
                 return View(model);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error creating user for {UserEmail}.", userEmail);
-                notifyService.Error("Error creating user. Try again");
+                _logger.LogError(ex, "Error creating user for {UserEmail}.", userEmail);
+                _notifyService.Error("Error creating user. Try again");
                 return this.RedirectToAction<DashboardController>(x => x.Index());
             }
-        }
-
-        private async Task LoadModel(ApplicationUser model, string userEmail)
-        {
-            var companyUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == userEmail);
-            var company = await _context.ClientCompany.AsNoTracking().Include(c => c.Country).FirstOrDefaultAsync(v => v.ClientCompanyId == companyUser.ClientCompanyId);
-            var usersInCompany = _context.ApplicationUser.AsNoTracking().Where(c => !c.Deleted && c.ClientCompanyId == companyUser.ClientCompanyId);
-            bool isManagerTaken = false;
-
-            foreach (var user in usersInCompany)
-            {
-                if (await userManager.IsInRoleAsync(user, MANAGER.DISPLAY_NAME))
-                {
-                    isManagerTaken = true;
-                    break;
-                }
-            }
-
-            var availableRoles = RoleGroups.CompanyAppRoles
-                .Where(r => r != AppRoles.COMPANY_ADMIN && r != AppRoles.MANAGER || !isManagerTaken) // Exclude MANAGER if already taken
-                .Select(r => new SelectListItem
-                {
-                    Value = r.ToString(),
-                    Text = r.GetType()
-                            .GetMember(r.ToString())
-                            .First()
-                            .GetCustomAttribute<DisplayAttribute>()?.Name ?? r.ToString()
-                })
-                .ToList();
-
-            model.ClientCompany = company;
-            model.Country = company.Country;
-            model.CountryId = company.CountryId;
-
-            model.StateId = model.SelectedStateId;
-            model.DistrictId = model.SelectedDistrictId;
-            model.PinCodeId = model.SelectedPincodeId;
-            model.AvailableRoles = availableRoles;
         }
 
         [HttpPost]
@@ -161,30 +84,29 @@ namespace risk.control.system.Controllers.CompanyAdmin
             {
                 if (!ModelState.IsValid)
                 {
-                    notifyService.Error("Please correct the errors");
-                    await LoadModel(model, userEmail);
+                    _errorNotifyService.ShowErrorNotification(ModelState);
+                    await _manageCompanyUserService.LoadModelAsync(model, User.Identity.Name);
                     return View(model);
                 }
-                var result = await companyUserService.CreateAsync(model, emailSuffix, userEmail, portal_base_url);
+
+                var result = await _manageCompanyUserService.CreateUserAsync(model, emailSuffix, User.Identity.Name, _baseUrl);
 
                 if (!result.Success)
                 {
                     foreach (var error in result.Errors)
-                    {
                         ModelState.AddModelError(error.Key, error.Value);
-                    }
-
-                    notifyService.Error("Correct the highlighted errors.");
-                    await LoadModel(model, userEmail);
-                    return View(model); // 🔥 fields now highlight
+                    _errorNotifyService.ShowErrorNotification(ModelState);
+                    await _manageCompanyUserService.LoadModelAsync(model, User.Identity.Name);
+                    return View(model);
                 }
 
-                notifyService.Success(result.Message);
+                _notifyService.Success(result.Message);
+                return RedirectToAction(nameof(Users));
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error creating user for {Company}. {UserEmail}.", emailSuffix, userEmail);
-                notifyService.Error("Error creating user. Try again");
+                _logger.LogError(ex, "Error creating user for {Company}. {UserEmail}.", emailSuffix, userEmail);
+                _notifyService.Error("Error creating user. Try again");
             }
             return RedirectToAction(nameof(Users), ControllerName<ManageCompanyUserController>.Name);
         }
@@ -192,58 +114,22 @@ namespace risk.control.system.Controllers.CompanyAdmin
         [Breadcrumb("Edit User", FromAction = nameof(Users))]
         public async Task<IActionResult> Edit(long? id)
         {
+            if (id == null) return RedirectToAction(nameof(Users));
+
             try
             {
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-
-                if (id == null || _context.ApplicationUser == null)
+                var model = await _manageCompanyUserService.GetUserForEditAsync(id.Value);
+                if (model == null)
                 {
-                    notifyService.Error("OOPs !!!..Contact Admin");
+                    _notifyService.Error("User not found.");
                     return RedirectToAction(nameof(Users));
                 }
-
-                var companyUser = await _context.ApplicationUser.AsNoTracking()
-                    .Include(u => u.Country).
-                    Include(u => u.ClientCompany)
-                    .FirstOrDefaultAsync(c => c.Id == id);
-
-                if (companyUser == null)
-                {
-                    notifyService.Error("OOPs !!!..Contact Admin");
-                    return RedirectToAction(nameof(Users));
-                }
-                var usersInCompany = _context.ApplicationUser.AsNoTracking().Where(c => !c.Deleted && c.ClientCompanyId == companyUser.ClientCompanyId && c.Id != companyUser.Id);
-                bool isManagerTaken = false;
-
-                foreach (var user in usersInCompany)
-                {
-                    if (await userManager.IsInRoleAsync(user, MANAGER.DISPLAY_NAME))
-                    {
-                        isManagerTaken = true;
-                        break;
-                    }
-                }
-
-                var availableRoles = RoleGroups.CompanyAppRoles
-                    .Where(r => r != AppRoles.COMPANY_ADMIN && r != AppRoles.MANAGER || !isManagerTaken) // Exclude MANAGER if already taken
-                    .Select(r => new SelectListItem
-                    {
-                        Value = r.ToString(),
-                        Text = r.GetType()
-                                .GetMember(r.ToString())
-                                .First()
-                                .GetCustomAttribute<DisplayAttribute>()?.Name ?? r.ToString()
-                    })
-                    .ToList();
-
-                companyUser.IsPasswordChangeRequired = await featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION) ? !companyUser.IsPasswordChangeRequired : true;
-                companyUser.AvailableRoles = availableRoles;
-                return View(companyUser);
+                return View(model);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error editing {UserId} for {UserEmail}.", id, HttpContext.User?.Identity?.Name);
-                notifyService.Error("Error editing user. Try again");
+                _logger.LogError(ex, "Error editing {UserId} for {UserEmail}.", id, HttpContext.User?.Identity?.Name);
+                _notifyService.Error("Error editing user. Try again");
             }
             return RedirectToAction(nameof(Users), ControllerName<ManageCompanyUserController>.Name);
         }
@@ -252,37 +138,36 @@ namespace risk.control.system.Controllers.CompanyAdmin
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(string id, ApplicationUser model)
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var currentUser = User.Identity?.Name;
             try
             {
                 if (!ModelState.IsValid)
                 {
-                    notifyService.Error($"Correct the error(s)");
-                    await LoadModel(model, userEmail);
+                    _errorNotifyService.ShowErrorNotification(ModelState);
+                    await _manageCompanyUserService.LoadModelAsync(model, currentUser);
                     return View(model);
                 }
-                var result = await companyUserService.UpdateAsync(id, model, userEmail, portal_base_url);
+
+                var result = await _manageCompanyUserService.UpdateUserAsync(id, model, currentUser, _baseUrl);
 
                 if (!result.Success)
                 {
                     foreach (var error in result.Errors)
-                    {
                         ModelState.AddModelError(error.Key, error.Value);
-                    }
+                    _errorNotifyService.ShowErrorNotification(ModelState);
 
-                    notifyService.Error("Correct the highlighted errors.");
-                    await LoadModel(model, User.Identity?.Name);
-                    return View(model); // 🔥 fields now highlight
+                    await _manageCompanyUserService.LoadModelAsync(model, currentUser);
+                    return View(model);
                 }
 
-                notifyService.Success(result.Message);
+                _notifyService.Custom(result.Message, 3, "orange", "fas fa-user-check");
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error editing {UserId} for {UserEmail}.", id, userEmail);
-                notifyService.Error($"Error to create Company user. Try again.", 3);
+                _logger.LogError(ex, "Error updating user {UserId}.", id);
+                _notifyService.Error("An unexpected error occurred.");
             }
-            return RedirectToAction(nameof(Users), ControllerName<ManageCompanyUserController>.Name);
+            return RedirectToAction(nameof(Users));
         }
 
         [HttpPost]
@@ -297,19 +182,19 @@ namespace risk.control.system.Controllers.CompanyAdmin
                     return Json(new { success = false, message = "Invalid user id" });
                 }
 
-                var user = await userManager.FindByIdAsync(userId);
+                var user = await _userManager.FindByIdAsync(userId);
                 if (user == null)
                 {
                     return Json(new { success = false, message = "User not found" });
                 }
 
                 // Optional extra safety
-                if (await userManager.IsInRoleAsync(user, "COMPANY_ADMIN"))
+                if (await _userManager.IsInRoleAsync(user, COMPANY_ADMIN.DISPLAY_NAME))
                 {
                     return Json(new { success = false, message = "Company Admin cannot be deleted" });
                 }
 
-                var result = await userManager.DeleteAsync(user);
+                var result = await _userManager.DeleteAsync(user);
 
                 if (!result.Succeeded)
                 {
@@ -322,7 +207,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             catch (Exception ex)
             {
                 // 🔥 log this properly in real apps
-                logger.LogError(ex, "Error deleting user {UserId}. {UserEmail}", userId, userEmail);
+                _logger.LogError(ex, "Error deleting user {UserId}. {UserEmail}", userId, userEmail);
 
                 return Json(new
                 {
