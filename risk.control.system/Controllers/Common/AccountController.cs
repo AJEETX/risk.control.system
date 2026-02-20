@@ -50,7 +50,7 @@ namespace risk.control.system.Controllers.Common
         [AllowAnonymous]
         public async Task<IActionResult> Login(string returnUrl = null)
         {
-            var setPassword = await _featureManager.IsEnabledAsync(FeatureFlags.SHOW_PASSWORD);
+            var setPassword = await _featureManager.IsEnabledAsync(FeatureFlags.SHOW_PASSWORD_ON_LOGIN);
             if (!string.IsNullOrEmpty(returnUrl) && !Url.IsLocalUrl(returnUrl))
             {
                 returnUrl = "/";
@@ -227,7 +227,7 @@ namespace risk.control.system.Controllers.Common
         {
             model.LoginError = error;
             ModelState.AddModelError(string.Empty, error);
-            model.SetPassword = await _featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
+            model.SetPassword = await _featureManager.IsEnabledAsync(FeatureFlags.SHOW_PASSWORD_ON_LOGIN);
             return View(model);
         }
     }
