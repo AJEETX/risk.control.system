@@ -13,5 +13,6 @@
         public string? ReportAiSummary { get; set; }
         public bool CaseIsValidToAssign { get; set; } = false;
         public string? Currency { get; set; }
+        public long vendorId { get; set; } = 0;
     }
 }
