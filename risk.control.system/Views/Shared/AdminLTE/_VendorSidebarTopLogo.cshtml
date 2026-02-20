@@ -13,21 +13,21 @@
             <img class="elevation-2 sidebar-profile img-circle" src="/Document/GetUserProfileImage/@user.Id" alt="Profile">
         </div>
         <a class="d-block">
-            <span id="user-firstname">@firstName</span>
-            <span id="user-role">
+            <div data-bs-toggle="tooltip" title="User Firstname" id="user-firstname">@firstName</div>
+            <div id="user-role">
                 @if (User.IsInRole(AGENCY_ADMIN.DISPLAY_NAME))
                 {
-                    <span class="badge badge-info">@AGENCY_ADMIN.CODE</span>
+                    <span data-bs-toggle="tooltip" title="Role" class="badge badge-info">@AGENCY_ADMIN.CODE</span>
                 }
                 else if (User.IsInRole(SUPERVISOR.DISPLAY_NAME))
                 {
-                    <span class="badge badge-dark">@SUPERVISOR.DISPLAY_NAME</span>
+                    <span data-bs-toggle="tooltip" title="Role" class="badge badge-dark">@SUPERVISOR.CODE</span>
                 }
                 else if (User.IsInRole(AGENT.DISPLAY_NAME))
                 {
-                    <span class="badge badge-dark">@AGENT.CODE</span>
+                    <span data-bs-toggle="tooltip" title="Role" class="badge badge-dark">@AGENT.CODE</span>
                 }
-            </span>
+            </div>
         </a>
     </div>
 }
