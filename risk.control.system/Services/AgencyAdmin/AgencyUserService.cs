@@ -98,7 +98,7 @@ namespace risk.control.system.Services.AgencyAdmin
 
         public async Task<ApplicationUser> GetUserAsync(long id)
         {
-            var agencyUser = await _context.ApplicationUser.AsNoTracking().Include(u => u.ClientCompany).Include(c => c.Country).FirstOrDefaultAsync(u => u.Id == id);
+            var agencyUser = await _context.ApplicationUser.AsNoTracking().Include(u => u.Vendor).Include(c => c.Country).FirstOrDefaultAsync(u => u.Id == id);
             return agencyUser;
         }
 
