@@ -20,8 +20,13 @@ namespace risk.control.system.Services.Api
         private readonly ApplicationDbContext context;
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly IBase64FileService base64FileService;
+        private readonly int sessionTimeoutInSeconds;
+        private readonly int sessionTimeoutinMinutes;
+        private readonly int awayThresholdInMinutes;
+        private readonly int onlineThresholdInMinutes;
         private readonly DateTime cutoffTime;
         private readonly IFeatureManager featureManager;
+        private readonly IConfiguration _config;
 
         public CompanyUserApiService(
             IConfiguration config,
@@ -30,7 +35,12 @@ namespace risk.control.system.Services.Api
             IBase64FileService base64FileService,
             IFeatureManager featureManager)
         {
-            cutoffTime = DateTime.UtcNow.AddMinutes(double.Parse(config["LOGIN_SESSION_TIMEOUT_MIN"]));
+            _config = config;
+            awayThresholdInMinutes = int.Parse(config["LOGIN_SESSION_INACTIVE_MIN"]);
+            onlineThresholdInMinutes = int.Parse(config["LOGIN_SESSION_ACTIVE_MIN"]);
+            sessionTimeoutInSeconds = int.Parse(config["SESSION_TIMEOUT_SEC"]);
+            sessionTimeoutinMinutes = sessionTimeoutInSeconds / 60;
+            cutoffTime = DateTime.UtcNow.AddSeconds(-sessionTimeoutInSeconds);
             this.context = context;
             this.webHostEnvironment = webHostEnvironment;
             this.base64FileService = base64FileService;
@@ -40,7 +50,6 @@ namespace risk.control.system.Services.Api
         public async Task<List<UserDetailResponse>> GetCompanyUsers(string userEmail)
         {
             var now = DateTime.UtcNow;
-
             // 1️⃣ Get the current company user
             var companyUser = await context.ApplicationUser.AsNoTracking()
                 .FirstOrDefaultAsync(c => c.Email == userEmail);
@@ -89,9 +98,9 @@ namespace risk.control.system.Services.Api
                     var minutesAway = (int)(now - session.LastSeen).TotalMinutes;
                     (status, statusName, icon) = minutesAway switch
                     {
-                        < 1 => ("green", "Online now", "fas fa-circle"),
-                        < 5 => ("orange", $"Inactive for {minutesAway} minutes", "fas fa-clock"),
-                        < 15 => ("orange", $"Away for {minutesAway} minutes", "far fa-clock"),
+                        var m when m < onlineThresholdInMinutes => ("green", "Online now", "fas fa-circle"),
+                        var m when m < awayThresholdInMinutes => ("orange", $"Inactive for {m} minutes", "fas fa-clock"),
+                        var m when m < sessionTimeoutinMinutes => ("orange", $"Away for {m} minutes", "far fa-clock"),
                         _ => ("#DED5D5", "Offline", "fa fa-circle-o")
                     };
                 }
@@ -177,9 +186,9 @@ namespace risk.control.system.Services.Api
 
                 var (status, statusName, icon) = minutesAway switch
                 {
-                    < 1 => ("green", "Online now", "fas fa-circle"),
-                    < 5 => ("orange", $"Inactive for {minutesAway} minutes", "fas fa-clock"),
-                    < 15 => ("orange", $"Away for {minutesAway} minutes", "far fa-clock"),
+                    var m when m < onlineThresholdInMinutes => ("green", "Online now", "fas fa-circle"),
+                    var m when m < awayThresholdInMinutes => ("orange", $"Inactive for {m} minutes", "fas fa-clock"),
+                    var m when m < sessionTimeoutinMinutes => ("orange", $"Away for {m} minutes", "far fa-clock"),
                     _ => ("#DED5D5", "Offline", "fa fa-circle-o")
                 };
 
