@@ -158,7 +158,7 @@
         "drawCallback": function (settings, start, end, max, total, pre) {
             // Preselect the radio button matching vendorId
             var selectedVendorId = $('#vendorId').val();
-            if (selectedVendorId) {
+            if (selectedVendorId > 0) {
                 $("input[type='radio'][name='selectedcase'][value='" + selectedVendorId + "']").prop('checked', true);
                 $('#allocatedcase').prop("disabled", false);
             }
@@ -312,27 +312,9 @@
             $rowResult.attr("title", data);
         });
     });
-    if ($("input[type='radio'].selected-case:checked").length) {
-        $("#allocatedcase").prop('disabled', false);
-    } else {
-        $("#allocatedcase").prop('disabled', true);
-    }
-    // When user checks a radio button, Enable submit button   
-    $("input[type='radio'].selected-case").change(function (e) {
-        if ($(this).is(":checked")) {
-            $("#allocatedcase").prop('disabled', false);
-        } else {
-            $("#allocatedcase").prop('disabled', true);
-        }
-    });
-    // Handle click on checkbox to set state of "Select all" control   
-    $('#dataTable tbody').on('change', 'input[type="radio"]', function () {
-        // If checkbox is not checked       
-        if (this.checked) {
-            $("#allocatedcase").prop('disabled', false);
-        } else {
-            $("#allocatedcase").prop('disabled', true);
-        }
+
+    $('#dataTable').on('change', 'input[name="selectedcase"]', function () {
+        $('#allocatedcase').prop('disabled', false);
     });
     $("#dataTable > tbody  > tr").each(function () {
         var av = $(this).find("span.avr").text();
@@ -420,24 +402,6 @@ function giveRating(img, image) {
     img.attr("src", "/img/FilledStar.jpeg").prevAll("img.rating").attr("src", "/img/FilledStar.jpeg");
 }
 
-function getdetails(id) {
-    $("body").addClass("submit-progress-bg");
-    // Wrap in setTimeout so the UI
-    // can update the spinners
-    setTimeout(function () {
-        $(".submit-progress").removeClass("hidden");
-    }, 1);
-
-    $('a#details' + id + '.btn.btn-xs.btn-info').html("<i class='fas fa-sync fa-spin'></i> Agency Info");
-    disableAllInteractiveElements()
-    var article = document.getElementById("article");
-    if (article) {
-        var nodes = article.getElementsByTagName('*');
-        for (var i = 0; i < nodes.length; i++) {
-            nodes[i].disabled = true;
-        }
-    }
-}
 if (window.location.search.includes("vendorId")) {
     const url = new URL(window.location);
     url.searchParams.delete("vendorId");

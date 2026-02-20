@@ -91,12 +91,12 @@
         const policyId = $('#policyDetailId').val();
 
         if (!policyId) {
-            $.alert('Policy details not found.');
+            $.alert('Case details not found.');
             return;
         }
 
         $.confirm({
-            title: '<i class="far fa-file-alt"></i> Policy Details',
+            title: '<i class="far fa-file-alt"></i> Case Details',
             closeIcon: true,
             type: 'blue',
             columnClass: 'large',
@@ -117,7 +117,7 @@
                         if (xhr.status === 401 || xhr.status === 403) {
                             handleSessionExpired();
                         } else {
-                            self.setContent('<span class="text-danger">Unable to load policy details.</span>');
+                            self.setContent('<span class="text-danger">Unable to load case details.</span>');
                         }
                     });
             },
@@ -174,7 +174,7 @@
         }
 
         openDetailPopup({
-            title: '<i class="far fa-file-alt"></i> Policy Notes',
+            title: '<i class="far fa-file-alt"></i> Case Notes',
             type: 'green',
             columnClass: 'large',
             url: '/api/CaseInvestigationDetails/GetPolicyNotes',
@@ -187,7 +187,7 @@
         var claimId = $('#claimId').val();
 
         $.confirm({
-            title: 'Policy Note!!!',
+            title: 'Case Note!!!',
             closeIcon: true,
             type: 'green',
             icon: 'far fa-file-powerpoint',
@@ -195,7 +195,7 @@
             <form class="formName">
                 <div class="form-group">
                     <hr>
-                    <label>Enter note on Policy</label>
+                    <label>Enter note on Case</label>
                     <input type="text" placeholder="Enter note" class="name form-control remarks" required />
                 </div>
             </form>`,
@@ -220,7 +220,7 @@
                             }
                         }).done(function (response) {
                             $.alert({
-                                title: 'Policy notes added!',
+                                title: 'Case notes added!',
                                 content: 'Status: ' + response.message,
                                 type: 'green'
                             });
@@ -476,7 +476,7 @@ function updateNotesUI(newCount) {
 // Logic to show existing notes (Extracted from your 'always' block)
 function showNotesModal() {
     $.confirm({
-        title: 'Policy Notes',
+        title: 'Case Notes',
         columnClass: 'medium',
         closeIcon: true,
         type: 'blue',
@@ -669,14 +669,14 @@ function renderPolicyDetailHtml(data, policyId) {
             <header class="card-header">
                 <h5 class="mb-0">
                     <i class="far fa-id-card"></i>
-                    Policy #: ${data.contractNumber}
+                    Case #: ${data.contractNumber}
                 </h5>
             </header>
 
             <div class="card-body">
                 ${renderPolicyRow('<i class="fas fa-clipboard-list"></i>', 'Case Type', data.claimType)}
                 ${renderPolicyRow('<i class="fa fa-money"></i>', 'Assured Amount', data.sumAssuredValue)}
-                ${renderPolicyRow('<i class="far fa-clock"></i>', 'Policy Issue Date', data.contractIssueDate)}
+                ${renderPolicyRow('<i class="far fa-clock"></i>', 'Case Issue Date', data.contractIssueDate)}
                 ${renderPolicyRow('<i class="fas fa-clock"></i>', 'Incident Date', data.dateOfIncident)}
                 ${renderPolicyRow('<i class="fas fa-tools"></i>', 'Service Type', data.investigationServiceType)}
                 ${renderPolicyRow('<i class="fas fa-bolt"></i>', 'Reason to Verify', data.caseEnabler)}
@@ -691,7 +691,7 @@ function renderPolicyDetailHtml(data, policyId) {
 
                 <img id="agentLocationPicture" class="img-fluid w-50 rounded border"
                      src="${policyDocUrl}"
-                     alt="Policy Document" />
+                     alt="Case Document" />
             </div>
         </div>
         </div>
