@@ -4,7 +4,6 @@ using Microsoft.FeatureManagement;
 using risk.control.system.AppConstant;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
-using risk.control.system.Services.Common;
 
 namespace risk.control.system.Services.Api
 {
@@ -15,29 +14,23 @@ namespace risk.control.system.Services.Api
 
     internal class UserService : IUserService
     {
-        private readonly IConfiguration config;
         private readonly ApplicationDbContext context;
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly UserManager<ApplicationUser> userManager;
-        private readonly IDashboardService dashboardService;
         private readonly DateTime cutoffTime;
         private readonly IFeatureManager featureManager;
 
-        public UserService(IConfiguration config, ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, UserManager<ApplicationUser> userManager, IDashboardService dashboardService, IFeatureManager featureManager)
+        public UserService(IConfiguration config, ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, UserManager<ApplicationUser> userManager, IFeatureManager featureManager)
         {
-            this.config = config;
-            cutoffTime = DateTime.UtcNow.AddMinutes(double.Parse(config["LOGIN_SESSION_TIMEOUT_MIN"]));
+            cutoffTime = DateTime.UtcNow.AddSeconds(-double.Parse(config["SESSION_TIMEOUT_SEC"]));
             this.context = context;
             this.webHostEnvironment = webHostEnvironment;
             this.userManager = userManager;
-            this.dashboardService = dashboardService;
             this.featureManager = featureManager;
         }
 
         public async Task<List<UserDetailResponse>> GetUsers(string userEmail)
         {
-            var cutoffTime = DateTime.UtcNow.AddMinutes(double.Parse(config["LOGIN_SESSION_TIMEOUT_MIN"]));
-
             // Fetch user session data from the database
             var userSessions = await context.UserSessionAlive
                 .Where(u => u.Updated >= cutoffTime) // Filter sessions within the last 15 minutes
