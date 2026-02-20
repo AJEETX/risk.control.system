@@ -51,14 +51,12 @@ namespace risk.control.system.Services.Creator
 
             var currentUser = await _context.ApplicationUser.AsNoTracking().Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == userEmail);
 
-            _context.Investigations.Update(caseTask);
-            await _context.SaveChangesAsync();
-
             return new CaseTransactionModel
             {
                 ClaimsInvestigation = caseTask,
                 Beneficiary = beneficiary,
                 FromEditPage = fromEditPage,
+                vendorId = vendorId,
                 Currency = CustomExtensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol,
             };
         }
