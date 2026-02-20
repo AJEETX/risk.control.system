@@ -189,7 +189,7 @@ namespace risk.control.system.Services.Common
                     session.LoggedOut = true;
                     session.Updated = DateTime.UtcNow;
                     session.UpdatedBy = email;
-                    await context.SaveChangesAsync();
+                    await context.SaveChangesAsync(null, false);
                 }
             }
 

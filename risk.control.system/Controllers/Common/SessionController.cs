@@ -59,6 +59,7 @@ namespace risk.control.system.Controllers.Company
 
                 if (session != null)
                 {
+                    session.UpdatedBy = user.Email;
                     session.Updated = now;
                     session.CurrentPage = request.CurrentPage;
                 }
@@ -73,7 +74,7 @@ namespace risk.control.system.Controllers.Company
                     });
                 }
 
-                await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync(null, false);
 
                 // Optionally refresh the cookie sign-in
                 await _signInManager.RefreshSignInAsync(user);

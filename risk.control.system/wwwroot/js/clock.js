@@ -61,7 +61,7 @@ async function refreshSession() {
             typeAnimated: true,
             buttons: {
                 login: {
-                    text: 'Login Now',
+                    text: 'Login Again',
                     btnClass: 'btn-warning',
                     action: function () {
                         smoothRedirect(loginPath);
@@ -98,13 +98,28 @@ function userIsIdle() {
     const idleMinutes = Math.floor(defaultTimeoutSeconds / 60);
     $.confirm({
         title: '<i class="fas fa-exclamation-triangle text-danger"></i> Session Expired',
-        content: `You have been inactive for <b><u> ${idleMinutes} </u></b> minutes. Please login again.`,
+        content: `
+        <div class="text-center">
+            <div class="mb-3">
+                <i class="fas fa-history fa-4x text-warning animate__animated animate__pulse animate__infinite"></i>
+            </div>
+            <p>
+                You have been inactive for <b><u><i>${idleMinutes} minutes</i></u></b>.<br>
+                For your security, please log back in.
+            </p>
+        </div>`,
         type: 'orange',
+        theme: 'modern', // Much cleaner than the default
+        icon: 'fas fa-lock',
+        backgroundDismiss: false,
         closeIcon: false,
+        animation: 'scale', // Smooth entrance
+        closeAnimation: 'zoom',
+        animateFromElement: false,
         bgOpacity: 0.7,
         buttons: {
             login: {
-                text: 'Login Now',
+                text: 'Login Again',
                 btnClass: 'btn-warning',
                 action: function () {
                     smoothRedirect(loginPath);
