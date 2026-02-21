@@ -13,11 +13,13 @@ namespace risk.control.system.Controllers.Tools
     public class FaceMatchController : Controller
     {
         private readonly IAmazonApiService amazonService;
+        private readonly ILogger<FaceMatchController> logger;
         private readonly UserManager<ApplicationUser> _userManager;
 
-        public FaceMatchController(IAmazonApiService amazonService, UserManager<ApplicationUser> userManager)
+        public FaceMatchController(IAmazonApiService amazonService, ILogger<FaceMatchController> logger, UserManager<ApplicationUser> userManager)
         {
             this.amazonService = amazonService;
+            this.logger = logger;
             this._userManager = userManager; // Inject UserManager
         }
 
@@ -39,22 +41,21 @@ namespace risk.control.system.Controllers.Tools
         [HttpPost]
         public async Task<IActionResult> Compare(FaceMatchData data)
         {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            // 1. Check Usage Limit before calling AWS
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return Unauthorized("Unauthorized");
+            }
+
+            if (user.FaceMatchCount >= 5)
+            {
+                return StatusCode(403, new { message = "Face Match limit reached (5/5)" });
+            }
             try
             {
-                if (!ModelState.IsValid) return BadRequest(ModelState);
-
-                // 1. Check Usage Limit before calling AWS
-                var user = await _userManager.GetUserAsync(User);
-                if (user == null)
-                {
-                    return Unauthorized("Unauthorized");
-                }
-
-                if (user.FaceMatchCount >= 5)
-                {
-                    return StatusCode(403, new { message = "Face Match limit reached (5/5)" });
-                }
-
                 // 2. Perform Biometric Comparison
                 var originalFace = await VerificationHelper.GetBytesFromIFormFile(data.OriginalFaceImage);
                 var secondayFace = await VerificationHelper.GetBytesFromIFormFile(data.MatchFaceImage);
@@ -80,9 +81,16 @@ namespace risk.control.system.Controllers.Tools
                     remaining = 5 - user.FaceMatchCount // Send remaining count back to JS
                 });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Biometric service is currently unavailable." });
+                logger.LogError(ex, "Error during face comparison. {UserId}", _userManager.GetUserId(User) ?? "Anonymous");
+
+                return Ok(new
+                {
+                    match = false,
+                    similarity = 0.0,
+                    remaining = 5 - user.FaceMatchCount  // Send remaining count back to JS
+                });
             }
         }
     }
