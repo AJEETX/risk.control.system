@@ -28,30 +28,24 @@ public static class AuthAndSecurutyExtension
         services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
         {
             options.User.RequireUniqueEmail = true;
-        }).AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
+            options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
+        })
+        .AddEntityFrameworkStores<ApplicationDbContext>()
+        .AddDefaultTokenProviders();
 
+        // 2. Controllers & Global Filters
         services.AddControllersWithViews(options =>
         {
             var policy = new AuthorizationPolicyBuilder()
                 .RequireAuthenticatedUser()
                 .Build();
-
             options.Filters.Add(new AuthorizeFilter(policy));
         })
-            .AddRazorRuntimeCompilation()
-            // Stick to one serializer if possible. Newtonsoft is more feature-rich for complex loops.
-            .AddNewtonsoftJson(options =>
-            {
-                options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
-                options.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
-            });
-
-        services.Configure<IdentityOptions>(options =>
+        .AddRazorRuntimeCompilation()
+        .AddNewtonsoftJson(options =>
         {
-            // User settings.
-            options.User.AllowedUserNameCharacters =
-            "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
-            options.User.RequireUniqueEmail = true;
+            options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+            options.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
         });
         services.Configure<CookiePolicyOptions>(options =>
         {
@@ -69,86 +63,55 @@ public static class AuthAndSecurutyExtension
         authBuilder.AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, options =>
         {
             options.SignInScheme = IdentityConstants.ApplicationScheme;
-
             options.ClientId = configuration["AzureAd:ClientId"];
             options.ClientSecret = EnvHelper.Get("AZUREAD__CLIENTSECRET");
-
             options.Authority = $"https://login.microsoftonline.com/{configuration["AzureAd:TenantId"]}/v2.0";
-
             options.ResponseType = OpenIdConnectResponseType.Code;
-
             options.SaveTokens = false;
             options.GetClaimsFromUserInfoEndpoint = true;
 
             options.Scope.Clear();
-            options.Scope.Add("openid");
-            options.Scope.Add("profile");
-            options.Scope.Add("email");
-            options.Scope.Add("User.Read");        // 🔴 REQUIRED
-            options.Scope.Add("User.Read.All");    // 🔴 REQUIRED (admin)
-            options.Scope.Add("Directory.Read.All"); // optional
+            new[] { "openid", "profile", "email", "User.Read", "User.Read.All" }
+                .ToList().ForEach(s => options.Scope.Add(s));
 
-            options.TokenValidationParameters = new TokenValidationParameters
-            {
-                NameClaimType = ClaimTypes.Email
-            };
+            options.TokenValidationParameters = new TokenValidationParameters { NameClaimType = ClaimTypes.Email };
+
+            // Cookie hardening for OIDC
+            options.NonceCookie.Path = options.CorrelationCookie.Path = "/";
+            options.NonceCookie.SameSite = options.CorrelationCookie.SameSite = SameSiteMode.None;
+            options.NonceCookie.SecurePolicy = options.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
+            options.NonceCookie.IsEssential = options.CorrelationCookie.IsEssential = true;
+
             options.Events = new OpenIdConnectEvents
             {
                 OnTokenValidated = async context =>
                 {
-                    var claimsIdentity = context.Principal.Identity as ClaimsIdentity;
-                    if (claimsIdentity != null)
-                    {
-                        var azureAdService = context.HttpContext.RequestServices.GetRequiredService<IAzureAdService>();
-                        var notifyService = context.HttpContext.RequestServices.GetRequiredService<INotyfService>();
-                        var email = await azureAdService.ValidateAzureSignIn(context);
-                        if (string.IsNullOrWhiteSpace(email))
-                        {
-                            context.Response.Redirect("/Account/Login");
-                            context.HandleResponse();
-                            notifyService.Error($"Azure AD Login error");
-                            return;
-                        }
-                        else
-                        {
-                            notifyService.Success($"Welcome <b>{email}</b>, Login successful");
-                            context.HandleResponse();
-                            context.Response.Redirect("/Dashboard/Index");
-                        }
-                    }
+                    var azureAdService = context.HttpContext.RequestServices.GetRequiredService<IAzureAdService>();
+                    var notifyService = context.HttpContext.RequestServices.GetRequiredService<INotyfService>();
 
-                    await Task.CompletedTask;
+                    var email = await azureAdService.ValidateAzureSignIn(context);
+                    if (string.IsNullOrWhiteSpace(email))
+                    {
+                        notifyService.Error("Azure AD Login error");
+                        context.Response.Redirect(AppCookie.LOGIN_PATH);
+                    }
+                    else
+                    {
+                        notifyService.Success($"Welcome <b>{email}</b>, Login successful");
+                        context.Response.Redirect("/Dashboard/Index");
+                    }
+                    context.HandleResponse();
                 },
                 OnRemoteFailure = context =>
                 {
-                    if (context.Failure != null && context.Failure.Message.Contains("Correlation failed"))
+                    if (context.Failure?.Message.Contains("Correlation failed") == true)
                     {
-                        context.Response.Redirect("/Account/Login");
+                        context.Response.Redirect(AppCookie.LOGIN_PATH);
                         context.HandleResponse();
                     }
                     return Task.CompletedTask;
                 }
             };
-        });
-
-        services.Configure<OpenIdConnectOptions>(OpenIdConnectDefaults.AuthenticationScheme, options =>
-        {
-            // Instead of CookieManager, we configure the individual cookies to be 'Essential'
-            // and pinned to the root path to prevent multiple versions from appearing.
-            options.NonceCookie.Path = "/";
-            options.CorrelationCookie.Path = "/";
-
-            options.NonceCookie.SameSite = SameSiteMode.None;
-            options.CorrelationCookie.SameSite = SameSiteMode.None;
-
-            options.NonceCookie.SecurePolicy = CookieSecurePolicy.Always;
-            options.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
-
-            options.NonceCookie.IsEssential = true;
-            options.CorrelationCookie.IsEssential = true;
-
-            // This helps prevent the '4x cookie' build-up by timing them out quickly
-            options.RemoteAuthenticationTimeout = TimeSpan.FromMinutes(1);
         });
 
         //  3️⃣ JWT Bearer authentication (API)
@@ -172,53 +135,50 @@ public static class AuthAndSecurutyExtension
         // 4. Configure the Identity Cookie (Do this AFTER AddAuthentication)
         services.ConfigureApplicationCookie(options =>
         {
+            options.Cookie.Name = AppCookie.AUTH_COOKIE_NAME;
             options.Cookie.Path = "/";
             options.Cookie.HttpOnly = true;
             options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-            options.Cookie.SameSite = SameSiteMode.None; // ✅ REQUIRED
-            options.Cookie.Name = AppCookie.AUTH_COOKIE_NAME;
-            options.LoginPath = AppCookie.LOGIN_PATH;
-            options.LogoutPath = AppCookie.LOGOUT_PATH;
-            options.AccessDeniedPath = AppCookie.LOGOUT_PATH;
+            options.Cookie.SameSite = SameSiteMode.None;
             options.CookieManager = new ChunkingCookieManager();
             options.SlidingExpiration = true;
-            options.ExpireTimeSpan = TimeSpan.FromSeconds(double.Parse(configuration["SESSION_TIMEOUT_SEC"]));
-            // This tells Identity to use the same logic for OIDC users
-            options.Events.OnRedirectToLogin = context =>
-            {
-                if (context.Request.Path.StartsWithSegments("/api"))
-                {
-                    context.Response.StatusCode = 401;
-                }
-                else
-                {
-                    context.Response.Redirect(context.RedirectUri);
-                }
-                return Task.CompletedTask;
-            };
+            options.ExpireTimeSpan = TimeSpan.FromSeconds(double.Parse(configuration["SESSION_TIMEOUT_SEC"] ?? "900"));
+
             options.Events = new CookieAuthenticationEvents
             {
+                OnRedirectToLogin = context =>
+                {
+                    // API requests should return 401, not a redirect
+                    if (context.Request.Path.StartsWithSegments("/api"))
+                    {
+                        context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                    }
+                    //// DYNAMIC PATH LOGIC: Check if user was trying to access /Tools
+                    //else if (context.Request.Path.StartsWithSegments("/Tools"))
+                    //{
+                    //    context.Response.Redirect("/Tools/Try" + context.Request.QueryString);
+                    //}
+                    else
+                    {
+                        context.Response.Redirect(AppCookie.LOGIN_PATH + context.Request.QueryString);
+                    }
+                    return Task.CompletedTask;
+                },
                 OnRedirectToAccessDenied = context =>
                 {
-                    // Treat AccessDenied same as Login after idle
-                    context.Response.Redirect(options.LoginPath);
+                    context.Response.Redirect(AppCookie.LOGIN_PATH);
                     return Task.CompletedTask;
                 },
                 OnSignedIn = context =>
                 {
                     var userName = context.Principal.Identity.Name;
                     var cookie = context.HttpContext.User.Claims;
-                    Console.WriteLine($"✅ Identity {userName} cookie issued");
+                    Console.WriteLine($"Identity {userName} cookie issued");
                     return Task.CompletedTask;
                 },
                 OnValidatePrincipal = context =>
                 {
-                    Console.WriteLine("🔍 Identity cookie validated");
-                    return Task.CompletedTask;
-                },
-                OnRedirectToLogin = context =>
-                {
-                    context.Response.Redirect(context.RedirectUri);
+                    Console.WriteLine("Identity cookie validated");
                     return Task.CompletedTask;
                 }
             };
