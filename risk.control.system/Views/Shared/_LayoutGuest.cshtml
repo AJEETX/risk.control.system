@@ -2,62 +2,65 @@
 @using Microsoft.EntityFrameworkCore
 @inject ApplicationDbContext _context
 @inject SignInManager<ApplicationUser> SignInManager
+@inject IHttpContextAccessor HttpContextAccessor
 
 <!DOCTYPE html>
 <html lang="en-us">
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>icheckify:tool</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
-    <link rel="icon" href="/favicon.ico" type="image/x-icon">
-    <partial name="AdminLTE/_Styles" />
-    <partial name="AdminLTE/_DataTableStylePartial" />
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>icheckify:tool</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+	<link rel="icon" href="/favicon.ico" type="image/x-icon">
+	<link rel="stylesheet" href="~/plugins/fontawesome-free/css/all.min.css" />
+	<link rel="stylesheet" href="~/dist/app.min.css" />
 </head>
 
 <body class="hold-transition sidebar-mini">
-    @Html.AntiForgeryToken() <!-- Add this line -->
-    @{
-        var userEmail = User?.Identity?.Name;
-    }
-    <div class="wrapper">
-        <div id="main-container">
-            @if (SignInManager.IsSignedIn(User))
-            {
-                var admin = _context.ApplicationUser.Include(c => c.Country).FirstOrDefault(c => c.Email == userEmail);
-                var navigationModel = new TopNavigation
-                {
-                    UserId = admin.Id,
-                    Email = admin.Email,
-                    CanChangePassword = true,
-                    CountryCode = admin.Country.Code,
-                    Country = $"{admin.Country.Name} ({admin.Country.Code})",
-                    IsdCode = $"(+{admin.Country.ISDCode})",
-                    CurrencyCode = $"{admin.Country.CurrencyCode} ({CustomExtensions.GetCultureByCountry(admin.Country.Code.ToUpper()).NumberFormat.CurrencySymbol})",
-                    CurrencyName = $"{admin.Country.CurrencyName} ({CustomExtensions.GetCultureByCountry(admin.Country.Code.ToUpper()).NumberFormat.CurrencySymbol})",
-                    Language = admin.Country.Language
-                };
-                <partial name="AdminLTE/_TopGuestNavigation" model="@navigationModel" />
-                <partial name="AdminLTE/_SidebarGuest" model="@admin" />
-                <div class="content-wrapper content-wrapper-main">
-                    <div id="main-content" class="content">
-                        <main>
-                            @RenderBody()
-                        </main>
-                    </div>
-                </div>
-                <partial name="AdminLTE/_Footer" />
-            }
-        </div>
+	@Html.AntiForgeryToken() <!-- Add this line -->
+	@{
+		var userEmail = User?.Identity?.Name;
+		var timeout = Context.Items["timeout"];
+		string CSPNonce = HttpContextAccessor.HttpContext?.Items["CSP-Nonce"]?.ToString() ?? "";
+	}
+	<div class="wrapper">
+		<div id="main-container">
+			<input type="hidden" id="timeout" name="timeout" value="@timeout" />
+			<input type="hidden" id="tools" name="tools" value="true" />
+			@if (SignInManager.IsSignedIn(User))
+			{
+				var admin = _context.ApplicationUser.Include(c => c.Country).FirstOrDefault(c => c.Email == userEmail);
+				var navigationModel = new TopNavigation
+				{
+					UserId = admin.Id,
+					Email = admin.Email,
+					CanChangePassword = true,
+					CountryCode = admin.Country.Code,
+					Country = $"{admin.Country.Name} ({admin.Country.Code})",
+					IsdCode = $"(+{admin.Country.ISDCode})",
+					CurrencyCode = $"{admin.Country.CurrencyCode} ({CustomExtensions.GetCultureByCountry(admin.Country.Code.ToUpper()).NumberFormat.CurrencySymbol})",
+					CurrencyName = $"{admin.Country.CurrencyName} ({CustomExtensions.GetCultureByCountry(admin.Country.Code.ToUpper()).NumberFormat.CurrencySymbol})",
+					Language = admin.Country.Language
+				};
+				<partial name="AdminLTE/_TopGuestNavigation" model="@navigationModel" />
+				<partial name="AdminLTE/_SidebarGuest" model="@admin" />
+				<div class="content-wrapper content-wrapper-main">
+					<div id="main-content" class="content">
+						<main>
+							@RenderBody()
+						</main>
+					</div>
+				</div>
+				<partial name="AdminLTE/_Footer" />
+			}
+		</div>
 
-        <!-- Logout Modal-->
-        <partial name="_LogoutGuest" />
-    </div>
-    <partial name="AdminLTE/_Scripts" />
-    <partial name="AdminLTE/_DataTableScriptPartial" />
-    <script src="~/js/site.js"></script>
-    @RenderSection("Scripts", required: false)
-    @await Component.InvokeAsync("Notyf")
+		<!-- Logout Modal-->
+		<partial name="_LogoutGuest" />
+	</div>
+	<script src="~/dist/app.min.js"></script>
+	@RenderSection("Scripts", required: false)
+	@await Component.InvokeAsync("Notyf", new { nonce = CSPNonce })
 </body>
 </html>

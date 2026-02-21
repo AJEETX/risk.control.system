@@ -1,4 +1,6 @@
-﻿var loginPath = "/Account/Login";
+﻿var istool = document.getElementById('tools')?.value || false; // is Tool
+
+var loginPath = istool ? "/Tools/Try": "/Account/Login";
 const refreshSessionPath = "/Session/KeepSessionAlive"; // Path to refresh session
 let isExpired = false; // New state flag
 

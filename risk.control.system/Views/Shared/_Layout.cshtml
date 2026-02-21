@@ -1,38 +1,39 @@
-﻿<!DOCTYPE html>
+﻿@inject IHttpContextAccessor HttpContextAccessor
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - icheckify</title>
-    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
-    <link rel="icon" href="/favicon.ico" type="image/x-icon">
-    <partial name="AdminLTE/_Styles" />
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <partial name="AdminLTE/_DataTableStylePartial" />
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>@ViewData["Title"] - icheckify</title>
+	<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+	<link rel="icon" href="/favicon.ico" type="image/x-icon">
+	<link rel="stylesheet" href="~/plugins/fontawesome-free/css/all.min.css" />
+	<link rel="stylesheet" href="~/dist/app.min.css" />
 </head>
 <body>
-    <div class="container">
-        <main role="main">
-            <header>
-                <nav class="navbar navbar-expand-sm navbar-light bg-white border-bottom box-shadow mb-3">
-                    <div class="container">
-                        <div class="navbar-collapse collapse w-100 d-flex justify-content-center">
-                            <img class="icheckify-logo" src="/img/iCheckifyLogo.png" alt="logo" />™️
-                        </div>
-                    </div>
-                </nav>
-            </header>
+	@{
+		var timeout = Context.Items["timeout"];
+		string CSPNonce = HttpContextAccessor.HttpContext?.Items["CSP-Nonce"]?.ToString() ?? "";
+	}
+	<div class="container">
+		<main role="main">
+			<input type="hidden" id="timeout" name="timeout" value="@timeout" />
+			<header>
+				<nav class="navbar navbar-expand-sm navbar-light bg-white border-bottom box-shadow mb-3">
+					<div class="container">
+						<div class="navbar-collapse collapse w-100 d-flex justify-content-center">
+							<img class="icheckify-logo" src="/img/iCheckifyLogo.png" alt="logo" />™️
+						</div>
+					</div>
+				</nav>
+			</header>
 
-            @RenderBody()
-        </main>
-    </div>
-    <partial name="_PasswordAdvise" />
-
-    <script src="~/js/jquery-3.7.1.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/ua-parser.min.js"></script>
-    <partial name="AdminLTE/_Scripts" />
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    @RenderSection("Scripts", required: false)
+			@RenderBody()
+		</main>
+	</div>
+	<partial name="_PasswordAdvise" />
+	<script src="~/dist/app.min.js"></script>
+	@RenderSection("Scripts", required: false)
+	@await Component.InvokeAsync("Notyf", new { nonce = CSPNonce })
 </body>
 </html>

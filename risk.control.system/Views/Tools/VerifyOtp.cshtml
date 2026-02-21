@@ -41,7 +41,7 @@
                     </div>
                     <div class="error-message">Code sent to <strong>@Model.CountryIsd @Model.MobileNumber</strong></div>
 
-                    <form id="login-form" asp-action="VerifyOtp" asp-controller="Tool" method="post">
+                    <form id="login-form" asp-action="VerifyOtp" asp-controller="Tools" method="post">
                         @Html.AntiForgeryToken()
                         <div class="input-boxes">
                             <input type="hidden" name="MobileNumber" value="@Model.MobileNumber" />
