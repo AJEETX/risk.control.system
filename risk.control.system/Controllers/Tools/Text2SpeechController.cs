@@ -10,13 +10,11 @@ namespace risk.control.system.Controllers.Tools
 {
     public class Text2SpeechController : Controller
     {
-        private readonly IWebHostEnvironment _env;
         private readonly UserManager<ApplicationUser> userManager;
         private readonly IText2SpeechService text2SpeechService;
 
-        public Text2SpeechController(IWebHostEnvironment env, UserManager<ApplicationUser> userManager, IText2SpeechService text2SpeechService)
+        public Text2SpeechController(UserManager<ApplicationUser> userManager, IText2SpeechService text2SpeechService)
         {
-            _env = env;
             this.userManager = userManager;
             this.text2SpeechService = text2SpeechService;
         }
@@ -34,6 +32,7 @@ namespace risk.control.system.Controllers.Tools
             };
             return View(model);
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> GenerateSpeech(Text2SpeechData input)

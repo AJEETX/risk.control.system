@@ -1,68 +1,173 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Caching.Memory;
-using risk.control.system.Helpers;
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
+
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+
+using risk.control.system.AppConstant;
+using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
-using risk.control.system.Services.Agent;
 using risk.control.system.Services.Common;
-using risk.control.system.Services.Tool;
 
 namespace risk.control.system.Controllers.Tools
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    [ApiExplorerSettings(IgnoreApi = true)]
-    public class ToolsController : ControllerBase
+    public class ToolsController : Controller
     {
-        private readonly IMemoryCache cache;
-        private readonly IFaceMatchService faceMatchService;
-        private readonly IFileStorageService fileStorageService;
-        private readonly IGoogleService googleApi;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly ILoginService loginService;
+        private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly ILogger<ToolsController> _logger;
+        private readonly INotyfService notifyService;
+        private readonly string BaseUrl;
 
         public ToolsController(
-            IMemoryCache cache,
-            IFaceMatchService faceMatchService,
-            IFileStorageService fileStorageService,
-            IGoogleService googleApi)
+            UserManager<ApplicationUser> userManager,
+            ILoginService loginService,
+            SignInManager<ApplicationUser> signInManager,
+             IHttpContextAccessor httpContextAccessor,
+            ILogger<ToolsController> logger,
+            INotyfService notifyService)
         {
-            this.cache = cache;
-            this.faceMatchService = faceMatchService;
-            this.fileStorageService = fileStorageService;
-            this.googleApi = googleApi;
+            _userManager = userManager ?? throw new ArgumentNullException();
+            this.loginService = loginService;
+            _signInManager = signInManager ?? throw new ArgumentNullException();
+            _logger = logger;
+            this.notifyService = notifyService;
+            var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
+            var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
+            BaseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
         }
 
-        //[AllowAnonymous]
-        [HttpPost("face-match")]
-        public async Task<IActionResult> FaceMatch(FaceMatchData data)
+        [Authorize(Roles = GUEST.DISPLAY_NAME)]
+        public async Task<IActionResult> Index()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return Unauthorized("Unauthorized");
+            }
+
+            var model = new ToolHubViewModel
+            {
+                FaceMatchRemaining = 5 - user.FaceMatchCount,
+                OcrRemaining = 5 - user.OcrCount,
+                PdfRemaining = 5 - user.PdfCount,
+                DocumentAnalysisRemaining = 5 - user.DocumentAnalysisCount,
+                Speech2TextRemaining = 5 - user.Speech2TextCount,
+                Text2SpeechRemaining = 5 - user.Text2SpeechCount
+            };
+
+            return View(model);
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        public IActionResult Try()
+        {
+            return View();
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        public IActionResult Error()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Try(OtpLoginModel model)
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                model.LoginError = "Bad Request";
+                ModelState.AddModelError(string.Empty, "Bad Request");
+                return View(model);
             }
-            var originalFace = await VerificationHelper.GetBytesFromIFormFile(data.OriginalFaceImage);
-            var secondayFace = await VerificationHelper.GetBytesFromIFormFile(data.MatchFaceImage);
-            var (file, path) = await fileStorageService.SaveAsync(data.OriginalFaceImage, "tool");
-            var faceMatchData = await faceMatchService.GetFaceMatchAsync(originalFace, secondayFace, Path.GetExtension(file));
+            var otpRequest = new OtpRequest
+            {
+                CountryIsd = model.CountryIsd,
+                MobileNumber = model.MobileNumber,
+                BaseUrl = this.BaseUrl // From the Controller's property
+            };
 
-            return Ok(faceMatchData);
+            var success = await loginService.SendOtpAsync(otpRequest);
+            if (!success)
+            {
+                notifyService.Warning($"Error to send Otp to Mobile <b>{model.CountryIsd}</b> <b>{model.MobileNumber} </b>. Try again.");
+                return RedirectToAction(nameof(Try));
+            }
+            else
+            {
+                ModelState.Clear();
+                notifyService.Success($"Otp sent to Mobile <b>{model.CountryIsd}</b> <b>{model.MobileNumber} </b>. Please verify.");
+                return View("VerifyOtp", model);
+            }
         }
 
-        //[AllowAnonymous]
-        [HttpPost("ocr")]
-        public async Task<IActionResult> OcrDocument(DocumentOcrData data)
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> VerifyOtp(OtpLoginModel model)
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                model.LoginError = "Bad Request";
+                ModelState.AddModelError(string.Empty, "Bad Request");
+                return View(model);
             }
-            var (file, path) = await fileStorageService.SaveAsync(data.DocumentImage, "tool");
-            var ocrData = await googleApi.DetectTextAsync(path);
-            if (ocrData == null || ocrData.Count == 0)
+            var result = await loginService.VerifyAndLoginAsync(model);
+
+            if (result.Success)
             {
-                return BadRequest("Ocr failed");
+                notifyService.Success($"Welcome <b>{GUEST.DISPLAY_NAME}</b>, {result.Message}");
+                return RedirectToAction(nameof(Index));
             }
-            var ocrDetail = ocrData.FirstOrDefault();
-            var description = ocrDetail != null ? ocrDetail.Description : string.Empty;
-            return Ok(description);
+
+            // If failed, return to the view with the error
+            model.LoginError = result.Message;
+            return View(model);
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResendOtp(OtpLoginModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new { success = false, message = "Invalid data." });
+            }
+
+            var otpRequest = new OtpRequest
+            {
+                CountryIsd = model.CountryIsd,
+                MobileNumber = model.MobileNumber,
+                BaseUrl = this.BaseUrl // From the Controller's property
+            };
+            // Call service logic
+            var result = await loginService.ResendOtpAsync(otpRequest);
+
+            if (result.Success)
+            {
+                notifyService.Success($"Otp resent to Mobile <b>{model.CountryIsd}</b> <b>{model.MobileNumber} </b>. Please verify.");
+                return Json(new { success = true, message = result.Message });
+            }
+            else
+            {
+                notifyService.Error($"Error to resend Otp to Mobile <b>{model.CountryIsd}</b> <b>{model.MobileNumber} </b>. Try again.");
+                return Json(new { success = false, message = result.Message });
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> LogoutGuest()
+        {
+            var user = await _signInManager.UserManager.GetUserAsync(User);
+            await _signInManager.SignOutAsync();
+            _logger.LogInformation("User logged out.");
+            return RedirectToAction(nameof(Try));
         }
     }
 }

@@ -79,6 +79,7 @@ namespace risk.control.system.Controllers.Company
                 // Optionally refresh the cookie sign-in
                 await _signInManager.RefreshSignInAsync(user);
 
+                Console.WriteLine($"Session kept alive for {email} at {now}. Current page: {request.CurrentPage}");
                 // Return minimal user info
                 var userDetails = new
                 {

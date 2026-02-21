@@ -13,7 +13,7 @@
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="~/plugins/fontawesome-free/css/all.min.css">
     <link rel="stylesheet" href="~/css/jquery-ui.css">
-    <link rel="stylesheet" href="~/css/jquery-confirm.min.css">
+            <link rel="stylesheet" href="~/js/jqueryconfirm/dist/jquery-confirm.min.css">
     <link rel="stylesheet" href="~/css/login.css">
     <link rel="stylesheet" href="~/css/cookie.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -39,7 +39,7 @@
                         Otp Login
                         <sup class="fa fa-info-circle password-info-icon"></sup>
                     </div>
-                    <form id="login-form" asp-controller="Tool" asp-action="Try" method="post">
+                    <form id="login-form" asp-controller="Tools" asp-action="Try" method="post">
                         @Html.AntiForgeryToken()
                         <div class="input-boxes">
                             <div class="input-box">
@@ -79,7 +79,7 @@
 @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
 }
-<script src="~/js/jqueryconfirm/dist/jquery-confirm.min.js"></script>
+<script src="~/js/jqueryconfirm/dist/jquery-confirm.js"></script>
 <script src="~/js/otp.js"></script>
     @await Component.InvokeAsync("Notyf")
 </html>
