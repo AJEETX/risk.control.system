@@ -8,13 +8,13 @@ namespace risk.control.system.Middleware
     public class SecurityMiddleware
     {
         private readonly RequestDelegate _next;
-        private readonly ILogger<WhitelistListMiddleware> _logger;
+        private readonly ILogger<SecurityMiddleware> _logger;
         private readonly IFeatureManager featureManager;
         private readonly IJwtService tokenService;
         private readonly IConfiguration config;
         private string[] errStatusCodes;
 
-        public SecurityMiddleware(RequestDelegate next, ILogger<WhitelistListMiddleware> logger,
+        public SecurityMiddleware(RequestDelegate next, ILogger<SecurityMiddleware> logger,
             string httpStatusErrorCodes, IFeatureManager featureManager,
             IJwtService tokenService,
             IConfiguration config)
