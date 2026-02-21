@@ -41,7 +41,10 @@
 
 document.querySelector('form').onsubmit = function () {
     document.getElementById('analyzeBtn').innerText = "Analyzing Pixels...";
-    document.getElementById('btnSpinner').classList.remove('d-none');
+    var spinner = document.getElementById('btnSpinner');
+    if (spinner) {
+        spinner.classList.remove('d-none');s
+    }
     document.getElementById('analyzeBtn').disabled = true;
 };
 
