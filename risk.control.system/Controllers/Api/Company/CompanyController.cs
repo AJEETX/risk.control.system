@@ -61,10 +61,10 @@ namespace risk.control.system.Controllers.Api.Company
             }
         }
 
-        [HttpGet("GetEmpanelledAgency")]
-        public async Task<IActionResult> GetEmpanelledAgency(long caseId)
+        [HttpGet("GetEmpanelledAgency/{id}")]
+        public async Task<IActionResult> GetEmpanelledAgency(long id)
         {
-            if (caseId <= 0)
+            if (id <= 0)
             {
                 return BadRequest("Invalid case ID.");
             }
@@ -72,7 +72,7 @@ namespace risk.control.system.Controllers.Api.Company
 
             try
             {
-                var result = await agencyService.GetEmpanelledAgency(userEmail, caseId);
+                var result = await agencyService.GetEmpanelledAgency(userEmail, id);
                 return Ok(result);
             }
             catch (Exception ex)
