@@ -22,6 +22,10 @@ namespace risk.control.system.Services.Api
         private readonly IBase64FileService base64FileService;
         private readonly DateTime cutoffTime;
         private readonly IFeatureManager featureManager;
+        private readonly int sessionTimeoutInSeconds;
+        private readonly int sessionTimeoutinMinutes;
+        private readonly int awayThresholdInMinutes;
+        private readonly int onlineThresholdInMinutes;
 
         public AgencyUserApiService(
             IConfiguration config,
@@ -30,6 +34,10 @@ namespace risk.control.system.Services.Api
             IBase64FileService base64FileService,
             IFeatureManager featureManager)
         {
+            awayThresholdInMinutes = int.Parse(config["LOGIN_SESSION_INACTIVE_MIN"]);
+            onlineThresholdInMinutes = int.Parse(config["LOGIN_SESSION_ACTIVE_MIN"]);
+            sessionTimeoutInSeconds = int.Parse(config["SESSION_TIMEOUT_SEC"]);
+            sessionTimeoutinMinutes = sessionTimeoutInSeconds / 60;
             cutoffTime = DateTime.UtcNow.AddSeconds(-double.Parse(config["SESSION_TIMEOUT_SEC"]));
             _contextFactory = contextFactory;
             this.dashboardService = dashboardService;
@@ -121,9 +129,9 @@ namespace risk.control.system.Services.Api
 
                     (status, statusName, icon) = minutesAway switch
                     {
-                        < 1 => ("green", "Online now", "fas fa-circle"),
-                        < 5 => ("orange", $"Inactive for {minutesAway} minutes", "fas fa-clock"),
-                        < 15 => ("orange", $"Away for {minutesAway} minutes", "far fa-clock"),
+                        var m when m < onlineThresholdInMinutes => ("green", "Online now", "fas fa-circle"),
+                        var m when m < awayThresholdInMinutes => ("orange", $"Inactive for {m} minutes", "fas fa-clock"),
+                        var m when m < sessionTimeoutinMinutes => ("orange", $"Away for {m} minutes", "far fa-clock"),
                         _ => ("#DED5D5", "Offline", "fa fa-circle-o")
                     };
                 }
@@ -206,21 +214,11 @@ namespace risk.control.system.Services.Api
                 .ToListAsync();
 
             var activeUsersDetails = new List<UserDetailResponse>();
-            var photoTasks = new List<Task<string>>();
-
-            // 3️⃣ Start pre-loading photos asynchronously
-            foreach (var user in vendorUsers)
-            {
-                photoTasks.Add(base64FileService.GetBase64FileAsync(user.ProfilePictureUrl, Applicationsettings.NO_USER));
-            }
-
-            var photoResults = await Task.WhenAll(photoTasks);
 
             // 4️⃣ Map users to UserDetailResponse
             for (int i = 0; i < vendorUsers.Count; i++)
             {
                 var user = vendorUsers[i];
-                var photoUrl = photoResults[i];
 
                 // Lookup last session
                 latestSessions.TryGetValue(user.Email, out var session);
@@ -237,12 +235,14 @@ namespace risk.control.system.Services.Api
                     var minutesAway = (int)(now - session.LastSeen).TotalMinutes;
                     (status, statusName, icon) = minutesAway switch
                     {
-                        < 1 => ("green", "Online now", "fas fa-circle"),
-                        < 5 => ("orange", $"Inactive for {minutesAway} minutes", "fas fa-clock"),
-                        < 15 => ("orange", $"Away for {minutesAway} minutes", "far fa-clock"),
+                        var m when m < onlineThresholdInMinutes => ("green", "Online now", "fas fa-circle"),
+                        var m when m < awayThresholdInMinutes => ("orange", $"Inactive for {m} minutes", "fas fa-clock"),
+                        var m when m < sessionTimeoutinMinutes => ("orange", $"Away for {m} minutes", "far fa-clock"),
                         _ => ("#DED5D5", "Offline", "fa fa-circle-o")
                     };
                 }
+                var photo = await base64FileService.GetBase64FileAsync(user.ProfilePictureUrl, Applicationsettings.NO_USER);
+
                 activeUsersDetails.Add(new UserDetailResponse
                 {
                     Id = user.Id,
@@ -252,7 +252,7 @@ namespace risk.control.system.Services.Api
                         : user.Email + "</a><span title=\"Onboarding incomplete !!!\" data-toggle=\"tooltip\"><i class='fa fa-asterisk asterik-style'></i></span>",
                     RawEmail = user.Email,
                     Phone = $"(+{user.Country.ISDCode}) {user.PhoneNumber}",
-                    Photo = photoUrl,
+                    Photo = photo,
                     Active = user.Active,
                     Addressline = $"{user.Addressline}, {user.District.Name}",
                     State = user.State.Code,
