@@ -1,62 +1,60 @@
-﻿@model IEnumerable<risk.control.system.Models.ClientCompany>
-
-@{
-    ViewData["Title"] = "Companies";
+﻿@{
+	ViewData["Title"] = "Companies";
 }
 
 <section class="content">
-    <div class="card card-secondary">
-        <div class="card-header">
-            <h3 class="card-title"><i class="far fa-building"></i> Companies</h3>
-        </div>
-        <div class="card-body">
-            <div class="submit-progress hidden">
-                <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
-            </div>
-            <table id="dataTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
-                <thead>
-                    <tr>
-                        <th>
-                            Id
-                        </th>
-                        <th>
-                            <i class="far fa-file-word"></i>
-                        </th>
-                        <th>
-                            Domain
-                        </th>
-                        <th>
-                            Mobile
-                        </th>
-                        <th>
-                            Address
-                        </th>
-                        <th>
-                            District
-                        </th>
-                        <th>
-                            State
-                        </th>
-                        <th>
-                            Country
-                        </th>
-                        <th>
-                            Active
-                        </th>
-                        <th>
-                            Updated
-                        </th>
-                        <th>
-                            UpdatedBy
-                        </th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-            </table>
-        </div>
-    </div>
+	<div class="card card-secondary">
+		<div class="card-header">
+			<h3 class="card-title"><i class="far fa-building"></i> Companies</h3>
+		</div>
+		<div class="card-body">
+			<div class="submit-progress hidden">
+				<i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+			</div>
+			<table id="dataTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
+				<thead>
+					<tr>
+						<th>
+							Id
+						</th>
+						<th>
+							<i class="far fa-file-word"></i>
+						</th>
+						<th>
+							Domain
+						</th>
+						<th>
+							Mobile
+						</th>
+						<th>
+							Address
+						</th>
+						<th>
+							District
+						</th>
+						<th>
+							State
+						</th>
+						<th>
+							Country
+						</th>
+						<th>
+							Active
+						</th>
+						<th>
+							Updated
+						</th>
+						<th>
+							UpdatedBy
+						</th>
+						<th>Actions</th>
+					</tr>
+				</thead>
+			</table>
+		</div>
+	</div>
 </section>
 
-@section Scripts    {
-    <script src="~/js/company-admin/client-companies.js"></script>
+@section Scripts {
+	<script src="~/js/company-admin/client-companies.js"></script>
 }

@@ -33,9 +33,10 @@
 			<div class="row">
 				<div class="col-md-12">
 					<div class="form-group">
-						<a id="back" asp-controller="ClientCompany" asp-action="AgencyDetails" asp-route-id="@Model.Id" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
-
-						<a class="create-agency-service btn btn-success" asp-controller="ClientCompany" asp-action="CreateService" asp-route-id="@Model.Id"><i class="fas fa-cog"></i> Add Service</a>
+						<a id="back" asp-controller="ClientCompany" asp-action="AgencyDetails" asp-route-id="@Model.Id" class="btn btn-outline-secondary"
+							   data-bs-toggle="tooltip" title="Back to Agency Detail">
+							<i class="fas fa-arrow-left"></i> <span class="badge badge-light"> <i class="fas fa-building"></i> </span> @Applicationsettings.BACK
+						</a>
 					</div>
 				</div>
 			</div>

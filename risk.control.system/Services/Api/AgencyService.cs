@@ -91,7 +91,7 @@ namespace risk.control.system.Services.Api
                 {
                     Id = u.VendorId,
                     Document = documentImage,
-                    Domain = $"<a href='/Vendors/Details?id={u.VendorId}'>{u.Email}</a>",
+                    Domain = $"<a>{u.Email}</a>",
                     u.Name,
                     u.Code,
                     Phone = $"(+{u.ISDCode}) {u.PhoneNumber}",

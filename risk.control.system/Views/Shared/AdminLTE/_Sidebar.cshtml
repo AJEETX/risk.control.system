@@ -81,7 +81,12 @@
 				</li>
 
 				<li class="nav-item">
-					<a is-active-page asp-controller="ClientCompany" asp-action="Agencies" class="actual-link nav-link @Url.MakeActiveClass("ClientCompany", "")">
+					<a is-active-page asp-controller="ClientCompany" asp-action="Agencies" class="actual-link nav-link 
+						@Url.MakeActiveClass("ClientCompany", "Agencies") 
+						@Url.MakeActiveClass("ClientCompany", "AgencyDetails") 
+						@Url.MakeActiveClass("ClientCompany", "EditAgency")
+						@Url.MakeActiveClass("ClientCompany", "AgencyUsers")
+						@Url.MakeActiveClass("ClientCompany", "AgencyService")">
 						<i class="nav-icon fas fa-building"></i>
 						<p>
 							Agencies

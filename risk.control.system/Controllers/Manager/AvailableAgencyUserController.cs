@@ -15,7 +15,7 @@ using SmartBreadcrumbs.Attributes;
 namespace risk.control.system.Controllers.Manager
 {
     [Breadcrumb("Manage Agency")]
-    [Authorize(Roles = $"{MANAGER.DISPLAY_NAME}")]
+    [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{MANAGER.DISPLAY_NAME}")]
     public class AvailableAgencyUserController : Controller
     {
         private readonly IErrorNotifyService _errorNotifyService;

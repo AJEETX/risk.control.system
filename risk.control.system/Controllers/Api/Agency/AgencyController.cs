@@ -100,7 +100,7 @@ namespace risk.control.system.Controllers.Api.Agency
             }
         }
 
-        [HttpGet("GetAgentWithCases")]
+        [HttpGet("GetAgentWithCases/{id}")]
         public async Task<IActionResult> GetAgentWithCases(long id)
         {
             if (id <= 0)
