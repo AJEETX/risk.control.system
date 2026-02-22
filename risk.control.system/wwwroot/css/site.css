@@ -3143,7 +3143,7 @@ th.col-match {
 .upload-err {
     border: 2px solid red;
     width: 100px;
-    margin-right: 7px;
+    margin-right: 3px;
     display: inline-block;
 }
 

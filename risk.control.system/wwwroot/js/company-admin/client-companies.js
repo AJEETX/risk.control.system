@@ -107,8 +107,8 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    buttons += '<a id=detail' + row.id + ' href="/ClientCompany/Details?Id=' + row.id + '" class="btn btn-xs btn-info"><i class="fa fa-search"></i> Detail</a>&nbsp;'
-                    buttons += '<a id=delete' + row.id + ' href="/ClientCompany/Delete?Id=' + row.id + '" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i></i> Delete</a>'
+                    buttons += '<a id=detail' + row.id + ' href="/ClientCompany/Details/' + row.id + '" class="btn btn-xs btn-info"><i class="fa fa-search"></i> Detail</a>&nbsp;'
+                    buttons += '<a id=delete' + row.id + ' href="/ClientCompany/Delete/' + row.id + '" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i></i> Delete</a>'
                     return buttons;
                 }
             },

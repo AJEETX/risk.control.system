@@ -130,7 +130,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: ClientCompanies/Delete/5
-        [Breadcrumb("Delete ", FromAction = "Companies")]
+        [Breadcrumb("Delete ", FromAction = nameof(Companies))]
         public async Task<IActionResult> Delete(long id)
         {
             if (id < 1 || _context.ClientCompany == null)
@@ -193,7 +193,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: ClientCompanies/Details/5
-        [Breadcrumb("Company Profile", FromAction = "Companies")]
+        [Breadcrumb("Company Profile", FromAction = nameof(Companies))]
         public async Task<IActionResult> Details(long id)
         {
             if (id < 1 || _context.ClientCompany == null)
@@ -314,16 +314,7 @@ namespace risk.control.system.Controllers
         [Breadcrumb("Companies")]
         public async Task<IActionResult> Companies()
         {
-            var applicationDbContext = _context.ClientCompany
-                .Include(c => c.Country)
-                .Include(c => c.PinCode)
-                .Include(c => c.State)
-                .Include(c => c.State)
-                .AsQueryable();
-
-            var applicationDbContextResult = await applicationDbContext.ToListAsync();
-
-            return View(applicationDbContextResult);
+            return View();
         }
 
         [Breadcrumb("Agencies")]
@@ -332,7 +323,7 @@ namespace risk.control.system.Controllers
             return View();
         }
 
-        [Breadcrumb(title: "Agency Profile", FromAction = "Agencies")]
+        [Breadcrumb(title: "Agency Profile", FromAction = nameof(Agencies))]
         public async Task<IActionResult> AgencyDetails(long id)
         {
             try
@@ -387,7 +378,7 @@ namespace risk.control.system.Controllers
             }
         }
 
-        [Breadcrumb(title: "Edit Agency", FromAction = "AgencyDetails")]
+        [Breadcrumb(title: "Edit Agency", FromAction = nameof(AgencyDetails))]
         public async Task<IActionResult> EditAgency(long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
@@ -460,7 +451,7 @@ namespace risk.control.system.Controllers
             model.PinCodeId = model.SelectedPincodeId;
         }
 
-        [Breadcrumb(" Agency Users", FromAction = "AgencyDetails")]
+        [Breadcrumb("Agency Users", FromAction = nameof(AgencyDetails))]
         public IActionResult AgencyUsers(long id)
         {
             var model = new ServiceModel { Id = id };
@@ -468,7 +459,7 @@ namespace risk.control.system.Controllers
             return View(model);
         }
 
-        [Breadcrumb("Agency Service", FromAction = "AgencyDetails")]
+        [Breadcrumb("Agency Service", FromAction = nameof(AgencyDetails))]
         public IActionResult AgencyService(long id)
         {
             var model = new ServiceModel { Id = id };

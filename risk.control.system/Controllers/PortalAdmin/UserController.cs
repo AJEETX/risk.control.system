@@ -96,13 +96,15 @@ namespace risk.control.system.Controllers.PortalAdmin
         }
 
         [Breadcrumb(" Edit")]
-        public async Task<IActionResult> Edit(string userId)
+        public async Task<IActionResult> Edit(long id)
         {
-            if (userId == null)
+            if (id < 1)
             {
                 return NotFound();
             }
-            var applicationUser = await userManager.FindByIdAsync(userId);
+            var applicationUser = await context.ApplicationUser.AsNoTracking()
+                .Include(u => u.Country)
+                .FirstOrDefaultAsync(c => c.Id == id);
             applicationUser.IsPasswordChangeRequired = await featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION) ? !applicationUser.IsPasswordChangeRequired : true;
             return View(applicationUser);
         }

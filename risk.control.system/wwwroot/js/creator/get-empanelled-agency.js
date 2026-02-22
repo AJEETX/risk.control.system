@@ -3,7 +3,7 @@
     var vendorId = $('#vendorId').val();
     var table = $("#dataTable").DataTable({
         ajax: {
-            url: '/api/Company/GetEmpanelledAgency?caseId=' + claimId,
+            url: '/api/Company/GetEmpanelledAgency/' + claimId,
             dataSrc: '',
             error: DataTableErrorHandler
         },
@@ -120,21 +120,31 @@
                 }
             },
             {
-                "data": "caseCount",
+                "data": "hasService",
                 "mRender": function (data, type, row) {
                     let statusText = row.hasService
                         ? '<span class="text-success fw-bold small"> <i class="fas fa-check-circle i-green"></i></span>'
                         : '<span class="i-red fw-bold small"> <i class="fa fa-times i-grey"></i></span>';
 
                     let tooltipText = row.hasService
-                        ? 'SERVICE AVAILABLE.\n\n  Total number of current cases = ' + row.caseCount
-                        : ' NO SERVICE AVAILABLE.\n\n Total number of current cases = ' + row.caseCount;
+                        ? 'SERVICE AVAILABLE.\n\n '
+                        : ' NO SERVICE AVAILABLE.\n\n';
                     return `
-            <span data-bs-toggle="tooltip" title="${tooltipText}">
-                ${statusText}
-                <span>(${data})</span>
-            </span>
-        `;
+                        <span data-bs-toggle="tooltip" title="${tooltipText}">
+                            ${statusText}
+                        </span>
+                    `;
+                }
+            },
+            {
+                "data": "caseCount",
+                "mRender": function (data, type, row) {
+                    let tooltipText = 'Total number of current cases = ' + row.caseCount;
+                    return `
+                        <span data-bs-toggle="tooltip" title="${tooltipText}">
+                            <span>(${data})</span>
+                        </span>
+                    `;
                 }
             },
             {

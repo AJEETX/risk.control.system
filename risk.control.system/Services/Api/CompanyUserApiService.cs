@@ -18,7 +18,6 @@ namespace risk.control.system.Services.Api
     internal class CompanyUserApiService : ICompanyUserApiService
     {
         private readonly ApplicationDbContext context;
-        private readonly IWebHostEnvironment webHostEnvironment;
         private readonly IBase64FileService base64FileService;
         private readonly int sessionTimeoutInSeconds;
         private readonly int sessionTimeoutinMinutes;
@@ -26,23 +25,19 @@ namespace risk.control.system.Services.Api
         private readonly int onlineThresholdInMinutes;
         private readonly DateTime cutoffTime;
         private readonly IFeatureManager featureManager;
-        private readonly IConfiguration _config;
 
         public CompanyUserApiService(
             IConfiguration config,
             ApplicationDbContext context,
-            IWebHostEnvironment webHostEnvironment,
             IBase64FileService base64FileService,
             IFeatureManager featureManager)
         {
-            _config = config;
             awayThresholdInMinutes = int.Parse(config["LOGIN_SESSION_INACTIVE_MIN"]);
             onlineThresholdInMinutes = int.Parse(config["LOGIN_SESSION_ACTIVE_MIN"]);
             sessionTimeoutInSeconds = int.Parse(config["SESSION_TIMEOUT_SEC"]);
             sessionTimeoutinMinutes = sessionTimeoutInSeconds / 60;
             cutoffTime = DateTime.UtcNow.AddSeconds(-sessionTimeoutInSeconds);
             this.context = context;
-            this.webHostEnvironment = webHostEnvironment;
             this.base64FileService = base64FileService;
             this.featureManager = featureManager;
         }
@@ -104,7 +99,7 @@ namespace risk.control.system.Services.Api
                         _ => ("#DED5D5", "Offline", "fa fa-circle-o")
                     };
                 }
-                var photo = (await base64FileService.GetBase64FileAsync(user.ProfilePictureUrl)) ?? Applicationsettings.NO_USER;
+                var photo = await base64FileService.GetBase64FileAsync(user.ProfilePictureUrl, Applicationsettings.NO_USER);
                 activeUsersDetails.Add(new UserDetailResponse
                 {
                     Id = user.Id,
@@ -193,9 +188,7 @@ namespace risk.control.system.Services.Api
                 };
 
                 // Convert photo to base64 (optional: cache this for performance)
-                var photo = string.IsNullOrWhiteSpace(user.ProfilePictureUrl)
-                    ? Applicationsettings.NO_USER
-                    : $"data:image/*;base64,{Convert.ToBase64String(File.ReadAllBytes(Path.Combine(webHostEnvironment.ContentRootPath, user.ProfilePictureUrl)))}";
+                var photo = await base64FileService.GetBase64FileAsync(user.ProfilePictureUrl, Applicationsettings.NO_USER);
 
                 activeUsersDetails.Add(new UserDetailResponse
                 {
