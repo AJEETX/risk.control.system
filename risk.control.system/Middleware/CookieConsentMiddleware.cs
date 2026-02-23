@@ -18,12 +18,16 @@
             try
             {
                 // Check if the "CookieConsent" cookie exists
-                var cookieConsent = context.Request.Cookies["CookieConsent"];
-                context.Items["HasCookieConsent"] = cookieConsent == "Accepted";
+                if (!context.Request.Path.StartsWithSegments("/api") && !context.Request.Path.StartsWithSegments("/js") && !context.Request.Path.StartsWithSegments("/Session"))
+                {
+                    var cookieConsent = context.Request.Cookies["CookieConsent"];
+                    context.Items["HasCookieConsent"] = cookieConsent == "Accepted";
 
-                var timeout = double.Parse(config["SESSION_TIMEOUT_SEC"]);
-                context.Items.Add("timeout", timeout);
-                Console.WriteLine("timeout (sec): " + timeout);
+                    var timeout = double.Parse(config["SESSION_TIMEOUT_SEC"]);
+                    context.Items.Add("timeout", timeout);
+                    Console.WriteLine("timeout (sec): " + timeout);
+                }
+
                 await _next(context).ConfigureAwait(false);
             }
             catch (Exception ex)

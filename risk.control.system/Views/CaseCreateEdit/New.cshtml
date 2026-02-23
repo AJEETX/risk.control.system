@@ -57,16 +57,16 @@
 					<div class="col-md-12">
 						@if (@Model.UserCanCreate)
 						{
-							<a class="create-policy btn btn-success" asp-controller="CaseCreateEdit" asp-action="Add"><i class="far fa-edit"></i> Add New</a>
+							<a class="create-policy btn btn-sm btn-success" asp-controller="CaseCreateEdit" asp-action="Add"><i class="far fa-edit"></i> Add New</a>
 						}
 						else
 						{
-							<button disabled class="create-policy btn btn-success"><i class="far fa-edit"></i> @Applicationsettings.CREATE</button>
+							<button disabled class="create-policy btn btn-sm  btn-success"><i class="far fa-edit"></i> @Applicationsettings.CREATE</button>
 						}
-						<button disabled id="allocatedcase" type="submit" class="btn btn-warning">
+						<button disabled id="allocatedcase" type="submit" class="btn btn-sm btn-warning">
 							<i class="fas fa-random"></i> Assign<sub>auto</sub>
 						</button>
-						<button disabled id="deletecase" type="submit" class="btn btn-danger">
+						<button disabled id="deletecase" type="submit" class="btn btn-sm btn-danger">
 							<i class="fas fa-trash"></i> Delete
 						</button>
 					</div>
