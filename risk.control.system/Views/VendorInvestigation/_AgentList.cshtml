@@ -35,21 +35,21 @@
 			<div class="col-md-12">
 				@if (Model.ReSelect)
 				{
-					<a id="back" asp-action="GetInvestigateReport" asp-route-id="@Model.ClaimsInvestigation.Id" class="btn btn-outline-secondary" data-bs-toggle="tooltip" title="Back to Submited cases">
+					<a id="back" asp-action="GetInvestigateReport" asp-route-id="@Model.ClaimsInvestigation.Id" class="btn btn-sm btn-outline-secondary" data-bs-toggle="tooltip" title="Back to Submited cases">
 						<i class="fas fa-arrow-left"></i> 
 						<span class="badge badge-light"> <i class="far fa-file-archive"></i> </span> @Applicationsettings.BACK
 					</a>
-					<button disabled="disabled" id="allocatedcase" type="submit" class="btn btn-danger">
+					<button disabled="disabled" id="allocatedcase" type="submit" class="btn btn-sm btn-danger">
 						<i class="fas fa-external-link-alt" aria-hidden="true"></i> Re-Allocate <sub>agent</sub>
 					</button>
 				}
 				else
 				{
-					<a id="back" asp-action="Allocate" class="btn btn-outline-secondary" data-bs-toggle="tooltip" title="Back to Allocate cases">
+					<a id="back" asp-action="Allocate" class="btn btn-sm btn-outline-secondary" data-bs-toggle="tooltip" title="Back to Allocate cases">
 						<i class="fas fa-arrow-left"></i>
 						<span class="badge badge-light"> <i class="fas fa-external-link-alt"></i> </span>	@Applicationsettings.BACK
 					</a>
-					<button disabled="disabled" id="allocatedcase" type="submit" class="btn btn-danger">
+					<button disabled="disabled" id="allocatedcase" type="submit" class="btn btn-sm btn-danger">
 						<i class="fas fa-external-link-alt" aria-hidden="true"></i> Allocate <sub>agent</sub>
 					</button>
 				}
