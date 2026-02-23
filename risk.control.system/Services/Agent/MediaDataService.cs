@@ -7,6 +7,7 @@ namespace risk.control.system.Services.Agent
     {
         Task SaveTranscript(long locationId, string reportName, string transcript);
     }
+
     internal class MediaDataService : IMediaDataService
     {
         private readonly ApplicationDbContext context;
@@ -15,6 +16,7 @@ namespace risk.control.system.Services.Agent
         {
             this.context = context;
         }
+
         public async Task SaveTranscript(long locationId, string reportName, string transcript)
         {
             var locationTemplate = await context.LocationReport

@@ -6,14 +6,15 @@ namespace risk.control.system.Models
 {
     public class DocumentIdReport : ReportBase
     {
-        public byte[]? IdImageBack { get; set; }
         public bool HasBackImage { get; set; } = true;
         public DocumentIdReportType ReportType { get; set; } = DocumentIdReportType.PAN;
         public long? LocationReportId { get; set; }  // This is the FK property
         public LocationReport? LocationReport { get; set; }  // Navigation property
+
         public override string ToString()
         {
             return $"Document Report:\n" +
+                $"Has Back Image:{HasBackImage}\n" +
                 $"Report Type:{ReportType.GetEnumDisplayName()}";
         }
     }

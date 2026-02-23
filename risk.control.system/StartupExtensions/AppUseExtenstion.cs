@@ -55,15 +55,7 @@ public static class AppUseExtenstion
         });
         app.UseAuthentication();
         app.UseAuthorization();
-        app.Map("/debug-test", branch =>
-        {
-            branch.Run(async context =>
-            {
-                var proto = context.Request.Headers["X-Forwarded-Proto"].FirstOrDefault() ?? "none";
-                var isHttps = context.Request.IsHttps;
-                await context.Response.WriteAsync($"Protocol: {proto} | IsHttps: {isHttps} | Scheme: {context.Request.Scheme}");
-            });
-        });
+
         app.UseMiddleware<SecurityMiddleware>(configuration["HttpStatusErrorCodes"]);
         app.UseMiddleware<RequirePasswordChangeMiddleware>();
         app.UseMiddleware<CookieConsentMiddleware>();
