@@ -7,6 +7,7 @@ namespace risk.control.system.Models
     {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long Id { get; set; }
+
         public bool Selected { get; set; } = false;
         public string? ReportName { get; set; }
         public string? FilePath { get; set; }
@@ -23,11 +24,16 @@ namespace risk.control.system.Models
         public bool ValidationExecuted { get; set; } = false;
         public bool? ImageValid { get; set; } = false;
         public bool IsRequired { get; set; } = false;
+
         public override string ToString()
         {
             return $"Report Information:\n" +
                 $"- Name: {ReportName}\n" +
                 $"- Location Info: {LocationInfo}\n" +
+                $"- Distance: {Distance}\n" +
+                $"- Duration: {Duration}\n" +
+                $"- Image is Valid: {ImageValid}\n" +
+                $"- Validation is done: {ValidationExecuted}\n" +
                 $"- Location Address: {LocationAddress}\n" +
                 $"- Valid: {ImageValid}";
         }
