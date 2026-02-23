@@ -87,7 +87,7 @@ namespace risk.control.system.Services.Agent
 
                 var image = Convert.FromBase64String(maskedImage.MaskedImage);
                 var savedMaskedImage = processImageService.ProcessCompress(image, onlyExtension);
-                await System.IO.File.WriteAllBytesAsync(filePath, savedMaskedImage);
+                await File.WriteAllBytesAsync(filePath, savedMaskedImage);
 
                 doc.LocationInfo = maskedImage.DocType + " data: ";
 

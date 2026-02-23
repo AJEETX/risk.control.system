@@ -39,6 +39,7 @@ services:
     volumes:
       - ./certs:/https:ro
       - web_data:/app/Document
+
   postgres:
     image: postgres:16
     container_name: postgres-db
@@ -67,6 +68,7 @@ services:
       - postgres
     volumes:
       - pgadmin_data:/var/lib/pgadmin
+
 volumes:
   web_data:
   postgres_data:
