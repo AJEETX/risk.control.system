@@ -36,7 +36,7 @@ namespace risk.control.system.Services.Common
 
         public async Task<string> SendSms2Customer(string currentUser, long claimId, string sms)
         {
-            var claim = await context.Investigations.AsNoTracking()
+            var claim = await context.Investigations
             .Include(c => c.CaseMessages)
             .Include(c => c.PolicyDetail)
             .Include(c => c.CustomerDetail)
@@ -56,13 +56,13 @@ namespace risk.control.system.Services.Common
             ApplicationUser agencyUser;
             if (isInsurerUser)
             {
-                insurerUser = (ApplicationUser)user;
+                insurerUser = user;
                 var entity = await context.ClientCompany.AsNoTracking().FirstOrDefaultAsync(c => c.ClientCompanyId == insurerUser.ClientCompanyId);
                 entityName = entity?.Name ?? string.Empty;
             }
             else if (isVendorUser)
             {
-                agencyUser = (ApplicationUser)user;
+                agencyUser = user;
                 var entity = await context.Vendor.AsNoTracking().FirstOrDefaultAsync(v => v.VendorId == agencyUser.VendorId);
                 entityName = entity?.Name ?? string.Empty;
             }
@@ -82,6 +82,7 @@ namespace risk.control.system.Services.Common
             {
                 Message = message,
                 InvestigationTaskId = claimId,
+                RecepicientEmail = claim.CustomerDetail.Name,
                 SenderEmail = user.Email,
                 UpdatedBy = user.Email,
                 Updated = DateTime.UtcNow
@@ -112,13 +113,13 @@ namespace risk.control.system.Services.Common
             ApplicationUser agencyUser;
             if (isInsurerUser)
             {
-                insurerUser = (ApplicationUser)user;
+                insurerUser = user;
                 var entity = await context.ClientCompany.AsNoTracking().FirstOrDefaultAsync(c => c.ClientCompanyId == insurerUser.ClientCompanyId);
                 entityName = entity.Name;
             }
             else if (isVendorUser)
             {
-                agencyUser = (ApplicationUser)user;
+                agencyUser = user;
                 var entity = await context.Vendor.AsNoTracking().FirstOrDefaultAsync(v => v.VendorId == agencyUser.VendorId);
                 entityName = entity.Name;
             }
@@ -143,7 +144,7 @@ namespace risk.control.system.Services.Common
                 UpdatedBy = user.Email,
                 Updated = DateTime.UtcNow
             };
-            var claim = await context.Investigations.AsNoTracking()
+            var claim = await context.Investigations
             .Include(c => c.CaseMessages)
             .Include(c => c.PolicyDetail)
             .Include(c => c.CustomerDetail)

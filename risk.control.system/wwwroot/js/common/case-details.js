@@ -125,7 +125,7 @@
             buttons: {
                 close: {
                     text: 'Close',
-                    btnClass: 'btn-secondary'
+                    btnClass: 'btn-default'
                 }
             }
         });
@@ -190,7 +190,7 @@
             title: 'Case Note!!!',
             closeIcon: true,
             type: 'green',
-            icon: 'far fa-file-powerpoint',
+            icon: 'far fa-file-alt',
             content: `
             <form class="formName">
                 <div class="form-group">
@@ -222,6 +222,7 @@
                             $.alert({
                                 title: 'Case notes added!',
                                 content: 'Status: ' + response.message,
+                                icon: 'far fa-file-alt',
                                 type: 'green'
                             });
                             if (response.newCount !== undefined) {
@@ -301,7 +302,6 @@
                                     type: 'green',
                                     icon: 'far fa-comments',
                                     content: 'Status: ' + response.message,
-                                    autoClose: 'ok|2000',
                                     buttons: {
                                         ok: {
                                             text: 'Close',
@@ -385,9 +385,8 @@
                                     title: 'Message Status!',
                                     closeIcon: true,
                                     type: 'green',
-                                    icon: 'fa fa-user-tie',
+                                    icon: 'far fa-comments',
                                     content: 'Status: ' + response.message,
-                                    autoClose: 'ok|2000',
                                     buttons: {
                                         ok: {
                                             text: 'Close',
@@ -480,8 +479,14 @@ function showNotesModal() {
         columnClass: 'medium',
         closeIcon: true,
         type: 'blue',
-        icon: 'fas fa-list',
-        buttons: { close: { text: "Close", btnClass: 'btn-secondary' } },
+        icon: 'far fa-file-alt',
+        buttons: {
+            close:
+            {
+                text: "Close",
+                btnClass: 'btn-default'
+            }
+        },
         content: function () {
             var self = this;
             return $.ajax({
@@ -611,7 +616,7 @@ function openDetailPopup(options) {
         buttons: {
             close: {
                 text: 'Close',
-                btnClass: 'btn-secondary'
+                btnClass: 'btn-default'
             }
         }
     });

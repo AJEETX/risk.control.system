@@ -12,9 +12,12 @@ namespace risk.control.system.Models
         public DigitalIdReportType ReportType { get; set; }
         public long? LocationReportId { get; set; }  // This is the FK property
         public LocationReport? LocationReport { get; set; }  // Navigation property
+
         public override string ToString()
         {
             return $"Face Report:\n" +
+                $"Face Match Confidence:{MatchConfidence}\n" +
+                $"Similarity:{Similarity}\n" +
                 $"Report Type:{ReportType.GetEnumDisplayName()}";
         }
     }
@@ -39,5 +42,4 @@ namespace risk.control.system.Models
         [Display(Name = "House Front")]
         HOUSE_FRONT,
     }
-
 }

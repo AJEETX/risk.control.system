@@ -15,8 +15,6 @@ namespace risk.control.system.StartupExtensions
             services.Configure<ForwardedHeadersOptions>(options =>
             {
                 options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
-                options.KnownNetworks.Clear();
-                options.KnownProxies.Clear();
             });
             services.AddMemoryCache();
             services.AddHsts(options =>
