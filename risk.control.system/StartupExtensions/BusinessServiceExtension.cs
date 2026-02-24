@@ -40,7 +40,7 @@ public static class BusinessServiceExtension
         services.AddScoped<INavigationService, NavigationService>();
         services.AddScoped<IAgencyAgentService, AgencyAgentService>();
         services.AddScoped<IAgencyInvestigationServiceService, AgencyInvestigationServiceService>();
-        services.AddScoped<IEmpanelledAvailableAgencyService, EmpanelledAvailableAgencyService>();
+        services.AddScoped<ICompanyAgencyApiService, CompanyAgencyApiService>();
         services.AddScoped<IFileUploadCaseAllocationService, FileUploadCaseAllocationService>();
         services.AddScoped<IManagerDashboardService, ManagerDashboardService>();
         services.AddScoped<IAssessorDashboardService, AssessorDashboardService>();
