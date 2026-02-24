@@ -1,14 +1,12 @@
 ﻿using AspNetCoreHero.ToastNotification.Abstractions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
 using risk.control.system.AppConstant;
 using risk.control.system.Controllers.Common;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
-using risk.control.system.Services.Agency;
+using risk.control.system.Services.AgencyAdmin;
 using risk.control.system.Services.Common;
 using SmartBreadcrumbs.Attributes;
 
@@ -19,85 +17,61 @@ namespace risk.control.system.Controllers.Agency
     public class AgencyUserProfileController : Controller
     {
         private readonly ApplicationDbContext _context;
-        private readonly IAgencyUserService vendorUserService;
-        private readonly IAccountService accountService;
-        private readonly INotyfService notifyService;
-        private readonly ILogger<AgencyUserProfileController> logger;
-        private readonly string portal_base_url = string.Empty;
+        private readonly IAgencyUserService _agencyUserService;
+        private readonly IErrorNotifyService _errorNotifyService;
+        private readonly IAccountService _accountService;
+        private readonly INotyfService _notifyService;
+        private readonly ILogger<AgencyUserProfileController> _logger;
+        private readonly string _baseUrl;
 
         public AgencyUserProfileController(ApplicationDbContext context,
-            IAgencyUserService vendorUserService,
+            IAgencyUserService agencyUserService,
+            IErrorNotifyService errorNotifyService,
             IAccountService accountService,
              IHttpContextAccessor httpContextAccessor,
             INotyfService notifyService,
             ILogger<AgencyUserProfileController> logger)
         {
             _context = context;
-            this.vendorUserService = vendorUserService;
-            this.accountService = accountService;
-            this.notifyService = notifyService;
-            this.logger = logger;
+            _agencyUserService = agencyUserService;
+            _errorNotifyService = errorNotifyService;
+            _accountService = accountService;
+            _notifyService = notifyService;
+            _logger = logger;
             var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
             var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
-            portal_base_url = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
+            _baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
         }
 
         public async Task<IActionResult> Index()
         {
-            try
-            {
-                var userEmail = HttpContext.User?.Identity?.Name;
-                var vendorUser = await _context.ApplicationUser
-                    .Include(u => u.PinCode)
-                    .Include(u => u.Country)
-                    .Include(u => u.State)
-                    .Include(u => u.District)
-                    .FirstOrDefaultAsync(c => c.Email == userEmail);
-
-                return View(vendorUser);
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Error occurred.");
-                notifyService.Error("OOPS !!!..Contact Admin");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
-            }
+            return View();
         }
 
-        [Breadcrumb("Edit Profile")]
-        public async Task<IActionResult> Edit(long? userId)
+        [Breadcrumb("Edit Profile", FromAction = nameof(DashboardController.Index), FromController = typeof(DashboardController))]
+        public async Task<IActionResult> Edit(long id)
         {
             try
             {
-                if (userId == null || _context.ApplicationUser == null)
+                if (id < 1)
                 {
-                    notifyService.Custom($"No user not found.", 3, "red", "fas fa-user");
+                    _notifyService.Custom($"No user not found.", 3, "red", "fas fa-user");
                     return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
 
-                var vendorApplicationUser = await _context.ApplicationUser.Include(v => v.Vendor).Include(c => c.Country).FirstOrDefaultAsync(u => u.Id == userId);
-                if (vendorApplicationUser == null)
+                var agencyUser = await _agencyUserService.GetUserAsync(id);
+                if (agencyUser == null)
                 {
-                    notifyService.Custom($"No user not found.", 3, "red", "fas fa-user");
+                    _notifyService.Custom($"No user not found.", 3, "red", "fas fa-user");
                     return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
 
-                var country = _context.Country.OrderBy(o => o.Name);
-                var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == vendorApplicationUser.CountryId).OrderBy(d => d.Name);
-                var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == vendorApplicationUser.StateId).OrderBy(d => d.Name);
-                var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == vendorApplicationUser.DistrictId).OrderBy(d => d.Name);
-
-                ViewData["CountryId"] = new SelectList(country.OrderBy(c => c.Name), "CountryId", "Name", vendorApplicationUser.CountryId);
-                ViewData["StateId"] = new SelectList(relatedStates, "StateId", "Name", vendorApplicationUser.StateId);
-                ViewData["DistrictId"] = new SelectList(districts, "DistrictId", "Name", vendorApplicationUser.DistrictId);
-                ViewData["PinCodeId"] = new SelectList(pincodes, "PinCodeId", "Code", vendorApplicationUser.PinCodeId);
-
-                return View(vendorApplicationUser);
+                return View(agencyUser);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting {UserId} for {UserEmail}", userId, HttpContext.User?.Identity?.Name ?? "Anonymous");
-                notifyService.Error("OOPS !!!..Contact Admin");
+                _logger.LogError(ex, "Error getting {UserId} for {UserEmail}", id, HttpContext.User?.Identity?.Name ?? "Anonymous");
+                _notifyService.Error("OOPS !!!..Contact Admin");
                 return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
@@ -111,45 +85,46 @@ namespace risk.control.system.Controllers.Agency
             {
                 if (!ModelState.IsValid)
                 {
-                    notifyService.Error("Please correct the errors");
+                    _notifyService.Error("Please correct the errors");
+                    await _agencyUserService.LoadModel(model, userEmail);
                     return View(model);
                 }
                 if (id != model.Id.ToString())
                 {
-                    notifyService.Error("OOPS !!!..Contact Admin");
+                    _notifyService.Error("OOPS !!!..Contact Admin");
                     return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
-                var result = await vendorUserService.UpdateUserAsync(id, model, userEmail, portal_base_url);
+                var result = await _agencyUserService.UpdateUserAsync(id, model, userEmail, _baseUrl);
 
                 if (!result.Success)
                 {
-                    notifyService.Error(result.Message ?? "Validation failed");
-
                     foreach (var error in result.Errors)
                     {
                         ModelState.AddModelError(error.Key, error.Value);
                     }
+                    _errorNotifyService.ShowErrorNotification(ModelState);
+                    await _agencyUserService.LoadModel(model, userEmail);
 
                     return View(model);
                 }
-                notifyService.Custom($"User profile edited successfully.", 3, "orange", "fas fa-user");
+                _notifyService.Custom($"User profile edited successfully.", 3, "orange", "fas fa-user");
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error editing {UserId} for {UserEmail}", id, userEmail ?? "Anonymous");
-                notifyService.Error("OOPS !!!..Contact Admin");
+                _logger.LogError(ex, "Error editing {UserId} for {UserEmail}", id, userEmail ?? "Anonymous");
+                _notifyService.Error("OOPS !!!..Contact Admin");
             }
             return this.RedirectToAction<DashboardController>(x => x.Index());
         }
 
         [HttpGet]
-        [Breadcrumb("Change Password ")]
+        [Breadcrumb("Change Password", FromAction = nameof(DashboardController.Index), FromController = typeof(DashboardController))]
         public async Task<IActionResult> ChangePassword()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             try
             {
-                var vendorUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
+                var vendorUser = await _agencyUserService.GetChangePasswordUserAsync(userEmail);
                 if (vendorUser != null)
                 {
                     var model = new ChangePasswordViewModel { Id = vendorUser.Id };
@@ -158,12 +133,47 @@ namespace risk.control.system.Controllers.Agency
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error for {UserEmail}", userEmail ?? "Anonymous");
-                notifyService.Error("OOPS !!!..Contact Admin");
+                _logger.LogError(ex, "Error for {UserEmail}", userEmail ?? "Anonymous");
+                _notifyService.Error("OOPS !!!..Contact Admin");
                 return this.RedirectToAction<DashboardController>(x => x.Index());
             }
-            notifyService.Error("OOPS !!!..Contact Admin");
+            _notifyService.Error("OOPS !!!..Contact Admin");
             return this.RedirectToAction<DashboardController>(x => x.Index());
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                _notifyService.Custom($"Password update Error", 3, "red", "fa fa-lock");
+
+                return View(model);
+            }
+            try
+            {
+                var result = await _accountService.ChangePasswordAsync(model, User, HttpContext.User.Identity.IsAuthenticated, _baseUrl);
+
+                if (!result.Success)
+                {
+                    _notifyService.Error(result.Message);
+
+                    foreach (var error in result.Errors)
+                        ModelState.AddModelError(error.Key, error.Value);
+
+                    return View(model);
+                }
+
+                _notifyService.Custom($"Password update successful", 3, "orange", "fa fa-unlock");
+                return RedirectToAction("Index", "Dashboard");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while changing password for {UserEmail}", User.Identity.Name ?? "Anonymous");
+                _notifyService.Error("OOPS !!!..Contact Admin");
+                return RedirectToAction(nameof(AccountController.Login), ControllerName<AccountController>.Name);
+            }
         }
     }
 }

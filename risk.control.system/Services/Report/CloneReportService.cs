@@ -3,15 +3,20 @@
 using Microsoft.EntityFrameworkCore;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
+
 namespace risk.control.system.Services.Report
 {
     public interface ICloneReportService
     {
         Task<ReportTemplate> DeepCloneReportTemplate(long clientCompanyId, InsuranceType insuranceType);
+
         Task<ReportTemplate> CreateCloneReportTemplate(long templateId, string currentUserEmail);
+
         Task<bool> Activate(long templateId);
+
         Task<object> GetReportTemplate(long caseId, string agentEmail);
     }
+
     internal class CloneReportService : ICloneReportService
     {
         private readonly ApplicationDbContext context;
@@ -66,7 +71,7 @@ namespace risk.control.system.Services.Report
                 .FirstOrDefaultAsync(r => r.Id == templateId);
 
             string baseName = Regex.Replace(originalTemplate.Name, @"_\d{8}_\d{6,9}$", "");
-            string newName = $"{baseName}_{DateTime.Now:yyyyMMdd_HHmmss}";
+            string newName = $"{baseName}_{DateTime.UtcNow:yyyyMMdd_HHmmss}";
 
             var clone = new ReportTemplate
             {
@@ -75,7 +80,7 @@ namespace risk.control.system.Services.Report
                 InsuranceType = originalTemplate.InsuranceType,
                 Basetemplate = false, // Set to false for the cloned template
                 OriginalTemplateId = originalTemplate.Id, // Reference to the original template
-                Created = DateTime.Now,
+                Created = DateTime.UtcNow,
                 UpdatedBy = currentUserEmail, // Or current user
                 LocationReport = originalTemplate.LocationReport.Select(loc => new LocationReport
                 {
@@ -109,7 +114,6 @@ namespace risk.control.system.Services.Report
                         IsRequired = doc.IsRequired,
                         ReportType = doc.ReportType,
                         ReportName = doc.ReportName,
-                        IdImageBack = doc.IdImageBack,
                         Selected = doc.Selected,
                     }).ToList(),
 
@@ -151,7 +155,7 @@ namespace risk.control.system.Services.Report
                 InsuranceType = originalTemplate.InsuranceType,
                 Basetemplate = false, // Set to false for the cloned template
                 OriginalTemplateId = originalTemplate.Id, // Reference to the original template
-                Created = DateTime.Now,
+                Created = DateTime.UtcNow,
                 UpdatedBy = "system", // Or current user
                 LocationReport = originalTemplate.LocationReport.Select(loc => new LocationReport
                 {
@@ -185,7 +189,6 @@ namespace risk.control.system.Services.Report
                         IsRequired = doc.IsRequired,
                         ReportType = doc.ReportType,
                         ReportName = doc.ReportName,
-                        IdImageBack = doc.IdImageBack,
                         Selected = doc.Selected,
                     }).ToList(),
 
@@ -201,6 +204,7 @@ namespace risk.control.system.Services.Report
             };
             return clone;
         }
+
         public async Task<object> GetReportTemplate(long caseId, string agentEmail)
         {
             var investigation = await context.Investigations.FindAsync(caseId);
@@ -249,7 +253,6 @@ namespace risk.control.system.Services.Report
                     IsRequired = doc.IsRequired,
                     ReportType = doc.ReportType.GetEnumDisplayName(),
                     ReportName = doc.ReportName,
-                    IdImageBack = doc.IdImageBack,
                 }).ToList(),
 
                 Questions = loc.Questions?.Select(q => new

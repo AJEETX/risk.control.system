@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using System.Text.RegularExpressions;
+using risk.control.system.Helpers;
 using risk.control.system.Models;
 
 namespace risk.control.system.Services.Common
@@ -38,7 +39,7 @@ namespace risk.control.system.Services.Common
         // Ideally move these to configuration or secrets manager
         private const string ApiHost = "phonenumbervalidatefree.p.rapidapi.com";
 
-        private static string ApiKey = Environment.GetEnvironmentVariable("PHONE_API");
+        private static string ApiKey = EnvHelper.Get("PHONE_API");
         private const string BaseUrl = $"https://{ApiHost}/ts_PhoneNumberValidateTest.jsp";
 
         public PhoneService(IHttpClientFactory httpClientFactory)

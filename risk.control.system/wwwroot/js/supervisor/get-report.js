@@ -100,167 +100,6 @@ $(document).ready(function () {
         }
     });
 
-
-    $('#create-form').on('submit', function (e) {
-        var report = $('#assessorRemarks').val();
-
-        if (report == '') {
-            e.preventDefault();
-            $.alert({
-                title: "Claim Remarks !!!",
-                content: "Please enter remarks?",
-                icon: 'fas fa-exclamation-triangle',
-    
-                type: 'red',
-                closeIcon: true,
-                buttons: {
-                    cancel: {
-                        text: "OK",
-                        btnClass: 'btn-danger', action: function () {
-                            $.alert('Canceled!');
-                            $('#assessorRemarks').focus();
-                        }
-                    }
-                }
-            });
-        }
-        else if (!askConfirmation && approve && $('#assessorRemarkType').val() == 'OK') {
-            e.preventDefault();
-            $.confirm({
-                title: "Confirm APPROVE",
-                content: "Are you sure?",
-                icon: 'far fa-thumbs-up',
-    
-                type: 'green',
-                closeIcon: true,
-                buttons: {
-                    confirm: {
-                        text: "APPROVE",
-                        btnClass: 'btn-success',
-                        action: function () {
-                            askConfirmation = true;
-                            approve = false;
-                            $("body").addClass("submit-progress-bg");
-                            // Wrap in setTimeout so the UI
-                            // can update the spinners
-                            setTimeout(function () {
-                                $(".submit-progress").removeClass("hidden");
-                            }, 1);
-
-                            $('#approve-case').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> APPROVE");
-                            disableAllInteractiveElements();
-
-                            $('#create-form').submit();
-
-                            var createForm = document.getElementById("create-form");
-                            if (createForm) {
-
-                                var nodes = createForm.getElementsByTagName('*');
-                                for (var i = 0; i < nodes.length; i++) {
-                                    nodes[i].disabled = true;
-                                }
-                            }
-                        }
-                    },
-                    cancel: {
-                        text: "Cancel",
-                        btnClass: 'btn-default'
-                    }
-                }
-            });
-        }
-        else if (!askConfirmation && review && $('#assessorRemarkType').val() == 'REVIEW') {
-            e.preventDefault();
-            $.confirm({
-                title: "Confirm REVIEW",
-                content: "Are you sure?",
-                icon: 'fas fa-sync',
-    
-                type: 'orange',
-                closeIcon: true,
-                buttons: {
-                    confirm: {
-                        text: "REVIEW",
-                        btnClass: 'btn-warning',
-                        action: function () {
-                            askConfirmation = true;
-                            review = false;
-                            $("body").addClass("submit-progress-bg");
-                            // Wrap in setTimeout so the UI
-                            // can update the spinners
-                            setTimeout(function () {
-                                $(".submit-progress").removeClass("hidden");
-                            }, 1);
-
-                            $('#approve-case').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i>  REVIEW");
-                            disableAllInteractiveElements();
-
-                            $('#create-form').submit();
-
-                            var createForm = document.getElementById("create-form");
-                            if (createForm) {
-
-                                var nodes = createForm.getElementsByTagName('*');
-                                for (var i = 0; i < nodes.length; i++) {
-                                    nodes[i].disabled = true;
-                                }
-                            }
-                        }
-                    },
-                    cancel: {
-                        text: "Cancel",
-                        btnClass: 'btn-default'
-                    }
-                }
-            });
-        }
-        else if (!askConfirmation && reject && $('#assessorRemarkType').val() == 'REJECT') {
-            e.preventDefault();
-            $.confirm({
-                title: "Confirm REJECT",
-                content: "Are you sure?",
-                icon: 'far fa-thumbs-down',
-
-                type: 'red',
-                closeIcon: true,
-                buttons: {
-                    confirm: {
-                        text: "REJECT",
-                        btnClass: 'btn-danger',
-                        action: function () {
-                            askConfirmation = true;
-                            reject = false;
-                            $("body").addClass("submit-progress-bg");
-                            // Wrap in setTimeout so the UI
-                            // can update the spinners
-                            setTimeout(function () {
-                                $(".submit-progress").removeClass("hidden");
-                            }, 1);
-
-                            $('#approve-case').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i>  REJECT");
-                            disableAllInteractiveElements();
-
-                            $('#create-form').submit();
-
-                            var createForm = document.getElementById("create-form");
-                            if (createForm) {
-
-                                var nodes = createForm.getElementsByTagName('*');
-                                for (var i = 0; i < nodes.length; i++) {
-                                    nodes[i].disabled = true;
-                                }
-                            }
-                        }
-                    },
-                    cancel: {
-                        text: "Cancel",
-                        btnClass: 'btn-default'
-                    }
-                }
-            });
-        }
-    });
-
     $('#query-form').on('submit', function (e) {
         var enquiry = $('#description').val();
 
@@ -287,7 +126,7 @@ $(document).ready(function () {
         else if (!askConfirmation) {
             e.preventDefault();
             $.confirm({
-                title: "Confirm Enquiry",
+                title: "Enquiry Detail !!!",
                 content: "Are you sure?",
                 icon: 'far fa-thumbs-up',
 
@@ -295,7 +134,7 @@ $(document).ready(function () {
                 closeIcon: true,
                 buttons: {
                     confirm: {
-                        text: "Send Enquiry",
+                        text: "Reply Enquiry",
                         btnClass: 'btn-warning',
                         action: function () {
                             askConfirmation = true;
@@ -306,7 +145,7 @@ $(document).ready(function () {
                                 $(".submit-progress").removeClass("hidden");
                             }, 1);
 
-                            $('#send-query').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Enquiring...");
+                            $('#send-query').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Reply Enquiry");
                             disableAllInteractiveElements();
 
                             $('#query-form').submit();

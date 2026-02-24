@@ -204,8 +204,7 @@ namespace risk.control.system.Services.Common
             {
                 await roleManager.CreateAsync(new ApplicationRole
                 {
-                    Name = roleName,
-                    Code = roleName.Length >= 2 ? roleName.Substring(0, 2) : "XX"
+                    Name = roleName
                 });
             }
             await _userManager.AddToRoleAsync(user, roleName);

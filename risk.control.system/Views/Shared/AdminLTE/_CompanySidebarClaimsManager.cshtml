@@ -12,7 +12,7 @@
         </a>
     </li>
     <li class="nav-item">
-        <a is-active-page asp-controller="Manager" asp-action="Active" class="actual-link nav-link 
+        <a is-active-page asp-controller="Manager" asp-action="Active" class="actual-link nav-link
                         @Url.MakeActiveClass("Manager","Active")
                         @Url.MakeActiveClass("Manager","ActiveDetail")">
             <i class="fa fa-toggle-on nav-icon"></i>
@@ -23,7 +23,7 @@
     </li>
     <li class="nav-item">
         <a is-active-page asp-controller="Manager" asp-action="Approved" class="actual-link nav-link @Url.MakeActiveClass("Manager","Approved")
-                                                            @Url.MakeActiveClass("Manager","ApprovedDetail") 
+                                                            @Url.MakeActiveClass("Manager","ApprovedDetail")
                                                             @Url.MakeActiveClass("Manager","ShowInvoice")
                                                                           @Url.MakeActiveClass("Manager","PrintInvoice")">
             <i class="far fa-thumbs-up nav-icon"></i>
@@ -41,15 +41,12 @@
            </p>
        </a>
     </li>
-    if (Model.BulkUpload)
-    {
-        <li class="nav-item">
-            <a is-active-page asp-controller="CaseUpload" asp-action="Uploads" class="actual-link nav-link @Url.MakeActiveClass("CaseUpload","Uploads")">
-                <i class="nav-icon fa fa-upload"></i>
-                <p>
-                    <span class="badge badge-secondary"> UPLOAD <sub>file</sub></span>
-                </p>
-            </a>
-        </li>
-    }
+    <li class="nav-item">
+        <a is-active-page asp-controller="CaseUpload" asp-action="Uploads" class="actual-link nav-link @Url.MakeActiveClass("CaseUpload", "Uploads")">
+            <i class="nav-icon fa fa-upload"></i>
+            <p>
+                <span class="badge badge-secondary"> UPLOAD <sub>file</sub></span>
+            </p>
+        </a>
+    </li>
 }

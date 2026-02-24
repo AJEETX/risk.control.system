@@ -53,19 +53,19 @@ namespace risk.control.system.Controllers.CompanyAdmin
             return RedirectToAction(nameof(CompanyProfile));
         }
 
-        [Breadcrumb("Company Profile", FromAction = "Index")]
+        [Breadcrumb("Company Profile", FromAction = nameof(Index))]
         public async Task<IActionResult> CompanyProfile()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             try
             {
-                var companyUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
+                var companyUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == userEmail);
                 if (companyUser is null)
                 {
                     notifyService.Error("OOPs !!!..User Not Found");
                     return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
-                var clientCompany = await _context.ClientCompany
+                var clientCompany = await _context.ClientCompany.AsNoTracking()
                     .Include(c => c.Country)
                     .Include(c => c.District)
                     .Include(c => c.PinCode)
@@ -87,20 +87,19 @@ namespace risk.control.system.Controllers.CompanyAdmin
             }
         }
 
-        [Breadcrumb("Edit Company", FromAction = "CompanyProfile")]
+        [Breadcrumb("Edit Company", FromAction = nameof(CompanyProfile))]
         public async Task<IActionResult> Edit()
         {
+            var userEmail = HttpContext.User?.Identity?.Name;
             try
             {
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-
-                var companyUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == currentUserEmail);
+                var companyUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == userEmail);
                 if (companyUser is null)
                 {
                     notifyService.Error("OOPs !!!..User Not Found");
                     return RedirectToAction(nameof(CompanyProfile));
                 }
-                var clientCompany = await _context.ClientCompany
+                var clientCompany = await _context.ClientCompany.AsNoTracking()
                     .Include(c => c.Country)
                     .Include(c => c.State)
                     .Include(c => c.District)
@@ -159,7 +158,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
 
         private async Task Load(ClientCompany model)
         {
-            var country = await _context.Country.FirstOrDefaultAsync(c => c.CountryId == model.SelectedCountryId);
+            var country = await _context.Country.AsNoTracking().FirstOrDefaultAsync(c => c.CountryId == model.SelectedCountryId);
             model.Country = country;
             model.CountryId = model.SelectedCountryId;
             model.StateId = model.SelectedStateId;

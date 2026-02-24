@@ -19,27 +19,6 @@
         }
     });
 
-    $('#investigatecase').on('click', function (event) {
-        $("body").addClass("submit-progress-bg");
-
-        setTimeout(function () {
-            $(".submit-progress").removeClass("hidden");
-        }, 1);
-        // Disable all buttons, submit inputs, and anchors
-
-        $('#investigatecase').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Investigate");
-        disableAllInteractiveElements();
-
-        $('#radioButtons').submit();
-        var article = document.getElementById("article");
-        if (article) {
-            var nodes = article.getElementsByTagName('*');
-            for (var i = 0; i < nodes.length; i++) {
-                nodes[i].disabled = true;
-            }
-        }
-    });
-
     var table = $("#dataTable").DataTable({
         ajax: {
             url: '/api/agency/VendorInvestigation/GetNewCases',
@@ -59,72 +38,9 @@
                     orderDir: d.order?.[0]?.dir || "desc"
                 };
             },
-            error: function (xhr, status, error) {
-                console.error("AJAX Error:", status, error);
-                console.error("Response:", xhr.responseText);
-                if (xhr.status === 401 || xhr.status === 403) {
-                    $.confirm({
-                        title: 'Session Expired!',
-                        content: 'Your session has expired or you are unauthorized. You will be redirected to the login page.',
-                        type: 'red',
-                        typeAnimated: true,
-                        buttons: {
-                            Ok: {
-                                text: 'Login',
-                                btnClass: 'btn-red',
-                                action: function () {
-                                    window.location.href = '/Account/Login';
-                                }
-                            }
-                        },
-                        onClose: function () {
-                            window.location.href = '/Account/Login';
-                        }
-                    });
-                }
-                else if (xhr.status === 500) {
-                    $.confirm({
-                        title: 'Server Error!',
-                        content: 'An unexpected server error occurred. You will be redirected to the Assign page.',
-                        type: 'orange',
-                        typeAnimated: true,
-                        buttons: {
-                            Ok: function () {
-                                window.location.href = '/VendorInvestigation/Allocate';
-                            }
-                        },
-                        onClose: function () {
-                            window.location.href = '/VendorInvestigation/Allocate';
-                        }
-                    });
-                }
-                else if (xhr.status === 400) {
-                    $.confirm({
-                        title: 'Bad Request!',
-                        content: 'Try with valid data.You will be redirected to the Assign page',
-                        type: 'orange',
-                        typeAnimated: true,
-                        buttons: {
-                            Ok: function () {
-                                window.location.href = '/VendorInvestigation/Allocate';
-                            }
-                        },
-                        onClose: function () {
-                            window.location.href = '/VendorInvestigation/Allocate';
-                        }
-                    });
-                }
-            }
+            error: DataTableErrorHandler
         },
-        columnDefs: [{
-            'targets': 0,
-            'searchable': false,
-            'orderable': false,
-            'className': 'dt-body-center',
-            'render': function (data, type, full, meta) {
-                return '<input type="checkbox" name="selectedcase[]" value="' + $('<div/>').text(data).html() + '">';
-            }
-        },
+        columnDefs: [
         {
             className: 'max-width-column-number', // Apply the CSS class,
             targets: 1                      // Index of the column to style
@@ -177,7 +93,7 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     if (!row.isQueryCase) {
-                        var img = '<input name="selectedcase" class="selected-case" type="radio" id="' + row.id + '"  value="' + row.id + '"  data-bs-toggle="tooltip" title="Select Case to Allocate" />';
+                        var img = '<input name="id" class="selected-case" type="radio" id="' + row.id + '"  value="' + row.id + '"  data-bs-toggle="tooltip" title="Select Case to Allocate" />';
                         return img;
                     }
                 }
@@ -289,7 +205,7 @@
                 "mRender": function (data, type, row) {
                     var buttons = "";
                     if (row.isQueryCase) {
-                        buttons += `<a data-id="${row.id}" class="btn btn-xs btn-warning"><i class="fas fa-question" aria-hidden="true"></i> Enquiry </a> &nbsp;` ;
+                        buttons += `<a data-id="${row.id}" class="btn btn-xs btn-warning"><i class="fas fa-question" aria-hidden="true"></i> Enquiry </a> &nbsp;`;
                     }
                     else {
                         buttons += `<a data-id="${row.id}" class="btn btn-xs btn-info"><i class="fas fa-search"></i> Detail</a>`
@@ -311,10 +227,8 @@
                 }, 3000);
             }
             $('.btn-info', row).addClass('btn-white-color');
-
         },
         "drawCallback": function (settings, start, end, max, total, pre) {
-            
             // Reinitialize Bootstrap 5 tooltips
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
             tooltipTriggerList.map(function (el) {
@@ -337,7 +251,7 @@
 
         showSpinnerOnButton(element, "Detail");
 
-        const url = `/VendorInvestigation/CaseDetail?Id=${encodeURIComponent(id)}`;
+        const url = `/VendorInvestigation/CaseDetail/${encodeURIComponent(id)}`;
 
         setTimeout(() => {
             window.location.href = url;
@@ -355,7 +269,7 @@
 
         showSpinnerOnButton(element, "Enquiry");
 
-        const editUrl = `/VendorInvestigation/ReplyEnquiry?Id=${encodeURIComponent(id)}`;
+        const editUrl = `/VendorInvestigation/ReplyEnquiry/${encodeURIComponent(id)}`;
 
         setTimeout(() => {
             window.location.href = editUrl;
@@ -395,59 +309,19 @@
             html: true
         });
     });
-    if ($("input[type='radio'].selected-case:checked").length) {
-        $("#allocatedcase").prop('disabled', false);
-        $("#investigatecase").prop('disabled', false);
-    }
-    else {
-        $("#allocatedcase").prop('disabled', true);
-        $("#investigatecase").prop('disabled', true);
-    }
-
-    // When user checks a radio button, Enable submit button
-    $("input[type='radio'].selected-case").change(function (e) {
-        if ($(this).is(":checked")) {
-            $("#allocatedcase").prop('disabled', false);
-            $("#investigatecase").prop('disabled', false);
-        }
-        else {
-            $("#allocatedcase").prop('disabled', true);
-            $("#investigatecase").prop('disabled', true);
-        }
+    $('#dataTable').on('change', 'input[name="id"]', function () {
+        $('#allocatedcase').prop('disabled', false);
     });
 
-    // Handle click on checkbox to set state of "Select all" control
-    $('#dataTable tbody').on('change', 'input[type="radio"]', function () {
-        // If checkbox is not checked
-        if (this.checked) {
-            $("#allocatedcase").prop('disabled', false);
-            $("#investigatecase").prop('disabled', false);
+    $('#allocatedcase').on('click', function () {
+        // Find the checked radio button
+        var id = $("input[name='id']:checked").val();
+
+        if (id) {
+            // Redirect to the clean URL
+            window.location.href = 'SelectVendorAgent/' + id;
         } else {
-            $("#allocatedcase").prop('disabled', true);
-            $("#investigatecase").prop('disabled', true);
+            $.alert("Please select a case.");
         }
-    });
-    let askConfirmation = false;
-
-    // Handle form submission event
-    $('#checkboxes').on('submit', function (e) {
-        var form = this;
-
-        // Iterate over all checkboxes in the table
-        table.$('input[type="checkbox"]').each(function () {
-            // If checkbox doesn't exist in DOM
-            if (!$.contains(document, this)) {
-                // If checkbox is checked
-                if (this.checked) {
-                    // Create a hidden element
-                    $(form).append(
-                        $('<input>')
-                            .attr('type', 'hidden')
-                            .attr('name', this.name)
-                            .val(this.value)
-                    );
-                }
-            }
-        });
     });
 });

@@ -26,7 +26,7 @@ namespace risk.control.system.Models
             audit.CompanyId = CompanyId;
             audit.Type = AuditType.ToString();
             audit.TableName = TableName;
-            audit.DateTime = DateTime.Now;
+            audit.DateTime = DateTime.UtcNow;
             audit.PrimaryKey = JsonConvert.SerializeObject(KeyValues);
             audit.OldValues = OldValues.Count == 0 ? null : JsonConvert.SerializeObject(OldValues);
             audit.NewValues = NewValues.Count == 0 ? null : JsonConvert.SerializeObject(NewValues);

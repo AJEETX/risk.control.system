@@ -5,7 +5,7 @@ namespace risk.control.system.Services.Common
 {
     public interface ICaseNotesService
     {
-        Task<bool> SubmitNotes(string userEmail, long claimId, string notes);
+        Task<(bool, int)> SubmitNotes(string userEmail, long claimId, string notes);
     }
 
     internal class CaseNotesService : ICaseNotesService
@@ -17,7 +17,7 @@ namespace risk.control.system.Services.Common
             this._context = context;
         }
 
-        public async Task<bool> SubmitNotes(string userEmail, long claimId, string notes)
+        public async Task<(bool, int)> SubmitNotes(string userEmail, long claimId, string notes)
         {
             var caseTask = await _context.Investigations
                .Include(c => c.CaseNotes)
@@ -26,12 +26,12 @@ namespace risk.control.system.Services.Common
             {
                 Comment = notes,
                 SenderEmail = userEmail,
-                Created = DateTime.Now,
-                Updated = DateTime.Now,
+                Created = DateTime.UtcNow,
+                Updated = DateTime.UtcNow,
                 UpdatedBy = userEmail
             });
             _context.Investigations.Update(caseTask);
-            return await _context.SaveChangesAsync() > 0;
+            return (await _context.SaveChangesAsync() > 0, caseTask.CaseNotes.Count);
         }
     }
 }

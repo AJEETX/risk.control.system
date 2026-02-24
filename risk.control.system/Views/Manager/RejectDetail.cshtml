@@ -8,7 +8,7 @@
 <section class="content">
     <input type="hidden" id="policyDetailId" value="@Model.ClaimsInvestigation?.PolicyDetail.PolicyDetailId" />
     <input type="hidden" id="customerDetailId" value="@Model.ClaimsInvestigation?.CustomerDetail.CustomerDetailId" />
-    <input type="hidden" id="beneficiaryId" value="@Model.Location?.BeneficiaryDetailId" />
+    <input type="hidden" id="beneficiaryId" value="@Model.Beneficiary?.BeneficiaryDetailId" />
     <input type="hidden" id="claimId" value="@Model.ClaimsInvestigation?.Id" />
     <div id="article" class="shadow-lg border-1 rounded-lg">
         <div class="card-header bg-secondary text-white text-center">
@@ -33,8 +33,6 @@
                 </span>
             </h3>
         </div>
-        
-
     </div>
     <partial name="Investigation/_ApprovedPolicyDetails" model="@Model" />
     <partial name="Company/_AgencySubmittedReport" model="@Model" />

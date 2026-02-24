@@ -1,27 +1,28 @@
-﻿using risk.control.system.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 
 namespace risk.control.system.Services.Creator
 {
     public interface IUploadFileStatusService
     {
-        void SetUploadAssignSuccess(FileOnFileSystemModel fileData, List<InvestigationTask> claims, List<long> autoAllocated);
+        Task SetUploadAssignSuccess(FileOnFileSystemModel fileData, List<InvestigationTask> claims, List<long> autoAllocated);
 
-        void SetUploadSuccess(FileOnFileSystemModel fileData, List<InvestigationTask> claims);
+        Task SetUploadSuccess(FileOnFileSystemModel fileData, List<InvestigationTask> claims);
 
-        void SetFileUploadFailure(FileOnFileSystemModel fileData, string message, bool uploadAndAssign, List<long> claimsIds = null);
+        Task SetFileUploadFailure(FileOnFileSystemModel fileData, string message, bool uploadAndAssign, List<long> claimsIds = null);
     }
 
     internal class UploadFileStatusService : IUploadFileStatusService
     {
-        private readonly ApplicationDbContext context;
+        private readonly IDbContextFactory<ApplicationDbContext> _contextFactory;
 
-        public UploadFileStatusService(ApplicationDbContext context)
+        public UploadFileStatusService(IDbContextFactory<ApplicationDbContext> contextFactory)
         {
-            this.context = context;
+            _contextFactory = contextFactory;
         }
 
-        public void SetUploadAssignSuccess(FileOnFileSystemModel fileData, List<InvestigationTask> claims, List<long> autoAllocated)
+        public async Task SetUploadAssignSuccess(FileOnFileSystemModel fileData, List<InvestigationTask> claims, List<long> autoAllocated)
         {
             var uploadedClaimCount = claims.Count(c => c.PolicyDetail.InsuranceType == InsuranceType.CLAIM);
 
@@ -38,14 +39,15 @@ namespace risk.control.system.Services.Creator
             fileData.DirectAssign = true;
             fileData.RecordCount = claims.Count;
             fileData.CaseIds = claims.Select(c => new CaseListModel { CaseId = c.Id }).ToList();
-            fileData.CompletedOn = DateTime.Now;
-            var timeTaken = DateTime.Now.Subtract(fileData.CreatedOn).Seconds;
+            fileData.CompletedOn = DateTime.UtcNow;
+            var timeTaken = DateTime.UtcNow.Subtract(fileData.CreatedOn).Seconds;
             fileData.TimeTakenSeconds = timeTaken == 0 ? 1 : timeTaken;
+            await using var context = await _contextFactory.CreateDbContextAsync();
             context.FilesOnFileSystem.Update(fileData);
-            context.SaveChanges();
+            await context.SaveChangesAsync();
         }
 
-        public void SetUploadSuccess(FileOnFileSystemModel fileData, List<InvestigationTask> claims)
+        public async Task SetUploadSuccess(FileOnFileSystemModel fileData, List<InvestigationTask> claims)
         {
             var claimCount = claims.Count(c => c.PolicyDetail.InsuranceType == InsuranceType.CLAIM);
             var underWritingCount = claims.Count(c => c.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING);
@@ -57,14 +59,15 @@ namespace risk.control.system.Services.Creator
             fileData.Message = message;
             fileData.RecordCount = claims.Count;
             fileData.CaseIds = claims.Select(c => new CaseListModel { CaseId = c.Id }).ToList();
-            fileData.CompletedOn = DateTime.Now;
-            var timeTaken = DateTime.Now.Subtract(fileData.CreatedOn).Seconds;
+            fileData.CompletedOn = DateTime.UtcNow;
+            var timeTaken = DateTime.UtcNow.Subtract(fileData.CreatedOn).Seconds;
             fileData.TimeTakenSeconds = timeTaken == 0 ? 1 : timeTaken;
+            await using var context = await _contextFactory.CreateDbContextAsync();
             context.FilesOnFileSystem.Update(fileData);
-            context.SaveChanges();
+            await context.SaveChangesAsync();
         }
 
-        public void SetFileUploadFailure(FileOnFileSystemModel fileData, string message, bool uploadAndAssign, List<long> claimsIds = null)
+        public async Task SetFileUploadFailure(FileOnFileSystemModel fileData, string message, bool uploadAndAssign, List<long> claimsIds = null)
         {
             fileData.Completed = false;
             fileData.Icon = "fas fa-times-circle i-orangered";
@@ -72,12 +75,13 @@ namespace risk.control.system.Services.Creator
             fileData.Message = message;
             fileData.RecordCount = claimsIds == null ? 0 : claimsIds.Count;
             fileData.DirectAssign = uploadAndAssign;
-            fileData.CompletedOn = DateTime.Now;
+            fileData.CompletedOn = DateTime.UtcNow;
             fileData.CaseIds = claimsIds?.Select(c => new CaseListModel { CaseId = c }).ToList();
-            var timeTaken = DateTime.Now.Subtract(fileData.CreatedOn).Seconds;
+            var timeTaken = DateTime.UtcNow.Subtract(fileData.CreatedOn).Seconds;
             fileData.TimeTakenSeconds = timeTaken == 0 ? 1 : timeTaken;
+            await using var context = await _contextFactory.CreateDbContextAsync();
             context.FilesOnFileSystem.Update(fileData);
-            context.SaveChanges();
+            await context.SaveChangesAsync();
         }
     }
 }

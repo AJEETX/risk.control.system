@@ -14,9 +14,12 @@ namespace risk.control.system.Services.Api
 
     internal class AgencyDashboardService : IAgencyDashboardService
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IDbContextFactory<ApplicationDbContext> contextFactory;
+        private readonly ILogger<AgencyDashboardService> logger;
 
+        // Consts remained the same for logic consistency
         private const string allocated = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR;
+
         private const string assigned2Agent = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT;
         private const string submitted2Supervisor = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR;
         private const string submitted2Assessor = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR;
@@ -26,157 +29,144 @@ namespace risk.control.system.Services.Api
         private const string approved = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR;
         private const string finished = CONSTANTS.CASE_STATUS.FINISHED;
 
-        public AgencyDashboardService(ApplicationDbContext context)
+        public AgencyDashboardService(IDbContextFactory<ApplicationDbContext> contextFactory, ILogger<AgencyDashboardService> logger)
         {
-            this._context = context;
+            this.contextFactory = contextFactory;
+            this.logger = logger;
         }
 
         public async Task<DashboardData> GetAgentCount(string userEmail, string role)
         {
-            var vendorUser = await _context.ApplicationUser.Include(u => u.Vendor).FirstOrDefaultAsync(c => c.Email == userEmail);
-            var taskCountTask = GetCases().CountAsync(c => c.VendorId == vendorUser.VendorId &&
-            c.SubStatus == assigned2Agent &&
-            c.TaskedAgentEmail == userEmail);
+            try
+            {
+                await using var _context = contextFactory.CreateDbContext();
+                var vendorUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == userEmail);
 
-            var agentSubmittedCountTask = GetCases().Distinct().CountAsync(t => t.TaskedAgentEmail == userEmail && t.SubStatus != assigned2Agent);
+                // Execute the first count
+                var taskCount = await GetCases(_context).CountAsync(c =>
+                    c.VendorId == vendorUser.VendorId &&
+                    c.SubStatus == assigned2Agent &&
+                    c.TaskedAgentEmail == userEmail);
 
-            await Task.WhenAll(taskCountTask, agentSubmittedCountTask);
+                // Execute the second count
+                var agentSubmittedCount = await GetCases(_context).CountAsync(t =>
+                    t.TaskedAgentEmail == userEmail &&
+                    t.SubStatus != assigned2Agent);
 
-            var data = new DashboardData();
-            data.FirstBlockName = "Tasks";
-            data.FirstBlockCount = await taskCountTask;
-            data.FirstBlockUrl = "/Agent/Index";
-
-            data.SecondBlockName = "Submitted";
-            data.SecondBlockCount = await agentSubmittedCountTask;
-            data.SecondBlockUrl = "/Agent/Submitted";
-
-            return data;
+                return new DashboardData
+                {
+                    FirstBlockName = "Tasks",
+                    FirstBlockCount = taskCount,
+                    FirstBlockUrl = "/Agent/Index",
+                    SecondBlockName = "Submitted",
+                    SecondBlockCount = agentSubmittedCount,
+                    SecondBlockUrl = "/Agent/Submitted"
+                };
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error occurred for {UserEmail}", userEmail);
+                throw;
+            }
         }
 
         public async Task<DashboardData> GetSupervisorCount(string userEmail, string role)
         {
-            var claimsAllocateTask = GetAgencyAllocateCount(userEmail);
-            var claimsVerifiedTask = GetAgencyVerifiedCount(userEmail);
-            var claimsActiveCountTask = GetSuperVisorActiveCount(userEmail);
-            var claimsCompletedTask = GetAgencyyCompleted(userEmail);
+            try
+            {
+                // Execute queries in parallel
+                var claimsAllocateTask = GetAgencyAllocateCount(userEmail);
+                var claimsVerifiedTask = GetAgencyVerifiedCount(userEmail);
+                var claimsActiveCountTask = GetSuperVisorActiveCount(userEmail);
+                var claimsCompletedTask = GetAgencyyCompleted(userEmail);
 
-            await Task.WhenAll(claimsAllocateTask, claimsVerifiedTask, claimsActiveCountTask, claimsCompletedTask);
+                await Task.WhenAll(claimsAllocateTask, claimsVerifiedTask, claimsActiveCountTask, claimsCompletedTask);
 
-            var data = new DashboardData();
-            data.FirstBlockName = "Allocate/Enquiry";
-            data.FirstBlockCount = await claimsAllocateTask;
-            data.FirstBlockUrl = "/VendorInvestigation/Allocate";
-
-            data.SecondBlockName = "Submit(report)";
-            data.SecondBlockCount = await claimsVerifiedTask;
-            data.SecondBlockUrl = "/VendorInvestigation/CaseReport";
-
-            data.ThirdBlockName = "Active";
-            data.ThirdBlockCount = await claimsActiveCountTask;
-            data.ThirdBlockUrl = "/VendorInvestigation/Open";
-
-            data.LastBlockName = "Completed";
-            data.LastBlockCount = await claimsCompletedTask;
-            data.LastBlockUrl = "/VendorInvestigation/Completed";
-
-            return data;
+                return new DashboardData
+                {
+                    FirstBlockName = "Allocate/Enquiry",
+                    FirstBlockCount = await claimsAllocateTask,
+                    FirstBlockUrl = "/VendorInvestigation/Allocate",
+                    SecondBlockName = "Submit(report)",
+                    SecondBlockCount = await claimsVerifiedTask,
+                    SecondBlockUrl = "/VendorInvestigation/CaseReport",
+                    ThirdBlockName = "Active",
+                    ThirdBlockCount = await claimsActiveCountTask,
+                    ThirdBlockUrl = "/VendorInvestigation/Open",
+                    LastBlockName = "Completed",
+                    LastBlockCount = await claimsCompletedTask,
+                    LastBlockUrl = "/VendorInvestigation/Completed"
+                };
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error occurred while getting supervisor dashboard data for user {UserEmail}", userEmail);
+                throw;
+            }
         }
 
         private async Task<int> GetSuperVisorActiveCount(string userEmail)
         {
-            var claims = GetAgencyClaims();
+            await using var _context = contextFactory.CreateDbContext();
             var vendorUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
+            var query = GetAgencyClaims(_context).Where(a => a.VendorId == vendorUser.VendorId && a.Status != finished);
+
             if (vendorUser.IsVendorAdmin)
             {
-                return await claims.CountAsync(a => a.VendorId == vendorUser.VendorId &&
-            a.Status != finished &&
-                 (a.SubStatus == assigned2Agent ||
-                a.SubStatus == submitted2Assessor ||
-                 a.SubStatus == reply2Assessor));
+                return await query.CountAsync(a => a.SubStatus == assigned2Agent ||
+                                                   a.SubStatus == submitted2Assessor ||
+                                                   a.SubStatus == reply2Assessor);
             }
-            var count = await claims.CountAsync(a => a.VendorId == vendorUser.VendorId &&
-            a.Status != finished &&
-                 ((a.SubStatus == assigned2Agent && a.AllocatingSupervisordEmail == userEmail) ||
-                (a.SubStatus == submitted2Assessor && a.SubmittingSupervisordEmail == userEmail) ||
-                 (a.SubStatus == reply2Assessor && a.SubmittingSupervisordEmail == userEmail)));
-            return count;
+
+            return await query.CountAsync(a => (a.SubStatus == assigned2Agent && a.AllocatingSupervisordEmail == userEmail) ||
+                                               (a.SubStatus == submitted2Assessor && a.SubmittingSupervisordEmail == userEmail) ||
+                                               (a.SubStatus == reply2Assessor && a.SubmittingSupervisordEmail == userEmail));
         }
 
         private async Task<int> GetAgencyVerifiedCount(string userEmail)
         {
-            var agencyCases = GetAgencyClaims();
-
-            var vendorUser = await _context.ApplicationUser.Include(u => u.Vendor).FirstOrDefaultAsync(c => c.Email == userEmail);
-
-            var count = await agencyCases.CountAsync(i => i.VendorId == vendorUser.VendorId &&
-            i.SubStatus == submitted2Supervisor);
-            return count;
+            await using var _context = contextFactory.CreateDbContext();
+            var vendorUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
+            return await GetAgencyClaims(_context).CountAsync(i => i.VendorId == vendorUser.VendorId && i.SubStatus == submitted2Supervisor);
         }
 
         private async Task<int> GetAgencyAllocateCount(string userEmail)
         {
+            await using var _context = contextFactory.CreateDbContext();
             var vendorUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
-
-            var agencyCases = GetAgencyClaims().Where(i => i.VendorId == vendorUser.VendorId);
-
-            var count = await agencyCases
-                    .CountAsync(i => i.SubStatus == allocated ||
-                    i.SubStatus == requestedAssessor);
-
-            return count;
+            return await GetAgencyClaims(_context).CountAsync(i => i.VendorId == vendorUser.VendorId &&
+                (i.SubStatus == allocated || i.SubStatus == requestedAssessor));
         }
 
         private async Task<int> GetAgencyyCompleted(string userEmail)
         {
+            await using var _context = contextFactory.CreateDbContext();
             var agencyUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
-            var applicationDbContext = GetAgencyClaims().Where(c =>
-                c.CustomerDetail != null && c.VendorId == agencyUser.VendorId);
+            var query = GetAgencyClaims(_context).Where(c => c.VendorId == agencyUser.VendorId && c.Status == finished);
+
             if (agencyUser.IsVendorAdmin)
             {
-                var claimsSubmitted = 0;
-                foreach (var item in applicationDbContext)
-                {
-                    if (item.Status == finished &&
-                        item.SubStatus == approved ||
-                        item.SubStatus == rejectd
-                        )
-                    {
-                        claimsSubmitted += 1;
-                    }
-                }
-                return claimsSubmitted;
+                return await query.CountAsync(item => item.SubStatus == approved || item.SubStatus == rejectd);
             }
-            else
-            {
-                var claimsSubmitted = 0;
-                foreach (var item in applicationDbContext)
-                {
-                    if (item.SubmittingSupervisordEmail == userEmail && item.Status == finished &&
-                        (item.SubStatus == approved ||
-                        item.SubStatus == rejectd)
-                        )
-                    {
-                        claimsSubmitted += 1;
-                    }
-                }
-                return claimsSubmitted;
-            }
+
+            return await query.CountAsync(item => item.SubmittingSupervisordEmail == userEmail &&
+                (item.SubStatus == approved || item.SubStatus == rejectd));
         }
 
-        private IQueryable<InvestigationTask> GetCases()
+        private static IQueryable<InvestigationTask> GetCases(ApplicationDbContext context)
         {
-            var applicationDbContext = _context.Investigations
-               .Include(c => c.PolicyDetail)
+            // Do NOT use a 'using' block here
+            return context.Investigations
+                .AsNoTracking()
+                .Include(c => c.PolicyDetail)
                 .Where(c => !c.Deleted);
-            return applicationDbContext.OrderBy(o => o.Created);
         }
 
-        private IQueryable<InvestigationTask> GetAgencyClaims()
+        private static IQueryable<InvestigationTask> GetAgencyClaims(ApplicationDbContext context)
         {
-            var applicationDbContext = _context.Investigations
+            return context.Investigations
+                .AsNoTracking()
                 .Where(c => !c.Deleted);
-            return applicationDbContext.OrderBy(o => o.Created);
         }
     }
 }

@@ -7,7 +7,6 @@ using risk.control.system.AppConstant;
 using risk.control.system.Services.Api;
 using ControllerBase = Microsoft.AspNetCore.Mvc.ControllerBase;
 
-
 namespace risk.control.system.Controllers.Api.Agency
 {
     [ApiExplorerSettings(IgnoreApi = true)]
@@ -31,13 +30,9 @@ namespace risk.control.system.Controllers.Api.Agency
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userEmail))
-            {
-                return Unauthorized("User not authenticated.");
-            }
             try
             {
-                var response = await vendorInvestigationService.GetNewCases(userEmail,draw, start,length,search,orderColumn,orderDir);
+                var response = await vendorInvestigationService.GetNewCases(userEmail, draw, start, length, search, orderColumn, orderDir);
                 return Ok(response);
             }
             catch (Exception ex)
@@ -46,15 +41,12 @@ namespace risk.control.system.Controllers.Api.Agency
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
+
         [HttpGet("GetOpenCases")]
         public async Task<IActionResult> GetOpenCases(int draw, int start, int length, string search = "", int orderColumn = 0, string orderDir = "asc")
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userEmail))
-            {
-                return Unauthorized("User not authenticated.");
-            }
             try
             {
                 var response = await vendorInvestigationService.GetOpenCases(userEmail, draw, start, length, search, orderColumn, orderDir);
@@ -72,10 +64,6 @@ namespace risk.control.system.Controllers.Api.Agency
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userEmail))
-            {
-                return Unauthorized("User not authenticated.");
-            }
             try
             {
                 var response = await vendorInvestigationService.GetAgentReports(userEmail, draw, start, length, search, orderColumn, orderDir);
@@ -87,17 +75,15 @@ namespace risk.control.system.Controllers.Api.Agency
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
+
         [HttpGet("GetCompleted")]
         public async Task<IActionResult> GetCompleted(int draw, int start, int length, string search = "", int orderColumn = 0, string orderDir = "asc")
         {
             var userEmail = HttpContext.User?.Identity?.Name;
-            var userClaim = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
-            if (string.IsNullOrEmpty(userEmail) || string.IsNullOrWhiteSpace(userClaim))
-            {
-                return Unauthorized("User not authenticated.");
-            }
+
             try
             {
+                var userClaim = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
                 var response = await vendorInvestigationService.GetCompletedCases(userEmail, userClaim, draw, start, length, search, orderColumn, orderDir);
                 return Ok(response);
             }

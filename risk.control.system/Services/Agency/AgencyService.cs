@@ -53,13 +53,13 @@ namespace risk.control.system.Services.Agency
                 vendor.DocumentUrl = relativePath;
             }
             vendor.Status = VendorStatus.ACTIVE;
-            vendor.AgreementDate = DateTime.Now;
-            vendor.ActivatedDate = DateTime.Now;
+            vendor.AgreementDate = DateTime.UtcNow;
+            vendor.ActivatedDate = DateTime.UtcNow;
             vendor.DomainName = domainData;
             vendor.BankName = WebUtility.HtmlEncode(vendor.BankName.ToUpper());
             vendor.IFSCCode = WebUtility.HtmlEncode(vendor.IFSCCode.ToUpper());
             vendor.PhoneNumber = WebUtility.HtmlEncode(vendor.PhoneNumber.TrimStart('0'));
-            vendor.Updated = DateTime.Now;
+            vendor.Updated = DateTime.UtcNow;
             vendor.UpdatedBy = userEmail;
             vendor.CreatedUser = userEmail;
             vendor.PinCodeId = vendor.SelectedPincodeId;
@@ -76,8 +76,8 @@ namespace risk.control.system.Services.Agency
 
             var notification = new StatusNotification
             {
-                Role = managerRole,
-                Company = companyUser.ClientCompany,
+                RoleId = managerRole.Id,
+                ClientCompanyId = companyUser.ClientCompanyId,
                 Symbol = "far fa-hand-point-right i-green",
                 Message = $"Agency {vendor.Email}",
                 Status = "Created",
@@ -120,7 +120,7 @@ namespace risk.control.system.Services.Agency
             vendor.PhoneNumber = WebUtility.HtmlEncode(vendor.PhoneNumber.TrimStart('0'));
             var pinCode = await context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).FirstOrDefaultAsync(s => s.PinCodeId == vendor.SelectedPincodeId);
             vendor.IsUpdated = true;
-            vendor.Updated = DateTime.Now;
+            vendor.Updated = DateTime.UtcNow;
             vendor.UpdatedBy = userEmail;
             context.Vendor.Update(vendor);
             var rowsAffected = await context.SaveChangesAsync();

@@ -13,7 +13,6 @@
                             <span>
                                 <i class="fas fa-user-check"></i><b> Billing Info: @Model.ClaimsInvestigation.Vendor.Email</b>.
                             </span>
-
                         </span>
                     </span>
                 </h3>
@@ -25,7 +24,7 @@
                 <div class="row">
                     <div class="col-7">
                         <h2 class="lead"><b>Insurance Type: </b>@Model.ClaimsInvestigation?.PolicyDetail.InsuranceType.GetEnumDisplayName()</h2>
-                       
+
                         <ul class="ml-4 mb-0 fa-ul text-muted">
                             <li class="small">
                                 <span class="fa-li">
@@ -44,9 +43,8 @@
                                 <span class="fa-li">
                                     <i class="fas fa-sun"></i>
                                 </span>
-                                Total Amount (@ViewBag.Currency) : @Model.VendorInvoice.GrandTotal
+                                Total Amount (@Model.Currency) : @Model.VendorInvoice.GrandTotal
                             </li>
-
                         </ul>
                     </div>
                 </div>

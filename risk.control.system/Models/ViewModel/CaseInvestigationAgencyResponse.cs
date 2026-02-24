@@ -26,7 +26,6 @@
         public bool? IsNewAssigned { get; set; }
         public bool? IsQueryCase { get; set; }
         public string OwnerDetail { get; set; }
-        public string? RawStatus { get; set; }
         public string PersonMapAddressUrl { get; set; }
         public string? Distance { get; set; }
         public string? Duration { get; set; }

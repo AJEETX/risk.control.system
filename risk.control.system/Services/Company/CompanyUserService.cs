@@ -12,9 +12,15 @@ namespace risk.control.system.Services.Company
 {
     public interface ICompanyUserService
     {
+        Task<ApplicationUser> GetUserAsync(long id);
+
+        Task<ApplicationUser> GetChangePasswordUserAsync(string userEmail);
+
         Task<ServiceResult> CreateAsync(ApplicationUser model, string emailSuffix, string performedBy, string portal_base_url);
 
         Task<ServiceResult> UpdateAsync(string id, ApplicationUser model, string performedBy, string portal_base_url);
+
+        Task LoadModel(ApplicationUser model, string currentUserEmail);
     }
 
     public sealed class CompanyUserService : ICompanyUserService
@@ -72,7 +78,7 @@ namespace risk.control.system.Services.Company
 
                 model.PhoneNumber = model.PhoneNumber.TrimStart('0');
                 model.IsClientAdmin = model.Role == AppRoles.COMPANY_ADMIN;
-                model.Updated = DateTime.Now;
+                model.Updated = DateTime.UtcNow;
                 model.UpdatedBy = performedBy;
                 model.CountryId = model.SelectedCountryId;
                 model.StateId = model.SelectedStateId;
@@ -125,7 +131,7 @@ namespace risk.control.system.Services.Company
                 user.Role = model.Role;
                 user.IsClientAdmin = user.Role == AppRoles.COMPANY_ADMIN;
 
-                user.Updated = DateTime.Now;
+                user.Updated = DateTime.UtcNow;
                 user.UpdatedBy = performedBy;
                 user.SecurityStamp = Guid.NewGuid().ToString();
 
@@ -147,7 +153,7 @@ namespace risk.control.system.Services.Company
                     }
                     else
                     {
-                        await _userManager.SetLockoutEndDateAsync(user, DateTime.Now);
+                        await _userManager.SetLockoutEndDateAsync(user, DateTime.UtcNow);
                     }
                 }
                 var country = await _context.Country.FindAsync(user.CountryId);
@@ -160,6 +166,19 @@ namespace risk.control.system.Services.Company
                 _logger.LogError(ex, "UpdateAsync failed");
                 return Fail("Unexpected error while updating user.");
             }
+        }
+
+        public async Task LoadModel(ApplicationUser model, string currentUserEmail)
+        {
+            var companyUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == currentUserEmail);
+            var company = await _context.ClientCompany.AsNoTracking().Include(c => c.Country).FirstOrDefaultAsync(v => v.ClientCompanyId == companyUser.ClientCompanyId);
+            model.ClientCompany = company;
+            model.Country = company.Country;
+            model.CountryId = company.CountryId;
+
+            model.StateId = model.SelectedStateId;
+            model.DistrictId = model.SelectedDistrictId;
+            model.PinCodeId = model.SelectedPincodeId;
         }
 
         private static ServiceResult Success(string msg) => new() { Success = true, Message = msg };
@@ -212,6 +231,18 @@ namespace risk.control.system.Services.Company
             var (fileName, relativePath) = await _fileStorage.SaveAsync(file, domain, "user");
             user.ProfilePictureUrl = relativePath;
             user.ProfilePictureExtension = Path.GetExtension(fileName);
+        }
+
+        public async Task<ApplicationUser> GetUserAsync(long id)
+        {
+            var companyUser = await _context.ApplicationUser.AsNoTracking().Include(u => u.ClientCompany).Include(c => c.Country).FirstOrDefaultAsync(u => u.Id == id);
+            return companyUser;
+        }
+
+        public async Task<ApplicationUser> GetChangePasswordUserAsync(string userEmail)
+        {
+            var companyUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(u => u.Email == userEmail);
+            return companyUser;
         }
     }
 }

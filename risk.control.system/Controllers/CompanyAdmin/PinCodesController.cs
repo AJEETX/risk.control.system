@@ -31,7 +31,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
         // GET: PinCodes
         public IActionResult Index()
         {
-            return RedirectToAction("Profile");
+            return RedirectToAction(nameof(Profile));
         }
 
         [Breadcrumb("Pincode")]
@@ -39,6 +39,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
         {
             return View();
         }
+
         [HttpGet]
         public async Task<IActionResult> GetPincodes(int draw, int start, int length, string search, int orderColumn, string orderDirection)
         {
@@ -168,7 +169,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
         }
 
         // GET: PinCodes/Create
-        [Breadcrumb("Add New", FromAction = "Profile")]
+        [Breadcrumb("Add New", FromAction = nameof(Profile))]
         public async Task<IActionResult> Create()
         {
             var userEmail = HttpContext.User.Identity.Name;
@@ -193,7 +194,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             }
             try
             {
-                pinCode.Updated = DateTime.Now;
+                pinCode.Updated = DateTime.UtcNow;
                 pinCode.UpdatedBy = HttpContext.User?.Identity?.Name;
                 pinCode.CountryId = pinCode.SelectedCountryId;
                 pinCode.StateId = pinCode.SelectedStateId;
@@ -212,7 +213,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
         }
 
         // GET: PinCodes/Edit/5
-        [Breadcrumb("Edit  ", FromAction = "Profile")]
+        [Breadcrumb("Edit  ", FromAction = nameof(Profile))]
         public async Task<IActionResult> Edit(long id)
         {
             if (id <= 0)
@@ -246,14 +247,14 @@ namespace risk.control.system.Controllers.CompanyAdmin
                     return RedirectToAction(nameof(Profile));
                 }
                 var existingPincode = await _context.PinCode.FindAsync(id);
-                if(existingPincode == null)
+                if (existingPincode == null)
                 {
                     notifyService.Error("Pincode not found!");
                     return RedirectToAction(nameof(Profile));
                 }
                 existingPincode.Code = pinCode.Code;
                 existingPincode.Name = pinCode.Name;
-                existingPincode.Updated = DateTime.Now;
+                existingPincode.Updated = DateTime.UtcNow;
                 existingPincode.UpdatedBy = HttpContext.User?.Identity?.Name;
                 existingPincode.CountryId = pinCode.SelectedCountryId;
                 existingPincode.StateId = pinCode.SelectedStateId;
@@ -293,7 +294,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 {
                     return Json(new { success = true, message = "Pincode not found!" });
                 }
-                pinCode.Updated = DateTime.Now;
+                pinCode.Updated = DateTime.UtcNow;
                 pinCode.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.PinCode.Remove(pinCode);
                 await _context.SaveChangesAsync();

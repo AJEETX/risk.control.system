@@ -3,64 +3,9 @@
     var vendorId = $('#vendorId').val();
     var table = $("#dataTable").DataTable({
         ajax: {
-            url: '/api/Company/GetEmpanelledAgency?caseId=' + claimId,
+            url: '/api/Company/GetEmpanelledAgency/' + claimId,
             dataSrc: '',
-            error: function (xhr, status, error) {
-                console.error("AJAX Error:", status, error);
-                console.error("Response:", xhr.responseText);
-                if (xhr.status === 401 || xhr.status === 403) {
-                    $.confirm({
-                        title: 'Session Expired!',
-                        content: 'Your session has expired or you are unauthorized. You will be redirected to the login page.',
-                        type: 'red',
-                        typeAnimated: true,
-                        buttons: {
-                            Ok: {
-                                text: 'Login',
-                                btnClass: 'btn-red',
-                                action: function () {
-                                    window.location.href = '/Account/Login';
-                                }
-                            }
-                        },
-                        onClose: function () {
-                            window.location.href = '/Account/Login';
-                        }
-                    });
-                }
-                else if (xhr.status === 500) {
-                    $.confirm({
-                        title: 'Server Error!',
-                        content: 'An unexpected server error occurred. You will be redirected to the Main page.',
-                        type: 'orange',
-                        typeAnimated: true,
-                        buttons: {
-                            Ok: function () {
-                                window.location.href = '/Investigation/EmpanelledVendors?id' + claimId;
-                            }
-                        },
-                        onClose: function () {
-                            window.location.href = '/Investigation/EmpanelledVendors?id' + claimId;
-                        }
-                    });
-                }
-                else if (xhr.status === 400) {
-                    $.confirm({
-                        title: 'Bad Request!',
-                        content: 'Try with valid data.You will be redirected to the Main page',
-                        type: 'orange',
-                        typeAnimated: true,
-                        buttons: {
-                            Ok: function () {
-                                window.location.href = '/Investigation/EmpanelledVendors?id' + claimId;
-                            }
-                        },
-                        onClose: function () {
-                            window.location.href = '/Investigation/EmpanelledVendors?id' + claimId;
-                        }
-                    });
-                }
-            }
+            error: DataTableErrorHandler
         },
         columnDefs: [
             {
@@ -175,21 +120,31 @@
                 }
             },
             {
-                "data": "caseCount",
+                "data": "hasService",
                 "mRender": function (data, type, row) {
                     let statusText = row.hasService
                         ? '<span class="text-success fw-bold small"> <i class="fas fa-check-circle i-green"></i></span>'
                         : '<span class="i-red fw-bold small"> <i class="fa fa-times i-grey"></i></span>';
 
                     let tooltipText = row.hasService
-                        ? 'SERVICE AVAILABLE.\n\n  Total number of current cases = ' + row.caseCount
-                        : ' NO SERVICE AVAILABLE.\n\n Total number of current cases = ' + row.caseCount;
+                        ? 'SERVICE AVAILABLE.\n\n '
+                        : ' NO SERVICE AVAILABLE.\n\n';
                     return `
-            <span data-bs-toggle="tooltip" title="${tooltipText}">
-                ${statusText}
-                <span>(${data})</span>
-            </span>
-        `;
+                        <span data-bs-toggle="tooltip" title="${tooltipText}">
+                            ${statusText}
+                        </span>
+                    `;
+                }
+            },
+            {
+                "data": "caseCount",
+                "mRender": function (data, type, row) {
+                    let tooltipText = 'Total number of current cases = ' + row.caseCount;
+                    return `
+                        <span data-bs-toggle="tooltip" title="${tooltipText}">
+                            <span>(${data})</span>
+                        </span>
+                    `;
                 }
             },
             {
@@ -213,11 +168,11 @@
         "drawCallback": function (settings, start, end, max, total, pre) {
             // Preselect the radio button matching vendorId
             var selectedVendorId = $('#vendorId').val();
-            if (selectedVendorId) {
+            if (selectedVendorId > 0) {
                 $("input[type='radio'][name='selectedcase'][value='" + selectedVendorId + "']").prop('checked', true);
                 $('#allocatedcase').prop("disabled", false);
             }
-            
+
             // Reinitialize Bootstrap 5 tooltips
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
             tooltipTriggerList.map(function (el) {
@@ -229,7 +184,7 @@
         }
     });
 
-    $('body').on('click', 'a.btn-info', function (e) {
+    $('body').on('click', 'a.btn.btn-xs.btn-info', function (e) {
         e.preventDefault();
         const id = $(this).data('id');
         showagencydetail(id, this);
@@ -241,7 +196,7 @@
 
         showSpinnerOnButton(element, "Agency Info");
 
-        const url = `/Investigation/VendorDetail?Id=${encodeURIComponent(id)}&selectedcase=${claimId}`;
+        const url = `/Creator/VendorDetail/${encodeURIComponent(id)}?selectedcase=${claimId}`;
 
         setTimeout(() => {
             window.location.href = url;
@@ -367,27 +322,9 @@
             $rowResult.attr("title", data);
         });
     });
-    if ($("input[type='radio'].selected-case:checked").length) {
-        $("#allocatedcase").prop('disabled', false);
-    } else {
-        $("#allocatedcase").prop('disabled', true);
-    }
-    // When user checks a radio button, Enable submit button   
-    $("input[type='radio'].selected-case").change(function (e) {
-        if ($(this).is(":checked")) {
-            $("#allocatedcase").prop('disabled', false);
-        } else {
-            $("#allocatedcase").prop('disabled', true);
-        }
-    });
-    // Handle click on checkbox to set state of "Select all" control   
-    $('#dataTable tbody').on('change', 'input[type="radio"]', function () {
-        // If checkbox is not checked       
-        if (this.checked) {
-            $("#allocatedcase").prop('disabled', false);
-        } else {
-            $("#allocatedcase").prop('disabled', true);
-        }
+
+    $('#dataTable').on('change', 'input[name="selectedcase"]', function () {
+        $('#allocatedcase').prop('disabled', false);
     });
     $("#dataTable > tbody  > tr").each(function () {
         var av = $(this).find("span.avr").text();
@@ -455,7 +392,7 @@
             if ($container.children().length === 0) {
                 $container.html("<div class='text-center p-3'><i class='fas fa-sync fa-spin fa-2x'></i></div>");
 
-                $.get("/Investigation/GetReportTemplate", { caseId: caseId })
+                $.get("/Creator/GetReportTemplate", { caseId: caseId })
                     .done(function (html) {
                         const safe = DOMPurify.sanitize(html, { RETURN_TRUSTED_TYPE: false });
                         $container.html(safe);
@@ -475,24 +412,6 @@ function giveRating(img, image) {
     img.attr("src", "/img/FilledStar.jpeg").prevAll("img.rating").attr("src", "/img/FilledStar.jpeg");
 }
 
-function getdetails(id) {
-    $("body").addClass("submit-progress-bg");
-    // Wrap in setTimeout so the UI
-    // can update the spinners
-    setTimeout(function () {
-        $(".submit-progress").removeClass("hidden");
-    }, 1);
-
-    $('a#details' + id + '.btn.btn-xs.btn-info').html("<i class='fas fa-sync fa-spin'></i> Agency Info");
-    disableAllInteractiveElements()
-    var article = document.getElementById("article");
-    if (article) {
-        var nodes = article.getElementsByTagName('*');
-        for (var i = 0; i < nodes.length; i++) {
-            nodes[i].disabled = true;
-        }
-    }
-}
 if (window.location.search.includes("vendorId")) {
     const url = new URL(window.location);
     url.searchParams.delete("vendorId");

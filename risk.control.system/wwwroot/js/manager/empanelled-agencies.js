@@ -3,56 +3,21 @@
         ajax: {
             url: '/api/Company/GetEmpanelledVendors',
             dataSrc: '',
-            error: function (xhr, status, error) {
-                console.error("AJAX Error:", status, error);
-                console.error("Response:", xhr.responseText);
-                if (xhr.status === 401 || xhr.status === 403) {
-                    $.confirm({
-                        title: 'Session Expired!',
-                        content: 'Your session has expired or you are unauthorized. You will be redirected to the login page.',
-                        type: 'red',
-                        typeAnimated: true,
-                        buttons: {
-                            Ok: {
-                                text: 'Login',
-                                btnClass: 'btn-red',
-                                action: function () {
-                                    window.location.href = '/Account/Login';
-                                }
-                            }
-                        },
-                        onClose: function () {
-                            window.location.href = '/Account/Login';
-                        }
-                    });
-                }
-            }
+            error: DataTableErrorHandler
         },
-        columnDefs: [{
-            'targets': 0,
-            'searchable': false,
-            'orderable': false,
-            'className': 'dt-body-center',
-            'render': function (data, type, full, meta) {
-                return '<input type="checkbox" name="id[]" value="' + $('<div/>').text(data).html() + '">';
-            }
-        },
-        {
-            className: 'max-width-column-name', // Apply the CSS class,
-            targets: 2                      // Index of the column to style
-        },
-        //{
-        //    className: 'max-width-column-name', // Apply the CSS class,
-        //    targets: 3                      // Index of the column to style
-        //},
-        {
-            className: 'max-width-column', // Apply the CSS class,
-            targets: 4                      // Index of the column to style
-        },
-        {
-            className: 'max-width-column-name', // Apply the CSS class,
-            targets: 9                      // Index of the column to style
-        }],
+        columnDefs: [
+            {
+                className: 'max-width-column-name', // Apply the CSS class,
+                targets: 2                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column', // Apply the CSS class,
+                targets: 4                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column-name', // Apply the CSS class,
+                targets: 9                      // Index of the column to style
+            }],
         order: [[11, 'desc'], [12, 'desc']], // Sort by `isUpdated` and `lastModified`,
         fixedHeader: true,
         processing: true,
@@ -62,8 +27,6 @@
             processing: '<i class="fas fa-sync fa-spin fa-4x fa-fw"></i><span class="sr-only">Loading...</span>'
         },
         columns: [
-            /* Name of the keys from
-            data file source */
             {
                 "sDefaultContent": "",
                 "bSortable": false,
@@ -88,32 +51,21 @@
                     for (var i = 1; i <= 5; i++) {
                         img += '<img id="' + i + '" src="/img/StarFade.gif" class="rating" vendorId="' + row.id + '"/>';
                     }
-
-                    // Add the rate count badge
                     img +=
                         ' <span class="badge badge-light" ' +
                         'data-bs-toggle="tooltip" data-bs-html="true" ' +
                         'title="(Total users rated)<sup>star ratings</sup>"> (' + row.rateCount + ')</span>';
 
-                    // Calculate and display the average rating if available
                     if (row.rateCount && row.rateCount > 0) {
                         var averageRating = row.rateTotal / row.rateCount;
                         img += '<span class="avr"><sup>' + averageRating + '</sup></span>';
                     }
                     img += '</span>';
-                    // Add the result span
                     img += '<br /> <span class="result"></span>';
 
-                    // Return the domain with the appended rating images and information
-                    return '<span title="' + row.name + '" data-bs-toggle="tooltip"><a id="edit' + row.id + '" href="/EmpanelledAgency/Detail?Id=' + row.id + '"> ' + data + '</a></span>' + '<br /> ' + img;
+                    return '<span title="' + row.name + '" data-bs-toggle="tooltip" class="blue">' + data + '</span>' + '<br /> ' + img;
                 }
             },
-            //{
-            //    "data": "name",
-            //    "mRender": function (data, type, row) {
-            //        return '<span title="' + row.name + '" data-bs-toggle="tooltip">' + data + '</span>'
-            //    }
-            //},
             {
                 "data": "phone",
                 "mRender": function (data, type, row) {
@@ -170,6 +122,18 @@
             {
                 "data": "lastModified",
                 bVisible: false
+            },
+            {
+                "name": "actions",
+                "data": null,            // Add this: tells DT there is no field in the JSON for this
+                "defaultContent": "",    // Add this: prevents the 'Requested unknown parameter' error
+                "bSortable": false,
+                "mRender": function (data, type, row) {
+                    var buttons = "";
+                    buttons += `<a data-id="${row.id}" class="btn btn-xs btn-warning" data-bs-toggle="tooltip" title="Edit"><i class="fas fa-edit"></i> Edit</a>`;
+
+                    return buttons;
+                }
             }
         ],
         "drawCallback": function (settings, start, end, max, total, pre) {
@@ -187,7 +151,27 @@
             });
         }
     });
+    $('body').on('click', 'a.btn-warning', function (e) {
+        e.preventDefault();
+        const id = $(this).data('id');
+        showedit(id, this);
+    });
+    function showedit(id, element) {
+        id = String(id).replace(/[^a-zA-Z0-9_-]/g, "");
+        $("body").addClass("submit-progress-bg");
+        setTimeout(() => $(".submit-progress").removeClass("hidden"), 1);
 
+        showSpinnerOnButton(element, "Edit");
+
+        const url = `/EmpanelledAgency/Detail/${encodeURIComponent(id)}`;
+
+        setTimeout(() => {
+            window.location.href = url;
+        }, 1000);
+    }
+    function showSpinnerOnButton(selector, spinnerText) {
+        $(selector).html(`<i class='fas fa-sync fa-spin'></i> ${spinnerText}`);
+    }
     table.on('draw', function () {
         table.rows().every(function () {
             var data = this.data(); // Get row data

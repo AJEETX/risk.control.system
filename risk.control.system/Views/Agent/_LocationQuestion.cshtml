@@ -103,7 +103,7 @@
 									else if (question.QuestionType == "date")
 									{
 										<div class="position-relative">
-											<input max="@DateTime.Now.ToString("yyyy-MM-dd")" type="date" name="Questions[@i].AnswerText"
+											<input max="@DateTime.UtcNow.ToString("yyyy-MM-dd")" type="date" name="Questions[@i].AnswerText"
 												   value="@question.AnswerText" class="form-control date-input pe-5" @required placeholder="@question.QuestionText" />
 											<button type="button" class="btn btn-sm btn-clear-date" title="Clear date">
 												&times;

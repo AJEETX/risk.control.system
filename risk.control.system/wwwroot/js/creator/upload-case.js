@@ -53,62 +53,7 @@
 
                 return json.data;
             },
-            error: function (xhr, status, error) {
-                console.error("AJAX Error:", status, error);
-                console.error("Response:", xhr.responseText);
-                if (xhr.status === 401 || xhr.status === 403) {
-                    $.confirm({
-                        title: 'Session Expired!',
-                        content: 'Your session has expired or you are unauthorized. You will be redirected to the login page.',
-                        type: 'red',
-                        typeAnimated: true,
-                        buttons: {
-                            Ok: {
-                                text: 'Login',
-                                btnClass: 'btn-red',
-                                action: function () {
-                                    window.location.href = '/Account/Login';
-                                }
-                            }
-                        },
-                        onClose: function () {
-                            window.location.href = '/Account/Login';
-                        }
-                    });
-                }
-                else if (xhr.status === 500) {
-                    $.confirm({
-                        title: 'Server Error!',
-                        content: 'An unexpected server error occurred. You will be redirected to the Upload page.',
-                        type: 'orange',
-                        typeAnimated: true,
-                        buttons: {
-                            Ok: function () {
-                                window.location.href = '/CaseUpload/Uploads';
-                            }
-                        },
-                        onClose: function () {
-                            window.location.href = '/CaseUpload/Uploads';
-                        }
-                    });
-                }
-                else if (xhr.status === 400) {
-                    $.confirm({
-                        title: 'Bad Request!',
-                        content: 'Try with valid data.You will be redirected to the Upload  page',
-                        type: 'orange',
-                        typeAnimated: true,
-                        buttons: {
-                            Ok: function () {
-                                window.location.href = '/CaseUpload/Uploads';
-                            }
-                        },
-                        onClose: function () {
-                            window.location.href = '/CaseUpload/Uploads';
-                        }
-                    });
-                }
-            }
+            error: DataTableErrorHandler
         },
         responsive: true,
         fixedHeader: true,
@@ -312,26 +257,45 @@
                 url: `/api/Investigation/GetFileById/${uploadId}`, // Call the API to check status
                 type: 'GET',
                 success: function (updatedRowData) {
-                    var icon = updatedRowData.data.result.directAssign ? 'fas fa-random' : 'fas fa-upload';  // Dynamic icon based on checkbox
-                    var popType = updatedRowData.data.result.directAssign ? 'red' : 'blue';  // Dynamic color type ('blue' for Upload & Assign, 'green' for just Upload)
-                    var title = updatedRowData.data.result.directAssign ? "Assign" : "Upload";
-                    var btnClass = updatedRowData.data.result.directAssign ? 'btn-danger' : 'btn-info';
-                    if (updatedRowData.data.result.status === 'Error' || updatedRowData.data.result.status === "Completed") {
-                        console.log("Status is Completed, stopping polling and updating row.");
-                        clearInterval(pollingTimer); // Stop polling
-                        updateProcessingRow(uploadId, updatedRowData.data.result); // Update the row with completed data
+                    if (updatedRowData.data && updatedRowData.data.result) {
+                        var icon = updatedRowData.data.result.directAssign ? 'fas fa-random' : 'fas fa-upload';  // Dynamic icon based on checkbox
+                        var popType = updatedRowData.data.result.directAssign ? 'red' : 'blue';  // Dynamic color type ('blue' for Upload & Assign, 'green' for just Upload)
+                        var title = updatedRowData.data.result.directAssign ? "Assign" : "Upload";
+                        var btnClass = updatedRowData.data.result.directAssign ? 'btn-danger' : 'btn-info';
+                        if (updatedRowData.data.result.status === 'Error' || updatedRowData.data.result.status === "Completed") {
+                            console.log("Status is Completed, stopping polling and updating row.");
+                            clearInterval(pollingTimer); // Stop polling
+                            updateProcessingRow(uploadId, updatedRowData.data.result); // Update the row with completed data
+                        }
+                        // If status is Processing, keep polling
+                        else if (updatedRowData.data.result.status === "Processing") {
+                            console.log("Status is still Processing, continuing to poll...");
+                        }
                     }
-                    // If status is Processing, keep polling
-                    else if (updatedRowData.data.result.status === "Processing") {
-                        console.log("Status is still Processing, continuing to poll...");
-                    }
+                    else {
+                        console.error('Server Error fetching file data:');
 
-                    //// If status is Completed, stop polling and update the row
-                    //else if (updatedRowData.data.result.status === "Completed") {
-                    //    console.log("Status is Completed, stopping polling and updating row.");
-                    //    clearInterval(pollingTimer); // Stop polling
-                    //    updateProcessingRow(uploadId, updatedRowData.data.result); // Update the row with completed data
-                    //}
+                        // Stop polling to avoid repeated errors
+                        clearInterval(pollingTimer);
+
+                        // Show jConfirm alert
+                        $.confirm({
+                            title: 'Error!',
+                            content: 'Failed to fetch file data from server. The page will refresh.',
+                            type: 'red',
+                            icon: 'fas fa-exclamation-triangle',
+                            buttons: {
+                                ok: {
+                                    text: 'OK',
+                                    btnClass: 'btn-red',
+                                    action: function () {
+                                        // Refresh the page after user clicks OK
+                                        location.reload();
+                                    }
+                                }
+                            }
+                        });
+                    }
                 },
                 error: function (err) {
                     console.error('Error fetching file data:', err);

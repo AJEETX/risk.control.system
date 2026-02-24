@@ -53,18 +53,18 @@ $(document).ready(function () {
         switch (actionType) {
             case 'details':
                 showLoadingState(this, 'Detail');
-                targetUrl = `/AvailableAgencyService/Details?id=${id}`; // Redirect to details page
+                targetUrl = `/AvailableAgencyService/Details/${id}`; // Redirect to details page
                 break;
 
             case 'edit':
                 showLoadingState(this, 'Edit');
-                targetUrl = `/AvailableAgencyService/Edit?id=${id}`; // Redirect to edit page
+                targetUrl = `/AvailableAgencyService/Edit/=${id}`; // Redirect to edit page
                 break;
 
             case 'delete':
                 showLoadingState(this, 'Delete');
                 // Perform your delete logic here, then redirect if necessary
-                targetUrl = `/AvailableAgencyService/Delete?id=${id}`; // For deleting, you may want to confirm before navigating
+                targetUrl = `/AvailableAgencyService/Delete/${id}`; // For deleting, you may want to confirm before navigating
                 break;
 
             default:
@@ -80,32 +80,9 @@ $(document).ready(function () {
     // Initialize DataTable
     const table = $("#dataTable").DataTable({
         ajax: {
-            url: `/api/Company/AllServices?id=${$('#Id').val()}`,
+            url: `/api/Company/AllServices/${$('#Id').val()}`,
             dataSrc: '',
-            error: function (xhr, status, error) {
-                console.error("AJAX Error:", status, error);
-                console.error("Response:", xhr.responseText);
-                if (xhr.status === 401 || xhr.status === 403) {
-                    $.confirm({
-                        title: 'Session Expired!',
-                        content: 'Your session has expired or you are unauthorized. You will be redirected to the login page.',
-                        type: 'red',
-                        typeAnimated: true,
-                        buttons: {
-                            Ok: {
-                                text: 'Login',
-                                btnClass: 'btn-red',
-                                action: function () {
-                                    window.location.href = '/Account/Login';
-                                }
-                            }
-                        },
-                        onClose: function () {
-                            window.location.href = '/Account/Login';
-                        }
-                    });
-                }
-            }
+            error: DataTableErrorHandler
         },
         order: [[10, 'desc'], [11, 'desc']],
         columnDefs: [

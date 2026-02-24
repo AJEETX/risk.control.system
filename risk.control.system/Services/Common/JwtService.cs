@@ -49,7 +49,7 @@ namespace risk.control.system.Services.Common
                 var user = await context.ApplicationUser.FirstOrDefaultAsync(a => a.Email == userEmail && a.Role == appRole);
                 var userSessionAlive = new UserSessionAlive
                 {
-                    Updated = DateTime.Now,
+                    Updated = DateTime.UtcNow,
                     ActiveUser = user,
                     CurrentPage = httpContext.Request.Path.Value
                 };

@@ -38,7 +38,7 @@ namespace risk.control.system.Helpers
             return new JwtSecurityToken(
                 issuer: issuer,
                 audience: audience,
-                expires: DateTime.Now.Add(expiration),
+                expires: DateTime.UtcNow.Add(expiration),
                 claims: claims,
                 signingCredentials: creds
             );

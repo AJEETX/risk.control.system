@@ -22,13 +22,13 @@ namespace risk.control.system.Services
     public class AssessorService : IAssessorService
     {
         private readonly ApplicationDbContext context;
-        private readonly IWebHostEnvironment env;
+        private readonly IDbContextFactory<ApplicationDbContext> contextFactory;
         private readonly IBase64FileService base64FileService;
 
-        public AssessorService(ApplicationDbContext context, IWebHostEnvironment env, IBase64FileService base64FileService)
+        public AssessorService(ApplicationDbContext context, IDbContextFactory<ApplicationDbContext> contextFactory, IBase64FileService base64FileService)
         {
             this.context = context;
-            this.env = env;
+            this.contextFactory = contextFactory;
             this.base64FileService = base64FileService;
         }
 
@@ -148,7 +148,7 @@ namespace risk.control.system.Services
                 var beneficiaryTask = base64FileService.GetBase64FileAsync(a.beneficiaryImagePath, Applicationsettings.NO_USER);
                 var ownerDetailTask = base64FileService.GetBase64FileAsync(a.VendorDocumentUrl, Applicationsettings.NO_USER);
 
-                await Task.WhenAll(documentTask, customerTask, beneficiaryTask);
+                await Task.WhenAll(documentTask, customerTask, beneficiaryTask, ownerDetailTask);
                 return new CaseInvestigationResponse
                 {
                     Id = a.Id,
@@ -182,8 +182,8 @@ namespace risk.control.system.Services
                     Distance = a.SelectedAgentDrivingDistance,
                     Duration = a.SelectedAgentDrivingDuration,
                     IsNewSubmittedToCompany = a.IsNewSubmittedToCompany,
-                    TimeElapsed = DateTime.Now.Subtract(a.ProcessedByAssessorTime ?? DateTime.Now).TotalSeconds,
-                    CanDownload = CanDownload(a.Id, userEmail)
+                    TimeElapsed = DateTime.UtcNow.Subtract(a.ProcessedByAssessorTime ?? DateTime.UtcNow).TotalSeconds,
+                    CanDownload = await CanDownload(a.Id, userEmail)
                 };
             });
 
@@ -209,33 +209,33 @@ namespace risk.control.system.Services
         {
             DateTime time2Compare = SubmittedToAssessorTime;
             time2Compare = SubmittedToAssessorTime;
-            if (DateTime.Now.Subtract(time2Compare).Days >= AssessorSla)
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(time2Compare).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Hurry up, {DateTime.Now.Subtract(time2Compare).Days} days since created!\"></i>");
-            else if (DateTime.Now.Subtract(time2Compare).Days >= 3 || DateTime.Now.Subtract(time2Compare).Days >= AssessorSla)
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(time2Compare).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Caution : {DateTime.Now.Subtract(time2Compare).Days} day since created.\"></i>");
+            if (DateTime.UtcNow.Subtract(time2Compare).Days >= AssessorSla)
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(time2Compare).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Hurry up, {DateTime.UtcNow.Subtract(time2Compare).Days} days since created!\"></i>");
+            else if (DateTime.UtcNow.Subtract(time2Compare).Days >= 3 || DateTime.UtcNow.Subtract(time2Compare).Days >= AssessorSla)
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(time2Compare).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Caution : {DateTime.UtcNow.Subtract(time2Compare).Days} day since created.\"></i>");
 
-            if (DateTime.Now.Subtract(time2Compare).Days >= 1)
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(time2Compare).Days} day</span>");
+            if (DateTime.UtcNow.Subtract(time2Compare).Days >= 1)
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(time2Compare).Days} day</span>");
 
-            if (DateTime.Now.Subtract(time2Compare).Hours < 24 &&
-                DateTime.Now.Subtract(time2Compare).Hours > 0)
+            if (DateTime.UtcNow.Subtract(time2Compare).Hours < 24 &&
+                DateTime.UtcNow.Subtract(time2Compare).Hours > 0)
             {
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(time2Compare).Hours} hr </span>");
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(time2Compare).Hours} hr </span>");
             }
-            if (DateTime.Now.Subtract(time2Compare).Hours == 0 && DateTime.Now.Subtract(time2Compare).Minutes > 0)
+            if (DateTime.UtcNow.Subtract(time2Compare).Hours == 0 && DateTime.UtcNow.Subtract(time2Compare).Minutes > 0)
             {
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(time2Compare).Minutes} min </span>");
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(time2Compare).Minutes} min </span>");
             }
-            if (DateTime.Now.Subtract(time2Compare).Minutes == 0 && DateTime.Now.Subtract(time2Compare).Seconds > 0)
+            if (DateTime.UtcNow.Subtract(time2Compare).Minutes == 0 && DateTime.UtcNow.Subtract(time2Compare).Seconds > 0)
             {
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(time2Compare).Seconds} sec </span>");
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(time2Compare).Seconds} sec </span>");
             }
             return string.Join("", "<span class='badge badge-light'>now</span>");
         }
 
         public async Task<object> GetReviews(string userEmail, int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc")
         {
-            var companyUser = await context.ApplicationUser
+            var companyUser = await context.ApplicationUser.AsNoTracking()
                  .Include(c => c.Country)
                  .FirstOrDefaultAsync(c => c.Email == userEmail);
 
@@ -337,6 +337,8 @@ namespace risk.control.system.Services
                     var beneficiaryTask = base64FileService.GetBase64FileAsync(a.beneficiaryImagePath, Applicationsettings.NO_USER);
                     var ownerDetailTask = base64FileService.GetBase64FileAsync(a.VendorDocumentUrl, Applicationsettings.NO_USER);
 
+                    await Task.WhenAll(documentTask, customerTask, beneficiaryTask, ownerDetailTask);
+
                     return new CaseInvestigationResponse
                     {
                         Id = a.Id,
@@ -366,7 +368,7 @@ namespace risk.control.system.Services
                         PolicyNum = a.PolicyNum,
                         BeneficiaryPhoto = await beneficiaryTask,
                         BeneficiaryName = a.BeneficiaryName,
-                        TimeElapsed = DateTime.Now.Subtract(a.investigation.EnquiredByAssessorTime ?? DateTime.Now).TotalSeconds,
+                        TimeElapsed = DateTime.UtcNow.Subtract(a.investigation.EnquiredByAssessorTime ?? DateTime.UtcNow).TotalSeconds,
                         PersonMapAddressUrl = string.Format(a.SelectedAgentDrivingMap, "300", "300"),
                         Distance = a.SelectedAgentDrivingDistance,
                         Duration = a.SelectedAgentDrivingDuration
@@ -387,25 +389,25 @@ namespace risk.control.system.Services
         public static string GetAssessorReviewTime(DateTime EnquiredByAssessorTime, int AssessorSla)
         {
             DateTime time2Compare = EnquiredByAssessorTime;
-            if (DateTime.Now.Subtract(time2Compare).Days >= AssessorSla)
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(time2Compare).Days} day</span>");
-            else if (DateTime.Now.Subtract(time2Compare).Days >= 3 || DateTime.Now.Subtract(time2Compare).Days >= AssessorSla)
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(time2Compare).Days} day</span>");
-            if (DateTime.Now.Subtract(time2Compare).Days >= 1)
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(time2Compare).Days} day</span>");
+            if (DateTime.UtcNow.Subtract(time2Compare).Days >= AssessorSla)
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(time2Compare).Days} day</span>");
+            else if (DateTime.UtcNow.Subtract(time2Compare).Days >= 3 || DateTime.UtcNow.Subtract(time2Compare).Days >= AssessorSla)
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(time2Compare).Days} day</span>");
+            if (DateTime.UtcNow.Subtract(time2Compare).Days >= 1)
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(time2Compare).Days} day</span>");
 
-            if (DateTime.Now.Subtract(time2Compare).Hours < 24 &&
-                DateTime.Now.Subtract(time2Compare).Hours > 0)
+            if (DateTime.UtcNow.Subtract(time2Compare).Hours < 24 &&
+                DateTime.UtcNow.Subtract(time2Compare).Hours > 0)
             {
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(time2Compare).Hours} hr </span>");
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(time2Compare).Hours} hr </span>");
             }
-            if (DateTime.Now.Subtract(time2Compare).Hours == 0 && DateTime.Now.Subtract(time2Compare).Minutes > 0)
+            if (DateTime.UtcNow.Subtract(time2Compare).Hours == 0 && DateTime.UtcNow.Subtract(time2Compare).Minutes > 0)
             {
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(time2Compare).Minutes} min </span>");
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(time2Compare).Minutes} min </span>");
             }
-            if (DateTime.Now.Subtract(time2Compare).Minutes == 0 && DateTime.Now.Subtract(time2Compare).Seconds > 0)
+            if (DateTime.UtcNow.Subtract(time2Compare).Minutes == 0 && DateTime.UtcNow.Subtract(time2Compare).Seconds > 0)
             {
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(time2Compare).Seconds} sec </span>");
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(time2Compare).Seconds} sec </span>");
             }
             return string.Join("", "<span class='badge badge-light'>now</span>");
         }
@@ -521,7 +523,7 @@ namespace risk.control.system.Services
                 var beneficiaryTask = base64FileService.GetBase64FileAsync(a.beneficiaryImagePath, Applicationsettings.NO_USER);
                 var ownerDetailTask = base64FileService.GetBase64FileAsync(a.VendorDocumentUrl, Applicationsettings.NO_USER);
 
-                await Task.WhenAll(documentTask, customerTask, beneficiaryTask);
+                await Task.WhenAll(documentTask, customerTask, beneficiaryTask, ownerDetailTask);
                 return new CaseInvestigationResponse
                 {
                     Id = a.Id,
@@ -555,8 +557,8 @@ namespace risk.control.system.Services
                     Distance = a.SelectedAgentDrivingDistance,
                     Duration = a.SelectedAgentDrivingDuration,
 
-                    TimeElapsed = DateTime.Now.Subtract(a.ProcessedByAssessorTime ?? DateTime.Now).TotalSeconds,
-                    CanDownload = CanDownload(a.Id, userEmail)
+                    TimeElapsed = DateTime.UtcNow.Subtract(a.ProcessedByAssessorTime ?? DateTime.UtcNow).TotalSeconds,
+                    CanDownload = await CanDownload(a.Id, userEmail)
                 };
             });
             var finalData = (await Task.WhenAll(finalDataTasks));
@@ -574,29 +576,30 @@ namespace risk.control.system.Services
         {
             DateTime time2Compare = ProcessedByAssessorTime;
 
-            if (DateTime.Now.Subtract(time2Compare).Days >= 1)
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(time2Compare).Days} day</span>");
+            if (DateTime.UtcNow.Subtract(time2Compare).Days >= 1)
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(time2Compare).Days} day</span>");
 
-            if (DateTime.Now.Subtract(time2Compare).Hours < 24 &&
-                DateTime.Now.Subtract(time2Compare).Hours > 0)
+            if (DateTime.UtcNow.Subtract(time2Compare).Hours < 24 &&
+                DateTime.UtcNow.Subtract(time2Compare).Hours > 0)
             {
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(time2Compare).Hours} hr </span>");
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(time2Compare).Hours} hr </span>");
             }
-            if (DateTime.Now.Subtract(time2Compare).Hours == 0 && DateTime.Now.Subtract(time2Compare).Minutes > 0)
+            if (DateTime.UtcNow.Subtract(time2Compare).Hours == 0 && DateTime.UtcNow.Subtract(time2Compare).Minutes > 0)
             {
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(time2Compare).Minutes} min </span>");
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(time2Compare).Minutes} min </span>");
             }
-            if (DateTime.Now.Subtract(time2Compare).Minutes == 0 && DateTime.Now.Subtract(time2Compare).Seconds > 0)
+            if (DateTime.UtcNow.Subtract(time2Compare).Minutes == 0 && DateTime.UtcNow.Subtract(time2Compare).Seconds > 0)
             {
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(time2Compare).Seconds} sec </span>");
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(time2Compare).Seconds} sec </span>");
             }
             return string.Join("", "<span class='badge badge-light'>now</span>");
         }
 
-        private bool CanDownload(long id, string userEmail)
+        private async Task<bool> CanDownload(long id, string userEmail)
         {
-            var tracker = context.PdfDownloadTracker
-                          .FirstOrDefault(t => t.ReportId == id && t.UserEmail == userEmail);
+            await using var _context = contextFactory.CreateDbContext();
+            var tracker = await _context.PdfDownloadTracker
+                          .FirstOrDefaultAsync(t => t.ReportId == id && t.UserEmail == userEmail);
             bool canDownload = true;
             if (tracker != null && tracker.DownloadCount > 3)
             {

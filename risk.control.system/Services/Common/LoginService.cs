@@ -13,17 +13,23 @@ namespace risk.control.system.Services.Common
     public interface ILoginService
     {
         Task<(bool IsAuthorized, string DisplayName, bool IsAdmin)> GetUserStatusAsync(ApplicationUser user, string agentLogin = "");
+
         Task<IEnumerable<SelectListItem>> GetUserSelectListAsync();
+
         Task SignInWithTimeoutAsync(ApplicationUser user); // Moved here
+
         string GetErrorMessage(SignInResult result);
+
         Task<bool> SendOtpAsync(OtpRequest request);
+
         Task<(bool Success, string Message)> ResendOtpAsync(OtpRequest request);
+
         Task<(bool Success, string Message)> VerifyAndLoginAsync(OtpLoginModel request);
     }
 
     internal class LoginService : ILoginService
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IDbContextFactory<ApplicationDbContext> contextFactory;
         private readonly IMemoryCache cache;
         private readonly ISmsService smsService;
         private readonly IFeatureManager _featureManager;
@@ -32,7 +38,7 @@ namespace risk.control.system.Services.Common
         private readonly SignInManager<ApplicationUser> signInManager;
 
         public LoginService(
-            ApplicationDbContext context,
+            IDbContextFactory<ApplicationDbContext> contextFactory,
             IMemoryCache cache,
             ISmsService smsService,
             IFeatureManager featureManager,
@@ -40,7 +46,7 @@ namespace risk.control.system.Services.Common
             IConfiguration config,
             SignInManager<ApplicationUser> signInManager)
         {
-            _context = context;
+            this.contextFactory = contextFactory;
             this.cache = cache;
             this.smsService = smsService;
             _featureManager = featureManager;
@@ -49,14 +55,16 @@ namespace risk.control.system.Services.Common
             this.signInManager = signInManager;
         }
 
-        public async Task<(bool IsAuthorized, string DisplayName, bool IsAdmin)> GetUserStatusAsync(ApplicationUser user, string agentLogin ="")
+        public async Task<(bool IsAuthorized, string DisplayName, bool IsAdmin)> GetUserStatusAsync(ApplicationUser user, string agentLogin = "")
         {
             // 1. Admin Logic
             if (await _userManager.IsInRoleAsync(user, PORTAL_ADMIN.DISPLAY_NAME))
             {
                 return (true, "Admin", true); // IsAdmin = true
             }
+
             // 2. Company User Logic
+            await using var _context = contextFactory.CreateDbContext();
             var companyUser = await _context.ApplicationUser
                 .FirstOrDefaultAsync(u => u.Email == user.Email && !u.Deleted && u.ClientCompanyId > 0);
 
@@ -94,6 +102,7 @@ namespace risk.control.system.Services.Common
 
         public async Task<IEnumerable<SelectListItem>> GetUserSelectListAsync()
         {
+            await using var _context = contextFactory.CreateDbContext();
             var users = await _context.Users
                 .Where(u => !u.Deleted)
                 .OrderBy(o => o.Email)
@@ -101,6 +110,7 @@ namespace risk.control.system.Services.Common
                 .ToListAsync();
             return users;
         }
+
         public async Task SignInWithTimeoutAsync(ApplicationUser user)
         {
             var timeout = config["SESSION_TIMEOUT_SEC"] ?? "900";
@@ -124,10 +134,12 @@ namespace risk.control.system.Services.Common
             var result = await InternalSendOtpLogic(request);
             return result.Success;
         }
+
         public async Task<(bool Success, string Message)> ResendOtpAsync(OtpRequest request)
         {
             return await InternalSendOtpLogic(request);
         }
+
         public async Task<(bool Success, string Message)> VerifyAndLoginAsync(OtpLoginModel request)
         {
             string cleanIsd = request.CountryIsd.TrimStart('+');
@@ -146,6 +158,7 @@ namespace risk.control.system.Services.Common
 
             if (user == null)
             {
+                await using var _context = contextFactory.CreateDbContext();
                 var country = await _context.Country.FirstOrDefaultAsync(c => c.ISDCode.ToString() == cleanIsd);
 
                 user = new ApplicationUser
@@ -170,6 +183,7 @@ namespace risk.control.system.Services.Common
 
             return (true, "Login successful.");
         }
+
         private async Task<(bool Success, string Message)> InternalSendOtpLogic(OtpRequest request)
         {
             string cleanIsd = request.CountryIsd?.TrimStart('+') ?? "";
@@ -184,6 +198,7 @@ namespace risk.control.system.Services.Common
             cache.Set(cacheKey, otp, cacheOptions);
 
             // 2. Database Lookup
+            await using var _context = contextFactory.CreateDbContext();
             var country = await _context.Country.FirstOrDefaultAsync(c => c.ISDCode.ToString() == cleanIsd);
             if (country == null) return (false, "Invalid country code.");
 

@@ -1,7 +1,7 @@
 ﻿@model risk.control.system.Models.ApplicationUser
 
 @{
-    ViewData["Title"] = @Applicationsettings.EDIT;
+    ViewData["Title"] = "Edit Profile";
 }
 
 <section class="content">
@@ -136,7 +136,7 @@
                                 <i class="fa fa-window-close"></i> @Applicationsettings.CANCEL
                             </a>
                             <button id="edit" type="submit" class="btn btn-warning">
-                                <i class="fas fa-save"></i> Save Profile
+                                <i class="fas fa-user-edit"></i> Save Profile
                             </button>
                         </div>
                     </div>
@@ -154,4 +154,5 @@
     <script src="~/js/company-admin/pincode.js"></script>
     <script src="~/js/company-admin/phone-bank-validate.js"></script>
     <script src="~/js/common/profile-image-upload.js"></script>
+    <script src="~/js/common/form-validation.js"></script>
 }

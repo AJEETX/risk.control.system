@@ -22,6 +22,7 @@ internal class DocumentIdfyService : IDocumentIdfyService
     private readonly ILogger<FaceIdfyService> logger;
     private readonly IFileStorageService fileStorageService;
     private readonly IPanCardService panCardService;
+    private readonly IOcrService ocrService;
     private readonly IGoogleService googleApi;
     private readonly IHttpClientService httpClientService;
     private readonly ICustomApiClient customApiCLient;
@@ -32,6 +33,7 @@ internal class DocumentIdfyService : IDocumentIdfyService
         ILogger<FaceIdfyService> logger,
         IFileStorageService fileStorageService,
         IPanCardService panCardService,
+        IOcrService ocrService,
         IGoogleService googleApi,
         IHttpClientService httpClientService,
         ICustomApiClient customApiCLient)
@@ -42,6 +44,7 @@ internal class DocumentIdfyService : IDocumentIdfyService
         this.logger = logger;
         this.fileStorageService = fileStorageService;
         this.panCardService = panCardService;
+        this.ocrService = ocrService;
         this.googleApi = googleApi;
         this.httpClientService = httpClientService;
         this.customApiCLient = customApiCLient;
@@ -73,27 +76,33 @@ internal class DocumentIdfyService : IDocumentIdfyService
             byte[] docImage = await VerificationHelper.GetBytesFromIFormFile(data.Image);
 
             // 2. Parallel Service Calls (OCR, Address, and Mapping)
+            //var ocrTask = ocrService.ExtractTextDataAsync(documentReport, docImage);
             var googleTask = googleApi.DetectTextAsync(documentReport.FilePath);
             var addressTask = httpClientService.GetRawAddress(lat, lon);
             var mapTask = customApiCLient.GetMap(expected.lat, expected.lon, double.Parse(lat), double.Parse(lon), "Start", "End", "300", "300", "green", "red");
 
-            await Task.WhenAll(googleTask, addressTask, mapTask);
+            await Task.WhenAll(
+                googleTask,
+                addressTask, mapTask
+                //, ocrTask
+                );
 
             // 3. Process Results
+            //var (ocrText, Pan, maskedImage) = await ocrTask;
             var (dist, distM, dur, durS, mapUrl) = await mapTask;
             documentReport.LocationMapUrl = mapUrl;
             documentReport.DistanceInMetres = distM;
             documentReport.DurationInSeconds = durS;
             documentReport.LocationAddress = await addressTask;
             documentReport.LongLat = $"Latitude = {lat}, Longitude = {lon}";
-            documentReport.LongLatTime = DateTime.Now;
+            documentReport.LongLatTime = DateTime.UtcNow;
 
             var detectedText = await googleTask;
             await ProcessOcrResults(documentReport, docImage, detectedText, claim);
 
             // 4. Persistence
             locationTemplate.ValidationExecuted = true;
-            locationTemplate.Updated = DateTime.Now;
+            locationTemplate.Updated = DateTime.UtcNow;
             locationTemplate.UpdatedBy = data.Email;
 
             context.DocumentIdReport.Update(documentReport);

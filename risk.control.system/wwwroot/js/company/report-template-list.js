@@ -1,6 +1,5 @@
 ﻿$(document).ready(function () {
-
-    var table =$('#reportTemplatesTable').DataTable({
+    var table = $('#reportTemplatesTable').DataTable({
         processing: true,
         serverSide: true,
         language: {
@@ -12,7 +11,8 @@
             type: 'POST',
             data: function (d) {
                 d.insuranceType = $('#caseTypeFilter').val(); // <--- sends filter value
-            }
+            },
+            error: DataTableErrorHandler
         },
         columnDefs: [
             { targets: 1, width: '25%' } // 1 = 'name' column
@@ -219,7 +219,6 @@
 
                     var q = response.updatedQuestion;
                     if (q && locationId) {
-
                         // Sanitize remote question properties
                         var qText = safeText(q.questionText);
                         var qType = safeText(q.questionType);

@@ -61,4 +61,10 @@ namespace risk.control.system.Helpers
             return controller.RedirectToAction(actionName, controllerName);
         }
     }
+
+    public static class ControllerName<T> where T : Microsoft.AspNetCore.Mvc.Controller
+    {
+        // Returns "CaseCreateEdit" instead of "CaseCreateEditController"
+        public static string Name => typeof(T).Name.Replace("Controller", "");
+    }
 }

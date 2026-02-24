@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 
 using risk.control.system.AppConstant;
+using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Services.Common;
 using static risk.control.system.AppConstant.Applicationsettings;
@@ -15,7 +16,6 @@ namespace risk.control.system.Seeds
             UserManager<ApplicationUser> userManager,
             Vendor vendor, int pinCode, string photo, string firstName, string lastName, IFileStorageService fileStorageService, string addressLine = "")
         {
-
             string agentImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", Path.GetFileName(photo));
             var agentImage = File.ReadAllBytes(agentImagePath);
 
@@ -26,8 +26,7 @@ namespace risk.control.system.Seeds
             var address = addressLine + ", " + pincode.District.Name + ", " + pincode.State.Name + ", " + pincode.Country.Code;
             var coordinates = await customApiCLient.GetCoordinatesFromAddressAsync(address);
             var customerLatLong = coordinates.Latitude + "," + coordinates.Longitude;
-            var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{customerLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
-
+            var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{customerLatLong}&key={EnvHelper.Get("GOOGLE_MAP_KEY")}";
 
             var vendorAgent = new ApplicationUser()
             {
@@ -53,7 +52,7 @@ namespace risk.control.system.Seeds
                 PinCodeId = pincode?.PinCodeId ?? default!,
                 ProfilePictureUrl = relativePath,
                 Role = AppRoles.AGENT,
-                Updated = DateTime.Now,
+                Updated = DateTime.UtcNow,
                 AddressMapLocation = url,
                 AddressLatitude = coordinates.Latitude,
                 AddressLongitude = coordinates.Longitude

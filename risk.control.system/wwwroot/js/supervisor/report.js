@@ -1,5 +1,4 @@
 ﻿$(document).ready(function () {
-
     $('#allocatedcase').on('click', function () {
         $("body").addClass("submit-progress-bg");
         // Wrap in setTimeout so the UI
@@ -7,9 +6,9 @@
         setTimeout(function () {
             $(".submit-progress").removeClass("hidden");
         }, 1);
-        
+
         $('#allocatedcase').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Submit <sub>report</sub>");
-        
+
         $('#allocatedcase').css('pointer-events', 'none')
 
         var article = document.getElementById("article");
@@ -20,18 +19,12 @@
             }
         }
     });
-    
+
     var table = $("#dataTable").DataTable({
         ajax: {
             url: '/api/agency/Supervisor/GetReport',
             dataSrc: '',
-            error: function (xhr, status, error) {
-                console.error("AJAX Error:", status, error);
-                console.error("Response:", xhr.responseText);
-                if (xhr.status === 401 || xhr.status === 403) {
-                    window.location.href = '/Account/Login'; // Or session timeout handler
-                }
-            }
+            error: DataTableErrorHandler
         },
         columnDefs: [{
             'targets': 0,
@@ -42,18 +35,18 @@
                 return '<input type="checkbox" name="selectedcase[]" value="' + $('<div/>').text(data).html() + '">';
             }
         },
-            {
-                className: 'max-width-column-number', // Apply the CSS class,
-                targets: 1                      // Index of the column to style
-            },
-            {
-                className: 'max-width-column-number', // Apply the CSS class,
-                targets: 2                      // Index of the column to style
-            },
-            {
-                className: 'max-width-column-name', // Apply the CSS class,
-                targets: 9                      // Index of the column to style
-            }],
+        {
+            className: 'max-width-column-number', // Apply the CSS class,
+            targets: 1                      // Index of the column to style
+        },
+        {
+            className: 'max-width-column-number', // Apply the CSS class,
+            targets: 2                      // Index of the column to style
+        },
+        {
+            className: 'max-width-column-name', // Apply the CSS class,
+            targets: 9                      // Index of the column to style
+        }],
         order: [[14, 'asc']],
         fixedHeader: true,
         processing: true,
@@ -170,7 +163,7 @@
                 }
             },
             { "data": "timePending" },
-            
+
             { "data": "timeElapsed", "bVisible": false }
         ],
         "rowCallback": function (row, data, index) {
@@ -193,13 +186,13 @@
     });
 
     table.on('mouseenter', '.map-thumbnail', function () {
-            const $this = $(this); // Cache the current element
+        const $this = $(this); // Cache the current element
 
-            // Set a timeout to show the full map after 1 second
-            hoverTimeout = setTimeout(function () {
-                $this.find('.full-map').show(); // Show full map
-            }, 1000); // Delay of 1 second
-        })
+        // Set a timeout to show the full map after 1 second
+        hoverTimeout = setTimeout(function () {
+            $this.find('.full-map').show(); // Show full map
+        }, 1000); // Delay of 1 second
+    })
         .on('mouseleave', '.map-thumbnail', function () {
             const $this = $(this); // Cache the current element
 
@@ -266,6 +259,4 @@
             }
         });
     });
-    
-
 });

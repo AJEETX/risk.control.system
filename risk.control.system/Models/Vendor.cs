@@ -23,6 +23,7 @@ namespace risk.control.system.Models
 
         [Display(Name = "Phone number")]
         public string PhoneNumber { get; set; } = string.Empty;
+
         public string Email { get; set; } = string.Empty;
         public string? Branch { get; set; } = string.Empty;
         public string Addressline { get; set; } = string.Empty;
@@ -30,6 +31,7 @@ namespace risk.control.system.Models
 
         [Display(Name = "State name")]
         public long? StateId { get; set; } = default!;
+
         public State? State { get; set; } = default!;
 
         [Display(Name = "Country name")]
@@ -47,7 +49,7 @@ namespace risk.control.system.Models
 
         [Display(Name = "District")]
         public District? District { get; set; } = default!;
-        
+
         [Display(Name = "Bank Name")]
         public string? BankName { get; set; } = default!;
 
@@ -59,11 +61,11 @@ namespace risk.control.system.Models
 
         [Display(Name = "Agreement date")]
         [DataType(DataType.Date)]
-        public DateTime? AgreementDate { get; set; } = DateTime.Now;
+        public DateTime? AgreementDate { get; set; } = DateTime.UtcNow;
 
         [Display(Name = "Activated date")]
         [DataType(DataType.Date)]
-        public DateTime? ActivatedDate { get; set; } = DateTime.Now;
+        public DateTime? ActivatedDate { get; set; } = DateTime.UtcNow;
 
         public VendorStatus? Status { get; set; } = VendorStatus.ACTIVE;
         public Domain? DomainName { get; set; } = Domain.com;
@@ -72,8 +74,8 @@ namespace risk.control.system.Models
         public string? DocumentUrl { get; set; } = default!;
 
         [Display(Name = "Document")]
-
         public string? DocumentImageExtension { get; set; } = default!;
+
         public string? AddressMapLocation { get; set; }
         public string? AddressLatitude { get; set; }
         public string? AddressLongitude { get; set; }
@@ -85,7 +87,6 @@ namespace risk.control.system.Models
         public List<ClientCompany>? Clients { get; set; } = new List<ClientCompany>();
 
         [Display(Name = "Empanel")]
-        
         public bool Deleted { get; set; } = false;
 
         public int? RateCount
@@ -102,21 +103,28 @@ namespace risk.control.system.Models
         }
 
         public virtual ICollection<AgencyRating>? ratings { get; set; }
-        public string? MobileAppUrl { get; set; } = Environment.GetEnvironmentVariable("APP_URL");
+        public string? MobileAppUrl { get; set; } = EnvHelper.Get("APP_URL");
         public bool CanChangePassword { get; set; } = false;
         public bool HasClaims { get; set; } = false;
+
         [NotMapped]
         public bool SelectedByCompany { get; set; }
+
         [NotMapped]
         public IFormFile? Document { get; set; }
+
         [NotMapped]
         public long SelectedPincodeId { get; set; }
+
         [NotMapped]
         public long SelectedDistrictId { get; set; }
+
         [NotMapped]
         public long SelectedStateId { get; set; }
+
         [NotMapped]
         public long SelectedCountryId { get; set; }
+
         public override string ToString()
         {
             return $"Investigation Agency Information:\n" +

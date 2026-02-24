@@ -71,7 +71,7 @@ namespace risk.control.system.Controllers.PortalAdmin
                     globalSettings.AddressUri = settings.AddressUri;
                     globalSettings.AddressUriData = settings.AddressUriData;
                     globalSettings.WeatherUri = settings.WeatherUri;
-                    globalSettings.Updated = DateTime.Now;
+                    globalSettings.Updated = DateTime.UtcNow;
                     globalSettings.UpdatedBy = HttpContext.User?.Identity?.Name;
                     _context.GlobalSettings.Update(globalSettings);
                     await _context.SaveChangesAsync();

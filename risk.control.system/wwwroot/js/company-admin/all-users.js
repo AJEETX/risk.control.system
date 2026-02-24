@@ -3,30 +3,7 @@
         ajax: {
             url: '/api/User/AllUsers',
             dataSrc: '',
-            error: function (xhr, status, error) {
-                console.error("AJAX Error:", status, error);
-                console.error("Response:", xhr.responseText);
-                if (xhr.status === 401 || xhr.status === 403) {
-                    $.confirm({
-                        title: 'Session Expired!',
-                        content: 'Your session has expired or you are unauthorized. You will be redirected to the login page.',
-                        type: 'red',
-                        typeAnimated: true,
-                        buttons: {
-                            Ok: {
-                                text: 'Login',
-                                btnClass: 'btn-red',
-                                action: function () {
-                                    window.location.href = '/Account/Login';
-                                }
-                            }
-                        },
-                        onClose: function () {
-                            window.location.href = '/Account/Login';
-                        }
-                    });
-                }
-            }
+            error: DataTableErrorHandler
         },
         fixedHeader: true,
         processing: true,
@@ -153,7 +130,7 @@
                         buttons += '<button id="details' + row.id + '" class="btn btn-xs btn-danger"><i class="fa fa-trash "></i> Delete </button>';
                     }
                     else {
-                        buttons += '<a id=edit' + row.id + ' href="/User/Edit?userId=' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-user-minus"></i> Edit</a>&nbsp;'
+                        buttons += '<a id=edit' + row.id + ' href="/User/Edit/' + row.id + '" class="btn btn-xs btn-info"><i class="fas fa-search"></i> Detail</a>'
                     }
                     return buttons;
                 }
@@ -286,31 +263,6 @@ function getColorClass(color) {
             return "online-icon-default"; // Fallback class
     }
 }
-function showroles() {
-    $("body").addClass("submit-progress-bg");
-    // Wrap in setTimeout so the UI
-    // can update the spinners
-    setTimeout(function () {
-        $(".submit-progress").removeClass("hidden");
-    }, 1);
-    // Disable all buttons, submit inputs, and anchors
-    $('button, input[type="submit"], a').prop('disabled', true);
-
-    // Add a class to visually indicate disabled state for anchors
-    $('a').addClass('disabled-anchor').on('click', function (e) {
-        e.preventDefault(); // Prevent default action for anchor clicks
-    });
-
-    $('a.btn.btn-info').html("<i class='fas fa-sync fa-spin'></i> Roles");
-
-    var article = document.getElementById("article");
-    if (article) {
-        var nodes = article.getElementsByTagName('*');
-        for (var i = 0; i < nodes.length; i++) {
-            nodes[i].disabled = true;
-        }
-    }
-}
 function showedit(id) {
     $("body").addClass("submit-progress-bg");
     // Wrap in setTimeout so the UI
@@ -318,7 +270,7 @@ function showedit(id) {
     setTimeout(function () {
         $(".submit-progress").removeClass("hidden");
     }, 1);
-    var editbtn = $('a#edit' + id + '.btn.btn-xs.btn-warning')
+    var editbtn = $('a#edit' + id + '.btn.btn-xs.btn-info')
     // Disable all buttons, submit inputs, and anchors
     $('button, input[type="submit"], a').prop('disabled', true);
 
@@ -326,7 +278,7 @@ function showedit(id) {
     $('a').addClass('disabled-anchor').on('click', function (e) {
         e.preventDefault(); // Prevent default action for anchor clicks
     });
-    editbtn.html("<i class='fas fa-sync fa-spin'></i> Edit");
+    editbtn.html("<i class='fas fa-sync fa-spin'></i> Detail");
 
     var article = document.getElementById("article");
     if (article) {

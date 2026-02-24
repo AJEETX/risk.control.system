@@ -1,0 +1,110 @@
+﻿@using risk.control.system.Helpers;
+@model LocationReport
+@{
+	var location = Model;
+}
+@if (location.FaceIds?.Any(f => f.Selected) == true)
+{  
+	<div class="table-responsive mb-4">
+		<table class="table table-bordered table-hover dt-responsive nowrap w-100">
+			<thead class="thead-light">
+				<tr>
+					<th class="col-verifier-name" title="Photo ID">
+						<img class="action-image" src="~/headers/customer.gif" /> Photo ID
+					</th>
+					<th class="col-face-photo">
+						<i class="far fa-user text-primary" title="This Image has photo at the location" data-bs-toggle="tooltip"></i> Photo
+					</th>
+					<th class="col-pin-img" title="Indicative Map Route">
+						<img class="action-image" src="~/headers/pincode.gif" /> Indicative Map
+					</th>
+										<th class="col-address" title="Indicative Address Info">Indicative Address Info</th>
+					<th class="col-weather" title="Location Info">
+						<img class="action-image" src="~/headers/information.gif" /> Location Info
+					</th>
+					<th class="col-match">Match</th>
+				</tr>
+			</thead>
+
+		<tbody>
+			@foreach (var face in location.FaceIds.Where(f => f.Selected))
+			{
+				<tr>
+					<td>
+						<small>
+						@face.ReportName
+						</small>
+							@if (face.IsRequired)
+							{
+								<span class="required-asterisk" title="Mandatory Photo">*</span>
+							}
+					</td>
+					
+					<td>
+						@if (face.ValidationExecuted)
+						{
+							<img id="face-img-@face.Id"
+								 src="/Document/GetFaceDocument/@face.Id"
+								 class="mobile-capture-info preview-image"
+								 title="@face.ReportName" />
+						}
+						else
+						{
+							<img id="face-img-@face.Id" src="~/img/no-user.png" class="thumbnail profile-image doc-profile-image" />
+						}
+					</td>
+					<td>
+						@if (face.ValidationExecuted && face.LocationMapUrl != null)
+						{
+								<img src="@string.Format(face.LocationMapUrl, "500","500")"
+									 class="mobile-capture-map map-image"
+								 data-faceid="@face.Id"
+								 data-locationid="@location.Id"
+								 data-source="face"
+								 title="Click to view map" />
+								
+						}
+						else
+						{
+							<img src="~/img/no-map.jpeg" class="thumbnail profile-image doc-profile-image" />
+						}
+					</td>
+					<td>
+									<div>@face.LongLat</div>
+						<small>
+						@face.LocationAddress
+						</small>
+						<span class="badge badge-light">
+								Indicative Distance from @location.Address Address @face.Distance
+							</span>
+					</td>
+					<td>
+						<small>
+						@face.LocationInfo
+						</small>
+					</td>
+					<td>
+						@if (face.ValidationExecuted)
+						{
+							@if (face.ImageValid.GetValueOrDefault())
+							{
+								<i class='fas fa-check-circle i-green'></i>
+							}
+							else
+							{
+								<i class='fa fa-times i-orangered' aria-hidden='true'></i>
+							}
+						}
+						else
+						{
+							<i class='fa fa-times i-grey' aria-hidden='true'></i>
+						}
+
+					</td>
+				</tr>
+			}
+
+		</tbody>
+	</table>
+	</div>
+}

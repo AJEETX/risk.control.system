@@ -31,10 +31,6 @@ namespace risk.control.system.Controllers.Api.Agency
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userEmail))
-            {
-                return Unauthorized("User not authenticated.");
-            }
             try
             {
                 var response = await agencyService.AllAgencies();
@@ -53,10 +49,6 @@ namespace risk.control.system.Controllers.Api.Agency
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userEmail))
-            {
-                return Unauthorized("User not authenticated.");
-            }
             try
             {
                 var response = await agencyService.AllServices(userEmail);
@@ -69,7 +61,7 @@ namespace risk.control.system.Controllers.Api.Agency
             }
         }
 
-        [HttpGet("GetCompanyAgencyUser")]
+        [HttpGet("GetCompanyAgencyUser/{id}")]
         public async Task<IActionResult> GetCompanyAgencyUser(long id)
         {
             if (id <= 0)
@@ -78,10 +70,6 @@ namespace risk.control.system.Controllers.Api.Agency
             }
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userEmail))
-            {
-                return Unauthorized("User not authenticated.");
-            }
             try
             {
                 var result = await agencyUserApiService.GetCompanyAgencyUsers(userEmail, id);
@@ -100,10 +88,6 @@ namespace risk.control.system.Controllers.Api.Agency
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userEmail))
-            {
-                return Unauthorized("User not authenticated.");
-            }
             try
             {
                 var agentWithLoad = await agencyUserApiService.GetAgencyUsers(userEmail);
@@ -116,7 +100,7 @@ namespace risk.control.system.Controllers.Api.Agency
             }
         }
 
-        [HttpGet("GetAgentWithCases")]
+        [HttpGet("GetAgentWithCases/{id}")]
         public async Task<IActionResult> GetAgentWithCases(long id)
         {
             if (id <= 0)
@@ -125,10 +109,6 @@ namespace risk.control.system.Controllers.Api.Agency
             }
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userEmail))
-            {
-                return Unauthorized("User not authenticated.");
-            }
             try
             {
                 var agentList = await agencyService.GetAgentWithCases(userEmail, id);

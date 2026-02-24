@@ -123,7 +123,7 @@
                     <div class="col-md-6">
                         <div class="card card-light">
                             <div class="col-md-12">
-                                
+
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group">
@@ -277,15 +277,11 @@
                                             </div>
                                         </div>
                                     </div>
-                                    
                                 </div>
-
                             </div>
-
                         </div>
                     </div>
                 </div>
-
             </div>
             <div class="card-footer">
                 <div class="row float-right">
@@ -295,7 +291,7 @@
                             @Applicationsettings.BACK
                         </a>
                         <button id="edit" type="submit" class="btn btn-warning">
-                            <i class="fas fa-wrench"></i>  @Applicationsettings.EDIT @Applicationsettings.GLOBAL_SETTINGS
+                            <i class="fas fa-wrench"></i>  Edit
                         </button>
                     </div>
                 </div>
@@ -304,12 +300,10 @@
     </form>
 </section>
 
-
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
     <script src="~/js/global.js">
-
     </script>
 }

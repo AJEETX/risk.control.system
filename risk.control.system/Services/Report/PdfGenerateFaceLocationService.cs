@@ -51,7 +51,7 @@ namespace risk.control.system.Services.Report
         {
             var imagePath = webHostEnvironment.WebRootPath;
 
-            string googlePhotoImagePath = Path.Combine(imagePath, "report", $"google-face-map-{DateTime.Now.ToString("ddMMMyyyHHmmsss")}.png");
+            string googlePhotoImagePath = Path.Combine(imagePath, "report", $"google-face-map-{DateTime.UtcNow.ToString("ddMMMyyyHHmmsss")}.png");
             // =================== FACE IDs ====================
 
             if (loc.FaceIds?.Any() == true && loc.FaceIds.Any(f => f.ValidationExecuted))

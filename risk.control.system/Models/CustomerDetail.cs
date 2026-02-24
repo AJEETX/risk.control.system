@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-
+using Microsoft.AspNetCore.Mvc.Rendering;
 using risk.control.system.Helpers;
 
 namespace risk.control.system.Models
@@ -55,6 +55,7 @@ namespace risk.control.system.Models
 
         [Display(Name = "District")]
         public District? District { get; set; }
+
         [Required]
         public long? InvestigationTaskId { get; set; }
 
@@ -81,18 +82,39 @@ namespace risk.control.system.Models
         public string? AddressLocationInfo { get; set; }
 
         #region NOT MAPPED PROPERTIES
+
         [NotMapped]
         public IFormFile? ProfileImage { get; set; }
+
         [NotMapped]
         public long SelectedPincodeId { get; set; }
+
         [NotMapped]
         public long SelectedDistrictId { get; set; }
+
         [NotMapped]
         public long SelectedStateId { get; set; }
+
         [NotMapped]
         public long SelectedCountryId { get; set; }
 
-        #endregion
+        [NotMapped]
+        public IEnumerable<SelectListItem>? GenderList { get; set; }
+
+        [NotMapped]
+        public IEnumerable<SelectListItem>? IncomeList { get; set; }
+
+        [NotMapped]
+        public IEnumerable<SelectListItem>? EducationList { get; set; }
+
+        [NotMapped]
+        public IEnumerable<SelectListItem>? OccupationList { get; set; }
+
+        [NotMapped]
+        public string? CurrencySymbol { get; set; }
+
+        #endregion NOT MAPPED PROPERTIES
+
         public override string ToString()
         {
             return $"Customer Information:\n" +

@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using risk.control.system.AppConstant;
-using risk.control.system.Models;
 using risk.control.system.Services.Api;
 using risk.control.system.Services.Company;
 
@@ -9,22 +8,20 @@ namespace risk.control.system.Controllers.Api.PortalAdmin
 {
     [ApiExplorerSettings(IgnoreApi = true)]
     [Route("api/[controller]")]
-    [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME},{AGENCY_ADMIN.DISPLAY_NAME},{CREATOR.DISPLAY_NAME},{ASSESSOR.DISPLAY_NAME},{MANAGER.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME},{AGENT.DISPLAY_NAME}")]
+    [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME}")]
     [ApiController]
     public class PortalCompanyController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
         private readonly ILogger<PortalCompanyController> logger;
         private readonly ICompanyUserApiService companyUserApiService;
         private readonly ICompanyService companyService;
 
-        public PortalCompanyController(ApplicationDbContext context,
+        public PortalCompanyController(
             ILogger<PortalCompanyController> logger,
             ICompanyUserApiService companyUserApiService,
             ICompanyService companyService
             )
         {
-            _context = context;
             this.logger = logger;
             this.companyUserApiService = companyUserApiService;
             this.companyService = companyService;

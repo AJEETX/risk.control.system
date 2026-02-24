@@ -22,7 +22,7 @@
         $("#PinCodeText").prop("disabled", false);
 
         // Preload details if Pincode is provided
-        if (preloadedPincodeId) {
+        if (preloadedPincodeId && preloadedPincodeId != 0) {
             preloadPincodeDetails(preloadedCountryId, preloadedPincodeId);
         }
     }

@@ -10,84 +10,21 @@
             data: function (result) {
                 console.log("Data before sending:", result); // Debugging
             },
-            error: function (xhr, status, error) {
-                console.error("AJAX Error:", status, error);
-                console.error("Response:", xhr.responseText);
-                if (xhr.status === 401 || xhr.status === 403) {
-                    $.confirm({
-                        title: 'Session Expired!',
-                        content: 'Your session has expired or you are unauthorized. You will be redirected to the login page.',
-                        type: 'red',
-                        typeAnimated: true,
-                        buttons: {
-                            Ok: {
-                                text: 'Login',
-                                btnClass: 'btn-red',
-                                action: function () {
-                                    window.location.href = '/Account/Login';
-                                }
-                            }
-                        },
-                        onClose: function () {
-                            window.location.href = '/Account/Login';
-                        }
-                    });
-                }
-                else if (xhr.status === 500) {
-                    $.confirm({
-                        title: 'Server Error!',
-                        content: 'An unexpected server error occurred. You will be redirected to Available Agencies page.',
-                        type: 'orange',
-                        typeAnimated: true,
-                        buttons: {
-                            Ok: function () {
-                                window.location.href = '/AvailableAgency/Agencies';
-                            }
-                        },
-                        onClose: function () {
-                            window.location.href = '/AvailableAgency/Agencies';
-                        }
-                    });
-                }
-                else if (xhr.status === 400) {
-                    $.confirm({
-                        title: 'Agencies!',
-                        content: 'Try with valid data. You will be redirected to Available Agencies page.',
-                        type: 'orange',
-                        typeAnimated: true,
-                        buttons: {
-                            Ok: function () {
-                                window.location.href = '/AvailableAgency/Agencies';
-                            }
-                        },
-                        onClose: function () {
-                            window.location.href = '/AvailableAgency/Agencies';
-                        }
-                    });
-                }
-            }
+            error: DataTableErrorHandler
         },
-        columnDefs: [{
-            'targets': 0,
-            'searchable': false,
-            'orderable': false,
-            'className': 'dt-body-center',
-            'render': function (data, type, full, meta) {
-                return '<input type="checkbox" name="id[]" value="' + $('<div/>').text(data).html() + '">';
-            }
-        },
-        {
-            className: 'max-width-column-name', // Apply the CSS class,
-            targets: 3                      // Index of the column to style
-        },
-        {
-            className: 'max-width-column', // Apply the CSS class,
-            targets: 5                      // Index of the column to style
-        },
-        {
-            className: 'max-width-column-name', // Apply the CSS class,
-            targets: 10                      // Index of the column to style
-        }],
+        columnDefs: [
+            {
+                className: 'max-width-column-name', // Apply the CSS class,
+                targets: 3                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column', // Apply the CSS class,
+                targets: 5                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column-name', // Apply the CSS class,
+                targets: 10                      // Index of the column to style
+            }],
         order: [[1, 'asc']],
         fixedHeader: true,
         processing: true,
@@ -123,15 +60,9 @@
             {
                 "data": "domain",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.vendorName + '" data-bs-toggle="tooltip">' + data + '</span>'
+                    return '<span title="' + row.vendorName + '" data-bs-toggle="tooltip" class="blue">' + data + '</span>'
                 }
             },
-            //{
-            //    "data": "name",
-            //    "mRender": function (data, type, row) {
-            //        return '<span title="' + row.name + '" data-bs-toggle="tooltip">' + data + '</span>'
-            //    }
-            //},
             {
                 "data": "phone",
                 "mRender": function (data, type, row) {
@@ -181,7 +112,7 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    buttons += `<a data-id="${row.id}" class="btn btn-xs btn-warning" data-bs-toggle="tooltip" title="Edit"><i class="fas fa-edit"></i> Edit</a> &nbsp;` ;
+                    buttons += `<a data-id="${row.id}" class="btn btn-xs btn-warning" data-bs-toggle="tooltip" title="Edit"><i class="fas fa-edit"></i> Edit</a> &nbsp;`;
                     if (data) {
                         buttons += '<button id="' + row.id + '" class="btn btn-xs btn-danger"><i class="fa fa-trash "></i> Delete </button>';
                     }
@@ -227,7 +158,7 @@
 
         showSpinnerOnButton(element, "Edit");
 
-        const url = `/AvailableAgency/Details?Id=${encodeURIComponent(id)}`;
+        const url = `/AvailableAgency/Detail/${encodeURIComponent(id)}`;
 
         setTimeout(() => {
             window.location.href = url;
@@ -236,7 +167,6 @@
     function showSpinnerOnButton(selector, spinnerText) {
         $(selector).html(`<i class='fas fa-sync fa-spin'></i> ${spinnerText}`);
     }
-
 
     $('#dataTable tbody').on('click', '.btn-danger', function (e) {
         e.preventDefault();

@@ -10,32 +10,28 @@ namespace risk.control.system.Controllers.Common
     [ApiExplorerSettings(IgnoreApi = true)]
     public class DownloadController : ControllerBase
     {
-        private readonly ApplicationDbContext context;
-        private readonly ILogger<DownloadController> logger;
+        private readonly ApplicationDbContext _context;
+        private readonly ILogger<DownloadController> _logger;
 
         public DownloadController(ApplicationDbContext context, ILogger<DownloadController> logger)
         {
-            this.context = context;
-            this.logger = logger;
+            this._context = context;
+            this._logger = logger;
         }
 
         public async Task<IActionResult> EnquiryFileAttachment(int id)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userEmail))
-            {
-                return Unauthorized("User not authenticated.");
-            }
             try
             {
-                var applicationUser = await context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == userEmail);
+                var applicationUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(u => u.Email == userEmail);
                 if (applicationUser == null)
                 {
                     return NotFound();
                 }
 
-                var fileAttachment = await context.QueryRequest.FirstOrDefaultAsync(q => q.QueryRequestId == id);
+                var fileAttachment = await _context.QueryRequest.AsNoTracking().FirstOrDefaultAsync(q => q.QueryRequestId == id);
                 if (fileAttachment == null)
                 {
                     return NotFound();
@@ -44,7 +40,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred while getting file attachment for user {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error occurred while getting file attachment for user {UserEmail}", userEmail);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -53,19 +49,15 @@ namespace risk.control.system.Controllers.Common
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userEmail))
-            {
-                return Unauthorized("User not authenticated.");
-            }
             try
             {
-                var applicationUser = await context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefaultAsync();
+                var applicationUser = await _context.ApplicationUser.AsNoTracking().Where(u => u.Email == userEmail).FirstOrDefaultAsync();
                 if (applicationUser == null)
                 {
                     return NotFound();
                 }
 
-                var fileAttachment = await context.QueryRequest.FirstOrDefaultAsync(q => q.QueryRequestId == id);
+                var fileAttachment = await _context.QueryRequest.AsNoTracking().FirstOrDefaultAsync(q => q.QueryRequestId == id);
                 if (fileAttachment == null)
                 {
                     return NotFound();
@@ -74,7 +66,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred while getting file attachment for user {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error occurred while getting file attachment for user {UserEmail}", userEmail);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -83,19 +75,15 @@ namespace risk.control.system.Controllers.Common
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userEmail))
-            {
-                return Unauthorized("User not authenticated.");
-            }
             try
             {
-                var applicationUser = await context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefaultAsync();
+                var applicationUser = await _context.ApplicationUser.AsNoTracking().Where(u => u.Email == userEmail).FirstOrDefaultAsync();
                 if (applicationUser == null)
                 {
                     return NotFound();
                 }
 
-                var investigation = await context.Investigations.Include(i => i.InvestigationReport).FirstOrDefaultAsync(q => q.InvestigationReport.Id == id);
+                var investigation = await _context.Investigations.AsNoTracking().Include(i => i.InvestigationReport).FirstOrDefaultAsync(q => q.InvestigationReport.Id == id);
                 if (investigation == null || investigation.InvestigationReport == null)
                 {
                     return NotFound();
@@ -107,7 +95,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred while getting file attachment for user {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error occurred while getting file attachment for user {UserEmail}", userEmail);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }

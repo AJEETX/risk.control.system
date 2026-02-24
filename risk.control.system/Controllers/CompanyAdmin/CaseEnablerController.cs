@@ -11,8 +11,6 @@ using risk.control.system.Models;
 
 using SmartBreadcrumbs.Attributes;
 
-using static risk.control.system.AppConstant.Applicationsettings;
-
 namespace risk.control.system.Controllers.CompanyAdmin
 {
     [Breadcrumb("Company Settings ")]
@@ -32,7 +30,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
 
         public IActionResult Index()
         {
-            return RedirectToAction("Profile");
+            return RedirectToAction(nameof(Profile));
         }
 
         [Breadcrumb("Reason To Verify ")]
@@ -55,6 +53,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
 
             return Json(new { data });
         }
+
         [Breadcrumb("Details ")]
         public async Task<IActionResult> Details(int id)
         {
@@ -81,7 +80,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             }
         }
 
-        [Breadcrumb("Add  New", FromAction = "Profile")]
+        [Breadcrumb("Add  New", FromAction = nameof(Profile))]
         public IActionResult Create()
         {
             return View();
@@ -107,7 +106,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                     return View(caseEnabler);
                 }
                 caseEnabler.Name = WebUtility.HtmlEncode(caseEnabler.Name);
-                caseEnabler.Updated = DateTime.Now;
+                caseEnabler.Updated = DateTime.UtcNow;
                 caseEnabler.UpdatedBy = HttpContext.User?.Identity?.Name;
 
                 _context.Add(caseEnabler);
@@ -122,7 +121,6 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 return RedirectToAction(nameof(Profile));
             }
         }
-
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -139,7 +137,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             return Json(exists);
         }
 
-        [Breadcrumb("Edit ", FromAction = "Profile")]
+        [Breadcrumb("Edit ", FromAction = nameof(Profile))]
         public async Task<IActionResult> Edit(long id)
         {
             if (id < 1)
@@ -188,7 +186,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                     return View(caseEnabler);
                 }
 
-                caseEnabler.Updated = DateTime.Now;
+                caseEnabler.Updated = DateTime.UtcNow;
                 caseEnabler.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Update(caseEnabler);
                 await _context.SaveChangesAsync();
@@ -219,7 +217,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                     return Json(new { success = false, message = "Reason Not found!" });
                 }
 
-                caseEnabler.Updated = DateTime.Now;
+                caseEnabler.Updated = DateTime.UtcNow;
                 caseEnabler.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.CaseEnabler.Remove(caseEnabler);
                 await _context.SaveChangesAsync();

@@ -17,20 +17,18 @@ namespace risk.control.system.AppConstant
 
     public static class RoleGroups
     {
-        public static AppRoles[] CompanyAppRoles = new[]
-                {
-                    AppRoles.COMPANY_ADMIN,
-                    AppRoles.CREATOR,
-                    AppRoles.MANAGER,
-                    AppRoles.ASSESSOR
-                };
-
-        public static AppRoles[] AgencyAppRoles = new[]
-                {
-                    AppRoles.AGENCY_ADMIN,
-                    AppRoles.SUPERVISOR,
-                    AppRoles.AGENT
-                };
+        public static string[] AllRoles =
+            {
+            PORTAL_ADMIN.DISPLAY_NAME,
+            COMPANY_ADMIN.DISPLAY_NAME,
+            CREATOR.DISPLAY_NAME,
+            ASSESSOR.DISPLAY_NAME,
+            MANAGER.DISPLAY_NAME,
+            AGENCY_ADMIN.DISPLAY_NAME,
+            SUPERVISOR.DISPLAY_NAME,
+            AGENT.DISPLAY_NAME,
+                GUEST.DISPLAY_NAME
+        };
 
         public static readonly string[] CompanyRoles =
         {
@@ -47,6 +45,21 @@ namespace risk.control.system.AppConstant
             SUPERVISOR.DISPLAY_NAME,
             AGENT.DISPLAY_NAME
         };
+
+        public static AppRoles[] CompanyAppRoles = new[]
+                {
+                    AppRoles.COMPANY_ADMIN,
+                    AppRoles.CREATOR,
+                    AppRoles.MANAGER,
+                    AppRoles.ASSESSOR
+                };
+
+        public static AppRoles[] AgencyAppRoles = new[]
+                {
+                    AppRoles.AGENCY_ADMIN,
+                    AppRoles.SUPERVISOR,
+                    AppRoles.AGENT
+                };
     }
 
     public static class PORTAL_ADMIN

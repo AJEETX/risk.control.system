@@ -16,7 +16,15 @@ namespace risk.control.system.Helpers
             string text = "...iCheckified...";
             var padding = 30;
             Color color = Color.Silver;
-            Font font = SystemFonts.CreateFont("Arial", 2, FontStyle.Italic);
+            if (!SystemFonts.Collection.TryGet("Arial", out FontFamily family))
+            {
+                // Fallback: If Arial isn't found, use the first available system font
+                // to prevent the application from crashing.
+                family = SystemFonts.Collection.Families.First();
+            }
+
+            Font font = family.CreateFont(2, FontStyle.Italic);
+
             Size imgSize = processingContext.GetCurrentSize();
             float targetWidth = imgSize.Width - (padding * 2);
             float targetHeight = imgSize.Height - (padding * 2);

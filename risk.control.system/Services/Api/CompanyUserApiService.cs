@@ -18,31 +18,35 @@ namespace risk.control.system.Services.Api
     internal class CompanyUserApiService : ICompanyUserApiService
     {
         private readonly ApplicationDbContext context;
-        private readonly IWebHostEnvironment webHostEnvironment;
         private readonly IBase64FileService base64FileService;
+        private readonly int sessionTimeoutInSeconds;
+        private readonly int sessionTimeoutinMinutes;
+        private readonly int awayThresholdInMinutes;
+        private readonly int onlineThresholdInMinutes;
         private readonly DateTime cutoffTime;
         private readonly IFeatureManager featureManager;
 
         public CompanyUserApiService(
             IConfiguration config,
             ApplicationDbContext context,
-            IWebHostEnvironment webHostEnvironment,
             IBase64FileService base64FileService,
             IFeatureManager featureManager)
         {
-            cutoffTime = DateTime.Now.AddMinutes(double.Parse(config["LOGIN_SESSION_TIMEOUT_MIN"]));
+            awayThresholdInMinutes = int.Parse(config["LOGIN_SESSION_INACTIVE_MIN"]);
+            onlineThresholdInMinutes = int.Parse(config["LOGIN_SESSION_ACTIVE_MIN"]);
+            sessionTimeoutInSeconds = int.Parse(config["SESSION_TIMEOUT_SEC"]);
+            sessionTimeoutinMinutes = sessionTimeoutInSeconds / 60;
+            cutoffTime = DateTime.UtcNow.AddSeconds(-sessionTimeoutInSeconds);
             this.context = context;
-            this.webHostEnvironment = webHostEnvironment;
             this.base64FileService = base64FileService;
             this.featureManager = featureManager;
         }
 
         public async Task<List<UserDetailResponse>> GetCompanyUsers(string userEmail)
         {
-            var now = DateTime.Now;
-
+            var now = DateTime.UtcNow;
             // 1️⃣ Get the current company user
-            var companyUser = await context.ApplicationUser
+            var companyUser = await context.ApplicationUser.AsNoTracking()
                 .FirstOrDefaultAsync(c => c.Email == userEmail);
 
             if (companyUser == null) return new List<UserDetailResponse>();
@@ -61,33 +65,20 @@ namespace risk.control.system.Services.Api
                 .ToDictionaryAsync(x => x.Email, x => new { x.LastSeen, x.LoggedOut });
 
             // 3️⃣ Fetch company users
-            var companyUsers = await context.ApplicationUser
+            var companyUsers = await context.ApplicationUser.AsNoTracking()
                 .Where(u => u.ClientCompanyId == companyUser.ClientCompanyId && !u.Deleted && u.Email != userEmail)
                 .Include(u => u.PinCode)
                 .Include(u => u.District)
                 .Include(u => u.State)
-                .ThenInclude(u => u.Country)
+                .Include(u => u.Country)
                 .OrderBy(u => u.FirstName)
                 .ThenBy(u => u.LastName)
                 .ToListAsync();
 
-            var photoTasks = new List<Task<byte[]>>();
-            foreach (var user in companyUsers)
-            {
-                photoTasks.Add(user.ProfilePictureUrl != null
-                    ? System.IO.File.ReadAllBytesAsync(Path.Combine(webHostEnvironment.ContentRootPath, user.ProfilePictureUrl))
-                    : Task.FromResult(Array.Empty<byte>()));
-            }
-            var photoResults = await Task.WhenAll(photoTasks);
-
-            // 4️⃣ Map users to UserDetailResponse
             var activeUsersDetails = new List<UserDetailResponse>();
             for (int i = 0; i < companyUsers.Count; i++)
             {
                 var user = companyUsers[i];
-                var photoBytes = photoResults[i];
-
-                // Lookup last session
                 latestSessions.TryGetValue(user.Email, out var session);
 
                 string status, statusName, icon;
@@ -102,13 +93,13 @@ namespace risk.control.system.Services.Api
                     var minutesAway = (int)(now - session.LastSeen).TotalMinutes;
                     (status, statusName, icon) = minutesAway switch
                     {
-                        < 1 => ("green", "Online now", "fas fa-circle"),
-                        < 5 => ("orange", $"Inactive for {minutesAway} minutes", "fas fa-clock"),
-                        < 15 => ("orange", $"Away for {minutesAway} minutes", "far fa-clock"),
+                        var m when m < onlineThresholdInMinutes => ("green", "Online now", "fas fa-circle"),
+                        var m when m < awayThresholdInMinutes => ("orange", $"Inactive for {m} minutes", "fas fa-clock"),
+                        var m when m < sessionTimeoutinMinutes => ("orange", $"Away for {m} minutes", "far fa-clock"),
                         _ => ("#DED5D5", "Offline", "fa fa-circle-o")
                     };
                 }
-
+                var photo = await base64FileService.GetBase64FileAsync(user.ProfilePictureUrl, Applicationsettings.NO_USER);
                 activeUsersDetails.Add(new UserDetailResponse
                 {
                     Id = user.Id,
@@ -116,7 +107,7 @@ namespace risk.control.system.Services.Api
                     Email = $"<a href=/Company/EditUser?userId={user.Id}>{user.Email}</a>",
                     RawEmail = user.Email,
                     Phone = $"(+{user.Country.ISDCode}) {user.PhoneNumber}",
-                    Photo = photoBytes.Length > 0 ? $"data:image/*;base64,{Convert.ToBase64String(photoBytes)}" : Applicationsettings.NO_USER,
+                    Photo = photo,
                     Active = user.Active,
                     Addressline = $"{user.Addressline}, {user.District.Name}",
                     District = user.District.Name,
@@ -141,7 +132,7 @@ namespace risk.control.system.Services.Api
             }
 
             // 5️⃣ Bulk reset IsUpdated
-            await context.ApplicationUser
+            await context.ApplicationUser.AsNoTracking()
                 .Where(u => u.ClientCompanyId == companyUser.ClientCompanyId)
                 .ExecuteUpdateAsync(u => u.SetProperty(x => x.IsUpdated, false));
 
@@ -151,7 +142,7 @@ namespace risk.control.system.Services.Api
         public async Task<List<UserDetailResponse>> GetCompanyUsers(string userEmail, long companyId)
         {
             // Get the company user
-            var companyUser = await context.ApplicationUser
+            var companyUser = await context.ApplicationUser.AsNoTracking()
                 .FirstOrDefaultAsync(c => c.Email == userEmail);
             if (companyUser == null) return new List<UserDetailResponse>();
 
@@ -167,7 +158,7 @@ namespace risk.control.system.Services.Api
                 .ToDictionary(g => g.Key, g => g.Max(s => s.Updated));
 
             // Fetch all users for the company (excluding deleted and current user)
-            var users = await context.ApplicationUser
+            var users = await context.ApplicationUser.AsNoTracking()
                 .Include(u => u.PinCode)
                 .Include(u => u.District)
                 .Include(u => u.State)
@@ -179,7 +170,7 @@ namespace risk.control.system.Services.Api
 
             var loginVerificationEnabled = await featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION);
 
-            var now = DateTime.Now;
+            var now = DateTime.UtcNow;
             var activeUsersDetails = new List<UserDetailResponse>();
 
             foreach (var user in users)
@@ -190,16 +181,14 @@ namespace risk.control.system.Services.Api
 
                 var (status, statusName, icon) = minutesAway switch
                 {
-                    < 1 => ("green", "Online now", "fas fa-circle"),
-                    < 5 => ("orange", $"Inactive for {minutesAway} minutes", "fas fa-clock"),
-                    < 15 => ("orange", $"Away for {minutesAway} minutes", "far fa-clock"),
+                    var m when m < onlineThresholdInMinutes => ("green", "Online now", "fas fa-circle"),
+                    var m when m < awayThresholdInMinutes => ("orange", $"Inactive for {m} minutes", "fas fa-clock"),
+                    var m when m < sessionTimeoutinMinutes => ("orange", $"Away for {m} minutes", "far fa-clock"),
                     _ => ("#DED5D5", "Offline", "fa fa-circle-o")
                 };
 
                 // Convert photo to base64 (optional: cache this for performance)
-                var photo = string.IsNullOrWhiteSpace(user.ProfilePictureUrl)
-                    ? Applicationsettings.NO_USER
-                    : $"data:image/*;base64,{Convert.ToBase64String(File.ReadAllBytes(Path.Combine(webHostEnvironment.ContentRootPath, user.ProfilePictureUrl)))}";
+                var photo = await base64FileService.GetBase64FileAsync(user.ProfilePictureUrl, Applicationsettings.NO_USER);
 
                 activeUsersDetails.Add(new UserDetailResponse
                 {

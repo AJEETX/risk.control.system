@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 
@@ -6,9 +7,7 @@ namespace risk.control.system.Services.Creator
 {
     public interface IEmpanelledAgencyService
     {
-        Task<CaseInvestigationVendorsModel> GetEmpanelledVendors(long selectedcase);
-
-        Task<ReportTemplate> GetReportTemplate(long caseId);
+        Task<CaseTransactionModel> GetEmpanelledVendors(long selectedcase, string userEmail, long vendorId, bool fromEditPage = false);
     }
 
     internal class EmpanelledAgencyService : IEmpanelledAgencyService
@@ -20,9 +19,9 @@ namespace risk.control.system.Services.Creator
             this._context = context;
         }
 
-        public async Task<CaseInvestigationVendorsModel> GetEmpanelledVendors(long selectedcase)
+        public async Task<CaseTransactionModel> GetEmpanelledVendors(long selectedcase, string userEmail, long vendorId, bool fromEditPage = false)
         {
-            var claimsInvestigation = await _context.Investigations
+            var caseTask = await _context.Investigations
                 .Include(c => c.CaseNotes)
                 .Include(c => c.PolicyDetail)
                 .Include(c => c.ClientCompany)
@@ -41,6 +40,7 @@ namespace risk.control.system.Services.Creator
                 .Include(c => c.CustomerDetail)
                 .ThenInclude(c => c.State)
                 .FirstOrDefaultAsync(m => m.Id == selectedcase);
+
             var beneficiary = await _context.BeneficiaryDetail
                .Include(c => c.PinCode)
                .Include(c => c.BeneficiaryRelation)
@@ -48,34 +48,17 @@ namespace risk.control.system.Services.Creator
                .Include(c => c.State)
                .Include(c => c.Country)
                .FirstOrDefaultAsync(c => c.InvestigationTaskId == selectedcase);
-            return new CaseInvestigationVendorsModel
+
+            var currentUser = await _context.ApplicationUser.AsNoTracking().Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == userEmail);
+
+            return new CaseTransactionModel
             {
-                Location = beneficiary,
-                //Vendors = vendorWithCaseCounts,
-                ClaimsInvestigation = claimsInvestigation
+                ClaimsInvestigation = caseTask,
+                Beneficiary = beneficiary,
+                FromEditPage = fromEditPage,
+                vendorId = vendorId,
+                Currency = CustomExtensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol,
             };
-        }
-
-        public async Task<ReportTemplate> GetReportTemplate(long caseId)
-        {
-            var claimsInvestigation = await _context.Investigations
-                .AsNoTracking()
-                .FirstOrDefaultAsync(c => c.Id == caseId);
-
-            var template = await _context.ReportTemplates
-                .Include(r => r.LocationReport)
-                    .ThenInclude(l => l.AgentIdReport)
-                .Include(r => r.LocationReport)
-                    .ThenInclude(l => l.MediaReports)
-                .Include(r => r.LocationReport)
-                    .ThenInclude(l => l.FaceIds)
-                .Include(r => r.LocationReport)
-                    .ThenInclude(l => l.DocumentIds)
-                .Include(r => r.LocationReport)
-                    .ThenInclude(l => l.Questions)
-                .FirstOrDefaultAsync(r => r.Id == claimsInvestigation.ReportTemplateId);
-
-            return template;
         }
     }
 }

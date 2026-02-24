@@ -14935,51 +14935,15 @@ postcode,place_name,state_name,state_code,latitude,longitude,accuracy
 3995,Cape Paterson,Victoria,VIC,-38.6709,145.6213,4
 3996,Pound Creek,Victoria,VIC,-38.6333,145.8,4
 3996,Inverloch,Victoria,VIC,-38.6266,145.7226,4
-8001,Melbourne,Victoria,VIC,-37.814,144.9633,4
-8002,East Melbourne,Victoria,VIC,-37.8167,144.9879,4
-8003,Collins Street East,Victoria,VIC,-37.8153,144.9756,1
-8004,St Kilda Road,Victoria,VIC,-37.8153,144.9756,1
-8005,World Trade Centre,Victoria,VIC,-37.8153,144.9756,1
-8006,Abeckett Street,Victoria,VIC,-37.8153,144.9756,1
-8007,Collins Street West,Victoria,VIC,-37.8153,144.9756,1
-8008,St Kilda Road Central,Victoria,VIC,-37.8153,144.9756,1
-8009,Flinders Lane,Victoria,VIC,-37.8153,144.9756,1
-8010,Law Courts,Victoria,VIC,-37.8149,144.9505,1
-8011,Little Lonsdale Street,Victoria,VIC,-37.8149,144.9505,1
-8012,Docklands,Victoria,VIC,-37.8149,144.9505,4
-8045,Melbourne,Victoria,VIC,-37.814,144.9633,4
-8051,Melbourne,Victoria,VIC,-37.814,144.9633,4
-8060,Melbourne,Victoria,VIC,-37.814,144.9633,4
-8061,Melbourne,Victoria,VIC,-37.814,144.9633,4
-8066,Melbourne,Victoria,VIC,-37.814,144.9633,4
-8069,Melbourne,Victoria,VIC,-37.814,144.9633,4
-8070,Melbourne,Victoria,VIC,-37.814,144.9633,4
-8071,Melbourne,Victoria,VIC,-37.814,144.9633,4
-8102,Melbourne,Victoria,VIC,-37.814,144.9633,4
-8103,Melbourne,Victoria,VIC,-37.814,144.9633,4
-8107,Melbourne,Victoria,VIC,-37.814,144.9633,4
-8108,Melbourne,Victoria,VIC,-37.814,144.9633,4
-8111,Melbourne,Victoria,VIC,-37.814,144.9633,4
-8120,Melbourne,Victoria,VIC,-37.814,144.9633,4
-8205,Melbourne,Victoria,VIC,-37.814,144.9633,4
-8383,Melbourne,Victoria,VIC,-37.814,144.9633,4
-8386,Melbourne,Victoria,VIC,-37.814,144.9633,4
-8388,Melbourne,Victoria,VIC,-37.814,144.9633,4
-8390,Melbourne,Victoria,VIC,-37.814,144.9633,4
-8393,Melbourne,Victoria,VIC,-37.814,144.9633,4
-8394,Melbourne,Victoria,VIC,-37.814,144.9633,4
-8396,Melbourne,Victoria,VIC,-37.814,144.9633,4
-8399,Melbourne,Victoria,VIC,-37.814,144.9633,4
-8627,Camberwell,Victoria,VIC,-37.8421,145.0694,4
-872,Ngaanyatjarra-Giles,Western Australia,WA,-23.3256,133.0557,3
-872,Gibson Desert North,Western Australia,WA,-23.3256,133.0557,3
-872,Tjirrkarli,Western Australia,WA,-23.3256,133.0557,3
-872,Wannan,Western Australia,WA,-23.3256,133.0557,3
-872,Gibson Desert South,Western Australia,WA,-23.3256,133.0557,3
-872,Patjarr,Western Australia,WA,-23.3256,133.0557,3
-872,Wingellina,Western Australia,WA,-23.3256,133.0557,3
-872,Kiwirrkurra,Western Australia,WA,-23.3256,133.0557,3
-872,Tjukurla,Western Australia,WA,-23.3256,133.0557,3
+0872,Ngaanyatjarra-Giles,Western Australia,WA,-23.3256,133.0557,3
+0872,Gibson Desert North,Western Australia,WA,-23.3256,133.0557,3
+0872,Tjirrkarli,Western Australia,WA,-23.3256,133.0557,3
+0872,Wannan,Western Australia,WA,-23.3256,133.0557,3
+0872,Gibson Desert South,Western Australia,WA,-23.3256,133.0557,3
+0872,Patjarr,Western Australia,WA,-23.3256,133.0557,3
+0872,Wingellina,Western Australia,WA,-23.3256,133.0557,3
+0872,Kiwirrkurra,Western Australia,WA,-23.3256,133.0557,3
+0872,Tjukurla,Western Australia,WA,-23.3256,133.0557,3
 6000,Perth,Western Australia,WA,-31.9522,115.8614,4
 6000,Perth GPO,Western Australia,WA,-31.9522,115.8614,3
 6000,City Delivery Centre,Western Australia,WA,-31.9522,115.8614,3

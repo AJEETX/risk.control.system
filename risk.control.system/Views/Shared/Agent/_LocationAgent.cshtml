@@ -1,0 +1,117 @@
+﻿@using risk.control.system.Helpers;
+@model LocationReport
+<!-- Agent Table -->
+@{
+	var location = Model;
+	var agent = location.AgentIdReport;
+}
+<table class="table table-bordered table-hover dt-responsive nowrap w-100">
+	<thead class="table-light">
+		<tr>
+			<th title="Agent Name"><img class="action-image" src="~/headers/customer.gif" /></th>
+			<th>
+				<i class="far fa-user text-primary" title="This Image has agent photo at the location" data-bs-toggle="tooltip"></i>
+			</th>
+			<th title="Verified Address"><img class="action-image" src="~/headers/pincode.gif" /></th>
+			<th>Indicative Captured Address Info</th>
+			<th title="Weather info"><img class="action-image" src="~/headers/information.gif" /></th>
+			<th>Match</th>
+			<th title="Action"><img class="action-image" src="~/headers/action.gif" /></th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>
+				<small>
+				@if (agent.ValidationExecuted)
+				{
+					@location.AgentEmail
+				}
+				else
+				{
+					@agent.ReportType.GetEnumDisplayName()
+				}
+					</small>
+				@if (agent.IsRequired)
+				{
+					<span class="required-asterisk" title="Mandatory Location">*</span>
+				}
+			</td>
+
+			<td>
+				@if (agent.ValidationExecuted)
+				{
+					<img id="face-img-@agent.Id"
+						 src="@(agent?.FilePath)"
+						 class="thumbnail profile-image doc-profile-image preview-image"
+						 title="@location.AgentEmail photo" />
+				}
+				else
+				{
+					<img id="face-img-@agent.Id" src="~/img/no-user.png" class="thumbnail profile-image doc-profile-image" />
+				}
+
+			</td>
+			<td>
+				@if (agent.ValidationExecuted && agent.LocationMapUrl != null)
+				{
+					<img src="@string.Format(@agent.LocationMapUrl, "500","500")"
+						 class="thumbnail profile-image doc-profile-image map-image"
+						 data-faceid="@agent.Id"
+						 data-locationid="@location.Id"
+						 data-source="agent"
+						 title="Captured Address map" />
+				}
+				else
+				{
+					<img src="~/img/no-map.jpeg" class="thumbnail profile-image doc-profile-image" />
+				}
+			</td>
+			<td>
+				<small>
+				@agent.LocationAddress
+					</small>
+				<span class="badge badge-light">
+					Indicative Distance from @location.Address Address @agent.Distance
+				</span>
+			</td>
+			<td>
+				<small>
+				@agent.LocationInfo
+					</small>
+			</td>
+			<td>
+				@if (agent.ValidationExecuted)
+				{
+					@if (agent.ImageValid.GetValueOrDefault())
+					{
+						<i class='fas fa-check-circle i-green'></i>
+					}
+					else
+					{
+						<i class='fa fa-times i-orangered' aria-hidden='true'></i>
+					}
+				}
+				else
+				{
+					<i class='fa fa-times i-grey' aria-hidden='true'></i>
+				}
+
+			</td>
+			<td>
+				<input type="file" class="form-control remarks document-image-input face-upload" data-faceid="@agent.Id" accept="image/*"
+					   data-bs-toggle="tooltip" title="Agent Photo" />
+				<button type="button" class="btn btn-sm btn-success mt-2 upload-face-btn"
+						data-faceid="@agent.Id"
+						data-isagent="true"
+						data-location-name="@location.LocationName"
+						data-locationid="@location.Id"
+						data-name="@agent.ReportName">
+					<i class="fas fa-upload"></i> Upload
+				</button>
+				<div id="upload-status-@agent.Id" class="text-success small mt-1"></div>
+			</td>
+
+		</tr>
+	</tbody>
+</table>

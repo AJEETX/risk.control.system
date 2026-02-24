@@ -1,81 +1,42 @@
-﻿using System.Security.Claims;
-
-using AspNetCoreHero.ToastNotification.Abstractions;
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
 
 using Hangfire;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.CodeAnalysis;
-using Microsoft.EntityFrameworkCore;
 using risk.control.system.AppConstant;
 using risk.control.system.Controllers.Common;
 using risk.control.system.Helpers;
-using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
-using risk.control.system.Services.Common;
 using risk.control.system.Services.Creator;
 using SmartBreadcrumbs.Attributes;
 
 namespace risk.control.system.Controllers.Creator
 {
-    [Authorize(Roles = $"{CREATOR.DISPLAY_NAME}, {MANAGER.DISPLAY_NAME}")]
-    [Breadcrumb(" Cases")]
+    [Authorize(Roles = $"{CREATOR.DISPLAY_NAME}")]
+    [Breadcrumb("Cases")]
     public class CaseActiveController : Controller
     {
-        private readonly ApplicationDbContext _context;
-        private readonly INotyfService notifyService;
-        private readonly ILogger<CaseActiveController> logger;
-        private readonly IEmpanelledAgencyService empanelledAgencyService;
-        private readonly IInvestigationDetailService investigationDetailService;
+        private readonly ICaseActiveService _caseActiveService;
+        private readonly INotyfService _notifyService;
+        private readonly ILogger<CaseActiveController> _logger;
+        private readonly IReportTemplateService _reportTemplateService;
 
-        public CaseActiveController(ApplicationDbContext context,
+        public CaseActiveController(
+            ICaseActiveService caseActiveService,
             INotyfService notifyService,
             ILogger<CaseActiveController> logger,
-            IEmpanelledAgencyService empanelledAgencyService,
-            IInvestigationDetailService investigationDetailService)
+            IReportTemplateService reportTemplateService)
         {
-            _context = context;
-            this.notifyService = notifyService;
-            this.logger = logger;
-            this.empanelledAgencyService = empanelledAgencyService;
-            this.investigationDetailService = investigationDetailService;
+            _caseActiveService = caseActiveService;
+            _notifyService = notifyService;
+            _logger = logger;
+            _reportTemplateService = reportTemplateService;
         }
 
         public IActionResult Index()
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
-            if (string.IsNullOrWhiteSpace(userEmail))
-            {
-                notifyService.Error("UnAuthenticated User");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
-            }
-            try
-            {
-                var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
-                if (userRole.Value.Contains(CREATOR.DISPLAY_NAME))
-                {
-                    return RedirectToAction("Active");
-                }
-                else if (userRole.Value.Contains(ASSESSOR.DISPLAY_NAME))
-                {
-                    return RedirectToAction("Assessor");
-                }
-                else if (userRole.Value.Contains(MANAGER.DISPLAY_NAME))
-                {
-                    return RedirectToAction("Manager");
-                }
-                else
-                {
-                    return RedirectToAction("Index", "Dashboard");
-                }
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Error occurred getting active case(s). {UserEmail}", userEmail);
-                notifyService.Error("OOPs !!!..Contact Admin");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
-            }
+            return RedirectToAction(nameof(Active));
         }
 
         [HttpGet]
@@ -102,44 +63,36 @@ namespace risk.control.system.Controllers.Creator
             var userEmail = HttpContext.User.Identity.Name;
             try
             {
-                var pendingCount = await _context.Investigations.CountAsync(c => c.UpdatedBy == userEmail && c.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.UPLOAD_IN_PROGRESS);
+                var pendingCount = await _caseActiveService.GetPendingUploadCount(userEmail);
                 return View(new JobStatus { JobId = jobId, PendingCount = pendingCount });
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred getting active case {JobId}. {UserEmail}", jobId, userEmail);
-                notifyService.Error("OOPs !!!..Contact Admin");
+                _logger.LogError(ex, "Error occurred getting active case {JobId}. {UserEmail}", jobId, userEmail);
+                _notifyService.Error("OOPs !!!..Contact Admin");
                 return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
 
-        [Breadcrumb(title: " Details", FromAction = "Active")]
+        [Breadcrumb(title: " Details", FromAction = nameof(Active))]
         public async Task<IActionResult> ActiveDetail(long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             if (!ModelState.IsValid || id <= 0)
             {
-                notifyService.Error("OOPS !!! Case Not Found !!!..");
+                _notifyService.Error("OOPS !!! Case Not Found !!!..");
                 return this.RedirectToAction<DashboardController>(x => x.Index());
             }
             try
             {
-                var currentUser = await _context.ApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == userEmail);
-                ViewData["Currency"] = CustomExtensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
-                if (id < 1)
-                {
-                    notifyService.Error("OOPS !!! Case Not Found !!!..");
-                    return this.RedirectToAction<DashboardController>(x => x.Index());
-                }
-
-                var model = await investigationDetailService.GetCaseDetails(userEmail, id);
+                var model = await _caseActiveService.GetActiveCaseDetails(userEmail, id);
 
                 return View(model);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred active case detail {Id}. {UserEmail}", id, userEmail);
-                notifyService.Error("OOPs !!!..Contact Admin");
+                _logger.LogError(ex, "Error occurred active case detail {Id}. {UserEmail}", id, userEmail);
+                _notifyService.Error("OOPs !!!..Contact Admin");
                 return this.RedirectToAction<DashboardController>(x => x.Index());
             }
         }
@@ -154,7 +107,7 @@ namespace risk.control.system.Controllers.Creator
 
             try
             {
-                var template = await empanelledAgencyService.GetReportTemplate(caseId);
+                var template = await _reportTemplateService.GetReportTemplate(caseId);
 
                 if (template == null)
                 {
@@ -165,11 +118,7 @@ namespace risk.control.system.Controllers.Creator
             }
             catch (Exception ex)
             {
-                logger.LogError(
-                    ex,
-                    "Error getting report template. CaseId: {CaseId}, User: {UserEmail}",
-                    caseId,
-                    User.Identity?.Name ?? "Anonymous");
+                _logger.LogError(ex, "Error getting report template. CaseId: {CaseId}, User: {UserEmail}", caseId, User.Identity?.Name ?? "Anonymous");
 
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }

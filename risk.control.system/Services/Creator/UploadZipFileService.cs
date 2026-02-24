@@ -11,20 +11,20 @@ namespace risk.control.system.Services.Creator
 
     internal class UploadZipFileService : IUploadZipFileService
     {
-        private readonly ApplicationDbContext context;
+        private readonly IDbContextFactory<ApplicationDbContext> _contextFactory;
         private readonly IUploadFileDataProcessor uploadFileDataProcessor;
         private readonly IUploadFileInitiator uploadFileInitiator;
         private readonly ICsvFileReaderService csvFileReaderService;
         private readonly ILogger<UploadZipFileService> logger;
 
         public UploadZipFileService(
-            ApplicationDbContext context,
+            IDbContextFactory<ApplicationDbContext> contextFactory,
             IUploadFileDataProcessor uploadFileDataProcessor,
             IUploadFileInitiator uploadFileInitiator,
             ICsvFileReaderService csvFileReaderService,
             ILogger<UploadZipFileService> logger)
         {
-            this.context = context;
+            _contextFactory = contextFactory;
             this.uploadFileDataProcessor = uploadFileDataProcessor;
             this.uploadFileInitiator = uploadFileInitiator;
             this.csvFileReaderService = csvFileReaderService;
@@ -36,7 +36,8 @@ namespace risk.control.system.Services.Creator
         {
             try
             {
-                var companyUser = await context.ApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(c => c.Email == userEmail);
+                await using var context = await _contextFactory.CreateDbContextAsync();
+                var companyUser = await context.ApplicationUser.AsNoTracking().Include(u => u.ClientCompany).FirstOrDefaultAsync(c => c.Email == userEmail);
 
                 var uploadFileData = await context.FilesOnFileSystem.FirstOrDefaultAsync(f => f.Id == uploadId && f.CompanyId == companyUser.ClientCompanyId && f.UploadedBy == userEmail && !f.Deleted);
 

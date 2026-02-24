@@ -23,7 +23,7 @@ namespace risk.control.system.Services.Creator
                 DateTimeStyles.None,
                 out var dob
             );
-            if (!isValid || dob > DateTime.Now || dob < DateTime.Now.AddYears(-120))
+            if (!isValid || dob > DateTime.UtcNow || dob < DateTime.UtcNow.AddYears(-120))
             {
                 errs.Add(new UploadError { UploadData = $"[{dateType} Date of Birth: {value}]", Error = "Invalid/Null" });
                 sums.Add($"[{dateType} Date of Birth={value} is invalid]");
@@ -40,13 +40,13 @@ namespace risk.control.system.Services.Creator
             if (!isIssueValid || issueDate > DateTime.Today)
             {
                 AddError("Issue Date", uc.IssueDate, errs, sums);
-                issueDate = DateTime.Now;
+                issueDate = DateTime.UtcNow;
             }
 
             if (!isIncidentValid || incidentDate > DateTime.Today)
             {
                 AddError("Incident Date", uc.IncidentDate, errs, sums);
-                incidentDate = DateTime.Now;
+                incidentDate = DateTime.UtcNow;
             }
 
             if (isIssueValid && isIncidentValid && issueDate > incidentDate)

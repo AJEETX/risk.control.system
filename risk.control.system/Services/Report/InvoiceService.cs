@@ -37,6 +37,7 @@ namespace risk.control.system.Services.Report
               .ThenInclude(v => v.Country)
               .Include(i => i.InvestigationServiceType)
               .FirstOrDefaultAsync();
+
             return invoice;
         }
     }

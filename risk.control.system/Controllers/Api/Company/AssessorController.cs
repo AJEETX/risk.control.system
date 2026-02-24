@@ -28,10 +28,6 @@ namespace risk.control.system.Controllers.Api.Company
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userEmail))
-            {
-                return Unauthorized("User not authenticated.");
-            }
             try
             {
                 var response = await assesorService.GetInvestigationReports(userEmail, draw, start, length, search, caseType, orderColumn, orderDir);
@@ -50,10 +46,6 @@ namespace risk.control.system.Controllers.Api.Company
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userEmail))
-            {
-                return Unauthorized("User not authenticated.");
-            }
             try
             {
                 var response = await assesorService.GetReviews(userEmail, draw, start, length, search, caseType, orderColumn, orderDir);
@@ -72,10 +64,6 @@ namespace risk.control.system.Controllers.Api.Company
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userEmail))
-            {
-                return Unauthorized("User not authenticated.");
-            }
             try
             {
                 var response = await assesorService.GetApprovededCases(userEmail, draw, start, length, search, caseType, orderColumn, orderDir);
@@ -93,10 +81,6 @@ namespace risk.control.system.Controllers.Api.Company
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userEmail))
-            {
-                return Unauthorized("User not authenticated.");
-            }
             try
             {
                 var response = await assesorService.GetRejectedCases(userEmail, draw, start, length, search, caseType, orderColumn, orderDir);

@@ -1,7 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc.Rendering;
+
 namespace risk.control.system.Models.ViewModel
 {
-
     public class CreateCaseViewModel
     {
         [Required]
@@ -41,12 +42,26 @@ namespace risk.control.system.Models.ViewModel
         [Required]
         [DataType(DataType.Date)]
         [Display(Name = "Case issue date")]
-        public DateTime ContractIssueDate { get; set; }
+        public DateTime? ContractIssueDate { get; set; }
 
         [Required]
         [DataType(DataType.Date)]
         [Display(Name = "Date of incident")]
-        public DateTime DateOfIncident { get; set; }
+        public DateTime? DateOfIncident { get; set; }
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (ContractIssueDate.HasValue && DateOfIncident.HasValue)
+            {
+                if (DateOfIncident < ContractIssueDate)
+                {
+                    yield return new ValidationResult(
+                        "Date of incident cannot be before the case issue date.",
+                        new[] { nameof(DateOfIncident), nameof(ContractIssueDate) }
+                    );
+                }
+            }
+        }
 
         [Required]
         [StringLength(70)]
@@ -65,5 +80,12 @@ namespace risk.control.system.Models.ViewModel
         [Required]
         [Display(Name = "Reason To Verify")]
         public long CaseEnablerId { get; set; }
+
+        public IEnumerable<SelectListItem> CaseEnablers { get; set; } = Enumerable.Empty<SelectListItem>();
+        public IEnumerable<SelectListItem> CostCentres { get; set; } = Enumerable.Empty<SelectListItem>();
+        public IEnumerable<SelectListItem> InsuranceTypes { get; set; } = Enumerable.Empty<SelectListItem>();
+        public IEnumerable<SelectListItem> InvestigationServiceTypes { get; set; } = Enumerable.Empty<SelectListItem>();
+
+        public string? CurrencySymbol { get; set; }
     }
 }

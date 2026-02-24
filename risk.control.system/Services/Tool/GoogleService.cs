@@ -1,5 +1,6 @@
 ﻿using Google.Apis.Auth.OAuth2;
 using Google.Cloud.Vision.V1;
+using risk.control.system.Helpers;
 
 namespace risk.control.system.Services.Tool
 {
@@ -21,7 +22,7 @@ namespace risk.control.system.Services.Tool
         {
             try
             {
-                string credentialJson = Environment.GetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS_JSON");
+                string credentialJson = EnvHelper.Get("GOOGLE_APPLICATION_CREDENTIALS_JSON"); // "{ \"type\": \"service_account\", ... }";
 
                 // Create Google Credential from JSON string
                 GoogleCredential googleCredential = GoogleCredential.FromJson(credentialJson);
@@ -36,7 +37,7 @@ namespace risk.control.system.Services.Tool
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred.");
+                logger.LogError(ex, "Error occurred While text detection.");
                 return null!;
             }
         }

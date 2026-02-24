@@ -1,111 +1,110 @@
-﻿@model CaseInvestigationVendorAgentModel
+﻿@model CaseAgencyAgentModel
 
 @{
-    ViewData["Title"] = @Applicationsettings.SERVICE;
+	ViewData["Title"] = @Applicationsettings.SERVICE;
 }
 
 <section class="content">
-    <div id="article" class="card shadow-lg border-1 rounded-lg">
-        <div class="card-header bg-secondary text-white text-center">
-            <h3 class="card-title">
-                <i class="fas fa-users"></i>  @Applicationsettings.AGENTS
-                <span class="hover-text">
-                    <i class="fas fa-info-circle"></i>
-                    <span class="tooltip-text" id="information">
-                        
-                        <li>
-                            <i class='far fa-hand-point-right'></i> Case:
-                            <b>
-                                <i class="far fa-file-powerpoint"></i>
-                                @Model.ClaimsInvestigation?.PolicyDetail?.ContractNumber  ( <i class='fa fa-plus'></i> )
-                            </b>
-                        </li>
-                        <li>
-                            <i class='far fa-hand-point-right'></i>
-                            <button class='badge badge-default xs top-info'>
-                                <b>
-                                    <i class="fa fa-sync"></i> Refresh
-                                </b>
-                            </button>
-                        </li>
-                        <li>
-                            <i class='far fa-hand-point-left'></i> Select <input type='radio' /> <strong>AGENT</strong>
-                        </li>
-                        <li>
-                            <i class='far fa-thumbs-up'></i>
-                            <button class='btn btn-danger  btn-xs'>
-                                <span class='badge badge-danger btn-xs'>
-                                    <i class='fas fa-external-link-alt'></i>
-                                </span> <b>Allocate</b>
-                            </button>
-                        </li>
-                    </span>
-                </span>
-            </h3>
-        </div>
-        <article>
-            <input type="hidden" id="policyDetailId" value="@Model.ClaimsInvestigation?.PolicyDetail.PolicyDetailId" />
-            <input type="hidden" id="customerDetailId" value="@Model.ClaimsInvestigation?.CustomerDetail.CustomerDetailId" />
-            <input type="hidden" id="caseLocationId" value="@Model.CaseLocation?.BeneficiaryDetailId" />
-            <input type="hidden" id="beneficiaryId" value="@Model.CaseLocation?.BeneficiaryDetailId" />
-            <input type="hidden" id="claimId" value="@Model.ClaimsInvestigation?.Id" />
-            <div class="bb-blog-inner">
-                <div class="card shadow-lg border-1 rounded-lg direct-chat-warning collapsed-card">
-                    <div class="card-header bg-light text-white text-center">
-                        <h3 class="card-title">
-                            Claim: <span class="badge badge-light"><i class="far fa-file-powerpoint"></i>  @Model.ClaimsInvestigation?.PolicyDetail?.ContractNumber</span>
-                            <span class="hover-text">
-                                <i class="fas fa-info-circle"></i>
-                                <span class="tooltip-text" id="information">
-                                    <li>
-                                        <i class='far fa-file-powerpoint'></i> Policy details.
-                                    </li>
-                                    <li>
-                                        <i class='fa fa-user-plus'></i> Customer details.
-                                    </li>
-                                    <li> <i class='fas fa-user-tie'></i> Beneficiary details </li>
+	<div id="article" class="card shadow-lg border-1 rounded-lg">
+		<div class="card-header bg-secondary text-white text-center">
+			<h3 class="card-title">
+				<i class="fas fa-users"></i>  @Applicationsettings.AGENTS
+				<span class="hover-text">
+					<i class="fas fa-info-circle"></i>
+					<span class="tooltip-text" id="information">
 
-                                </span>
-                            </span>
-                        </h3>
-                        <div class="card-tools">
-                            <span data-bs-toggle="tooltip" title="Claim # : @Model.ClaimsInvestigation?.PolicyDetail?.ContractNumber" class="badge badge-light">
-                                <i class='far fa-hand-point-right'></i>
-                            </span>
-                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                                <i class="fas fa-plus"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="card-body">
+						<li>
+							<i class='far fa-hand-point-right'></i> Case:
+							<b>
+								<i class="far fa-file-powerpoint"></i>
+								@Model.ClaimsInvestigation?.PolicyDetail?.ContractNumber  ( <i class='fa fa-plus'></i> )
+							</b>
+						</li>
+						<li>
+							<i class='far fa-hand-point-right'></i>
+							<button class='badge badge-default xs top-info'>
+								<b>
+									<i class="fa fa-sync"></i> Refresh
+								</b>
+							</button>
+						</li>
+						<li>
+							<i class='far fa-hand-point-left'></i> Select <input type='radio' /> <strong>AGENT</strong>
+						</li>
+						<li>
+							<i class='far fa-thumbs-up'></i>
+							<button class='btn btn-danger  btn-xs'>
+								<span class='badge badge-danger btn-xs'>
+									<i class='fas fa-external-link-alt'></i>
+								</span> <b>Allocate</b>
+							</button>
+						</li>
+					</span>
+				</span>
+			</h3>
+		</div>
+		<article>
+			<input type="hidden" id="policyDetailId" value="@Model.ClaimsInvestigation?.PolicyDetail.PolicyDetailId" />
+			<input type="hidden" id="customerDetailId" value="@Model.ClaimsInvestigation?.CustomerDetail.CustomerDetailId" />
+			<input type="hidden" id="caseLocationId" value="@Model.Beneficiary?.BeneficiaryDetailId" />
+			<input type="hidden" id="beneficiaryId" value="@Model.Beneficiary?.BeneficiaryDetailId" />
+			<input type="hidden" id="claimId" value="@Model.ClaimsInvestigation?.Id" />
+			<div class="bb-blog-inner">
+				<div class="card shadow-lg border-1 rounded-lg direct-chat-warning collapsed-card">
+					<div class="card-header bg-light text-white text-center">
+						<h3 class="card-title">
+							Claim: <span class="badge badge-light"><i class="far fa-file-powerpoint"></i>  @Model.ClaimsInvestigation?.PolicyDetail?.ContractNumber</span>
+							<span class="hover-text">
+								<i class="fas fa-info-circle"></i>
+								<span class="tooltip-text" id="information">
+									<li>
+										<i class='far fa-file-powerpoint'></i> Policy details.
+									</li>
+									<li>
+										<i class='fa fa-user-plus'></i> Customer details.
+									</li>
+									<li> <i class='fas fa-user-tie'></i> Beneficiary details </li>
+								</span>
+							</span>
+						</h3>
+						<div class="card-tools">
+							<span data-bs-toggle="tooltip" title="Claim # : @Model.ClaimsInvestigation?.PolicyDetail?.ContractNumber" class="badge badge-light">
+								<i class='far fa-hand-point-right'></i>
+							</span>
+							<button type="button" class="btn btn-tool" data-card-widget="collapse">
+								<i class="fas fa-plus"></i>
+							</button>
+						</div>
+					</div>
+					<div class="card-body">
 
-                        <div class="row">
-                            <partial name="_ClaimPolicyDetails" model="@Model" />
-                            @if (Model.ClaimsInvestigation.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING)
+						<div class="row">
+							<partial name="_ClaimPolicyDetails" model="@Model" />
+							@if (Model.ClaimsInvestigation.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING)
 
-                            {
-                                <partial name="_ClaimCustomerDetails" model="@Model" />
-                            }
-                            else
-                            {
-                                <partial name="_ClaimBeneficairyDetails" model="@Model" />
-                            }
-                        </div>
-                    </div>
-                </div>
-            </div> <!-- class bb-blog-inner -->
-        </article>
-        @{
-            Model.ReSelect = true;
-        }
-        <div class="card shadow-lg border-1 rounded-lg">
-            <button id="refreshTable" class="btn btn-default"> <i id="refreshIcon" class="fas fa-sync"></i> Refresh</button>
-        </div>
-        <partial name="_AgentList" model="@Model" />
-    </div>
+							{
+								<partial name="_ClaimCustomerDetails" model="@Model" />
+							}
+							else
+							{
+								<partial name="_ClaimBeneficairyDetails" model="@Model" />
+							}
+						</div>
+					</div>
+				</div>
+			</div> <!-- class bb-blog-inner -->
+		</article>
+		@{
+			Model.ReSelect = true;
+		}
+		<div class="card shadow-lg border-1 rounded-lg">
+			<button id="refreshTable" class="btn btn-default"> <i id="refreshIcon" class="fas fa-sync"></i> Refresh</button>
+		</div>
+		<partial name="_AgentList" model="@Model" />
+	</div>
 </section>
 
 @section Scripts {
-    <script src="~/js/agency/select-agent.js"></script>
-    <script src="~/js/common/case-details.js"></script>
+	<script src="~/js/agency/select-agent.js"></script>
+	<script src="~/js/common/case-details.js"></script>
 }

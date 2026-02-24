@@ -25,13 +25,13 @@ namespace risk.control.system.Seeds
             var states = pincodes.GroupBy(g => new { g.StateName, g.StateCode });
             foreach (var state in states)
             {
-                var dbState = new State { Code = state.Key.StateCode, Name = state.Key.StateName, Country = country, Updated = DateTime.Now };
+                var dbState = new State { Code = state.Key.StateCode, Name = state.Key.StateName, Country = country, Updated = DateTime.UtcNow };
                 var stateAdded = await context.State.AddAsync(dbState);
                 var districts = state.GroupBy(g => g.District);
                 var pinCodeList = new List<PinCode> { };
                 foreach (var district in districts)
                 {
-                    var districtDetail = new District { Code = district.Key, Name = district.Key, State = stateAdded.Entity, Country = country, Updated = DateTime.Now };
+                    var districtDetail = new District { Code = district.Key, Name = district.Key, State = stateAdded.Entity, Country = country, Updated = DateTime.UtcNow };
                     var districtAdded = await context.District.AddAsync(districtDetail);
                     foreach (var pinCode in district)
                     {
@@ -44,7 +44,7 @@ namespace risk.control.system.Seeds
                             District = districtAdded.Entity,
                             State = stateAdded.Entity,
                             Country = country,
-                            Updated = DateTime.Now,
+                            Updated = DateTime.UtcNow,
                         };
                         pinCodeList.Add(pincodeState);
                     }
@@ -87,7 +87,7 @@ namespace risk.control.system.Seeds
                                 CurrencyCode = currency?.CurrencyCode ?? currencyName?.CurrencyCode,
                                 CurrencyName = currencyName?.CurrencyName,
                                 Language = currency?.Language.ToUpper(),
-                                Updated = DateTime.Now,
+                                Updated = DateTime.UtcNow,
                             };
 
                             countries.Add(country);

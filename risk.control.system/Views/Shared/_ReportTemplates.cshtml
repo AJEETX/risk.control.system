@@ -67,7 +67,7 @@
                             <small>
                                 @{
                                     var created = template.Created;
-                                    var now = DateTime.Now;
+                                    var now = DateTime.UtcNow;
                                     var diff = now.Date - created.Date;
                                     string displayText;
 

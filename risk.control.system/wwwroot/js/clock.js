@@ -1,14 +1,12 @@
-﻿var askConfirmation = true; // Prevent duplicate confirmation dialogs
-var logoutPath = "/Account/Logout";
-var defaultTimeoutSeconds = parseInt(document.getElementById('timeout')?.value || "900", 10); // Default 15 minutes
-var sessionTimer = localStorage.getItem("sessionTimer")
-    ? parseInt(localStorage.getItem("sessionTimer"), 10)
-    : defaultTimeoutSeconds;
+﻿var istool = document.getElementById('tools')?.value || false; // is Tool
+
+var loginPath = istool ? "/Tools/Try": "/Account/Login";
 const refreshSessionPath = "/Session/KeepSessionAlive"; // Path to refresh session
+let isExpired = false; // New state flag
 
 async function refreshSession() {
     const currentPageUrl = window.location.href;
-    console.log(`Refreshing session on ${currentPageUrl}`);
+    console.log(`Refreshing session on page ${currentPageUrl}`);
     var token = $('input[name="__RequestVerificationToken"]').val();
 
     try {
@@ -23,7 +21,7 @@ async function refreshSession() {
         });
 
         if (response.status === 401 || response.status === 403 || !response.ok) {
-            // Use jConfirm before redirecting
+            isExpired = true; // Stop activity tracking immediately
             $.confirm({
                 title: 'Session Expired!',
                 content: 'Your session has expired or you are unauthorized. You will be redirected to the login page.',
@@ -34,13 +32,13 @@ async function refreshSession() {
                         text: 'Login',
                         btnClass: 'btn-red',
                         action: function () {
-                            window.location.href = "/Account/Login";
+                            smoothRedirect(loginPath);
                         }
                     }
                 },
                 onClose: function () {
                     // In case user closes the dialog manually
-                    window.location.href = "/Account/Login";
+                    smoothRedirect(loginPath);
                 }
             });
             return;
@@ -49,32 +47,27 @@ async function refreshSession() {
         // Parse and log user identity if available
         try {
             const userDetails = await response.json();
-            console.log("User Identity Details:", userDetails);
+            console.log("User Details:", userDetails);
         } catch (error) {
-            console.error("Failed to parse user identity details as JSON:", error);
-            // Optional: show jConfirm before redirect
-            $.confirm({
-                title: 'Session Error!',
-                content: 'Unable to parse session. Redirecting to login.',
-                type: 'red',
-                typeAnimated: true,
-                buttons: {
-                    Ok: function () {
-                        window.location.href = "/Account/Login";
-                    }
-                }
-            });
+            console.error("Failed to parse user details as JSON:", error);
+            smoothRedirect(loginPath);
         }
     } catch (error) {
         console.error("Error during session refresh request:", error);
+        isExpired = true; // Stop activity tracking immediately
+
         $.confirm({
             title: 'Connection Error!',
             content: 'There was a problem refreshing your session. You will be redirected to the login page.',
             type: 'red',
             typeAnimated: true,
             buttons: {
-                Ok: function () {
-                    window.location.href = "/Account/Login";
+                login: {
+                    text: 'Login Again',
+                    btnClass: 'btn-warning',
+                    action: function () {
+                        smoothRedirect(loginPath);
+                    }
                 }
             }
         });
@@ -82,28 +75,64 @@ async function refreshSession() {
 }
 
 let idleTimer = null;
-let idleLimit = defaultTimeoutSeconds * 1000; // 15 minutes
-
+var lastSyncTime = 0;
+var defaultTimeoutSeconds = parseInt(document.getElementById('timeout')?.value || "900", 10); // Default 900 seconds
+var idleLimit = defaultTimeoutSeconds * 1000; // in minutes
+var syncInterval = 60000;     // Sync server once per minute
 function resetIdleTimer() {
+    if (isExpired) return;
+    const now = new Date().getTime();
+
+    if (now - lastSyncTime > syncInterval) {
+        refreshSession();
+        lastSyncTime = now;
+    }
+
     clearTimeout(idleTimer);
     idleTimer = setTimeout(userIsIdle, idleLimit);
+    const expiry = new Date(now + idleLimit);
+    console.log(`%c[${new Date().toLocaleTimeString()}] %cTimer Reset. %cExpires at: %c${expiry.toLocaleTimeString()}`,
+        "color: gray;", "color: green; font-weight: bold;", "color: black;", "color: red; font-weight: bold;");
 }
 
 function userIsIdle() {
+    isExpired = true; // Block further resets
+    const idleMinutes = Math.floor(defaultTimeoutSeconds / 60);
     $.confirm({
         title: '<i class="fas fa-exclamation-triangle text-danger"></i> Session Expired',
-        content: 'You have been inactive for 15 minutes. Please login again.',
-        type: 'red',
+        content: `
+        <div class="text-center">
+            <div class="mb-3">
+                <i class="fas fa-history fa-4x text-warning animate__animated animate__pulse animate__infinite"></i>
+            </div>
+            <p>
+                You have been inactive for <b><u><i>${idleMinutes} minutes</i></u></b>.<br>
+                For your security, please log back in.
+            </p>
+        </div>`,
+        type: 'orange',
+        theme: 'modern', // Much cleaner than the default
+        icon: 'fas fa-lock',
+        backgroundDismiss: false,
         closeIcon: false,
+        animation: 'scale', // Smooth entrance
+        closeAnimation: 'zoom',
+        animateFromElement: false,
+        bgOpacity: 0.7,
         buttons: {
             login: {
-                text: 'Login',
-                btnClass: 'btn-danger',
+                text: 'Login Again',
+                btnClass: 'btn-warning',
                 action: function () {
-                    window.location.href = '/Account/Login';
+                    smoothRedirect(loginPath);
                 }
             }
         }
+    });
+}
+function smoothRedirect(url) {
+    $('body').fadeOut(800, function () {
+        window.location.href = url;
     });
 }
 

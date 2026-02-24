@@ -1,50 +1,48 @@
 ﻿@model CaseTransactionModel
 
 @{
-    ViewData["Title"] = "Details";
+	ViewData["Title"] = "Details";
 
 }
 
 <section class="content">
-    <input type="hidden" id="policyDetailId" value="@Model.ClaimsInvestigation?.PolicyDetail.PolicyDetailId" />
-    <input type="hidden" id="customerDetailId" value="@Model.ClaimsInvestigation?.CustomerDetail.CustomerDetailId" />
-    <input type="hidden" id="beneficiaryId" value="@Model.Location?.BeneficiaryDetailId" />
-    <input type="hidden" id="claimId" value="@Model.ClaimsInvestigation?.Id" />
-    <div id="article" class="card shadow-lg border-1 rounded-lg">
-        <div class="card-header bg-secondary text-white text-center">
-            <h3 class="card-title">
-                <i class="fas fa-newspaper"></i> Details
-                <span class="hover-text">
-                    <i class="fas fa-info-circle"></i>
-                    <span class="tooltip-text" id="information">
-                        <li>
-                            <i class='far fa-file-powerpoint'></i> Policy details.
-                        </li>
-                        @if (Model.ClaimsInvestigation.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING)
-                        {
-                            <li>
-                                <i class='fa fa-user-plus'></i> Customer details
-                            </li>
-                        }
-                        else
-                        {
-                            <li> <i class='fas fa-user-tie'></i> Beneficiary details </li>
-                        }
-                        <li> <i class="fas fa-newspaper"></i> Agency report </li>
-                        <li><i class="far fa-comment"></i> Assessor Remarks </li>
-                        <li><i class="fas fa-clock"></i> Timeline </li>
-                        <li><i class="fas fa-money-check-alt"></i> Billing Info </li>
-
-                    </span>
-                </span>
-            </h3>
-        </div>
-
-    </div>
-    <partial name="_ApprovedPolicyDetails" model="@Model" />
+	<input type="hidden" id="policyDetailId" value="@Model.ClaimsInvestigation?.PolicyDetail.PolicyDetailId" />
+	<input type="hidden" id="customerDetailId" value="@Model.ClaimsInvestigation?.CustomerDetail.CustomerDetailId" />
+	<input type="hidden" id="beneficiaryId" value="@Model.Beneficiary?.BeneficiaryDetailId" />
+	<input type="hidden" id="claimId" value="@Model.ClaimsInvestigation?.Id" />
+	<div id="article" class="card shadow-lg border-1 rounded-lg">
+		<div class="card-header bg-secondary text-white text-center">
+			<h3 class="card-title">
+				<i class="fas fa-newspaper"></i> Details
+				<span class="hover-text">
+					<i class="fas fa-info-circle"></i>
+					<span class="tooltip-text" id="information">
+						<li>
+							<i class='far fa-file-powerpoint'></i> Policy details.
+						</li>
+						@if (Model.ClaimsInvestigation.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING)
+						{
+							<li>
+								<i class='fa fa-user-plus'></i> Customer details
+							</li>
+						}
+						else
+						{
+							<li> <i class='fas fa-user-tie'></i> Beneficiary details </li>
+						}
+						<li> <i class="fas fa-newspaper"></i> Agency report </li>
+						<li><i class="far fa-comment"></i> Assessor Remarks </li>
+						<li><i class="fas fa-clock"></i> Timeline </li>
+						<li><i class="fas fa-money-check-alt"></i> Billing Info </li>
+					</span>
+				</span>
+			</h3>
+		</div>
+	</div>
+	<partial name="_SubmittedReportDetails" model="@Model" />
 </section>
 
 @section Scripts {
-    <script src="~/js/common/case-details.js"></script>
-    <script src="~/js/case-map.js"></script>
+	<script src="~/js/common/case-details.js"></script>
+	<script src="~/js/case-map.js"></script>
 }

@@ -7,5 +7,13 @@
         public bool Has2Face { get; set; } = false;
         public DigitalIdReportType ReportType { get; set; }
 
+        override public string ToString()
+        {
+            return $"AgentIdReport: " +
+                   $"Report Type={ReportType}, " +
+                   $"Image Match Confidence={DigitalIdImageMatchConfidence}, " +
+                   $"Similarity={Similarity}, " +
+                   $"Has front and back Face={Has2Face}";
+        }
     }
 }

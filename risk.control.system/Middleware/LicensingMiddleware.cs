@@ -15,10 +15,10 @@ namespace risk.control.system.Middleware
     public class LicensingMiddleware
     {
         private readonly RequestDelegate _next;
-        private readonly ILogger<WhitelistListMiddleware> _logger;
+        private readonly ILogger<LicensingMiddleware> _logger;
         private readonly IFeatureManager featureManager;
 
-        public LicensingMiddleware(RequestDelegate next, ILogger<WhitelistListMiddleware> logger, IFeatureManager featureManager)
+        public LicensingMiddleware(RequestDelegate next, ILogger<LicensingMiddleware> logger, IFeatureManager featureManager)
         {
             _next = next;
             _logger = logger;
@@ -47,7 +47,7 @@ namespace risk.control.system.Middleware
                                 await context.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
                                 // Redirect to login page
-                                context.Response.Redirect("/Account/Login"); // Replace with your logout or login page
+                                context.Response.Redirect(AppCookie.LOGIN_PATH); // Replace with your logout or login page
                                 return;
                             }
                         }
@@ -82,7 +82,7 @@ namespace risk.control.system.Middleware
                                     context.Response.Redirect("/page/error.html");
                                     return;
                                 }
-                                if (company.LicenseType == LicenseType.Trial && company.ExpiryDate.HasValue && DateTime.Now.Subtract(company.ExpiryDate.Value).Ticks > 0)
+                                if (company.LicenseType == LicenseType.Trial && company.ExpiryDate.HasValue && DateTime.UtcNow.Subtract(company.ExpiryDate.Value).Ticks > 0)
                                 {
                                     context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
                                     context.Response.Redirect("/page/trial.html");

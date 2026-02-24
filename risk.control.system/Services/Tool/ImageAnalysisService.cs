@@ -36,29 +36,33 @@ namespace risk.control.system.Services.Tool
 
             // Run Analysis
             bool isSuspicious = CheckMetadata(filePath);
-            GenerateElaImage(filePath, elaPath);
+            var score = GenerateElaImage(filePath, elaPath);
 
             var model = new ImageAnalysisViewModel
             {
                 OriginalImageUrl = $"/uploads/{file.FileName}",
                 ElaImageUrl = $"/uploads/ela_{file.FileName}",
-                MetadataFlagged = isSuspicious
+                MetadataFlagged = isSuspicious,
+                ElaScore = Math.Round(score, 2)
             };
             if (isSuspicious)
                 model.AnalysisNotes.Add("Warning: Editing software (Photoshop/GIMP) detected in metadata.");
             return model;
         }
 
-        private void GenerateElaImage(string sourcePath, string outputPath, int quality = 90)
+        private double GenerateElaImage(string sourcePath, string outputPath, int quality = 90)
         {
             using var image = Image.Load<Rgba32>(sourcePath);
             using var ms = new MemoryStream();
 
+            // Re-save at a specific quality to see how pixels react
             image.SaveAsJpeg(ms, new JpegEncoder { Quality = quality });
             ms.Position = 0;
             using var compressed = Image.Load<Rgba32>(ms);
 
             using var elaImage = new Image<Rgba32>(image.Width, image.Height);
+
+            double totalDiff = 0;
 
             for (int y = 0; y < image.Height; y++)
             {
@@ -67,14 +71,31 @@ namespace risk.control.system.Services.Tool
                     var p1 = image[x, y];
                     var p2 = compressed[x, y];
 
-                    byte r = (byte)Math.Clamp(Math.Abs(p1.R - p2.R) * 20, 0, 255);
-                    byte g = (byte)Math.Clamp(Math.Abs(p1.G - p2.G) * 20, 0, 255);
-                    byte b = (byte)Math.Clamp(Math.Abs(p1.B - p2.B) * 20, 0, 255);
+                    // Calculate difference for the score
+                    int diffR = Math.Abs(p1.R - p2.R);
+                    int diffG = Math.Abs(p1.G - p2.G);
+                    int diffB = Math.Abs(p1.B - p2.B);
+
+                    totalDiff += (diffR + diffG + diffB);
+
+                    // Amplify differences for the visual ELA image (the *20 you had)
+                    byte r = (byte)Math.Clamp(diffR * 20, 0, 255);
+                    byte g = (byte)Math.Clamp(diffG * 20, 0, 255);
+                    byte b = (byte)Math.Clamp(diffB * 20, 0, 255);
 
                     elaImage[x, y] = new Rgba32(r, g, b);
                 }
             }
+
             elaImage.SaveAsPng(outputPath);
+
+            // Calculate Average Difference per pixel (0 to 255 range)
+            double avgDiff = totalDiff / (image.Width * image.Height * 3);
+
+            // Convert to a percentage where 100% is perfectly consistent (0 diff)
+            // We cap it at 100 and floor it at 0.
+            double consistency = Math.Max(0, 100 - (avgDiff * 2));
+            return consistency;
         }
 
         private bool CheckMetadata(string path)

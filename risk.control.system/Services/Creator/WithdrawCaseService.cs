@@ -8,7 +8,7 @@ namespace risk.control.system.Services.Creator
 {
     public interface IWithdrawCaseService
     {
-        Task<(ClientCompany, long)> WithdrawCaseByCompany(string userEmail, CaseTransactionModel model, long caseId);
+        Task<(string, long)> WithdrawCaseByCompany(string userEmail, CaseTransactionModel model, long caseId);
     }
 
     internal class WithdrawCaseService : IWithdrawCaseService
@@ -24,18 +24,19 @@ namespace risk.control.system.Services.Creator
             this.timelineService = timelineService;
         }
 
-        public async Task<(ClientCompany, long)> WithdrawCaseByCompany(string userEmail, CaseTransactionModel model, long caseId)
+        public async Task<(string, long)> WithdrawCaseByCompany(string userEmail, CaseTransactionModel model, long caseId)
         {
             try
             {
-                var currentUser = await context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == userEmail);
+                var currentUser = await context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(u => u.Email == userEmail);
                 var caseTask = await context.Investigations
+                    .Include(t => t.PolicyDetail)
                     .FirstOrDefaultAsync(c => c.Id == caseId);
                 var vendorId = caseTask.VendorId;
                 var company = await context.ClientCompany.FirstOrDefaultAsync(c => c.ClientCompanyId == caseTask.ClientCompanyId);
 
                 caseTask.IsNew = true;
-                caseTask.Updated = DateTime.Now;
+                caseTask.Updated = DateTime.UtcNow;
                 caseTask.UpdatedBy = currentUser.Email;
                 caseTask.AssignedToAgency = false;
                 caseTask.CaseOwner = company.Email;
@@ -47,7 +48,7 @@ namespace risk.control.system.Services.Creator
 
                 await timelineService.UpdateTaskStatus(caseTask.Id, currentUser.Email);
 
-                return rows ? (company, vendorId.GetValueOrDefault()) : (null, 0);
+                return rows ? (caseTask.PolicyDetail.ContractNumber, vendorId.GetValueOrDefault()) : (null, 0);
             }
             catch (Exception ex)
             {

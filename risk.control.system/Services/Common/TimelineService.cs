@@ -7,17 +7,20 @@ namespace risk.control.system.Services.Common
     {
         Task UpdateTaskStatus(long taskId, string updatedBy, string subStatus = "");
     }
+
     internal class TimelineService : ITimelineService
     {
-        private readonly ApplicationDbContext context;
+        private readonly IDbContextFactory<ApplicationDbContext> _contextFactory;
 
-        public TimelineService(ApplicationDbContext context)
+        public TimelineService(IDbContextFactory<ApplicationDbContext> contextFactory)
         {
-            this.context = context;
+            _contextFactory = contextFactory;
         }
+
         public async Task UpdateTaskStatus(long taskId, string updatedBy, string subStatus = "")
         {
-            var task = await context.Investigations
+            using var context = await _contextFactory.CreateDbContextAsync();
+            var task = await context.Investigations.AsNoTracking()
                 .Include(t => t.InvestigationTimeline)
                 .FirstOrDefaultAsync(t => t.Id == taskId);
 
@@ -30,7 +33,7 @@ namespace risk.control.system.Services.Common
             TimeSpan? duration = null;
             if (lastHistory != null)
             {
-                duration = DateTime.Now - lastHistory.StatusChangedAt;
+                duration = DateTime.UtcNow - lastHistory.StatusChangedAt;
             }
 
             if (!string.IsNullOrWhiteSpace(subStatus))
@@ -45,7 +48,7 @@ namespace risk.control.system.Services.Common
                 SubStatus = task.SubStatus,
                 UpdatedBy = updatedBy,
                 AssigedTo = task.CaseOwner,
-                StatusChangedAt = DateTime.Now,
+                StatusChangedAt = DateTime.UtcNow,
                 Duration = duration
             };
 

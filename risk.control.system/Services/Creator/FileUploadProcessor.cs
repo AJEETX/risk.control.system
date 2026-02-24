@@ -11,26 +11,24 @@ namespace risk.control.system.Services.Creator
 
     internal class FileUploadProcessor : IFileUploadProcessor
     {
-        private readonly ApplicationDbContext _context;
         private readonly IUploadFileStatusService uploadFileStatusService;
         private readonly ILogger<FileUploadProcessor> logger;
         private readonly ITimelineService timelineService;
+        private readonly IFileUploadCaseAllocationService fileUploadCaseAllocationService;
         private readonly IMailService mailService;
-        private readonly ICaseAllocationService caseAllocationService;
 
-        public FileUploadProcessor(ApplicationDbContext context,
+        public FileUploadProcessor(
             IUploadFileStatusService uploadFileStatusService,
             ILogger<FileUploadProcessor> logger,
             ITimelineService timelineService,
-            IMailService mailService,
-            ICaseAllocationService caseAllocationService)
+            IFileUploadCaseAllocationService fileUploadCaseAllocationService,
+            IMailService mailService)
         {
-            _context = context;
             this.uploadFileStatusService = uploadFileStatusService;
             this.logger = logger;
             this.timelineService = timelineService;
+            this.fileUploadCaseAllocationService = fileUploadCaseAllocationService;
             this.mailService = mailService;
-            this.caseAllocationService = caseAllocationService;
         }
 
         public async Task ProcessloadFile(string userEmail, List<InvestigationTask> uploadedCases, FileOnFileSystemModel uploadFileData, string url, bool uploadAndAssign = false)
@@ -40,30 +38,28 @@ namespace risk.control.system.Services.Creator
                 if (uploadAndAssign && uploadedCases.Any())
                 {
                     // Auto-Assign Claims if Enabled
-                    var claimsIds = uploadedCases.Select(c => c.Id).ToList();
-                    var autoAllocated = await caseAllocationService.BackgroundUploadAutoAllocation(claimsIds, userEmail, url);
-                    uploadFileStatusService.SetUploadAssignSuccess(uploadFileData, uploadedCases, autoAllocated);
-                    await _context.SaveChangesAsync();
+                    var autoAllocated = await fileUploadCaseAllocationService.UploadAutoAllocation(uploadedCases, userEmail, url);
+                    await uploadFileStatusService.SetUploadAssignSuccess(uploadFileData, uploadedCases, autoAllocated);
                 }
                 else
                 {
                     // Upload Success
-                    uploadFileStatusService.SetUploadSuccess(uploadFileData, uploadedCases);
-                    await _context.SaveChangesAsync();
+                    await uploadFileStatusService.SetUploadSuccess(uploadFileData, uploadedCases);
 
+                    // Add Timeline entry for all uploaded cases
                     var updateTasks = uploadedCases.Select(u => timelineService.UpdateTaskStatus(u.Id, userEmail));
                     await Task.WhenAll(updateTasks);
 
                     // Notify User
                     await mailService.NotifyFileUpload(userEmail, uploadFileData, url);
                 }
-                await _context.SaveChangesAsync();
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred");
-                uploadFileStatusService.SetFileUploadFailure(uploadFileData, "Error Assigning cases", uploadAndAssign, uploadedCases.Select(u => u.Id).ToList());
-                await _context.SaveChangesAsync();
+                logger.LogError(ex, "Error occurred Process Upload File. {UserEmail}", userEmail);
+                var errorString = "Error processing upload file. Please try again.";
+                uploadFileData.ErrorByteData = System.Text.Encoding.UTF8.GetBytes(errorString);
+                await uploadFileStatusService.SetFileUploadFailure(uploadFileData, "Error processing the uploaded file", uploadAndAssign, uploadedCases.Select(u => u.Id).ToList());
                 await mailService.NotifyFileUpload(userEmail, uploadFileData, url);
             }
         }

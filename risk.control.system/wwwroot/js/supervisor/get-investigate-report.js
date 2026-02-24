@@ -24,7 +24,7 @@
         setTimeout(function () {
             $(".submit-progress").removeClass("hidden");
         }, 1);
-        $(this).html("<i class='fas fa-sync fa-spin'></i> REVIEW");
+        $(this).html("<i class='fas fa-sync fa-spin'></i> Re-Allocate");
         disableAllInteractiveElements();
 
         var section = document.getElementById("section");
