@@ -5,7 +5,7 @@ using risk.control.system.Services.Common;
 
 namespace risk.control.system.Services.Api
 {
-    public interface IEmpanelledAvailableAgencyService
+    public interface ICompanyAgencyApiService
     {
         Task<object[]> GetAllEmpanelledAgenciesAsync(string userEmail);
 
@@ -14,12 +14,12 @@ namespace risk.control.system.Services.Api
         Task<object[]> GetAvailableAgencies(string userEmail);
     }
 
-    internal class EmpanelledAvailableAgencyService : IEmpanelledAvailableAgencyService
+    internal class CompanyAgencyApiService : ICompanyAgencyApiService
     {
         private readonly IDbContextFactory<ApplicationDbContext> _contextFactory;
         private readonly IBase64FileService base64FileService;
 
-        public EmpanelledAvailableAgencyService(
+        public CompanyAgencyApiService(
             IDbContextFactory<ApplicationDbContext> contextFactory,
             IBase64FileService base64FileService)
         {
@@ -42,7 +42,7 @@ namespace risk.control.system.Services.Api
             var companyUser = await _context.ApplicationUser.AsNoTracking()
                     .FirstOrDefaultAsync(c => c.Email == userEmail);
 
-            var company = await _context.ClientCompany.AsNoTracking()
+            var company = await _context.ClientCompany
                 .Include(c => c.EmpanelledVendors).ThenInclude(v => v.State)
                 .Include(c => c.EmpanelledVendors).ThenInclude(v => v.District)
                 .Include(c => c.EmpanelledVendors).ThenInclude(v => v.Country)
@@ -72,7 +72,7 @@ namespace risk.control.system.Services.Api
                 .Include(c => c.EmpanelledVendors)
                 .FirstOrDefaultAsync(c => c.ClientCompanyId == companyUser.ClientCompanyId);
 
-            var availableVendors = await _context.Vendor.AsNoTracking()
+            var availableVendors = await _context.Vendor
                 .Where(v => !company.EmpanelledVendors.Contains(v) && !v.Deleted && v.CountryId == company.CountryId)
                 .Include(v => v.ApplicationUser)
                 .Include(v => v.Country)

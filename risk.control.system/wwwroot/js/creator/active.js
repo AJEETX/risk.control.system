@@ -86,9 +86,12 @@
                 "data": "agent",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.agent + '" data-bs-toggle="tooltip">' + data + '</span>';
+                    var img = '<span title="' + data + '" data-bs-toggle="tooltip">';
+                    img += '<img class="profile-image doc-profile-image" src="' + row.ownerDetail + '" />'; // Thumbnail image with class 'thumbnail'
+                    img += '</span>';
+                    return img;
+
                 }
-                ///<button type="button" class="btn btn-lg btn-danger" data-bs-toggle="popover" title="Popover title" data-content="And here's some amazing content. It's very engaging. Right?">Click to toggle popover</button>
             },
             {
                 "data": "pincode",

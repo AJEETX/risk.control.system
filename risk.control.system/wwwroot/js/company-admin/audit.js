@@ -19,6 +19,15 @@
             loadingRecords: '&nbsp;',
             processing: '<i class="fas fa-sync fa-spin fa-4x fa-fw"></i><span class="sr-only">Loading...</span>'
         },
+        columnDefs: [
+            {
+                className: 'max-width-column-name', // Apply the CSS class,
+                targets: 0                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column-name', // Apply the CSS class,
+                targets: 2                      // Index of the column to style
+            }],
         columns: [
             { data: 'userId' },
             { data: 'type' },
@@ -31,6 +40,7 @@
             },
             {
                 data: 'oldValues', // or newValues
+                orderable: false,
                 render: function (data, type, row) {
                     if (!data) return '';
 
@@ -55,6 +65,7 @@
             },
             {
                 data: 'newValues',
+                orderable: false,
                 render: function (data) {
                     if (!data || data == undefined) return '';
 
