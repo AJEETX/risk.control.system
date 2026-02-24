@@ -59,7 +59,7 @@ public static class AppUseExtenstion
         app.UseMiddleware<SecurityMiddleware>(configuration["HttpStatusErrorCodes"]);
         app.UseMiddleware<RequirePasswordChangeMiddleware>();
         app.UseMiddleware<CookieConsentMiddleware>();
-        app.UseMiddleware<LicensingMiddleware>();
+        //app.UseMiddleware<LicensingMiddleware>();
 
         app.UseRateLimiter();
 
