@@ -97,8 +97,8 @@ internal class DocumentIdfyService : IDocumentIdfyService
             documentReport.LongLat = $"Latitude = {lat}, Longitude = {lon}";
             documentReport.LongLatTime = DateTime.UtcNow;
 
-            ////var detectedText = await googleTask;
-            ////await ProcessOcrResults(documentReport, docImage, detectedText, claim);
+            var detectedText = await googleTask;
+            await ProcessOcrResults(documentReport, docImage, detectedText, claim);
 
             // 4. Persistence
             locationTemplate.ValidationExecuted = true;
