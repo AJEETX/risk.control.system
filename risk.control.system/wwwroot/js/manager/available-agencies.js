@@ -12,27 +12,19 @@
             },
             error: DataTableErrorHandler
         },
-        columnDefs: [{
-            'targets': 0,
-            'searchable': false,
-            'orderable': false,
-            'className': 'dt-body-center',
-            'render': function (data, type, full, meta) {
-                return '<input type="checkbox" name="id[]" value="' + $('<div/>').text(data).html() + '">';
-            }
-        },
-        {
-            className: 'max-width-column-name', // Apply the CSS class,
-            targets: 3                      // Index of the column to style
-        },
-        {
-            className: 'max-width-column', // Apply the CSS class,
-            targets: 5                      // Index of the column to style
-        },
-        {
-            className: 'max-width-column-name', // Apply the CSS class,
-            targets: 10                      // Index of the column to style
-        }],
+        columnDefs: [
+            {
+                className: 'max-width-column-name', // Apply the CSS class,
+                targets: 3                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column', // Apply the CSS class,
+                targets: 5                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column-name', // Apply the CSS class,
+                targets: 10                      // Index of the column to style
+            }],
         order: [[1, 'asc']],
         fixedHeader: true,
         processing: true,
@@ -68,15 +60,9 @@
             {
                 "data": "domain",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.vendorName + '" data-bs-toggle="tooltip">' + data + '</span>'
+                    return '<span title="' + row.vendorName + '" data-bs-toggle="tooltip" class="blue">' + data + '</span>'
                 }
             },
-            //{
-            //    "data": "name",
-            //    "mRender": function (data, type, row) {
-            //        return '<span title="' + row.name + '" data-bs-toggle="tooltip">' + data + '</span>'
-            //    }
-            //},
             {
                 "data": "phone",
                 "mRender": function (data, type, row) {

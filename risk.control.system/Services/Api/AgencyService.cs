@@ -31,7 +31,7 @@ namespace risk.control.system.Services.Api
         private readonly IDbContextFactory<ApplicationDbContext> _contextFactory;
         private readonly IAgencyInvestigationServiceService agencyInvestigationServiceService;
         private readonly ILogger<AgencyService> logger;
-        private readonly IEmpanelledAvailableAgencyService empanelledAvailableAgencyService;
+        private readonly ICompanyAgencyApiService empanelledAvailableAgencyService;
         private readonly IAgencyAgentService agencyAgentService;
         private readonly IBase64FileService base64FileService;
 
@@ -39,7 +39,7 @@ namespace risk.control.system.Services.Api
             IDbContextFactory<ApplicationDbContext> contextFactory,
             IAgencyInvestigationServiceService agencyInvestigationServiceService,
             ILogger<AgencyService> logger,
-            IEmpanelledAvailableAgencyService empanelledAvailableAgencyService,
+            ICompanyAgencyApiService empanelledAvailableAgencyService,
             IAgencyAgentService agencyAgentService,
             IBase64FileService base64FileService)
         {
