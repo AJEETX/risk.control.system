@@ -2,7 +2,7 @@
 
 namespace risk.control.system.test
 {
-    public class PlaywrightTestBase
+    public abstract class PlaywrightTestBase
     {
         protected IPlaywright? _playwright;
         protected IBrowser? _browser;

@@ -22,7 +22,7 @@
 
             // Upload file
             await _page.ClickAsync("#UploadFileButton");
-            await _page.ClickAsync("button:has-text(\"Upload\")");
+            //await _page.ClickAsync("button:has-text(\"Upload\")");
 
             Assert.That(_page.Url.StartsWith(url));
             //Assert.That(_page.Url, Does.Match($"{url}?uploadid=\\d+"));

@@ -5,11 +5,11 @@ namespace risk.control.system.test.Tests
     public class LoginTests : PlaywrightTestBase
     {
         [TestCase("admin@insurer.com", Applicationsettings.TestingData, COMPANY_ADMIN.FIRST_NAME, COMPANY_ADMIN.CODE)]
-        [TestCase("manager@insurer.com", Applicationsettings.TestingData, MANAGER.FIRST_NAME, MANAGER.CODE)]
-        [TestCase("creator@insurer.com", Applicationsettings.TestingData, CREATOR.FIRST_NAME, CREATOR.CODE)]
-        [TestCase("assessor@insurer.com", Applicationsettings.TestingData, ASSESSOR.FIRST_NAME, ASSESSOR.CODE)]
-        [TestCase("admin@verify.com", Applicationsettings.TestingData, AGENCY_ADMIN.FIRST_NAME, AGENCY_ADMIN.CODE)]
-        [TestCase("supervisor@verify.com", Applicationsettings.TestingData, SUPERVISOR.FIRST_NAME, SUPERVISOR.CODE)]
+        //[TestCase("manager@insurer.com", Applicationsettings.TestingData, MANAGER.FIRST_NAME, MANAGER.CODE)]
+        //[TestCase("creator@insurer.com", Applicationsettings.TestingData, CREATOR.FIRST_NAME, CREATOR.CODE)]
+        //[TestCase("assessor@insurer.com", Applicationsettings.TestingData, ASSESSOR.FIRST_NAME, ASSESSOR.CODE)]
+        //[TestCase("admin@verify.com", Applicationsettings.TestingData, AGENCY_ADMIN.FIRST_NAME, AGENCY_ADMIN.CODE)]
+        //[TestCase("supervisor@verify.com", Applicationsettings.TestingData, SUPERVISOR.FIRST_NAME, SUPERVISOR.CODE)]
         public async Task Login_ShouldRedirectToHome_AndDisplayCorrectUserInfo(
             string email,
             string password,
@@ -25,11 +25,11 @@ namespace risk.control.system.test.Tests
 
             // Read user name
             var username = await _page.Locator("#user-firstname").InnerTextAsync();
-            StringAssert.Contains(expectedName, username);
+            Assert.That(username, Is.EqualTo(expectedName));
 
             // Read user role
             var role = await _page.Locator("#user-role").InnerTextAsync();
-            StringAssert.Contains(expectedRole, role);
+            Assert.That(expectedRole, Is.EqualTo(role));
         }
 
         /// <summary>

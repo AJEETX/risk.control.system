@@ -2,87 +2,87 @@
 
 <div class="row">
 
-    <div class="col">
-        <div class="small-box bg-secondary">
-            <div class="inner">
-                <h3 id="upload-claims" title="UPLOADS: @Model.BulkUploadBlockCount | DIRECT ASSIGN: @Model.BulkUploadAssignCount" data-toggle="tooltip">@Model.BulkUploadBlockCount | @Model.BulkUploadAssignCount</h3>
-                <span>@Model.BulkUploadBlockName</span>
-            </div>
-            <div class="icon">
-                <i class="fa fa-upload"></i>
-            </div>
-            <a href="@Model.BulkUploadBlockUrl" class="details-page small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
-        </div>
-    </div>
-    <div class="col-auto d-flex align-items-center">
-        <i class="fas fa-arrow-right fa-2x text-secondary"></i>
-    </div>
-    <div class="col">
+	<div class="col">
+		<div class="small-box bg-secondary">
+			<div class="inner">
+				<h3 id="upload-claims" title="UPLOADS: @Model.BulkUploadBlockCount | DIRECT ASSIGN: @Model.BulkUploadAssignCount" data-toggle="tooltip">@Model.BulkUploadBlockCount | @Model.BulkUploadAssignCount</h3>
+				<span>@Model.BulkUploadBlockName</span>
+			</div>
+			<div class="icon">
+				<i class="fa fa-upload"></i>
+			</div>
+			<a id="file-upload-link" href="@Model.BulkUploadBlockUrl" class="details-page small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+		</div>
+	</div>
+	<div class="col-auto d-flex align-items-center">
+		<i class="fas fa-arrow-right fa-2x text-secondary"></i>
+	</div>
+	<div class="col">
 
-        <div class="small-box bg-warning">
-            <div class="inner">
-                <h3 id="new-claims" title="CLAIMS: @Model.FirstBlockCount | UNDERWRITINGS: @Model.SecondBlockCount" data-toggle="tooltip">@Model.FirstBlockCount | @Model.SecondBlockCount</h3>
-                <span>@Model.FirstBlockName</span>
-            </div>
-            <div class="icon">
-                <i class="fas fa-random"></i>
-            </div>
-            <a href="@Model.FirstBlockUrl" class="details-page small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
-        </div>
-    </div>
-    <div class="col-auto d-flex align-items-center">
-        <i class="fas fa-arrow-right fa-2x text-warning"></i>
-    </div>
+		<div class="small-box bg-warning">
+			<div class="inner">
+				<h3 id="new-claims" title="CLAIMS: @Model.FirstBlockCount | UNDERWRITINGS: @Model.SecondBlockCount" data-toggle="tooltip">@Model.FirstBlockCount | @Model.SecondBlockCount</h3>
+				<span>@Model.FirstBlockName</span>
+			</div>
+			<div class="icon">
+				<i class="fas fa-random"></i>
+			</div>
+			<a href="@Model.FirstBlockUrl" class="details-page small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+		</div>
+	</div>
+	<div class="col-auto d-flex align-items-center">
+		<i class="fas fa-arrow-right fa-2x text-warning"></i>
+	</div>
 
-        <div class="col">
+	<div class="col">
 
-            <div class="small-box bg-primary">
-                <div class="inner">
-                <h3 id="active-claims" title="CLAIMS: @Model.ThirdBlockCount | UNDERWRITINGS: @Model.LastBlockCount" data-toggle="tooltip">@Model.ThirdBlockCount | @Model.LastBlockCount</h3>
-                    <span>@Model.ThirdBlockName</span>
-                </div>
-                <div class="icon">
-                    <i class="fa fa-toggle-on"></i>
-                </div>
-                <a href="@Model.ThirdBlockUrl" class="details-page small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
-            </div>
-        </div>
+		<div class="small-box bg-primary">
+			<div class="inner">
+				<h3 id="active-claims" title="CLAIMS: @Model.ThirdBlockCount | UNDERWRITINGS: @Model.LastBlockCount" data-toggle="tooltip">@Model.ThirdBlockCount | @Model.LastBlockCount</h3>
+				<span>@Model.ThirdBlockName</span>
+			</div>
+			<div class="icon">
+				<i class="fa fa-toggle-on"></i>
+			</div>
+			<a href="@Model.ThirdBlockUrl" class="details-page small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+		</div>
+	</div>
 </div>
 
 <div class="row">
-    <div class="col-md-6">
-        <div class="card card-light direct-chat-warning collapsed-card">
-            <div class="card-header">
-                <h3 class="card-title"><i class="fas fa-tachometer-alt"></i> Claims Pie Chart</h3>
-                <div class="card-tools">
-                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                        <i class="fas fa-plus"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="card-body">
-                <div id="container-claim-pie" class="container-claim">
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-6">
-        <div class="card card-light direct-chat-warning collapsed-card">
-            <div class="card-header">
-                <h3 class="card-title"><i class="fas fa-tachometer-alt"></i> Underwritings Pie Chart</h3>
-                <div class="card-tools">
-                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                        <i class="fas fa-plus"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="card-body">
-                <div id="container-underwriting-pie" class="container-claim">
-                </div>
-            </div>
-        </div>
-    </div>
-    @* <div class="col-md-6">
+	<div class="col-md-6">
+		<div class="card card-light direct-chat-warning collapsed-card">
+			<div class="card-header">
+				<h3 class="card-title"><i class="fas fa-tachometer-alt"></i> Claims Pie Chart</h3>
+				<div class="card-tools">
+					<button type="button" class="btn btn-tool" data-card-widget="collapse">
+						<i class="fas fa-plus"></i>
+					</button>
+				</div>
+			</div>
+			<div class="card-body">
+				<div id="container-claim-pie" class="container-claim">
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="col-md-6">
+		<div class="card card-light direct-chat-warning collapsed-card">
+			<div class="card-header">
+				<h3 class="card-title"><i class="fas fa-tachometer-alt"></i> Underwritings Pie Chart</h3>
+				<div class="card-tools">
+					<button type="button" class="btn btn-tool" data-card-widget="collapse">
+						<i class="fas fa-plus"></i>
+					</button>
+				</div>
+			</div>
+			<div class="card-body">
+				<div id="container-underwriting-pie" class="container-claim">
+				</div>
+			</div>
+		</div>
+	</div>
+	@* <div class="col-md-6">
         <div class="card card-light  collapsed-card">
             <div class="card-header">
                 <h3 class="card-title"><i class="fas fa-tachometer-alt"></i> Month-wise Cases</h3>
@@ -100,72 +100,72 @@
     </div> *@
 </div>
 <div class="row">
-    <div class="col-md-6">
-        <div class="card card-light  direct-chat-warning collapsed-card">
-            <div class="card-header">
-                <h3 class="card-title"><i class="fas fa-tachometer-alt"></i> Agency Claims: Pie Chart</h3>
-                <div class="card-tools">
-                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                        <i class="fas fa-plus"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="card-body">
-                <div id="container-agency-claim-pie" class="container-agency">
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-6">
-        <div class="card card-light  direct-chat-warning collapsed-card">
-            <div class="card-header">
-                <h3 class="card-title"><i class="fas fa-tachometer-alt"></i> Agency Underwritings: Pie Chart</h3>
-                <div class="card-tools">
-                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                        <i class="fas fa-plus"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="card-body">
-                <div id="container-agency-underwriting-pie" class="container-agency">
-                </div>
-            </div>
-        </div>
-    </div>
+	<div class="col-md-6">
+		<div class="card card-light  direct-chat-warning collapsed-card">
+			<div class="card-header">
+				<h3 class="card-title"><i class="fas fa-tachometer-alt"></i> Agency Claims: Pie Chart</h3>
+				<div class="card-tools">
+					<button type="button" class="btn btn-tool" data-card-widget="collapse">
+						<i class="fas fa-plus"></i>
+					</button>
+				</div>
+			</div>
+			<div class="card-body">
+				<div id="container-agency-claim-pie" class="container-agency">
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="col-md-6">
+		<div class="card card-light  direct-chat-warning collapsed-card">
+			<div class="card-header">
+				<h3 class="card-title"><i class="fas fa-tachometer-alt"></i> Agency Underwritings: Pie Chart</h3>
+				<div class="card-tools">
+					<button type="button" class="btn btn-tool" data-card-widget="collapse">
+						<i class="fas fa-plus"></i>
+					</button>
+				</div>
+			</div>
+			<div class="card-body">
+				<div id="container-agency-underwriting-pie" class="container-agency">
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
 
 <div class="row">
-    <div class="col-md-6">
-        <div class="card card-light direct-chat-warning collapsed-card">
-            <div class="card-header">
-                <h3 class="card-title"><i class="fas fa-tachometer-alt"></i> Cases Bar Chart</h3>
-                <div class="card-tools">
-                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                        <i class="fas fa-plus"></i>
-                    </button>
-                </div>
-            </div>
+	<div class="col-md-6">
+		<div class="card card-light direct-chat-warning collapsed-card">
+			<div class="card-header">
+				<h3 class="card-title"><i class="fas fa-tachometer-alt"></i> Cases Bar Chart</h3>
+				<div class="card-tools">
+					<button type="button" class="btn btn-tool" data-card-widget="collapse">
+						<i class="fas fa-plus"></i>
+					</button>
+				</div>
+			</div>
 
-            <div class="card-body">
-                <div id="container-claim" class="container-claim">
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-6">
-        <div class="card card-light direct-chat-warning collapsed-card">
-            <div class="card-header">
-                <h3 class="card-title"><i class="fas fa-tachometer-alt"></i> Turn Around Time </h3>
-                <div class="card-tools">
-                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                        <i class="fas fa-plus"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="card-body">
-                <div id="container-claim-tat" class="container-claim">
-                </div>
-            </div>
-        </div>
-    </div>
+			<div class="card-body">
+				<div id="container-claim" class="container-claim">
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="col-md-6">
+		<div class="card card-light direct-chat-warning collapsed-card">
+			<div class="card-header">
+				<h3 class="card-title"><i class="fas fa-tachometer-alt"></i> Turn Around Time </h3>
+				<div class="card-tools">
+					<button type="button" class="btn btn-tool" data-card-widget="collapse">
+						<i class="fas fa-plus"></i>
+					</button>
+				</div>
+			</div>
+			<div class="card-body">
+				<div id="container-claim-tat" class="container-claim">
+				</div>
+			</div>
+		</div>
+	</div>
 </div>

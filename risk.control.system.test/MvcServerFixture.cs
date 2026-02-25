@@ -10,7 +10,7 @@ namespace risk.control.system.test
         public static string BaseUrl { get; private set; } = Environment.GetEnvironmentVariable("TEST_BASE_URL") ?? "https://localhost:5001";
         private static string DllPath => Path.Combine(PublishFolder, "risk.control.system.dll");
         private static string ProjectPath => Path.GetFullPath(Path.Combine(TestContext.CurrentContext.TestDirectory, "../../../../../risk.control.system"));
-        private static string PublishFolder => Path.Combine(ProjectPath, "risk.control.system", "bin", "Release", "net8.0", "publish");
+        private static string PublishFolder => Path.Combine(ProjectPath, "risk.control.system", "bin", "Release", "net10.0", "publish");
 
         [OneTimeSetUp]
         public async Task StartServer()
