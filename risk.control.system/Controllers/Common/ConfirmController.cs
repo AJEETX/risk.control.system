@@ -20,6 +20,14 @@ namespace risk.control.system.Controllers.Common
             _logger = logger;
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetSmsHistory(long caseId, bool isCustomer)
+        {
+            var messages = await _notificationService.GetSmsHistory(caseId, isCustomer);
+
+            return Ok(messages);
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Sms2Customer(SmsModel model)

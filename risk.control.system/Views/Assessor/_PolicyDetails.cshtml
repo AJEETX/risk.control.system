@@ -55,6 +55,9 @@
 	var map = string.Format(Model.CaseTask.CustomerDetail.CustomerLocationMap, "400", "400");
 	var bmap = string.Format(Model.Beneficiary.BeneficiaryLocationMap, "400", "400");
 
+	var customerSMSCount = Model.CaseTask.CaseMessages.Where(x => x.IsCustomer).Count();
+	var beneficiarySMSCount = Model.CaseTask.CaseMessages.Where(x => !x.IsCustomer).Count();
+
 	<article>
 		<div class="bb-blog-inner">
 			<div class="card shadow-lg border-1 rounded-lg direct-chat-warning collapsed-card">
@@ -318,13 +321,14 @@
 								</div>
 								<div class="card-footer">
 									<div class="text-right">
-										<a id="customer-comments" class="btn btn-sm bg-teal" data-bs-toggle="tooltip" title="Send SMS to Customer">
+										<button id="customer-comments" class="btn btn-sm bg-teal" title="Send Sms to Customer" data-bs-toggle="tooltip">
 											<i class="fas fa-comments"></i>
-										</a>
+											<span id="customer-sms-count" class="badge bg-danger ms-1">@customerSMSCount</span>
+										</button>
 
-										<a id="customer-detail" class="btn btn-sm btn-warning" data-bs-toggle="tooltip" title="Show Customer Details">
+										<button id="customer-detail" class="btn btn-sm btn-warning" data-bs-toggle="tooltip" title="Show Customer Details">
 											<i class="fa fa-user-plus"></i> ...
-										</a>
+										</button>
 									</div>
 								</div>
 							</div>
@@ -415,13 +419,13 @@
 
 								<div class="card-footer">
 									<div class="text-right">
-										<a id="beneficiary-comments" class="btn btn-sm bg-teal" data-bs-toggle="tooltip" title="Send SMS to Beneficiary">
+										<button id="beneficiary-comments" class="btn btn-sm bg-teal" title="Send Sms to Beneficiary" data-bs-toggle="tooltip">
 											<i class="fas fa-comments"></i>
-										</a>
-
-										<a id="beneficiary-detail" class="btn btn-sm btn-success" data-bs-toggle="tooltip" title="Show Beneficiary Details">
+											<span id="beneficiary-sms-count" class="badge bg-danger ms-1">@beneficiarySMSCount</span>
+										</button>
+										<button id="beneficiary-detail" class="btn btn-sm btn-success" title="Display Beneficiary Detail" data-bs-toggle="tooltip">
 											<i class="fas fa-user-tie"></i> ...
-										</a>
+										</button>
 									</div>
 								</div>
 							</div>

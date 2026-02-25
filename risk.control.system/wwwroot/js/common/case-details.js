@@ -34,8 +34,8 @@
             },
             buttons: {
                 ok: {
-                    text: 'Ok',
-                    btnClass: 'btn-secondary'
+                    text: 'Close',
+                    btnClass: 'btn-default'
                 }
             }
         });
@@ -80,8 +80,8 @@
 
             buttons: {
                 ok: {
-                    text: 'Ok',
-                    btnClass: 'btn-secondary'
+                    text: 'Close',
+                    btnClass: 'btn-default'
                 }
             }
         });
@@ -255,38 +255,59 @@
     var ready = false;
     $('#customer-comments').click(function (e) {
         var claimId = $('#claimId').val();
-        $.confirm({
-            title: 'SMS Customer !!!',
-            closeIcon: true,
-            type: 'green',
-            icon: 'fa fa-user-plus',
-            content: '' +
-                '<form class="formName">' +
-                '<div class="form-group">' +
-                '<hr>' +
-                '<label>Enter message</label>' +
-                '<input type="text" placeholder="Enter message" class="name form-control remarks" required />' +
-                '</div>' +
-                '</form>',
-            buttons: {
-                formSubmit: {
-                    text: 'Send SMS',
-                    btnClass: 'btn-green',
-                    action: function (e) {
-                        var name = this.$content.find('.name').val();
-                        if (!name) {
-                            $.alert({
-                                title: 'Enter message !!!',
-                                closeIcon: true,
-                                type: 'red',
-                                icon: 'fa fa-user-plus',
-                                content: 'Please enter message'
-                            });
-                            var input = this.$content.find('.name.form-control.remarks');
-                            input.focus();
-                            return false;
-                        }
-                        else {
+
+        // 1. Fetch the history first
+        $.get('/Confirm/GetSmsHistory', { caseId: claimId, isCustomer: true }, function (history) {
+            // 2. Build the history HTML string
+            var historyHtml = '<div class="sms-history-header">';
+
+            if (history.length === 0) {
+                historyHtml += '<p class="text-muted">No previous messages found.</p>';
+            } else {
+                history.forEach(function (msg) {
+                    var date = new Date(msg.updated).toLocaleString();
+                    historyHtml += `
+                    <div class="sms-body">
+                        <small class="text-primary"><b>${msg.senderEmail}</b> - ${date}</small><br>
+                        <span>${msg.message}</span>
+                    </div>`;
+                });
+            }
+            historyHtml += '</div>';
+
+            // 3. Open the confirm dialog with the history included
+            $.confirm({
+                title: 'SMS Customer !!!',
+                columnClass: 'medium', // Make it wider to fit history
+                closeIcon: true,
+                type: 'green',
+                icon: 'fa fa-user-plus',
+                content: '' +
+                    historyHtml + // Insert history here
+                    '<form class="formName">' +
+                    '<div class="form-group">' +
+                    '<label>Enter new message</label>' +
+                    '<input type="text" placeholder="Enter message" class="name form-control remarks" required />' +
+                    '</div>' +
+                    '</form>',
+                buttons: {
+                    formSubmit: {
+                        text: 'Send SMS',
+                        btnClass: 'btn-green',
+                        action: function () {
+                            var name = this.$content.find('.name').val();
+                            if (!name) {
+                                $.alert({
+                                    title: 'Enter message !!!',
+                                    closeIcon: true,
+                                    type: 'red',
+                                    icon: 'fa fa-user-plus',
+                                    content: 'Please enter message'
+                                });
+                                return false;
+                            }
+
+                            // Ajax call remains the same...
                             return $.ajax({
                                 url: '/Confirm/Sms2Customer',
                                 method: 'POST',
@@ -297,7 +318,7 @@
                                 }
                             }).done(function (response) {
                                 $.alert({
-                                    title: 'Message Status!',
+                                    title: 'SMS Status!',
                                     closeIcon: true,
                                     type: 'green',
                                     icon: 'far fa-comments',
@@ -308,70 +329,88 @@
                                         }
                                     }
                                 });
-                            }).fail(function (response) {
+                                var badge = $('#customer-sms-count');
+                                badge.text(history.length + 1);
+                            }).fail(function () {
                                 $.alert({
-                                    title: 'Message Status!',
-                                    content: 'Status: failed',
+                                    title: 'SMS Status!',
+                                    closeIcon: true,
+                                    type: 'red',
+                                    icon: 'far fa-comments',
+                                    content: 'Status: failed'
                                 });
-                            }).always(function () {
                             });
                         }
-                    }
+                    },
+                    cancel: function () { }
                 },
-                cancel: function () {
-                    //close
-                },
-            },
-            onContentReady: function () {
-                // bind to events
-                var jc = this;
-                var input = this.$content.find('.name.form-control.remarks');
-                input.focus();
-                this.$content.find('form').on('submit', function (e) {
-                    // if the user submits the form by pressing enter in the field.
-                    e.preventDefault();
-                    jc.$$formSubmit.trigger('click'); // reference the button and click it
-
-                    //var form = $('#cust-sms');
-                    //form.submit();
-                });
-            }
+                onContentReady: function () {
+                    var jc = this;
+                    this.$content.find('.name').focus();
+                    this.$content.find('form').on('submit', function (e) {
+                        e.preventDefault();
+                        jc.$$formSubmit.trigger('click');
+                    });
+                }
+            });
         });
-    })
+    });
 
     $('#beneficiary-comments').click(function () {
         var claimId = $('#claimId').val();
-        const token = $('input[name="__RequestVerificationToken"]').val();
-        $.confirm({
-            title: 'SMS Beneficiary !!!',
-            icon: 'fas fa-user-tie',
-            closeIcon: true,
-            type: 'green',
-            content: '' +
-                '<form class="formName">' +
-                '<div class="form-group">' +
-                '<hr>' +
-                '<label>Enter message</label>' +
-                '<input type="text" placeholder="Enter message" class="name form-control remarks" required />' +
-                '</div>' +
-                '</form>',
-            buttons: {
-                formSubmit: {
-                    text: 'Send SMS',
-                    btnClass: 'btn-green',
-                    action: function () {
-                        var name = this.$content.find('.name').val();
-                        if (!name) {
-                            $.alert({
-                                title: 'Enter message !!!',
-                                closeIcon: true,
-                                type: 'red',
-                                icon: 'fas fa-user-tie',
-                                content: 'Please enter message'
-                            });
-                            return false;
-                        }
-                        else {
+
+        // 1. Fetch the history first
+        $.get('/Confirm/GetSmsHistory', { caseId: claimId, isCustomer: false }, function (history) {
+            // 2. Build the history HTML string
+            var historyHtml = '<div class="sms-history-header">';
+
+            if (history.length === 0) {
+                historyHtml += '<p class="text-muted">No previous messages found.</p>';
+            } else {
+                history.forEach(function (msg) {
+                    var date = new Date(msg.updated).toLocaleString();
+                    historyHtml += `
+                    <div class="sms-body">
+                        <small class="text-primary"><b>${msg.senderEmail}</b> - ${date}</small><br>
+                        <span>${msg.message}</span>
+                    </div>`;
+                });
+            }
+            historyHtml += '</div>';
+
+            // 3. Open the confirm dialog with the history included
+            $.confirm({
+                title: 'SMS Beneficiary !!!',
+                columnClass: 'medium', // Make it wider to fit history
+                closeIcon: true,
+                type: 'green',
+                icon: 'fas fa-user-tie',
+                content: '' +
+                    historyHtml + // Insert history here
+                    '<form class="formName">' +
+                    '<div class="form-group">' +
+                    '<label>Enter new message</label>' +
+                    '<input type="text" placeholder="Enter message" class="name form-control remarks" required />' +
+                    '</div>' +
+                    '</form>',
+                buttons: {
+                    formSubmit: {
+                        text: 'Send SMS',
+                        btnClass: 'btn-green',
+                        action: function () {
+                            var name = this.$content.find('.name').val();
+                            if (!name) {
+                                $.alert({
+                                    title: 'Enter message !!!',
+                                    closeIcon: true,
+                                    type: 'red',
+                                    icon: 'fas fa-user-tie',
+                                    content: 'Please enter message'
+                                });
+                                return false;
+                            }
+
+                            // Ajax call remains the same...
                             return $.ajax({
                                 url: '/Confirm/Sms2Beneficiary',
                                 method: 'POST',
@@ -382,7 +421,7 @@
                                 }
                             }).done(function (response) {
                                 $.alert({
-                                    title: 'Message Status!',
+                                    title: 'SMS Status!',
                                     closeIcon: true,
                                     type: 'green',
                                     icon: 'far fa-comments',
@@ -393,33 +432,32 @@
                                         }
                                     }
                                 });
-                            }).fail(function (response) {
+                                var badge = $('#beneficiary-sms-count');
+                                badge.text(history.length + 1);
+                            }).fail(function () {
                                 $.alert({
-                                    title: 'Message Status!',
-                                    content: 'Status: failed',
+                                    title: 'SMS Status!',
+                                    closeIcon: true,
+                                    type: 'red',
+                                    icon: 'far fa-comments',
+                                    content: 'Status: failed'
                                 });
-                            }).always(function () {
                             });
                         }
-                    }
+                    },
+                    cancel: function () { }
                 },
-                cancel: function () {
-                    //close
-                },
-            },
-            onContentReady: function () {
-                // bind to events
-                var jc = this;
-                var input = this.$content.find('.name.form-control.remarks');
-                input.focus();
-                this.$content.find('form').on('submit', function (e) {
-                    // if the user submits the form by pressing enter in the field.
-                    e.preventDefault();
-                    jc.$$formSubmit.trigger('click'); // reference the button and click it
-                });
-            }
+                onContentReady: function () {
+                    var jc = this;
+                    this.$content.find('.name').focus();
+                    this.$content.find('form').on('submit', function (e) {
+                        e.preventDefault();
+                        jc.$$formSubmit.trigger('click');
+                    });
+                }
+            });
         });
-    })
+    });
 
     $('a#assign-manual').on('click', function () {
         $("body").addClass("submit-progress-bg");
@@ -453,6 +491,12 @@
         }
     });
 });
+
+function updateSmsCount(count) {
+    var badge = $('#customer-sms-count');
+    badge.text(count);
+}
+
 function updateNotesUI(newCount) {
     // Select both possible IDs to ensure we find the element
     const $badge = $('#notesBadge');
