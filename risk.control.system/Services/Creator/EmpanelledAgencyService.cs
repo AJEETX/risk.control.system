@@ -22,6 +22,7 @@ namespace risk.control.system.Services.Creator
         public async Task<CaseTransactionModel> GetEmpanelledVendors(long selectedcase, string userEmail, long vendorId, bool fromEditPage = false)
         {
             var caseTask = await _context.Investigations
+                .Include(c => c.CaseMessages)
                 .Include(c => c.CaseNotes)
                 .Include(c => c.PolicyDetail)
                 .Include(c => c.ClientCompany)

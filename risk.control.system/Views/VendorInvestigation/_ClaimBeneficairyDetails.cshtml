@@ -22,6 +22,7 @@
 		}
 	}
 	var map = string.Format(Model.Beneficiary.BeneficiaryLocationMap, "400", "400");
+	var beneficiarySMSCount = Model.ClaimsInvestigation.CaseMessages.Where(x => !x.IsCustomer).Count();
 }
 <div class="col-12 col-sm-6 d-flex align-items-stretch flex-column">
 	<div class="card bg-light d-flex flex-fill">
@@ -109,13 +110,13 @@
 
 		<div class="card-footer">
 			<div class="text-right">
-				<a id="beneficiary-comments" class="btn btn-sm bg-teal" data-bs-toggle="tooltip" title="Send SMS to Beneficiary">
+				<button id="beneficiary-comments" class="btn btn-sm bg-teal" title="Send Sms to Beneficiary" data-bs-toggle="tooltip">
 					<i class="fas fa-comments"></i>
-				</a>
-
-				<a id="beneficiary-detail" class="btn btn-sm btn-success" data-bs-toggle="tooltip" title="Show Beneficiary Details">
+					<span id="beneficiary-sms-count" class="badge bg-danger ms-1">@beneficiarySMSCount</span>
+				</button>
+				<button id="beneficiary-detail" class="btn btn-sm btn-success" title="Display Beneficiary Detail" data-bs-toggle="tooltip">
 					<i class="fas fa-user-tie"></i> ...
-				</a>
+				</button>
 			</div>
 		</div>
 	</div>

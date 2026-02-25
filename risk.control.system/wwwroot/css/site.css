@@ -15,9 +15,11 @@ a.navbar-brand {
 a {
     color: #0366d6;
 }
-.blue{
-    color:blue;
+
+.blue {
+    color: blue;
 }
+
 .btn-primary {
     color: #fff;
     background-color: #1b6ec2;
@@ -4285,4 +4287,20 @@ h2.lead {
     border: 2px solid #dc3545 !important;
     background-color: #fff8f8 !important;
     box-shadow: 0 0 5px rgba(220, 53, 69, 0.5) !important;
+}
+
+.sms-history-header {
+    max-height: 200px;
+    overflow-y: auto;
+    background: #f9f9f9;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 15px;
+}
+
+.sms-body {
+    margin-bottom: 10px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 5px;
 }
