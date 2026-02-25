@@ -152,6 +152,7 @@
 				@if (Model.ClaimsInvestigation.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING)
 				{
 					var map = string.Format(@Model.ClaimsInvestigation?.CustomerDetail.CustomerLocationMap, "200", "200");
+					var customerSMSCount = Model.ClaimsInvestigation.CaseMessages.Where(x => x.IsCustomer).Count();
 
 					<div class="col-12 col-sm-6 col-md-6 d-flex align-items-stretch flex-column">
 						<div class="card bg-light d-flex flex-fill">
@@ -223,12 +224,14 @@
 								</div>
 								<div class="card-footer">
 									<div class="text-right">
-										<a id="customer-comments" class="btn btn-sm bg-teal" data-bs-toggle="tooltip" title="Send SMS to Customer">
+										<button id="customer-comments" class="btn btn-sm bg-teal" title="Send Sms to Customer" data-bs-toggle="tooltip">
 											<i class="fas fa-comments"></i>
-										</a>
-										<a id="customer-detail" class="btn btn-sm btn-warning" data-bs-toggle="tooltip" title="Show Customer Details">
+											<span id="customer-sms-count" class="badge bg-danger ms-1">@customerSMSCount</span>
+										</button>
+
+										<button id="customer-detail" class="btn btn-sm btn-warning" data-bs-toggle="tooltip" title="Show Customer Details">
 											<i class="fa fa-user-plus"></i> ...
-										</a>
+										</button>
 									</div>
 								</div>
 							</div>
@@ -237,6 +240,7 @@
 					@if (Model.ClaimsInvestigation.PolicyDetail.InsuranceType == InsuranceType.CLAIM)
 					{
 						var map = string.Format(Model.Beneficiary.BeneficiaryLocationMap, "200", "200");
+						var beneficiarySMSCount = Model.ClaimsInvestigation.CaseMessages.Where(x => !x.IsCustomer).Count();
 
 						<div class="col-12 col-sm-6 col-md-6 d-flex align-items-stretch flex-column">
 							<div class="card bg-light d-flex flex-fill">
@@ -309,12 +313,13 @@
 								</div>
 								<div class="card-footer">
 									<div class="text-right">
-										<a id="beneficiary-comments" class="btn btn-sm bg-teal" data-bs-toggle="tooltip" title="Send SMS to Beneficiary">
+										<button id="beneficiary-comments" class="btn btn-sm bg-teal" title="Send Sms to Beneficiary" data-bs-toggle="tooltip">
 											<i class="fas fa-comments"></i>
-										</a>
-										<a id="beneficiary-detail" class="btn btn-sm btn-success" data-bs-toggle="tooltip" title="Show Beneficiary Details">
+											<span id="beneficiary-sms-count" class="badge bg-danger ms-1">@beneficiarySMSCount</span>
+										</button>
+										<button id="beneficiary-detail" class="btn btn-sm btn-success" title="Display Beneficiary Detail" data-bs-toggle="tooltip">
 											<i class="fas fa-user-tie"></i> ...
-										</a>
+										</button>
 									</div>
 								</div>
 							</div>

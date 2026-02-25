@@ -34,6 +34,7 @@
     {
         benficiaryProgressClass = "progress-bar-grey";
     }
+	var beneficiarySMSCount = Model.ClaimsInvestigation.CaseMessages.Where(x => !x.IsCustomer).Count();
 
 }
 <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
@@ -120,30 +121,13 @@
         <div class="card-footer">
             <div class="text-right">
 
-                    @if (Model.ClaimsInvestigation.BeneficiaryDetail != null && !string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.BeneficiaryDetail.PhoneNumber))
-                    {
                     <button id="beneficiary-comments" class="btn btn-sm bg-teal" title="Send Sms to Beneficiary" data-bs-toggle="tooltip">
-                            <i class="fas fa-comments"></i>
-                        </button>
-                    }
-                    else
-                    {
-                        <button disabled id="beneficiary-comments" class="btn btn-sm bg-teal">
-                            <i class="fas fa-comments"></i>
-                        </button>
-                    }
-                    @if (Model.ClaimsInvestigation.BeneficiaryDetail != null && !string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.BeneficiaryDetail.PhoneNumber))
-                    {
+                        <i class="fas fa-comments"></i>
+                        <span id="beneficiary-sms-count" class="badge bg-danger ms-1">@beneficiarySMSCount</span>
+                    </button>
                     <button id="beneficiary-detail" class="btn btn-sm btn-success" title="Display Beneficiary Detail" data-bs-toggle="tooltip">
                             <i class="fas fa-user-tie"></i> ...
                         </button>
-                    }
-                    else
-                    {
-                        <button disabled id="beneficiary-detail" class="btn btn-sm btn-success">
-                            <i class="fas fa-user-tie"></i> ...
-                        </button>
-                    }
             </div>
         </div>
     </div>
