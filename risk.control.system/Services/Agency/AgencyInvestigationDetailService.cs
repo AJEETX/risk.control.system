@@ -99,7 +99,7 @@ namespace risk.control.system.Services.Agency
 
         public async Task<CaseAgencyAgentModel> SelectVendorAgent(string userEmail, long selectedcase)
         {
-            var caseAllocate2Agent = await GetCases().Include(c => c.CaseNotes).FirstOrDefaultAsync(v => v.Id == selectedcase);
+            var caseAllocate2Agent = await GetCases().Include(c => c.CaseNotes).Include(c => c.CaseMessages).FirstOrDefaultAsync(v => v.Id == selectedcase);
 
             var beneficiaryDetail = await context.BeneficiaryDetail.AsNoTracking()
                 .Include(c => c.PinCode)

@@ -40,6 +40,8 @@ namespace risk.control.system.Services.Agent
             _logger.LogInformation("Fetching investigation case {CaseId} for user {UserEmail}", selectedCaseId, userEmail);
 
             var caseTask = await _context.Investigations
+                .Include(c => c.CaseMessages)
+                .Include(c => c.CaseNotes)
                 .Include(c => c.ClientCompany)
                     .ThenInclude(c => c.Country)
                 .Include(c => c.PolicyDetail)

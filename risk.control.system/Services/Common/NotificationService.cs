@@ -16,6 +16,8 @@ namespace risk.control.system.Services.Common
         Task<string> SendSms2Customer(string currentUser, long claimId, string sms);
 
         Task<string> SendSms2Beneficiary(string currentUser, long claimId, string sms);
+
+        Task<List<CaseMessage>> GetSmsHistory(long caseId, bool isCustomer);
     }
 
     internal class NotificationService : INotificationService
@@ -80,7 +82,8 @@ namespace risk.control.system.Services.Common
 
             var scheduleMessage = new CaseMessage
             {
-                Message = message,
+                Message = sms,
+                IsCustomer = true,
                 InvestigationTaskId = claimId,
                 RecepicientEmail = claim.CustomerDetail.Name,
                 SenderEmail = user.Email,
@@ -97,16 +100,14 @@ namespace risk.control.system.Services.Common
         {
             var beneficiary = await context.BeneficiaryDetail.AsNoTracking()
                 .Include(b => b.Country)
-                .Include(b => b.InvestigationTask)
-                .ThenInclude(c => c.PolicyDetail)
                .FirstOrDefaultAsync(c => c.InvestigationTaskId == claimId);
 
             var mobile = beneficiary.PhoneNumber.ToString();
             var user = await context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(u => u.Email == currentUser);
             var isdCode = beneficiary.Country.ISDCode;
 
-            var isInsurerUser = user is ApplicationUser;
-            var isVendorUser = user is ApplicationUser;
+            var isInsurerUser = user.ClientCompanyId > 0;
+            var isVendorUser = user.VendorId > 0;
 
             string entityName = string.Empty;
             ApplicationUser insurerUser;
@@ -127,30 +128,30 @@ namespace risk.control.system.Services.Common
             {
                 return string.Empty;
             }
+            var caseTask = await context.Investigations
+            .Include(c => c.CaseMessages)
+            .Include(c => c.PolicyDetail)
+            .FirstOrDefaultAsync(c => c.Id == claimId);
+
             var message = $"Dear {beneficiary.Name}\n\n";
             message += $"{sms}\n\n";
             message += $"Thanks\n\n";
             message += $"{user.FirstName} {user.LastName}\n\n";
-            message += $"Policy #:{beneficiary.InvestigationTask.PolicyDetail.ContractNumber}\n\n";
+            message += $"Policy #:{caseTask.PolicyDetail.ContractNumber}\n\n";
             message += $"{entityName}\n\n";
             message += $"{logo}";
 
             var scheduleMessage = new CaseMessage
             {
-                Message = message,
+                Message = sms,
                 InvestigationTaskId = claimId,
                 RecepicientEmail = beneficiary.Name,
                 SenderEmail = user.Email,
                 UpdatedBy = user.Email,
                 Updated = DateTime.UtcNow
             };
-            var claim = await context.Investigations
-            .Include(c => c.CaseMessages)
-            .Include(c => c.PolicyDetail)
-            .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.PinCode)
-            .FirstOrDefaultAsync(c => c.Id == claimId);
-            claim.CaseMessages.Add(scheduleMessage);
+
+            caseTask.CaseMessages.Add(scheduleMessage);
             await context.SaveChangesAsync(null, false);
             await smsService.DoSendSmsAsync(beneficiary.Country.Code, "+" + isdCode + mobile, message);
             return beneficiary.Name;
@@ -288,6 +289,16 @@ namespace risk.control.system.Services.Common
             {
                 await MarkAsRead(notification.StatusNotificationId, userEmail);
             }
+        }
+
+        public async Task<List<CaseMessage>> GetSmsHistory(long caseId, bool isCustomer)
+        {
+            var messages = await context.CaseMessages
+                .Where(m => m.InvestigationTaskId == caseId && m.IsCustomer == isCustomer)
+                .OrderByDescending(m => m.Updated) // Show newest first
+
+                .ToListAsync();
+            return messages;
         }
     }
 }
