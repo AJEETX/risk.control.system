@@ -14,7 +14,7 @@ namespace risk.control.system.Models
         public long VendorId { get; set; }
 
         public string UserEmail { get; set; }
-        public virtual Vendor? Vendor { get; set; }
+
         public override string ToString()
         {
             return $"AgencyRating Information:\n" +

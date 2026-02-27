@@ -161,73 +161,6 @@
             });
         }
     })
-
-    var countryId = $("#CountryId").val();
-
-    // Fetch states if the countryId is pre-filled
-    if (countryId) {
-        fetchStates(countryId);
-    }
-
-    // When country changes, fetch the states again
-    $("#CountryId").on("change", function () {
-        countryId = $(this).val();
-        fetchStates(countryId);
-    });
-
-    // Function to fetch states based on countryId
-    function fetchStates(countryId) {
-        $.ajax({
-            url: '/api/MasterData/GetStateName',  // Your controller route to fetch states
-            type: 'GET',
-            data: { countryId: countryId },
-            success: function (data) {
-                var stateSuggestions = [];
-                // Prepare suggestions for autocomplete
-                if (data && data.length) {
-                    stateSuggestions = data.map(function (state) {
-                        return {
-                            label: state.StateName,
-                            value: state.StateId
-                        };
-                    });
-                }
-
-                // Apply autocomplete on the StateId input field
-                $("#StateId").autocomplete({
-                    source: stateSuggestions,
-                    select: function (event, ui) {
-                        // When a state is selected, store the StateId in the hidden input field
-                        $("#SelectedStateId").val(ui.item.value);
-                    }
-                });
-            },
-            error: function () {
-                console.log("Error fetching states");
-            }
-        });
-    }
-
-    // Pre-fill the StateId input if a StateId is set in the model
-    var selectedStateId = $("#SelectedStateId").val();  // Replace with the actual stateId from the model
-    if (selectedStateId) {
-        // Fetch the state name from the backend if needed or directly fill the state name
-        $.ajax({
-            url: '/api/MasterData/GetStateNameForCountry',  // Your controller route to fetch state name
-            type: 'GET',
-            data: { countryId: countryId, id: selectedStateId },
-            success: function (data) {
-                if (data) {
-                    $("#StateId").val(data.stateName);
-                    $("#SelectedStateId").val(data.stateId);
-                }
-            },
-            error: function () {
-                console.log("Error fetching selected state");
-            }
-        });
-    }
-
     $('a.create').on('click', function () {
         $("body").addClass("submit-progress-bg");
         // Wrap in setTimeout so the UI
@@ -333,7 +266,7 @@ function showedit(id) {
         }
     }
 }
-var country = $('#CountryId');
-if (country) {
-    country.focus();
+var state = $('#StateText');
+if (state) {
+    state.focus();
 }

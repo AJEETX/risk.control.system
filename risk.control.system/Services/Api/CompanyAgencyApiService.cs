@@ -47,7 +47,7 @@ namespace risk.control.system.Services.Api
                 .Include(c => c.EmpanelledVendors).ThenInclude(v => v.District)
                 .Include(c => c.EmpanelledVendors).ThenInclude(v => v.Country)
                 .Include(c => c.EmpanelledVendors).ThenInclude(v => v.PinCode)
-                .Include(c => c.EmpanelledVendors).ThenInclude(v => v.ratings)
+                .Include(c => c.EmpanelledVendors).ThenInclude(v => v.Ratings)
                 .FirstOrDefaultAsync(c => c.ClientCompanyId == companyUser.ClientCompanyId.Value);
             if (company == null) return Array.Empty<object>();
 
@@ -135,7 +135,7 @@ namespace risk.control.system.Services.Api
                 .Include(c => c.EmpanelledVendors)
                     .ThenInclude(v => v.PinCode)
                 .Include(c => c.EmpanelledVendors)
-                    .ThenInclude(v => v.ratings)
+                    .ThenInclude(v => v.Ratings)
                 .FirstOrDefaultAsync(c => c.ClientCompanyId == companyUser.ClientCompanyId);
 
             if (company == null)

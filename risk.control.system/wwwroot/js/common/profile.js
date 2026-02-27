@@ -56,7 +56,7 @@ $(document).ready(function () {
         currentpassword.focus()
     }
 
-    $('#editButton').on('click', function (e) {
+    $('#updatebutton').on('click', function (e) {
         $("#edit-form").addClass("submit-progress-bg");
 
         // Update UI with a short delay to show spinner
@@ -64,65 +64,9 @@ $(document).ready(function () {
             $(".submit-progress").removeClass("hidden");
         }, 1);
 
-        $('#editButton').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> User Profile");
+        $('#updatebutton').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Update");
     });
     $("#edit-form").validate();
-});
-document.addEventListener('DOMContentLoaded', function () {
-    // Add event listeners to all elements with class `toggle-password-visibility`
-    const toggleButtons = document.querySelectorAll('.toggle-password-visibility');
-
-    toggleButtons.forEach(function (button) {
-        button.addEventListener('click', function () {
-            // Get the target input field ID from the `data-target` attribute
-            const passwordFieldId = button.getAttribute('data-target');
-            const passwordField = document.getElementById(passwordFieldId);
-            const eyeIcon = button.querySelector('i');
-
-            // Toggle password visibility
-            if (passwordField.type === "password") {
-                passwordField.type = "text";
-                eyeIcon.classList.remove("fa-eye-slash");
-                eyeIcon.classList.add("fa-eye");
-            } else {
-                passwordField.type = "password";
-                eyeIcon.classList.remove("fa-eye");
-                eyeIcon.classList.add("fa-eye-slash");
-            }
-        });
-    });
-
-    var pwdModal = document.getElementById('passwordModal');
-    var closeTermsButton = document.getElementById('closeterms');
-    var pwdLinks = document.querySelectorAll('.update-password-description');
-
-    if (pwdLinks) {
-        pwdLinks.forEach(function (termsLink) {
-            termsLink.addEventListener('click', function (e) {
-                e.preventDefault(); // Prevent default link behavior (i.e., not navigating anywhere)
-
-                // Show the terms modal
-                //var termsModal = document.querySelector('#passwordModal');
-                pwdModal.classList.remove('hidden-section');
-                pwdModal.classList.add('show');
-            });
-        });
-    }
-
-    if (closeTermsButton) {
-        closeTermsButton.addEventListener('click', function () {
-            pwdModal.classList.add('hidden-section'); // Remove the 'show' class to hide the modal
-            pwdModal.classList.remove('show'); // Close the modal if clicked outside
-        });
-    }
-
-    // Optionally, you can close the modal if clicked outside the modal content
-    window.addEventListener('click', function (e) {
-        if (e.target === pwdModal) {
-            pwdModal.classList.add('hidden-section'); // Remove the 'show' class to hide the modal
-            pwdModal.classList.remove('show'); // Close the modal if clicked outside
-        }
-    });
 });
 let typingInProgress = false;
 let messageQueue = [];
@@ -132,27 +76,15 @@ if (chatGPTMessage) {
     var userEmail = document.getElementById('Email').value;
     const eventSource = new EventSource(`/Session/StreamTypingUpdates?email=${encodeURIComponent(userEmail)}`);
 
+    eventSource.onopen = () => console.log("SSE Connection Opened");
+    eventSource.onerror = (e) => console.error("SSE Connection Failed", e);
+
     eventSource.addEventListener('message', (event) => {
-        // 🔐 Origin check — prevent DOM-based injection
-        if (event.origin !== window.location.origin || event.target.url !== window.location.origin + "/Session/StreamTypingUpdates") {
-            console.warn("⚠️ Blocked message from unknown origin:", event.origin);
-            return;
-        }
+        console.log("Received data:", event.data); // Debugging line
 
         if (event.data === "done") {
             eventSource.close();
-        }
-        else if (event.data.startsWith("PASSWORD_UPDATE|")) {
-            const jsonData = event.data.replace("PASSWORD_UPDATE|", "");
-            const passwordModel = JSON.parse(jsonData);
-
-            document.getElementById('displayedEmail').textContent = passwordModel.email;
-            document.getElementById('CurrentPassword').value = passwordModel.currentPassword;
-            document.getElementById('profilePicture').src =
-                `data:image/*;base64,${passwordModel.profilePicture}`;
-        }
-        else {
-            // Queue other streaming messages
+        } else {
             messageQueue.push(event.data);
             processNextMessage();
         }
