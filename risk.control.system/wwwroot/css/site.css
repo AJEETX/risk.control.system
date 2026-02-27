@@ -4304,3 +4304,9 @@ h2.lead {
     border-bottom: 1px solid #eee;
     padding-bottom: 5px;
 }
+.ziplink{
+    text-decoration:underline;
+}
+.ziplink img{
+    height:20px;
+}
