@@ -28,7 +28,7 @@
                         {
 
                             <input readonly type="text"
-                                   id="CountryId"
+                                   id="CountryText"
                                    class="form-control remarks"
                                    data-placeholder="country"
                                    asp-for="CountryId"
@@ -39,7 +39,7 @@
                         {
 
                             <input type="text"
-                                   id="CountryId"
+                                   id="CountryText"
                                    class="form-control remarks auto-dropdown"
                                    data-placeholder="country" placeholder="Type country"
                                    asp-for="CountryId"
@@ -52,12 +52,12 @@
                 </div>
 
                 <div class="form-group">
-                    <span class="input-group-label" for="StateId"> State:</span>
+                    <span class="input-group-label" for="StateText"> State:</span>
                     <div class="input-group mb-3 autocomplete-wrapper">
                         <div class="input-group-prepend">
-                            <span class="input-group-text" for="StateId"><i class="fas fa-map-marker-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                            <span class="input-group-text" for="StateText"><i class="fas fa-map-marker-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                         </div>
-                        <input type="text" id="StateId" class="form-control remarks auto-dropdown" data-placeholder="state" placeholder="Type state" asp-for="StateId" required  />
+                        <input type="text" id="StateText" class="form-control remarks auto-dropdown" data-placeholder="state" placeholder="Type state" required />
                         <span asp-validation-for="StateId" class="text-danger"></span>
                         <input asp-for="SelectedStateId" type="hidden" id="SelectedStateId" name="SelectedStateId" value="@Model?.StateId" />
                     </div>
@@ -68,7 +68,7 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="fas fa-city"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                         </div>
-                        <input id="Name" type="text" asp-for="Name" class="form-control remarks title-name" required placeholder="District Name"  maxlength="50">
+                        <input id="DistrictId" type="text" asp-for="Name" class="form-control remarks title-name" required placeholder="District Name"  maxlength="50">
                         <span asp-validation-for="Name" class="text-danger"></span>
                     </div>
                 </div>
@@ -101,8 +101,8 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-    <script src="~/js/company-admin/district.js"></script>
     <script src="~/js/company-admin/pincode.js"></script>
-    <script src="~/js/common/form-validation.js"></script>
+            <script src="~/js/company-admin/district.js"></script>
+            <script src="~/js/common/form-validation.js"></script>
 
 }

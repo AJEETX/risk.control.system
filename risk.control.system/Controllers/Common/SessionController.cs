@@ -48,9 +48,6 @@ namespace risk.control.system.Controllers.Company
 
                 var now = DateTime.UtcNow;
 
-                // Update user's last activity
-                user.LastActivityDate = now;
-
                 // Update or create UserSessionAlive
                 var session = await _context.UserSessionAlive
                     .Where(s => s.ActiveUser.Id == user.Id && !s.LoggedOut)
@@ -85,7 +82,7 @@ namespace risk.control.system.Controllers.Company
                 {
                     name = user.UserName,
                     role = user.Role?.GetEnumDisplayName(),
-                    lastActivity = user.LastActivityDate,
+                    lastActivity = now,
                     currentPage = request.CurrentPage
                 };
 
@@ -102,45 +99,36 @@ namespace risk.control.system.Controllers.Company
         public async Task StreamTypingUpdates(string email, CancellationToken cancellationToken)
         {
             Response.ContentType = "text/event-stream";
+            // Important: Disable buffering so the browser gets data immediately
+            Response.Headers.Add("Connection", "keep-alive");
 
-            // Fetch user details for password change
             var user = await _userManager.FindByEmailAsync(email);
             if (user == null)
             {
-                await Response.WriteAsync($"data: ERROR_UserNotFound\n");
-                await Response.WriteAsync($"data: done\n");
+                await Response.WriteAsync("data: ERROR_UserNotFound\n\n"); // Added \n\n
                 await Response.Body.FlushAsync(cancellationToken);
                 return;
             }
 
-            // Send user details first
-            var credentialModelJson = System.Text.Json.JsonSerializer.Serialize(new
-            {
-                email = user.Email,
-                currentPassword = user.Password
-            });
-
-            await Response.WriteAsync($"data: CREDENTIAL|{credentialModelJson}\n");
-            await Response.Body.FlushAsync(cancellationToken);
-            await Task.Delay(1000, cancellationToken); // Small delay to ensure UI updates first
-
-            // Now, stream messages one by one
             var messages = new List<string>
             {
-                $"Welcome ! {user.Email} First time user.",
+                $"Welcome! {user.Email}",
                 "Please update credential to continue.",
                 "Remember credential for later."
             };
 
             foreach (var message in messages)
             {
-                await Response.WriteAsync($"data: {message}\n");
+                if (cancellationToken.IsCancellationRequested) break;
+
+                // The double \n\n is mandatory for the 'message' event to fire in JS
+                await Response.WriteAsync($"data: {message}\n\n");
                 await Response.Body.FlushAsync(cancellationToken);
-                await Task.Delay(1500, cancellationToken); // Simulate delay between messages
+
+                await Task.Delay(1500, cancellationToken);
             }
 
-            // Indicate completion
-            await Response.WriteAsync($"data: done\n");
+            await Response.WriteAsync("data: done\n\n");
             await Response.Body.FlushAsync(cancellationToken);
         }
     }

@@ -10,7 +10,7 @@ namespace risk.control.system.Models
         public long DistrictId { get; set; }
 
         [Display(Name = "District name")]
-        public string Name { get; set; } = "ALL DISTRICTS";
+        public string Name { get; set; } = "";
 
         [Display(Name = "District code")]
         [Required]
@@ -30,10 +30,13 @@ namespace risk.control.system.Models
 
         [NotMapped]
         public long SelectedDistrictId { get; set; }
+
         [NotMapped]
         public long SelectedStateId { get; set; }
+
         [NotMapped]
         public long SelectedCountryId { get; set; }
+
         public override string ToString()
         {
             return $"City Information:\n" +

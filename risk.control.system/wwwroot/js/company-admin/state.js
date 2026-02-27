@@ -1,11 +1,10 @@
 ﻿$(document).ready(function () {
-    $('#Name').focus();
 
     $("#Code").on("input", function () {
         this.value = this.value.toUpperCase();
     });
 
-    var preloadedCountryId = $("#CountryId").val(); // Get the hidden field value
+    var preloadedCountryId = $("#CountryText").val(); // Get the hidden field value
 
     if (preloadedCountryId) {
         $.ajax({
@@ -14,13 +13,13 @@
             data: { countryId: preloadedCountryId },
             success: function (response) {
                 if (response && response.countryName) {
-                    $("#CountryName").val(response.countryName); // Populate input with name
+                    $("#CountryText").val(response.countryName); // Populate input with name
                 }
             },
             error: DataTableErrorHandler
         });
     }
-    $("#CountryName").autocomplete({
+    $("#CountryText").autocomplete({
         source: function (request, response) {
             $.ajax({
                 url: '/api/MasterData/SearchCountry',
@@ -38,16 +37,16 @@
         minLength: 1, // Start search after typing 2 characters
         select: function (event, ui) {
             // Set the selected country's name and ID
-            $("#CountryName").val(ui.item.label); // Set the display name
-            $("#CountryId").val(ui.item.id); // Set the hidden country ID
+            $("#CountryText").val(ui.item.label); // Set the display name
+            $("#SelectedCountryId").val(ui.item.id); // Set the hidden country ID
             return false;
         }
     });
 
     // Clear hidden field if the user clears the input manually
-    $("#CountryName").on('input', function () {
+    $("#CountryText").on('input', function () {
         if (!$(this).val()) {
-            $("#CountryId").val('');
+            $("#SelectedCountryId").val('');
         }
     });
 
@@ -315,3 +314,4 @@ function showedit(id) {
         }
     }
 }
+$('#Name').focus();

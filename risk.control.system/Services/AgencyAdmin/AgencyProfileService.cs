@@ -29,7 +29,7 @@ namespace risk.control.system.Services.AgencyAdmin
             if (vendorUser == null) return null;
 
             return await _context.Vendor
-                .Include(v => v.ratings)
+                .Include(v => v.Ratings)
                 .Include(v => v.Country)
                 .Include(v => v.PinCode)
                 .Include(v => v.State)
