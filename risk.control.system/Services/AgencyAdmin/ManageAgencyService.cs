@@ -96,7 +96,7 @@ namespace risk.control.system.Services.AgencyAdmin
         public async Task<Vendor> GetVendorDetailAsync(long id)
         {
             var vendor = await _context.Vendor
-                    .Include(v => v.ratings)
+                    .Include(v => v.Ratings)
                     .Include(v => v.Country)
                     .Include(v => v.PinCode)
                     .Include(v => v.State)
