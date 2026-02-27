@@ -23,7 +23,7 @@
                         {
 
                             <input readonly type="text"
-                                   id="CountryId"
+                                   id="CountryText"
                                    class="form-control remarks"
                                    data-placeholder="country"
                                    value="@Model.Country.Name"
@@ -33,7 +33,7 @@
                         {
 
                             <input type="text"
-                                   id="CountryId"
+                                   id="CountryText"
                                    class="form-control remarks auto-dropdown"
                                    data-placeholder="country" placeholder="Type country"
                                    asp-for="CountryId"
@@ -48,13 +48,12 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <span class="input-group-label" for="StateId"> State:</span>
+                    <span class="input-group-label" for="StateText"> State:</span>
                     <div class="input-group mb-3 autocomplete-wrapper">
                         <div class="input-group-prepend">
-                            <span class="input-group-text" for="StateId"><i class="fas fa-map-marker-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                            <span class="input-group-text" for="StateText"><i class="fas fa-map-marker-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                         </div>
-                        <input type="text" id="StateId" class="form-control remarks auto-dropdown" data-placeholder="state" placeholder="Type state..." asp-for="StateId" required  />
-                        <span asp-validation-for="StateId" class="text-danger"></span>
+                        <input type="text" id="StateText" class="form-control remarks auto-dropdown" data-placeholder="state" placeholder="Type state..." required  />
                         <input asp-for="SelectedStateId" type="hidden" id="SelectedStateId" name="SelectedStateId" value="@Model?.StateId" />
                         <div id="state-loading" class="loading-spinner">
                             <i class="fas fa-spinner fa-spin"></i>
@@ -62,15 +61,15 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <span class="input-group-label" for="DistrictId">District:</span>
+                    <span class="input-group-label" for="DistrictText">District:</span>
                     <div class="input-group mb-3 autocomplete-wrapper">
                         <div class="input-group-prepend">
-                            <span class="input-group-text" for="DistrictId">
+                            <span class="input-group-text" for="DistrictText">
                                 <i class="fas fa-city"></i>
                                 <i class="fa fa-asterisk asterik-style"></i>
                             </span>
                         </div>
-                        <input type="text" id="DistrictId" class="form-control remarks auto-dropdown" data-placeholder="district" placeholder="Type district..." asp-for="DistrictId" required  />
+                        <input type="text" id="DistrictText" class="form-control remarks auto-dropdown" data-placeholder="district" placeholder="Type district..." required />
                         <span asp-validation-for="DistrictId" class="text-danger"></span>
                         <input asp-for="SelectedDistrictId" type="hidden" id="SelectedDistrictId" name="SelectedDistrictId" value="@Model?.DistrictId" />
                         <div id="district-loading" class="loading-spinner">
@@ -116,7 +115,7 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-    <script src="~/js/company-admin/pincode-edit.js"></script>
     <script src="~/js/company-admin/pincode.js"></script>
-    <script src="~/js/common/form-validation.js"></script>
-}
+            <script src="~/js/common/form-validation.js"></script>
+            <script src="~/js/company-admin/pincode-edit.js"></script>
+        }

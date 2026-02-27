@@ -86,7 +86,6 @@ namespace risk.control.system.Models
         public long? VendorId { get; set; }
         public Vendor? Vendor { get; set; }
 
-        public DateTime? LastActivityDate { get; set; }
         public bool HasClaims { get; set; } = false;
         public string? AddressLatitude { get; set; }
         public string? AddressLongitude { get; set; }
@@ -128,7 +127,6 @@ namespace risk.control.system.Models
                 $"- Updated By: {UpdatedBy}\n" +
                 $"- Active: {Active}\n" +
                 $"- Deleted: {Deleted}\n" +
-                $"- Last Activity Date: {LastActivityDate}\n" +
                 $"- Has Claims: {HasClaims}";
         }
     }
