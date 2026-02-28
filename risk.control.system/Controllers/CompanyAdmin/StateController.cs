@@ -202,7 +202,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 state.CountryId = state.SelectedCountryId;
                 state.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.State.Add(state);
-                await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync(null, false);
                 notifyService.Success("State created successfully!");
                 return RedirectToAction(nameof(Profile));
             }
@@ -262,7 +262,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 existingState.CountryId = state.SelectedCountryId;
                 existingState.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Update(existingState);
-                await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync(null, false);
                 notifyService.Custom($"State edited successfully!", 3, "orange", "far fa-edit");
                 return RedirectToAction(nameof(Profile));
             }
@@ -298,7 +298,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 state.Updated = DateTime.UtcNow;
                 state.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.State.Remove(state);
-                await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync(null, false);
                 return Json(new { success = true, message = "State deleted successfully!" });
             }
             catch (Exception ex)

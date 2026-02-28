@@ -1,590 +1,363 @@
 ﻿$(document).ready(function () {
-    const fields = ['#CountryText', '#StateText', '#DistrictText', '#PinCodeText'];
-    $("#StateText").prop("disabled", true).val("");
-    $("#PinCodeText").prop("disabled", true);
-    fields.forEach(function (field) {
-        $(field).on('input', function () {
-            const isValid = /^[a-zA-Z0-9 ]*$/.test(this.value); // Check if input is valid
-            if (!isValid) {
-                $(this).val('');
+    $('#dataTable').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: {
+            url: '/Pincodes/GetPincodes',
+            type: 'GET',
+            dataType: 'json',
+            data: function (d) {
+                d.search = d.search.value; // Pass the search term
+                d.orderColumn = d.order[0].column; // Column index (0, 1, 2, etc.)
+                d.orderDirection = d.order[0].dir; // Sorting direction ("asc" or "desc")
+            }
+        },
+        order: [[0, 'asc']],
+        fixedHeader: true,
+        processing: true,
+        paging: true,
+
+        language: {
+            loadingRecords: '&nbsp;',
+            processing: '<i class="fas fa-sync fa-spin fa-4x fa-fw"></i><span class="sr-only">Loading...</span>'
+        },
+        columns: [
+            { data: 'code' },
+            { data: 'name' },
+            { data: 'district' },
+            { data: 'state' },
+            { data: 'country' },
+            { data: 'updated' },
+            {
+                data: 'pinCodeId',
+                render: function (data, type, row) {
+                    return `
+                                <a id="edit${data}"class="btn btn-xs btn-warning" href="/Pincodes/Edit/${data}">
+                                    <i class="fas fa-map-pin"></i> Edit
+                                </a>
+                                <button type="button" class="btn btn-xs btn-danger delete-item" data-id="${data}">
+                                            <i class="fas fa-trash"></i> Delete
+                                        </a>`;
+                }
+            }
+        ],
+        "drawCallback": function (setting) {
+            $('#dataTable tbody').on('click', '.btn-warning', function (e) {
+                e.preventDefault(); // Prevent the default anchor behavior
+                var id = $(this).attr('id').replace('edit', ''); // Extract the ID from the button's ID attribute
+                showedit(id); // Call the getdetails function with the ID
+                window.location.href = $(this).attr('href'); // Navigate to the delete page
+            });
+        }
+    });
+
+    var askConfirmation = true;
+    $('#create-form').submit(function (e) {
+        if (askConfirmation) {
+            if ($('#create-form').valid()) { // Ensure `valid` is called as a method
+                e.preventDefault();
+                $.confirm({
+                    title: "Confirm  Add New",
+                    content: "Are you sure to add?",
+
+                    icon: 'fas fa-map-pin',
+                    type: 'green',
+                    closeIcon: true,
+                    buttons: {
+                        confirm: {
+                            text: " Add New",
+                            btnClass: 'btn-success',
+                            action: function () {
+                                askConfirmation = false;
+                                $("body").addClass("submit-progress-bg");
+                                // Wrap in setTimeout so the UI
+                                // can update the spinners
+                                setTimeout(function () {
+                                    $(".submit-progress").removeClass("hidden");
+                                }, 1);
+                                // Disable all buttons, submit inputs, and anchors
+                                $('button, input[type="submit"], a').prop('disabled', true);
+
+                                // Add a class to visually indicate disabled state for anchors
+                                $('a').addClass('disabled-anchor').on('click', function (e) {
+                                    e.preventDefault(); // Prevent default action for anchor clicks
+                                });
+                                $('#create').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Add New");
+
+                                $('#create-form').submit();
+                                var form = document.getElementById("create-form");
+                                if (form) {
+                                    const formElements = form.getElementsByTagName("*");
+                                    for (const element of formElements) {
+                                        element.disabled = true;
+                                        if (element.hasAttribute("readonly")) {
+                                            element.classList.remove("valid", "is-valid", "valid-border");
+                                            element.removeAttribute("aria-invalid");
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        cancel: {
+                            text: "Cancel",
+                            btnClass: 'btn-default'
+                        }
+                    }
+                });
+            }
+            else {
+                $.alert({
+                    title: 'Invalid detail',
+                    content: 'Complete the required fields',
+                    type: 'red'
+                })
+            }
+        }
+    });
+
+    var askEditConfirmation = true;
+    $('#edit-form').submit(function (e) {
+        if (askEditConfirmation) {
+            if ($('#edit-form').valid()) {
+                e.preventDefault();
+                $.confirm({
+                    title: "Confirm Edit",
+                    content: "Are you sure to edit?",
+                    icon: 'fas fa-map-pin',
+
+                    type: 'orange',
+                    closeIcon: true,
+                    buttons: {
+                        confirm: {
+                            text: "Edit ",
+                            btnClass: 'btn-warning',
+                            action: function () {
+                                askEditConfirmation = false;
+                                $("body").addClass("submit-progress-bg");
+                                // Wrap in setTimeout so the UI
+                                // can update the spinners
+                                setTimeout(function () {
+                                    $(".submit-progress").removeClass("hidden");
+                                }, 1);
+                                // Disable all buttons, submit inputs, and anchors
+                                $('button, input[type="submit"], a').prop('disabled', true);
+
+                                // Add a class to visually indicate disabled state for anchors
+                                $('a').addClass('disabled-anchor').on('click', function (e) {
+                                    e.preventDefault(); // Prevent default action for anchor clicks
+                                });
+                                $('#edit').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Edit ");
+                                $('#edit-form').submit();
+                                var form = document.getElementById("edit-form");
+                                if (form) {
+                                    const formElements = form.getElementsByTagName("*");
+                                    for (const element of formElements) {
+                                        element.disabled = true;
+                                        if (element.hasAttribute("readonly")) {
+                                            element.classList.remove("valid", "is-valid", "valid-border");
+                                            element.removeAttribute("aria-invalid");
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        cancel: {
+                            text: "Cancel",
+                            btnClass: 'btn-default'
+                        }
+                    }
+                });
+            }
+            else {
+                $.alert({
+                    title: 'Invalid detail',
+                    content: 'Complete the required fields',
+                    type: 'red'
+                })
+            }
+        }
+    });
+
+    $('a.create').on('click', function () {
+        $("body").addClass("submit-progress-bg");
+        // Wrap in setTimeout so the UI
+        // can update the spinners
+        setTimeout(function () {
+            $(".submit-progress").removeClass("hidden");
+        }, 1);
+        // Disable all buttons, submit inputs, and anchors
+        $('button, input[type="submit"], a').prop('disabled', true);
+
+        // Add a class to visually indicate disabled state for anchors
+        $('a').addClass('disabled-anchor').on('click', function (e) {
+            e.preventDefault(); // Prevent default action for anchor clicks
+        });
+
+        $('a.create').html("<i class='fas fa-sync fa-spin'></i> Add New");
+
+        var article = document.getElementById("article");
+        if (article) {
+            var nodes = article.getElementsByTagName('*');
+            for (var i = 0; i < nodes.length; i++) {
+                nodes[i].disabled = true;
+            }
+        }
+    });
+
+    $(document).on("click", ".delete-item", function () {
+        var $btn = $(this);
+        var $spinner = $(".submit-progress"); // global spinner (you already have this)
+        var id = $(this).data("id");
+        var row = $(this).closest("tr");
+        var table = $('#dataTable').DataTable();
+
+        $.confirm({
+            title: 'Confirm Deletion',
+            content: 'Are you sure you want to delete ?',
+            type: 'red',
+            buttons: {
+                confirm: {
+                    text: 'Yes, Delete',
+                    btnClass: 'btn-red',
+                    action: function () {
+                        $spinner.removeClass("hidden");
+                        $btn.prop("disabled", true).html('<i class="fas fa-sync fa-spin"></i> Delete');
+                        $.ajax({
+                            url: '/Pincodes/Delete',
+                            type: 'POST',
+                            data: {
+                                __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val(),
+                                id: id
+                            },
+                            success: function (response) {
+                                if (response.success) {
+                                    table.row(row).remove().draw(false); // correct DataTable removal
+                                    $.alert({
+                                        title: 'Deleted',
+                                        content: response.message,
+                                        type: 'red'
+                                    });
+                                } else {
+                                    $.alert(response.message);
+                                }
+                            },
+                            error: function (e) {
+                                $.alert('Error while deleting.');
+                            },
+                            complete: function () {
+                                $spinner.addClass("hidden");
+                                // ✅ Re-enable button and restore text
+                                $btn.prop("disabled", false).html('<i class="fas fa-trash"></i> Delete');
+                            }
+                        });
+                    }
+                },
+                cancel: {
+                    text: 'Cancel',
+                    btnClass: 'btn-default'
+                }
             }
         });
     });
-
-    const preloadedCountryId = $("#SelectedCountryId").val();
-    const preloadedPincodeId = $("#SelectedPincodeId").val();
-
-    if (preloadedCountryId) {
-        // Preload country name
-        fetchAndSetFieldValue("/api/MasterData/GetCountryName", { id: preloadedCountryId }, "#CountryText", "name");
-
-        $("#StateText").prop("disabled", false);
-        $("#PinCodeText").prop("disabled", false);
-
-        // Preload details if Pincode is provided
-        if (preloadedPincodeId && preloadedPincodeId != 0) {
-            preloadPincodeDetails(preloadedCountryId, preloadedPincodeId);
-        }
+    var countryId = $("#SelectedCountryId").val();
+    var selectedStateId = $("#SelectedStateId").val();
+    var selectedDistrictId = $("#SelectedDistrictId").val();
+    if (countryId && countryId !== "0") {
+        loadStates(countryId, selectedStateId);
     }
-    $("#CountryText").on("input change", function () {
-        const selectedCountryId = $("#SelectedCountryId").val();
+    function loadStates(countryId, selectedStateId = null) {
+        $("#StateId").empty();
+        $("#StateId").append('<option value="">Loading...</option>');
 
-        if (selectedCountryId) {
-            stateAutocomplete();
-            $("#StateText").prop("disabled", false);
-            $("#DistrictText").prop("disabled", false);
-            $("#PinCodeText").prop("disabled", false);
-        } else {
-            $("#StateText").prop("disabled", true);
-            $("#PinCodeText").prop("disabled", true);
+        $.ajax({
+            url: '/District/GetStatesByCountry',
+            type: 'GET',
+            data: { countryId: countryId },
+            success: function (data) {
+                $("#StateId").empty();
+                $("#StateId").append('<option value="">-- Select State --</option>');
 
-            // Reset dependent fields
-            resetField("#PinCodeText");
-            resetField("#StateText");
-            resetField("#DistrictText");
-        }
+                $.each(data, function (i, state) {
+                    $("#StateId").append(
+                        $('<option>', {
+                            value: state.id,
+                            text: state.name
+                        })
+                    );
+                });
+
+                // Set selected state (for Edit scenario)
+                if (selectedStateId) {
+                    $("#StateId").val(selectedStateId);
+                    loadDistrictData(selectedStateId, countryId);
+                }
+            },
+            error: function () {
+                $("#StateId").empty();
+                $("#StateId").append('<option value="">Error loading states</option>');
+            }
+        });
+    }
+
+    $('#StateId').on('change', function () {
+        loadDistrictData($(this).val(), countryId);
     });
-
-    $("#StateText").on("blur", function () {
-        const stateIdValue = $(this).val().trim();
-
-        if (!stateIdValue) {
-            $("#PinCodeText").prop("disabled", true);
-            resetField("#DistrictText");
-            resetField("#PinCodeText");
-        }
-        else {
-            districtAutocomplete();
-            $("#StateText").prop("disabled", false);
-            $("#DistrictText").prop("disabled", false);
-            $("#PinCodeText").prop("disabled", false);
-        }
-    });
-
-    // Watch for changes in CountryId
-    $("#StateText").on("input change", function () {
-        const selectedStateId = $("#SelectedStateId").val();
-
-        if (selectedStateId) {
-            $("#DistrictText").prop("disabled", false);
-            $("#PinCodeText").prop("disabled", false);
-            districtAutocomplete();
-
-        } else {
-            $("#PinCodeText").prop("disabled", true);
-
-            // Reset dependent fields
-            resetField("#PinCodeText");
-            resetField("#DistrictText");
-        }
-    });
-
-    $("#StateText").on("blur", function () {
-        const stateValue = $(this).val().trim();
-        const countryId = $("#SelectedCountryId").val();
-        validateStateSelection(stateValue, countryId);
-    });
-
-    $("#DistrictText").on("blur", function () {
-        const districtValue = $(this).val().trim();
-        const stateId = $("#SelectedStateId").val();
-        const countryId = $("#SelectedCountryId").val();
-        validateDistrictSelection(districtValue, stateId, countryId);
-    });
-
-    // Initialize country autocomplete
-    countryAutocomplete();
-
-    //Initialize state autocomplete
-    stateAutocomplete();
-
-    //Initialize district autocomplete
-    districtAutocomplete();
-
-    // Initialize autocomplete for Pincode
-    pincodeAutocomplete();
+    function loadDistrictData(stateId, countryId) {
+        $("#DistrictId").empty();
+        $("#DistrictId").append('<option value="">Loading...</option>');
+        $.ajax({
+            url: '/Pincodes/GetDistrictsByStatesAndCountry',
+            type: 'GET',
+            data: { countryId: countryId, stateId: stateId },
+            success: function (data) {
+                $("#DistrictId").empty();
+                $("#DistrictId").append('<option value="">-- Select District --</option>');
+                if (data.length > 0) {
+                    $.each(data, function (i, district) {
+                        $("#DistrictId").append(
+                            $('<option>', {
+                                value: district.id,
+                                text: district.name
+                            })
+                        );
+                    });
+                    // Set selected state (for Edit scenario)
+                    if (selectedDistrictId) {
+                        $("#DistrictId").val(selectedDistrictId);
+                    }
+                }
+                
+            },
+            error: function () {
+                $("#DistrictId").empty();
+                $("#DistrictId").append('<option value="">Error loading district</option>');
+            }
+        });
+    }
 });
-function preloadPincodeDetails(preloadedCountryId, preloadedPincodeId) {
-    showLoader("#pincode-loading");
 
-    $.ajax({
-        url: "/api/MasterData/GetPincode",
-        type: "GET",
-        data: { id: preloadedPincodeId, countryId: preloadedCountryId },
-        success: function (response) {
-            hideLoader("#pincode-loading");
+function showedit(id) {
+    $("body").addClass("submit-progress-bg");
+    // Wrap in setTimeout so the UI
+    // can update the spinners
+    setTimeout(function () {
+        $(".submit-progress").removeClass("hidden");
+    }, 1);
 
-            if (response) {
-                // Preload Pincode
-                $("#PinCodeText").val(response.pincodeName);
-                $("#SelectedPincodeId").val(response.pincodeId);
+    $('a#edit' + id + '.btn.btn-xs.btn-warning').html("<i class='fas fa-sync fa-spin'></i> Edit");
 
-                // Preload State
-                if (response.stateId) {
-                    fetchAndSetFieldValue(
-                        "/api/MasterData/GetStateName",
-                        { id: response.stateId, CountryId: preloadedCountryId },
-                        "#StateText",
-                        "stateName"
-                    );
-                }
+    disableAllInteractiveElements();
 
-                // Preload District
-                if (response.districtId) {
-                    fetchAndSetFieldValue(
-                        "/api/MasterData/GetDistrictName",
-                        { id: response.districtId, stateId: response.stateId, CountryId: preloadedCountryId },
-                        "#DistrictText",
-                        "districtName"
-                    );
-                }
-            } else {
-                $("#PinCodeText").addClass("invalid")
-                resetField("#PinCodeText");
-                resetField("#StateText");
-                resetField("#DistrictText");
-            }
-        },
-        error: function () {
-            hideLoader("#pincode-loading");
-            $("#PinCodeText").addClass("invalid")
+    var article = document.getElementById("article");
+    if (article) {
+        var nodes = article.getElementsByTagName('*');
+        for (var i = 0; i < nodes.length; i++) {
+            nodes[i].disabled = true;
         }
-    });
-}
-
-function countryAutocomplete() {
-    $("#CountryText").autocomplete({
-        source: function (request, response) {
-            fetchCountrySuggestions(request.term, function (suggestions) {
-                // Filter out non-selectable items
-                response(suggestions);
-            });
-        },
-        focus: function (event, ui) {
-            if (ui.item.isSelectable === false) {
-                $("#CountryText").val('');
-                $("#CountryText").addClass("invalid");
-                return false;
-            }
-            // Set the input field to the "label" value when navigating with arrow keys
-            $("#CountryText").val(ui.item.label);
-            return false; // Prevent default behavior of updating the field with "value"
-        },
-        select: function (event, ui) {
-            if (ui.item.isSelectable === false) {
-                // Prevent selection if it's the "No result found"
-                $("#CountryText").addClass("invalid");
-                return false;
-            } else {
-                $("#CountryText").removeClass("invalid");
-                // On selecting a country, populate the field with its name and set its ID
-                $("#CountryText").val(ui.item.label); // Set country name
-                $("#SelectedCountryId").val(ui.item.value); // Set hidden field for CountryId
-                $("#PinCodeText").prop("disabled", false).attr("placeholder", "Search Pincode or name ...");
-
-                // Reset dependent fields (State, District, Pincode) when the country changes
-                resetField("#StateText");
-                resetField("#SelectedStateId");
-                resetField("#DistrictText");
-                resetField("#SelectedDistrictId");
-                resetField("#PinCodeText");
-                resetField("#SelectedPincodeId");
-
-                return false; // Prevent default autocomplete behavior
-            }
-        },
-        minLength: 2 // Minimum number of characters to trigger suggestions
-    });
-    $("#CountryText").on("blur", function () {
-        validateCountrySelection($(this).val(), $("#SelectedCountryId").val());
-    });
-}
-function fetchCountrySuggestions(term, responseCallback) {
-    $.ajax({
-        url: "/api/MasterData/GetCountrySuggestions", // API endpoint for country suggestions
-        type: "GET",
-        data: { term: term },
-        success: function (data) {
-            const suggestions = data.map(item => ({
-                label: `${item.name}`,
-                value: item.id,
-                name: item.name,
-            }));
-            // If no suggestions found, add the "No result found" option
-            if (suggestions.length === 0) {
-                suggestions.push({
-                    label: "No result found",
-                    value: "",
-                    name: null,
-                    isSelectable: false // Mark it as non-selectable
-                });
-            }
-            responseCallback(suggestions);
-        },
-        error: function () {
-            console.log("Error fetching Country suggestions.");
-        }
-    });
-}
-
-function validateCountrySelection(inputValue, countryId) {
-    if (!inputValue) {
-        $("#CountryText").val("");
-        $("#SelectedCountryId").val("");
-        markInvalidField("#CountryText");
-        resetField("#StateText");
-        resetField("#SelectedStateId");
-        resetField("#DistrictText");
-        resetField("#SelectedDistrictId");
-        resetField("#PinCodeText");
-        resetField("#SelectedPincodeId");
-        return;
     }
-
-    $.ajax({
-        url: "/api/MasterData/GetCountrySuggestions",
-        type: "GET",
-        data: { term: inputValue},
-        success: function (data) {
-            const isValid = data.some(item =>
-                `${item.name}` === inputValue);
-
-            if (!isValid) {
-                markInvalidField("#CountryText");
-                $("#CountryText").val("");
-                $("#SelectedCountryId").val("");
-                $("#CountryText").focus();
-            } else {
-                $("#PinCodeText").prop("disabled", false).attr("placeholder", "Search Pincode or name ...");
-                $("#PinCodeText").focus();
-                $("#CountryText").removeClass("invalid"); // Remove invalid class if valid
-            }
-        },
-        error: function () {
-            console.log("Error validating Country.");
-            markInvalidField("#CountryText");
-            $("#CountryText").val("");
-            $("#SelectedCountryId").val("");
-        }
-    });
 }
 
-function pincodeAutocomplete() {
-    const pinCodeField = "#PinCodeText";
-    const selectedPinCodeField = "#SelectedPincodeId";
-    const selectedCountryField = "#SelectedCountryId";
-
-    // Initialize autocomplete
-    $(pinCodeField).autocomplete({
-        source: function (request, response) {
-            fetchPincodeSuggestions(request.term, $(selectedCountryField).val(), function (suggestions) {
-                // Filter out non-selectable items
-                response(suggestions);
-            });
-        },
-        focus: function (event, ui) {
-            if (ui.item.isSelectable === false) {
-                $(pinCodeField).val('');
-                $(pinCodeField).addClass("invalid");
-                return false;
-            }
-            // Set the input field to the "label" value when navigating with arrow keys
-            $(pinCodeField).val(ui.item.label);
-            return false; // Prevent default behavior of updating the field with "value"
-        },
-        select: function (event, ui) {
-            if (ui.item.isSelectable === false) {
-                // Prevent selection if it's the "No result found"
-                $(pinCodeField).addClass("invalid");
-                return false;
-            }
-            populatePincodeDetails(ui.item);
-            $(pinCodeField).removeClass("invalid");
-            return false;
-        },
-        minLength: 2
-    });
-
-    // Validate on blur to ensure a valid option is selected
-    $(pinCodeField).on("blur", function () {
-        validatePincodeSelection($(this).val(), $(selectedCountryField).val());
-    });
-}
-
-function fetchPincodeSuggestions(term, countryId, responseCallback) {
-    $.ajax({
-        url: "/api/MasterData/GetPincodeSuggestions",
-        type: "GET",
-        data: { term: term, countryId: countryId },
-        success: function (data) {
-            const suggestions = data.map(item => ({
-                label: `${item.name} - ${item.pincode}`,
-                value: item.pincodeId,
-                stateId: item.stateId,
-                stateName: item.stateName,
-                districtId: item.districtId,
-                districtName: item.districtName
-            }));
-            // If no suggestions found, add the "No result found" option
-            if (suggestions.length === 0) {
-                suggestions.push({
-                    label: "No result found",
-                    value: "",
-                    stateId: null,
-                    stateName: null,
-                    districtId: null,
-                    districtName: null,
-                    isSelectable: false // Mark it as non-selectable
-                });
-            }
-            responseCallback(suggestions);
-        },
-        error: function () {
-            console.log("Error fetching Pincode suggestions.");
-        }
-    });
-}
-
-function populatePincodeDetails(selectedItem) {
-    $("#PinCodeText").val(selectedItem.label);
-    $("#SelectedPincodeId").val(selectedItem.value);
-    $("#StateText").removeClass("invalid");
-    $("#StateText").addClass("valid-border");
-    $("#StateText").val(selectedItem.stateName);
-    $("#SelectedStateId").val(selectedItem.stateId);
-    $("#DistrictText").removeClass("invalid");
-    $("#DistrictText").addClass("valid-border");
-    $("#DistrictText").val(selectedItem.districtName);
-    $("#SelectedDistrictId").val(selectedItem.districtId);
-    $("#PinCodeText").removeClass("invalid");
-}
-
-function validatePincodeSelection(inputValue, countryId) {
-    if (!inputValue) {
-        clearPincodeFields();
-        markInvalidField("#CountryText");
-        return;
-    }
-
-    $.ajax({
-        url: "/api/MasterData/GetPincodeSuggestions",
-        type: "GET",
-        data: { term: inputValue, countryId: countryId },
-        success: function (data) {
-            const isValid = data.some(item =>
-                `${item.name} - ${item.pincode}` === inputValue);
-
-            if (!isValid) {
-                markInvalidField("#CountryText");
-                clearPincodeFields();
-                //alert("Please select a valid Pincode from the dropdown.");
-            } else {
-                var countryIdVisible = $("#CountryText");
-                if (countryIdVisible) {
-                    $("#CountryText").removeClass("invalid"); // Remove invalid class if valid
-                }
-            }
-        },
-        error: function () {
-            console.log("Error validating Pincode.");
-            markInvalidField("#CountryText");
-            clearPincodeFields();
-        }
-    });
-}
-
-function validateStateSelection(inputValue, countryId) {
-    if (!inputValue) {
-        clearStateFields();
-        markInvalidField("#StateText");
-        return;
-    }
-
-    $.ajax({
-        url: "/api/MasterData/SearchState",
-        type: "GET",
-        data: { term: inputValue, countryId: countryId },
-        success: function (data) {
-            const isValid = data.some(item => item.stateName === inputValue);
-
-            if (!isValid) {
-                markInvalidField("#StateText");
-                clearStateFields();
-            } else {
-                $("#StateText").removeClass("invalid");
-            }
-        },
-        error: function () {
-            markInvalidField("#StateText");
-            clearStateFields();
-        }
-    });
-}
-
-function clearStateFields() {
-    $("#StateText").val("");
-    $("#SelectedStateId").val("");
-    $("#DistrictText").val("");
-    $("#SelectedDistrictId").val("");
-    $("#PinCodeText").val("");
-    $("#SelectedPincodeId").val("");
-}
-
-function validateDistrictSelection(inputValue, stateId, countryId) {
-    if (!inputValue) {
-        clearDistrictFields();
-        markInvalidField("#DistrictText");
-        return;
-    }
-
-    $.ajax({
-        url: "/api/MasterData/SearchDistrict",
-        type: "GET",
-        data: { term: inputValue, stateId: stateId, countryId: countryId },
-        success: function (data) {
-            const isValid = data.some(item => item.districtName === inputValue);
-
-            if (!isValid) {
-                markInvalidField("#DistrictText");
-                clearDistrictFields();
-            } else {
-                $("#DistrictText").removeClass("invalid");
-            }
-        },
-        error: function () {
-            markInvalidField("#DistrictText");
-            clearDistrictFields();
-        }
-    });
-}
-
-function clearDistrictFields() {
-    $("#DistrictText").val("");
-    $("#SelectedDistrictId").val("");
-    $("#PinCodeText").val("");
-    $("#SelectedPincodeId").val("");
-}
-
-function markInvalidField(fieldSelector) {
-    $(fieldSelector).addClass("invalid");
-}
-
-function clearPincodeFields() {
-    $("#PinCodeText").val("");
-    $("#SelectedPincodeId").val("");
-    $("#StateText").val("");
-    $("#SelectedStateId").val("");
-    $("#DistrictText").val("");
-    $("#SelectedDistrictId").val("");
-}
-
-function stateAutocomplete() {
-    $("#StateText").autocomplete({
-        source: function (request, response) {
-            $.ajax({
-                url: "/api/MasterData/SearchState",
-                type: "GET",
-                data: { term: request.term, countryId: $("#SelectedCountryId").val() },
-                success: function (data) {
-                    response(data.map(function (item) {
-                        return {
-                            label: `${item.stateName}`,
-                            value: item.stateId,
-                            stateName: item.stateName,
-                        };
-                    }));
-                },
-                error: function () {
-                    console.log("Error fetching Pincode suggestions.");
-                }
-            });
-        },
-        focus: function (event, ui) {
-            // Set the input field to the "label" value when navigating with arrow keys
-            $("#StateText").val(ui.item.label);
-            $("#SelectedStateId").val(ui.item.value);
-            return false; // Prevent default behavior of updating the field with "value"
-        },
-        select: function (event, ui) {
-            $("#StateText").val(ui.item.label);
-            $("#SelectedStateId").val(ui.item.value);
-
-            return false;
-        },
-        minLength: 2
-    });
-}
-
-function districtAutocomplete() {
-    $("#DistrictText").autocomplete({
-        source: function (request, response) {
-            $.ajax({
-                url: "/api/MasterData/SearchDistrict",
-                type: "GET",
-                data: { term: request.term, stateId: $("#SelectedStateId").val(), countryId: $("#SelectedCountryId").val() },
-                success: function (data) {
-                    response(data.map(function (item) {
-                        return {
-                            label: `${item.districtName}`,
-                            value: item.districtId,
-                            districtName: item.districtName,
-                        };
-                    }));
-                },
-                error: function () {
-                    console.log("Error fetching district suggestions.");
-                }
-            });
-        },
-        focus: function (event, ui) {
-            $("#DistrictText").val(ui.item.label);
-            $("#SelectedDistrictId").val(ui.item.value);
-
-            return false;
-        },
-        select: function (event, ui) {
-            $("#DistrictText").val(ui.item.label);
-            $("#SelectedDistrictId").val(ui.item.value);
-
-            return false;
-        },
-        minLength: 2
-    });
-}
-
-function fetchAndSetFieldValue(url, data, fieldSelector, fieldName, callback = null) {
-    showLoader(`${fieldSelector}-loading`);
-
-    $.ajax({
-        url: url,
-        type: "GET",
-        data: data,
-        success: function (response) {
-            hideLoader(`${fieldSelector}-loading`);
-            if (response && response[fieldName]) {
-                $(fieldSelector).val(response[fieldName]);
-                $(fieldSelector).addClass('valid-border');
-            }
-            if (callback) callback(response);
-        },
-        error: function () {
-            hideLoader(`${fieldSelector}-loading`);
-        }
-    });
-}
-
-function resetField(fieldSelector) {
-    $(fieldSelector).val("");
-}
-
-function showLoader(selector) {
-    $(selector).show();
-}
-
-function hideLoader(selector) {
-    $(selector).hide();
-}
-
-function markInvalidField(fieldSelector) {
-    $(fieldSelector).addClass("invalid");
+var state = $('#StateId');
+if (state) {
+    state.focus();
 }

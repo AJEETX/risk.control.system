@@ -153,7 +153,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 notifyService.Error("Error editing Company. Try again.");
                 return RedirectToAction(nameof(CompanyProfile));
             }
-            return RedirectToAction(nameof(ManageCompanyController.CompanyProfile), "ManageCompany");
+            return RedirectToAction(nameof(CompanyProfile), "ManageCompany");
         }
 
         private async Task Load(ClientCompany model)
