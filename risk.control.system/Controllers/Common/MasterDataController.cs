@@ -200,7 +200,53 @@ namespace risk.control.system.Controllers.Common
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
+        [HttpGet("SearchDistrictTerm")]
+        public IActionResult SearchDistrictTerm(long stateId, long countryId, string term = "")
+        {
+            var userEmail = HttpContext.User?.Identity?.Name;
 
+            try
+            {
+                var districts = string.IsNullOrEmpty(term?.Trim())
+                ? _context.District.AsNoTracking()
+                    .Where(x => x.CountryId == countryId && x.StateId == stateId)
+                    .OrderBy(x => x.Name)
+                    .Take(10)
+                    .Select(x => new
+                    {
+                        DistrictId = x.DistrictId,
+                        DistrictName = $"{x.Name}"
+                    })
+                    .ToList()
+                : _context.District.AsNoTracking()
+                    .Where(x => x.CountryId == countryId && x.StateId == stateId && x.Name.ToLower().Contains(term.ToLower()))
+                    .OrderBy(x => x.Name)
+                    .Take(10)
+                    .Select(x => new
+                    {
+                        DistrictId = x.DistrictId,
+                        DistrictName = $"{x.Name}"
+                    })
+                    .ToList();
+
+                // Add the "ALL DISTRICTS" option to the response
+                var result = new List<object>
+                {
+
+                };
+
+                // Append the queried districts to the result
+                result.AddRange(districts);
+
+                // Return the final response
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while getting districts for user {UserEmail}", userEmail);
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
         [HttpGet("SearchDistrict")]
         public IActionResult SearchDistrict(long stateId, long countryId, string term = "")
         {
