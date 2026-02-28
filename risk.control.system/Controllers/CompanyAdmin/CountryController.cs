@@ -151,7 +151,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 country.Name = WebUtility.HtmlEncode(country.Name);
                 country.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Add(country);
-                await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync(null, false);
                 notifyService.Success("country added successfully!");
                 return RedirectToAction(nameof(Profile));
             }
@@ -204,7 +204,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                     country.IsUpdated = true;
                     country.UpdatedBy = HttpContext.User?.Identity?.Name;
                     _context.Update(country);
-                    await _context.SaveChangesAsync();
+                    await _context.SaveChangesAsync(null, false);
                 }
                 catch (Exception ex)
                 {
@@ -257,7 +257,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 _context.Country.Remove(country);
             }
 
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(null, false);
             notifyService.Success("Country deleted successfully!");
             return RedirectToAction(nameof(Profile));
         }
