@@ -116,7 +116,7 @@ namespace risk.control.system.Services.Company
             ApplyCompanyChanges(company, model, userEmail);
 
             context.ClientCompany.Update(company);
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(null, false);
 
             await SendNotificationAsync(company, model.Email, portal_base_url);
 

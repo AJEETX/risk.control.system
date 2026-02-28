@@ -25,7 +25,7 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text" id="emailid"><i class="fas fa-at"></i> <i class="fa fa-asterisk asterik-style"></i> </span>
                             </div>
-                            <input type="text" asp-for="Email" id="emailAddress" class="form-control email-address" 
+                            <input type="text" asp-for="Email" id="emailAddress" class="form-control email-address"
                                    required placeholder="Enter User Email prefix" maxlength="15" autocomplete="name">
                             <div class="input-group-append">
                                 <span class="input-group-text" id="Email">@@@email</span>
@@ -44,7 +44,6 @@
                 </div>
                 <div class="col-md-3">
                 </div>
-
             </div>
         </div>
 
@@ -64,7 +63,7 @@
                         <div class="form-group">
                             <label class="input-group-label" for="createImageInput"> Photo:</label>
                             <div class="input-group mb-3">
-                                <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src="@Applicationsettings.NO_USER" data-toggle="tooltip" title="Upload Photo" alt="Profile"/>
+                                <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src="@Applicationsettings.NO_USER" data-toggle="tooltip" title="Upload Photo" alt="Profile" />
                                 <i class="fa fa-asterisk asterik-style"></i>
                                 <input accept=".jpg,.jpeg,.png" asp-for="ProfileImage" class="form-control remarks document-image-input" type="file" id="createImageInput" data-preview-id="createProfileImage" required data-toggle="tooltip" title="Upload Photo" />
                             </div>
@@ -157,7 +156,6 @@
                             </div>
                         </div>
                     </div>
-                    
                 </div>
             </div>
             <div class="card-footer">
@@ -176,7 +174,6 @@
                 </div>
             </div>
         </form>
-
     </div>
 </section>
 
@@ -185,5 +182,5 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
     <script src="~/js/common/manage-user.js"></script>
-    <script src="~/js/company-admin/pincode.js"></script>
+    <script src="~/js/common/address-with-pincode.js"></script>
 }

@@ -114,7 +114,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 costCentre.Updated = DateTime.UtcNow;
                 costCentre.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Add(costCentre);
-                await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync(null, false);
                 notifyService.Success("Budget Centre created successfully!");
                 return RedirectToAction(nameof(Profile));
             }
@@ -186,7 +186,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 costCentre.Updated = DateTime.UtcNow;
                 costCentre.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Update(costCentre);
-                await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync(null, false);
                 notifyService.Custom($"Budget Centre edited successfully!", 3, "orange", "far fa-edit");
                 return RedirectToAction(nameof(Profile));
             }
@@ -217,7 +217,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 costCentre.Updated = DateTime.UtcNow;
                 costCentre.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.CostCentre.Remove(costCentre);
-                await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync(null, false);
                 return Json(new { success = true, message = "Budget Centre deleted successfully!" });
             }
             catch (Exception ex)
