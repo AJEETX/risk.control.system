@@ -40,6 +40,17 @@ namespace risk.control.system.Controllers.CompanyAdmin
         }
 
         [HttpGet]
+        public async Task<IActionResult> GetStatesByCountry(long countryId)
+        {
+            var states = await _context.State
+                .Where(s => s.CountryId == countryId)
+                .Select(s => new { id = s.StateId, name = s.Name })
+                .ToListAsync();
+
+            return Json(states);
+        }
+
+        [HttpGet]
         public async Task<IActionResult> GetDistricts(int draw, int start, int length, string search, int? orderColumn, string orderDirection)
         {
             var query = _context.District
@@ -165,7 +176,13 @@ namespace risk.control.system.Controllers.CompanyAdmin
 
             var user = await _context.ApplicationUser.Include(a => a.Country).FirstOrDefaultAsync(u => u.Email == userEmail);
 
-            var district = new District { IsUpdated = !user.IsSuperAdmin, Country = user.Country, CountryId = user.CountryId.GetValueOrDefault(), SelectedCountryId = user.CountryId.GetValueOrDefault() };
+            var district = new District
+            {
+                IsUpdated = !user.IsSuperAdmin,
+                Country = user.Country,
+                CountryId = user.CountryId.GetValueOrDefault(),
+                SelectedCountryId = user.CountryId.GetValueOrDefault()
+            };
             return View(district);
         }
 
@@ -196,9 +213,8 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 district.Updated = DateTime.UtcNow;
                 district.UpdatedBy = HttpContext.User?.Identity?.Name;
                 district.CountryId = district.SelectedCountryId;
-                district.StateId = district.SelectedStateId;
                 _context.District.Add(district);
-                await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync(null, false);
                 notifyService.Success("District created successfully!");
                 return RedirectToAction(nameof(Profile));
             }
@@ -253,9 +269,9 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 existingdistrict.CountryId = district.SelectedCountryId;
                 existingdistrict.Updated = DateTime.UtcNow;
                 existingdistrict.UpdatedBy = HttpContext.User?.Identity?.Name;
-                existingdistrict.StateId = district.SelectedStateId;
+                existingdistrict.StateId = district.StateId;
                 _context.Update(existingdistrict);
-                await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync(null, false);
                 notifyService.Custom($"District edited successfully!", 3, "orange", "far fa-edit");
                 return RedirectToAction(nameof(Profile));
             }
@@ -291,7 +307,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 district.Updated = DateTime.UtcNow;
                 district.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.District.Remove(district);
-                await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync(null, false);
                 return Json(new { success = true, message = "District deleted successfully!" });
             }
             catch (Exception ex)

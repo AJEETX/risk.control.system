@@ -144,6 +144,17 @@ namespace risk.control.system.Controllers.CompanyAdmin
             return Json(response);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetDistrictsByStatesAndCountry(long countryId, long stateId)
+        {
+            var states = await _context.District
+                .Where(s => s.CountryId == countryId && s.StateId == stateId)
+                .Select(s => new { id = s.DistrictId, name = s.Name })
+                .ToListAsync();
+
+            return Json(states);
+        }
+
         // GET: PinCodes/Details/5
         [Breadcrumb("Details")]
         public async Task<IActionResult> Details(long id)
@@ -176,8 +187,14 @@ namespace risk.control.system.Controllers.CompanyAdmin
 
             var user = await _context.ApplicationUser.Include(a => a.Country).FirstOrDefaultAsync(u => u.Email == userEmail);
 
-            var district = new PinCode { IsUpdated = !user.IsSuperAdmin, Country = user.Country, CountryId = user.CountryId.GetValueOrDefault(), SelectedCountryId = user.CountryId.GetValueOrDefault() };
-            return View(district);
+            var pincode = new PinCode
+            {
+                IsUpdated = !user.IsSuperAdmin,
+                Country = user.Country,
+                CountryId = user.CountryId.GetValueOrDefault(),
+                SelectedCountryId = user.CountryId.GetValueOrDefault()
+            };
+            return View(pincode);
         }
 
         // POST: PinCodes/Create
@@ -197,10 +214,8 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 pinCode.Updated = DateTime.UtcNow;
                 pinCode.UpdatedBy = HttpContext.User?.Identity?.Name;
                 pinCode.CountryId = pinCode.SelectedCountryId;
-                pinCode.StateId = pinCode.SelectedStateId;
-                pinCode.DistrictId = pinCode.SelectedDistrictId;
                 _context.Add(pinCode);
-                await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync(null, false);
                 notifyService.Success("Pincode created successfully!");
                 return RedirectToAction(nameof(Profile));
             }
@@ -260,7 +275,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 existingPincode.StateId = pinCode.SelectedStateId;
                 existingPincode.DistrictId = pinCode.SelectedDistrictId;
                 _context.Update(existingPincode);
-                if (await _context.SaveChangesAsync() > 0)
+                if (await _context.SaveChangesAsync(null, false) > 0)
                 {
                     notifyService.Custom($"Pincode edited successfully!", 3, "orange", "far fa-edit");
                     return RedirectToAction(nameof(Profile));
@@ -297,7 +312,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 pinCode.Updated = DateTime.UtcNow;
                 pinCode.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.PinCode.Remove(pinCode);
-                await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync(null, false);
                 return Json(new { success = true, message = "Pincode deleted successfully!" });
             }
             catch (Exception ex)

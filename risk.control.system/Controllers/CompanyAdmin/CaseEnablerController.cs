@@ -110,7 +110,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 caseEnabler.UpdatedBy = HttpContext.User?.Identity?.Name;
 
                 _context.Add(caseEnabler);
-                await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync(null, false);
                 notifyService.Success("Reason created successfully!");
                 return RedirectToAction(nameof(Profile));
             }
@@ -189,7 +189,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 caseEnabler.Updated = DateTime.UtcNow;
                 caseEnabler.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Update(caseEnabler);
-                await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync(null, false);
                 notifyService.Custom($"Reason edited successfully!", 3, "orange", "fas fa-puzzle-piece");
                 return RedirectToAction(nameof(Profile));
             }
@@ -220,7 +220,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 caseEnabler.Updated = DateTime.UtcNow;
                 caseEnabler.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.CaseEnabler.Remove(caseEnabler);
-                await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync(null, false);
                 return Json(new { success = true, message = "Reason deleted successfully!" });
             }
             catch (Exception ex)

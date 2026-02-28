@@ -61,7 +61,7 @@
                                 <div class="input-group-prepend">
                                     @* Display Country Code *@
                                     <span class="input-group-text country-code-text" data-bs-toggle="tooltip" title="Country Code: +@Model?.Country.ISDCode">
-                                        <img src="@("/flags/" + @Model.Country.Code.ToLower() + ".png")" class="flag-icon" alt="flag"/>
+                                        <img src="@("/flags/" + @Model.Country.Code.ToLower() + ".png")" class="flag-icon" alt="flag" />
                                         +@Model?.Country.ISDCode <i class="fa fa-asterisk asterik-style"></i>
                                     </span>
                                 </div>
@@ -89,7 +89,6 @@
                                 <input id="Email" readonly asp-for="Email" class="form-control readonly-input valid-border" />
                             </div>
                         </div>
-
 
                         <!-- Role Section -->
                         <div class="form-group">
@@ -149,7 +148,7 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
     <script src="~/js/agency/agency-edit-user-profile.js"></script>
-    <script src="~/js/company-admin/pincode.js"></script>
+    <script src="~/js/common/address-with-pincode.js"></script>
     <script src="~/js/company-admin/phone-bank-validate.js"></script>
     <script src="~/js/common/profile-image-upload.js"></script>
     <script src="~/js/common/form-validation.js"></script>
