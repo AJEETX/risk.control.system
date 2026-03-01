@@ -114,7 +114,7 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     if (!row.ready2Assign) {
-                        return '<i class="fas fa-exclamation-triangle" data-bs-toggle="tooltip" title="Incomplete"></i>';
+                        return '<i class="fas fa-exclamation-triangle i-orangered" data-bs-toggle="tooltip" title="Incomplete"></i>';
                     }
                     else {
                         var img = '<input class="vendors" name="claims" type="checkbox" id="' + row.id + '"  value="' + row.id + '"  data-bs-toggle="tooltip" title="Assign <sub>auto</sub> / delete" />';
