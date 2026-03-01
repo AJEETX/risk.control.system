@@ -4310,3 +4310,11 @@ h2.lead {
 .ziplink img{
     height:20px;
 }
+.location-header-width{
+    width:85% !important;
+}
+.location-button-mt2{
+    margin-top:3px;
+    margin-left:2px !important;
+    float:left !important;
+}
