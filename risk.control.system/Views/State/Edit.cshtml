@@ -1,7 +1,6 @@
 ﻿@model risk.control.system.Models.State
 @{
 	ViewData["Title"] = @Applicationsettings.EDIT;
-
 }
 <section class="content">
 	<div id="article" class="card shadow-lg border-1 rounded-lg">
@@ -14,6 +13,7 @@
 					<i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
 				</div>
 				<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+				<input type="hidden" asp-for="CountryId" />
 				<input type="hidden" asp-for="StateId" value="@Model.StateId" />
 				<div class="form-group">
 					<span class="input-group-label" for="CountryText"> Country:</span>
