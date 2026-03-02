@@ -246,11 +246,19 @@
                                         type: 'red'
                                     });
                                 } else {
-                                    $.alert(response.message);
+                                    $.alert({
+                                        title: 'Delete Error',
+                                        content: response.message,
+                                        type: 'red'
+                                    });
                                 }
                             },
                             error: function (e) {
-                                $.alert('Error while deleting.');
+                                $.alert({
+                                    title: 'Delete Error',
+                                    content: 'Error while deleting.',
+                                    type: 'red'
+                                });
                             },
                             complete: function () {
                                 $spinner.addClass("hidden");

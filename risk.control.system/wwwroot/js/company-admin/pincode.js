@@ -1,4 +1,13 @@
 ﻿$(document).ready(function () {
+    $("#Code").on("input", function (e) {
+        // 1. Remove any non-numeric characters using a Regex
+        this.value = this.value.replace(/[^0-9]/g, '');
+
+        // 2. Double check length (redundant but safe for copy-paste)
+        if (this.value.length > 6) {
+            this.value = this.value.slice(0, 6);
+        }
+    });
     $('#dataTable').DataTable({
         processing: true,
         serverSide: true,
@@ -16,7 +25,6 @@
         fixedHeader: true,
         processing: true,
         paging: true,
-
         language: {
             loadingRecords: '&nbsp;',
             processing: '<i class="fas fa-sync fa-spin fa-4x fa-fw"></i><span class="sr-only">Loading...</span>'
@@ -263,6 +271,7 @@
     var selectedStateId = $("#SelectedStateId").val();
     var selectedDistrictId = $("#SelectedDistrictId").val();
     if (countryId && countryId !== "0") {
+        
         loadStates(countryId, selectedStateId);
     }
     function loadStates(countryId, selectedStateId = null) {
@@ -300,8 +309,21 @@
     }
 
     $('#StateId').on('change', function () {
+        var selectedVal = $(this).val();
+        $("#SelectedStateId").val(selectedVal);
+        $("#DistrictId").empty();
+
+        $('#Name').val('');
+        $('#Code').val('');
         loadDistrictData($(this).val(), countryId);
     });
+    $('#DistrictId').on('change', function () {
+        var selectedVal = $(this).val();
+        $("#SelectedDistrictId").val(selectedVal);
+        $('#Name').val('');
+        $('#Code').val('');
+    });
+
     function loadDistrictData(stateId, countryId) {
         $("#DistrictId").empty();
         $("#DistrictId").append('<option value="">Loading...</option>');
@@ -322,11 +344,10 @@
                         );
                     });
                     // Set selected state (for Edit scenario)
-                    if (selectedDistrictId) {
+                    if (selectedStateId && selectedDistrictId != '0') {
                         $("#DistrictId").val(selectedDistrictId);
                     }
                 }
-                
             },
             error: function () {
                 $("#DistrictId").empty();
@@ -357,7 +378,10 @@ function showedit(id) {
     }
 }
 
-var state = $('#StateId');
-if (state) {
-    state.focus();
+var state = $('#SelectedStateId').val();
+var district = $('#SelectedDistrictId').val();
+if (state != '0' && district != '0') {
+    $('#Name').focus();
+} else {
+    $('#StateId').focus();
 }

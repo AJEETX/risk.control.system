@@ -38,10 +38,10 @@
 				<!-- ADMIN_SETTINGS Menu -->
 				<li class="nav-item">
 					<a asp-controller="ClientCompany" asp-action="Index" is-active-page class="navlink-border nav-link
-                    @Url.MakeActiveClass("ClientCompany","")">
+						@Url.MakeActiveClass("ClientCompany","")">
 						<i class="nav-icon fas fa-shield-alt"></i>
 						<p class="sidebar-menu-header-label">
-							@Applicationsettings.ADMIN_SETTINGS
+							@Applicationsettings.ADMIN_SETTING
 							<div class="right"> <i class="fas fa-angle-down"></i></div>
 						</p>
 					</a>
@@ -58,11 +58,11 @@
 
 				<li class="nav-item">
 					<a is-active-page asp-controller="ClientCompany" asp-action="Companies" class="actual-link nav-link @Url.MakeActiveClass("ClientCompany", "Index")
-                                                    @Url.MakeActiveClass("ClientCompany", "Details")
-                                                    @Url.MakeActiveClass("ClientCompany", "Delete")
-                                                @Url.MakeActiveClass("ClientCompany", "Companies")
-                                            @Url.MakeActiveClass("ClientCompany", "Edit")
-                                    @Url.MakeActiveClass("CompanyUser", "") @Url.MakeActiveClass("CompanyUserRoles", "")">
+						@Url.MakeActiveClass("ClientCompany", "Details")
+						@Url.MakeActiveClass("ClientCompany", "Delete")
+						@Url.MakeActiveClass("ClientCompany", "Companies")
+						@Url.MakeActiveClass("ClientCompany", "Edit")
+						@Url.MakeActiveClass("CompanyUser", "") @Url.MakeActiveClass("CompanyUserRoles", "")">
 						<i class="nav-icon fas fa-building"></i>
 						<p>
 							Companies
@@ -72,7 +72,7 @@
 
 				<li class="nav-item">
 					<a is-active-page asp-controller="ClientCompany" asp-action="Create" class="actual-link nav-link @Url.MakeActiveClass("ClientCompany", "Create")
-                                            ">
+						">
 						<i class="nav-icon fas fa-plus"></i>
 						<p>
 							Add Company
@@ -81,9 +81,9 @@
 				</li>
 
 				<li class="nav-item">
-					<a is-active-page asp-controller="ClientCompany" asp-action="Agencies" class="actual-link nav-link 
-						@Url.MakeActiveClass("ClientCompany", "Agencies") 
-						@Url.MakeActiveClass("ClientCompany", "AgencyDetails") 
+					<a is-active-page asp-controller="ClientCompany" asp-action="Agencies" class="actual-link nav-link
+						@Url.MakeActiveClass("ClientCompany", "Agencies")
+						@Url.MakeActiveClass("ClientCompany", "AgencyDetails")
 						@Url.MakeActiveClass("ClientCompany", "EditAgency")
 						@Url.MakeActiveClass("ClientCompany", "AgencyUsers")
 						@Url.MakeActiveClass("ClientCompany", "AgencyService")">
@@ -96,8 +96,8 @@
 
 				<li class="nav-item">
 					<a asp-controller="User" asp-action="Index" is-active-page
-					   class="navlink-border nav-link @Url.MakeActiveClass("User","")
-                             @Url.MakeActiveClass("Roles","")">
+						   class="navlink-border nav-link @Url.MakeActiveClass("User","")
+						@Url.MakeActiveClass("Roles","")">
 						<i class="nav-icon fas fa-user-cog"></i>
 						<p class="sidebar-menu-header-label">
 							@Applicationsettings.USER_ROLES
@@ -126,13 +126,13 @@
 
 				<li class="nav-item">
 					<a asp-controller="CaseEnabler" asp-action="Profile" is-active-page
-					   class="navlink-border nav-link
-                    @Url.MakeActiveClass("CaseEnabler","")
-                    @Url.MakeActiveClass("Costcentre","")
-                    @Url.MakeActiveClass("BeneficiaryRelation","")">
+						   class="navlink-border nav-link
+						@Url.MakeActiveClass("CaseEnabler","")
+						@Url.MakeActiveClass("Costcentre","")
+						@Url.MakeActiveClass("BeneficiaryRelation","")">
 						<i class="nav-icon fas fa-cog"></i>
 						<p class="sidebar-menu-header-label">
-							@Applicationsettings.COMPANY_SETTINGS
+							@Applicationsettings.COMPANY_SETTING
 							<div class="right"> <i class="fas fa-angle-down"></i></div>
 						</p>
 					</a>
@@ -167,9 +167,9 @@
 
 				<li class="nav-item">
 					<a asp-controller="Country" asp-action="Index" is-active-page class="navlink-border nav-link @Url.MakeActiveClass("Country","")
-                        @Url.MakeActiveClass("State","") @Url.MakeActiveClass("District","") @Url.MakeActiveClass("PinCodes","")
-                        @Url.MakeActiveClass("Global","")
-                        @Url.MakeActiveClass("Audit","")">
+						@Url.MakeActiveClass("State","") @Url.MakeActiveClass("District","") @Url.MakeActiveClass("PinCodes","")
+						@Url.MakeActiveClass("Global","")
+						@Url.MakeActiveClass("Audit","")">
 						<i class="nav-icon fas fa-wrench"></i>
 						<p class="sidebar-menu-header-label">
 							@Applicationsettings.GENERAL_SETUP

@@ -1,4 +1,6 @@
-﻿using System.Linq.Expressions;
+﻿using System.Globalization;
+using System.Linq.Expressions;
+using System.Net;
 using System.Text.RegularExpressions;
 
 using AspNetCoreHero.ToastNotification.Abstractions;
@@ -155,31 +157,6 @@ namespace risk.control.system.Controllers.CompanyAdmin
             return Json(states);
         }
 
-        // GET: PinCodes/Details/5
-        [Breadcrumb("Details")]
-        public async Task<IActionResult> Details(long id)
-        {
-            if (id < 1 || _context.PinCode == null)
-            {
-                notifyService.Error("Pincode not found!");
-                return RedirectToAction(nameof(Profile));
-            }
-
-            var pinCode = await _context.PinCode
-                .Include(p => p.Country)
-                .Include(p => p.State)
-                .Include(p => p.District)
-                .FirstOrDefaultAsync(m => m.PinCodeId == id);
-            if (pinCode == null)
-            {
-                notifyService.Error("Pincode not found!");
-                return RedirectToAction(nameof(Profile));
-            }
-
-            return View(pinCode);
-        }
-
-        // GET: PinCodes/Create
         [Breadcrumb("Add New", FromAction = nameof(Profile))]
         public async Task<IActionResult> Create()
         {
@@ -197,59 +174,75 @@ namespace risk.control.system.Controllers.CompanyAdmin
             return View(pincode);
         }
 
-        // POST: PinCodes/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(PinCode pinCode)
         {
-            if (pinCode is null)
+            if (!ModelState.IsValid)
             {
-                notifyService.Error("Pincode Empty!");
+                notifyService.Custom("Invalid Pincode data!", 3, "red", "fas fa-map-pin");
                 return RedirectToAction(nameof(Profile));
             }
             try
             {
+                var pinCodeExist = await _context.PinCode.AnyAsync(p => p.Code == pinCode.Code && p.CountryId == pinCode.SelectedCountryId);
+                if (pinCodeExist)
+                {
+                    notifyService.Custom($"Pincode <b>{pinCode.Code}</b> already exist in Country!", 3, "red", "fas fa-map-pin");
+                    ModelState.Clear();
+
+                    var userEmail = HttpContext.User.Identity.Name;
+
+                    var user = await _context.ApplicationUser.Include(a => a.Country).FirstOrDefaultAsync(u => u.Email == userEmail);
+                    return View(new PinCode
+                    {
+                        IsUpdated = !user.IsSuperAdmin,
+                        Country = user.Country,
+                        CountryId = user.CountryId.GetValueOrDefault(),
+                        SelectedCountryId = user.CountryId.GetValueOrDefault(),
+                        StateId = pinCode.StateId,
+                        SelectedStateId = pinCode.StateId.GetValueOrDefault(),
+                        DistrictId = pinCode.DistrictId,
+                        SelectedDistrictId = pinCode.DistrictId.GetValueOrDefault()
+                    });
+                }
+                var textInfo = CultureInfo.CurrentCulture.TextInfo;
+                pinCode.Name = WebUtility.HtmlEncode(textInfo.ToTitleCase(pinCode.Name.ToLower()));
                 pinCode.Updated = DateTime.UtcNow;
                 pinCode.UpdatedBy = HttpContext.User?.Identity?.Name;
                 pinCode.CountryId = pinCode.SelectedCountryId;
                 _context.Add(pinCode);
                 await _context.SaveChangesAsync(null, false);
-                notifyService.Success("Pincode created successfully!");
+                notifyService.Custom($"Pincode <b>{pinCode.Name} ({pinCode.Code})</b> created successfully!", 3, "green", "fas fa-map-pin");
                 return RedirectToAction(nameof(Profile));
             }
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error occurred.");
-                notifyService.Error("Error to create Pincode!");
+                notifyService.Custom("An error occurred while creating the Pincode!", 3, "red", "fas fa-map-pin");
                 return RedirectToAction(nameof(Profile));
             }
         }
 
-        // GET: PinCodes/Edit/5
         [Breadcrumb("Edit  ", FromAction = nameof(Profile))]
         public async Task<IActionResult> Edit(long id)
         {
             if (id <= 0)
             {
-                notifyService.Error("Pincode not found!");
+                notifyService.Custom("Pincode Not Found!", 3, "red", "fas fa-map-pin");
                 return RedirectToAction(nameof(Profile));
             }
 
             var pinCode = await _context.PinCode.Include(d => d.Country).Include(d => d.State).Include(d => d.District).FirstOrDefaultAsync(p => p.PinCodeId == id);
             if (pinCode == null)
             {
-                notifyService.Error("Pincode not found!");
+                notifyService.Custom("Pincode Not Found!", 3, "red", "fas fa-map-pin");
                 return RedirectToAction(nameof(Profile));
             }
 
             return View(pinCode);
         }
 
-        // POST: PinCodes/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(long id, PinCode pinCode)
@@ -258,38 +251,39 @@ namespace risk.control.system.Controllers.CompanyAdmin
             {
                 if (!ModelState.IsValid)
                 {
-                    notifyService.Error("Pincode Null!");
+                    notifyService.Custom("Invalid Pincode data!", 3, "red", "fas fa-map-pin");
                     return RedirectToAction(nameof(Profile));
                 }
                 var existingPincode = await _context.PinCode.FindAsync(id);
                 if (existingPincode == null)
                 {
-                    notifyService.Error("Pincode not found!");
+                    notifyService.Custom("Pincode Not Found!", 3, "red", "fas fa-map-pin");
                     return RedirectToAction(nameof(Profile));
                 }
+                var pinCodeExist = await _context.PinCode.AnyAsync(p => p.Code == pinCode.Code && p.CountryId == pinCode.SelectedCountryId && p.PinCodeId != pinCode.PinCodeId);
+                if (pinCodeExist)
+                {
+                    notifyService.Custom($"Pincode <b>{pinCode.Code}</b> already exist in Country!", 3, "red", "fas fa-map-pin");
+                    var currentPinCode = await _context.PinCode.Include(d => d.Country).Include(d => d.State).Include(d => d.District).FirstOrDefaultAsync(p => p.PinCodeId == id);
+
+                    return View(currentPinCode);
+                }
+                var textInfo = CultureInfo.CurrentCulture.TextInfo;
+                existingPincode.Name = WebUtility.HtmlEncode(textInfo.ToTitleCase(pinCode.Name.ToLower()));
                 existingPincode.Code = pinCode.Code;
-                existingPincode.Name = pinCode.Name;
                 existingPincode.Updated = DateTime.UtcNow;
                 existingPincode.UpdatedBy = HttpContext.User?.Identity?.Name;
                 existingPincode.CountryId = pinCode.SelectedCountryId;
                 existingPincode.StateId = pinCode.SelectedStateId;
-                existingPincode.DistrictId = pinCode.SelectedDistrictId;
                 _context.Update(existingPincode);
-                if (await _context.SaveChangesAsync(null, false) > 0)
-                {
-                    notifyService.Custom($"Pincode edited successfully!", 3, "orange", "far fa-edit");
-                    return RedirectToAction(nameof(Profile));
-                }
-                else
-                {
-                    notifyService.Error("An error occurred while updating the pincode!");
-                    return RedirectToAction(nameof(Profile));
-                }
+                await _context.SaveChangesAsync(null, false);
+                notifyService.Custom($"Pincode <b>{existingPincode.Name} ({existingPincode.Code})</b> edited successfully!", 3, "orange", "fas fa-map-pin");
+                return RedirectToAction(nameof(Profile));
             }
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error occurred.");
-                notifyService.Error("An error occurred while updating the pincode!");
+                notifyService.Custom("An error occurred while updating the Pincode!", 3, "red", "fas fa-map-pin");
                 return RedirectToAction(nameof(Profile));
             }
         }
@@ -300,14 +294,14 @@ namespace risk.control.system.Controllers.CompanyAdmin
         {
             if (!ModelState.IsValid)
             {
-                return Json(new { success = true, message = "Pincode not found!" });
+                return Json(new { success = true, message = "Pincode Not Found!" });
             }
             try
             {
                 var pinCode = await _context.PinCode.FindAsync(id);
                 if (pinCode == null)
                 {
-                    return Json(new { success = true, message = "Pincode not found!" });
+                    return Json(new { success = true, message = "Pincode Not Found!" });
                 }
                 pinCode.Updated = DateTime.UtcNow;
                 pinCode.UpdatedBy = HttpContext.User?.Identity?.Name;
@@ -318,8 +312,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error occurred.");
-                notifyService.Error("Error to delete District!");
-                return RedirectToAction(nameof(Profile));
+                return Json(new { success = false, message = "An error occurred while updating the Pincode!" });
             }
         }
     }

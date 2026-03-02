@@ -1,66 +1,66 @@
 ﻿@using risk.control.system.Helpers;
 @{
-    if (User.IsInRole(COMPANY_ADMIN.DISPLAY_NAME))
-    {
-        <li class="nav-item">
-            <a is-active-page
-            class="navlink-border nav-link
-                        @Url.MakeActiveClass("Audit", "")
-                        @Url.MakeActiveClass("ReportTemplate", "")
-                        @Url.MakeActiveClass("CaseEnabler", "")
-                        @Url.MakeActiveClass("Costcentre", "")
-                        @Url.MakeActiveClass("OccupationType","")
-                        @Url.MakeActiveClass("EducationType","")
-                        @Url.MakeActiveClass("AnnualIncome","")
-                        @Url.MakeActiveClass("BeneficiaryRelation","")">
-                <i class="nav-icon fas fa-cog"></i>
-                <p class="sidebar-menu-header-label">
-                    @Applicationsettings.COMPANY_SETTINGS
-                    <div class="right"><i class="fas fa-angle-down"></i></div>
-                </p>
-            </a>
-        </li>
+	if (User.IsInRole(COMPANY_ADMIN.DISPLAY_NAME))
+	{
+		<li class="nav-item">
+			<a is-active-page
+				   class="navlink-border nav-link
+				@Url.MakeActiveClass("Audit", "")
+				@Url.MakeActiveClass("ReportTemplate", "")
+				@Url.MakeActiveClass("CaseEnabler", "")
+				@Url.MakeActiveClass("Costcentre", "")
+				@Url.MakeActiveClass("OccupationType", "")
+				@Url.MakeActiveClass("EducationType", "")
+				@Url.MakeActiveClass("AnnualIncome", "")
+				@Url.MakeActiveClass("BeneficiaryRelation", "")">
+				<i class="nav-icon fas fa-cog"></i>
+				<p class="sidebar-menu-header-label">
+					@Applicationsettings.COMPANY_SETTING
+					<div class="right"><i class="fas fa-angle-down"></i></div>
+				</p>
+			</a>
+		</li>
 
-        <li class="nav-item">
-            <a is-active-page asp-controller="CaseEnabler" asp-action="Profile" class="actual-link nav-link @Url.MakeActiveClass("CaseEnabler","")">
-                <i class="fas fa-puzzle-piece nav-icon"></i>
-                <p>
-                    @Applicationsettings.CASE_ENABLER
-                </p>
-            </a>
-        </li>
-        <li class="nav-item">
-            <a is-active-page asp-controller="Costcentre" asp-action="Profile" class="actual-link nav-link @Url.MakeActiveClass("Costcentre", "")">
-                <i class="fas fa-building nav-icon"></i>
-                <p>
-                    Budget Centre
-                </p>
-            </a>
-        </li>
-        <li class="nav-item">
-            <a is-active-page asp-controller="BeneficiaryRelation" asp-action="Profile" class="actual-link nav-link @Url.MakeActiveClass("BeneficiaryRelation","")">
-                <i class="fas fa-user-tie nav-icon"></i>
-                <p>
-                    Beneficiary Relation
-                </p>
-            </a>
-        </li>
-        <li class="nav-item">
-            <a is-active-page asp-controller="ReportTemplate" asp-action="Profile" class="actual-link nav-link @Url.MakeActiveClass("ReportTemplate", "")">
-                <i class="nav-icon far fa-file-powerpoint"></i>
-                <p>
-                    Report <sub class="i-green">template</sub>
-                </p>
-            </a>
-        </li>
-        <li class="nav-item">
-            <a is-active-page asp-controller="Audit" asp-action="Profile" class="actual-link nav-link @Url.MakeActiveClass("Audit", "")">
-                <i class="nav-icon fa fa-align-center"></i>
-                <p>
-                    Audit <sub class="i-grey">log</sub>
-                </p>
-            </a>
-        </li>
+		<li class="nav-item">
+			<a is-active-page asp-controller="CaseEnabler" asp-action="Profile" class="actual-link nav-link @Url.MakeActiveClass("CaseEnabler","")">
+				<i class="fas fa-puzzle-piece nav-icon"></i>
+				<p>
+					@Applicationsettings.CASE_ENABLER
+				</p>
+			</a>
+		</li>
+		<li class="nav-item">
+			<a is-active-page asp-controller="Costcentre" asp-action="Profile" class="actual-link nav-link @Url.MakeActiveClass("Costcentre", "")">
+				<i class="fas fa-building nav-icon"></i>
+				<p>
+					Budget Centre
+				</p>
+			</a>
+		</li>
+		<li class="nav-item">
+			<a is-active-page asp-controller="BeneficiaryRelation" asp-action="Profile" class="actual-link nav-link @Url.MakeActiveClass("BeneficiaryRelation", "")">
+				<i class="fas fa-user-tie nav-icon"></i>
+				<p>
+					Beneficiary Relation
+				</p>
+			</a>
+		</li>
+		<li class="nav-item">
+			<a is-active-page asp-controller="ReportTemplate" asp-action="Profile" class="actual-link nav-link @Url.MakeActiveClass("ReportTemplate", "")">
+				<i class="nav-icon far fa-file-powerpoint"></i>
+				<p>
+					Report <sub class="i-green">template</sub>
+				</p>
+			</a>
+		</li>
+		<li class="nav-item">
+			<a is-active-page asp-controller="Audit" asp-action="Profile" class="actual-link nav-link @Url.MakeActiveClass("Audit", "")">
+				<i class="nav-icon fa fa-align-center"></i>
+				<p>
+					Audit <sub class="i-grey">log</sub>
+				</p>
+			</a>
+		</li>
 
-    }
+	}
 }

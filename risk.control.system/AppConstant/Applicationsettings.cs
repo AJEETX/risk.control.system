@@ -123,7 +123,7 @@ namespace risk.control.system.AppConstant
         public const string DASHBOARD = "DASHBOARD";
         public const string INVESTIGATION_CLAIM = "CLAIMS";
         public const string INVESTIGATION_CASE_SETTINGS = "CASE SETTINGS";
-        public const string COMPANY_SETTINGS = "COMPANY SETTINGS";
+        public const string COMPANY_SETTING = "COMPANY SETTING";
         public const string INVESTIGATION_CASE_STATUS = "Case status";
         public const string INVESTIGATION_CLAIMS_CASE = "Claim";
         public const string INVESTIGATION_CLAIMS_CASE_READY_TO_ASSIGN = "Claim (ready to assign)";
@@ -142,7 +142,7 @@ namespace risk.control.system.AppConstant
         public const string DRAFT_MAIL = "Draft";
         public const string INVESTIGATION_UNDERWRITINGS = "Underwriting";
         public const string USER_ROLES = "USERS/ROLES";
-        public const string ADMIN_SETTINGS = "ADMIN SETTINGS";
+        public const string ADMIN_SETTING = "ADMIN SETTING";
         public const string GLOBAL_SETTINGS = "Global-settings";
         public const string GENERAL_SETUP = "GENERAL SETUP";
         public const string UPLOAD_FILE = "UPLOAD FILE";
