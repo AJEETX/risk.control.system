@@ -17,7 +17,6 @@
         fixedHeader: true,
         processing: true,
         paging: true,
-
         language: {
             loadingRecords: '&nbsp;',
             processing: '<i class="fas fa-sync fa-spin fa-4x fa-fw"></i><span class="sr-only">Loading...</span>'
@@ -241,11 +240,19 @@
                                         type: 'red'
                                     });
                                 } else {
-                                    $.alert(response.message);
+                                    $.alert({
+                                        title: 'Delete Error',
+                                        content: response.message,
+                                        type: 'red'
+                                    });
                                 }
                             },
                             error: function (e) {
-                                $.alert('Error while deleting.');
+                                $.alert({
+                                    title: 'Delete Error',
+                                    content: 'Error while deleting.',
+                                    type: 'red'
+                                });
                             },
                             complete: function () {
                                 $spinner.addClass("hidden");
@@ -262,14 +269,20 @@
             }
         });
     });
-
+    $("#StateId").on("change", function () {
+        var selectedVal = $(this).val();
+            $("#SelectedStateId").val(selectedVal);
+        $('#Name').val('');
+        $('#Code').val('');
+        // Optional: Log to console to verify it's working
+        console.log("Selected State ID updated to: " + selectedVal);
+    });
     var countryId = $("#SelectedCountryId").val();
     var selectedStateId = $("#SelectedStateId").val();
     if (countryId && countryId !== "0") {
         loadStates(countryId, selectedStateId);
     }
     function loadStates(countryId, selectedStateId = null) {
-
         $("#StateId").empty();
         $("#StateId").append('<option value="">Loading...</option>');
 
@@ -278,7 +291,6 @@
             type: 'GET',
             data: { countryId: countryId },
             success: function (data) {
-
                 $("#StateId").empty();
                 $("#StateId").append('<option value="">-- Select State --</option>');
 
@@ -324,7 +336,13 @@ function showedit(id) {
         }
     }
 }
+
 var state = $('#StateId');
-if (state) {
+var selectedStateId = $('#SelectedStateId');
+if (state && selectedStateId.val()) {
+    $('#Name').focus();
+}
+else {
     state.focus();
+
 }

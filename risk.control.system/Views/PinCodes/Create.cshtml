@@ -10,6 +10,8 @@
 		</div>
 		<div class="card-body">
 			<form id="create-form" asp-action="Create">
+				@Html.AntiForgeryToken()
+				<input type="hidden" asp-for="CountryId" />
 				<div class="submit-progress hidden">
 					<i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
 				</div>
@@ -58,6 +60,7 @@
 								required>
 							<option value="">-- Select State --</option>
 						</select>
+						<input type="hidden" id="SelectedStateId" value="@Model?.StateId" />
 						<span asp-validation-for="StateId" class="text-danger"></span>
 					</div>
 				</div>
@@ -73,6 +76,7 @@
 						<select asp-for="DistrictId" id="DistrictId" class="form-control remarks" required>
 							<option value="">-- Select District --</option>
 						</select>
+						<input asp-for="SelectedDistrictId" type="hidden" id="SelectedDistrictId" name="SelectedStateId" />
 						<span asp-validation-for="DistrictId" class="text-danger"></span>
 					</div>
 				</div>
