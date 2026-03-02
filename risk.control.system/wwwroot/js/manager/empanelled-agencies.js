@@ -130,7 +130,7 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    buttons += `<a data-id="${row.id}" class="btn btn-xs btn-warning" data-bs-toggle="tooltip" title="Edit"><i class="fas fa-edit"></i> Edit</a>`;
+                    buttons += `<a data-id="${row.id}" class="btn btn-xs btn-warning"><i class="fas fa-edit"></i> Edit</a>`;
 
                     return buttons;
                 }

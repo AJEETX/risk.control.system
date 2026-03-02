@@ -29,10 +29,7 @@ namespace risk.control.system.Models
         public Country? Country { get; set; } = default!;
 
         [NotMapped]
-        public long SelectedDistrictId { get; set; }
-
-        [NotMapped]
-        public long SelectedStateId { get; set; }
+        public long? SelectedStateId { get; set; }
 
         [NotMapped]
         public long SelectedCountryId { get; set; }
