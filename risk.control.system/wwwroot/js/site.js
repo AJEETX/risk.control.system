@@ -636,48 +636,50 @@ window.onpageshow = function (evt) { if (evt.persisted) DisableBackButton() }
 fetchIpInfo();
 
 loadNotifications(false);
-
-
 let internetPopup = null;
-function checkInternetConnection() {
-    if (!navigator.onLine) {
 
-        // If popup already exists, do not open another
-        if (internetPopup) return;
+function checkInternetConnection() {
+    // SCENARIO: OFFLINE
+    if (!navigator.onLine) {
+        // Stop if a popup is already visible
+        if (internetPopup) {
+            internetPopup.setContent('Still offline... checked at ' + new Date().toLocaleTimeString());
+            return;
+        }
 
         internetPopup = $.confirm({
             title: 'No Internet Connection',
-            content: 'It looks like your internet connection is down. Please check and try again.',
+            content: 'Please check your network settings.',
             type: 'red',
-            closeIcon: false,
             buttons: {
                 tryAgain: {
                     text: 'Retry',
                     action: function () {
-                        internetPopup = null; // reset before retry
+                        // Just run the check again
                         checkInternetConnection();
-                        return false; // keep dialog open if still offline
+                        return false; // Keep open if still offline
                     }
-                },
-                close: function () {
-                    internetPopup = null;
                 }
             },
-            onDestroy: function () {
+            // Important: reset variable when closed by ANY means
+            onClose: function () {
                 internetPopup = null;
             }
         });
     }
+    // SCENARIO: ONLINE
     else {
-        // If connection is back, close popup automatically
-        if (internetPopup) {
+        // FIX: Only call .close() if internetPopup IS NOT NULL
+        if (internetPopup && typeof internetPopup.close === 'function') {
             internetPopup.close();
-            internetPopup = null;
+            internetPopup = null; // Clean up immediately
         }
     }
 }
-window.addEventListener('online', function () {
-    internetPopupOpen = false;
-    $('.jconfirm').remove();
-});
 
+// Event Listeners
+window.addEventListener('online', checkInternetConnection);
+window.addEventListener('offline', checkInternetConnection);
+
+// Initial call
+checkInternetConnection();
