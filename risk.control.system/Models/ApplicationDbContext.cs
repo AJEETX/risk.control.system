@@ -34,6 +34,7 @@ namespace risk.control.system.Models
         public virtual DbSet<OccupationType> OccupationType { get; set; }
         public virtual DbSet<AnnualIncome> AnnualIncome { get; set; }
         public virtual DbSet<PdfDownloadTracker> PdfDownloadTracker { get; set; }
+        public virtual DbSet<CaseMessage> CaseMessages { get; set; }
         public virtual DbSet<InvestigationTask> Investigations { get; set; }
         public DbSet<ReportTemplate> ReportTemplates { get; set; }
         public DbSet<LocationReport> LocationReport { get; set; }

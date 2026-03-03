@@ -141,6 +141,9 @@
 					var bage = DateTime.UtcNow.Subtract(Model.Beneficiary.DateOfBirth.GetValueOrDefault()).TotalDays;
 					beneficaryAge = (int)bage / 365;
 				}
+				var customerSMSCount = @Model.ClaimsInvestigation.CaseMessages.Where(x => x.IsCustomer).Count();
+				var beneficiarySMSCount = @Model.ClaimsInvestigation.CaseMessages.Where(x => !x.IsCustomer).Count();
+
 				@if (Model.ClaimsInvestigation.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING)
 				{
 					<div class="col-12 col-sm-6 col-md-6 d-flex align-items-stretch flex-column">
@@ -213,12 +216,14 @@
 								</div>
 								<div class="card-footer">
 									<div class="text-right">
-										<a id="customer-comments" class="btn btn-sm bg-teal">
+										<button id="customer-comments" class="btn btn-sm bg-teal" title="Send Sms to Customer" data-bs-toggle="tooltip">
 											<i class="fas fa-comments"></i>
-										</a>
-										<a id="customer-detail" class="btn btn-sm btn-warning">
+											<span id="customer-sms-count" class="badge bg-danger ms-1">@customerSMSCount</span>
+										</button>
+
+										<button id="customer-detail" class="btn btn-sm btn-warning" data-bs-toggle="tooltip" title="Show Customer Details">
 											<i class="fa fa-user-plus"></i> ...
-										</a>
+										</button>
 									</div>
 								</div>
 							</div>
@@ -297,12 +302,13 @@
 								</div>
 								<div class="card-footer">
 									<div class="text-right">
-										<a id="beneficiary-comments" class="btn btn-sm bg-teal">
+										<button id="beneficiary-comments" class="btn btn-sm bg-teal" title="Send Sms to Beneficiary" data-bs-toggle="tooltip">
 											<i class="fas fa-comments"></i>
-										</a>
-										<a id="beneficiary-detail" class="btn btn-sm btn-success">
+											<span id="beneficiary-sms-count" class="badge bg-danger ms-1">@beneficiarySMSCount</span>
+										</button>
+										<button id="beneficiary-detail" class="btn btn-sm btn-success" title="Display Beneficiary Detail" data-bs-toggle="tooltip">
 											<i class="fas fa-user-tie"></i> ...
-										</a>
+										</button>
 									</div>
 								</div>
 							</div>

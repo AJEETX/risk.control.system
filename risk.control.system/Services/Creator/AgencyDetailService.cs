@@ -26,7 +26,7 @@ namespace risk.control.system.Services
         public async Task<Vendor> GetVendorDetailAsync(long vendorId, long selectedCaseId)
         {
             var vendor = await context.Vendor
-                .Include(v => v.ratings)
+                .Include(v => v.Ratings)
                 .Include(v => v.Country)
                 .Include(v => v.PinCode)
                 .Include(v => v.State)

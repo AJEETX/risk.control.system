@@ -27,7 +27,6 @@ namespace risk.control.system.Controllers.CompanyAdmin
             this.logger = logger;
         }
 
-        // GET: RiskCaseStatus
         public IActionResult Index()
         {
             return RedirectToAction(nameof(Profile));
@@ -143,26 +142,6 @@ namespace risk.control.system.Controllers.CompanyAdmin
             return Json(response);
         }
 
-        // GET: RiskCaseStatus/Details/5
-        [Breadcrumb("Details")]
-        public async Task<IActionResult> Details(long id)
-        {
-            if (id < 1)
-            {
-                notifyService.Error("State not found!");
-                return RedirectToAction(nameof(Profile));
-            }
-
-            var state = await _context.State.Include(s => s.Country).FirstOrDefaultAsync(m => m.StateId == id);
-            if (state == null)
-            {
-                notifyService.Error("State not found!");
-                return RedirectToAction(nameof(Profile));
-            }
-
-            return View(state);
-        }
-
         [Breadcrumb("Add New", FromAction = nameof(Profile))]
         public async Task<IActionResult> Create()
         {
@@ -182,99 +161,125 @@ namespace risk.control.system.Controllers.CompanyAdmin
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(State state)
         {
-            if (state is null)
+            var userEmail = HttpContext.User.Identity.Name;
+            var user = await _context.ApplicationUser.Include(u => u.Country).FirstOrDefaultAsync(u => u.Email == userEmail);
+            if (!ModelState.IsValid)
             {
-                notifyService.Error("Invalid State data!");
-                return RedirectToAction(nameof(Profile));
+                notifyService.Custom($"Invalid State data!", 3, "red", "fas fa-map-marker-alt");
+
+                // This is the magic line that clears the cached input values
+                ModelState.Clear();
+
+                state.Country = user.Country;
+                state.CountryId = user.CountryId.GetValueOrDefault();
+                state.Name = "";
+                state.Code = "";
+                return View(state);
             }
+
             try
             {
-                state.Code = WebUtility.HtmlEncode(state.Code?.ToUpper(CultureInfo.InvariantCulture));
                 bool exists = await _context.State.AnyAsync(x => x.Code == state.Code && x.CountryId == state.SelectedCountryId);
                 if (exists)
                 {
-                    notifyService.Error("State Code already exists!");
-                    return RedirectToAction(nameof(Profile));
+                    notifyService.Custom($"State Code <b>{state.Code}</b> already exists!", 3, "red", "fas fa-map-marker-alt");
+
+                    // Clear ModelState here as well
+                    ModelState.Clear();
+
+                    state.Country = user.Country;
+                    state.CountryId = user.CountryId.GetValueOrDefault();
+                    state.SelectedCountryId = user.CountryId.GetValueOrDefault();
+                    state.Name = "";
+                    state.Code = "";
+                    return View(state);
                 }
                 var textInfo = CultureInfo.CurrentCulture.TextInfo;
-                state.Name = textInfo.ToTitleCase(state.Name.ToLower());
+                state.Name = WebUtility.HtmlEncode(textInfo.ToTitleCase(state.Name.ToLower()));
+                state.Code = WebUtility.HtmlEncode(state.Code.ToUpper());
                 state.Updated = DateTime.UtcNow;
                 state.CountryId = state.SelectedCountryId;
                 state.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.State.Add(state);
-                await _context.SaveChangesAsync();
-                notifyService.Success("State created successfully!");
+                await _context.SaveChangesAsync(null, false);
+                notifyService.Custom($"State <b>{state.Name}</b> created successfully!", 3, "green", "fas fa-map-marker-alt");
                 return RedirectToAction(nameof(Profile));
             }
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error occurred.");
-                notifyService.Error("Error to create State!");
+                notifyService.Custom($"An error occurred while creating the State!!", 3, "red", "fas fa-map-marker-alt");
                 return RedirectToAction(nameof(Profile));
             }
         }
 
-        // GET: RiskCaseStatus/Edit/5
         [Breadcrumb("Edit", FromAction = nameof(Profile))]
         public async Task<IActionResult> Edit(long id)
         {
             if (id < 1)
             {
-                notifyService.Error("State not found!");
+                notifyService.Custom($"State Not Found!", 3, "red", "fas fa-map-marker-alt");
                 return RedirectToAction(nameof(Profile));
             }
 
             var state = await _context.State.Include(s => s.Country).FirstOrDefaultAsync(c => c.StateId == id);
             if (state == null)
             {
-                notifyService.Error("State not found!");
+                notifyService.Custom($"State Not Found!", 3, "red", "fas fa-map-marker-alt");
                 return RedirectToAction(nameof(Profile));
             }
 
             return View(state);
         }
 
-        // POST: RiskCaseStatus/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(long id, State state)
         {
-            if (id < 1 && state is null)
+            if (!ModelState.IsValid)
             {
-                notifyService.Error("State Null!");
-                return RedirectToAction(nameof(Profile));
+                notifyService.Custom($"Invalid State data!", 3, "red", "fas fa-map-marker-alt");
+                var currentState = await _context.State.Include(s => s.Country).FirstOrDefaultAsync(c => c.StateId == id);
+                return View(currentState);
             }
             try
             {
+                var existingState = await _context.State.FindAsync(id);
+                if (existingState == null)
+                {
+                    notifyService.Custom($"State Not Found!", 3, "red", "fas fa-map-marker-alt");
+                    return RedirectToAction(nameof(Profile));
+                }
                 bool exists = await _context.State.AnyAsync(x => x.Code == state.Code && x.CountryId == state.SelectedCountryId && x.StateId != id);
                 if (exists)
                 {
-                    notifyService.Error("State Code already exists!");
-                    return RedirectToAction(nameof(Profile));
+                    notifyService.Custom($"State Code <b>{state.Code}</b> already exists!", 3, "red", "fas fa-map-marker-alt");
+                    ModelState.Remove("Name");
+                    ModelState.Remove("Code");
+                    var currentState = await _context.State.Include(s => s.Country).FirstOrDefaultAsync(c => c.StateId == id);
+                    currentState.Name = "";
+                    currentState.Code = "";
+                    return View(currentState);
                 }
-                var existingState = _context.State.Find(id);
-                existingState.Code = state.Code;
+                existingState.Code = WebUtility.HtmlEncode(state.Code.ToUpper());
                 var textInfo = CultureInfo.CurrentCulture.TextInfo;
-                existingState.Name = textInfo.ToTitleCase(state.Name.ToLower());
+                existingState.Name = WebUtility.HtmlEncode(textInfo.ToTitleCase(state.Name.ToLower()));
                 existingState.Updated = DateTime.UtcNow;
                 existingState.CountryId = state.SelectedCountryId;
                 existingState.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Update(existingState);
-                await _context.SaveChangesAsync();
-                notifyService.Custom($"State edited successfully!", 3, "orange", "far fa-edit");
+                await _context.SaveChangesAsync(null, false);
+                notifyService.Custom($"State <b>{existingState.Name}</b> edited successfully!", 3, "orange", "fas fa-map-marker-alt");
                 return RedirectToAction(nameof(Profile));
             }
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error occurred.");
-                notifyService.Error("Error to edit State!");
+                notifyService.Custom($"An error occurred while editing the State!!", 3, "red", "fas fa-map-marker-alt");
                 return RedirectToAction(nameof(Profile));
             }
         }
 
-        // POST: RiskCaseStatus/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(long id)
@@ -288,7 +293,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 var state = await _context.State.FindAsync(id);
                 if (state == null)
                 {
-                    return Json(new { success = false, message = "State not found!" });
+                    return Json(new { success = false, message = "State Not Found!" });
                 }
                 var hasDistrict = _context.District.Any(d => d.StateId == id);
                 if (hasDistrict)
@@ -298,14 +303,13 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 state.Updated = DateTime.UtcNow;
                 state.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.State.Remove(state);
-                await _context.SaveChangesAsync();
-                return Json(new { success = true, message = "State deleted successfully!" });
+                await _context.SaveChangesAsync(null, false);
+                return Json(new { success = true, message = $"State <b>{state.Name}</b> deleted successfully!" });
             }
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error occurred.");
-                notifyService.Error("Error to delete State!");
-                return RedirectToAction(nameof(Profile));
+                return Json(new { success = false, message = $"An error occurred while deleting the State!" });
             }
         }
     }

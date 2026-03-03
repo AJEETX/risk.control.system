@@ -91,18 +91,18 @@ namespace risk.control.system.Models
 
         public int? RateCount
         {
-            get { return ratings != null ? ratings.Count : 1; }
+            get { return Ratings != null ? Ratings.Count : 0; }
         }
 
         public int? RateTotal
         {
             get
             {
-                return (ratings != null ? ratings.Sum(m => m.Rate) : 1);
+                return (Ratings != null ? Ratings.Sum(m => m.Rate) : 0);
             }
         }
 
-        public virtual ICollection<AgencyRating>? ratings { get; set; }
+        public virtual ICollection<AgencyRating>? Ratings { get; set; }
         public string? MobileAppUrl { get; set; } = EnvHelper.Get("APP_URL");
         public bool CanChangePassword { get; set; } = false;
         public bool HasClaims { get; set; } = false;

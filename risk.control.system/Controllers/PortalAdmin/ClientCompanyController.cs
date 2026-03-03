@@ -336,7 +336,7 @@ namespace risk.control.system.Controllers
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
 
                 var vendor = await _context.Vendor
-                    .Include(v => v.ratings)
+                    .Include(v => v.Ratings)
                     .Include(v => v.Country)
                     .Include(v => v.PinCode)
                     .Include(v => v.State)

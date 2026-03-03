@@ -112,7 +112,7 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    buttons += `<a data-id="${row.id}" class="btn btn-xs btn-warning" data-bs-toggle="tooltip" title="Edit"><i class="fas fa-edit"></i> Edit</a> &nbsp;`;
+                    buttons += `<a data-id="${row.id}" class="btn btn-xs btn-warning"><i class="fas fa-edit"></i> Edit</a> &nbsp;`;
                     if (data) {
                         buttons += '<button id="' + row.id + '" class="btn btn-xs btn-danger"><i class="fa fa-trash "></i> Delete </button>';
                     }
@@ -178,7 +178,7 @@
 
         $.confirm({
             title: 'Confirm Deletion',
-            content: 'Are you sure you want to delete this case?',
+            content: 'Are you sure you want to delete this Agency?',
             type: 'red',
             icon: 'fas fa-trash',
             buttons: {
@@ -324,12 +324,12 @@
                 content: "Please select agency to empanel?",
                 icon: 'fas fa-exclamation-triangle',
 
-                type: 'green',
+                type: 'orange',
                 closeIcon: true,
                 buttons: {
                     cancel: {
                         text: "SELECT",
-                        btnClass: 'btn-success'
+                        btnClass: 'btn-warning'
                     }
                 }
             });
@@ -382,55 +382,3 @@
         }
     });
 });
-
-function handleDeleteButtonClick(e) {
-    e.preventDefault(); // Prevent the default anchor behavior
-    var id = $(this).attr('id').replace('delete', ''); // Extract the ID from the button's ID attribute
-    getdetails(id); // Call the getdetails function with the ID
-    window.location.href = $(this).attr('href'); // Navigate to the delete page
-}
-function getdetails(id) {
-    $("body").addClass("submit-progress-bg");
-    // Wrap in setTimeout so the UI
-    // can update the spinners
-    setTimeout(function () {
-        $(".submit-progress").removeClass("hidden");
-    }, 1);
-    // Disable all buttons, submit inputs, and anchors
-    $('button, input[type="submit"], a').prop('disabled', true);
-
-    // Add a class to visually indicate disabled state for anchors
-    $('a').addClass('disabled-anchor').on('click', function (e) {
-        e.preventDefault(); // Prevent default action for anchor clicks
-    });
-
-    $('a#delete' + id + '.btn.btn-xs.btn-danger').html("<i class='fas fa-sync fa-spin'></i> Delete");
-    var article = document.getElementById("article");
-    if (article) {
-        var nodes = article.getElementsByTagName('*');
-        for (var i = 0; i < nodes.length; i++) {
-            nodes[i].disabled = true;
-        }
-    }
-}
-
-function showedit(id) {
-    $("body").addClass("submit-progress-bg");
-    // Wrap in setTimeout so the UI
-    // can update the spinners
-    setTimeout(function () {
-        $(".submit-progress").removeClass("hidden");
-    }, 1);
-    $('a.btn').attr('disabled', 'disabled');
-    var editbtn = $('a#edit' + id + '.btn.btn-xs.btn-warning')
-
-    editbtn.html("<i class='fas fa-sync fa-spin'></i> Edit ");
-
-    var article = document.getElementById("article");
-    if (article) {
-        var nodes = article.getElementsByTagName('*');
-        for (var i = 0; i < nodes.length; i++) {
-            nodes[i].disabled = true;
-        }
-    }
-}

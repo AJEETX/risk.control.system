@@ -81,7 +81,9 @@ namespace risk.control.system.Models
         [Range(1, 500)]
         public int TotalCreatedClaimAllowed { get; set; } = 100;
 
+        [Range(1, 500)]
         public int TotalToAssignMaxAllowed { get; set; } = 100;
+
         public bool Deleted { get; set; } = false;
         public bool HasClaims { get; set; } = false;
         public bool AiEnabled { get; set; } = false;

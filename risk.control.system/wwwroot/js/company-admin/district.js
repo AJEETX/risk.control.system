@@ -17,7 +17,6 @@
         fixedHeader: true,
         processing: true,
         paging: true,
-
         language: {
             loadingRecords: '&nbsp;',
             processing: '<i class="fas fa-sync fa-spin fa-4x fa-fw"></i><span class="sr-only">Loading...</span>'
@@ -56,178 +55,129 @@
     var askConfirmation = true;
     $('#create-form').submit(function (e) {
         if (askConfirmation) {
-            e.preventDefault();
-            $.confirm({
-                title: "Confirm  Add New",
+            if ($('#create-form').valid()) {
+                e.preventDefault();
+                $.confirm({
+                    title: "Confirm  Add New",
 
-                content: "Are you sure to add?",
-                icon: 'fas fa-city',
-                type: 'green',
-                closeIcon: true,
-                buttons: {
-                    confirm: {
-                        text: " Add New",
-                        btnClass: 'btn-success',
-                        action: function () {
-                            askConfirmation = false;
-                            $("body").addClass("submit-progress-bg");
-                            // Wrap in setTimeout so the UI
-                            // can update the spinners
-                            setTimeout(function () {
-                                $(".submit-progress").removeClass("hidden");
-                            }, 1);
-                            // Disable all buttons, submit inputs, and anchors
-                            $('button, input[type="submit"], a').prop('disabled', true);
+                    content: "Are you sure to add?",
+                    icon: 'fas fa-city',
+                    type: 'green',
+                    closeIcon: true,
+                    buttons: {
+                        confirm: {
+                            text: " Add New",
+                            btnClass: 'btn-success',
+                            action: function () {
+                                askConfirmation = false;
+                                $("body").addClass("submit-progress-bg");
+                                // Wrap in setTimeout so the UI
+                                // can update the spinners
+                                setTimeout(function () {
+                                    $(".submit-progress").removeClass("hidden");
+                                }, 1);
+                                // Disable all buttons, submit inputs, and anchors
+                                $('button, input[type="submit"], a').prop('disabled', true);
 
-                            // Add a class to visually indicate disabled state for anchors
-                            $('a').addClass('disabled-anchor').on('click', function (e) {
-                                e.preventDefault(); // Prevent default action for anchor clicks
-                            });
-                            $('#create').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Add New");
+                                // Add a class to visually indicate disabled state for anchors
+                                $('a').addClass('disabled-anchor').on('click', function (e) {
+                                    e.preventDefault(); // Prevent default action for anchor clicks
+                                });
+                                $('#create').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Add New");
 
-                            $('#create-form').submit();
-                            var form = document.getElementById("create-form");
-                            if (form) {
-                                const formElements = form.getElementsByTagName("*");
-                                for (const element of formElements) {
-                                    element.disabled = true;
-                                    if (element.hasAttribute("readonly")) {
-                                        element.classList.remove("valid", "is-valid", "valid-border");
-                                        element.removeAttribute("aria-invalid");
+                                $('#create-form').submit();
+                                var form = document.getElementById("create-form");
+                                if (form) {
+                                    const formElements = form.getElementsByTagName("*");
+                                    for (const element of formElements) {
+                                        element.disabled = true;
+                                        if (element.hasAttribute("readonly")) {
+                                            element.classList.remove("valid", "is-valid", "valid-border");
+                                            element.removeAttribute("aria-invalid");
+                                        }
                                     }
                                 }
                             }
+                        },
+                        cancel: {
+                            text: "Cancel",
+                            btnClass: 'btn-default'
                         }
-                    },
-                    cancel: {
-                        text: "Cancel",
-                        btnClass: 'btn-default'
                     }
-                }
-            });
+                });
+            }
+            else {
+                $.alert({
+                    title: 'Invalid detail',
+                    content: 'Complete the required fields',
+                    type: 'red'
+                })
+            }
         }
     });
 
     var askEditConfirmation = true;
     $('#edit-form').submit(function (e) {
         if (askEditConfirmation) {
-            e.preventDefault();
-            $.confirm({
-                title: "Confirm Edit",
-                content: "Are you sure to edit?",
+            if ($('#edit-form').valid()) {
+                e.preventDefault();
+                $.confirm({
+                    title: "Confirm Edit",
+                    content: "Are you sure to edit?",
 
-                icon: 'fas fa-city',
-                type: 'orange',
-                closeIcon: true,
-                buttons: {
-                    confirm: {
-                        text: "Edit ",
-                        btnClass: 'btn-warning',
-                        action: function () {
-                            askEditConfirmation = false;
-                            $("body").addClass("submit-progress-bg");
-                            // Wrap in setTimeout so the UI
-                            // can update the spinners
-                            setTimeout(function () {
-                                $(".submit-progress").removeClass("hidden");
-                            }, 1);
-                            // Disable all buttons, submit inputs, and anchors
-                            $('button, input[type="submit"], a').prop('disabled', true);
+                    icon: 'fas fa-city',
+                    type: 'orange',
+                    closeIcon: true,
+                    buttons: {
+                        confirm: {
+                            text: "Edit ",
+                            btnClass: 'btn-warning',
+                            action: function () {
+                                askEditConfirmation = false;
+                                $("body").addClass("submit-progress-bg");
+                                // Wrap in setTimeout so the UI
+                                // can update the spinners
+                                setTimeout(function () {
+                                    $(".submit-progress").removeClass("hidden");
+                                }, 1);
+                                // Disable all buttons, submit inputs, and anchors
+                                $('button, input[type="submit"], a').prop('disabled', true);
 
-                            // Add a class to visually indicate disabled state for anchors
-                            $('a').addClass('disabled-anchor').on('click', function (e) {
-                                e.preventDefault(); // Prevent default action for anchor clicks
-                            });
-                            $('#edit').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Edit ");
-                            $('#edit-form').submit();
-                            var form = document.getElementById("edit-form");
-                            if (form) {
-                                const formElements = form.getElementsByTagName("*");
-                                for (const element of formElements) {
-                                    element.disabled = true;
-                                    if (element.hasAttribute("readonly")) {
-                                        element.classList.remove("valid", "is-valid", "valid-border");
-                                        element.removeAttribute("aria-invalid");
+                                // Add a class to visually indicate disabled state for anchors
+                                $('a').addClass('disabled-anchor').on('click', function (e) {
+                                    e.preventDefault(); // Prevent default action for anchor clicks
+                                });
+                                $('#edit').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Edit ");
+                                $('#edit-form').submit();
+                                var form = document.getElementById("edit-form");
+                                if (form) {
+                                    const formElements = form.getElementsByTagName("*");
+                                    for (const element of formElements) {
+                                        element.disabled = true;
+                                        if (element.hasAttribute("readonly")) {
+                                            element.classList.remove("valid", "is-valid", "valid-border");
+                                            element.removeAttribute("aria-invalid");
+                                        }
                                     }
                                 }
                             }
+                        },
+                        cancel: {
+                            text: "Cancel",
+                            btnClass: 'btn-default'
                         }
-                    },
-                    cancel: {
-                        text: "Cancel",
-                        btnClass: 'btn-default'
-                    }
-                }
-            });
-        }
-    })
-
-    var countryId = $("#CountryId").val();
-
-    // Fetch states if the countryId is pre-filled
-    if (countryId) {
-        fetchStates(countryId);
-    }
-
-    // When country changes, fetch the states again
-    $("#CountryId").on("change", function () {
-        countryId = $(this).val();
-        fetchStates(countryId);
-    });
-
-    // Function to fetch states based on countryId
-    function fetchStates(countryId) {
-        $.ajax({
-            url: '/api/MasterData/GetStateName',  // Your controller route to fetch states
-            type: 'GET',
-            data: { countryId: countryId },
-            success: function (data) {
-                var stateSuggestions = [];
-                // Prepare suggestions for autocomplete
-                if (data && data.length) {
-                    stateSuggestions = data.map(function (state) {
-                        return {
-                            label: state.StateName,
-                            value: state.StateId
-                        };
-                    });
-                }
-
-                // Apply autocomplete on the StateId input field
-                $("#StateId").autocomplete({
-                    source: stateSuggestions,
-                    select: function (event, ui) {
-                        // When a state is selected, store the StateId in the hidden input field
-                        $("#SelectedStateId").val(ui.item.value);
                     }
                 });
-            },
-            error: function () {
-                console.log("Error fetching states");
             }
-        });
-    }
-
-    // Pre-fill the StateId input if a StateId is set in the model
-    var selectedStateId = $("#SelectedStateId").val();  // Replace with the actual stateId from the model
-    if (selectedStateId) {
-        // Fetch the state name from the backend if needed or directly fill the state name
-        $.ajax({
-            url: '/api/MasterData/GetStateNameForCountry',  // Your controller route to fetch state name
-            type: 'GET',
-            data: { countryId: countryId, id: selectedStateId },
-            success: function (data) {
-                if (data) {
-                    $("#StateId").val(data.stateName);
-                    $("#SelectedStateId").val(data.stateId);
-                }
-            },
-            error: function () {
-                console.log("Error fetching selected state");
+            else {
+                $.alert({
+                    title: 'Invalid detail',
+                    content: 'Complete the required fields',
+                    type: 'red'
+                })
             }
-        });
-    }
-
+        }
+    });
     $('a.create').on('click', function () {
         $("body").addClass("submit-progress-bg");
         // Wrap in setTimeout so the UI
@@ -290,11 +240,19 @@
                                         type: 'red'
                                     });
                                 } else {
-                                    $.alert(response.message);
+                                    $.alert({
+                                        title: 'Delete Error',
+                                        content: response.message,
+                                        type: 'red'
+                                    });
                                 }
                             },
                             error: function (e) {
-                                $.alert('Error while deleting.');
+                                $.alert({
+                                    title: 'Delete Error',
+                                    content: 'Error while deleting.',
+                                    type: 'red'
+                                });
                             },
                             complete: function () {
                                 $spinner.addClass("hidden");
@@ -311,6 +269,51 @@
             }
         });
     });
+    $("#StateId").on("change", function () {
+        var selectedVal = $(this).val();
+            $("#SelectedStateId").val(selectedVal);
+        $('#Name').val('');
+        $('#Code').val('');
+        // Optional: Log to console to verify it's working
+        console.log("Selected State ID updated to: " + selectedVal);
+    });
+    var countryId = $("#SelectedCountryId").val();
+    var selectedStateId = $("#SelectedStateId").val();
+    if (countryId && countryId !== "0") {
+        loadStates(countryId, selectedStateId);
+    }
+    function loadStates(countryId, selectedStateId = null) {
+        $("#StateId").empty();
+        $("#StateId").append('<option value="">Loading...</option>');
+
+        $.ajax({
+            url: '/District/GetStatesByCountry',
+            type: 'GET',
+            data: { countryId: countryId },
+            success: function (data) {
+                $("#StateId").empty();
+                $("#StateId").append('<option value="">-- Select State --</option>');
+
+                $.each(data, function (i, state) {
+                    $("#StateId").append(
+                        $('<option>', {
+                            value: state.id,
+                            text: state.name
+                        })
+                    );
+                });
+
+                // Set selected state (for Edit scenario)
+                if (selectedStateId) {
+                    $("#StateId").val(selectedStateId);
+                }
+            },
+            error: function () {
+                $("#StateId").empty();
+                $("#StateId").append('<option value="">Error loading states</option>');
+            }
+        });
+    }
 });
 
 function showedit(id) {
@@ -333,7 +336,13 @@ function showedit(id) {
         }
     }
 }
-var country = $('#CountryId');
-if (country) {
-    country.focus();
+
+var state = $('#StateId');
+var selectedStateId = $('#SelectedStateId');
+if (state && selectedStateId.val()) {
+    $('#Name').focus();
+}
+else {
+    state.focus();
+
 }
