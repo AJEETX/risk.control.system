@@ -50,7 +50,7 @@ namespace risk.control.system.Services.Creator
 
             var policy = new PolicyDetail
             {
-                ContractNumber = uc.CaseId,
+                ContractNumber = uc.CaseId?.ToUpper(),
                 SumAssuredValue = amount,
                 ContractIssueDate = issueDate,
                 DateOfIncident = incidentDate,

@@ -3,10 +3,10 @@
 @inject IAuthorizationService AuthorizationService
 
 @{
-    var canCreate = (await AuthorizationService.AuthorizeAsync(User, Permissions.Claim.Create)).Succeeded;
-    var canView = (await AuthorizationService.AuthorizeAsync(User, Permissions.Claim.View)).Succeeded;
-    var canEdit = (await AuthorizationService.AuthorizeAsync(User, Permissions.Claim.Edit)).Succeeded;
-    var canDelete = (await AuthorizationService.AuthorizeAsync(User, Permissions.Claim.Delete)).Succeeded;
+    var canCreate = (await AuthorizationService.AuthorizeAsync(User, Permissions.Claims.Add)).Succeeded;
+    var canView = (await AuthorizationService.AuthorizeAsync(User, Permissions.Claims.View)).Succeeded;
+    var canEdit = (await AuthorizationService.AuthorizeAsync(User, Permissions.Claims.Edit)).Succeeded;
+    var canDelete = (await AuthorizationService.AuthorizeAsync(User, Permissions.Claims.Delete)).Succeeded;
 }
 
 <div class="card">

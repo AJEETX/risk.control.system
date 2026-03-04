@@ -7,6 +7,7 @@
         public const string EmptyNull = "null/empty";
         public const string NullInvalid = "null/invalid";
         public const string ValidDateFormat = "dd-MM-yyyy";
+        public const string AgencyUsersImageCollection = "AgencyUsersImageCollection";
 
         public static class CASE_STATUS
         {
@@ -36,6 +37,7 @@
                 public const string WITHDRAWN_BY_AGENCY = "DECLINED";
             }
         }
+
         public readonly static string[] CreatedAndDraftStatuses = new[] {
                 CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.UPLOAD_COMPLETED,
                 CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.DRAFTED_BY_CREATOR,
@@ -45,6 +47,7 @@
                 CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY,
                 CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER
             };
+
         public static readonly string[] ActiveSubStatuses = new[]
             {
                 CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.UPLOAD_IN_PROGRESS,
@@ -57,6 +60,7 @@
                 CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY,
                 CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR
             };
+
         public const string UNDERWRITING = "underwriting";
         public const string CLAIM = "claim";
 
@@ -78,5 +82,4 @@
         public const string CUSTOMER_IMAGE = "customer.jpg";
         public const string BENEFICIARY_IMAGE = "beneficiary.jpg";
     }
-    
 }
