@@ -33,7 +33,8 @@ namespace risk.control.system.Models.ViewModel
         [Display(Name = "Case number")]
         public string ContractNumber { get; set; } = string.Empty;
 
-        public InsuranceType InsuranceType { get; set; } = InsuranceType.CLAIM;
+        [Required]
+        public InsuranceType? InsuranceType { get; set; }
 
         [Required]
         [Display(Name = "Investigation type")]

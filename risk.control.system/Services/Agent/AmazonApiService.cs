@@ -7,6 +7,16 @@ namespace risk.control.system.Services.Agent
 {
     public interface IAmazonApiService
     {
+        Task<CollectionStatus> EnsureCollectionExistsAsync(string collectionId);
+
+        Task<DeleteCollectionResponse> DeleteCollectionAsync(string collectionId);
+
+        Task<IndexFacesResponse> IndexFacesAsync(IndexFacesRequest request);
+
+        Task<SearchFacesByImageResponse> SearchFacesByImageAsync(SearchFacesByImageRequest request);
+
+        Task<DeleteFacesResponse> DeleteFacesAsync(string collectionId, List<string> faceIds);
+
         Task<(bool, float, Amazon.Rekognition.Model.BoundingBox?)> FaceMatch(byte[] originalImage, byte[] targetImage);
 
         Task<CompareFacesResponse> CompareFaceMatch(byte[] originalImage, byte[] targetImage);
@@ -14,17 +24,104 @@ namespace risk.control.system.Services.Agent
         Task<DetectDocumentTextResponse> ExtractTextAsync(byte[] bytes);
     }
 
+    public enum CollectionStatus { Existing, Created, Failed }
+
     internal class AmazonApiService : IAmazonApiService
     {
-        private readonly IAmazonRekognition rekognitionClient;
+        private readonly IAmazonRekognition _rekognitionClient;
         private readonly IAmazonTextract textractClient;
-        private readonly ILogger<AmazonApiService> logger;
+        private readonly ILogger<AmazonApiService> _logger;
 
         public AmazonApiService(IAmazonRekognition rekognitionClient, IAmazonTextract textractClient, ILogger<AmazonApiService> logger)
         {
-            this.rekognitionClient = rekognitionClient;
+            _rekognitionClient = rekognitionClient;
             this.textractClient = textractClient;
-            this.logger = logger;
+            _logger = logger;
+        }
+
+        public async Task<CollectionStatus> EnsureCollectionExistsAsync(string collectionId)
+        {
+            try
+            {
+                // Try to describe the collection to see if it exists
+                var response = await _rekognitionClient.DescribeCollectionAsync(new DescribeCollectionRequest
+                {
+                    CollectionId = collectionId
+                });
+                if (response.UserCount > 0)
+                {
+                    return CollectionStatus.Existing;
+                }
+            }
+            catch (Amazon.Rekognition.Model.ResourceNotFoundException ex)
+            {
+                // If not found, create it
+                _logger.LogInformation($"Collection {collectionId} not found. Creating new collection.{ex.Message}");
+                var createdResponse = await _rekognitionClient.CreateCollectionAsync(new CreateCollectionRequest
+                {
+                    CollectionId = collectionId
+                });
+                return createdResponse.StatusCode == (int)System.Net.HttpStatusCode.OK ? CollectionStatus.Created : CollectionStatus.Failed;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error ensuring collection: {ex.Message}");
+            }
+            return CollectionStatus.Failed;
+        }
+
+        public async Task<DeleteCollectionResponse> DeleteCollectionAsync(string collectionId)
+        {
+            try
+            {
+                var response = await _rekognitionClient.DescribeCollectionAsync(new DescribeCollectionRequest
+                {
+                    CollectionId = collectionId
+                });
+                if (response.HttpStatusCode == System.Net.HttpStatusCode.OK && response.UserCount > 0)
+                {
+                    var request = new DeleteCollectionRequest
+                    {
+                        CollectionId = collectionId
+                    };
+                    return await _rekognitionClient.DeleteCollectionAsync(request);
+                }
+                else
+                {
+                    _logger.LogInformation($"Collection {collectionId} does not exist. No need to delete.");
+                    return new DeleteCollectionResponse { StatusCode = (int)System.Net.HttpStatusCode.NotFound };
+                }
+            }
+            catch (Amazon.Rekognition.Model.ResourceNotFoundException ex)
+            {
+                _logger.LogError($"Error ensuring collection: {ex.Message}");
+                return new DeleteCollectionResponse { StatusCode = (int)ex.StatusCode };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error ensuring collection: {ex.Message}");
+                return new DeleteCollectionResponse { StatusCode = (int)System.Net.HttpStatusCode.InternalServerError };
+            }
+        }
+
+        public async Task<IndexFacesResponse> IndexFacesAsync(IndexFacesRequest request)
+        {
+            return await _rekognitionClient.IndexFacesAsync(request);
+        }
+
+        public async Task<SearchFacesByImageResponse> SearchFacesByImageAsync(SearchFacesByImageRequest request)
+        {
+            return await _rekognitionClient.SearchFacesByImageAsync(request);
+        }
+
+        public async Task<DeleteFacesResponse> DeleteFacesAsync(string collectionId, List<string> faceIds)
+        {
+            var request = new DeleteFacesRequest
+            {
+                CollectionId = collectionId,
+                FaceIds = faceIds
+            };
+            return await _rekognitionClient.DeleteFacesAsync(request);
         }
 
         public async Task<(bool, float, Amazon.Rekognition.Model.BoundingBox?)> FaceMatch(byte[] originalImage, byte[] targetImage)
@@ -45,7 +142,7 @@ namespace risk.control.system.Services.Agent
                     SimilarityThreshold = similarityThreshold,
                 };
 
-                var compareFacesResponse = await rekognitionClient.CompareFacesAsync(compareFacesRequest);
+                var compareFacesResponse = await _rekognitionClient.CompareFacesAsync(compareFacesRequest);
                 var result = compareFacesResponse.FaceMatches.Count >= 1
                     && compareFacesResponse.FaceMatches[0].Similarity >= similarityThreshold;
                 var faceBox = result ? compareFacesResponse.FaceMatches[0].Face.BoundingBox : compareFacesResponse.UnmatchedFaces[0].BoundingBox;
@@ -54,7 +151,7 @@ namespace risk.control.system.Services.Agent
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Failed to compare faces");
+                _logger.LogError(ex, "Failed to compare faces");
                 return (false, 0, null);
             }
         }
@@ -73,13 +170,13 @@ namespace risk.control.system.Services.Agent
 
                 foreach (var block in detectResponse.Blocks)
                 {
-                    logger.LogInformation($"Type {block.BlockType}, Text: {block.Text}");
+                    _logger.LogInformation($"Type {block.BlockType}, Text: {block.Text}");
                 }
                 return detectResponse;
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Failed to extract texts");
+                _logger.LogError(ex, "Failed to extract texts");
                 return null!;
             }
         }
@@ -102,12 +199,12 @@ namespace risk.control.system.Services.Agent
                     SimilarityThreshold = similarityThreshold,
                 };
 
-                var compareFacesResponse = await rekognitionClient.CompareFacesAsync(compareFacesRequest);
+                var compareFacesResponse = await _rekognitionClient.CompareFacesAsync(compareFacesRequest);
                 return compareFacesResponse;
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Failed to compare faces");
+                _logger.LogError(ex, "Failed to compare faces");
                 return null!;
             }
         }

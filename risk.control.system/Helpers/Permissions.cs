@@ -36,12 +36,12 @@ namespace risk.control.system.Helpers
             public static string Delete = ModuleManager.GetModule(nameof(Underwriting), Applicationsettings.DELETE);
         }
 
-        public static class Claim
+        public static class Claims
         {
-            public static string View = ModuleManager.GetModule(nameof(Claim), Applicationsettings.VIEW);
-            public static string Create = ModuleManager.GetModule(nameof(Claim), Applicationsettings.CREATE);
-            public static string Edit = ModuleManager.GetModule(nameof(Claim), Applicationsettings.EDIT);
-            public static string Delete = ModuleManager.GetModule(nameof(Claim), Applicationsettings.DELETE);
+            public static string View = ModuleManager.GetModule(nameof(Claims), Applicationsettings.VIEW);
+            public static string Add = ModuleManager.GetModule(nameof(Claims), Applicationsettings.CREATE);
+            public static string Edit = ModuleManager.GetModule(nameof(Claims), Applicationsettings.EDIT);
+            public static string Delete = ModuleManager.GetModule(nameof(Claims), Applicationsettings.DELETE);
         }
 
         public static class ModuleManager

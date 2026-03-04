@@ -1,4 +1,8 @@
 $(document).ready(function () {
+
+    $("#ContractNumber").on("input", function () {
+        this.value = this.value.toUpperCase();
+    });
     let askCreateConfirmation = true;
     let askEditConfirmation = true;
 

@@ -183,7 +183,9 @@ namespace risk.control.system.Seeds
                 PINCODE = PINCODE,
                 PHONE = "432854196"
             };
-            var agencies = new List<SeedInput> { checker, verify, honest, investigate, investigation, proper, nicer, sample, cyber, zoom, crucible, hubris };
+            var agencies = new List<SeedInput> { checker
+                //, verify, honest, investigate, investigation, proper, nicer, sample, cyber, zoom, crucible, hubris
+            };
             var vendors = new List<Vendor> { };
             foreach (var agency in agencies)
             {
