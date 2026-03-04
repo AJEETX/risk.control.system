@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Globalization;
+using System.Net;
 using System.Text.RegularExpressions;
 
 using AspNetCoreHero.ToastNotification.Abstractions;
@@ -27,6 +28,7 @@ namespace risk.control.system.Services.AgencyAdmin
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ApplicationDbContext _context;
         private readonly IFileStorageService _fileStorage;
+        private readonly IUserFaceImageCheckService _faceImageCheckService;
         private readonly INotyfService _notify;
         private readonly ISmsService _sms;
         private readonly ICustomApiClient _geoClient;
@@ -37,6 +39,7 @@ namespace risk.control.system.Services.AgencyAdmin
             UserManager<ApplicationUser> userManager,
             ApplicationDbContext context,
             IFileStorageService fileStorage,
+            IUserFaceImageCheckService faceImageCheckService,
             INotyfService notify,
             ISmsService sms,
             ICustomApiClient geoClient,
@@ -46,6 +49,7 @@ namespace risk.control.system.Services.AgencyAdmin
             _userManager = userManager;
             _context = context;
             _fileStorage = fileStorage;
+            _faceImageCheckService = faceImageCheckService;
             _notify = notify;
             _sms = sms;
             _geoClient = geoClient;
@@ -78,6 +82,13 @@ namespace risk.control.system.Services.AgencyAdmin
             {
                 return (false, "Invalid profile image.", errors);
             }
+            var matchedFace = await _faceImageCheckService.CheckFaceImageAsync(model.ProfileImage);
+            if (matchedFace)
+            {
+                modelState.AddModelError("ProfileImage", "Profile image matches with existing user. Please use a different image.");
+                errors.Add("ProfileImage", "Profile image matches with existing users. Please use a different image.");
+                return (false, "Profile image matches with existing users. Please use a different image.", errors);
+            }
             await SaveProfileImageAsync(model, request.EmailSuffix);
 
             PopulateUserEntity(model, email, request.CreatedBy);
@@ -102,7 +113,10 @@ namespace risk.control.system.Services.AgencyAdmin
 
             await tx.CommitAsync();
 
-            return (true, $"User <b> {email} </b> created successfully.", errors);
+            var userAdded = (true, $"User <b> {email} </b> created successfully.", errors);
+
+            await _faceImageCheckService.SetImageToAws(email);
+            return userAdded;
         }
 
         public async Task<(bool Success, string Message, Dictionary<string, string> Errors)> EditVendorUserAsync(EditVendorUserRequest request, ModelStateDictionary modelState, string portal_base_url)
@@ -130,6 +144,16 @@ namespace risk.control.system.Services.AgencyAdmin
                 var suffix = user.Email.Split('@').Last();
                 await SaveProfileImageAsync(input, suffix);
             }
+            if (input.ProfileImage != null && input.ProfileImage.Length > 0)
+            {
+                var matchedFace = await _faceImageCheckService.CheckFaceImageAsync(input.ProfileImage);
+                if (matchedFace)
+                {
+                    modelState.AddModelError("ProfileImage", "Profile image matches with existing user. Please use a different image.");
+                    errors.Add("ProfileImage", "Profile image matches with existing users. Please use a different image.");
+                    return (false, "Profile image matches with existing users. Please use a different image.", errors);
+                }
+            }
             UpdateUserFields(input, user, request.UpdatedBy);
 
             await UpdateGeoLocationAsync(user);
@@ -151,7 +175,11 @@ namespace risk.control.system.Services.AgencyAdmin
 
             await tx.CommitAsync();
 
-            return (true, $"User <b> {user.Email} </b> updated successfully", errors);
+            var userEdited = (true, $"User <b> {user.Email} </b> updated successfully", errors);
+
+            await _faceImageCheckService.SetImageToAws(user.Email);
+
+            return userEdited;
         }
 
         private async Task SaveProfileImageAsync(ApplicationUser model, string suffix)
@@ -172,8 +200,11 @@ namespace risk.control.system.Services.AgencyAdmin
             model.Password = null;
             model.Updated = DateTime.UtcNow;
             model.UpdatedBy = createdBy;
-            model.FirstName = WebUtility.HtmlEncode(model.FirstName);
-            model.LastName = WebUtility.HtmlEncode(model.LastName);
+
+            var textInfo = CultureInfo.CurrentCulture.TextInfo;
+            model.FirstName = WebUtility.HtmlEncode(textInfo.ToTitleCase(model.FirstName.ToLower()));
+            model.LastName = WebUtility.HtmlEncode(textInfo.ToTitleCase(model.LastName.ToLower()));
+
             model.PhoneNumber = WebUtility.HtmlEncode(model.PhoneNumber?.TrimStart('0'));
             model.Comments = WebUtility.HtmlEncode(model.Comments);
             model.Addressline = WebUtility.HtmlEncode(model.Addressline);
@@ -283,8 +314,11 @@ namespace risk.control.system.Services.AgencyAdmin
         {
             user.ProfilePictureUrl = input.ProfilePictureUrl ?? user.ProfilePictureUrl;
             user.ProfilePictureExtension = input.ProfilePictureExtension ?? user.ProfilePictureExtension;
-            user.FirstName = WebUtility.HtmlEncode(input.FirstName);
-            user.LastName = WebUtility.HtmlEncode(input.LastName);
+
+            var textInfo = CultureInfo.CurrentCulture.TextInfo;
+            user.FirstName = WebUtility.HtmlEncode(textInfo.ToTitleCase(input.FirstName.ToLower()));
+            user.LastName = WebUtility.HtmlEncode(textInfo.ToTitleCase(input.LastName.ToLower()));
+
             user.Addressline = WebUtility.HtmlEncode(input.Addressline);
             user.Comments = WebUtility.HtmlEncode(input.Comments);
             user.PhoneNumber = input.PhoneNumber?.TrimStart('0');

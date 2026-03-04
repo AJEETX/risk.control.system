@@ -1,4 +1,6 @@
-﻿using risk.control.system.Helpers;
+﻿using System.Globalization;
+using System.Net;
+using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services.Common;
@@ -54,10 +56,11 @@ namespace risk.control.system.Services.Creator
                 var (imagePath, extension) = await imageTask;
                 if (pinCode == null) verifierProcessor.AddLocationError(errors, summaries, uploadCase.CustomerPincode, uploadCase.CustomerDistrictName);
 
+                var textInfo = CultureInfo.CurrentCulture.TextInfo;
                 // 4. Mapping
                 var customer = new CustomerDetail
                 {
-                    Name = uploadCase.CustomerName,
+                    Name = WebUtility.HtmlEncode(textInfo.ToTitleCase(uploadCase.CustomerName.ToLower())),
                     Gender = gender,
                     DateOfBirth = dob,
                     PhoneNumber = uploadCase.CustomerContact,

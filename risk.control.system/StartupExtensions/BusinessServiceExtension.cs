@@ -23,6 +23,7 @@ public static class BusinessServiceExtension
     public static IServiceCollection AddBusinessServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddHttpClient();
+        services.AddScoped<IUserFaceImageCheckService, UserFaceImageCheckService>();
         services.AddScoped<IOcrService, OcrService>();
         services.AddScoped<IManageAgencyUserService, ManageAgencyUserService>();
         services.AddScoped<IErrorNotifyService, ErrorNotifyService>();

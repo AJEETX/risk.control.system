@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Globalization;
+using System.Net;
+using Microsoft.EntityFrameworkCore;
 using risk.control.system.AppConstant;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
@@ -56,7 +58,7 @@ namespace risk.control.system.Services.Creator
             {
                 var currentUser = await context.ApplicationUser.AsNoTracking().Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == userEmail);
 
-                var reportTemplate = await cloneService.DeepCloneReportTemplate(currentUser.ClientCompanyId.Value, model.PolicyDetailDto.InsuranceType);
+                var reportTemplate = await cloneService.DeepCloneReportTemplate(currentUser.ClientCompanyId.Value, model.PolicyDetailDto.InsuranceType.GetValueOrDefault());
                 context.ReportTemplates.Add(reportTemplate);
                 await context.SaveChangesAsync();
 
@@ -66,7 +68,7 @@ namespace risk.control.system.Services.Creator
                 {
                     PolicyDetail = new PolicyDetail
                     {
-                        ContractNumber = model.PolicyDetailDto.ContractNumber,
+                        ContractNumber = WebUtility.HtmlEncode(model.PolicyDetailDto.ContractNumber.ToUpper()),
                         InsuranceType = model.PolicyDetailDto.InsuranceType,
                         InvestigationServiceTypeId = model.PolicyDetailDto.InvestigationServiceTypeId,
                         CaseEnablerId = model.PolicyDetailDto.CaseEnablerId,
@@ -112,7 +114,7 @@ namespace risk.control.system.Services.Creator
             {
                 var existingPolicy = await context.Investigations.Include(c => c.PolicyDetail).FirstOrDefaultAsync(c => c.Id == model.Id);
 
-                var reportTemplate = await cloneService.DeepCloneReportTemplate(existingPolicy.ClientCompanyId.Value, model.PolicyDetailDto.InsuranceType);
+                var reportTemplate = await cloneService.DeepCloneReportTemplate(existingPolicy.ClientCompanyId.Value, model.PolicyDetailDto.InsuranceType.GetValueOrDefault());
                 context.ReportTemplates.Add(reportTemplate);
                 await context.SaveChangesAsync();
 
@@ -124,7 +126,7 @@ namespace risk.control.system.Services.Creator
                     existingPolicy.PolicyDetail.DocumentImageExtension = Path.GetExtension(fileName);
                 }
 
-                existingPolicy.PolicyDetail.ContractNumber = model.PolicyDetailDto.ContractNumber;
+                existingPolicy.PolicyDetail.ContractNumber = WebUtility.HtmlEncode(model.PolicyDetailDto.ContractNumber.ToUpper());
                 existingPolicy.PolicyDetail.InsuranceType = model.PolicyDetailDto.InsuranceType;
                 existingPolicy.PolicyDetail.InvestigationServiceTypeId = model.PolicyDetailDto.InvestigationServiceTypeId;
                 existingPolicy.PolicyDetail.CaseEnablerId = model.PolicyDetailDto.CaseEnablerId;
@@ -164,6 +166,9 @@ namespace risk.control.system.Services.Creator
                 }
                 caseTask.UpdatedBy = userEmail;
                 caseTask.Updated = DateTime.UtcNow;
+
+                var textInfo = CultureInfo.CurrentCulture.TextInfo;
+                customerDetail.Name = WebUtility.HtmlEncode(textInfo.ToTitleCase(customerDetail.Name.ToLower()));
 
                 customerDetail.PhoneNumber = customerDetail.PhoneNumber.TrimStart('0');
                 customerDetail.CountryId = customerDetail.SelectedCountryId;
@@ -221,6 +226,9 @@ namespace risk.control.system.Services.Creator
                 caseTask.Updated = DateTime.UtcNow;
                 customerDetail.PhoneNumber = customerDetail.PhoneNumber.TrimStart('0');
 
+                var textInfo = CultureInfo.CurrentCulture.TextInfo;
+                customerDetail.Name = WebUtility.HtmlEncode(textInfo.ToTitleCase(customerDetail.Name.ToLower()));
+
                 customerDetail.CountryId = customerDetail.SelectedCountryId;
                 customerDetail.StateId = customerDetail.SelectedStateId;
                 customerDetail.DistrictId = customerDetail.SelectedDistrictId;
@@ -265,6 +273,8 @@ namespace risk.control.system.Services.Creator
                     beneficiary.ProfilePictureExtension = Path.GetExtension(fileName);
                     beneficiary.ImagePath = relativePath;
                 }
+                var textInfo = CultureInfo.CurrentCulture.TextInfo;
+                beneficiary.Name = WebUtility.HtmlEncode(textInfo.ToTitleCase(beneficiary.Name.ToLower()));
 
                 beneficiary.Updated = DateTime.UtcNow;
                 beneficiary.UpdatedBy = userEmail;
@@ -331,6 +341,9 @@ namespace risk.control.system.Services.Creator
                 caseTask.SubStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR;
                 caseTask.IsReady2Assign = true;
                 beneficiary.PhoneNumber = beneficiary.PhoneNumber.TrimStart('0');
+
+                var textInfo = CultureInfo.CurrentCulture.TextInfo;
+                beneficiary.Name = WebUtility.HtmlEncode(textInfo.ToTitleCase(beneficiary.Name.ToLower()));
 
                 beneficiary.CountryId = beneficiary.SelectedCountryId;
                 beneficiary.StateId = beneficiary.SelectedStateId;

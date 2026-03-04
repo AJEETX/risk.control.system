@@ -63,7 +63,7 @@ internal class AgentFaceIdfyService : IAgentFaceIdfyService
         {
             // 1. Prepare Data & Save Physical File
             var faceBytes = await VerificationHelper.GetBytesFromIFormFile(data.Image);
-            var (fileName, relativePath) = await fileStorageService.SaveAsync(data.Image, "Case", claim.PolicyDetail.ContractNumber, "report");
+            var (faceImageFileName, relativePath) = await fileStorageService.SaveAsync(data.Image, "Case", claim.PolicyDetail.ContractNumber, "report");
 
             // 2. Extract Coordinates
             var (lat, lon) = VerificationHelper.ParseCoordinates(data.LocationLatLong);
@@ -72,7 +72,7 @@ internal class AgentFaceIdfyService : IAgentFaceIdfyService
             // 3. Parallel Service Calls (Orchestration)
             var registeredImage = await File.ReadAllBytesAsync(Path.Combine(webHostEnvironment.ContentRootPath, agent.ProfilePictureUrl));
 
-            var faceTask = faceMatchService.GetFaceMatchAsync(registeredImage, faceBytes, Path.GetExtension(fileName));
+            var faceTask = faceMatchService.GetFaceMatchAsync(registeredImage, faceBytes, Path.GetExtension(faceImageFileName));
             var weatherTask = weatherInfoService.GetWeatherAsync(lat, lon);
             var addressTask = httpClientService.GetRawAddress(lat, lon);
             var mapTask = customApiClient.GetMap(expectedCoords.lat, expectedCoords.lon, double.Parse(lat), double.Parse(lon), "Start", "End", "300", "300", "green", "red");
@@ -80,7 +80,7 @@ internal class AgentFaceIdfyService : IAgentFaceIdfyService
             await Task.WhenAll(faceTask, weatherTask, addressTask, mapTask);
 
             // 4. Update Entities
-            AgentFaceIdfyHelper.MapMetadataToReport(agentIdReport, locationTemplate, data, relativePath, fileName, lat, lon);
+            AgentFaceIdfyHelper.MapMetadataToReport(agentIdReport, locationTemplate, data, relativePath, faceImageFileName, lat, lon);
 
             var (conf, compImage, sim) = await faceTask;
             var (dist, distM, dur, durS, mapUrl) = await mapTask;

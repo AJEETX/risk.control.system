@@ -71,12 +71,6 @@ namespace risk.control.system.Services.Creator
             return model;
         }
 
-        private IEnumerable<SelectListItem> GetEnumSelectList<T>() where T : Enum
-        {
-            return Enum.GetValues(typeof(T)).Cast<T>()
-                .Select(e => new SelectListItem { Text = e.ToString(), Value = e.ToString() });
-        }
-
         public async Task PrepareMetadataAsync(CustomerDetail model, string userEmail)
         {
             var user = await GetUserWithCompanyAsync(userEmail);
