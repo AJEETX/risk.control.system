@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 
 using risk.control.system.AppConstant;
+using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Services.Common;
 using static risk.control.system.AppConstant.Applicationsettings;
@@ -13,10 +14,10 @@ namespace risk.control.system.Seeds
         public static async Task Seed(ApplicationDbContext context,
             IWebHostEnvironment webHostEnvironment,
             UserManager<ApplicationUser> userManager,
+            RoleManager<ApplicationRole> roleManager,
             int pinCodeCode,
             IFileStorageService fileStorageService)
         {
-
             var pinCode = await context.PinCode.Include(p => p.District).Include(p => p.State).Include(p => p.Country).FirstOrDefaultAsync(p => p.Code == pinCodeCode);
 
             string adminImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", Path.GetFileName(PORTAL_ADMIN.PROFILE_IMAGE));
@@ -68,26 +69,29 @@ namespace risk.control.system.Seeds
 
                 ////////PERMISSIONS TO MODULES
 
-                //var adminRole = await roleManager.FindByNameAsync(AppRoles.PORTAL_ADMIN.ToString()) ?? default!;
-                //var allClaims = await roleManager.GetClaimsAsync(adminRole);
+                var adminRole = await roleManager.FindByNameAsync(AppRoles.PORTAL_ADMIN.ToString()) ?? default!;
+                var allClaims = await roleManager.GetClaimsAsync(adminRole);
 
                 //ADD PERMISSIONS
+                string Claims = "Claims";
 
-                //var moduleList = new List<string> { nameof(Underwriting), nameof(Claim) };
-                //var modules = context.PermissionModule.ToList();
+                var moduleList = new List<string> {
+                    //nameof(Underwriting),
+                    nameof(Claims) };
+                var modules = context.PermissionModule.ToList();
 
-                //foreach (var module in moduleList)
-                //{
-                //    var modulePermissions = Permissions.GeneratePermissionsForModule(module);
+                foreach (var module in moduleList)
+                {
+                    var modulePermissions = Permissions.GeneratePermissionsForModule(module);
 
-                //    foreach (var modulePermission in modulePermissions)
-                //    {
-                //        if (!allClaims.Any(a => a.Type == PERMISSION && a.Value == modulePermission))
-                //        {
-                //            await roleManager.AddClaimAsync(adminRole, new System.Security.Claims.Claim(PERMISSION, modulePermission));
-                //        }
-                //    }
-                //}
+                    foreach (var modulePermission in modulePermissions)
+                    {
+                        if (!allClaims.Any(a => a.Type == PERMISSION && a.Value == modulePermission))
+                        {
+                            await roleManager.AddClaimAsync(adminRole, new System.Security.Claims.Claim(PERMISSION, modulePermission));
+                        }
+                    }
+                }
             }
         }
     }

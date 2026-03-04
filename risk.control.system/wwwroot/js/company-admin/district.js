@@ -108,7 +108,7 @@
             }
             else {
                 $.alert({
-                    title: 'Invalid detail',
+                    title: 'Incomplete detail',
                     content: 'Complete the required fields',
                     type: 'red'
                 })
@@ -171,13 +171,14 @@
             }
             else {
                 $.alert({
-                    title: 'Invalid detail',
+                    title: 'Incomplete detail',
                     content: 'Complete the required fields',
                     type: 'red'
                 })
             }
         }
     });
+
     $('a.create').on('click', function () {
         $("body").addClass("submit-progress-bg");
         // Wrap in setTimeout so the UI

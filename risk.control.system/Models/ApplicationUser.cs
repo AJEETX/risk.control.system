@@ -92,6 +92,8 @@ namespace risk.control.system.Models
         public string? AddressMapLocation { get; set; }
         public bool IsUpdated { get; set; } = true;
         public string? Comments { get; set; } = default!;
+        public DateTime? FaceIndexedAt { get; set; }
+        public string? AwsFaceId { get; set; }
 
         [Display(Name = "Image")]
         [NotMapped]

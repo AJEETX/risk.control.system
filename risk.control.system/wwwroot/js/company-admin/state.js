@@ -106,109 +106,126 @@
     var askConfirmation = true;
     $('#create-form').submit(function (e) {
         if (askConfirmation) {
-            e.preventDefault();
-            $.confirm({
-                title: "Confirm  Add New",
-                content: "Are you sure to add?",
+            if ($('#create-form').valid()) {
+                e.preventDefault();
+                $.confirm({
+                    title: "Confirm  Add New",
+                    content: "Are you sure to add?",
 
-                icon: 'fas fa-map-marker-alt',
-                type: 'green',
-                closeIcon: true,
-                buttons: {
-                    confirm: {
-                        text: " Add New",
-                        btnClass: 'btn-success',
-                        action: function () {
-                            askConfirmation = false;
-                            $("body").addClass("submit-progress-bg");
-                            // Wrap in setTimeout so the UI
-                            // can update the spinners
-                            setTimeout(function () {
-                                $(".submit-progress").removeClass("hidden");
-                            }, 1);
-                            // Disable all buttons, submit inputs, and anchors
-                            $('button, input[type="submit"], a').prop('disabled', true);
+                    icon: 'fas fa-map-marker-alt',
+                    type: 'green',
+                    closeIcon: true,
+                    buttons: {
+                        confirm: {
+                            text: " Add New",
+                            btnClass: 'btn-success',
+                            action: function () {
+                                askConfirmation = false;
+                                $("body").addClass("submit-progress-bg");
+                                // Wrap in setTimeout so the UI
+                                // can update the spinners
+                                setTimeout(function () {
+                                    $(".submit-progress").removeClass("hidden");
+                                }, 1);
+                                // Disable all buttons, submit inputs, and anchors
+                                $('button, input[type="submit"], a').prop('disabled', true);
 
-                            // Add a class to visually indicate disabled state for anchors
-                            $('a').addClass('disabled-anchor').on('click', function (e) {
-                                e.preventDefault(); // Prevent default action for anchor clicks
-                            });
-                            $('#create').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Add New");
+                                // Add a class to visually indicate disabled state for anchors
+                                $('a').addClass('disabled-anchor').on('click', function (e) {
+                                    e.preventDefault(); // Prevent default action for anchor clicks
+                                });
+                                $('#create').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Add New");
 
-                            $('#create-form').submit();
-                            var form = document.getElementById("create-form");
-                            if (form) {
-                                const formElements = form.getElementsByTagName("*");
-                                for (const element of formElements) {
-                                    element.disabled = true;
-                                    if (element.hasAttribute("readonly")) {
-                                        element.classList.remove("valid", "is-valid", "valid-border");
-                                        element.removeAttribute("aria-invalid");
+                                $('#create-form').submit();
+                                var form = document.getElementById("create-form");
+                                if (form) {
+                                    const formElements = form.getElementsByTagName("*");
+                                    for (const element of formElements) {
+                                        element.disabled = true;
+                                        if (element.hasAttribute("readonly")) {
+                                            element.classList.remove("valid", "is-valid", "valid-border");
+                                            element.removeAttribute("aria-invalid");
+                                        }
                                     }
                                 }
                             }
+                        },
+                        cancel: {
+                            text: "Cancel",
+                            btnClass: 'btn-default'
                         }
-                    },
-                    cancel: {
-                        text: "Cancel",
-                        btnClass: 'btn-default'
                     }
-                }
-            });
+                });
+            } else {
+                $.alert({
+                    title: 'Incomplete detail',
+                    content: 'Complete the required fields',
+                    type: 'red'
+                })
+            }
+
         }
     });
 
     var askEditConfirmation = true;
     $('#edit-form').submit(function (e) {
         if (askEditConfirmation) {
-            e.preventDefault();
-            $.confirm({
-                title: "Confirm Edit",
-                content: "Are you sure to edit?",
-                icon: 'fas fa-map-marker-alt',
+            if ($('#edit-form').valid()) {
+                e.preventDefault();
+                $.confirm({
+                    title: "Confirm Edit",
+                    content: "Are you sure to edit?",
+                    icon: 'fas fa-map-marker-alt',
 
-                type: 'orange',
-                closeIcon: true,
-                buttons: {
-                    confirm: {
-                        text: "Edit ",
-                        btnClass: 'btn-warning',
-                        action: function () {
-                            askEditConfirmation = false;
-                            $("body").addClass("submit-progress-bg");
-                            // Wrap in setTimeout so the UI
-                            // can update the spinners
-                            setTimeout(function () {
-                                $(".submit-progress").removeClass("hidden");
-                            }, 1);
-                            // Disable all buttons, submit inputs, and anchors
-                            $('button, input[type="submit"], a').prop('disabled', true);
+                    type: 'orange',
+                    closeIcon: true,
+                    buttons: {
+                        confirm: {
+                            text: "Edit ",
+                            btnClass: 'btn-warning',
+                            action: function () {
+                                askEditConfirmation = false;
+                                $("body").addClass("submit-progress-bg");
+                                // Wrap in setTimeout so the UI
+                                // can update the spinners
+                                setTimeout(function () {
+                                    $(".submit-progress").removeClass("hidden");
+                                }, 1);
+                                // Disable all buttons, submit inputs, and anchors
+                                $('button, input[type="submit"], a').prop('disabled', true);
 
-                            // Add a class to visually indicate disabled state for anchors
-                            $('a').addClass('disabled-anchor').on('click', function (e) {
-                                e.preventDefault(); // Prevent default action for anchor clicks
-                            });
-                            $('#edit').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Edit ");
-                            $('#edit-form').submit();
-                            var form = document.getElementById("edit-form");
-                            if (form) {
-                                const formElements = form.getElementsByTagName("*");
-                                for (const element of formElements) {
-                                    element.disabled = true;
-                                    if (element.hasAttribute("readonly")) {
-                                        element.classList.remove("valid", "is-valid", "valid-border");
-                                        element.removeAttribute("aria-invalid");
+                                // Add a class to visually indicate disabled state for anchors
+                                $('a').addClass('disabled-anchor').on('click', function (e) {
+                                    e.preventDefault(); // Prevent default action for anchor clicks
+                                });
+                                $('#edit').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Edit ");
+                                $('#edit-form').submit();
+                                var form = document.getElementById("edit-form");
+                                if (form) {
+                                    const formElements = form.getElementsByTagName("*");
+                                    for (const element of formElements) {
+                                        element.disabled = true;
+                                        if (element.hasAttribute("readonly")) {
+                                            element.classList.remove("valid", "is-valid", "valid-border");
+                                            element.removeAttribute("aria-invalid");
+                                        }
                                     }
                                 }
                             }
+                        },
+                        cancel: {
+                            text: "Cancel",
+                            btnClass: 'btn-default'
                         }
-                    },
-                    cancel: {
-                        text: "Cancel",
-                        btnClass: 'btn-default'
                     }
-                }
-            });
+                });
+            } else {
+                $.alert({
+                    title: 'Incomplete detail',
+                    content: 'Complete the required fields',
+                    type: 'red'
+                })
+            }
         }
     })
 

@@ -1,5 +1,5 @@
 ﻿using System.Security.Claims;
-
+using Amazon.Rekognition.Model;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -10,6 +10,7 @@ using risk.control.system.AppConstant;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
+using risk.control.system.Services.Agent;
 using risk.control.system.Services.Api;
 using risk.control.system.Services.Common;
 using risk.control.system.Services.Report;
@@ -18,10 +19,11 @@ namespace risk.control.system.Controllers.Api
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class SecureController : ControllerBase
+    public class SwaggerController : ControllerBase
     {
         private readonly ITokenService tokenService;
         private readonly UserManager<Models.ApplicationUser> _userManager;
+        private readonly IAmazonApiService _amazonApiService;
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly IPdfGenerativeService pdfGenerativeService;
         private readonly IPhoneService phoneService;
@@ -31,7 +33,8 @@ namespace risk.control.system.Controllers.Api
         private readonly ApplicationDbContext _context;
         private readonly string baseUrl;
 
-        public SecureController(UserManager<Models.ApplicationUser> userManager,
+        public SwaggerController(UserManager<Models.ApplicationUser> userManager,
+            IAmazonApiService amazonApiService,
             IWebHostEnvironment webHostEnvironment,
             IPdfGenerativeService generateService,
             IPhoneService phoneService,
@@ -43,6 +46,7 @@ namespace risk.control.system.Controllers.Api
             ITokenService tokenService)
         {
             _userManager = userManager ?? throw new ArgumentNullException();
+            _amazonApiService = amazonApiService;
             this.webHostEnvironment = webHostEnvironment;
             this.pdfGenerativeService = generateService;
             this.phoneService = phoneService;
@@ -261,6 +265,37 @@ namespace risk.control.system.Controllers.Api
                 Console.WriteLine(ex.StackTrace);
                 return StatusCode(500, "Internal server error");
             }
+        }
+
+        [AllowAnonymous]
+        [HttpGet("cleanup-agency-user-image-collection")]
+        public async Task<IActionResult> CleanUpAgencyUserCollectionAsync(string collectionId = CONSTANTS.AgencyUsersImageCollection)
+        {
+            try
+            {
+                var response = await _amazonApiService.DeleteCollectionAsync(collectionId);
+
+                if (response.StatusCode == 200)
+                {
+                    Console.WriteLine($"Successfully deleted collection: {collectionId}");
+                    return Ok($"Successfully deleted collection: {collectionId}");
+                }
+                else if (response.StatusCode == 400)
+                {
+                    Console.WriteLine($"Collection: {collectionId} Not Found. Status code: {response.StatusCode}");
+                    return BadRequest($"Collection: {collectionId} Not Found. Status code: {response.StatusCode}");
+                }
+                else if (response.StatusCode == 500)
+                {
+                    Console.WriteLine($"Server error deleting Collection {collectionId}. Status code: {response.StatusCode}");
+                    return StatusCode(500, $"Server error deleting Collection {collectionId}");
+                }
+            }
+            catch (ResourceNotFoundException ex)
+            {
+                Console.WriteLine($"Collection {collectionId} does not exist. Nothing to delete. {ex.Message}");
+            }
+            return StatusCode(500, $"Server error deleting Collection {collectionId}");
         }
     }
 }
