@@ -1,5 +1,5 @@
 ﻿using System.Globalization;
-
+using System.Net;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using risk.control.system.AppConstant;
@@ -71,6 +71,10 @@ namespace risk.control.system.Services.Company
 
                 await SetProfileImageAsync(model, model.ProfileImage, emailSuffix);
 
+                var textInfo = CultureInfo.CurrentCulture.TextInfo;
+                model.FirstName = WebUtility.HtmlEncode(textInfo.ToTitleCase(model.FirstName.ToLower()));
+                model.LastName = WebUtility.HtmlEncode(textInfo.ToTitleCase(model.LastName.ToLower()));
+
                 model.Email = model.UserName = fullEmail;
                 model.Password = Applicationsettings.TestingData;
                 model.Active = true;
@@ -118,9 +122,10 @@ namespace risk.control.system.Services.Company
                     var domain = user.Email.Split('@')[1];
                     await SetProfileImageAsync(user, model.ProfileImage, domain);
                 }
+                var textInfo = CultureInfo.CurrentCulture.TextInfo;
+                user.FirstName = WebUtility.HtmlEncode(textInfo.ToTitleCase(model.FirstName.ToLower()));
+                user.LastName = WebUtility.HtmlEncode(textInfo.ToTitleCase(model.LastName.ToLower()));
 
-                user.FirstName = model.FirstName;
-                user.LastName = model.LastName;
                 user.CountryId = model.SelectedCountryId;
                 user.StateId = model.SelectedStateId;
                 user.DistrictId = model.SelectedDistrictId;

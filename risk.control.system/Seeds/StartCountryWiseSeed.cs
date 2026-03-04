@@ -9,7 +9,7 @@ namespace risk.control.system.Seeds
     {
         private static int randomPinCode;
 
-        public static async Task Seed(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, UserManager<ApplicationUser> userManager, ICustomApiClient customApiCLient, IFileStorageService fileStorageService)
+        public static async Task<int> Seed(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, UserManager<ApplicationUser> userManager, ICustomApiClient customApiCLient, IFileStorageService fileStorageService)
         {
             var globalSetting = new GlobalSettings
             {
@@ -35,8 +35,7 @@ namespace risk.control.system.Seeds
                 randomPinCode = await IndiaSeed.Seed(context, webHostEnvironment, userManager, customApiCLient, countries, servicesTypes, fileStorageService);
                 randomPinCode = await AustraliaSeed.Seed(context, webHostEnvironment, userManager, customApiCLient, countries, servicesTypes, fileStorageService);
             }
-
-            await PortalAdminSeed.Seed(context, webHostEnvironment, userManager, randomPinCode, fileStorageService);
+            return randomPinCode;
         }
     }
 }

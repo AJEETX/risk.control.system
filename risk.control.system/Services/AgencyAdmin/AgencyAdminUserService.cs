@@ -6,6 +6,7 @@ using Microsoft.FeatureManagement;
 using risk.control.system.AppConstant;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
+using risk.control.system.Services.Agent;
 
 namespace risk.control.system.Services.AgencyAdmin
 {
@@ -26,11 +27,15 @@ namespace risk.control.system.Services.AgencyAdmin
     {
         private readonly ApplicationDbContext _context;
         private readonly IFeatureManager _featureManager;
+        private readonly IAmazonApiService _amazonApiService;
 
-        public AgencyAdminUserService(ApplicationDbContext context, IFeatureManager featureManager)
+        public AgencyAdminUserService(
+            ApplicationDbContext context,
+            IFeatureManager featureManager, IAmazonApiService amazonApiService)
         {
             _context = context;
             _featureManager = featureManager;
+            _amazonApiService = amazonApiService;
         }
 
         public async Task<ApplicationUser> PrepareCreateModelAsync(string currentUserEmail)
@@ -137,8 +142,19 @@ namespace risk.control.system.Services.AgencyAdmin
             user.Updated = DateTime.UtcNow;
             user.UpdatedBy = deletedBy;
             user.Deleted = true;
+            if (await _featureManager.IsEnabledAsync(FeatureFlags.ENABLE_AGENCY_USER_FACE_MATCH))
+            {
+                if (!string.IsNullOrEmpty(user.AwsFaceId))
+                {
+                    await _amazonApiService.DeleteFacesAsync(CONSTANTS.AgencyUsersImageCollection, new List<string> { user.AwsFaceId });
 
+                    // Clear the fields in your DB
+                    user.AwsFaceId = null;
+                    user.FaceIndexedAt = null;
+                }
+            }
             _context.ApplicationUser.Update(user);
+
             await _context.SaveChangesAsync();
             return true;
         }

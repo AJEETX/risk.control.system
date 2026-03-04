@@ -3,6 +3,8 @@
     public interface IBase64FileService
     {
         Task<string> GetBase64FileAsync(string relativePath, string fallback = "");
+
+        Task<byte[]> GetByteFileAsync(string relativePath);
     }
 
     internal class Base64FileService : IBase64FileService
@@ -24,6 +26,14 @@
             // Use the async version of file reading
             byte[] bytes = await File.ReadAllBytesAsync(fullPath);
             return $"data:image/*;base64,{Convert.ToBase64String(bytes)}";
+        }
+
+        public async Task<byte[]> GetByteFileAsync(string relativePath)
+        {
+            var fullPath = Path.Combine(env.ContentRootPath, relativePath);
+
+            byte[] bytes = await File.ReadAllBytesAsync(fullPath);
+            return bytes;
         }
     }
 }
