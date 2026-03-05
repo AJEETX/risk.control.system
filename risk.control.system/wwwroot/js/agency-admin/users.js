@@ -74,9 +74,9 @@
                 }
             },
             {
-                "data": "email",
+                "data": "rawEmail",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.rawEmail + '" data-bs-toggle="tooltip">' + data + '</span>'
+                    return '<span class="blue" title="' + row.name + '" data-bs-toggle="tooltip">' + data + '</span>'
                 }
             },
             {

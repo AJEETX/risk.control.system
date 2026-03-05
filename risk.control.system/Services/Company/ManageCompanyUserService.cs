@@ -27,7 +27,7 @@ namespace risk.control.system.Services.Company
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly ICompanyUserService _companyUserService; // Internal logic service
+        private readonly ICompanyUserService _companyUserService;
         private readonly IFeatureManager _featureManager;
 
         public ManageCompanyUserService(
@@ -137,7 +137,5 @@ namespace risk.control.system.Services.Company
 
             return result;
         }
-
-        // Implement CreateUserAsync, UpdateUserAsync, and DeleteUserAsync similarly...
     }
 }

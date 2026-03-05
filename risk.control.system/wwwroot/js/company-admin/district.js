@@ -52,6 +52,69 @@
     $("#Code").on("input", function () {
         this.value = this.value.toUpperCase();
     });
+
+    var isChecking = false; // Flag to prevent recursion
+
+    $("#Code").on("blur", function () {
+        var code = $(this).val().trim();
+        if (!code || isChecking) {
+            $("#Code").removeClass('is-invalid').addClass('is-valid');
+            return;
+        }
+
+        isChecking = true; // Block further triggers
+
+        var id = $('#DistrictId').val() || null;
+        var CountryId = $('#CountryId').val();
+        var StateId = $('#SelectedStateId').val();
+        $.ajax({
+            url: '/District/CheckDuplicateCode',
+            type: 'POST',
+            data: {
+                __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val(),
+                code: code,
+                id: id,
+                CountryId: CountryId,
+                StateId: StateId
+            },
+            success: function (exists) {
+                if (exists) {
+                    $.alert({
+                        title: '<i class="fas fa-exclamation-triangle text-danger"></i> Duplicate District Code!',
+                        content: 'The District Code <b>' + code + '</b> already exists. Please choose another.',
+                        type: 'red',
+                        buttons: {
+                            ok: {
+                                action: function () {
+                                    $("#Code").val("").focus();
+                                    $("#Code").addClass('is-invalid').removeClass('is-valid');
+                                }
+                            }
+                        },
+                        // 2. THIS IS THE KEY: Wait for the modal to fully close
+                        onClose: function () {
+                            setTimeout(function () {
+                                $("#Code").focus();
+                            }, 400); // 100ms delay ensures the modal is gone
+                            $("#Code").addClass('is-invalid').removeClass('is-valid');
+                        }
+                    });
+
+                } else {
+                    $("#Code").removeClass('is-invalid').addClass('is-valid');
+                }
+            },
+            error: function () {
+                isChecking = false;
+                $.alert({
+                    title: 'Error',
+                    content: 'Error occurred checking if State Code already exist.',
+                    type: 'red',
+                });
+            }
+        });
+    });
+
     var askConfirmation = true;
     $('#create-form').submit(function (e) {
         if (askConfirmation) {
@@ -308,6 +371,7 @@
                 if (selectedStateId) {
                     $("#StateId").val(selectedStateId);
                 }
+                $('#DistrictId').focus();
             },
             error: function () {
                 $("#StateId").empty();
@@ -339,11 +403,6 @@ function showedit(id) {
 }
 
 var state = $('#StateId');
-var selectedStateId = $('#SelectedStateId');
-if (state && selectedStateId.val()) {
-    $('#Name').focus();
-}
-else {
+if (state) {
     state.focus();
-
 }

@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Globalization;
+using System.Net;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -52,6 +53,10 @@ namespace risk.control.system.Services.Agency
                 vendor.DocumentImageExtension = Path.GetExtension(fileName);
                 vendor.DocumentUrl = relativePath;
             }
+
+            var textInfo = CultureInfo.CurrentCulture.TextInfo;
+            vendor.Name = WebUtility.HtmlEncode(textInfo.ToTitleCase(vendor.Name.ToLower()));
+
             vendor.Status = VendorStatus.ACTIVE;
             vendor.AgreementDate = DateTime.UtcNow;
             vendor.ActivatedDate = DateTime.UtcNow;
@@ -111,6 +116,9 @@ namespace risk.control.system.Services.Agency
                     vendor.DocumentUrl = existingVendor.DocumentUrl;
                 }
             }
+            var textInfo = CultureInfo.CurrentCulture.TextInfo;
+            vendor.Name = WebUtility.HtmlEncode(textInfo.ToTitleCase(vendor.Name.ToLower()));
+
             vendor.PinCodeId = vendor.SelectedPincodeId;
             vendor.DistrictId = vendor.SelectedDistrictId;
             vendor.StateId = vendor.SelectedStateId;

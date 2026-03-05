@@ -65,13 +65,11 @@ namespace risk.control.system.Controllers.CompanyAdmin
             // Apply search filter
             if (!string.IsNullOrEmpty(search) && Regex.IsMatch(search, @"^[a-zA-Z0-9\s]*$"))
             {
-                search = search.Trim().Replace("%", "[%]")
-                   .Replace("_", "[_]")
-                   .Replace("[", "[[]");
+                var lowerSearch = search.ToLower();
                 query = query.Where(p =>
-                    EF.Functions.Like(p.Code, $"%{search}%") ||
-                    EF.Functions.Like(p.Name, $"%{search}%") ||
-                    EF.Functions.Like(p.Country.Name, $"%{search}%"));
+                    p.Code.ToLower().Contains(lowerSearch) ||
+                    p.Name.ToLower().Contains(lowerSearch) ||
+                    p.Country.Name.ToLower().Contains(lowerSearch));
             }
 
             // Dynamically apply sorting using reflection
@@ -140,6 +138,18 @@ namespace risk.control.system.Controllers.CompanyAdmin
             };
 
             return Json(response);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<JsonResult> CheckDuplicateCode(string code, long? id, long CountryId)
+        {
+            if (string.IsNullOrWhiteSpace(code))
+                return Json(false);
+
+            bool exists = await _context.State.AnyAsync(x => x.CountryId == CountryId && x.Code.ToUpper() == code.ToUpper(CultureInfo.InvariantCulture) && (!id.HasValue || x.StateId != id.Value));
+
+            return Json(exists);
         }
 
         [Breadcrumb("Add New", FromAction = nameof(Profile))]
