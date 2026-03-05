@@ -10,9 +10,13 @@ namespace risk.control.system.Models
         public long PinCodeId { get; set; }
 
         [Display(Name = "PinCode name")]
+        [Required]
+        [StringLength(50, MinimumLength = 3, ErrorMessage = "Name must be between 3 and 50 characters.")]
         public string Name { get; set; } = default!;
 
         [Display(Name = "PinCode")]
+        [Required]
+        [StringLength(50, MinimumLength = 3, ErrorMessage = "Name must be between 3 and 50 characters.")]
         public int Code { get; set; } = default!;
 
         public string? Latitude { get; set; }
@@ -38,12 +42,16 @@ namespace risk.control.system.Models
 
         [NotMapped]
         public long SelectedPincodeId { get; set; }
+
         [NotMapped]
         public long SelectedDistrictId { get; set; }
+
         [NotMapped]
         public long SelectedStateId { get; set; }
+
         [NotMapped]
         public long SelectedCountryId { get; set; }
+
         public override string ToString()
         {
             return $"Pincode Information:\n" +

@@ -11,6 +11,8 @@ namespace risk.control.system.Models
         public long BeneficiaryDetailId { get; set; }
 
         [Display(Name = "Beneficiary Name")]
+        [Required]
+        [StringLength(50, MinimumLength = 3, ErrorMessage = "Name must be between 3 and 50 characters.")]
         public string Name { get; set; }
 
         [Display(Name = "Relation")]
@@ -56,6 +58,8 @@ namespace risk.control.system.Models
         public PinCode? PinCode { get; set; } = default!;
 
         [Display(Name = "Address")]
+        [Required]
+        [StringLength(70, MinimumLength = 3, ErrorMessage = "Addressline must be between 3 and 70 characters.")]
         public string Addressline { get; set; }
 
         public string? BeneficiaryLocationMap { get; set; }

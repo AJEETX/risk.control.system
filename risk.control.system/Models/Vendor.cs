@@ -13,20 +13,17 @@ namespace risk.control.system.Models
         public long VendorId { get; set; }
 
         [Display(Name = "Agency name")]
+        [StringLength(50, MinimumLength = 3, ErrorMessage = "Name must be between 3 and 50 characters.")]
         public string Name { get; set; } = string.Empty;
-
-        [Display(Name = "Agency code")]
-        public string? Code { get; set; } = string.Empty;
-
-        [Display(Name = "Agency detail")]
-        public string? Description { get; set; } = string.Empty;
 
         [Display(Name = "Phone number")]
         public string PhoneNumber { get; set; } = string.Empty;
 
         public string Email { get; set; } = string.Empty;
-        public string? Branch { get; set; } = string.Empty;
+
+        [StringLength(70, MinimumLength = 3, ErrorMessage = "Addressline must be between 3 and 70 characters.")]
         public string Addressline { get; set; } = string.Empty;
+
         public List<VendorInvestigationServiceType>? VendorInvestigationServiceTypes { get; set; } = default!;
 
         [Display(Name = "State name")]
@@ -130,11 +127,8 @@ namespace risk.control.system.Models
             return $"Investigation Agency Information:\n" +
            $"- Domain (web) name: {DomainName}\n" +
            $"- Name: {Name}\n" +
-           $"- Code: {Code}\n" +
-           $"- Description: {Description}\n" +
            $"- Phone Number: ${PhoneNumber}\n" +
            $"- Domain name: {Email}\n" +
-           $"- Branch name: {Branch}\n" +
            $"- Address line: {Addressline}\n" +
            $"- City: {District}\n" +
            $"- State: {State}\n" +

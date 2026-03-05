@@ -1,5 +1,5 @@
 ﻿using System.Globalization;
-
+using System.Net;
 using AspNetCoreHero.ToastNotification.Abstractions;
 
 using Microsoft.AspNetCore.Authorization;
@@ -112,11 +112,14 @@ namespace risk.control.system.Controllers.CompanyAdmin
                     notifyService.Error("Beneficiary Relation Code already exists!");
                     return View(beneficiaryRelation);
                 }
+                var textInfo = CultureInfo.CurrentCulture.TextInfo;
+                beneficiaryRelation.Name = WebUtility.HtmlEncode(textInfo.ToTitleCase(beneficiaryRelation.Name.ToLower()));
+
                 beneficiaryRelation.Updated = DateTime.UtcNow;
                 beneficiaryRelation.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Add(beneficiaryRelation);
                 await _context.SaveChangesAsync();
-                notifyService.Success("Beneficiary Relation created successfully!");
+                notifyService.Success($"Beneficiary Relation Code <b>{beneficiaryRelation.Code}</b> created successfully!");
                 return RedirectToAction(nameof(Profile));
             }
             catch (Exception ex)
@@ -182,11 +185,13 @@ namespace risk.control.system.Controllers.CompanyAdmin
                     notifyService.Error("Beneficiary Relation Code already exists!");
                     return View(beneficiaryRelation);
                 }
+                var textInfo = CultureInfo.CurrentCulture.TextInfo;
+                beneficiaryRelation.Name = WebUtility.HtmlEncode(textInfo.ToTitleCase(beneficiaryRelation.Name.ToLower()));
                 beneficiaryRelation.Updated = DateTime.UtcNow;
                 beneficiaryRelation.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Update(beneficiaryRelation);
                 await _context.SaveChangesAsync();
-                notifyService.Custom($"Beneficiary Relation edited successfully!", 3, "orange", "far fa-edit");
+                notifyService.Custom($"Beneficiary Relation Code <b>{beneficiaryRelation.Code}</b> edited successfully!", 3, "orange", "far fa-edit");
                 return RedirectToAction(nameof(Profile));
             }
             catch (Exception ex)

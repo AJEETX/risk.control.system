@@ -10,10 +10,13 @@ namespace risk.control.system.Models
         public long StateId { get; set; }
 
         [Display(Name = "State name")]
+        [Required]
+        [StringLength(50, MinimumLength = 3, ErrorMessage = "Name must be between 3 and 50 characters.")]
         public string Name { get; set; } = default!;
 
         [Display(Name = "State code")]
         [Required]
+        [StringLength(20, MinimumLength = 3, ErrorMessage = "Code must be between 3 and 20 characters.")]
         public string Code { get; set; } = default!;
 
         [Display(Name = "Country name")]
@@ -24,6 +27,7 @@ namespace risk.control.system.Models
 
         [NotMapped]
         public long SelectedCountryId { get; set; }
+
         public override string ToString()
         {
             return $"State Information:\n" +

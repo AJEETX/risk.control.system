@@ -142,7 +142,7 @@ namespace risk.control.system.Services.Api
                     Id = u.Id,
                     Photo = photo,
 
-                    Email = $"<a href=/Agency/EditUser?userId={u.Id}>{u.Email}</a>" +
+                    Email = $"{u.Email}" +
                         (u.Role == AppRoles.AGENT && string.IsNullOrWhiteSpace(u.MobileUId)
                             ? "<span title=\"Onboarding incomplete !!!\"><i class='fa fa-asterisk asterik-style'></i></span>"
                             : ""),

@@ -60,7 +60,7 @@
             {
                 "data": "domain",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.vendorName + '" data-bs-toggle="tooltip" class="blue">' + data + '</span>'
+                    return '<span title="' + row.name + '" data-bs-toggle="tooltip" class="blue">' + data + '</span>'
                 }
             },
             {

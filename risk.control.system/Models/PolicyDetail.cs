@@ -35,7 +35,7 @@ namespace risk.control.system.Models
 
         [Display(Name = "Cause of loss")]
         [Required]
-        [StringLength(70)]
+        [StringLength(70, MinimumLength = 3, ErrorMessage = "CauseOfLoss must be between 3 and 70 characters.")]
         public string CauseOfLoss { get; set; }
 
         [Display(Name = "Sum assured value")]
