@@ -101,7 +101,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             try
             {
                 costCentre.Code = WebUtility.HtmlEncode(costCentre.Code?.ToUpper(CultureInfo.InvariantCulture));
-                costCentre.Name = WebUtility.HtmlEncode(costCentre.Name);
+
                 // Check for duplicate code before saving
                 bool exists = await _context.CostCentre
                     .AnyAsync(x => x.Code == costCentre.Code);
@@ -111,11 +111,14 @@ namespace risk.control.system.Controllers.CompanyAdmin
                     notifyService.Error("Budget Centre Code already exists!");
                     return View(costCentre);
                 }
+                var textInfo = CultureInfo.CurrentCulture.TextInfo;
+                costCentre.Name = WebUtility.HtmlEncode(textInfo.ToTitleCase(costCentre.Name.ToLower()));
+
                 costCentre.Updated = DateTime.UtcNow;
                 costCentre.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Add(costCentre);
                 await _context.SaveChangesAsync(null, false);
-                notifyService.Success("Budget Centre created successfully!");
+                notifyService.Success($"Budget Centre Code <b>{costCentre.Code}</b> created successfully!");
                 return RedirectToAction(nameof(Profile));
             }
             catch (Exception ex)
@@ -173,7 +176,6 @@ namespace risk.control.system.Controllers.CompanyAdmin
             {
                 // Uppercase normalization
                 costCentre.Code = WebUtility.HtmlEncode(costCentre.Code?.ToUpper(CultureInfo.InvariantCulture));
-                costCentre.Name = WebUtility.HtmlEncode(costCentre.Name);
 
                 // Check for duplicate code before saving
                 bool exists = await _context.CostCentre.AnyAsync(x => x.Code == costCentre.Code && x.CostCentreId != id);
@@ -183,11 +185,15 @@ namespace risk.control.system.Controllers.CompanyAdmin
                     notifyService.Error("Budget Centre Code already exists!");
                     return View(costCentre);
                 }
+
+                var textInfo = CultureInfo.CurrentCulture.TextInfo;
+                costCentre.Name = WebUtility.HtmlEncode(textInfo.ToTitleCase(costCentre.Name.ToLower()));
+
                 costCentre.Updated = DateTime.UtcNow;
                 costCentre.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Update(costCentre);
                 await _context.SaveChangesAsync(null, false);
-                notifyService.Custom($"Budget Centre edited successfully!", 3, "orange", "far fa-edit");
+                notifyService.Custom($"Budget Centre Code <b>{costCentre.Code}</b> edited successfully!", 3, "orange", "far fa-edit");
                 return RedirectToAction(nameof(Profile));
             }
             catch (Exception ex)

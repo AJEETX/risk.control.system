@@ -13,6 +13,7 @@ namespace risk.control.system.Models
 
         [Required]
         [Display(Name = "Name")]
+        [StringLength(50, MinimumLength = 3, ErrorMessage = "Name must be between 3 and 50 characters.")]
         public string Name { get; set; }
 
         [Required]
@@ -30,6 +31,7 @@ namespace risk.control.system.Models
 
         [Required]
         [Display(Name = "Address line")]
+        [StringLength(70, MinimumLength = 3, ErrorMessage = "Addressline must be between 3 and 70 characters.")]
         public string Addressline { get; set; }
 
         [Display(Name = "PinCode")]

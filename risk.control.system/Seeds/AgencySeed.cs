@@ -44,7 +44,6 @@ namespace risk.control.system.Seeds
             {
                 Name = input.NAME,
                 Addressline = input.ADDRESSLINE,
-                Branch = input.BRANCH,
                 ActivatedDate = DateTime.UtcNow,
                 AgreementDate = DateTime.UtcNow,
                 BankName = input.BANK,
@@ -56,7 +55,6 @@ namespace risk.control.system.Seeds
                 DistrictId = pinCode.DistrictId,
                 StateId = pinCode.StateId,
                 PinCodeId = pinCode.PinCodeId,
-                Description = "HEAD OFFICE ",
                 Email = input.DOMAIN,
                 PhoneNumber = input.PHONE,
                 DocumentUrl = relativePath,

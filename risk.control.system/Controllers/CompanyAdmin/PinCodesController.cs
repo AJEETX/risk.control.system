@@ -60,15 +60,13 @@ namespace risk.control.system.Controllers.CompanyAdmin
             // Filter based on the search input (if provided)
             if (!string.IsNullOrEmpty(search) && Regex.IsMatch(search, @"^[a-zA-Z0-9\s]*$"))
             {
-                search = search.Trim().Replace("%", "[%]")
-                   .Replace("_", "[_]")
-                   .Replace("[", "[[]");
+                var lowerSearch = search.ToLower();
                 query = query.Where(p =>
-                    EF.Functions.Like(p.Code.ToString(), $"%{search}%") ||
-                    EF.Functions.Like(p.Name, $"%{search}%") ||
-                    EF.Functions.Like(p.District.Name, $"%{search}%") ||
-                    EF.Functions.Like(p.State.Name, $"%{search}%") ||
-                    EF.Functions.Like(p.Country.Name, $"%{search}%"));
+                    p.Code.ToString().Contains(lowerSearch) ||
+                    p.Name.ToLower().Contains(lowerSearch) ||
+                    p.District.Name.ToLower().Contains(lowerSearch) ||
+                    p.State.Name.ToLower().Contains(lowerSearch) ||
+                    p.Country.Name.ToLower().Contains(lowerSearch));
             }
             string sortColumn = orderColumn switch
             {
@@ -155,6 +153,18 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 .ToListAsync();
 
             return Json(states);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<JsonResult> CheckDuplicateCode(string code, long? id, long DistrictId, long StateId, long CountryId)
+        {
+            if (string.IsNullOrWhiteSpace(code))
+                return Json(false);
+
+            bool exists = await _context.PinCode.AnyAsync(x => x.CountryId == CountryId && x.StateId == StateId && x.DistrictId == DistrictId && x.Code.ToString() == code && (!id.HasValue || x.DistrictId != id.Value));
+
+            return Json(exists);
         }
 
         [Breadcrumb("Add New", FromAction = nameof(Profile))]

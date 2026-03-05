@@ -8,6 +8,67 @@
             this.value = this.value.slice(0, 6);
         }
     });
+
+    var isChecking = false; // Flag to prevent recursion
+
+    $("#Code").on("blur", function () {
+        var code = $(this).val().trim().toUpperCase();
+        if (!code || isChecking) return;
+
+        isChecking = true; // Block further triggers
+
+        var id = $('input[name="District"]').val() || null;
+        var CountryId = $('#CountryId').val();
+        var StateId = $('#SelectedStateId').val();
+        var DistrictId = $('#SelectedDistrictId').val();
+        $.ajax({
+            url: '/Pincodes/CheckDuplicateCode',
+            type: 'POST',
+            data: {
+                __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val(),
+                code: code,
+                id: id,
+                CountryId: CountryId,
+                StateId: StateId,
+                DistrictId: DistrictId
+            },
+            success: function (exists) {
+                if (exists) {
+                    $.alert({
+                        title: '<i class="fas fa-exclamation-triangle text-danger"></i> Duplicate Pincode!',
+                        content: 'The Pincode <b>' + code + '</b> already exists. Please choose another.',
+                        type: 'red',
+                        buttons: {
+                            ok: {
+                                action: function () {
+                                    $("#Code").val("").focus();
+                                    $("#Code").addClass('is-invalid').removeClass('is-valid');
+                                }
+                            }
+                        },
+                        // 2. THIS IS THE KEY: Wait for the modal to fully close
+                        onClose: function () {
+                            setTimeout(function () {
+                                $("#Code").focus();
+                            }, 400); // 100ms delay ensures the modal is gone
+                            $("#Code").addClass('is-invalid').removeClass('is-valid');
+                        }
+                    });
+                } else {
+                    $("#Code").removeClass('is-invalid').addClass('is-valid');
+                }
+            },
+            error: function () {
+                isChecking = false;
+                $.alert({
+                    title: 'Error',
+                    content: 'Error occurred checking if State Code already exist.',
+                    type: 'red',
+                });
+            }
+        });
+    });
+
     $('#dataTable').DataTable({
         processing: true,
         serverSide: true,
@@ -271,7 +332,6 @@
     var selectedStateId = $("#SelectedStateId").val();
     var selectedDistrictId = $("#SelectedDistrictId").val();
     if (countryId && countryId !== "0") {
-        
         loadStates(countryId, selectedStateId);
     }
     function loadStates(countryId, selectedStateId = null) {
@@ -300,6 +360,7 @@
                     $("#StateId").val(selectedStateId);
                     loadDistrictData(selectedStateId, countryId);
                 }
+                $("#StateId").focus();
             },
             error: function () {
                 $("#StateId").empty();
@@ -347,6 +408,7 @@
                     if (selectedStateId && selectedDistrictId != '0') {
                         $("#DistrictId").val(selectedDistrictId);
                     }
+                    $("#StateId").focus();
                 }
             },
             error: function () {
@@ -378,10 +440,8 @@ function showedit(id) {
     }
 }
 
-var state = $('#SelectedStateId').val();
-var district = $('#SelectedDistrictId').val();
-if (state != '0' && district != '0') {
-    $('#Name').focus();
-} else {
-    $('#StateId').focus();
+var state = $('#StateId').val();
+if (state) {
+    state.focus();
+
 }

@@ -40,7 +40,7 @@ namespace risk.control.system.Services.Common
         {
             if (!await _featureManager.IsEnabledAsync(FeatureFlags.ENABLE_AGENCY_USER_FACE_MATCH))
             {
-                return true; // If the feature is disabled, skip face matching and return true
+                return false; // If the feature is disabled, skip face matching and return true
             }
 
             using var memoryStream = new MemoryStream();
