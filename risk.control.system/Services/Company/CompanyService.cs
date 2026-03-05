@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Globalization;
+using System.Net;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.FeatureManagement;
@@ -153,7 +154,9 @@ namespace risk.control.system.Services.Company
             company.DistrictId = model.SelectedDistrictId;
             company.PinCodeId = model.SelectedPincodeId;
 
-            company.Name = WebUtility.HtmlEncode(model.Name);
+            var textInfo = CultureInfo.CurrentCulture.TextInfo;
+            company.Name = WebUtility.HtmlEncode(textInfo.ToTitleCase(company.Name.ToLower()));
+
             company.PhoneNumber = WebUtility.HtmlEncode(model.PhoneNumber.TrimStart('0'));
             company.Branch = WebUtility.HtmlEncode(model.Branch);
             company.BankName = WebUtility.HtmlEncode(model.BankName);

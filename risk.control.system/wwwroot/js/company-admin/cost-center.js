@@ -1,17 +1,19 @@
 ﻿$(document).ready(function () {
     $('#Name').focus();
 
-    $("#Name").on("input", function () {
-        this.value = this.value.toUpperCase();
-    });
-
     $("#Code").on("input", function () {
         this.value = this.value.toUpperCase();
     });
-    $("#Code").on("blur", function () {
-        var code = $(this).val().trim().toUpperCase();
-        if (!code) return;
+    var isChecking = false; // Flag to prevent recursion
 
+    $("#Code").on("blur", function () {
+        var code = $(this).val().trim();
+        if (!code || isChecking) {
+            $("#Code").removeClass('is-invalid').addClass('is-valid');
+            return;
+        }
+
+        isChecking = true; // Block further triggers
         var id = $('input[name="CostCentreId"]').val() || null;
         $.ajax({
             url: '/CostCentre/CheckDuplicateCode',
@@ -24,17 +26,34 @@
             success: function (exists) {
                 if (exists) {
                     $.alert({
-                        title: '<i class="fas fa-exclamation-triangle text-danger"></i> Duplicate Code!',
+                        title: '<i class="fas fa-exclamation-triangle text-danger"></i> Duplicate Budget Centre Code!',
                         content: 'The Budget Centre Code <b>' + code + '</b> already exists. Please choose another.',
                         type: 'red',
+                        buttons: {
+                            ok: {
+                                action: function () {
+                                    $("#Code").val("").focus();
+                                    $("#Code").addClass('is-invalid').removeClass('is-valid');
+                                }
+                            }
+                        },
+                        // 2. THIS IS THE KEY: Wait for the modal to fully close
+                        onClose: function () {
+                            setTimeout(function () {
+                                $("#Code").focus();
+                            }, 400); // 100ms delay ensures the modal is gone
+                            $("#Code").addClass('is-invalid').removeClass('is-valid');
+                        }
                     });
-                    $("#Code").val("").focus();
+                } else {
+                    $("#Code").removeClass('is-invalid').addClass('is-valid');
                 }
             },
             error: function () {
+                isChecking = false;
                 $.alert({
                     title: 'Error',
-                    content: 'Budget Centre Code already exist.',
+                    content: 'Error occurred checking if Budget Centre Code already exist.',
                     type: 'red',
                 });
             }

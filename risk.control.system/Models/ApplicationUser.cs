@@ -29,10 +29,12 @@ namespace risk.control.system.Models
 
         [Required]
         [Display(Name = "First name")]
+        [StringLength(50, MinimumLength = 3, ErrorMessage = "FirstName must be between 3 and 50 characters.")]
         public string FirstName { get; set; } = default!;
 
         [Required]
         [Display(Name = "Last name")]
+        [StringLength(50, MinimumLength = 3, ErrorMessage = "LastName must be between 3 and 50 characters.")]
         public string LastName { get; set; } = default!;
 
         [Display(Name = "PinCode name")]
@@ -60,6 +62,7 @@ namespace risk.control.system.Models
         public District? District { get; set; } = default!;
 
         [Display(Name = "Address line")]
+        [StringLength(70, MinimumLength = 3, ErrorMessage = "Addressline must be between 3 and 70 characters.")]
         public string? Addressline { get; set; }
 
         public DateTime Created { get; set; } = DateTime.UtcNow;
