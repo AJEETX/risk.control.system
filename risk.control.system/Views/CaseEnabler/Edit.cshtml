@@ -37,7 +37,7 @@
                     </div>
                 </div>
                 <div class="form-group text-right">
-                    <a id="back" asp-action="Profile" class="btn btn-secondary"><i class="fa fa-window-close"></i> @Applicationsettings.CANCEL</a> &nbsp;
+                            <a id="back" asp-action="Profile" class="btn btn-secondary ignore-validation"><i class="fa fa-window-close"></i> @Applicationsettings.CANCEL</a> &nbsp;
                     <button id="edit" type="submit" class="btn btn-warning"> <i class="fas fa-puzzle-piece"></i> @Applicationsettings.EDIT </button>
                 </div>
             </form>
@@ -48,8 +48,6 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-    <script src="~/js/company-admin/case-enabler.js">
-       
-    </script>
-    <script src="~/js/common/form-validation.js"></script>
+            <script src="~/js/common/form-valid.js"></script>
+            <script src="~/js/company-admin/case-enabler.js"></script>
 }

@@ -105,13 +105,14 @@ namespace risk.control.system.Controllers.CompanyAdmin
                     notifyService.Error("Reason Code already exists!");
                     return View(caseEnabler);
                 }
-                caseEnabler.Name = WebUtility.HtmlEncode(caseEnabler.Name);
+                var textInfo = CultureInfo.CurrentCulture.TextInfo;
+                caseEnabler.Name = WebUtility.HtmlEncode(textInfo.ToTitleCase(caseEnabler.Name.ToLower()));
                 caseEnabler.Updated = DateTime.UtcNow;
                 caseEnabler.UpdatedBy = HttpContext.User?.Identity?.Name;
 
                 _context.Add(caseEnabler);
                 await _context.SaveChangesAsync(null, false);
-                notifyService.Success("Reason created successfully!");
+                notifyService.Success($"Reason Code <b>{caseEnabler.Code}</b> created successfully!");
                 return RedirectToAction(nameof(Profile));
             }
             catch (Exception ex)
@@ -176,7 +177,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             {
                 // Uppercase normalization
                 caseEnabler.Code = WebUtility.HtmlEncode(caseEnabler.Code?.ToUpper(CultureInfo.InvariantCulture));
-                caseEnabler.Name = WebUtility.HtmlEncode(caseEnabler.Name);
+
                 // Check for duplicate code before saving
                 bool exists = await _context.CaseEnabler.AnyAsync(x => x.CaseEnablerId != id && x.Code == caseEnabler.Code);
                 if (exists)
@@ -185,12 +186,14 @@ namespace risk.control.system.Controllers.CompanyAdmin
                     notifyService.Error("Reason Code already exists!");
                     return View(caseEnabler);
                 }
+                var textInfo = CultureInfo.CurrentCulture.TextInfo;
+                caseEnabler.Name = WebUtility.HtmlEncode(textInfo.ToTitleCase(caseEnabler.Name.ToLower()));
 
                 caseEnabler.Updated = DateTime.UtcNow;
                 caseEnabler.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Update(caseEnabler);
                 await _context.SaveChangesAsync(null, false);
-                notifyService.Custom($"Reason edited successfully!", 3, "orange", "fas fa-puzzle-piece");
+                notifyService.Custom($"Reason Code <b>{caseEnabler.Code}</b> edited successfully!", 3, "orange", "fas fa-puzzle-piece");
                 return RedirectToAction(nameof(Profile));
             }
             catch (Exception ex)

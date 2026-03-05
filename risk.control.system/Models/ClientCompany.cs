@@ -10,13 +10,18 @@ namespace risk.control.system.Models
         public long ClientCompanyId { get; set; }
 
         [Display(Name = "Insurer name")]
+        [StringLength(50, MinimumLength = 3, ErrorMessage = "Name must be between 3 and 50 characters.")]
         public string Name { get; set; } = default!;
 
         [Display(Name = "Phone number")]
         public string PhoneNumber { get; set; } = default!;
 
+        [StringLength(50, MinimumLength = 3, ErrorMessage = "Email must be between 3 and 30 characters.")]
         public string Email { get; set; } = default!;
+
         public string? Branch { get; set; } = default!;
+
+        [StringLength(70, MinimumLength = 3, ErrorMessage = "Addressline must be between 3 and 70 characters.")]
         public string Addressline { get; set; } = default!;
 
         [Display(Name = "State name")]

@@ -10,10 +10,13 @@ namespace risk.control.system.Models
         public long DistrictId { get; set; }
 
         [Display(Name = "District name")]
+        [Required]
+        [StringLength(50, MinimumLength = 3, ErrorMessage = "Name must be between 3 and 50 characters.")]
         public string Name { get; set; } = "";
 
         [Display(Name = "District code")]
         [Required]
+        [StringLength(50, MinimumLength = 3, ErrorMessage = "Code must be between 3 and 50 characters.")]
         public string Code { get; set; } = default!;
 
         [Display(Name = "State name")]

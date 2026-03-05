@@ -37,7 +37,7 @@
                 </div>
 
                 <div class="form-group text-right">
-                    <a id="back" asp-action="Profile" class="btn btn-secondary"><i class="fa fa-window-close"></i> @Applicationsettings.CANCEL</a> &nbsp;
+                            <a id="back" asp-action="Profile" class="btn btn-secondary ignore-validation"><i class="fa fa-window-close"></i> @Applicationsettings.CANCEL</a> &nbsp;
                     <button id="create" type="submit" class="btn btn-success"> <i class="fas fa-user-tie"></i> @Applicationsettings.CREATE New</button>
                 </div>
             </form>
@@ -47,7 +47,6 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-    <script src="~/js/company-admin/beneficiary.js">
-    </script>
-    <script src="~/js/common/form-validation.js"></script>
+            <script src="~/js/common/form-valid.js"></script>
+            <script src="~/js/company-admin/beneficiary.js"></script>
 }
