@@ -10,8 +10,10 @@ namespace risk.control.system.Models
         public long Id { get; set; }
 
         public string SenderEmail { get; set; }
+
+        [StringLength(50, MinimumLength = 3, ErrorMessage = "Comment must be between 3 and 50 characters.")]
         public string Comment { get; set; }
-        public CaseNote? ParentCaseNote { get; set; }
+
         public override string ToString()
         {
             return $"CaseNote Information:\n" +

@@ -1,6 +1,5 @@
 ﻿$(document).ready(function () {
-
-    const previewImg = $('#createProfileImage');
+    const previewImg = $('#document-Image');
     const fileInput = $('#createImageInput');
     // Finds the label inside the same 'custom-file' div
     const fileLabel = fileInput.siblings('.custom-file-label');
@@ -12,7 +11,7 @@
         var email = $('#email').val();
         const urlParts = email.split('@');
         const username = urlParts[0];
-        const displayName = username +".png";
+        const displayName = username + ".png";
 
         fileLabel.addClass("selected valid").html(displayName);
         fileInput.attr('data-bs-toggle', "tooltip");
@@ -37,7 +36,7 @@
 
     // Store the original image URL when the page is loaded
     function initializeOriginalImage() {
-        const previewElement = $('#createProfileImage'); // Select the preview image element
+        const previewElement = $('#document-Image'); // Select the preview image element
         originalImageUrl = previewElement.attr('src'); // Store the original image URL
     }
 

@@ -27,6 +27,7 @@ namespace risk.control.system.Models
         [Required]
         [Display(Name = "Contact number")]
         [DataType(DataType.PhoneNumber)]
+        [StringLength(10, MinimumLength = 9, ErrorMessage = "PhoneNumber must be between 9 and 10 characters.")]
         public string PhoneNumber { get; set; }
 
         [Required]
@@ -76,7 +77,6 @@ namespace risk.control.system.Models
         public string? ImagePath { get; set; }
         public string? ProfilePictureExtension { get; set; }
 
-        public string? Description { get; set; }
         public string? CustomerLocationMap { get; set; }
         public string? Latitude { get; set; }
         public string? Longitude { get; set; }

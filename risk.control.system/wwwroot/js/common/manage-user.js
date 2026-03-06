@@ -157,14 +157,19 @@
     $('#check-email').on('click', function () {
         checkUserEmail();
     });
+
+    $('#ActiveSwitch').change(function () {
+        $(this).next('label').text(this.checked ? 'Active Account' : 'Deactivated Account');
+    });
+
 });
 
 function alphaOnly(event) {
     var key = event.keyCode;
     return ((key >= 65 && key <= 90) || key == 8);
 };
-
 function checkUserEmail() {
+    const $detailsFieldset = $('#user-details-fields');
     var url = "/api/MasterData/CheckUserEmail";
     var name = $('#emailAddress').val().toLowerCase();
     var emailSuffix = $('#emailSuffix').val().toLowerCase();
@@ -176,16 +181,20 @@ function checkUserEmail() {
                 $("#result").html("<span class='available' data-toggle='tooltip' title='Available' data-toggle='tooltip'> <i class='fas fa-check'></i></span>");
                 $('#result').addClass('result-padding');
                 $("#emailAddress").removeClass('error-border');
+                $detailsFieldset.prop('disabled', false);
             }
             else if (data === 1) { //domain exists
                 $('#mailAddress').val('');
                 $("#result").html("<span class='unavailable' data-toggle='tooltip' title='Email exists' data-toggle='tooltip'><i class='fa fa-times-circle'></i></span>");
                 $('#result').addClass('result-padding');
                 $("#emailAddress").addClass('error-border');
+                $detailsFieldset.prop('disabled', true);
             }
 
             else if (data = null || data == undefined) {
                 $('#mailAddress').val('');
+                $detailsFieldset.prop('disabled', true);
+                $("#result").empty();
             }
         });
     }

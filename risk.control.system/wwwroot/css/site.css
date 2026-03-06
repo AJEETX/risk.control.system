@@ -688,7 +688,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     text-transform: lowercase;
 }
 
-#Email {
+#email, #Email {
     color: blue;
     padding-left: 5px;
 }
@@ -717,6 +717,9 @@ input.title-name {
 }
 
 input.remarks[required]:valid {
+    border-right: 3px solid green;
+}
+label.remarks.valid {
     border-right: 3px solid green;
 }
 
@@ -2234,6 +2237,10 @@ select#PinCodeId {
     transition: transform 0.3s ease; /* Smooth transition effect on hover */
 }
 
+    #document-Image:hover {
+        transform: scale(1.01); /* Slightly enlarges the image on hover */
+        border-color: #007bff; /* Changes border color on hover */
+    }
 /* Optional: You can add some styling to the file input for better appearance */
 .document-image-input {
     border-radius: 0 !important;

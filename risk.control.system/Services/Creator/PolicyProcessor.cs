@@ -37,9 +37,9 @@ namespace risk.control.system.Services.Creator
             decimal.TryParse(uc.Amount, out var amount);
 
             // 3. Lookups (Service Type, Enabler, Cost Centre)
-            var serviceTypeTask = GetServiceType(uc.ServiceType, insuranceType);
-            var enablerTask = GetCaseEnabler(uc.Reason);
-            var costCentreTask = GetCostCentre(uc.Department);
+            var serviceTypeTask = GetServiceType(uc.ServiceType.Trim(), insuranceType);
+            var enablerTask = GetCaseEnabler(uc.Reason.Trim());
+            var costCentreTask = GetCostCentre(uc.Department.Trim());
             await Task.WhenAll(serviceTypeTask, enablerTask, costCentreTask);
 
             var serviceType = await serviceTypeTask;
@@ -58,7 +58,7 @@ namespace risk.control.system.Services.Creator
                 CaseEnablerId = enabler.CaseEnablerId,
                 CostCentreId = costCentre.CostCentreId,
                 InsuranceType = insuranceType,
-                CauseOfLoss = uc.Cause ?? "UNKNOWN",
+                CauseOfLoss = uc.Cause.Trim() ?? "UNKNOWN",
                 DocumentPath = imgPath,
                 DocumentImageExtension = ext,
                 Updated = DateTime.UtcNow,

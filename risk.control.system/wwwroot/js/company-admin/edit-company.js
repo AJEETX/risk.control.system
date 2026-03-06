@@ -14,8 +14,6 @@
                     action: function () {
 
                         $("body").addClass("submit-progress-bg");
-                        // Wrap in setTimeout so the UI
-                        // can update the spinners
                         setTimeout(function () {
                             $(".submit-progress").removeClass("hidden");
                         }, 1);

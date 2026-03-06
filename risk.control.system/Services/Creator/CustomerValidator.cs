@@ -1,6 +1,4 @@
-﻿using System.Globalization;
-using risk.control.system.AppConstant;
-using risk.control.system.Models;
+﻿using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 
 namespace risk.control.system.Services.Creator
@@ -31,10 +29,10 @@ namespace risk.control.system.Services.Creator
         public (DateTime Dob, Gender Gen, Education Edu, Occupation Occ, Income Inc) ValidateDetails(UploadCase uc, List<UploadError> errs, List<string> sums)
         {
             var dob = dateParserService.ParseDate(uc.CustomerDob, errs, sums, "Customer");
-            var gender = ParseEnum<Gender>(uc.Gender, "Gender", errs, sums);
-            var edu = ParseEnum<Education>(uc.Education, "Education", errs, sums);
-            var occ = ParseEnum<Occupation>(uc.Occupation, "Occupation", errs, sums);
-            var inc = ParseEnum<Income>(uc.Income, "Income", errs, sums);
+            var gender = ParseEnum<Gender>(uc.Gender.Trim(), "Gender", errs, sums);
+            var edu = ParseEnum<Education>(uc.Education.Trim(), "Education", errs, sums);
+            var occ = ParseEnum<Occupation>(uc.Occupation.Trim(), "Occupation", errs, sums);
+            var inc = ParseEnum<Income>(uc.Income.Trim(), "Income", errs, sums);
 
             return (dob, gender, edu, occ, inc);
         }

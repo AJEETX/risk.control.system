@@ -18,7 +18,7 @@ namespace risk.control.system.Models
 
         [Display(Name = "Case number")]
         [Required]
-        [StringLength(20)]
+        [StringLength(30, MinimumLength = 5, ErrorMessage = "CaseNumber must be between 5 and 30 characters.")]
         public string ContractNumber { get; set; } = default!;
 
         [Display(Name = "Case issue date")]
@@ -35,7 +35,7 @@ namespace risk.control.system.Models
 
         [Display(Name = "Cause of loss")]
         [Required]
-        [StringLength(70, MinimumLength = 3, ErrorMessage = "CauseOfLoss must be between 3 and 70 characters.")]
+        [StringLength(70, MinimumLength = 3, ErrorMessage = "Cause Of Loss must be between 3 and 70 characters.")]
         public string CauseOfLoss { get; set; }
 
         [Display(Name = "Sum assured value")]

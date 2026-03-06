@@ -1,5 +1,4 @@
 ﻿$(document).ready(function () {
-
     const previewImg = $('#createProfileImage');
     const fileInput = $('#createImageInput');
     // Finds the label inside the same 'custom-file' div
@@ -9,23 +8,23 @@
 
     // Initialization: Show filename if image exists on load
     if (currentSrc && currentSrc.includes('Document')) {
-        var email = $('#email').val();
-        const urlParts = email.split('@');
-        const username = urlParts[0];
-        const displayName = username +".png";
+        const urlParts = currentSrc.split('/');
+        const companyId = urlParts[urlParts.length - 1];
+        const displayName = "Logo.png";
 
-        fileLabel.addClass("selected valid").html(displayName);
+        fileLabel.addClass("selected").html(displayName);
         fileInput.attr('data-bs-toggle', "tooltip");
         fileInput.attr('data-bs-original-title', displayName);
         fileInput.attr('title', displayName);
     }
+
     // Update on Change: Show new filename when user selects a file
     fileInput.on('change', function () {
         const fileName = $(this).val().split('\\').pop();
         if (fileName) {
-            fileLabel.addClass("selected valid").html(fileName);
+            fileLabel.addClass("selected").html(fileName);
         } else {
-            fileLabel.removeClass("selected").html("Choose User Photo...");
+            fileLabel.removeClass("selected").html("Choose logo...");
         }
     });
 
@@ -71,6 +70,8 @@
     $(".document-image-input").on('change', function () {
         const inputElement = $(this);
         const previewElement = $(`#${inputElement.data('preview-id')}`); // Dynamically find preview element
+        const defaultImageUrl = inputElement.data('default-image'); // Get the default image URL from the data attribute
+        const previewElementTitle = inputElement.data('title-id'); // Dynamically find preview element
 
         const files = inputElement[0].files;
 
@@ -111,12 +112,31 @@
         if (typeof FileReader !== "undefined") {
             // Preview the selected image
             const fileReader = new FileReader();
-            //fileReader.onload = function (e) {
-            //    if (previewElement) {
-            //        inputElement.removeClass('invalid-border')
-            //        previewElement.attr('src', e.target.result); // Set the preview image source
-            //    }
-            //};
+            fileReader.onload = function (e) {
+                if (previewElement) {
+                    inputElement.removeClass('invalid-border')
+                    previewElement.attr('src', e.target.result); // Set the preview image source
+                    if (previewElementTitle === 'case-document') {
+                        previewElement.attr('data-bs-original-title', 'Case Document'); // Set the preview image source
+                        previewElement.attr('data-original-title', 'Case Document'); // Set the preview image source
+                    } else if (previewElementTitle === 'customer-document') {
+                        previewElement.attr('data-bs-original-title', 'Customer Photo'); // Set the preview image source
+                        previewElement.attr('data-original-title', 'Customer Photo'); // Set the preview image source
+                    } else if (previewElementTitle === 'beneficiary-document') {
+                        previewElement.attr('data-bs-original-title', 'Beneficiary Photo'); // Set the preview image source
+                        previewElement.attr('data-original-title', 'Beneficiary Photo'); // Set the preview image source
+                    } else if (previewElementTitle === 'user-document') {
+                        previewElement.attr('data-bs-original-title', 'User Photo'); // Set the preview image source
+                        previewElement.attr('data-original-title', 'User Photo'); // Set the preview image source
+                    } else if (previewElementTitle === 'agency-document') {
+                        previewElement.attr('data-bs-original-title', 'Agency Document'); // Set the preview image source
+                        previewElement.attr('data-original-title', 'Agency Document'); // Set the preview image source
+                    } else if (previewElementTitle === 'company-document') {
+                        previewElement.attr('data-bs-original-title', 'Company Document'); // Set the preview image source
+                        previewElement.attr('data-original-title', 'Company Document'); // Set the preview image source
+                    }
+                }
+            };
             var imageToUpdate = document.getElementById('document-Image');
             if (imageToUpdate) {
                 imageToUpdate.src = window.URL.createObjectURL($(this)[0].files[0]);
