@@ -1,5 +1,5 @@
 ﻿@model CaseTransactionModel
-                                
+
 @{
     <div class="card direct-chat direct-chat-warning collapsed-card">
         <div class="card-header">
@@ -25,7 +25,7 @@
                             {
                                 <div class="direct-chat-msg">
                                     <div class="direct-chat-infos clearfix">
-                                        <span class="direct-chat-name float-left">@Model.ClaimsInvestigation.CaseMessages[i].SenderPhone</span>
+                                        <span class="direct-chat-name float-left">@Model.ClaimsInvestigation.CaseMessages[i].SenderEmail</span>
                                         <span class="direct-chat-timestamp float-right">@Model.ClaimsInvestigation.CaseMessages[i].Created.ToString("dd MMM hh:mm")</span>
                                     </div>
                                     <img class="direct-chat-img" src="/img/company-admin.jpeg" alt="sender image">
@@ -49,10 +49,8 @@
                             }
                         }
                     }
-                   
                 </div>
             </div>
-
         </div>
     </div>
 }

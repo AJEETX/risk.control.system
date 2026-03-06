@@ -22,7 +22,9 @@ namespace risk.control.system.Models
         public BeneficiaryRelation? BeneficiaryRelation { get; set; }
 
         [DataType(DataType.PhoneNumber)]
-        [Display(Name = "Phone")]
+        [Display(Name = "Contact number")]
+        [Required]
+        [StringLength(10, MinimumLength = 9, ErrorMessage = "PhoneNumber must be between 9 and 10 characters.")]
         public string PhoneNumber { get; set; }
 
         [Display(Name = "Annual Income")]

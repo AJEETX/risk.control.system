@@ -380,7 +380,6 @@ namespace risk.control.system.Controllers.Mobile
                         Country = c.CustomerDetail.Country.Name,
                         State = c.CustomerDetail.State.Name,
                         District = c.CustomerDetail.District.Name,
-                        c.CustomerDetail.Description,
                         Locations = new
                         {
                             c.BeneficiaryDetail.BeneficiaryDetailId,

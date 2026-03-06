@@ -94,7 +94,10 @@ namespace risk.control.system.Models
         public string? AddressLongitude { get; set; }
         public string? AddressMapLocation { get; set; }
         public bool IsUpdated { get; set; } = true;
+
+        [StringLength(50, MinimumLength = 5, ErrorMessage = "Comments must be between 5 and 50 characters.")]
         public string? Comments { get; set; } = default!;
+
         public DateTime? FaceIndexedAt { get; set; }
         public string? AwsFaceId { get; set; }
 
