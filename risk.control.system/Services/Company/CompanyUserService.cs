@@ -72,15 +72,15 @@ namespace risk.control.system.Services.Company
                 await SetProfileImageAsync(model, model.ProfileImage, emailSuffix);
 
                 var textInfo = CultureInfo.CurrentCulture.TextInfo;
-                model.FirstName = WebUtility.HtmlEncode(textInfo.ToTitleCase(model.FirstName.ToLower()));
-                model.LastName = WebUtility.HtmlEncode(textInfo.ToTitleCase(model.LastName.ToLower()));
+                model.FirstName = WebUtility.HtmlEncode(textInfo.ToTitleCase(model.FirstName.Trim().ToLower()));
+                model.LastName = WebUtility.HtmlEncode(textInfo.ToTitleCase(model.LastName.Trim().ToLower()));
 
                 model.Email = model.UserName = fullEmail;
                 model.Password = Applicationsettings.TestingData;
                 model.Active = true;
                 model.EmailConfirmed = true;
 
-                model.PhoneNumber = model.PhoneNumber.TrimStart('0');
+                model.PhoneNumber = model.PhoneNumber.TrimStart('0').Trim();
                 model.IsClientAdmin = model.Role == AppRoles.COMPANY_ADMIN;
                 model.Updated = DateTime.UtcNow;
                 model.UpdatedBy = performedBy;
@@ -123,15 +123,15 @@ namespace risk.control.system.Services.Company
                     await SetProfileImageAsync(user, model.ProfileImage, domain);
                 }
                 var textInfo = CultureInfo.CurrentCulture.TextInfo;
-                user.FirstName = WebUtility.HtmlEncode(textInfo.ToTitleCase(model.FirstName.ToLower()));
-                user.LastName = WebUtility.HtmlEncode(textInfo.ToTitleCase(model.LastName.ToLower()));
+                user.FirstName = WebUtility.HtmlEncode(textInfo.ToTitleCase(model.FirstName.Trim().ToLower()));
+                user.LastName = WebUtility.HtmlEncode(textInfo.ToTitleCase(model.LastName.Trim().ToLower()));
 
                 user.CountryId = model.SelectedCountryId;
                 user.StateId = model.SelectedStateId;
                 user.DistrictId = model.SelectedDistrictId;
                 user.PinCodeId = model.SelectedPincodeId;
                 user.Addressline = model.Addressline;
-                user.PhoneNumber = model.PhoneNumber.TrimStart('0');
+                user.PhoneNumber = model.PhoneNumber.TrimStart('0').Trim();
 
                 user.Role = model.Role;
                 user.IsClientAdmin = user.Role == AppRoles.COMPANY_ADMIN;

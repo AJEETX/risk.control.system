@@ -1,155 +1,162 @@
 ﻿@model risk.control.system.Models.ApplicationUser
 
 @{
-    ViewData["Title"] = "Edit Profile";
+	ViewData["Title"] = "Edit Profile";
 }
 
 <section class="content">
-    <form id="edit-form" asp-action="Edit" enctype="multipart/form-data">
-        <div class="card shadow-lg border-1 rounded-lg">
-            <div class="card-header bg-secondary text-white text-center">
-                <h3 class="card-title">
-                    <i class="fas fa-user-edit"></i> @Applicationsettings.EDIT Profile
-                </h3>
-            </div>
-            <div class="card-body">
-                <div class="submit-progress hidden">
-                    <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
-                </div>
-                <div class="row">
-                    <div class="col-md-6">
-                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                        <input type="hidden" asp-for="Id" />
-                        <input type="hidden" asp-for="ClientCompanyId" value="@Model.ClientCompany.ClientCompanyId" />
-                        <input type="hidden" id="Isd" value="@Model?.Country.ISDCode" />
-                        <input type="hidden" id="countryCode" value="@Model?.Country.Code" />
-                        <!-- Profile Image Section -->
-                        <div class="form-group text-center">
-                            <div class="profile-img-container">
-                                <img id="editProfileImage" class="form-Image" src="/Document/GetUserProfileImage/@Model?.Id" alt="Profile" />
-                            </div>
-                            <label for="editImageInput" class="control-label">Profile Photo <i class="fa fa-asterisk asterik-style"></i></label>
-                            <input asp-for="ProfileImage" class="form-control remarks document-image-input filled-valid" type="file" id="editImageInput" data-preview-id="editProfileImage" title="User Photo" />
-                        </div>
+	<form id="edit-form" asp-action="Edit" enctype="multipart/form-data">
+		<div class="card shadow-lg border-1 rounded-lg">
+			<div class="card-header bg-secondary text-white text-center">
+				<h3 class="card-title">
+					<i class="fas fa-user-edit"></i> @Applicationsettings.EDIT Profile
+				</h3>
+			</div>
+			<div class="card-body">
+				<div class="submit-progress hidden">
+					<i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+				</div>
+				<div class="row top-margin-10">
+					<div class="col-md-6">
+						<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+						<input type="hidden" asp-for="Id" />
+						<input type="hidden" asp-for="ClientCompanyId" value="@Model.ClientCompany.ClientCompanyId" />
+						<input type="hidden" id="Isd" value="@Model?.Country.ISDCode" />
+						<input type="hidden" id="countryCode" value="@Model?.Country.Code" />
+						<!-- Profile Image Section -->
+						<div class="form-group text-center">
+							<div class="profile-img-container mb-2">
+								<img id="document-Image" class="form-Image img-circle" src="/Document/GetUserProfileImage/@Model?.Id" title="User Photo" alt="User" data-bs-toggle="tooltip" />
+							</div>
 
-                        <!-- Name Sections (First & Last) -->
-                        <div class="form-group">
-                            <label for="FirstName" class="input-group-label">First Name:</label>
-                            <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text"><i class="fas fa-user"></i><i class="fa fa-asterisk asterik-style"></i></span>
-                                </div>
-                                <input type="text" asp-for="FirstName" class="form-control remarks title-name" required placeholder="First Name" maxlength="20" />
-                                <span asp-validation-for="FirstName" class="text-danger"></span>
-                            </div>
-                        </div>
+							<div class="control-label">User Photo <i class="fa fa-asterisk asterik-style-logo"></i></div>
 
-                        <div class="form-group">
-                            <label for="LastName" class="input-group-label">Last Name:</label>
-                            <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text"><i class="fas fa-user"></i><i class="fa fa-asterisk asterik-style"></i></span>
-                                </div>
-                                <input type="text" asp-for="LastName" class="form-control remarks title-name" required placeholder="Last Name" maxlength="20" />
-                                <span asp-validation-for="LastName" class="text-danger"></span>
-                            </div>
-                        </div>
-                        <!-- Phone Number Section -->
-                        <div class="form-group">
-                            <label for="PhoneNumber" class="input-group-label">Mobile #:</label>
-                            <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    @* Display Country Code *@
-                                    <span class="input-group-text country-code-text" data-bs-toggle="tooltip" title="Country Code: +@Model?.Country.ISDCode">
-                                        <img src="@("/flags/" + @Model.Country.Code.ToLower() + ".png")" class="flag-icon" alt="flag" />
-                                        +@Model?.Country.ISDCode <i class="fa fa-asterisk asterik-style"></i>
-                                    </span>
-                                </div>
-                                <input id="PhoneNumber" type="text" asp-for="PhoneNumber" class="form-control remarks" required maxlength="10" autocomplete="off" placeholder="Enter mobile # without country-code" data-bs-toggle="tooltip" />
-                                <span id="phone-spinner" class="text-secondary phone-icon d-none">
-                                    <i class="fas fa-spinner fa-spin"></i>
-                                </span>
-                                <span id="phone-valid" class="text-success phone-icon d-none">
-                                </span>
-                                <span id="phone-invalid" class="text-danger phone-icon d-none">
-                                    <i class="fas fa-times-circle"></i>
-                                </span>
-                                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
-                            </div>
-                        </div>
-                    </div>
+							<div class="custom-file text-left">
+								<input id="createImageInput" accept=".jpg,.jpeg,.png" asp-for="ProfileImage"
+									   class="custom-file-input document-image-input" type="file"
+									   data-preview-id="createProfileImage" data-title-id="user-document" title="Upload User Photo" data-bs-toggle="tooltip" />
+								<span asp-validation-for="ProfileImage" class="text-danger"></span>
+								<label class="custom-file-label text-sm remarks" for="createImageInput">Choose User Photo...</label>
+							</div>
+						</div>
+						<!-- Name Sections (First & Last) -->
+						<div class="form-group">
+							<label for="FirstName" class="input-group-label">First Name:</label>
+							<div class="input-group mb-3">
+								<div class="input-group-prepend">
+									<span class="input-group-text"><i class="fas fa-user"></i><i class="fa fa-asterisk asterik-style"></i></span>
+								</div>
+								<input type="text" asp-for="FirstName" class="form-control remarks title-name" required placeholder="First Name" maxlength="20" />
+								<span asp-validation-for="FirstName" class="text-danger"></span>
+							</div>
+						</div>
 
-                    <!-- Address & Note Section -->
-                    <div class="col-md-6">
-                        <!-- Email Section -->
-                        <div class="form-group">
-                            <label for="Email" class="input-group-label" for="Email">Email Address:</label>
-                            <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text"><i class="fas fa-at"></i><i class="fa fa-asterisk asterik-style"></i></span>
-                                </div>
-                                <input id="Email" readonly asp-for="Email" class="form-control readonly-input valid-border" />
-                            </div>
-                        </div>
+						<div class="form-group">
+							<label for="LastName" class="input-group-label">Last Name:</label>
+							<div class="input-group mb-3">
+								<div class="input-group-prepend">
+									<span class="input-group-text"><i class="fas fa-user"></i><i class="fa fa-asterisk asterik-style"></i></span>
+								</div>
+								<input type="text" asp-for="LastName" class="form-control remarks title-name" required placeholder="Last Name" maxlength="20" />
+								<span asp-validation-for="LastName" class="text-danger"></span>
+							</div>
+						</div>
+						<!-- Phone Number Section -->
+						<div class="form-group">
+							<label for="PhoneNumber" class="input-group-label">Mobile #:</label>
+							<div class="input-group mb-3">
+								<div class="input-group-prepend">
+									@* Display Country Code *@
+									<span class="input-group-text country-code-text" data-bs-toggle="tooltip" title="Country Code: +@Model?.Country.ISDCode">
+										<img src="@("/flags/" + @Model.Country.Code.ToLower() + ".png")" class="flag-icon" alt="flag" />
+										+@Model?.Country.ISDCode <i class="fa fa-asterisk asterik-style"></i>
+									</span>
+								</div>
+								<input id="PhoneNumber" type="text" asp-for="PhoneNumber" class="form-control remarks" required maxlength="10" autocomplete="off" placeholder="Enter mobile # without country-code" data-bs-toggle="tooltip" />
+								<span id="phone-spinner" class="text-secondary phone-icon d-none">
+									<i class="fas fa-spinner fa-spin"></i>
+								</span>
+								<span id="phone-valid" class="text-success phone-icon d-none">
+								</span>
+								<span id="phone-invalid" class="text-danger phone-icon d-none">
+									<i class="fas fa-times-circle"></i>
+								</span>
+								<span asp-validation-for="PhoneNumber" class="text-danger"></span>
+							</div>
+						</div>
+					</div>
 
-                        <!-- Role Section -->
-                        <div class="form-group">
-                            <label for="Role" class="input-group-label">Role:</label>
-                            <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text"><i class="fas fa-user"></i><i class="fa fa-asterisk asterik-style"></i></span>
-                                </div>
-                                <input id="Role" readonly asp-for="Role" class="form-control readonly-input valid-border" />
-                            </div>
-                        </div>
-                        <partial name="_Address" model="@Model" />
+					<!-- Address & Note Section -->
+					<div class="col-md-6">
+						<!-- Email Section -->
+						<div class="form-group">
+							<label for="Email" class="input-group-label" for="Email">Email Address:</label>
+							<div class="input-group mb-3">
+								<div class="input-group-prepend">
+									<span class="input-group-text"><i class="fas fa-at"></i><i class="fa fa-asterisk asterik-style"></i></span>
+								</div>
+								<input id="email" readonly asp-for="Email" class="form-control readonly-input valid-border" />
+							</div>
+						</div>
 
-                        <!-- Address Line -->
-                        <div class="form-group">
-                            <label class="input-group-label" for="Addressline"> Address:</label>
-                            <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text"><i class="fa fa-home"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
-                                </div>
-                                <input  id="Addressline" type="text" asp-for="Addressline" class="form-control remarks" placeholder="Street Address..." maxlength="70" required />
-                            </div>
-                        </div>
+						<!-- Role Section -->
+						<div class="form-group">
+							<label for="Role" class="input-group-label">Role:</label>
+							<div class="input-group mb-3">
+								<div class="input-group-prepend">
+									<span class="input-group-text"><i class="fas fa-user"></i><i class="fa fa-asterisk asterik-style"></i></span>
+								</div>
+								<input id="Role" readonly asp-for="Role" class="form-control readonly-input valid-border" />
+							</div>
+						</div>
+						<partial name="_Address" model="@Model" />
 
-                        <!-- Note Section -->
-                        @* <div class="form-group">
+						<!-- Address Line -->
+						<div class="form-group">
+							<label class="input-group-label" for="Addressline"> Address:</label>
+							<div class="input-group mb-3">
+								<div class="input-group-prepend">
+									<span class="input-group-text"><i class="fa fa-home"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
+								</div>
+								<input id="Addressline" type="text" asp-for="Addressline" class="form-control remarks" placeholder="Street Address..." maxlength="70" required />
+							</div>
+						</div>
+
+						<!-- Note Section -->
+						@* <div class="form-group">
                             <label for="Comments" class="input-group-label">Note:</label>
                             <input type="text" asp-for="Comments" class="form-control remarks" placeholder="Note" maxlength="50" />
                         </div> *@
-                    </div>
-                </div>
-            </div>
+					</div>
+				</div>
+			</div>
 
-            <!-- Form Footer -->
-            <div class="card-footer">
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="form-group text-right">
-                            <a id="cancel" asp-controller="Dashboard" asp-action="Index" class="btn btn-secondary">
-                                <i class="fa fa-window-close"></i> @Applicationsettings.CANCEL
-                            </a>
-                            <button id="edit" type="submit" class="btn btn-warning">
-                                <i class="fas fa-user-edit"></i> Save Profile
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </form>
+			<!-- Form Footer -->
+			<div class="card-footer">
+				<div class="row">
+					<div class="col-md-12">
+						<div class="form-group text-right">
+							<a id="cancel" asp-controller="Dashboard" asp-action="Index" class="btn btn-secondary">
+								<i class="fa fa-window-close"></i> @Applicationsettings.CANCEL
+							</a>
+							<button id="edit" type="submit" class="btn btn-warning">
+								<i class="fas fa-user-edit"></i> Save Profile
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</form>
 </section>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-    <script src="~/js/company-admin/company-user-profile.js"></script>
-    <script src="~/js/common/address-with-pincode.js"></script>
-    <script src="~/js/company-admin/phone-bank-validate.js"></script>
-    <script src="~/js/common/profile-image-upload.js"></script>
-    <script src="~/js/common/form-validation.js"></script>
+	@{
+		await Html.RenderPartialAsync("_ValidationScriptsPartial");
+	}
+	<script src="~/js/company-admin/company-user-profile.js"></script>
+	<script src="~/js/common/address-with-pincode.js"></script>
+	<script src="~/js/company-admin/phone-bank-validate.js"></script>
+	<script src="~/js/common/edit-image-upload.js"></script>
+	<script src="~/js/common/form-validation.js"></script>
 }
