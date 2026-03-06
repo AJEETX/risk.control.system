@@ -21,12 +21,22 @@
 						<div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
 						<div class="form-group text-center">
-							<div class="profile-img-container">
+							<div class="profile-img-container mb-2">
 								<img id="document-Image" class="form-Image img-circle" src="/Document/GetUserProfileImage/@Model?.Id" title="User Photo" alt="User" data-bs-toggle="tooltip" />
 							</div>
-							<label for="createImageInput" class="control-label">User Photo<i class="fa fa-asterisk asterik-style-logo"></i></label>
-							<input id="createImageInput" accept=".jpg,.jpeg,.png" asp-for="ProfileImage" class="form-control remarks document-image-input filled-valid" type="file" data-preview-id="createProfileImage" data-title-id="user-document" title="Upload User Photo" data-bs-toggle="tooltip" />
-							<span asp-validation-for="ProfileImage" class="text-danger"></span>
+
+							<div class="control-label">User Photo <i class="fa fa-asterisk asterik-style-logo"></i></div>
+							<div class="row justify-content-center">
+								<div class="col-10 col-md-8">
+									<div class="custom-file text-left">
+										<input id="createImageInput" accept=".jpg,.jpeg,.png" asp-for="ProfileImage"
+											   class="custom-file-input document-image-input" type="file"
+											   data-preview-id="createProfileImage" data-title-id="user-document" title="Upload User Photo" data-bs-toggle="tooltip" />
+										<span asp-validation-for="ProfileImage" class="text-danger"></span>
+										<label class="custom-file-label text-sm remarks" for="createImageInput">Choose User Photo...</label>
+									</div>
+								</div>
+							</div>
 						</div>
 
 						<div class="form-group">
@@ -43,9 +53,9 @@
 							</label>
 							<div class="input-group mb-3">
 								<div class="input-group-prepend">
-									<span class="input-group-text" id="email"><i class="fas fa-at"></i> <i class="fa fa-asterisk asterik-style-none"></i></span>
+									<span class="input-group-text"><i class="fas fa-at"></i> <i class="fa fa-asterisk asterik-style-none"></i></span>
 								</div>
-								<input readonly asp-for="Email" class="form-control readonly-input valid-border" />
+								<input id="email" readonly asp-for="Email" class="form-control readonly-input valid-border" />
 							</div>
 						</div>
 						<div class="form-group">
@@ -161,9 +171,6 @@
 						<div class="row">
 							<div class="col-md-12">
 								<div class="form-group text-right">
-									@* <button id="reset" type="submit" onclick="clearAllInputs()" class="btn btn-outline-secondary">
-                            <i class="fas fa-undo"></i> Reset
-                            </button> *@
 									<a id="cancel" asp-controller="ManageCompanyUser" asp-action="Users" class="btn btn-secondary">
 										<i class="fa fa-window-close"></i>
 										@Applicationsettings.CANCEL
@@ -186,6 +193,6 @@
 			<script src="~/js/common/manage-user.js"></script>
 			<script src="~/js/common/address-with-pincode.js"></script>
 			<script src="~/js/company-admin/phone-bank-validate.js"></script>
-			<script src="~/js/common/image-upload.js"></script>
+			<script src="~/js/common/edit-image-upload.js"></script>
 			<script src="~/js/common/form-validation.js"></script>
 		}

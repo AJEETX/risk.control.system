@@ -202,8 +202,8 @@ namespace risk.control.system.Services.Creator
 
         private static void Sanitize(PolicyDetailDto policy)
         {
-            policy.ContractNumber = WebUtility.HtmlEncode(policy.ContractNumber);
-            policy.CauseOfLoss = WebUtility.HtmlEncode(policy.CauseOfLoss);
+            policy.ContractNumber = WebUtility.HtmlEncode(policy.ContractNumber.Trim().ToUpper());
+            policy.CauseOfLoss = WebUtility.HtmlEncode(policy.CauseOfLoss.Trim());
         }
 
         public async Task<(bool Success, string? CaseId, Dictionary<string, string> Errors)> EditAsync(string userEmail, EditPolicyDto model)

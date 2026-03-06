@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Globalization;
+using System.Net;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.FeatureManagement;
@@ -215,8 +216,10 @@ namespace risk.control.system.Services.Creator
 
         private static void Sanitize(BeneficiaryDetail model)
         {
-            model.Name = WebUtility.HtmlEncode(model.Name);
-            model.PhoneNumber = WebUtility.HtmlEncode(model.PhoneNumber);
+            var textInfo = CultureInfo.CurrentCulture.TextInfo;
+            model.Name = WebUtility.HtmlEncode(textInfo.ToTitleCase(model.Name.Trim().ToLower()));
+
+            model.PhoneNumber = WebUtility.HtmlEncode(model.PhoneNumber.TrimStart('0').Trim());
         }
     }
 }
