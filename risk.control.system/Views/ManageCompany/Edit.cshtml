@@ -28,11 +28,22 @@
 						</div>
 
 						<div class="form-group text-center">
-							<div class="profile-img-container">
-								<img id="createProfileImage" class="form-Image" src="/Document/GetCompanyDocument/@Model.ClientCompanyId" title="Company Logo" alt="Company Logo" data-bs-toggle="tooltip" />
+							<div class="profile-img-container mb-2">
+								<img id="createProfileImage" class="form-Image" src="/Document/GetCompanyDocument/@Model.ClientCompanyId" title="Logo" alt="Logo" data-bs-toggle="tooltip" />
 							</div>
-							<label for="createImageInput" class="control-label">Company Logo <i class="fa fa-asterisk asterik-style-logo"></i></label>
-							<input id="createImageInput" accept=".jpg,.jpeg,.png" asp-for="Document" class="form-control remarks document-image-input filled-valid" type="file" data-preview-id="createProfileImage" data-title-id="company-document" title="Upload Company Logo" data-bs-toggle="tooltip" />
+
+							<div class="control-label">Logo <i class="fa fa-asterisk asterik-style-logo"></i></div>
+							<div class="row justify-content-center">
+								<div class="col-10 col-md-8">
+									<div class="custom-file text-left">
+										<input id="createImageInput" accept=".jpg,.jpeg,.png" asp-for="Document"
+											   class="custom-file-input document-image-input" type="file"
+											   data-preview-id="createProfileImage" data-title-id="company-document" />
+
+										<label class="custom-file-label" for="createImageInput">Choose logo...</label>
+									</div>
+								</div>
+							</div>
 						</div>
 						<div class="form-group">
 							<label class="input-group-label" for="Email"> Domain:</label>
@@ -54,16 +65,6 @@
 								<span asp-validation-for="Name" class="text-danger"></span>
 							</div>
 						</div>
-						@* <div class="form-group">
-                            <span class="input-group-label"> Code: </span>
-                            <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text"> <i class="fas fa-code"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                </div>
-                                <input type="text" id="Code" asp-for="Code" class="form-control asterikx remarks" required placeholder="Company Code" maxlength="5">
-                                <span asp-validation-for="Code" class="text-danger"></span>
-                            </div>
-                        </div> *@
 						<div class="form-group">
 							<label class="input-group-label" for="PhoneNumber"> Mobile #:</label>
 							<div class="input-group">
@@ -87,42 +88,8 @@
 								<span asp-validation-for="PhoneNumber" class="text-danger"></span>
 							</div>
 						</div>
-
-						@* <div class="form-group">
-                            <label class="input-group-label" for="Branch"> Branch Name: </label>
-                            <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text"><i class="far fa-building"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                </div>
-                                <input type="text" id="Branch" asp-for="Branch" class="form-control  title-name remarks" required placeholder="Branch Name" maxlength="30">
-                                <span asp-validation-for="Branch" class="text-danger"></span>
-                            </div>
-                        </div> *@
 					</div>
 					<div class="col-md-6">
-
-						@*
-
-                        <div class="form-group">
-                            <label class="input-group-label" for="AgreementDate"> Agreement Date: </label>
-                            <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text"><i class="far fa-calendar-check"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                </div>
-                                <input readonly type="text" id="AgreementDate" asp-for="AgreementDate" class="form-control remarks valid-border" placeholder="Agreement Date">
-                                <span asp-validation-for="AgreementDate" class="text-danger"></span>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <span class="input-group-label"> Activated Date: </span>
-                            <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text"> <i class="fas fa-calendar-check"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                </div>
-                                <input readonly type="text" id="ActivatedDate" asp-for="ActivatedDate" class="form-control remarks" required placeholder="Activated Date">
-                                <span asp-validation-for="ActivatedDate" class="text-danger"></span>
-                            </div>
-                        </div> *@
 						<div class="form-group">
 							<label class="input-group-label" for="IFSCCode"> IFSC Code: </label>
 							<div class="input-group mb-3 position-relative">
@@ -150,7 +117,7 @@
 										<i class="fa fa-asterisk asterik-style"></i>
 									</span>
 								</div>
-								<input type="text" id="BankName" asp-for="BankName" class="form-control remarks title-name" required placeholder="..." maxlength="50" readonly tabindex="-1" title="Auto-selected" data-bs-toggle="tooltip" />
+								<input type="text" id="BankName" asp-for="BankName" class="form-control remarks title-name" required readonly tabindex="-1" title="Auto-selected" data-bs-toggle="tooltip" />
 								<span asp-validation-for="BankName" class="text-danger"></span>
 							</div>
 						</div>
@@ -223,25 +190,6 @@
 								</div>
 							</div>
 						</div>
-
-						@* <div class="form-group">
-                            <label class="input-group-label" for="CountryText"> Country:</label>
-                            <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-
-                                    <span class="input-group-text country-code-text " data-bs-toggle="tooltip" title="Company Registered Country: @Model?.Country.Name">
-                                        <img src="@imgPath" class="flag-icon" data-bs-toggle="tooltip" />  @Model?.Country.Code
-                                    </span>
-                                </div>
-                                <input readonly type="text" id="CountryText" class="form-control remarks valid-border" data-placeholder="country" data-bs-toggle="tooltip" title="Registered Country"  tabindex="-1" />
-                                <span asp-validation-for="CountryId" class="text-danger"></span>
-                                <input asp-for="SelectedCountryId" type="hidden" id="SelectedCountryId" name="SelectedCountryId" value="@Model?.CountryId" />
-                                <div id="country-loading" class="loading-spinner">
-                                    <i class="fas fa-spinner fa-spin"></i>
-                                </div>
-                            </div>
-                        </div> *@
-
 						<div class="form-group">
 							<label class="input-group-label" for="Addressline"> Address:</label>
 							<div class="input-group mb-3">
@@ -252,19 +200,6 @@
 								<span asp-validation-for="Addressline" class="text-danger"></span>
 							</div>
 						</div>
-
-						@*
-
-                        <div class="form-group">
-                            <span class="input-group-label"> Note:</span>
-                            <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text"><i class="fas fa-edit"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                </div>
-                                <input type="text" id="Description" asp-for="Description" class="form-control remarks" placeholder="Note" maxlength="50" />
-                                <span asp-validation-for="Description" class="text-danger"></span>
-                            </div>
-                        </div> *@
 					</div>
 				</div>
 			</div>
@@ -292,6 +227,6 @@
 	<script src="~/js/company-admin/edit-company.js"></script>
 	<script src="~/js/common/address-with-pincode.js"></script>
 	<script src="~/js/company-admin/phone-bank-validate.js"></script>
-	<script src="~/js/common/profile-image-upload.js">    </script>
+	<script src="~/js/common/logo-upload.js"></script>
 	<script src="~/js/common/form-validation.js"></script>
 }

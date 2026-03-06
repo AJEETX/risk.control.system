@@ -9,6 +9,7 @@ namespace risk.control.system.Services
     {
         Task<byte[]> GetImagesWithDataInSubfolder(byte[] zipData, string subfolderName, string filename = "");
     }
+
     internal class CaseImageCreationService : ICaseImageCreationService
     {
         private readonly ILogger<CaseImageCreationService> logger;

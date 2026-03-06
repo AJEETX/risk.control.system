@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Globalization;
+using System.Net;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -141,9 +142,12 @@ namespace risk.control.system.Services.AgencyAdmin
 
         private static void MapUserFields(ApplicationUser user, ApplicationUser model, string updatedBy)
         {
-            user.Addressline = WebUtility.HtmlEncode(model.Addressline);
-            user.FirstName = WebUtility.HtmlEncode(model.FirstName);
-            user.LastName = WebUtility.HtmlEncode(model.LastName);
+            user.Addressline = WebUtility.HtmlEncode(model.Addressline.Trim());
+
+            var textInfo = CultureInfo.CurrentCulture.TextInfo;
+            user.FirstName = WebUtility.HtmlEncode(textInfo.ToTitleCase(model.FirstName.Trim().ToLower()));
+            user.LastName = WebUtility.HtmlEncode(textInfo.ToTitleCase(model.LastName.Trim().ToLower()));
+
             user.ProfilePictureUrl = model.ProfilePictureUrl ?? user.ProfilePictureUrl;
             user.Email = model.Email;
             user.UserName = model.Email;
@@ -154,8 +158,8 @@ namespace risk.control.system.Services.AgencyAdmin
             user.DistrictId = model.SelectedDistrictId;
             user.IsUpdated = true;
             user.Updated = DateTime.UtcNow;
-            user.Comments = WebUtility.HtmlEncode(model.Comments);
-            user.PhoneNumber = WebUtility.HtmlEncode(model.PhoneNumber.TrimStart('0'));
+            user.Comments = WebUtility.HtmlEncode(model.Comments.Trim());
+            user.PhoneNumber = WebUtility.HtmlEncode(model.PhoneNumber.TrimStart('0').Trim());
             user.UpdatedBy = updatedBy;
             user.SecurityStamp = DateTime.UtcNow.ToString();
 

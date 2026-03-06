@@ -202,12 +202,12 @@ namespace risk.control.system.Services.AgencyAdmin
             model.UpdatedBy = createdBy;
 
             var textInfo = CultureInfo.CurrentCulture.TextInfo;
-            model.FirstName = WebUtility.HtmlEncode(textInfo.ToTitleCase(model.FirstName.ToLower()));
-            model.LastName = WebUtility.HtmlEncode(textInfo.ToTitleCase(model.LastName.ToLower()));
+            model.FirstName = WebUtility.HtmlEncode(textInfo.ToTitleCase(model.FirstName.Trim().ToLower()));
+            model.LastName = WebUtility.HtmlEncode(textInfo.ToTitleCase(model.LastName.Trim().ToLower()));
 
-            model.PhoneNumber = WebUtility.HtmlEncode(model.PhoneNumber?.TrimStart('0'));
-            model.Comments = WebUtility.HtmlEncode(model.Comments);
-            model.Addressline = WebUtility.HtmlEncode(model.Addressline);
+            model.PhoneNumber = WebUtility.HtmlEncode(model.PhoneNumber?.TrimStart('0').Trim());
+            model.Comments = WebUtility.HtmlEncode(model.Comments?.Trim());
+            model.Addressline = WebUtility.HtmlEncode(model.Addressline.Trim());
             model.PinCodeId = model.SelectedPincodeId;
             model.DistrictId = model.SelectedDistrictId;
             model.StateId = model.SelectedStateId;
@@ -316,12 +316,12 @@ namespace risk.control.system.Services.AgencyAdmin
             user.ProfilePictureExtension = input.ProfilePictureExtension ?? user.ProfilePictureExtension;
 
             var textInfo = CultureInfo.CurrentCulture.TextInfo;
-            user.FirstName = WebUtility.HtmlEncode(textInfo.ToTitleCase(input.FirstName.ToLower()));
-            user.LastName = WebUtility.HtmlEncode(textInfo.ToTitleCase(input.LastName.ToLower()));
+            user.FirstName = WebUtility.HtmlEncode(textInfo.ToTitleCase(input.FirstName.Trim().ToLower()));
+            user.LastName = WebUtility.HtmlEncode(textInfo.ToTitleCase(input.LastName.Trim().ToLower()));
 
-            user.Addressline = WebUtility.HtmlEncode(input.Addressline);
-            user.Comments = WebUtility.HtmlEncode(input.Comments);
-            user.PhoneNumber = input.PhoneNumber?.TrimStart('0');
+            user.Addressline = WebUtility.HtmlEncode(input.Addressline.Trim());
+            user.Comments = WebUtility.HtmlEncode(input.Comments?.Trim());
+            user.PhoneNumber = input.PhoneNumber?.TrimStart('0').Trim();
             user.Active = input.Active;
 
             user.PinCodeId = input.SelectedPincodeId;

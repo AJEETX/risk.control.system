@@ -14,6 +14,7 @@
         if (!$ifscInput.length) return;
 
         var code = ($ifscInput.val() || '').toUpperCase().trim();
+        if (code === '') return;
         $ifscInput.val(code);
 
         // Reset UI
@@ -136,14 +137,8 @@
         validateBankCode();
     });
 
-    var existing = ($('#IFSCCode').val() || '').trim();
-    if (existing.length > 0) {
-        validateBankCode();
-    }
-    else {
-        setLabels();
-    }
-
+    validateBankCode();
+    setLabels();
     $('input.auto-dropdown, #IFSCCode').on('focus', function () {
         $(this).select();
     });

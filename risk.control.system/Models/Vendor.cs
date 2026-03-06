@@ -16,7 +16,10 @@ namespace risk.control.system.Models
         [StringLength(50, MinimumLength = 3, ErrorMessage = "Name must be between 3 and 50 characters.")]
         public string Name { get; set; } = string.Empty;
 
+        [Required]
         [Display(Name = "Phone number")]
+        [DataType(DataType.PhoneNumber)]
+        [StringLength(10, MinimumLength = 9, ErrorMessage = "PhoneNumber must be between 9 and 10 characters.")]
         public string PhoneNumber { get; set; } = string.Empty;
 
         public string Email { get; set; } = string.Empty;
@@ -48,12 +51,15 @@ namespace risk.control.system.Models
         public District? District { get; set; } = default!;
 
         [Display(Name = "Bank Name")]
+        [StringLength(50, MinimumLength = 3, ErrorMessage = "BankName must be between 3 and 50 characters.")]
         public string? BankName { get; set; } = default!;
 
         [Display(Name = "Bank Account Number")]
+        [StringLength(50, MinimumLength = 3, ErrorMessage = "BankAccountNumber must be between 3 and 50 characters.")]
         public string? BankAccountNumber { get; set; } = default!;
 
         [Display(Name = "IFSC code")]
+        [StringLength(15, MinimumLength = 6, ErrorMessage = "Code must be between 6 and 15 characters.")]
         public string? IFSCCode { get; set; } = default!;
 
         [Display(Name = "Agreement date")]

@@ -12,26 +12,21 @@ namespace risk.control.system.Models
         [EmailAddress]
         public string? SenderEmail { get; set; }
 
-        public string? SenderPhone { get; set; }
-
         [EmailAddress]
         public string? RecepicientEmail { get; set; }
 
-        public string? RecepicientPhone { get; set; }
         public bool IsCustomer { get; set; } = false;
-        public DateTime? ScheduleTime { get; set; }
+
+        [StringLength(50, MinimumLength = 3, ErrorMessage = "Message must be between 3 and 50 characters.")]
         public string? Message { get; set; }
+
         public long? InvestigationTaskId { get; set; }
-        public long? PreviousCaseMessageId { get; set; }
 
         public override string ToString()
         {
             return $"Claim Message Information:\n" +
                 $"- Sender Email: {SenderEmail}\n" +
-                $"- Sender Phone: {SenderPhone}\n" +
                 $"- Recepicient Email: {RecepicientEmail}\n" +
-                $"- Recepicient Phone: {RecepicientPhone}\n" +
-                $"- Schedule Time: {ScheduleTime}\n" +
                 $"- Message: {Message}\n";
         }
     }
