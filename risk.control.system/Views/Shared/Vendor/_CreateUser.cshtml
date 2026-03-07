@@ -94,13 +94,25 @@
         
     </div>
     <div class="col-md-6">
-         @if(Model.Role == null)
+         
+        <partial name="_Address" model="@Model" />
+        <div class="form-group">
+            <label class="input-group-label" for="Addressline"> Address:</label>
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text"><i class="fas fa-home"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                </div>
+                <input type="text" id="Addressline" asp-for="Addressline" class="form-control remarks" placeholder="Street Address..."  maxlength="70" required />
+                <span asp-validation-for="Addressline" class="text-danger"></span>
+            </div>
+        </div>
+        @if (Model.Role == null)
         {
             <div class="form-group">
                 <label class="input-group-label" for="UserRole"> Role:</label>
                 <div class="input-group mb-3">
                     <div class="input-group-prepend">
-                        <span class="input-group-text" ><i class="nav-icon fas fa-file-invoice"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                        <span class="input-group-text"><i class="nav-icon fas fa-file-invoice"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                     </div>
                     
                     <select required asp-for="@Model.Role" class="form-control remarks" asp-items="@Model.AvailableRoles">
@@ -125,17 +137,6 @@
             </div>
         }
    
-        <partial name="_Address" model="@Model" />
-        <div class="form-group">
-            <label class="input-group-label" for="Addressline"> Address:</label>
-            <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                    <span class="input-group-text"><i class="fas fa-home"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                </div>
-                <input type="text" id="Addressline" asp-for="Addressline" class="form-control remarks" placeholder="Street Address..."  maxlength="70" required />
-                <span asp-validation-for="Addressline" class="text-danger"></span>
-            </div>
-        </div>
         @if(Model.Active)
         {
             <div class="form-group">
