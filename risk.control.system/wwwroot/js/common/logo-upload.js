@@ -12,7 +12,7 @@
         const companyId = urlParts[urlParts.length - 1];
         const displayName = "Logo.png";
 
-        fileLabel.addClass("selected").html(displayName);
+        fileLabel.addClass("selected valid").html(displayName);
         fileInput.attr('data-bs-toggle', "tooltip");
         fileInput.attr('data-bs-original-title', displayName);
         fileInput.attr('title', displayName);
@@ -22,7 +22,7 @@
     fileInput.on('change', function () {
         const fileName = $(this).val().split('\\').pop();
         if (fileName) {
-            fileLabel.addClass("selected").html(fileName);
+            fileLabel.addClass("selected valid").html(fileName);
         } else {
             fileLabel.removeClass("selected").html("Choose logo...");
         }

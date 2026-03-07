@@ -104,6 +104,18 @@
 						</div>
 					</div>
 					<div class="col-md-6">
+						
+						<partial name="_Address" model="@Model" />
+
+						<div class="form-group">
+							<label class="input-group-label" for="Addressline"> Address:</label>
+							<div class="input-group mb-3">
+								<div class="input-group-prepend">
+									<span class="input-group-text"><i class="fa fa-home"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
+								</div>
+								<input type="text" id="Addressline" asp-for="Addressline" class="form-control remarks" required placeholder="Street Address..." maxlength="70" />
+							</div>
+						</div>
 						<div class="form-group">
 							<label class="input-group-label" for="UserRole"> Role:</label>
 							<div class="input-group mb-3">
@@ -123,17 +135,6 @@
 									</select>
 								}
 								<span asp-validation-for="@Model.Role" class="text-danger"></span>
-							</div>
-						</div>
-						<partial name="_Address" model="@Model" />
-
-						<div class="form-group">
-							<label class="input-group-label" for="Addressline"> Address:</label>
-							<div class="input-group mb-3">
-								<div class="input-group-prepend">
-									<span class="input-group-text"><i class="fa fa-home"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
-								</div>
-								<input type="text" id="Addressline" asp-for="Addressline" class="form-control remarks" required placeholder="Street Address..." maxlength="70" />
 							</div>
 						</div>
 						<div class="form-group">

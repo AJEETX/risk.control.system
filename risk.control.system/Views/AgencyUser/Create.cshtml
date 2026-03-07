@@ -18,7 +18,7 @@
 				<div class="col-md-6">
 					<div class="form-group mb-0">
 						<label class="input-group-label" for="emailAddress">
-							<strong>Step 1:</strong> Verify Email <small>(minimum 5 characters)</small>
+							<strong>Step 1:</strong> Verify Email <small class="i-red">(minimum 5 characters)</small>
 						</label>
 						<div class="input-group">
 							<div class="input-group-append">
@@ -49,14 +49,15 @@
 			<input type="hidden" id="emailSuffix" name="emailSuffix" value="@email" />
 			<input type="hidden" id="txn" name="txn" value="agency" />
 			<div asp-validation-summary="ModelOnly" class="text-danger"></div>
-			<fieldset id="user-details-fields" disabled>
 			<div class="card shadow-lg border-1 rounded-lg mb-4">
 				<div class="card-header justify-content-center">
 					<h3 class="card-title"><i class="fas fa-edit mr-2"></i><strong> Step 2: User Information </strong></h3>
 				</div>
+			<fieldset id="details-fields" disabled>
 				<div class="card-body pb-1">
 				<partial name="Vendor/_CreateUser" model="Model" />
 			</div>
+			</fieldset>
 			<div class="card-footer">
 				<div class="row">
 					<div class="col-md-12">
@@ -76,7 +77,6 @@
 				</div>
 			</div>
 			</div>
-			</fieldset>
 		</form>
 </section>
 @section Scripts {

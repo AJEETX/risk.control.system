@@ -169,18 +169,22 @@ function alphaOnly(event) {
     return ((key >= 65 && key <= 90) || key == 8);
 };
 function checkUserEmail() {
-    const $detailsFieldset = $('#user-details-fields');
+    const $detailsFieldset = $('#details-fields');
     var url = "/api/MasterData/CheckUserEmail";
     var name = $('#emailAddress').val().toLowerCase();
     var emailSuffix = $('#emailSuffix').val().toLowerCase();
     $('#mailAddress').val('');
     if (name) {
+        $('#result').fadeOut(1000); // 1.5 seconds
+        $('#result').fadeOut('slow'); // 1.5 seconds
         $.get(url, { input: name + '@' + emailSuffix }, function (data) {
             if (data === 0) { //available
                 $('#mailAddress').val($('#emailAddress').val());
                 $("#result").html("<span class='available' data-toggle='tooltip' title='Available' data-toggle='tooltip'> <i class='fas fa-check'></i></span>");
                 $('#result').addClass('result-padding');
                 $("#emailAddress").removeClass('error-border');
+                $('#result').fadeIn(1000); // 1.5 seconds
+                $('#result').fadeIn('slow'); // 1.5 seconds
                 $detailsFieldset.prop('disabled', false);
             }
             else if (data === 1) { //domain exists
@@ -188,6 +192,8 @@ function checkUserEmail() {
                 $("#result").html("<span class='unavailable' data-toggle='tooltip' title='Email exists' data-toggle='tooltip'><i class='fa fa-times-circle'></i></span>");
                 $('#result').addClass('result-padding');
                 $("#emailAddress").addClass('error-border');
+                $('#result').fadeIn(1000); // 1.5 seconds
+                $('#result').fadeIn('slow'); // 1.5 seconds
                 $detailsFieldset.prop('disabled', true);
             }
 
