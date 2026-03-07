@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using risk.control.system.Models.ViewModel;
 
 namespace risk.control.system.Models
 {
@@ -9,12 +10,14 @@ namespace risk.control.system.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long ClientCompanyId { get; set; }
 
+        public Domain? DomainName { get; set; } = Domain.com;
+
         [Display(Name = "Insurer name")]
         [StringLength(50, MinimumLength = 3, ErrorMessage = "Name must be between 3 and 50 characters.")]
         public string Name { get; set; } = default!;
 
         [Display(Name = "Phone number")]
-        [StringLength(10, MinimumLength = 9, ErrorMessage = "PhoneNumber must be between 9 and 10 characters.")]
+        [StringLength(13, MinimumLength = 9, ErrorMessage = "PhoneNumber must be between 9 and 13 characters.")]
         public string PhoneNumber { get; set; } = default!;
 
         [StringLength(50, MinimumLength = 3, ErrorMessage = "Email must be between 3 and 30 characters.")]

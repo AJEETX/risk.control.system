@@ -11,12 +11,12 @@ namespace risk.control.system.Models
 
         [Display(Name = "District name")]
         [Required]
-        [StringLength(50, MinimumLength = 3, ErrorMessage = "Name must be between 3 and 50 characters.")]
+        [StringLength(50, MinimumLength = 2, ErrorMessage = "Name must be between 2 and 50 characters.")]
         public string Name { get; set; } = "";
 
         [Display(Name = "District code")]
         [Required]
-        [StringLength(50, MinimumLength = 3, ErrorMessage = "Code must be between 3 and 50 characters.")]
+        [StringLength(50, MinimumLength = 2, ErrorMessage = "Code must be between 2 and 50 characters.")]
         public string Code { get; set; } = default!;
 
         [Display(Name = "State name")]

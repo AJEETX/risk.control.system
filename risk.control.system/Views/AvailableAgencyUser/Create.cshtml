@@ -18,7 +18,7 @@
 				<div class="col-md-6">
 					<div class="form-group mb-0">
 						<label class="input-group-label" for="emailAddress">
-							<strong>Step 1:</strong> Verify Email <small>(minimum 5 characters)</small>
+							<strong>Step 1:</strong> Verify Email <small class="i-red">(minimum 5 characters)</small>
 						</label>
 						<div class="input-group">
 							<div class="input-group-append">
@@ -45,39 +45,40 @@
 		</div>
 	</div>
 
-		<form id="create-form" asp-action="Create" enctype="multipart/form-data" autocomplete="off">
-			<input type="hidden" id="emailSuffix" name="emailSuffix" value="@email" />
-			<input type="hidden" id="txn" name="txn" value="vendor" />
-			<div asp-validation-summary="ModelOnly" class="text-danger"></div>
-			<fieldset id="user-details-fields" disabled>
-				<div class="card shadow-lg border-1 rounded-lg mb-4">
-					<div class="card-header justify-content-center">
-						<h3 class="card-title"><i class="fas fa-edit mr-2"></i><strong> Step 2: User Information </strong></h3>
-					</div>
+	<form id="create-form" asp-action="Create" enctype="multipart/form-data" autocomplete="off">
+		<input type="hidden" id="emailSuffix" name="emailSuffix" value="@email" />
+		<input type="hidden" id="txn" name="txn" value="vendor" />
+		<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+			<div class="card shadow-lg border-1 rounded-lg mb-4">
+				<div class="card-header justify-content-center">
+					<h3 class="card-title"><i class="fas fa-edit mr-2"></i><strong> Step 2: User Information </strong></h3>
+				</div>
+			<fieldset id="details-fields" disabled>
 				<div class="card-body pb-1">
 					<partial name="Vendor/_CreateUser" model="Model" />
-			</div>
-			<div class="card-footer">
-				<div class="row">
-					<div class="col-md-12">
-						<div class="form-group text-right">
-							@*  <button id="reset" type="submit" onclick="clearAllInputs()" class="btn btn-outline-secondary">
+				</div>
+			</fieldset>
+
+				<div class="card-footer">
+					<div class="row">
+						<div class="col-md-12">
+							<div class="form-group text-right">
+								@*  <button id="reset" type="submit" onclick="clearAllInputs()" class="btn btn-outline-secondary">
                             <i class="fas fa-undo"></i> Reset
                             </button> *@
-							<a id="cancel" asp-controller="AvailableAgencyUser" asp-action="Users" asp-route-id="@Model.Vendor.VendorId" class="btn btn-secondary">
-								<i class="fa fa-window-close"></i>
-								@Applicationsettings.CANCEL
-							</a>
-							<button disabled id="create" type="submit" class="btn btn-success">
-								<i class="fas fa-user-plus"></i> Add User
-							</button>
+								<a id="cancel" asp-controller="AvailableAgencyUser" asp-action="Users" asp-route-id="@Model.Vendor.VendorId" class="btn btn-secondary">
+									<i class="fa fa-window-close"></i>
+									@Applicationsettings.CANCEL
+								</a>
+								<button disabled id="create" type="submit" class="btn btn-success">
+									<i class="fas fa-user-plus"></i> Add User
+								</button>
+							</div>
 						</div>
 					</div>
 				</div>
-				</div>
 			</div>
-			</fieldset>
-		</form>
+	</form>
 </section>
 
 @section Scripts {
