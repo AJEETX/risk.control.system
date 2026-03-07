@@ -4,6 +4,7 @@
 	ViewData["Title"] = "Details";
 
 	// Initialize variables
+	bool policyExists = Model.ClaimsInvestigation.PolicyDetail != null;
 	bool customerExist = Model.ClaimsInvestigation.CustomerDetail != null;
 	bool beneficiaryExist = Model.Beneficiary?.BeneficiaryDetailId > 0;
 
@@ -11,7 +12,7 @@
 	string beneficiaryProgressbarMessage = beneficiaryExist ? "edit beneficiary" : "beneficiary";
 
 	string customerProgressColor = customerExist ? "steps" : "steps2";
-	string customerLineColor = Model.ClaimsInvestigation.PolicyDetail != null ? "line0" : customerExist ? "line1" : "line";
+	string customerLineColor = (policyExists && customerExist) ? "line1" : (policyExists && !customerExist) ? "line0" : "line";
 
 	string beneficiaryProgressColor = customerExist && beneficiaryExist ? "steps" : customerExist ? "steps2" : "steps3";
 	string beneficiaryLineColor = customerExist && beneficiaryExist ? "line1" : customerExist ? "line0" : "line";
@@ -102,15 +103,15 @@
 		</div>
 		<div class="container d-flex justify-content-center align-items-center">
 			<div class="progresses">
-				<div class="steps">
+				<div class="steps" title="Policy detail" data-bs-toggle="tooltip">
 					<span> <i class="far fa-file-powerpoint"></i></span>
 				</div>
 				<span class="@customerLineColor"></span>
-				<div class="@customerProgressColor">
+				<div class="@customerProgressColor" title="Customer detail" data-bs-toggle="tooltip">
 					<span class="font-weight-bold"><i class="fa fa-user-plus"></i></span>
 				</div>
 				<span class="@beneficiaryLineColor"></span>
-				<div class="@beneficiaryProgressColor">
+				<div class="@beneficiaryProgressColor" title="Beneficiary detail" data-bs-toggle="tooltip">
 					<span class="font-weight-bold"><i class="fas fa-user-tie"></i></span>
 				</div>
 			</div>
