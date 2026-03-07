@@ -24,19 +24,22 @@
 						<input type="hidden" id="Isd" value="@Model?.Country.ISDCode" />
 						<input type="hidden" id="countryCode" value="@Model?.Country.Code" />
 						<!-- Profile Image Section -->
-						<div class="form-group text-center">
+						<div class="form-group text-center image-logo-container">
 							<div class="profile-img-container mb-2">
 								<img id="document-Image" class="form-Image img-circle" src="/Document/GetUserProfileImage/@Model?.Id" title="User Photo" alt="User" data-bs-toggle="tooltip" />
 							</div>
 
 							<div class="control-label">User Photo <i class="fa fa-asterisk asterik-style-logo"></i></div>
-
+							<div class="row justify-content-center">
+								<div class="col-10 col-md-8">
 							<div class="custom-file text-left">
 								<input id="createImageInput" accept=".jpg,.jpeg,.png" asp-for="ProfileImage"
 									   class="custom-file-input document-image-input" type="file"
 									   data-preview-id="createProfileImage" data-title-id="user-document" title="Upload User Photo" data-bs-toggle="tooltip" />
 								<span asp-validation-for="ProfileImage" class="text-danger"></span>
 								<label class="custom-file-label text-sm remarks" for="createImageInput">Choose User Photo...</label>
+							</div>
+							</div>
 							</div>
 						</div>
 						<!-- Name Sections (First & Last) -->
