@@ -3,12 +3,11 @@
 <input type="hidden" asp-for="Email" id="mailAddress" />
 <input type="hidden" id="Isd" value="@Model?.Country.ISDCode" />
 <input type="hidden" id="countryCode" value="@Model?.Country.Code" />
-<h5 class="text-muted mb-4"><i class="fas fa-edit mr-2"></i> Step 2: User Information</h5>
 
 <div class="row">
     <div class="col-md-6">
 
-        <div class="form-group text-center">
+        <div class="form-group text-center image-logo-container">
             <div class="profile-img-container mb-2">
                 <img id="document-Image" class="form-Image img-circle" src="@Applicationsettings.NO_USER" title="User Photo" alt="User" data-bs-toggle="tooltip" />
             </div>
