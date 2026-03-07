@@ -2217,7 +2217,6 @@ select#PinCodeId {
     height: 11.6em; /* Set the desired height */
     border: 3px solid #ccc; /* Add a border around the image */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Adds a subtle shadow around the image */
-    object-fit: cover; /* Ensures the image maintains aspect ratio while filling the area */
     transition: transform 0.3s ease; /* Smooth transition effect on hover */
 }
 
@@ -4324,4 +4323,9 @@ h2.lead {
     margin-top:3px;
     margin-left:2px !important;
     float:left !important;
+}
+div.form-group.text-center.image-logo-container {
+    border-bottom: 2px solid #ddd;
+    background-color: whitesmoke;
+    border-radius: 1em;
 }
