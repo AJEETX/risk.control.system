@@ -133,6 +133,7 @@ function alphaOnly(event) {
 function checkDomain() {
     $("#domainAddress").val('');
     $('#mailAddress').val('');
+    const $detailsFieldset = $('#details-fields');
 
     var url = "/api/Masterdata/CheckAgencyName";
     var name = $('#emailAddress').val().toLowerCase();
@@ -151,6 +152,7 @@ function checkDomain() {
                 $("#emailAddress").removeClass('error-border');
                 $('#result').fadeIn(1000); // 1.5 seconds
                 $('#result').fadeIn('slow'); // 1.5 seconds
+                $detailsFieldset.prop('disabled', false);
             }
             else if (data == 1) {//domain exists
                 $("#domainAddress").val('');
@@ -160,10 +162,13 @@ function checkDomain() {
                 $("#emailAddress").addClass('error-border');
                 $('#result').fadeIn(1000); // 1.5 seconds
                 $('#result').fadeIn('slow'); // 1.5 seconds
+                $detailsFieldset.prop('disabled', true);
             }
             else if (data = null || data == undefined) {
                 $("#domainAddress").val('');
                 $('#mailAddress').val('');
+                $detailsFieldset.prop('disabled', true);
+                $("#result").empty();
             }
         });
     }
