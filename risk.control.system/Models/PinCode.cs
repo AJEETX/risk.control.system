@@ -11,12 +11,12 @@ namespace risk.control.system.Models
 
         [Display(Name = "PinCode name")]
         [Required]
-        [StringLength(50, MinimumLength = 3, ErrorMessage = "Name must be between 3 and 50 characters.")]
+        [StringLength(50, MinimumLength = 2, ErrorMessage = "Name must be between 2 and 50 characters.")]
         public string Name { get; set; } = default!;
 
         [Display(Name = "PinCode")]
         [Required]
-        [StringLength(50, MinimumLength = 3, ErrorMessage = "Name must be between 3 and 50 characters.")]
+        [StringLength(50, MinimumLength = 2, ErrorMessage = "Code must be between 2 and 50 characters.")]
         public int Code { get; set; } = default!;
 
         public string? Latitude { get; set; }

@@ -128,18 +128,8 @@ $(document).ready(function () {
             );
         }
     });
-
-    $('input#emailAddress').on('input change focus', function () {
-        if ($(this).val() !== '' && $(this).val().length > 4) {
-            $('#check-domain').prop('disabled', false).removeClass('disabled-btn').addClass('enabled-btn');
-        } else {
-            $('#check-domain').prop('disabled', true).removeClass('enabled-btn').addClass('disabled-btn');
-        }
-    });
 });
 function alphaOnly(event) {
     var key = event.keyCode;
     return ((key >= 65 && key <= 90) || key == 8);
 };
-
-$('#emailAddress').focus();

@@ -1,5 +1,4 @@
-﻿using System.Globalization;
-using AspNetCoreHero.ToastNotification.Abstractions;
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -76,7 +75,7 @@ namespace risk.control.system.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(ClientCompany clientCompany, string domainAddress, string mailAddress)
+        public async Task<IActionResult> Create(ClientCompany clientCompany, string domainAddress)
         {
             if (clientCompany is null || clientCompany.SelectedCountryId < 1 || clientCompany.SelectedStateId < 1 || clientCompany.SelectedDistrictId < 1 || clientCompany.SelectedPincodeId < 1)
             {
@@ -90,7 +89,7 @@ namespace risk.control.system.Controllers
             }
             Domain domainData = (Domain)Enum.Parse(typeof(Domain), domainAddress, true);
 
-            clientCompany.Email = mailAddress.ToLower(CultureInfo.InvariantCulture) + domainData.GetEnumDisplayName();
+            clientCompany.Email = clientCompany.Email.ToLower() + domainData.GetEnumDisplayName();
             if (clientCompany.Document is not null)
             {
                 var (fileName, relativePath) = await fileStorageService.SaveAsync(clientCompany.Document, clientCompany.Email, "company");
