@@ -22,19 +22,19 @@
 	</div>
 	<div class="container d-flex justify-content-center align-items-center">
 		<div class="progresses">
-			<div class="steps">
+			<div class="steps" title="Policy detail" data-bs-toggle="tooltip">
 				<span> <i class="far fa-file-powerpoint"></i></span>
 			</div>
 
 			<span class="line"></span>
 
-			<div class="steps3">
+			<div class="steps3" title="Customer detail" data-bs-toggle="tooltip">
 				<span class="font-weight-bold"><i class="fa fa-user-plus"></i></span>
 			</div>
 
 			<span class="line"></span>
 
-			<div class="steps3">
+			<div class="steps3" title="Beneficiary detail" data-bs-toggle="tooltip">
 				<span class="font-weight-bold"><i class="fas fa-user-tie"></i></span>
 			</div>
 		</div>
@@ -46,13 +46,13 @@
 		<div class="row top-margin-10">
 			<div class="col-md-6">
 
-				<div class="form-group text-center">
+				<div class="form-group text-center image-logo-container">
 					<div class="profile-img-container">
 						<img id="document-Image" class="form-Image" src="/img/add-file.png" title="Case Document" alt="Case Document" data-bs-toggle="tooltip" />
 					</div>
 					<div class="row justify-content-center">
 						<div class="col-10 col-md-8">
-							<div class="custom-file text-left">
+							<div class="custom-file text-center">
 								<label for="createImageInput" class="control-label">Case Document <i class="fa fa-asterisk asterik-style-logo"></i></label>
 								<input id="createImageInput" accept=".jpg,.jpeg,.png" required asp-for="Document" class="form-control remarks document-image-input" type="file" data-preview-id="documentImage" data-title-id="case-document" title="Upload Case Document" data-bs-toggle="tooltip" />
 								<span asp-validation-for="Document" class="text-danger"></span>

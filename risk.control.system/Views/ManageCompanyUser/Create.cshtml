@@ -44,118 +44,117 @@
 				</div>
 			</div>
 		</div>
+	</div>
 
-		<div class="py-2">
-			<hr class="mx-4" />
-		</div>
+	<form id="create-form" asp-action="Create" enctype="multipart/form-data" autocomplete="off">
+		<input type="hidden" asp-for="Email" id="mailAddress" />
+		<input type="hidden" id="Isd" value="@Model?.Country.ISDCode" />
+		<input type="hidden" id="countryCode" value="@Model?.Country.Code" />
+		<input type="hidden" id="emailSuffix" name="emailSuffix" value="@email" />
+		<input type="hidden" asp-for="ClientCompanyId" value="@Model.ClientCompany.ClientCompanyId" />
+		<fieldset id="user-details-fields" disabled>
+			<div class="card shadow-lg border-1 rounded-lg mb-4">
+				<div class="card-header justify-content-center">
+					<h3 class="card-title"><i class="fas fa-edit mr-2"></i><strong> Step 2: User Information </strong></h3>
+				</div>
+				<div class="card-body pb-1">
+				<div class="row">
+					<div class="col-md-6">
+						<div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-		<form id="create-form" asp-action="Create" enctype="multipart/form-data" autocomplete="off">
-			<input type="hidden" asp-for="Email" id="mailAddress" />
-			<input type="hidden" id="Isd" value="@Model?.Country.ISDCode" />
-			<input type="hidden" id="countryCode" value="@Model?.Country.Code" />
-			<input type="hidden" id="emailSuffix" name="emailSuffix" value="@email" />
-			<input type="hidden" asp-for="ClientCompanyId" value="@Model.ClientCompany.ClientCompanyId" />
-			<fieldset id="user-details-fields" disabled>
-				<div class="card-body pt-0">
-					<h5 class="text-muted mb-4"><i class="fas fa-edit mr-2"></i> Step 2: User Information</h5>
-					<div class="row">
-						<div class="col-md-6">
-							<div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
-							<div class="form-group text-center">
-								<div class="profile-img-container mb-2">
-									<img id="document-Image" class="form-Image img-circle" src="@Applicationsettings.NO_USER" title="User Photo" alt="User" data-bs-toggle="tooltip" />
-								</div>
-								<div class="control-label">User Photo <i class="fa fa-asterisk asterik-style-logo"></i></div>
-								<div class="row justify-content-center">
-									<div class="col-10 col-md-8">
-								<div class="custom-file text-left">
-									<input id="createImageInput" accept=".jpg,.jpeg,.png" asp-for="ProfileImage" required
-										   class="custom-file-input document-image-input remarks" type="file"
-										   data-preview-id="createProfileImage" data-title-id="user-document" title="Choose User Photo" data-bs-toggle="tooltip" />
-									<span asp-validation-for="ProfileImage" class="text-danger"></span>
-									<label class="custom-file-label text-sm remarks" for="createImageInput">Choose User Photo...</label>
-								</div>
-								</div>
+							<div class="form-group text-center image-logo-container">
+							<div class="profile-img-container mb-2">
+								<img id="document-Image" class="form-Image img-circle" src="@Applicationsettings.NO_USER" title="User Photo" alt="User" data-bs-toggle="tooltip" />
+							</div>
+							<div class="control-label">User Photo <i class="fa fa-asterisk asterik-style-logo"></i></div>
+							<div class="row justify-content-center">
+								<div class="col-10 col-md-8">
+									<div class="custom-file text-left">
+										<input id="createImageInput" accept=".jpg,.jpeg,.png" asp-for="ProfileImage" required
+											   class="custom-file-input document-image-input remarks" type="file"
+											   data-preview-id="createProfileImage" data-title-id="user-document" title="Choose User Photo" data-bs-toggle="tooltip" />
+										<span asp-validation-for="ProfileImage" class="text-danger"></span>
+										<label class="custom-file-label text-sm remarks" for="createImageInput">Choose User Photo...</label>
+									</div>
 								</div>
 							</div>
+						</div>
 
+						<div class="form-group">
+							<label class="input-group-label" for="FirstName"> First Name:</label>
+							<div class="input-group mb-3">
+								<div class="input-group-prepend">
+									<span class="input-group-text"><i class="fa fa-user"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+								</div>
+								<input type="text" id="FirstName" asp-for="FirstName" class="form-control title-name remarks" required placeholder="First Name" minlength="3" maxlength="20" autocomplete="off">
+									<span asp-validation-for="FirstName" class="text-danger"></span>
+								</div>
+							</div>
 							<div class="form-group">
-								<label class="input-group-label" for="FirstName"> First Name:</label>
+								<label class="input-group-label" for="LastName"> Last Name:</label>
 								<div class="input-group mb-3">
 									<div class="input-group-prepend">
-										<span class="input-group-text"><i class="fa fa-user"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+										<span class="input-group-text"> <i class="fa fa-user"></i> <i class="fa fa-asterisk asterik-style"></i></span>
 									</div>
-									<input type="text" id="FirstName" asp-for="FirstName" class="form-control title-name remarks" required placeholder="First Name" minlength="3" maxlength="20" autocomplete="off">
-										<span asp-validation-for="FirstName" class="text-danger"></span>
+									<input type="text" id="LastName" asp-for="LastName" class="form-control title-name remarks" required placeholder="Last Name" maxlength="20" autocomplete="off">
+										<span asp-validation-for="LastName" class="text-danger"></span>
 									</div>
 								</div>
 								<div class="form-group">
-									<label class="input-group-label" for="LastName"> Last Name:</label>
-									<div class="input-group mb-3">
+									<label class="input-group-label" for="PhoneNumber"> Mobile #:</label>
+									<div class="input-group">
 										<div class="input-group-prepend">
-											<span class="input-group-text"> <i class="fa fa-user"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-										</div>
-										<input type="text" id="LastName" asp-for="LastName" class="form-control title-name remarks" required placeholder="Last Name" maxlength="20" autocomplete="off">
-											<span asp-validation-for="LastName" class="text-danger"></span>
-										</div>
-									</div>
-									<div class="form-group">
-										<label class="input-group-label" for="PhoneNumber"> Mobile #:</label>
-										<div class="input-group">
-											<div class="input-group-prepend">
-												@{
-													var imgPath = "/flags/" + @Model.Country.Code.ToLower() + ".png";
-												}
-												<span class="input-group-text country-code-text" data-bs-toggle="tooltip" title="Country Code :+@Model?.Country.ISDCode">
-													<img src="@imgPath" class="flag-icon" data-bs-toggle="tooltip" alt="flag" />  +@Model?.Country.ISDCode<i class="fa fa-asterisk asterik-style"></i>
-												</span>
-											</div>
-											<input id="PhoneNumber" type="text" asp-for="PhoneNumber" class="form-control remarks" required maxlength="10" placeholder="Enter mobile # without country-code" data-bs-toggle="tooltip" />
-											<span id="phone-spinner" class="text-secondary phone-icon d-none">
-												<i class="fas fa-spinner fa-spin"></i>
+											@{
+												var imgPath = "/flags/" + @Model.Country.Code.ToLower() + ".png";
+											}
+											<span class="input-group-text country-code-text" data-bs-toggle="tooltip" title="Country Code :+@Model?.Country.ISDCode">
+												<img src="@imgPath" class="flag-icon" data-bs-toggle="tooltip" alt="flag" />  +@Model?.Country.ISDCode<i class="fa fa-asterisk asterik-style"></i>
 											</span>
-											<span id="phone-valid" class="text-success phone-icon d-none"></span>
-											<span id="phone-invalid" class="text-danger phone-icon d-none"></span>
-											<span asp-validation-for="PhoneNumber" class="text-danger"></span>
 										</div>
+										<input id="PhoneNumber" type="text" asp-for="PhoneNumber" class="form-control remarks" required maxlength="10" placeholder="Enter mobile # without country-code" data-bs-toggle="tooltip" />
+										<span id="phone-spinner" class="text-secondary phone-icon d-none">
+											<i class="fas fa-spinner fa-spin"></i>
+										</span>
+										<span id="phone-valid" class="text-success phone-icon d-none"></span>
+										<span id="phone-invalid" class="text-danger phone-icon d-none"></span>
+										<span asp-validation-for="PhoneNumber" class="text-danger"></span>
 									</div>
 								</div>
-								<div class="col-md-6">
-									<div class="form-group">
-										<label class="input-group-label" for="Role"> Role:</label>
-										<div class="input-group mb-3">
-											<div class="input-group-prepend">
-												<span class="input-group-text"><i class="nav-icon fas fa-file-invoice"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-											</div>
-											<select id="Role" required asp-for="Role" class="form-control remarks" asp-items="@Model.AvailableRoles">
-												<option value="">--- SELECT ---</option>
-											</select>
-											<span asp-validation-for="Role" class="text-danger"></span>
+							</div>
+							<div class="col-md-6">
+								<div class="form-group">
+									<label class="input-group-label" for="Role"> Role:</label>
+									<div class="input-group mb-3">
+										<div class="input-group-prepend">
+											<span class="input-group-text"><i class="nav-icon fas fa-file-invoice"></i> <i class="fa fa-asterisk asterik-style"></i></span>
 										</div>
+										<select id="Role" required asp-for="Role" class="form-control remarks" asp-items="@Model.AvailableRoles">
+											<option value="">--- SELECT ---</option>
+										</select>
+										<span asp-validation-for="Role" class="text-danger"></span>
 									</div>
+								</div>
 
-									<partial name="_Address" model="@Model" />
+								<partial name="_Address" model="@Model" />
 
-									<div class="form-group">
-										<label class="input-group-label" for="Addressline"> Address:</label>
-										<div class="input-group mb-3">
-											<div class="input-group-prepend">
-												<span class="input-group-text"><i class="fa fa-home"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
-											</div>
-											<input type="text" id="Addressline" asp-for="Addressline" class="form-control remarks" placeholder="Street Address..." required maxlength="70" autocomplete="off" />
-											<span asp-validation-for="Addressline" class="text-danger"></span>
+								<div class="form-group">
+									<label class="input-group-label" for="Addressline"> Address:</label>
+									<div class="input-group mb-3">
+										<div class="input-group-prepend">
+											<span class="input-group-text"><i class="fa fa-home"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
 										</div>
+										<input type="text" id="Addressline" asp-for="Addressline" class="form-control remarks" placeholder="Street Address..." required maxlength="70" autocomplete="off" />
+										<span asp-validation-for="Addressline" class="text-danger"></span>
 									</div>
+								</div>
 
-									<div class="form-group">
-										<label class="input-group-label" for="Comments"> Note:</label>
-										<div class="input-group mb-3">
-											<div class="input-group-prepend">
-												<span class="input-group-text"> <i class="fa fa-asterisk asterik-style-none"></i><i class="fas fa-comment"></i> </span>
-											</div>
-											<input type="text" id="Comments" asp-for="Comments" class="form-control remarks" placeholder="Notes (optional)" maxlength="70" autocomplete="off" />
+								<div class="form-group">
+									<label class="input-group-label" for="Comments"> Note:</label>
+									<div class="input-group mb-3">
+										<div class="input-group-prepend">
+											<span class="input-group-text"> <i class="fa fa-asterisk asterik-style-none"></i><i class="fas fa-comment"></i> </span>
 										</div>
+										<input type="text" id="Comments" asp-for="Comments" class="form-control remarks" placeholder="Notes (optional)" maxlength="70" autocomplete="off" />
 									</div>
 								</div>
 							</div>
@@ -173,9 +172,10 @@
 								</div>
 							</div>
 						</div>
-					</fieldset>
-				</form>
-			</div>
+					</div>
+					</div>
+				</fieldset>
+			</form>
 		</section>
 
 		@section Scripts {

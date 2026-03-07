@@ -38,19 +38,18 @@
 				</div>
 			</div>
 		</div>
-		
-		<div class="py-2">
-			<hr class="mx-4" />
-		</div>
+	</div>
 
 		<form id="create-form" asp-action="Create" enctype="multipart/form-data" method="post" autocomplete="off">
 			<input type="hidden" asp-for="Email" id="mailAddress" />
 			<input type="hidden" asp-for="DomainName" id="domainAddress" name="domainAddress" />
+			<div class="card shadow-lg border-1 rounded-lg mb-4">
+			<div class="card-header justify-content-center">
+				<h3 class="card-title"><i class="fas fa-edit mr-2"></i><strong> Step 2: Agency Information </strong></h3>
+			</div>
 			<partial name="Vendor/_Create" model="Model" />
-
-			
+			</div>
 		</form>
-	</div>
 </section>
 
 @section Scripts {
