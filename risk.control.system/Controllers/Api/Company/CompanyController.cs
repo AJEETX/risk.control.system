@@ -43,8 +43,8 @@ namespace risk.control.system.Controllers.Api.Company
             }
         }
 
-        [HttpGet("GetEmpanelledVendors")]
-        public async Task<IActionResult> GetEmpanelledVendors()
+        [HttpGet("GetAllEmpanelledAgencies")]
+        public async Task<IActionResult> GetAllEmpanelledAgencies()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 
