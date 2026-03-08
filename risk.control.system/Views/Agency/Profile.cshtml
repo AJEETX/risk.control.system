@@ -25,8 +25,8 @@
                         <img src="/Document/GetAgencyDocument/@Model?.VendorId"
                                  class="shadow-lg border profile-img" alt="User Profile" title="@Model.Email" data-bs-toggle="tooltip" />
                         </div>
-                    <h5 class="mt-3 blue" title="@Model.Name" data-bs-toggle="tooltip">@Model.Name</h5>
-                        
+                    <h5 class="mt-3" title="@Model.Name" data-bs-toggle="tooltip">@Model.Name</h5>
+
                     <ul class="ml-4 mb-0 fa-ul text-muted" title="Rating" data-bs-toggle="tooltip">
                             <li class="small">
                                 <div class="col-md-12" id="agency-rating">
@@ -45,7 +45,6 @@
                                             decimal a = @Model.RateTotal.Value / @Model.RateCount.Value;
                                             <span class="avr"> @a</span>
                                         }
-
                                     </span>
                                     <div class="badge badge-light">
                                         <span id="rating-result-data" class="result"></span>
@@ -53,36 +52,23 @@
                                 </div>
                             </li>
                         </ul>
-                        <div class="dropdown-divider"></div>
-
-
-                        <div class="card-footer">
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <p class="info-box-number">
-                                        <a id="editagency" asp-controller="Agency" asp-action="Edit" class="btn btn-warning"><i class='fas fa-building'></i> Edit Agency</a>
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                     <!-- Left Column -->
                     <div class="col-md-4">
                         <div class="info-box">
                             <span class="info-box-icon bg-primary"><i class="fas fa-envelope"></i></span>
                             <div class="info-box-content">
-                                <span class="info-box-text">Domain</span>
-                                <span class="info-box-number"><a href="#">@Model.Email</a></span>
+                                <span class="info-box-text">Domain name</span>
+                            <span class="info-box-number"><span class="blue">@Model.Email</span></span>
                             </div>
                         </div>
-
-                        <div class="info-box">
-                            <span class="info-box-icon bg-success"><i class="fas fa-phone"></i></span>
-                            <div class="info-box-content">
-                                <span class="info-box-text">Mobile #</span>
-                                <span class="info-box-number">+@Model.Country.ISDCode (0) @Model.PhoneNumber</span>
-                            </div>
+                    <div class="info-box">
+                        <span class="info-box-icon bg-success"><i class="fa fa-toggle-on"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text">Status </span>
+                            <span class="info-box-number">@Model.Status </span>
                         </div>
+                    </div>
                         <div class="info-box">
                             <span class="info-box-icon bg-info"><i class="fas fa-landmark"></i></span>
                             <div class="info-box-content">
@@ -117,13 +103,7 @@
                             </div>
                         </div>
 
-                        <div class="info-box">
-                            <span class="info-box-icon bg-warning"><i class="fas fa-map-pin"></i></span>
-                            <div class="info-box-content">
-                                <span class="info-box-text">Pin Code</span>
-                                <span class="info-box-number">@Model.PinCode.Code</span>
-                            </div>
-                        </div>
+                        
                         <div class="info-box">
                             <span class="info-box-icon bg-secondary"><i class="fas fa-city"></i></span>
                             <div class="info-box-content">
@@ -147,10 +127,25 @@
                                 <span class="info-box-number">@Model.Country.Name</span>
                             </div>
                         </div>
-
+                    <div class="info-box">
+                        <span class="info-box-icon bg-warning"><i class="fas fa-map-pin"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text">Pin Code</span>
+                            <span class="info-box-number">@Model.PinCode.Name - @Model.PinCode.Code</span>
+                        </div>
+                    </div>
                     </div>
                 </div>
             </div>
+        <div class="card-footer">
+            <div class="row float-right">
+                <div class="col-md-12">
+                    <p class="info-box-number">
+                        <a id="editagency" asp-controller="Agency" asp-action="Edit" class="btn btn-warning"><i class='fas fa-building'></i> Edit Agency</a>
+                    </p>
+                </div>
+            </div>
+        </div>
         </div>
 </section>
 

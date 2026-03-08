@@ -16,10 +16,7 @@
 								<i class="fas fa-info-circle"></i>
 								<span class="tooltip-text" id="information">
 									<span>
-										INVESTIGATION SERVICE INVOICE
-										<i class='far fa-file-powerpoint'></i> Policy details.
-										<i class='fa fa-user-plus'></i> <b> Customer Information.</b>
-										<b> <i class='fas fa-user-tie'></i> Beneficiary Details </b>
+										Agency Invoice
 									</span>
 								</span>
 							</span>
@@ -53,12 +50,10 @@
 								<div class="col-sm-4 invoice-col">
 									Bill To
 									<address>
-										<strong>@Model.ClientCompany.Name</strong><br>
-										@Model.ClientCompany.Branch<br>
+										<strong>@Model.ClientCompany.Name (@Model.ClientCompany.Branch)</strong><br>
+										<span class="blue">@Model.ClientCompany.Email</span><br>
 										@Model.ClientCompany.Addressline <br>
-										@Model.ClientCompany.District.Name<br>
-										@Model.ClientCompany.Email<br>
-										attn: @Model.ClientCompany.PhoneNumber
+										@Model.ClientCompany.District.Name, @Model.ClientCompany.State.Code (@Model.ClientCompany.PinCode.Code)<br>
 									</address>
 								</div>
 								<!-- /.col -->
@@ -66,10 +61,9 @@
 									From
 									<address>
 										<strong>@Model.Vendor.Name</strong><br>
+										<span class="blue">@Model.Vendor.Email</span><br>
 										@Model.Vendor.Addressline<br>
-										@Model.Vendor.District.Name<br>
-										@Model.Vendor.Email<br>
-										attn: @Model.Vendor.PhoneNumber
+										@Model.Vendor.District.Name , @Model.Vendor.State.Code (@Model.Vendor.PinCode.Code)<br>
 									</address>
 								</div>
 								<!-- /.col -->

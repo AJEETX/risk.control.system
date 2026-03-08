@@ -1,5 +1,4 @@
-﻿using System.Runtime.Serialization;
-using System.Security.Claims;
+﻿using System.Security.Claims;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -103,15 +102,6 @@ namespace risk.control.system.Controllers.Common
 
             return $"{(int)timeSpan.TotalDays} days ago";
         }
-    }
-
-    public enum CountryCode
-    {
-        [EnumMember(Value = "au")]
-        au,
-
-        [EnumMember(Value = "in")]
-        In // capitalized, avoids keyword issue
     }
 
     public class NotificationRequest

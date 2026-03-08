@@ -12,13 +12,13 @@
             },
             {
                 className: 'max-width-column', // Apply the CSS class,
-                targets: 4                      // Index of the column to style
+                targets: 3                      // Index of the column to style
             },
             {
                 className: 'max-width-column-name', // Apply the CSS class,
-                targets: 8                      // Index of the column to style
+                targets: 7                      // Index of the column to style
             }],
-        order: [[10, 'desc'], [11, 'desc']], // Sort by `isUpdated` and `lastModified`,
+        order: [[9, 'desc'], [10, 'desc']], // Sort by `isUpdated` and `lastModified`,
         fixedHeader: true,
         processing: true,
         paging: true,
@@ -43,13 +43,7 @@
             {
                 "data": "domain",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.vendorName + '" data-toggle="tooltip">' + data + '</span>'
-                }
-            },
-            {
-                "data": "phone",
-                "mRender": function (data, type, row) {
-                    return '<span title="' + data + '" data-toggle="tooltip"> <img alt="' + data + '" title="' + data + '" src="' + row.flag + '" class="flag-icon" data-toggle="tooltip"/>' + data + '</span>'
+                    return '<span class="blue" title="' + row.vendorName + '" data-toggle="tooltip">' + data + '</span>'
                 }
             },
             {
