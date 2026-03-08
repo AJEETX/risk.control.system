@@ -23,7 +23,7 @@
             },
             {
                 className: 'max-width-column-name', // Apply the CSS class,
-                targets: 9                      // Index of the column to style
+                targets: 10                      // Index of the column to style
             }],
         order: [[1, 'asc']],
         fixedHeader: true,
@@ -86,6 +86,12 @@
                 "data": "country",
                 "mRender": function (data, type, row) {
                     return '<span title="' + row.country + '" data-bs-toggle="tooltip"> <img alt="' + data + '" title="' + data + '" src="' + row.flag + '" class="flag-icon" data-bs-toggle="tooltip"/>' + data + '</span>';
+                }
+            },
+            {
+                "data": "pinCode",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + data + '" data-bs-toggle="tooltip">' + data + '</span>'
                 }
             },
             {

@@ -116,6 +116,12 @@
                 }
             },
             {
+                "data": "pinCode",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + data + '" data-bs-toggle="tooltip">' + data + '</span>'
+                }
+            },
+            {
                 "data": "hasService",
                 "mRender": function (data, type, row) {
                     let statusText = row.hasService
