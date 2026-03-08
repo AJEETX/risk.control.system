@@ -1,5 +1,4 @@
 $(document).ready(function () {
-
     $("#ContractNumber").on("input", function () {
         this.value = this.value.toUpperCase();
     });
@@ -110,7 +109,6 @@ $(document).ready(function () {
     $("#create-form").validate();
     $("#edit-form").validate();
 
-
     // Automatically set focus
     $("#ContractNumber").focus();
 
@@ -131,7 +129,7 @@ $(document).ready(function () {
             var token = $('input[name="__RequestVerificationToken"]').val();
 
             $.ajax({
-                url: "/api/MasterData/GetInvestigationServicesByInsuranceType",
+                url: "/api/VerifyEntity/GetInvestigationServicesByInsuranceType",
                 type: "GET",
                 data: {
                     InsuranceType: value

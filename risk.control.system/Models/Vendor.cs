@@ -16,12 +16,6 @@ namespace risk.control.system.Models
         [StringLength(50, MinimumLength = 3, ErrorMessage = "Name must be between 3 and 50 characters.")]
         public string Name { get; set; } = string.Empty;
 
-        [Required]
-        [Display(Name = "Phone number")]
-        [DataType(DataType.PhoneNumber)]
-        [StringLength(10, MinimumLength = 9, ErrorMessage = "PhoneNumber must be between 9 and 10 characters.")]
-        public string PhoneNumber { get; set; } = string.Empty;
-
         public string Email { get; set; } = string.Empty;
 
         [StringLength(70, MinimumLength = 3, ErrorMessage = "Addressline must be between 3 and 70 characters.")]
@@ -133,7 +127,6 @@ namespace risk.control.system.Models
             return $"Investigation Agency Information:\n" +
            $"- Domain (web) name: {DomainName}\n" +
            $"- Name: {Name}\n" +
-           $"- Phone Number: ${PhoneNumber}\n" +
            $"- Domain name: {Email}\n" +
            $"- Address line: {Addressline}\n" +
            $"- City: {District}\n" +
@@ -152,7 +145,6 @@ namespace risk.control.system.Models
     public enum VendorStatus
     {
         ACTIVE,
-        INACTIVE,
-        DELIST
+        INACTIVE
     }
 }

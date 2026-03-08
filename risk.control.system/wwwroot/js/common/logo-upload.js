@@ -13,8 +13,6 @@
         const displayName = "Logo.png";
 
         fileLabel.addClass("selected valid").html(displayName);
-        fileInput.attr('data-bs-toggle', "tooltip");
-        fileInput.attr('data-bs-original-title', displayName);
         fileInput.attr('title', displayName);
     }
 

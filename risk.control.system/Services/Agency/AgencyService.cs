@@ -63,7 +63,6 @@ namespace risk.control.system.Services.Agency
             vendor.DomainName = domainData;
             vendor.BankName = WebUtility.HtmlEncode(vendor.BankName.ToUpper());
             vendor.IFSCCode = WebUtility.HtmlEncode(vendor.IFSCCode.ToUpper());
-            vendor.PhoneNumber = WebUtility.HtmlEncode(vendor.PhoneNumber.TrimStart('0'));
             vendor.Updated = DateTime.UtcNow;
             vendor.UpdatedBy = userEmail;
             vendor.CreatedUser = userEmail;
@@ -90,10 +89,10 @@ namespace risk.control.system.Services.Agency
             };
             context.Notifications.Add(notification);
             var rowsAffected = await context.SaveChangesAsync();
-            if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
-            {
-                await smsService.DoSendSmsAsync(pinCode.Country.Code, pinCode.Country.ISDCode + vendor.PhoneNumber, "Agency created. \nDomain : " + vendor.Email + "\n" + portal_base_url);
-            }
+            //if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
+            //{
+            //    await smsService.DoSendSmsAsync(pinCode.Country.Code, pinCode.Country.ISDCode + vendor.PhoneNumber, "Agency created. \nDomain : " + vendor.Email + "\n" + portal_base_url);
+            //}
 
             return rowsAffected > 0;
         }
@@ -125,17 +124,16 @@ namespace risk.control.system.Services.Agency
             vendor.CountryId = vendor.SelectedCountryId;
             vendor.BankName = WebUtility.HtmlEncode(vendor.BankName.ToUpper());
             vendor.IFSCCode = WebUtility.HtmlEncode(vendor.IFSCCode.ToUpper());
-            vendor.PhoneNumber = WebUtility.HtmlEncode(vendor.PhoneNumber.TrimStart('0'));
             var pinCode = await context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).FirstOrDefaultAsync(s => s.PinCodeId == vendor.SelectedPincodeId);
             vendor.IsUpdated = true;
             vendor.Updated = DateTime.UtcNow;
             vendor.UpdatedBy = userEmail;
             context.Vendor.Update(vendor);
             var rowsAffected = await context.SaveChangesAsync();
-            if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
-            {
-                await smsService.DoSendSmsAsync(pinCode.Country.Code, pinCode.Country.ISDCode + vendor.PhoneNumber, "Agency edited. \n\nDomain : " + vendor.Email + "\n" + portal_base_url);
-            }
+            //if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
+            //{
+            //    await smsService.DoSendSmsAsync(pinCode.Country.Code, pinCode.Country.ISDCode + vendor.PhoneNumber, "Agency edited. \n\nDomain : " + vendor.Email + "\n" + portal_base_url);
+            //}
             return rowsAffected > 0;
         }
     }

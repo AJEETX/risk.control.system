@@ -26,7 +26,7 @@
     $("#CountryIsd").autocomplete({
         source: function (request, response) {
             $.ajax({
-                url: "/api/MasterData/GetIsdCode",
+                url: "/api/VerifyEntity/GetIsdCode",
                 type: "GET",
                 data: { term: request.term },
                 success: function (data) {
@@ -52,7 +52,6 @@
     $("#CountryIsd").focus();
 });
 document.addEventListener("DOMContentLoaded", function () {
-
     // Reference to the modal and close button
     var termsModal = document.getElementById('termsModal');
     var closeTermsButton = document.getElementById('closeterms');
@@ -85,6 +84,4 @@ document.addEventListener("DOMContentLoaded", function () {
             termsModal.classList.remove('show'); // Close the modal if clicked outside
         }
     });
-
 });
-

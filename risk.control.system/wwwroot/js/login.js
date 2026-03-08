@@ -38,7 +38,7 @@
                 nodes[i].disabled = true;
             }
         }
-        
+
         var resetForm = document.getElementById("reset-form");
         if (resetForm) {
             var nodes = resetForm.getElementsByTagName('*');
@@ -49,7 +49,6 @@
     }
 });
 document.addEventListener("DOMContentLoaded", function () {
-
     // Reference to the modal and close button
     var termsModal = document.getElementById('termsModal');
     var closeTermsButton = document.getElementById('closeterms');
@@ -74,7 +73,7 @@ document.addEventListener("DOMContentLoaded", function () {
             termsModal.classList.remove('show'); // Remove the 'show' class to hide the modal
         });
     }
-    
+
     // Optionally, you can close the modal if clicked outside the modal content
     window.addEventListener('click', function (e) {
         if (e.target === termsModal) {
@@ -82,11 +81,9 @@ document.addEventListener("DOMContentLoaded", function () {
             termsModal.classList.remove('show'); // Close the modal if clicked outside
         }
     });
-
 });
 
 $(document).ready(function () {
-
     validateMobile('#mobile', /[^0-9]/g); // Allow numeric only no spaces
     $("#flip").change(function () {
         if ($(this).prop("checked")) {
@@ -98,14 +95,13 @@ $(document).ready(function () {
         }
     });
 
-   
     $("#login-form").validate();
     $("#reset-form").validate();
     $("#email, #resetemail").autocomplete({
         source: function (request, response) {
             $("#loader").show(); // Show loader
             $.ajax({
-                url: "/api/MasterData/GetUserBySearch",
+                url: "/api/VerifyEntity/GetUserBySearch",
                 type: "GET",
                 data: {
                     search: request.term
@@ -151,7 +147,7 @@ $(document).ready(function () {
         source: function (request, response) {
             $("#loader").show(); // Show loader
             $.ajax({
-                url: "/api/MasterData/GetCountryIsdCode", // API endpoint for country suggestions
+                url: "/api/VerifyEntity/GetCountryIsdCode", // API endpoint for country suggestions
                 type: "GET",
                 data: {
                     term: request.term
@@ -216,7 +212,6 @@ $(document).ready(function () {
             $(this).autocomplete("search", ""); // Trigger autocomplete with an empty search term
         }
     });
-
 
     $('input').on('focus', function () {
         $(this).select();
