@@ -45,13 +45,6 @@
 
 											<li class="small">
 												<span class="fa-li">
-													<i class="fas fa-phone"></i>
-												</span>
-												Mobile #: <i class="fas fa-phone"></i> @Model.PhoneNumber
-											</li>
-
-											<li class="small">
-												<span class="fa-li">
 													<i class="fas fa-landmark"></i>
 												</span>
 												Bank Name: <i class="fas fa-landmark"></i> @Model.BankName
@@ -148,24 +141,24 @@
 								<span id="withdraw-information-popup" class="badge badge-light">
 									<div class="btn btn-outline-danger">
 										<i class="fa fa-trash"></i>  @Applicationsettings.DELETE <span class="badge badge-danger">
-											<i class="fas fa-info"></i>
-										</span>
-									</div>
-								</span>
-							}
+										<i class="fas fa-info"></i>
+									</span>
+								</div>
+							</span>
+						}
 							else
-							{
-								<button type="submit" class="btn btn-danger">
-									<i class="fas fa-trash me-1"></i> Delete
-								</button>
+						{
+							<button type="submit" class="btn btn-danger">
+								<i class="fas fa-trash me-1"></i> Delete
+							</button>
 
-							}
-						</div>
+						}
 					</div>
 				</div>
 			</div>
 		</div>
-	</form>
+	</div>
+</form>
 </section>
 
 @section Scripts {

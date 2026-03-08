@@ -21,7 +21,7 @@ $(document).ready(function () {
             $('#InvestigationServiceTypeId').append("<option value=''>--- SELECT ---</option>");
         } else {
             $.ajax({
-                url: "/api/MasterData/GetInvestigationServicesByInsuranceType",
+                url: "/api/VerifyEntity/GetInvestigationServicesByInsuranceType",
                 type: "GET",
                 data: {
                     InsuranceType: value
@@ -66,7 +66,6 @@ $(document).ready(function () {
     });
 
     // Bind the change event to the dropdown
-    
 
     const inputSelector = "#SelectedCountryId";
     const preloadedCountryId = $("#SelectedCountryId").val();
@@ -109,7 +108,6 @@ $(document).ready(function () {
     const $checkbox = $('#allDistrictsCheckbox');
 
     function updateSelectState() {
-
         if ($checkbox.is(':checked')) {
             // Hide spinner since we're not loading anything
             // Set dropdown to "All Districts"
@@ -135,7 +133,6 @@ $(document).ready(function () {
     $checkbox.on('change', function () {
         updateSelectState();
     });
-
 });
 /**
  * Preloads field data from hidden fields (e.g., SelectedCountryId).
@@ -197,7 +194,6 @@ function loadDistrictData(countryId, stateId) {
             $districtSelect.empty();
 
             if (Array.isArray(response) && response.length > 0) {
-
                 response.forEach(d => {
                     const opt = $("<option>")
                         .val(d.districtId)
@@ -207,7 +203,6 @@ function loadDistrictData(countryId, stateId) {
 
                 const preselected = $("#SelectedDistrictIds").data("selected")?.toString().split(",") || [];
                 $districtSelect.val(preselected);
-
             } else {
                 $districtSelect.append(
                     $("<option>").prop("disabled", true).text("No districts found")

@@ -141,6 +141,9 @@
 					var bage = DateTime.UtcNow.Subtract(Model.Beneficiary.DateOfBirth.GetValueOrDefault()).TotalDays;
 					beneficaryAge = (int)bage / 365;
 				}
+				var map = string.Format(Model.ClaimsInvestigation.CustomerDetail.CustomerLocationMap, "400", "400");
+				var bmap = string.Format(Model.Beneficiary.BeneficiaryLocationMap, "400", "400");
+
 				var customerSMSCount = @Model.ClaimsInvestigation.CaseMessages.Where(x => x.IsCustomer).Count();
 				var beneficiarySMSCount = @Model.ClaimsInvestigation.CaseMessages.Where(x => !x.IsCustomer).Count();
 
@@ -210,7 +213,7 @@
 											}
 										</p>
 										<p class="text-muted text-sm">
-											<img id="customerGoogleMap" class="img-fluid block-data" src="@Model.ClaimsInvestigation?.CustomerDetail?.CustomerLocationMap" />
+											<img id="customerGoogleMap" class="img-fluid block-data" src="@map" />
 										</div>
 									</div>
 								</div>
@@ -295,7 +298,7 @@
 												}
 											</p>
 											<p class="text-muted text-sm">
-												<img id="beneficiaryGoogleMap" class="img-fluid block-data" src="@Model?.Beneficiary?.BeneficiaryLocationMap" />
+												<img id="beneficiaryGoogleMap" class="img-fluid block-data" src="@bmap" />
 											</p>
 										</div>
 									</div>

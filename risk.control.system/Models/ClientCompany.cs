@@ -128,7 +128,6 @@ namespace risk.control.system.Models
         {
             return $"Insurance Company Information:\n" +
                 $"- Name: {Name}\n" +
-                $"- Phone Number: {PhoneNumber}\n" +
                 $"- Email: {Email}\n" +
                 $"- Branch: {Branch}\n" +
                 $"- Address Line: {Addressline}\n" +

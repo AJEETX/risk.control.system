@@ -2,7 +2,6 @@
 using Microsoft.FeatureManagement;
 using risk.control.system.AppConstant;
 using risk.control.system.Models;
-using risk.control.system.Models.ViewModel;
 using risk.control.system.Services.Agency;
 using risk.control.system.Services.Common;
 
@@ -56,7 +55,7 @@ namespace risk.control.system.Services.AgencyAdmin
 
             _validateImageService.ValidateImage(model.Document, errors);
 
-            await ValidatePhoneAsync(model, errors);
+            //await ValidatePhoneAsync(model, errors);
             if (errors.Any())
                 return (false, errors);
             var result = await _agencyService.CreateAgency(model, userEmail, domainAddress, baseUrl);
@@ -73,7 +72,7 @@ namespace risk.control.system.Services.AgencyAdmin
             {
                 _validateImageService.ValidateImage(model.Document, errors);
             }
-            await ValidatePhoneAsync(model, errors);
+            //await ValidatePhoneAsync(model, errors);
 
             if (errors.Any())
                 return (false, errors);
@@ -181,19 +180,19 @@ namespace risk.control.system.Services.AgencyAdmin
             model.PinCodeId = model.SelectedPincodeId;
         }
 
-        private async Task ValidatePhoneAsync(Vendor model, Dictionary<string, string> errors)
-        {
-            if (!await _featureManager.IsEnabledAsync(FeatureFlags.VALIDATE_PHONE))
-                return;
+        //private async Task ValidatePhoneAsync(Vendor model, Dictionary<string, string> errors)
+        //{
+        //    if (!await _featureManager.IsEnabledAsync(FeatureFlags.VALIDATE_PHONE))
+        //        return;
 
-            var country = await _context.Country.FindAsync(model.SelectedCountryId);
-            if (country == null)
-                return;
+        //    var country = await _context.Country.FindAsync(model.SelectedCountryId);
+        //    if (country == null)
+        //        return;
 
-            if (!_phoneService.IsValidMobileNumber(model.PhoneNumber, country.ISDCode.ToString()))
-            {
-                errors[nameof(BeneficiaryDetail.PhoneNumber)] = "Invalid mobile number";
-            }
-        }
+        //    if (!_phoneService.IsValidMobileNumber(model.PhoneNumber, country.ISDCode.ToString()))
+        //    {
+        //        errors[nameof(BeneficiaryDetail.PhoneNumber)] = "Invalid mobile number";
+        //    }
+        //}
     }
 }

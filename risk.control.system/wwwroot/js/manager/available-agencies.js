@@ -19,11 +19,11 @@
             },
             {
                 className: 'max-width-column', // Apply the CSS class,
-                targets: 5                      // Index of the column to style
+                targets: 4                      // Index of the column to style
             },
             {
                 className: 'max-width-column-name', // Apply the CSS class,
-                targets: 10                      // Index of the column to style
+                targets: 9                      // Index of the column to style
             }],
         order: [[1, 'asc']],
         fixedHeader: true,
@@ -61,12 +61,6 @@
                 "data": "domain",
                 "mRender": function (data, type, row) {
                     return '<span title="' + row.name + '" data-bs-toggle="tooltip" class="blue">' + data + '</span>'
-                }
-            },
-            {
-                "data": "phone",
-                "mRender": function (data, type, row) {
-                    return '<span title="' + data + '" data-bs-toggle="tooltip"> <img alt="' + data + '" title="' + data + '" src="' + row.flag + '" class="flag-icon" data-bs-toggle="tooltip"/>' + data + '</span>'
                 }
             },
             {
