@@ -72,7 +72,7 @@ namespace risk.control.system.Services.Api
                  DistrictName = u.District.Name,
                  StateCode = u.State.Code,
                  CountryCode = u.Country.Code,
-                 PinCodeValue = u.PinCode.Code,
+                 PinCodeValue = $"{u.PinCode.Name} - {u.PinCode.Code}",
                  u.Status,
                  u.Updated,
                  u.Created,

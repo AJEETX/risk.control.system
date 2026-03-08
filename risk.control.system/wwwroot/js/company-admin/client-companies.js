@@ -7,14 +7,18 @@
         },
         columnDefs: [
             {
+                className: 'max-width-column-name', // Apply the CSS class,
+                targets: 3                      // Index of the column to style
+            },
+            {
                 className: 'max-width-column', // Apply the CSS class,
                 targets: 4                      // Index of the column to style
             },
             {
                 className: 'max-width-column-name', // Apply the CSS class,
-                targets: 10                      // Index of the column to style
+                targets: 11                      // Index of the column to style
             }],
-        order: [[12, 'desc'], [13, 'desc']], // Sort by `isUpdated` and `lastModified`,
+        order: [[13, 'desc'], [14, 'desc']], // Sort by `isUpdated` and `lastModified`,
         fixedHeader: true,
         processing: true,
         paging: true,
@@ -69,9 +73,15 @@
                 }
             },
             {
-                "data": "country",
+                "data": "countryCode",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.country + '" data-toggle="tooltip"> <img alt="' + data + '" title="' + data + '" src="' + row.flag + '" class="flag-icon" data-toggle="tooltip"/>' + data + '</span>';
+                    return '<span title="' + row.country + '" data-toggle="tooltip"> <img alt="' + data + '" title="' + row.country + '" src="' + row.flag + '" class="flag-icon" data-toggle="tooltip"/>' + data + '</span>';
+                }
+            },
+            {
+                "data": "pinCode",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + data + '" data-toggle="tooltip">' + data + '</span>'
                 }
             },
             {

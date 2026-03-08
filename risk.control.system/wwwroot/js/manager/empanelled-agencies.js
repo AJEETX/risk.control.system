@@ -1,7 +1,7 @@
 ﻿$(document).ready(function () {
     var table = $("#dataTable").DataTable({
         ajax: {
-            url: '/api/Company/GetEmpanelledVendors',
+            url: '/api/Company/GetAllEmpanelledAgencies',
             dataSrc: '',
             error: DataTableErrorHandler
         },
@@ -12,9 +12,9 @@
             },
             {
                 className: 'max-width-column-name', // Apply the CSS class,
-                targets: 9                      // Index of the column to style
+                targets: 10                      // Index of the column to style
             }],
-        order: [[11, 'desc'], [12, 'desc']], // Sort by `isUpdated` and `lastModified`,
+        order: [[12, 'desc'], [13, 'desc']], // Sort by `isUpdated` and `lastModified`,
         fixedHeader: true,
         processing: true,
         paging: true,
@@ -85,6 +85,12 @@
                 "data": "countryCode",
                 "mRender": function (data, type, row) {
                     return '<span title="' + row.country + '" data-bs-toggle="tooltip"> <img alt="' + data + '" title="' + data + '" src="' + row.flag + '" class="flag-icon" data-bs-toggle="tooltip"/>' + data + '</span>';
+                }
+            },
+            {
+                "data": "pinCode",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + data + '" data-bs-toggle="tooltip">' + data + '</span>'
                 }
             },
             {
