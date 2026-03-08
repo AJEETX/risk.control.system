@@ -56,7 +56,6 @@ namespace risk.control.system.Seeds
                 StateId = pinCode.StateId,
                 PinCodeId = pinCode.PinCodeId,
                 Email = input.DOMAIN,
-                PhoneNumber = input.PHONE,
                 DocumentUrl = relativePath,
                 Updated = DateTime.UtcNow,
                 Status = VendorStatus.ACTIVE,

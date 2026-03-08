@@ -1,8 +1,7 @@
 ﻿$(document).ready(function () {
-
     var askConfirmation = true;
     $('#create-form').submit(function (e) {
-        if ($('#create-form').valid() &&  askConfirmation) {
+        if ($('#create-form').valid() && askConfirmation) {
             e.preventDefault();
             $.confirm({
                 title: "Confirm Add User",
@@ -161,7 +160,6 @@
     $('#ActiveSwitch').change(function () {
         $(this).next('label').text(this.checked ? 'Active Account' : 'Deactivated Account');
     });
-
 });
 
 function alphaOnly(event) {
@@ -170,7 +168,7 @@ function alphaOnly(event) {
 };
 function checkUserEmail() {
     const $detailsFieldset = $('#details-fields');
-    var url = "/api/MasterData/CheckUserEmail";
+    var url = "/api/VerifyEntity/GetUserEmail";
     var name = $('#emailAddress').val().toLowerCase();
     var emailSuffix = $('#emailSuffix').val().toLowerCase();
     $('#mailAddress').val('');

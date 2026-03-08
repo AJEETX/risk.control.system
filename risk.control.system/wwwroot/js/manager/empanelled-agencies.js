@@ -11,10 +11,6 @@
                 targets: 2                      // Index of the column to style
             },
             {
-                className: 'max-width-column', // Apply the CSS class,
-                targets: 4                      // Index of the column to style
-            },
-            {
                 className: 'max-width-column-name', // Apply the CSS class,
                 targets: 9                      // Index of the column to style
             }],
@@ -64,12 +60,6 @@
                     img += '<br /> <span class="result"></span>';
 
                     return '<span title="' + row.name + '" data-bs-toggle="tooltip" class="blue">' + data + '</span>' + '<br /> ' + img;
-                }
-            },
-            {
-                "data": "phone",
-                "mRender": function (data, type, row) {
-                    return '<span title="' + data + '" data-bs-toggle="tooltip"> <img alt="' + data + '" title="' + data + '" src="' + row.flag + '" class="flag-icon" data-bs-toggle="tooltip"/>' + data + '</span>'
                 }
             },
             {

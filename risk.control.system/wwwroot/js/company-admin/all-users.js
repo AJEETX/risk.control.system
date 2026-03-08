@@ -61,7 +61,7 @@
             {
                 "data": "email",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.rawEmail + '" data-toggle="tooltip">' + data + '</span>'
+                    return '<span class="blue" title="' + row.rawEmail + '" data-toggle="tooltip">' + data + '</span>'
                 }
             },
             {

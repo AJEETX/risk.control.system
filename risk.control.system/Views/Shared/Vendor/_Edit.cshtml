@@ -50,6 +50,31 @@
 		</div>
 
 		<div class="form-group">
+			<label class="input-group-label" for="Status"> Status:</label>
+			<div class="input-group mb-3">
+				<div class="input-group-prepend">
+					<span class="input-group-text">
+						<i class="fa fa-toggle-on"></i>
+						<i class="fa fa-asterisk asterik-style"></i>
+					</span>
+				</div>
+        
+				<select required id="Status" asp-for="Status" class="form-control remarks"
+						asp-items="Html.GetEnumSelectList<VendorStatus>()"
+						disabled="@(Model.SelectedByCompany ? "disabled" : null)">
+					<option value="">--- SELECT ---</option>
+				</select>
+
+				@if (Model.SelectedByCompany)
+				{
+					<input type="hidden" asp-for="Status" />
+				}
+        
+				<span asp-validation-for="Status" class="text-danger"></span>
+			</div>
+		</div>
+		
+		@* <div class="form-group">
 			<label class="input-group-label" for="PhoneNumber"> Mobile #:</label>
 			<div class="input-group">
 				<div class="input-group-prepend">
@@ -72,7 +97,6 @@
 				<span asp-validation-for="PhoneNumber" class="text-danger"></span>
 			</div>
 		</div>
-
 		@if (Model.SelectedByCompany)
 		{
 			<input asp-for="CanChangePassword" id="CanChangePassword" type="hidden" />
@@ -91,6 +115,7 @@
 					</div>
 				</div>
 			}
+ *@
 		</div>
 		<div class="col-md-6">
 			<div class="form-group">
@@ -137,34 +162,16 @@
 			<partial name="Vendor/_AgencyAddress" model="@Model" />
 
 			<div class="form-group">
-				<label class="input-group-label" for="Addressline"> Address:</label>
+				<label class="input-group-label" for="Addressline">Street Address:</label>
 				<div class="input-group mb-3">
 					<div class="input-group-prepend">
-						<span class="input-group-text"><i class="fa fa-home"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+					<span class="input-group-text"><i class="fas fa-map-marker-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
 					</div>
 					<input type="text" id="Addressline" asp-for="Addressline" class="form-control remarks" type="text" placeholder="Street Address..." required maxlength="70" />
 					<span asp-validation-for="Addressline" class="text-danger"></span>
 				</div>
 			</div>
 
-			@if (Model.SelectedByCompany)
-			{
-				<input type="hidden" id="Status" asp-for="Status" />
-			}
-			else
-			{
-				<div class="form-group">
-					<label class="input-group-label" for="Status"> Status:</label>
-					<div class="input-group mb-3">
-						<div class="input-group-prepend">
-							<span class="input-group-text"><i class="fa fa-toggle-on"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-						</div>
-						<select required id="Status" asp-for="Status" class="form-control remarks" asp-items="Html.GetEnumSelectList<VendorStatus>()">
-							<option value="">--- SELECT ---</option>
-						</select>
-						<span asp-validation-for="Status" class="text-danger"></span>
-					</div>
-				</div>
-			}
+			
 		</div>
 	</div>

@@ -10,7 +10,6 @@
     var $ifscInput = $('#IFSCCode');
 
     function validateBankCode() {
-        
         if (!$ifscInput.length) return;
 
         var code = ($ifscInput.val() || '').toUpperCase().trim();
@@ -44,7 +43,7 @@
                                 .attr('data-bs-original-title', '🏦 ' + data.BANK + ', ' + data.BRANCH + ', ' + data.ADDRESS);
 
                             $('#ifsc-valid-icon').show();
-                            $ifscInput
+                            $ifscInput.addClass('is-valid')
                                 .attr('data-original-title', '✅ Valid IFSC (' + data.BANK + ')')
                                 .attr('data-bs-original-title', '✅ Valid IFSC (' + data.BANK + ')');
                         } else {
@@ -70,16 +69,15 @@
             var bsbRegex = /^\d{6}$/;
             if (bsbRegex.test(code)) {
                 $('#ifsc-spinner').removeClass('d-none');
-                
+
                 $.ajax({
-                    url: '/api/MasterData/bsb?code=' + encodeURIComponent(code),
+                    url: '/api/VerifyEntity/get-bsb?code=' + encodeURIComponent(code),
                     method: 'GET',
                     success: function (data) {
                         $('#ifsc-spinner').addClass('d-none');
                         if (data && data.bank) {
-
-                        var bankData = '🏦 ' + data.bank + ', ' + data.address + ', ' + data.city + ', ' + data.state + ', ' + data.postcode;
-                        var branchData = '🏦 Branch: ' + data.branch + ', ' + data.address + ', ' + data.city + ', ' + data.state + ', ' + data.postcode;
+                            var bankData = '🏦 ' + data.bank + ', ' + data.address + ', ' + data.city + ', ' + data.state + ', ' + data.postcode;
+                            var branchData = '🏦 Branch: ' + data.branch + ', ' + data.address + ', ' + data.city + ', ' + data.state + ', ' + data.postcode;
                             $('#BankName')
                                 .val(data.bank)
                                 .addClass('valid-border')
@@ -155,21 +153,22 @@ document.addEventListener("DOMContentLoaded", function () {
     const invalidIcon = document.getElementById("phone-invalid");
     const spinnerIcon = document.getElementById("phone-spinner");
     var countryCode = ($('#countryCode').val() || '').toUpperCase().trim();
-
-    phoneInput.addEventListener('focus', function () {
-        this.select();
-    });
-
-    let typingTimer;
-    const typingDelay = 800; // milliseconds delay after typing stops
-
-    ["input","blur"].forEach(evt => {
-        phoneInput.addEventListener(evt, () => {
-            clearTimeout(typingTimer);
-            typingTimer = setTimeout(validatePhone, evt === "blur" ? 0 : typingDelay);
+    if (phoneInput) {
+        phoneInput.addEventListener('focus', function () {
+            this.select();
         });
-    });
 
+        let typingTimer;
+        const typingDelay = 800; // milliseconds delay after typing stops
+
+        ["input", "blur"].forEach(evt => {
+            phoneInput.addEventListener(evt, () => {
+                clearTimeout(typingTimer);
+                typingTimer = setTimeout(validatePhone, evt === "blur" ? 0 : typingDelay);
+            });
+        });
+    }
+    
     function setTooltip(el, text) {
         // Remove old cached tooltip
         el.removeAttribute("data-bs-original-title");
@@ -191,7 +190,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
         showSpinner();
         try {
-            const response = await fetch(`/api/MasterData/IsValidMobileNumber?phone=${encodeURIComponent(phone)}&countryCode=${isd}`);
+            const response = await fetch(`/api/VerifyEntity/IsMobileNumber?phone=${encodeURIComponent(phone)}&countryCode=${isd}`);
             const data = await response.json();
 
             if (data.valid) {
@@ -235,9 +234,10 @@ document.addEventListener("DOMContentLoaded", function () {
     function hideSpinner() {
         spinnerIcon.classList.add("d-none");
     }
+    if (phoneInput) {
 
-    validatePhone();
-
+        validatePhone();
+    }
 });
 
 function toggleSubmitButton(isValid) {
