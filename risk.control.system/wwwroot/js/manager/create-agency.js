@@ -1,6 +1,4 @@
-﻿
-$(document).ready(function () {
-
+﻿$(document).ready(function () {
     var askConfirmation = true;
 
     $('#create-form').submit(function (e) {
@@ -90,7 +88,6 @@ $(document).ready(function () {
     // Handle blur event
     if ($emailInput) {
         $emailInput.on("blur", function () {
-
             if ($(this).val()) {
                 CheckIfEmailValid($(this).val());
             }
@@ -135,7 +132,7 @@ function checkDomain() {
     $('#mailAddress').val('');
     const $detailsFieldset = $('#details-fields');
 
-    var url = "/api/Masterdata/CheckAgencyName";
+    var url = "/api/VerifyEntity/GetAgencyName";
     var name = $('#emailAddress').val().toLowerCase();
     var domain = $('#domain').val().toLowerCase();
     if (name) {

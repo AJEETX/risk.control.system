@@ -26,12 +26,8 @@
                 targets: 3                      // Index of the column to style
             },
             {
-                className: 'max-width-column-name', // Apply the CSS class,
-                targets: 4                      // Index of the column to style
-            },
-            {
                 className: 'max-width-column', // Apply the CSS class,
-                targets: 5                      // Index of the column to style
+                targets: 4                      // Index of the column to style
             },],
         order: [[1, 'asc']],
         fixedHeader: true,
@@ -96,12 +92,6 @@
                 }
             },
             {
-                "data": "phone",
-                "mRender": function (data, type, row) {
-                    return '<span title="' + data + '" data-bs-toggle="tooltip"> <img alt="' + data + '" title="' + data + '" src="' + row.flag + '" class="flag-icon" data-toggle="tooltip"/>' + data + '</span>'
-                }
-            },
-            {
                 "data": "address",
                 "mRender": function (data, type, row) {
                     return '<span title="' + row.address + '" data-bs-toggle="tooltip">' + data + '</span>';
@@ -117,6 +107,12 @@
                 "data": "state",
                 "mRender": function (data, type, row) {
                     return '<span title="' + row.state + '" data-bs-toggle="tooltip">' + data + '</span>';
+                }
+            },
+            {
+                "data": "countryCode",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.country + '" data-bs-toggle="tooltip"> <img alt="' + data + '" title="' + data + '" src="' + row.flag + '" class="flag-icon" data-bs-toggle="tooltip"/>' + data + '</span>';
                 }
             },
             {

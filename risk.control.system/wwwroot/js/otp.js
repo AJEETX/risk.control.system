@@ -32,7 +32,6 @@
 });
 
 document.addEventListener("DOMContentLoaded", function () {
-
     // Reference to the modal and close button
     var termsModal = document.getElementById('termsModal');
     var closeTermsButton = document.getElementById('closeterms');
@@ -65,20 +64,18 @@ document.addEventListener("DOMContentLoaded", function () {
             termsModal.classList.remove('show'); // Close the modal if clicked outside
         }
     });
-
 });
 
 $(document).ready(function () {
-
     validateNumber('#MobileNumber', /[^0-9]/g); // Allow numeric only no spaces
-   
+
     $("#login-form").validate();
-   
+
     $("#CountryIsdDisplay").autocomplete({
         source: function (request, response) {
             $("#loader").show(); // Show loader
             $.ajax({
-                url: "/api/MasterData/GetIsdCode", // API endpoint for country suggestions
+                url: "/api/VerifyEntity/GetIsdCode", // API endpoint for country suggestions
                 type: "GET",
                 data: {
                     term: request.term
@@ -247,7 +244,6 @@ $(document).ready(function () {
             },
             success: function (response) {
                 if (response.success) {
-                   
                     $('.otp-input').val('');
                     $('#UserEnteredOtp').val('');
                     $('.otp-input').first().focus();

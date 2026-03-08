@@ -1,16 +1,10 @@
-﻿using System.Globalization;
-using System.Security.Claims;
+﻿using System.Security.Claims;
 
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.FeatureManagement;
 using risk.control.system.AppConstant;
-using risk.control.system.Helpers;
 using risk.control.system.Models;
-using risk.control.system.Models.ViewModel;
-using risk.control.system.Services.Common;
 
 namespace risk.control.system.Controllers.Common
 {
@@ -21,112 +15,14 @@ namespace risk.control.system.Controllers.Common
     public class MasterDataController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
-        private readonly IPhoneService _phoneService;
-        private readonly IFeatureManager _featureManager;
-        private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger<MasterDataController> _logger;
 
         public MasterDataController(
             ApplicationDbContext context,
-            IPhoneService phoneService,
-            IFeatureManager featureManager,
-            UserManager<ApplicationUser> userManager,
             ILogger<MasterDataController> logger)
         {
-            this._context = context;
-            this._phoneService = phoneService;
-            this._featureManager = featureManager;
-            this._userManager = userManager;
-            this._logger = logger;
-        }
-
-        [HttpGet("CheckAgencyName")]
-        public async Task<int?> CheckAgencyName(string input, string domain)
-        {
-            if (string.IsNullOrWhiteSpace(input) || string.IsNullOrWhiteSpace(domain))
-            {
-                return null;
-            }
-            Domain domainData = (Domain)Enum.Parse(typeof(Domain), domain, true);
-
-            var newDomain = input.Trim().ToLower(CultureInfo.InvariantCulture) + domainData.GetEnumDisplayName();
-
-            var agenccompanyCount = await _context.ClientCompany.AsNoTracking().CountAsync(u => u.Email.Trim().ToLower() == newDomain && !u.Deleted);
-            var agencyCount = await _context.Vendor.AsNoTracking().CountAsync(u => u.Email.Trim().ToLower() == newDomain);
-
-            return agencyCount == 0 && agenccompanyCount == 0 ? 0 : 1;
-        }
-
-        [HttpGet("CheckUserEmail")]
-        public async Task<int?> CheckUserEmail(string input)
-        {
-            if (string.IsNullOrWhiteSpace(input))
-            {
-                return null;
-            }
-
-            var userCount = await _userManager.Users.AsNoTracking().CountAsync(u => u.Email == input.ToLower());
-
-            return userCount == 0 ? 0 : 1;
-        }
-
-        [HttpGet("GetInvestigationServicesByInsuranceType")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> GetInvestigationServicesByInsuranceType(string insuranceType)
-        {
-            var userEmail = HttpContext.User?.Identity?.Name;
-
-            try
-            {
-                InsuranceType type;
-                var services = new List<InvestigationServiceType>();
-                if (!string.IsNullOrWhiteSpace(insuranceType) && Enum.TryParse(insuranceType, out type))
-                {
-                    services = await _context.InvestigationServiceType.AsNoTracking().Where(s => s.InsuranceType == type).ToListAsync();
-                }
-                return Ok(services);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error occurred while getting investigation types for user {UserEmail}", userEmail);
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
-        }
-
-        [HttpGet("GetUserBySearch")]
-        [AllowAnonymous]
-        public async Task<IActionResult> GetUserBySearch(string search = "")
-        {
-            try
-            {
-                var vendorAgentIds = await _context.Set<ApplicationUser>()
-                .Where(v => v.Role == AppRoles.AGENT)
-                .Select(v => v.Id)
-                .ToListAsync();
-
-                IQueryable<ApplicationUser> query = _context.ApplicationUser.AsNoTracking()
-                    .Where(a => !a.Deleted && a.Email != PORTAL_ADMIN.EMAIL &&
-                                !vendorAgentIds.Contains(a.Id));
-
-                if (!string.IsNullOrWhiteSpace(search))
-                {
-                    string loweredSearch = search.Trim();
-                    query = query.Where(a => a.Email.StartsWith(loweredSearch));
-                }
-
-                var userEmails = await query
-                    .OrderBy(a => a.Email)
-                    .Take(10)
-                    .Select(a => a.Email)
-                    .ToListAsync();
-
-                return Ok(userEmails);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error occurred while getting users");
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
+            _context = context;
+            _logger = logger;
         }
 
         [HttpGet("SearchCountry")]
@@ -200,6 +96,7 @@ namespace risk.control.system.Controllers.Common
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
+
         [HttpGet("SearchDistrictTerm")]
         public IActionResult SearchDistrictTerm(long stateId, long countryId, string term = "")
         {
@@ -232,7 +129,6 @@ namespace risk.control.system.Controllers.Common
                 // Add the "ALL DISTRICTS" option to the response
                 var result = new List<object>
                 {
-
                 };
 
                 // Append the queried districts to the result
@@ -247,6 +143,7 @@ namespace risk.control.system.Controllers.Common
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
+
         [HttpGet("SearchDistrict")]
         public IActionResult SearchDistrict(long stateId, long countryId, string term = "")
         {
@@ -578,183 +475,6 @@ namespace risk.control.system.Controllers.Common
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error occurred while getting country for user {UserEmail}", userEmail);
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
-        }
-
-        [AllowAnonymous]
-        [HttpGet("GetCountryIsdCode")]
-        public IActionResult GetCountryIsdCode(string term = "")
-        {
-            try
-            {
-                var allCountries = _context.Country.AsNoTracking().ToList();
-
-                if (string.IsNullOrEmpty(term))
-                    return Ok(allCountries
-                        .OrderBy(x => x.Name)
-                     //.Take(10)
-                     .Select(c => new
-                     {
-                         IsdCode = $"+{c.ISDCode.ToString()}",
-                         Flag = "/flags/" + c.Code.ToLower() + ".png",
-                         CountryId = $"{c.Code.ToString()}",
-                         Label = $"+{c.ISDCode.ToString()} {c.Name}"
-                     })?
-                        .ToList());
-
-                var countries = allCountries
-                        .Where(c => c.Name.StartsWith(term, StringComparison.OrdinalIgnoreCase) || c.ISDCode.ToString().StartsWith(term, StringComparison.OrdinalIgnoreCase) || c.Code.StartsWith(term, StringComparison.OrdinalIgnoreCase))
-                        .OrderBy(x => x.Name)
-                        //.Take(10)
-                        .Select(c => new
-                        {
-                            IsdCode = $"+{c.ISDCode.ToString()}",
-                            Flag = "/flags/" + c.Code.ToLower() + ".png",
-                            CountryId = $"{c.Code.ToString()}",
-                            Label = $"+{c.ISDCode.ToString()} {c.Name}"
-                        })?
-                        .ToList();
-                return Ok(countries);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error occurred while getting isd code");
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
-        }
-
-        [AllowAnonymous]
-        [HttpGet("GetIsdCode")]
-        public IActionResult GetIsdCode(string term = "")
-        {
-            try
-            {
-                var allCountries = _context.Country.AsNoTracking().ToList();
-
-                if (string.IsNullOrEmpty(term))
-                    return Ok(allCountries
-                        .OrderBy(x => x.Name)
-                     //.Take(10)
-                     .Select(c => new
-                     {
-                         IsdCode = $"+{c.ISDCode.ToString()}",
-                         Flag = "/flags/" + c.Code.ToLower() + ".png",
-                         CountryId = $"{c.Code.ToString()}",
-                         Label = $"+{c.ISDCode.ToString()} ( {c.Name} )"
-                     })?
-                        .ToList());
-
-                var countries = allCountries
-                        .Where(c => c.Name.StartsWith(term, StringComparison.OrdinalIgnoreCase) || c.ISDCode.ToString().StartsWith(term, StringComparison.OrdinalIgnoreCase) || c.Code.StartsWith(term, StringComparison.OrdinalIgnoreCase))
-                        .OrderBy(x => x.Name)
-                        //.Take(10)
-                        .Select(c => new
-                        {
-                            IsdCode = $"+{c.ISDCode.ToString()}",
-                            Flag = "/flags/" + c.Code.ToLower() + ".png",
-                            CountryId = $"{c.Code.ToString()}",
-                            Label = $"+{c.ISDCode.ToString()} ( {c.Name} )"
-                        })?
-                        .ToList();
-                return Ok(countries);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error occurred while getting isd code");
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
-        }
-
-        [HttpGet("ValidatePhone")]
-        public async Task<IActionResult> ValidatePhone(string phone, int countryCode)
-        {
-            var userEmail = HttpContext.User?.Identity?.Name;
-
-            try
-            {
-                if (string.IsNullOrWhiteSpace(phone))
-                    return Ok(new { valid = false, message = "Mobile number is required." });
-                if (await _featureManager.IsEnabledAsync(FeatureFlags.VALIDATE_PHONE))
-                {
-                    var country = await _context.Country.AsNoTracking().FirstOrDefaultAsync(c => c.ISDCode == countryCode);
-
-                    var phoneInfo = await _phoneService.ValidateAsync(country.ISDCode.ToString() + phone);
-
-                    if (phoneInfo == null || !phoneInfo.IsValidNumber || phoneInfo.CountryCode != country.ISDCode.ToString() || phoneInfo.PhoneNumberRegion.ToLower() != country.Code.ToLower() || phoneInfo.NumberType.ToLower() != "mobile")
-                    {
-                        return Ok(new
-                        {
-                            valid = false,
-                            message = "Invalid mobile number."
-                        });
-                    }
-                    return Ok(new
-                    {
-                        valid = true,
-                        message = "Valid mobile number"
-                    });
-                }
-                return Ok(new
-                {
-                    valid = true,
-                    message = "Valid mobile number"
-                });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error occurred while validating mobile for user {UserEmail}", userEmail);
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
-        }
-
-        [HttpGet("IsValidMobileNumber")]
-        public async Task<IActionResult> IsValidMobileNumber(string phone, int countryCode)
-        {
-            var userEmail = HttpContext.User?.Identity?.Name;
-
-            try
-            {
-                if (string.IsNullOrWhiteSpace(phone))
-                    return Ok(new { valid = false, message = "Mobile number is required." });
-                var country = await _context.Country.AsNoTracking().FirstOrDefaultAsync(c => c.ISDCode == countryCode);
-
-                var isMobile = _phoneService.IsValidMobileNumber(phone, country.ISDCode.ToString());
-
-                if (!isMobile)
-                {
-                    return Ok(new
-                    {
-                        valid = false,
-                        message = "Invalid mobile number."
-                    });
-                }
-                return Ok(new
-                {
-                    valid = true,
-                    message = "Valid mobile number"
-                });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error occurred while checking mobile for user {UserEmail}", userEmail);
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
-        }
-
-        [HttpGet("bsb")]
-        public IActionResult GetBSBDetails(string code)
-        {
-            var userEmail = HttpContext.User?.Identity?.Name;
-
-            try
-            {
-                var bsbDetail = _context.BsbInfo.AsNoTracking().FirstOrDefault(b => b.BSB == code);
-                return Ok(bsbDetail);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error occurred while getting bsb details for user {UserEmail}", userEmail);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
