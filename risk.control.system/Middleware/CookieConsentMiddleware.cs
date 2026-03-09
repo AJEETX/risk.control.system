@@ -18,7 +18,12 @@
             try
             {
                 // Check if the "CookieConsent" cookie exists
-                if (!context.Request.Path.StartsWithSegments("/api") && !context.Request.Path.StartsWithSegments("/js") && !context.Request.Path.StartsWithSegments("/Session"))
+                if (!context.Request.Path.StartsWithSegments("/api") &&
+                    !context.Request.Path.StartsWithSegments("/js") &&
+                    !context.Request.Path.StartsWithSegments("/Session") &&
+                    !context.Request.Path.StartsWithSegments("/Document") &&
+                    !context.Request.Path.StartsWithSegments("/DashboardGraph") &&
+                    !context.Request.Path.StartsWithSegments("/Dashboard"))
                 {
                     var cookieConsent = context.Request.Cookies["CookieConsent"];
                     context.Items["HasCookieConsent"] = cookieConsent == "Accepted";
