@@ -46,16 +46,25 @@
 		<div class="row top-margin-10">
 			<div class="col-md-6">
 
-				<div class="form-group text-center image-logo-container">
-					<div class="profile-img-container">
+				<div class="form-group text-center">
+					<div class="profile-img-container mb-2">
 						<img id="document-Image" class="form-Image" src="/img/add-file.png" title="Case Document" alt="Case Document" data-bs-toggle="tooltip" />
 					</div>
+
+					<div class="control-label">Case Document <i class="fa fa-asterisk asterik-style-logo"></i></div>
 					<div class="row justify-content-center">
 						<div class="col-10 col-md-8">
-							<div class="custom-file text-center">
-								<label for="createImageInput" class="control-label">Case Document <i class="fa fa-asterisk asterik-style-logo"></i></label>
-								<input id="createImageInput" accept=".jpg,.jpeg,.png" required asp-for="Document" class="form-control remarks document-image-input" type="file" data-preview-id="documentImage" data-title-id="case-document" title="Upload Case Document" data-bs-toggle="tooltip" />
-								<span asp-validation-for="Document" class="text-danger"></span>
+							<div class="custom-file text-left">
+								<input id="createImageInput" accept=".jpg,.jpeg,.png" asp-for="Document"
+									   class="custom-file-input document-image-input d-none" type="file" data-bs-toggle="tooltip"
+									   data-preview-id="createProfileImage" data-title-id="company-document" />
+
+								<div class="row justify-content-center">
+										<label for="createImageInput" class="btn btn-outline-primary">
+											<i class="fa fa-cloud-upload mr-2"></i>
+											Add Document
+										</label>
+								</div>
 							</div>
 						</div>
 					</div>

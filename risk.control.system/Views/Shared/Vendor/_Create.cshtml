@@ -8,7 +8,7 @@
 		<div class="row">
 			<div class="col-md-6">
 
-				<div class="form-group text-center image-logo-container">
+				<div class="form-group text-center">
 					<div class="profile-img-container mb-2">
 						<img id="document-Image" class="form-Image" src="/img/add-logo.png" title="Logo" alt="Logo" data-bs-toggle="tooltip" />
 					</div>
@@ -18,10 +18,15 @@
 						<div class="col-10 col-md-8">
 							<div class="custom-file text-left">
 								<input id="createImageInput" accept=".jpg,.jpeg,.png" asp-for="Document"
-									   class="custom-file-input document-image-input" type="file" data-bs-toggle="tooltip"
+									   class="custom-file-input document-image-input d-none" type="file" data-bs-toggle="tooltip"
 									   data-preview-id="createProfileImage" data-title-id="company-document" />
 
-								<label class="custom-file-label text-sm remarks" for="createImageInput">Choose logo...</label>
+								<div class="row justify-content-center">
+									<label for="createImageInput" class="btn btn-outline-primary">
+										<i class="fa fa-cloud-upload mr-2"></i>
+										Add Logo
+									</label>
+								</div>
 							</div>
 						</div>
 					</div>
