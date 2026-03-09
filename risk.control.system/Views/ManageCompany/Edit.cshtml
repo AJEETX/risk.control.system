@@ -27,20 +27,25 @@
 							<label class="card-header shadow-lg rounded-lg text-sm bg-light" data-bs-toggle="tooltip" title="Active Since: @Model.ActivatedDate?.ToString("dd-MMM-yyyy")"> Active Since: @Model.ActivatedDate?.ToString("dd-MMM-yyyy")</label>
 						</div>
 
-						<div class="form-group text-center image-logo-container">
+						<div class="form-group text-center">
 							<div class="profile-img-container mb-2">
 								<img id="createProfileImage" class="form-Image" src="/Document/GetCompanyDocument/@Model.ClientCompanyId" title="Logo" alt="Logo" data-bs-toggle="tooltip" />
 							</div>
 
-							<div class="control-label">Logo <i class="fa fa-asterisk asterik-style-logo"></i></div>
+							<div class="control-label">Company Logo <i class="fa fa-asterisk asterik-style-logo"></i></div>
 							<div class="row justify-content-center">
 								<div class="col-10 col-md-8">
 									<div class="custom-file text-left">
 										<input id="createImageInput" accept=".jpg,.jpeg,.png" asp-for="Document"
-											   class="custom-file-input document-image-input" type="file" data-bs-toggle="tooltip"
+											   class="custom-file-input document-image-input d-none" type="file" data-bs-toggle="tooltip"
 											   data-preview-id="createProfileImage" data-title-id="company-document" />
 
-										<label class="custom-file-label text-sm remarks" for="createImageInput">Choose logo...</label>
+										<div class="row justify-content-center">
+											<label for="createImageInput" class="btn btn-outline-primary">
+												<i class="fa fa-cloud-upload mr-2"></i>
+												Edit Logo
+											</label>
+										</div>
 									</div>
 								</div>
 							</div>
