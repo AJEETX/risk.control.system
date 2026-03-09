@@ -17,7 +17,7 @@
 
         isChecking = true; // Block further triggers
 
-        var id = $('input[name="District"]').val() || null;
+        var id = $('#SelectedDistrictId').val() || null;
         var CountryId = $('#CountryId').val();
         var StateId = $('#SelectedStateId').val();
         var DistrictId = $('#SelectedDistrictId').val();
@@ -121,50 +121,36 @@
     });
 
     var askConfirmation = true;
-    $('#create-form').submit(function (e) {
-        if (askConfirmation) {
-            if ($('#create-form').valid()) { // Ensure `valid` is called as a method
-                e.preventDefault();
-                $.confirm({
-                    title: "Confirm  Add New",
-                    content: "Are you sure to add?",
 
+    $('#create-form').on('submit', function (e) {
+        var $form = $(this);
+
+        if (askConfirmation) {
+            if ($form.valid()) {
+                e.preventDefault(); // Stop the initial click
+
+                $.confirm({
+                    title: "Confirm Add New",
+                    content: "Are you sure you want to add this pincode?",
                     icon: 'fas fa-map-pin',
                     type: 'green',
-                    closeIcon: true,
                     buttons: {
                         confirm: {
-                            text: " Add New",
+                            text: "Add New",
                             btnClass: 'btn-success',
                             action: function () {
-                                askConfirmation = false;
+                                askConfirmation = false; // Set flag to allow the next submit
+
+                                // Show progress UI
                                 $("body").addClass("submit-progress-bg");
-                                // Wrap in setTimeout so the UI
-                                // can update the spinners
-                                setTimeout(function () {
-                                    $(".submit-progress").removeClass("hidden");
-                                }, 1);
-                                // Disable all buttons, submit inputs, and anchors
-                                $('button, input[type="submit"], a').prop('disabled', true);
+                                $(".submit-progress").removeClass("hidden");
 
-                                // Add a class to visually indicate disabled state for anchors
-                                $('a').addClass('disabled-anchor').on('click', function (e) {
-                                    e.preventDefault(); // Prevent default action for anchor clicks
-                                });
-                                $('#create').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Add New");
+                                // Only disable the button, NOT the whole form/inputs
+                                $('#create').prop('disabled', true)
+                                    .html("<i class='fas fa-sync fa-spin'></i> Submitting...");
 
-                                $('#create-form').submit();
-                                var form = document.getElementById("create-form");
-                                if (form) {
-                                    const formElements = form.getElementsByTagName("*");
-                                    for (const element of formElements) {
-                                        element.disabled = true;
-                                        if (element.hasAttribute("readonly")) {
-                                            element.classList.remove("valid", "is-valid", "valid-border");
-                                            element.removeAttribute("aria-invalid");
-                                        }
-                                    }
-                                }
+                                // Trigger the native DOM submit (bypasses jQuery)
+                                $form[0].submit();
                             }
                         },
                         cancel: {
@@ -173,13 +159,12 @@
                         }
                     }
                 });
-            }
-            else {
+            } else {
                 $.alert({
-                    title: 'Incomplete detail',
-                    content: 'Complete the required fields',
+                    title: 'Incomplete Details',
+                    content: 'Please fill in all required fields.',
                     type: 'red'
-                })
+                });
             }
         }
     });
@@ -443,5 +428,4 @@ function showedit(id) {
 var state = $('#StateId').val();
 if (state) {
     state.focus();
-
 }
