@@ -9,7 +9,7 @@
 			<h3 class="card-title"><i class="fas fa-map-pin"></i>  Add New</h3>
 		</div>
 		<div class="card-body">
-			<form id="create-form" asp-action="Create">
+			<form id="create-form" asp-action="Create" method="post">
 				@Html.AntiForgeryToken()
 				<input type="hidden" asp-for="CountryId" />
 				<div class="submit-progress hidden">
@@ -86,7 +86,7 @@
 						<div class="input-group-prepend">
 							<span class="input-group-text"><i class="fas fa-map-pin"></i> <i class="fa fa-asterisk asterik-style"></i></span>
 						</div>
-						<input id="Name" type="text" asp-for="Name" class="form-control remarks title-name" required placeholder="Pincode Name" maxlength="50">
+						<input id="Name" type="text" asp-for="Name" class="form-control remarks title-name" required placeholder="Pincode Name" minlength="2" maxlength="50">
 							<span asp-validation-for="Name" class="text-danger"></span>
 						</div>
 					</div>
@@ -97,7 +97,7 @@
 							<div class="input-group-prepend">
 								<span class="input-group-text"><i class="fas fa-code"></i> <i class="fa fa-asterisk asterik-style"></i></span>
 							</div>
-							<input id="Code" type="text" asp-for="Code" class="form-control remarks title-name" required placeholder="Pincode Code  (100001)" maxlength="6">
+							<input id="Code" type="text" asp-for="Code" class="form-control remarks title-name" required placeholder="Pincode Code  (100001)" minlength="4" maxlength="6">
 								<span asp-validation-for="Code" class="text-danger"></span>
 							</div>
 						</div>
