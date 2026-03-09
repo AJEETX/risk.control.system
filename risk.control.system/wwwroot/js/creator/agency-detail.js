@@ -16,6 +16,14 @@
 
     $('#agency-rating').on('mouseover', 'img.rating', function () {
         var starImage = $(this);
+        if (!starImage.data('bs.tooltip')) {
+            // Set the title attribute for the tooltip text
+            starImage.attr("title", "Rate this agency");
+
+            // Set data-toggle to enable the tooltip
+            starImage.attr("data-toggle", "tooltip");
+            new bootstrap.Tooltip(starImage[0]);
+        }
         starImage.addClass("toggle-password-visibility");
         var starId = starImage.attr('id'); // Get the ID of the hovered star
         var rating = parseInt(starId); // Convert to integer
@@ -25,14 +33,28 @@
         $('#agency-rating img.rating').each(function (index) {
             if (index < rating) {
                 $(this).attr('src', '/img/FilledStar.jpeg');
-            } else if (index === rating && av % 1 !== 0) {
-                $(this).attr('src', '/img/HalfStar.jpeg');
-            } else {
+            }else {
                 $(this).attr('src', '/img/StarFade.gif');
             }
         });
+        // Change the cursor to pointer when hovering over the star
+        starImage.css("cursor", "pointer");
+
+        // Initialize the tooltip (this should be called after setting the attributes)
+        var tooltip = bootstrap.Tooltip.getInstance ? bootstrap.Tooltip.getInstance(starImage[0]) : null;
+
+        if (tooltip) {
+            tooltip.show();
+        }
     }).on('mouseleave', 'img.rating', function () {
         var starImage = $(this);
+        // Dispose of the tooltip only if it has been initialized
+        var tooltip = bootstrap.Tooltip.getInstance ? bootstrap.Tooltip.getInstance(starImage[0]) : null;
+
+        if (tooltip) {
+            tooltip.dispose();
+        }
+
         starImage.removeClass("toggle-password-visibility");
         // Reset stars to original state when mouse leaves
         // You can call the same function as above to reset the stars to the original rating state
@@ -40,9 +62,7 @@
         $('#agency-rating img.rating').each(function (index) {
             if (index < Math.floor(av)) {
                 $(this).attr("src", "/img/FilledStar.jpeg");
-            } else if (index === Math.floor(av) && av % 1 !== 0) {
-                $(this).attr("src", "/img/HalfStar.jpeg");
-            } else {
+            }else {
                 $(this).attr("src", "/img/StarFade.gif");
             }
         });
@@ -86,9 +106,7 @@
 
                 if (index < Math.floor(av)) {  // Fully filled stars
                     star.attr("src", "/img/FilledStar.jpeg");
-                } else if (index === Math.floor(av) && av % 1 !== 0) {  // Handle half-filled stars
-                    star.attr("src", "/img/HalfStar.jpeg");  // You need a half-star image
-                } else {
+                }else {
                     star.attr("src", "/img/StarFade.gif");  // Faded stars
                 }
             });
