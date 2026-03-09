@@ -63,7 +63,7 @@
 						<div class="col-md-6">
 							<div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-							<div class="form-group text-center image-logo-container">
+							<div class="form-group text-center">
 								<div class="profile-img-container mb-2">
 									<img id="document-Image" class="form-Image img-circle" src="@Applicationsettings.NO_USER" title="User Photo" alt="User" data-bs-toggle="tooltip" />
 								</div>
@@ -72,10 +72,15 @@
 									<div class="col-10 col-md-8">
 										<div class="custom-file text-left">
 											<input id="createImageInput" accept=".jpg,.jpeg,.png" asp-for="ProfileImage" required
-												   class="custom-file-input document-image-input remarks" type="file"
+												   class="custom-file-input document-image-input remarks d-none" type="file"
 												   data-preview-id="createProfileImage" data-title-id="user-document" title="Choose User Photo" data-bs-toggle="tooltip" />
 											<span asp-validation-for="ProfileImage" class="text-danger"></span>
-											<label class="custom-file-label text-sm remarks" for="createImageInput">Choose User Photo...</label>
+											<div class="row justify-content-center">
+												<label for="createImageInput" class="btn btn-outline-primary">
+													<i class="fa fa-cloud-upload mr-2"></i>
+													Add User Photo
+												</label>
+											</div>
 										</div>
 									</div>
 								</div>

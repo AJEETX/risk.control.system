@@ -2231,7 +2231,7 @@ select#PinCodeId {
 
 #document-Image {
     width: 10em; /* Set the desired width */
-    height: 10.1em; /* Set the desired height */
+    height: 10em; /* Set the desired height */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Adds a subtle shadow around the image */
     transition: transform 0.3s ease; /* Smooth transition effect on hover */
 }
