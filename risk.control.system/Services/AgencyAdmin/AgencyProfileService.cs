@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using risk.control.system.AppConstant;
 using risk.control.system.Models;
+using risk.control.system.Services.Common;
 
 namespace risk.control.system.Services.AgencyAdmin
 {
@@ -15,10 +17,12 @@ namespace risk.control.system.Services.AgencyAdmin
     internal class AgencyProfileService : IAgencyProfileService
     {
         private readonly ApplicationDbContext _context;
+        private readonly IAgencyCaseLoadService _agencyCaseLoadService;
 
-        public AgencyProfileService(ApplicationDbContext context)
+        public AgencyProfileService(ApplicationDbContext context, IAgencyCaseLoadService agencyCaseLoadService)
         {
             _context = context;
+            _agencyCaseLoadService = agencyCaseLoadService;
         }
 
         public async Task<Vendor> GetAgencyProfileAsync(string userEmail)
@@ -28,7 +32,7 @@ namespace risk.control.system.Services.AgencyAdmin
 
             if (vendorUser == null) return null;
 
-            return await _context.Vendor
+            var vendor = await _context.Vendor
                 .Include(v => v.Ratings)
                 .Include(v => v.Country)
                 .Include(v => v.PinCode)
@@ -36,6 +40,21 @@ namespace risk.control.system.Services.AgencyAdmin
                 .Include(v => v.District)
                 .Include(v => v.VendorInvestigationServiceTypes)
                 .FirstOrDefaultAsync(m => m.VendorId == vendorUser.VendorId);
+            var approvedStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR;
+            var rejectedStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR;
+
+            var vendorAllCasesCount = await _context.Investigations.CountAsync(c => c.VendorId == vendor.VendorId && !c.Deleted &&
+                      (c.SubStatus == approvedStatus ||
+                      c.SubStatus == rejectedStatus));
+
+            var vendorUserCount = await _context.ApplicationUser.CountAsync(c => c.VendorId == vendor.VendorId && !c.Deleted);
+
+            // HACKY
+            var currentCases = await _agencyCaseLoadService.GetAgencyIdsLoad(new List<long> { vendor.VendorId });
+            vendor.SelectedCountryId = vendorUserCount;
+            vendor.SelectedStateId = currentCases.FirstOrDefault().CaseCount;
+            vendor.SelectedDistrictId = vendorAllCasesCount;
+            return vendor;
         }
 
         public async Task<Vendor> GetAgencyForEditAsync(string userEmail)

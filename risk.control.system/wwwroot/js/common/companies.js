@@ -3,7 +3,7 @@
     const isdCode = $('#Isd').val();
     displayBankCodeLabels(countryCode, isdCode);
 
-    $('#edit-company.btn.btn-warning').on('click', function () {
+    $('#edit-company').on('click', function () {
         $("body").addClass("submit-progress-bg");
         // Wrap in setTimeout so the UI
         // can update the spinners
@@ -17,7 +17,7 @@
         $('a').addClass('disabled-anchor').on('click', function (e) {
             e.preventDefault(); // Prevent default action for anchor clicks
         });
-        $('#edit-company.btn.btn-warning').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Edit Company");
+        $('#edit-company').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Edit Company");
 
         var article = document.getElementById("article");
         if (article) {
@@ -28,7 +28,7 @@
         }
     });
 
-    $('#edit-profile.btn.btn-warning').on('click', function () {
+    $('#edit-profile').on('click', function () {
         $("body").addClass("submit-progress-bg");
         // Wrap in setTimeout so the UI
         // can update the spinners
@@ -42,7 +42,7 @@
         $('a').addClass('disabled-anchor').on('click', function (e) {
             e.preventDefault(); // Prevent default action for anchor clicks
         });
-        $('#edit-profile.btn.btn-warning').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Profile");
+        $('#edit-profile').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Edit Profile");
 
         var article = document.getElementById("article");
         if (article) {
@@ -53,7 +53,7 @@
         }
     });
 
-    $('a#editagency.btn.btn-warning').on('click', function () {
+    $('#editagency').on('click', function () {
         $("body").addClass("submit-progress-bg");
         // Wrap in setTimeout so the UI
         // can update the spinners
@@ -67,7 +67,7 @@
         $('a').addClass('disabled-anchor').on('click', function (e) {
             e.preventDefault(); // Prevent default action for anchor clicks
         });
-        $('a#editagency.btn.btn-warning').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Edit Agency");
+        $('#editagency').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Edit Profile");
 
         var article = document.getElementById("article");
         if (article) {
