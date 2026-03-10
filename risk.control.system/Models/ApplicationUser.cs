@@ -37,28 +37,20 @@ namespace risk.control.system.Models
         [StringLength(50, MinimumLength = 3, ErrorMessage = "LastName must be between 3 and 50 characters.")]
         public string LastName { get; set; } = default!;
 
-        [Display(Name = "PinCode name")]
         public long? PinCodeId { get; set; } = default!;
 
-        [Display(Name = "PinCode name")]
         public PinCode? PinCode { get; set; } = default!;
 
-        [Display(Name = "State name")]
         public long? StateId { get; set; } = default!;
 
-        [Display(Name = "State name")]
         public State? State { get; set; } = default!;
 
-        [Display(Name = "Country name")]
         public long? CountryId { get; set; } = default!;
 
-        [Display(Name = "Country name")]
         public Country? Country { get; set; } = default!;
 
-        [Display(Name = "District")]
         public long? DistrictId { get; set; } = default!;
 
-        [Display(Name = "District")]
         public District? District { get; set; } = default!;
 
         [Display(Name = "Address line")]
@@ -71,7 +63,6 @@ namespace risk.control.system.Models
 
         public string? Password { get; set; }
 
-        [Display(Name = "Active")]
         public bool Active { get; set; } = false;
 
         public bool Deleted { get; set; } = false;
@@ -94,14 +85,9 @@ namespace risk.control.system.Models
         public string? AddressLongitude { get; set; }
         public string? AddressMapLocation { get; set; }
         public bool IsUpdated { get; set; } = true;
-
-        [StringLength(50, MinimumLength = 5, ErrorMessage = "Comments must be between 5 and 50 characters.")]
-        public string? Comments { get; set; } = default!;
-
         public DateTime? FaceIndexedAt { get; set; }
         public string? AwsFaceId { get; set; }
 
-        [Display(Name = "Image")]
         [NotMapped]
         public IFormFile? ProfileImage { get; set; }
 

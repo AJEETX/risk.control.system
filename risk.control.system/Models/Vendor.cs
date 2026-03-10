@@ -12,10 +12,13 @@ namespace risk.control.system.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long VendorId { get; set; }
 
+        [Required]
         [Display(Name = "Agency name")]
         [StringLength(50, MinimumLength = 3, ErrorMessage = "Name must be between 3 and 50 characters.")]
         public string Name { get; set; } = string.Empty;
 
+        [Required]
+        [StringLength(50, MinimumLength = 5, ErrorMessage = "Name must be between 5 and 50 characters.")]
         public string Email { get; set; } = string.Empty;
 
         [StringLength(70, MinimumLength = 3, ErrorMessage = "Addressline must be between 3 and 70 characters.")]
@@ -23,25 +26,20 @@ namespace risk.control.system.Models
 
         public List<VendorInvestigationServiceType>? VendorInvestigationServiceTypes { get; set; } = default!;
 
-        [Display(Name = "State name")]
         public long? StateId { get; set; } = default!;
 
         public State? State { get; set; } = default!;
 
-        [Display(Name = "Country name")]
         public long? CountryId { get; set; } = default!;
 
         public Country? Country { get; set; } = default!;
 
-        [Display(Name = "Pincode")]
         public long? PinCodeId { get; set; } = default!;
 
         public PinCode? PinCode { get; set; } = default!;
 
-        [Display(Name = "District")]
         public long? DistrictId { get; set; } = default!;
 
-        [Display(Name = "District")]
         public District? District { get; set; } = default!;
 
         [Display(Name = "Bank Name")]
@@ -64,7 +62,7 @@ namespace risk.control.system.Models
         [DataType(DataType.Date)]
         public DateTime? ActivatedDate { get; set; } = DateTime.UtcNow;
 
-        public VendorStatus? Status { get; set; } = VendorStatus.ACTIVE;
+        public VendorStatus? Status { get; set; }
         public Domain? DomainName { get; set; } = Domain.com;
 
         [Display(Name = "Document")]
@@ -77,13 +75,10 @@ namespace risk.control.system.Models
         public string? AddressLatitude { get; set; }
         public string? AddressLongitude { get; set; }
 
-        [Display(Name = "Vendor Users")]
         public List<ApplicationUser>? ApplicationUser { get; set; }
 
-        [Display(Name = "Insurer names")]
         public List<ClientCompany>? Clients { get; set; } = new List<ClientCompany>();
 
-        [Display(Name = "Empanel")]
         public bool Deleted { get; set; } = false;
 
         public int? RateCount

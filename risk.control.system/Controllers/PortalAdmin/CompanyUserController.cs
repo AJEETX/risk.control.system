@@ -199,7 +199,6 @@ namespace risk.control.system.Controllers.PortalAdmin
                     user.PinCodeId = applicationUser.SelectedPincodeId;
 
                     user.Updated = DateTime.Now;
-                    user.Comments = applicationUser.Comments;
                     user.Role = applicationUser.Role;
                     user.Role = (AppRoles)Enum.Parse(typeof(AppRoles), user.Role.ToString());
                     user.PhoneNumber = applicationUser.PhoneNumber;

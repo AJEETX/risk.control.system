@@ -4329,3 +4329,141 @@ div.form-group.text-center.image-logo-container {
     background-color: whitesmoke;
     border-radius: 1em;
 }
+
+.profile-header {
+    background-color: #6c757d;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+}
+
+.profile-body {
+    background-color: #f8f9fa;
+    padding: 2rem;
+}
+
+/* Sidebar & Logo */
+.identity-card {
+    border: none;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    height: 100%;
+    border-radius: 0.5rem;
+}
+
+.agency-logo {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 3px solid #dee2e6;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+    .agency-logo:hover {
+        transform: scale(1.05);
+    }
+
+.agency-name {
+    margin-top: 1rem;
+    font-weight: 700;
+    color: #343a40;
+}
+
+.agency-email {
+    color: #6c757d;
+    font-size: 0.875rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Ratings & Badges */
+.rating-container {
+    margin-bottom: 1.5rem;
+    border-top: 1px solid #eee;
+    padding-top: 1rem;
+}
+
+.review-count {
+    display: block;
+    font-size: 0.75rem;
+    color: #6c757d;
+    margin-top: 0.25rem;
+}
+
+.status-badge {
+    padding: 0.4rem 1rem;
+    border-radius: 50rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.status-active {
+    background-color: #28a745;
+    color: white;
+}
+
+.status-inactive {
+    background-color: #dc3545;
+    color: white;
+}
+
+/* Section Cards */
+.detail-section-card {
+    border: none;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    border-radius: 0.5rem;
+}
+
+    .detail-section-card .card-header {
+        background-color: white;
+        font-weight: 600;
+        border-bottom: 1px solid #f1f1f1;
+        padding: 0.75rem 1.25rem;
+    }
+
+.detail-group {
+    margin-bottom: 1rem;
+}
+
+    .detail-group label {
+        display: block;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        color: #adb5bd;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.25rem;
+    }
+
+    .detail-group p {
+        margin-bottom: 0;
+        font-weight: 500;
+        color: #495057;
+    }
+
+/* Forms & Switches */
+.custom-control-input:disabled ~ .custom-control-label {
+    cursor: not-allowed;
+    opacity: 0.8;
+}
+
+.activation-info {
+    background-color: #e7f3ff;
+    color: #004085;
+    padding: 0.75rem;
+    border-radius: 0.4rem;
+    font-size: 0.85rem;
+}
+
+    .activation-info i {
+        margin-right: 0.5rem;
+    }
+
+/* Footer */
+.profile-footer {
+    background-color: white;
+    border-top: 1px solid #dee2e6;
+    text-align: right;
+    padding: 1rem 1.5rem;
+}
