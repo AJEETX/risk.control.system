@@ -152,8 +152,7 @@ namespace risk.control.system.Models
                 $"- Rapid API Host: {PanAPIHost}\n" +
                 $"- Passport API URL: {PassportApiUrl}\n" +
                 $"- Passport API Key: {PassportApiData}\n" +
-                $"- Passport API Host: {PassportApiHost}\n" +
-                $"- Can Change Password: {CanChangePassword}\n";
+                $"- Passport API Host: {PassportApiHost}\n";
         }
     }
 

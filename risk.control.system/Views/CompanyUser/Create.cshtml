@@ -124,8 +124,6 @@
 								<span asp-validation-for="PhoneNumber" class="text-danger"></span>
 							</div>
 						</div>
-
-						
 					</div>
 					<div class="col-md-6">
 						<partial name="_Address" model="@Model" />
@@ -152,28 +150,6 @@
 									<span asp-validation-for="@Model.Role" class="text-danger"></span>
 								</div>
 							</div>
-						<div class="form-group">
-							<label class="input-group-label" for="Comments"> Note:</label>
-							<div class="input-group mb-3">
-								<div class="input-group-prepend">
-									<span class="input-group-text"> <i class="fa fa-asterisk asterik-style-none"></i><i class="fas fa-comment"></i> </span>
-								</div>
-								<input id="Comments" type="text" asp-for="Comments" class="form-control remarks" placeholder="Remarks (optional)" maxlength="70" autocomplete="off" />
-							</div>
-						</div>
-						@* <div class="form-group">
-                                        <span class="input-group-label"> Status:</span>
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text"><i class="fa fa-toggle-on"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                            </div>
-                                            <div class="input-group-prepend">
-                                            </div>
-                                            <span class="checkbox">
-                                                <input asp-for="Active" type="checkbox" data-toggle="toggle" data-on="<i class='fa fa-toggle-on'></i> Active " data-off="<i class='fa fa-toggle-off'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
-                                            </span>
-                                        </div>
-                                    </div> *@
 					</div>
 				</div>
 			</div>
