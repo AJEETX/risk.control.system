@@ -6,7 +6,11 @@
 
 <div class="row">
     <div class="col-md-6">
-
+        <div class="bg-light p-3 rounded mb-3 border">
+            <h6 class="text-secondary border-bottom pb-2 mb-3">
+                <i class="fas fa-camera mr-2"></i> User Photo
+            </h6>
+    
         <div class="form-group text-center">
             <div class="profile-img-container mb-2">
                 <img id="document-Image" class="form-Image img-circle" src="@Applicationsettings.NO_USER" title="User Photo" alt="User" data-bs-toggle="tooltip" />
@@ -30,8 +34,14 @@
             </div>
             </div>
         </div>
-
-        <div class="form-group">
+        </div>
+        <div class="bg-light p-3 rounded mb-3 border">
+            <h6 class="text-secondary border-bottom pb-2 mb-3">
+                <i class="fas fa-id-card mr-2"></i> Identity Details
+            </h6>
+            <div class="row">
+                <div class="col-md-6">
+                <div class="form-group">
             <label class="input-group-label" for="FirstName"> First Name:</label>
             <div class="input-group mb-3">
                 <div class="input-group-prepend">
@@ -41,7 +51,8 @@
                 <span asp-validation-for="FirstName" class="text-danger"></span>
             </div>
         </div>
-
+        </div>
+                <div class="col-md-6">
         <div class="form-group">
             <label class="input-group-label" for="LastName"> Last Name:</label>
             <div class="input-group mb-3">
@@ -52,54 +63,79 @@
                 <span asp-validation-for="LastName" class="text-danger"></span>
             </div>
         </div>
-
-        @*<div class="form-group">
-        <span class="input-group-label"> Password:</span>
-        <div class="input-group mb-3">
-        <div class="input-group-prepend">
-        <span class="input-group-text" id="Password"> <i class="fa fa-key"></i> <i class="fa fa-asterisk asterik-style"></i></span>
         </div>
-        <input type="password" asp-for="Password" class="form-control remarks" required placeholder="Password"  maxlength="20" autocomplete="new-password">
-        <span asp-validation-for="Password" class="text-danger"></span>
         </div>
-        </div>*@
-        
-        <div class="form-group">
-            <label class="input-group-label" for="PhoneNumber"> Mobile #:</label>
-            <div class="input-group">
-                <div class="input-group-prepend">
-                    @{
-                        var imgPath = "/flags/" + @Model.Country.Code.ToLower() + ".png";
-                    }
-                    <span class="input-group-text country-code-text" data-bs-toggle="tooltip" title="Country Code: +@Model?.Country.ISDCode">
-                        <img src="@imgPath" class="flag-icon" data-bs-toggle="tooltip" alt="flag"/>  +@Model?.Country.ISDCode <i class="fa fa-asterisk asterik-style"></i>
+        </div>
+        <div class="bg-light p-3 rounded mb-3 border">
+            <h6 class="text-secondary border-bottom pb-2 mb-3">
+                <i class="fas  fa-mobile-phone mr-2"></i> Contact#
+            </h6>
+            <div class="form-group">
+                <label class="input-group-label" for="PhoneNumber"> Mobile #:</label>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        @{
+                            var imgPath = "/flags/" + @Model.Country.Code.ToLower() + ".png";
+                        }
+                        <span class="input-group-text country-code-text" data-bs-toggle="tooltip" title="Country Code :+@Model?.Country.ISDCode">
+                            <img src="@imgPath" class="flag-icon" data-bs-toggle="tooltip" alt="flag" />  +@Model?.Country.ISDCode<i class="fa fa-asterisk asterik-style"></i>
+                        </span>
+                    </div>
+                    <input id="PhoneNumber" type="text" asp-for="PhoneNumber" class="form-control remarks" required maxlength="10" placeholder="Mobile # without country-code" data-bs-toggle="tooltip" />
+                    <span id="phone-spinner" class="text-secondary phone-icon d-none">
+                        <i class="fas fa-spinner fa-spin"></i>
                     </span>
+                    <span id="phone-valid" class="text-success phone-icon d-none"></span>
+                    <span id="phone-invalid" class="text-danger phone-icon d-none"></span>
+                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
                 </div>
-                <input id="PhoneNumber" type="text" asp-for="PhoneNumber" class="form-control remarks" required maxlength="10" placeholder="Enter mobile # without country-code" data-bs-toggle="tooltip" />
-                <span id="phone-spinner" class="text-secondary phone-icon d-none">
-                                    <i class="fas fa-spinner fa-spin"></i>
-                                </span>
-                                <span id="phone-valid" class="text-success phone-icon d-none">
-                                </span>
-                                <span id="phone-invalid" class="text-danger phone-icon d-none">
-                                    <i class="fas fa-times-circle"></i>
-                                </span>
-                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
             </div>
+            
+
         </div>
-            @* <div class="form-group">
-            <span class="input-group-label"> Note:</span>
-            <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                    <span class="input-group-text" id="Comments"><i class="fas fa-comment"></i>  <i class="fa fa-asterisk asterik-style-none"></i></span>
-                </div>
-                <input type="text" asp-for="Comments" class="form-control remarks" placeholder="Notes (optional)"  maxlength="50" />
-            </div>
-        </div> *@
         
     </div>
     <div class="col-md-6">
-         
+        <div class="bg-light p-3 rounded mb-3 border">
+            <h6 class="text-secondary border-bottom pb-2 mb-3">
+                <i class="fas fa-user-shield mr-2"></i> Role
+            </h6>
+            @if (Model.Role == null)
+            {
+                <div class="form-group">
+                    <label class="input-group-label" for="UserRole"> Role:</label>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="nav-icon fas fa-file-invoice"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                        </div>
+                    
+                        <select required asp-for="@Model.Role" class="form-control remarks" asp-items="@Model.AvailableRoles">
+                            <option value="">--- SELECT ---</option>
+                        </select>
+                        <span asp-validation-for="@Model.Role" class="text-danger"></span>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="form-group">
+                    <label class="input-group-label" for="UserRole"> Role:</label>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="nav-icon fas fa-file-invoice"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                        </div>
+                        <select asp-for="@Model.Role" class="form-control remarks">
+                            <option value="@Model.Role">@Model.Role</option>
+                        </select>
+                    </div>
+                </div>
+            }
+
+        </div>
+        <div class="bg-light p-3 rounded mb-3 border">
+            <h6 class="text-secondary border-bottom pb-2 mb-3">
+                <i class="fas fa-map-marker-alt mr-2"></i> Address Details
+            </h6>
         <partial name="_Address" model="@Model" />
         <div class="form-group">
             <label class="input-group-label" for="Addressline"> Address:</label>
@@ -111,37 +147,12 @@
                 <span asp-validation-for="Addressline" class="text-danger"></span>
             </div>
         </div>
-        @if (Model.Role == null)
-        {
-            <div class="form-group">
-                <label class="input-group-label" for="UserRole"> Role:</label>
-                <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text"><i class="nav-icon fas fa-file-invoice"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                    </div>
-                    
-                    <select required asp-for="@Model.Role" class="form-control remarks" asp-items="@Model.AvailableRoles">
-                        <option value="">--- SELECT ---</option>
-                    </select>
-                    <span asp-validation-for="@Model.Role" class="text-danger"></span>
-                </div>
-            </div>
-        }
-        else
-        {
-            <div class="form-group">
-                <label class="input-group-label" for="UserRole"> Role:</label>
-                <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text"><i class="nav-icon fas fa-file-invoice"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                    </div>
-                    <select asp-for="@Model.Role" class="form-control remarks">
-                        <option value="@Model.Role">@Model.Role</option>
-                    </select>
-                </div>
-            </div>
-        }
-   
+        </div>
+        
+        <div class="bg-light p-3 rounded mb-3 border">
+            <h6 class="text-secondary border-bottom pb-2 mb-3">
+                <i class="fa fa-toggle-on mr-2"></i> User Status
+            </h6>
         @if(Model.Active)
         {
             <div class="form-group">

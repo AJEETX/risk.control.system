@@ -12,7 +12,7 @@ namespace risk.control.system.Models
 
         public bool SendSMS { get; set; } = false;
 
-        public bool CanChangePassword { get; set; } = false;
+        public bool CanChangePassword { get; set; } = true;
         public bool VerifyPan { get; set; } = false;
         public bool VerifyPassport { get; set; } = false;
         public bool EnablePassport { get; set; } = false;

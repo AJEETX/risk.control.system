@@ -158,7 +158,6 @@ namespace risk.control.system.Services.AgencyAdmin
             user.DistrictId = model.SelectedDistrictId;
             user.IsUpdated = true;
             user.Updated = DateTime.UtcNow;
-            user.Comments = WebUtility.HtmlEncode(model.Comments.Trim());
             user.PhoneNumber = WebUtility.HtmlEncode(model.PhoneNumber.TrimStart('0').Trim());
             user.UpdatedBy = updatedBy;
             user.SecurityStamp = DateTime.UtcNow.ToString();
