@@ -276,7 +276,6 @@ namespace risk.control.system.Controllers.PortalAdmin
                     user.PinCodeId = applicationUser.PinCodeId;
                     user.Updated = DateTime.UtcNow;
                     user.IsUpdated = true;
-                    user.Comments = applicationUser.Comments;
                     user.PhoneNumber = applicationUser.PhoneNumber.TrimStart('0');
                     user.UpdatedBy = currentUserEmail;
                     user.SecurityStamp = DateTime.UtcNow.ToString();

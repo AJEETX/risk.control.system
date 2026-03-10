@@ -175,6 +175,8 @@
             } else {
                 $('td', row).removeClass('lightgrey');
             }
+            $('.btn-warning', row).addClass('btn-black-color');
+
         },
         "drawCallback": function (settings, start, end, max, total, pre) {
             // Reinitialize Bootstrap 5 tooltips

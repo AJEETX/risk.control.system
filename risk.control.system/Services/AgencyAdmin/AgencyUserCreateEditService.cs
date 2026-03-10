@@ -206,7 +206,6 @@ namespace risk.control.system.Services.AgencyAdmin
             model.LastName = WebUtility.HtmlEncode(textInfo.ToTitleCase(model.LastName.Trim().ToLower()));
 
             model.PhoneNumber = WebUtility.HtmlEncode(model.PhoneNumber?.TrimStart('0').Trim());
-            model.Comments = WebUtility.HtmlEncode(model.Comments?.Trim());
             model.Addressline = WebUtility.HtmlEncode(model.Addressline.Trim());
             model.PinCodeId = model.SelectedPincodeId;
             model.DistrictId = model.SelectedDistrictId;
@@ -320,7 +319,6 @@ namespace risk.control.system.Services.AgencyAdmin
             user.LastName = WebUtility.HtmlEncode(textInfo.ToTitleCase(input.LastName.Trim().ToLower()));
 
             user.Addressline = WebUtility.HtmlEncode(input.Addressline.Trim());
-            user.Comments = WebUtility.HtmlEncode(input.Comments?.Trim());
             user.PhoneNumber = input.PhoneNumber?.TrimStart('0').Trim();
             user.Active = input.Active;
 

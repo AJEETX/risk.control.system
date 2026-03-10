@@ -26,12 +26,12 @@
 								<span class="input-group-text" id="emailid"><i class="fas fa-at"></i> <i class="fa fa-asterisk asterik-style"></i> </span>
 							</div>
 							<input type="text" asp-for="Email" id="emailAddress" class="form-control email-address remarks" required
-								   placeholder="email" maxlength="15" autocomplete="name" title="Enter unique email with 5 minimum character" data-bs-toggle="tooltip" />
+								   placeholder="email" maxlength="15" autocomplete="new-password" title="Enter unique email with 5 minimum character" data-bs-toggle="tooltip" />
 							<div class="input-group-append" title="domain name">
-								<span class="input-group-text" id="Email">@@@email</span>
+								<span class="input-group-text font-weight-bold" id="Email">@@@email</span>
 							</div>
 							<div class="input-group-append" data-bs-toggle="tooltip" title="Click to validate email">
-								<button disabled id="check-email" class="input-group-text disabled-btn validate-user">
+								<button disabled id="check-email" class="btn btn-info disabled-btn validate-user">
 									<i class="far fa-question-circle"></i>
 								</button>
 							</div>
@@ -62,107 +62,136 @@
 					<div class="row">
 						<div class="col-md-6">
 							<div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
-							<div class="form-group text-center">
-								<div class="profile-img-container mb-2">
-									<img id="document-Image" class="form-Image img-circle" src="@Applicationsettings.NO_USER" title="User Photo" alt="User" data-bs-toggle="tooltip" />
-								</div>
-								<div class="control-label">User Photo <i class="fa fa-asterisk asterik-style-logo"></i></div>
-								<div class="row justify-content-center">
-									<div class="col-10 col-md-8">
-										<div class="custom-file text-left">
-											<input id="createImageInput" accept=".jpg,.jpeg,.png" asp-for="ProfileImage" required
-												   class="custom-file-input document-image-input remarks d-none" type="file"
-												   data-preview-id="createProfileImage" data-title-id="user-document" title="Choose User Photo" data-bs-toggle="tooltip" />
-											<span asp-validation-for="ProfileImage" class="text-danger"></span>
-											<div class="row justify-content-center">
-												<label for="createImageInput" class="btn btn-outline-primary">
-													<i class="fa fa-cloud-upload mr-2"></i>
-													Add User Photo
-												</label>
+							<div class="bg-light p-3 rounded mb-3 border">
+								<h6 class="text-secondary border-bottom pb-2 mb-3">
+									<i class="fas fa-camera mr-2"></i> User Photo
+								</h6>
+    
+								<div class="form-group text-center">
+									<div class="profile-img-container mb-2">
+										<img id="document-Image" class="form-Image img-circle" src="@Applicationsettings.NO_USER" title="User Photo" alt="User" data-bs-toggle="tooltip" />
+									</div>
+									<div class="row justify-content-center">
+										<div class="col-10 col-md-8">
+											<div class="custom-file text-left">
+												<input id="createImageInput" accept=".jpg,.jpeg,.png" asp-for="ProfileImage" required
+													   class="custom-file-input document-image-input remarks d-none" type="file"
+													   data-preview-id="createProfileImage" data-title-id="user-document" title="Choose User Photo" data-bs-toggle="tooltip" />
+												<span asp-validation-for="ProfileImage" class="text-danger"></span>
+												<div class="row justify-content-center">
+													<label for="createImageInput" class="btn btn-outline-primary">
+														<i class="fa fa-cloud-upload mr-2"></i>
+														Add User Photo
+													</label>
+												</div>
 											</div>
 										</div>
 									</div>
 								</div>
 							</div>
-
-							<div class="form-group">
-								<label class="input-group-label" for="FirstName"> First Name:</label>
-								<div class="input-group mb-3">
-									<div class="input-group-prepend">
-										<span class="input-group-text"><i class="fa fa-user"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-									</div>
-									<input type="text" id="FirstName" asp-for="FirstName" class="form-control title-name remarks" required placeholder="First Name" minlength="3" maxlength="20" autocomplete="off">
-										<span asp-validation-for="FirstName" class="text-danger"></span>
-									</div>
-								</div>
-								<div class="form-group">
-									<label class="input-group-label" for="LastName"> Last Name:</label>
-									<div class="input-group mb-3">
-										<div class="input-group-prepend">
-											<span class="input-group-text"> <i class="fa fa-user"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-										</div>
-										<input type="text" id="LastName" asp-for="LastName" class="form-control title-name remarks" required placeholder="Last Name" maxlength="20" autocomplete="off">
-											<span asp-validation-for="LastName" class="text-danger"></span>
-										</div>
-									</div>
-									<div class="form-group">
-										<label class="input-group-label" for="PhoneNumber"> Mobile #:</label>
-										<div class="input-group">
-											<div class="input-group-prepend">
-												@{
-													var imgPath = "/flags/" + @Model.Country.Code.ToLower() + ".png";
-												}
-												<span class="input-group-text country-code-text" data-bs-toggle="tooltip" title="Country Code :+@Model?.Country.ISDCode">
-													<img src="@imgPath" class="flag-icon" data-bs-toggle="tooltip" alt="flag" />  +@Model?.Country.ISDCode<i class="fa fa-asterisk asterik-style"></i>
-												</span>
+							<div class="bg-light p-3 rounded mb-3 border">
+								<h6 class="text-secondary border-bottom pb-2 mb-3">
+									<i class="fas fa-id-card mr-2"></i> Identity Details
+								</h6>
+								<div class="row">
+									<div class="col-md-6">
+										<div class="form-group">
+											<label class="input-group-label" for="FirstName">First Name:</label>
+											<div class="input-group">
+												<div class="input-group-prepend">
+													<span class="input-group-text"><i class="fa fa-user"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+												</div>
+												<input type="text" id="FirstName" asp-for="FirstName" class="form-control title-name remarks" required placeholder="First Name" minlength="3" maxlength="20">
+												</div>
+												<span asp-validation-for="FirstName" class="text-danger small"></span>
 											</div>
-											<input id="PhoneNumber" type="text" asp-for="PhoneNumber" class="form-control remarks" required maxlength="10" placeholder="Enter mobile # without country-code" data-bs-toggle="tooltip" />
-											<span id="phone-spinner" class="text-secondary phone-icon d-none">
-												<i class="fas fa-spinner fa-spin"></i>
-											</span>
-											<span id="phone-valid" class="text-success phone-icon d-none"></span>
-											<span id="phone-invalid" class="text-danger phone-icon d-none"></span>
-											<span asp-validation-for="PhoneNumber" class="text-danger"></span>
 										</div>
+
+										<div class="col-md-6">
+											<div class="form-group">
+												<label class="input-group-label" for="LastName">Last Name:</label>
+												<div class="input-group">
+													<div class="input-group-prepend">
+														<span class="input-group-text"> <i class="fa fa-user"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+													</div>
+													<input type="text" id="LastName" asp-for="LastName" class="form-control title-name remarks" required placeholder="Last Name" maxlength="20">
+													</div>
+													<span asp-validation-for="LastName" class="text-danger small"></span>
+												</div>
+											</div>
+										</div>
+										
 									</div>
 								</div>
 								<div class="col-md-6">
-								
+									<div class="bg-light p-3 rounded mb-3 border">
+										<h6 class="text-secondary border-bottom pb-2 mb-3">
+											<i class="fas fa-user-shield mr-2"></i> Contact# & Role
+										</h6>
+										<div class="row">
+											<div class="col-md-6">
 
-									<partial name="_Address" model="@Model" />
+										<div class="form-group">
+											<label class="input-group-label" for="PhoneNumber"> Mobile #:</label>
+											<div class="input-group">
+												<div class="input-group-prepend">
+													@{
+														var imgPath = "/flags/" + @Model.Country.Code.ToLower() + ".png";
+													}
+													<span class="input-group-text country-code-text" data-bs-toggle="tooltip" title="Country Code :+@Model?.Country.ISDCode">
+														<img src="@imgPath" class="flag-icon" data-bs-toggle="tooltip" alt="flag" />  +@Model?.Country.ISDCode<i class="fa fa-asterisk asterik-style"></i>
+													</span>
+												</div>
+												<input id="PhoneNumber" type="text" asp-for="PhoneNumber" class="form-control remarks" required maxlength="10" placeholder="Mobile # without country-code" data-bs-toggle="tooltip" />
+												<span id="phone-spinner" class="text-secondary phone-icon d-none">
+													<i class="fas fa-spinner fa-spin"></i>
+												</span>
+												<span id="phone-valid" class="text-success phone-icon d-none"></span>
+												<span id="phone-invalid" class="text-danger phone-icon d-none"></span>
+												<span asp-validation-for="PhoneNumber" class="text-danger"></span>
+											</div>
+										</div>
+											</div>
 
-									<div class="form-group">
-										<label class="input-group-label" for="Addressline"> Address:</label>
-										<div class="input-group mb-3">
-											<div class="input-group-prepend">
-												<span class="input-group-text"><i class="fa fa-home"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
+												<div class="col-md-6">
+
+										<div class="form-group">
+											<label class="input-group-label" for="Role"> Role:</label>
+											<div class="input-group mb-3">
+												<div class="input-group-prepend">
+													<span class="input-group-text"><i class="nav-icon fas fa-file-invoice"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+												</div>
+												<select id="Role" required asp-for="Role" class="form-control remarks" asp-items="@Model.AvailableRoles">
+													<option value="">--- SELECT ---</option>
+												</select>
+												<span asp-validation-for="Role" class="text-danger"></span>
 											</div>
-											<input type="text" id="Addressline" asp-for="Addressline" class="form-control remarks" placeholder="Street Address..." required maxlength="70" autocomplete="off" />
-											<span asp-validation-for="Addressline" class="text-danger"></span>
+										</div>
+										</div>
+										</div>
+
+									</div>
+									<div class="bg-light p-3 rounded mb-3 border">
+										<h6 class="text-secondary border-bottom pb-2 mb-3">
+											<i class="fas fa-map-marker-alt mr-2"></i> Address Details
+										</h6>
+    
+										<partial name="_Address" model="@Model" />
+
+										<div class="form-group mb-0">
+											<label class="input-group-label" for="Addressline">Street Address:</label>
+											<div class="input-group">
+												<div class="input-group-prepend">
+													<span class="input-group-text"><i class="fa fa-home"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+												</div>
+												<input type="text" id="Addressline" asp-for="Addressline" class="form-control remarks" placeholder="House/Building/Street..." required maxlength="70" autocomplete="off" />
+											</div>
+											<span asp-validation-for="Addressline" class="text-danger small"></span>
 										</div>
 									</div>
-									<div class="form-group">
-										<label class="input-group-label" for="Role"> Role:</label>
-										<div class="input-group mb-3">
-											<div class="input-group-prepend">
-												<span class="input-group-text"><i class="nav-icon fas fa-file-invoice"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-											</div>
-											<select id="Role" required asp-for="Role" class="form-control remarks" asp-items="@Model.AvailableRoles">
-												<option value="">--- SELECT ---</option>
-											</select>
-											<span asp-validation-for="Role" class="text-danger"></span>
-										</div>
-									</div>
-									<div class="form-group">
-										<label class="input-group-label" for="Comments"> Note:</label>
-										<div class="input-group mb-3">
-											<div class="input-group-prepend">
-												<span class="input-group-text"> <i class="fa fa-asterisk asterik-style-none"></i><i class="fas fa-comment"></i> </span>
-											</div>
-											<input type="text" id="Comments" asp-for="Comments" class="form-control remarks" placeholder="Notes (optional)" maxlength="70" autocomplete="off" />
-										</div>
-									</div>
+									
+									
+									
 								</div>
 							</div>
 
