@@ -82,8 +82,8 @@ namespace risk.control.system.Controllers.Api.Company
             }
         }
 
-        [HttpGet("GetAvailableVendors")]
-        public async Task<IActionResult> GetAvailableVendors()
+        [HttpGet("AvailableAgency")]
+        public async Task<IActionResult> AvailableAgency()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 

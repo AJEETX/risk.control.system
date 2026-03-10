@@ -3,10 +3,11 @@
 <input type="hidden" asp-for="Email" id="mailAddress" />
 <input type="hidden" id="Isd" value="@Model?.Country.ISDCode" />
 <input type="hidden" id="countryCode" value="@Model?.Country.Code" />
+<input type="hidden" asp-for="Active" value="true" />
 
 <div class="row">
     <div class="col-md-6">
-        <div class="bg-light p-3 rounded mb-3 border">
+        <div class="bg-light p-2 rounded mb-2 border">
             <h6 class="text-secondary border-bottom pb-2 mb-3">
                 <i class="fas fa-camera mr-2"></i> User Photo
             </h6>
@@ -36,7 +37,7 @@
         </div>
         </div>
         <div class="bg-light p-3 rounded mb-3 border">
-            <h6 class="text-secondary border-bottom pb-2 mb-3">
+            <h6 class="text-secondary border-bottom pb-2 mb-2">
                 <i class="fas fa-id-card mr-2"></i> Identity Details
             </h6>
             <div class="row">
@@ -66,41 +67,38 @@
         </div>
         </div>
         </div>
-        <div class="bg-light p-3 rounded mb-3 border">
-            <h6 class="text-secondary border-bottom pb-2 mb-3">
-                <i class="fas  fa-mobile-phone mr-2"></i> Contact#
-            </h6>
-            <div class="form-group">
-                <label class="input-group-label" for="PhoneNumber"> Mobile #:</label>
-                <div class="input-group">
-                    <div class="input-group-prepend">
-                        @{
-                            var imgPath = "/flags/" + @Model.Country.Code.ToLower() + ".png";
-                        }
-                        <span class="input-group-text country-code-text" data-bs-toggle="tooltip" title="Country Code :+@Model?.Country.ISDCode">
-                            <img src="@imgPath" class="flag-icon" data-bs-toggle="tooltip" alt="flag" />  +@Model?.Country.ISDCode<i class="fa fa-asterisk asterik-style"></i>
-                        </span>
-                    </div>
-                    <input id="PhoneNumber" type="text" asp-for="PhoneNumber" class="form-control remarks" required maxlength="10" placeholder="Mobile # without country-code" data-bs-toggle="tooltip" />
-                    <span id="phone-spinner" class="text-secondary phone-icon d-none">
-                        <i class="fas fa-spinner fa-spin"></i>
-                    </span>
-                    <span id="phone-valid" class="text-success phone-icon d-none"></span>
-                    <span id="phone-invalid" class="text-danger phone-icon d-none"></span>
-                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
-                </div>
-            </div>
-            
-
-        </div>
-        
     </div>
     <div class="col-md-6">
-        <div class="bg-light p-3 rounded mb-3 border">
-            <h6 class="text-secondary border-bottom pb-2 mb-3">
-                <i class="fas fa-user-shield mr-2"></i> Role
+        <div class="bg-light p-3 rounded mb-2 border">
+            <h6 class="text-secondary border-bottom pb-2 mb-2">
+                <i class="fas fa-user-shield mr-2"></i> Contact# & Role
             </h6>
-            @if (Model.Role == null)
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="input-group-label" for="PhoneNumber"> Mobile #:</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                @{
+                                    var imgPath = "/flags/" + @Model.Country.Code.ToLower() + ".png";
+                                }
+                                <span class="input-group-text country-code-text" data-bs-toggle="tooltip" title="Country Code :+@Model?.Country.ISDCode">
+                                    <img src="@imgPath" class="flag-icon" data-bs-toggle="tooltip" alt="flag" />  +@Model?.Country.ISDCode<i class="fa fa-asterisk asterik-style"></i>
+                                </span>
+                            </div>
+                            <input id="PhoneNumber" type="text" asp-for="PhoneNumber" class="form-control remarks" required maxlength="10" placeholder="Mobile # without country-code" data-bs-toggle="tooltip" />
+                            <span id="phone-spinner" class="text-secondary phone-icon d-none">
+                                <i class="fas fa-spinner fa-spin"></i>
+                            </span>
+                            <span id="phone-valid" class="text-success phone-icon d-none"></span>
+                            <span id="phone-invalid" class="text-danger phone-icon d-none"></span>
+                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                @if (Model.Role == null)
             {
                 <div class="form-group">
                     <label class="input-group-label" for="UserRole"> Role:</label>
@@ -131,9 +129,11 @@
                 </div>
             }
 
+            </div>
+            </div>
         </div>
         <div class="bg-light p-3 rounded mb-3 border">
-            <h6 class="text-secondary border-bottom pb-2 mb-3">
+            <h6 class="text-secondary border-bottom pb-2 mb-2">
                 <i class="fas fa-map-marker-alt mr-2"></i> Address Details
             </h6>
         <partial name="_Address" model="@Model" />
@@ -148,43 +148,5 @@
             </div>
         </div>
         </div>
-        
-        <div class="bg-light p-3 rounded mb-3 border">
-            <h6 class="text-secondary border-bottom pb-2 mb-3">
-                <i class="fa fa-toggle-on mr-2"></i> User Status
-            </h6>
-        @if(Model.Active)
-        {
-            <div class="form-group">
-                <label class="input-group-label" for="Active"> Status:</label>
-                <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text"><i class="fa fa-toggle-on"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                    </div>
-                    <div class="checkbox-wrapper">
-                        <input disabled asp-for="Active" type="checkbox" id="Active" class="custom-checkbox">
-                        <label for="Active" class="custom-checkbox-label"></label>
-                        <input type="hidden" asp-for="Active">
-                    </div>
-                </div>
-            </div>
-            
-        }
-        else
-        {
-            <div class="form-group">
-                <label class="input-group-label" for="Active"> Status:</label>
-                <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text"><i class="fa fa-toggle-on"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                    </div>
-                    <div class="checkbox-wrapper">
-                        <input asp-for="Active" type="checkbox" id="Active" class="custom-checkbox">
-                        <label for="Active" class="custom-checkbox-label"></label>
-                    </div>
-                </div>
-            </div>
-        }
-
-    </div>
+</div>
 </div>

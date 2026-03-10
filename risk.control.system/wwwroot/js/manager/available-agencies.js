@@ -1,7 +1,7 @@
 ﻿$(document).ready(function () {
     var table = $("#dataTable").DataTable({
         ajax: {
-            url: '/api/Company/GetAvailableVendors',
+            url: '/api/Company/AvailableAgency',
             type: 'GET',
             dataType: 'json',
             dataSrc: function (json) {
@@ -40,7 +40,16 @@
                 "sDefaultContent": "<span class='i-orangered'><i class='fas fa-exclamation-triangle' data-bs-toggle='tooltip' title='Incomplete/Inactive'></i></span>",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    if (row.canOnboard) {
+                    if (!row.status && !row.canOnboard) {
+                        return "<span class='i-red'><i class='fas fa-exclamation-triangle' data-bs-toggle='tooltip' title='Incomplete & Inactive'></i></span>";
+                    }
+                    else if (row.status && !row.canOnboard) {
+                        return "<span class='i-orangered'><i class='fas fa-exclamation-triangle' data-bs-toggle='tooltip' title='Incomplete'></i></span>";
+                    }
+                    else if (!row.status && row.canOnboard) {
+                        return "<span class='i-grey'><i class='fas fa-exclamation-triangle' data-bs-toggle='tooltip' title='Inactive'></i></span>";
+                    }
+                    else if (row.status && row.canOnboard) {
                         var img = '<input class="vendors" name="vendors" type="checkbox" id="' + row.id + '"  value="' + row.id + '" data-bs-toggle="tooltip" title="Select Agency to empanel" />';
                         return img;
                     }
@@ -131,6 +140,14 @@
                 bVisible: false
             }
         ],
+        "rowCallback": function (row, data, index) {
+            if (!data.status) {
+                $('td', row).addClass('lightgrey');
+            } else {
+                $('td', row).removeClass('lightgrey');
+            }
+            $('.btn-warning', row).addClass('btn-black-color');
+        },
         "drawCallback": function (settings, start, end, max, total, pre) {
             var rowCount = (this.fnSettings().fnRecordsTotal()); // total number of rows
             if (rowCount > 0) {

@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.FeatureManagement;
 using risk.control.system.AppConstant;
 using risk.control.system.Models;
 using risk.control.system.Services.Agency;
@@ -27,25 +26,19 @@ namespace risk.control.system.Services.AgencyAdmin
     internal class ManageAgencyService : IManageAgencyService
     {
         private readonly ApplicationDbContext _context;
-        private readonly IFeatureManager _featureManager;
         private readonly IValidateImageService _validateImageService;
         private readonly IAgencyCaseLoadService _agencyCaseLoadService;
-        private readonly IPhoneService _phoneService;
         private readonly IAgencyService _agencyService;
 
         public ManageAgencyService(
             ApplicationDbContext context,
-            IFeatureManager featureManager,
             IValidateImageService validateImageService,
             IAgencyCaseLoadService agencyCaseLoadService,
-            IPhoneService phoneService,
             IAgencyService agencyService)
         {
             _context = context;
-            _featureManager = featureManager;
             _validateImageService = validateImageService;
             _agencyCaseLoadService = agencyCaseLoadService;
-            _phoneService = phoneService;
             _agencyService = agencyService;
         }
 
