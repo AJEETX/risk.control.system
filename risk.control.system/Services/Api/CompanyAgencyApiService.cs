@@ -52,7 +52,7 @@ namespace risk.control.system.Services.Api
             if (company == null) return Array.Empty<object>();
 
             var vendorTasks = company.EmpanelledVendors
-                .Where(IsActiveVendor)
+                .Where(v => !v.Deleted)
                 .OrderBy(v => v.Name)
                 .Select(v => MapVendor(v, companyUser, claimsCases));
 
@@ -100,8 +100,8 @@ namespace risk.control.system.Services.Api
                         Flag = "/flags/" + u.Country.Code.ToLower() + ".png",
                         Updated = u.Updated.HasValue ? u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy"),
                         UpdateBy = u.UpdatedBy,
-                        CanOnboard = u.Status == VendorStatus.ACTIVE &&
-                        u.VendorInvestigationServiceTypes != null &&
+                        Status = u.Status == VendorStatus.ACTIVE,
+                        CanOnboard = u.VendorInvestigationServiceTypes != null &&
                         u.ApplicationUser != null &&
                         u.ApplicationUser.Count > 0 &&
                         u.VendorInvestigationServiceTypes.Count > 0,
@@ -246,6 +246,7 @@ namespace risk.control.system.Services.Api
                 District = u.District.Name,
                 StateCode = u.State.Code,
                 State = u.State.Name,
+                Active = u.Status.Value,
                 CountryCode = u.Country.Code,
                 PinCode = $"{u.PinCode.Name} - {u.PinCode.Code}",
                 Country = u.Country.Name,

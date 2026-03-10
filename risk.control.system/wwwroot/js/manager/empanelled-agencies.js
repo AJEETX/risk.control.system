@@ -132,6 +132,14 @@
                 }
             }
         ],
+        "rowCallback": function (row, data, index) {
+            if (data.active == 1) {
+                $('td', row).addClass('lightgrey');
+            } else {
+                $('td', row).removeClass('lightgrey');
+            }
+            $('.btn-warning', row).addClass('btn-black-color');
+        },
         "drawCallback": function (settings, start, end, max, total, pre) {
             var rowCount = (this.fnSettings().fnRecordsTotal()); // total number of rows
             if (rowCount > 0) {
