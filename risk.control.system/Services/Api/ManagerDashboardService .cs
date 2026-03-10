@@ -34,10 +34,10 @@ namespace risk.control.system.Services.Api
                 var claimsRejectTask = GetManagerReject(userEmail, InsuranceType.CLAIM);
                 var undewrwritingRejectTask = GetManagerReject(userEmail, InsuranceType.UNDERWRITING);
 
-                var empanelledAgenciesCountTask = GetEmpanelledAgencies(userEmail);
+                var activeAgenciesCountTask = GetActiveAgencies(userEmail);
                 var availableAgenciesCountTask = GetAvailableAgencies(userEmail);
 
-                await Task.WhenAll(claimsRejectTask, undewrwritingRejectTask, claimsCompletedTask, underwritingCompletedTask, activeClaimsTask, activeUnderwritingsTask, empanelledAgenciesCountTask, availableAgenciesCountTask);
+                await Task.WhenAll(claimsRejectTask, undewrwritingRejectTask, claimsCompletedTask, underwritingCompletedTask, activeClaimsTask, activeUnderwritingsTask, activeAgenciesCountTask, availableAgenciesCountTask);
 
                 var data = new DashboardData();
 
@@ -57,7 +57,7 @@ namespace risk.control.system.Services.Api
                 data.LastBlockUrl = "/Manager/Rejected";
 
                 data.FifthBlockName = "Active Agencies";
-                data.FifthBlockCount = await empanelledAgenciesCountTask;
+                data.FifthBlockCount = await activeAgenciesCountTask;
                 data.FifthBlockUrl = "/EmpanelledAgency/Agencies";
 
                 data.SixthBlockName = "Available Agencies";
@@ -117,12 +117,12 @@ namespace risk.control.system.Services.Api
             return count;
         }
 
-        private async Task<int> GetEmpanelledAgencies(string userEmail)
+        private async Task<int> GetActiveAgencies(string userEmail)
         {
             await using var _context = _contextFactory.CreateDbContext();
             var companyUser = await _context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == userEmail);
             var empAgencies = await _context.ClientCompany.Include(c => c.EmpanelledVendors).FirstOrDefaultAsync(c => c.ClientCompanyId == companyUser.ClientCompanyId);
-            var count = empAgencies.EmpanelledVendors.Count(v => v.Status == VendorStatus.ACTIVE && !v.Deleted);
+            var count = empAgencies.EmpanelledVendors.Count(v => !v.Deleted);
             return count;
         }
 

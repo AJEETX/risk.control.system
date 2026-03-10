@@ -96,7 +96,7 @@ namespace risk.control.system.Models
 
         public virtual ICollection<AgencyRating>? Ratings { get; set; }
         public string? MobileAppUrl { get; set; } = EnvHelper.Get("APP_URL");
-        public bool CanChangePassword { get; set; } = false;
+        public bool CanChangePassword { get; set; }
         public bool HasClaims { get; set; } = false;
 
         [NotMapped]

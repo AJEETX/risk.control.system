@@ -23,10 +23,16 @@
 				<div asp-validation-summary="ModelOnly" class="text-danger"></div>
 				<div class="row">
 					<div class="col-md-6">
-						<div class="form-group text-center">
-							<label class="card-header shadow-lg rounded-lg text-sm bg-light" data-bs-toggle="tooltip" title="Active Since: @Model.ActivatedDate?.ToString("dd-MMM-yyyy")"> Active Since: @Model.ActivatedDate?.ToString("dd-MMM-yyyy")</label>
-						</div>
+						<div class="bg-light p-3 rounded mb-3 border">
+							<i class="fas fa fa-globe mr-2"></i>Company Domain: <span class="font-weight-bold blue">@Model.Email</span>
 
+							<input type="hidden" id="email" asp-for="Email" />
+
+						</div>
+						<div class="bg-light p-3 rounded mb-3 border">
+							<h6 class="text-secondary border-bottom pb-2 mb-3">
+								<i class="fas  fa-file-image-o mr-2"></i> Company Logo
+							</h6>
 						<div class="form-group text-center">
 							<div class="profile-img-container mb-2">
 								<img id="createProfileImage" class="form-Image" src="/Document/GetCompanyDocument/@Model.ClientCompanyId" title="Logo" alt="Logo" data-bs-toggle="tooltip" />
@@ -50,16 +56,11 @@
 								</div>
 							</div>
 						</div>
-						<div class="form-group">
-							<label class="input-group-label" for="Email"> Domain:</label>
-							<div class="input-group mb-3">
-								<div class="input-group-prepend">
-									<span class="input-group-text" id="email"> <i class="fa fa-globe"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-								</div>
-								<input readonly asp-for="Email" class="form-control remarks valid-border" />
-							</div>
 						</div>
-
+						<div class="bg-light p-3 rounded mb-3 border">
+							<h6 class="text-secondary border-bottom pb-2 mb-3">
+								<i class="fas fa-id-card mr-2"></i> Name & Contact #
+							</h6>
 						<div class="form-group">
 							<label class="input-group-label" for="Name"> Name: </label>
 							<div class="input-group mb-3">
@@ -70,73 +71,112 @@
 								<span asp-validation-for="Name" class="text-danger"></span>
 							</div>
 						</div>
-						<div class="form-group">
-							<label class="input-group-label" for="PhoneNumber"> Mobile #:</label>
-							<div class="input-group">
-								<div class="input-group-prepend">
-									@{
-										var imgPath = "/flags/" + @Model.Country.Code.ToLower() + ".png";
-									}
-									<span class="input-group-text country-code-text" data-bs-toggle="tooltip" title="Country Code :+@Model?.Country.ISDCode">
-										<img src="@imgPath" class="flag-icon" data-bs-toggle="tooltip" title="@Model.Country.Name" alt="flag" />  +@Model?.Country.ISDCode
+							<div class="form-group">
+								<label class="input-group-label" for="PhoneNumber"> Mobile #:</label>
+								<div class="input-group">
+									<div class="input-group-prepend">
+										@{
+											var imgPath = "/flags/" + @Model.Country.Code.ToLower() + ".png";
+										}
+										<span class="input-group-text country-code-text" data-bs-toggle="tooltip" title="Country Code :+@Model?.Country.ISDCode">
+											<img src="@imgPath" class="flag-icon" data-bs-toggle="tooltip" title="@Model.Country.Name" alt="flag" />  +@Model?.Country.ISDCode
+										</span>
+									</div>
+									<input id="PhoneNumber" type="text" asp-for="PhoneNumber" class="form-control remarks" required maxlength="10" placeholder="Mobile # only (e.g., 9876543210)" data-bs-toggle="tooltip" />
+									<span id="phone-spinner" class="text-secondary phone-icon d-none">
+										<i class="fas fa-spinner fa-spin"></i>
 									</span>
-								</div>
-								<input id="PhoneNumber" type="text" asp-for="PhoneNumber" class="form-control remarks" required maxlength="10" placeholder="Mobile # only (e.g., 9876543210)" data-bs-toggle="tooltip" />
-								<span id="phone-spinner" class="text-secondary phone-icon d-none">
-									<i class="fas fa-spinner fa-spin"></i>
-								</span>
-								<span id="phone-valid" class="text-success phone-icon d-none">
-								</span>
-								<span id="phone-invalid" class="text-danger phone-icon d-none">
-									<i class="fas fa-times-circle"></i>
-								</span>
-								<span asp-validation-for="PhoneNumber" class="text-danger"></span>
-							</div>
-						</div>
-					</div>
-					<div class="col-md-6">
-						<div class="form-group">
-							<label class="input-group-label" for="BankName"> Bank Name: </label>
-							<div class="input-group mb-3">
-								<div class="input-group-prepend">
-									<span class="input-group-text">
-										<i class="fas fa-landmark"></i>
-										<i class="fa fa-asterisk asterik-style"></i>
+									<span id="phone-valid" class="text-success phone-icon d-none">
 									</span>
-								</div>
-								<input type="text" id="BankName" asp-for="BankName" class="form-control remarks title-name" required readonly tabindex="-1" title="Auto-selected" data-bs-toggle="tooltip" />
-								<span asp-validation-for="BankName" class="text-danger"></span>
-							</div>
-						</div>
-						<div class="form-group">
-							<label class="input-group-label" for="IFSCCode"> IFSC Code: </label>
-							<div class="input-group mb-3 position-relative">
-								<div class="input-group-prepend">
-									<span class="input-group-text">
-										<i class="fas fa-code"></i>
-										<i class="fa fa-asterisk asterik-style"></i>
+									<span id="phone-invalid" class="text-danger phone-icon d-none">
+										<i class="fas fa-times-circle"></i>
 									</span>
+									<span asp-validation-for="PhoneNumber" class="text-danger"></span>
 								</div>
-								<input type="text" id="IFSCCode" asp-for="IFSCCode" class="form-control remarks asterikx" required placeholder="IFSC Code" maxlength="11" title="Enter valid IFSC code" data-bs-toggle="tooltip" />
-								<span id="ifsc-spinner" class="text-secondary phone-icon d-none">
-									<i class="fas fa-spinner fa-spin"></i>
-								</span>
-								<span id="ifsc-valid-icon" class="ifsc-valid-icon">
-								</span>
-								<span asp-validation-for="IFSCCode" class="text-danger"></span>
 							</div>
 						</div>
 						
-						<div class="form-group">
-							<label class="input-group-label" for="BankAccountNumber"> Bank Account #: </label>
-							<div class="input-group mb-3">
-								<div class="input-group-prepend">
-									<span class="input-group-text"><i class="fab fa-btc"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+					</div>
+					<div class="col-md-6">
+						<div class="bg-light p-3 rounded mb-3 border">
+							<i class="fas  fa-lightbulb-o mr-2"></i><span>Active Since:</span> <span class="font-weight-bold"> @Model.ActivatedDate?.ToString("dd-MMM-yyyy")</span>
+						</div>
+						<div class="bg-light p-3 rounded mb-3 border">
+							<h6 class="text-secondary border-bottom pb-2 mb-3">
+								<i class="fas fa-bank mr-2"></i> Banking Details
+							</h6>
+							<div class="row">
+								<div class="col-md-6">
+									<div class="form-group">
+										<label class="input-group-label" for="IFSCCode"> IFSC Code: </label>
+										<div class="input-group mb-3 position-relative">
+											<div class="input-group-prepend">
+												<span class="input-group-text">
+													<i class="fas fa-code"></i>
+													<i class="fa fa-asterisk asterik-style"></i>
+												</span>
+											</div>
+											<input type="text" id="IFSCCode" asp-for="IFSCCode" class="form-control remarks asterikx" required placeholder="IFSC Code" maxlength="11" data-bs-toggle="tooltip" />
+											<span id="ifsc-spinner" class="text-secondary phone-icon d-none">
+												<i class="fas fa-spinner fa-spin"></i>
+											</span>
+											<span id="ifsc-valid-icon" class="ifsc-valid-icon">
+											</span>
+											<span asp-validation-for="IFSCCode" class="text-danger"></span>
+										</div>
+									</div>
 								</div>
-								<input type="text" id="BankAccountNumber" asp-for="BankAccountNumber" class="form-control remarks" required placeholder="Bank Account #" maxlength="20" />
-								<span asp-validation-for="BankAccountNumber" class="text-danger"></span>
+								<div class="col-md-6">
+									<div class="form-group">
+										<label class="input-group-label" for="BankAccountNumber"> Bank Account #: </label>
+										<div class="input-group mb-3">
+											<div class="input-group-prepend">
+												<span class="input-group-text"><i class="fab fa-btc"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+											</div>
+											<input type="text" id="BankAccountNumber" asp-for="BankAccountNumber" class="form-control remarks" required placeholder="Bank Account #" maxlength="20" />
+											<span asp-validation-for="BankAccountNumber" class="text-danger"></span>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="input-group-label" for="BankName"> Bank Name: </label>
+								<div class="input-group mb-3">
+									<div class="input-group-prepend">
+										<span class="input-group-text">
+											<i class="fas fa-landmark"></i>
+											<i class="fa fa-asterisk asterik-style"></i>
+										</span>
+									</div>
+									<input type="text" id="BankName" asp-for="BankName" class="form-control remarks title-name" required placeholder="..." maxlength="50" readonly tabindex="-1" title="Auto-selected" data-bs-toggle="tooltip" />
+									<span asp-validation-for="BankName" class="text-danger"></span>
+								</div>
 							</div>
 						</div>
+						<div class="bg-light p-3 rounded mb-3 border">
+							<h6 class="text-secondary border-bottom pb-2 mb-3">
+								<i class="fas fa-map-marker-alt mr-2"></i> Address Details
+							</h6>
+							<div class="form-group">
+								<label class="input-group-label" for="PinCodeText">Pincode:</label>
+								<div class="input-group mb-3 autocomplete-wrapper">
+									<div class="input-group-prepend">
+										<span class="input-group-text">
+											<i class="fas fa-map-pin"></i>
+											<i class="fa fa-asterisk asterik-style"></i>
+										</span>
+									</div>
+									<input type="text" id="PinCodeText" class="form-control remarks auto-dropdown" required data-placeholder="pincode" placeholder="Type pincode or name" autocomplete="off" />
+									<span asp-validation-for="PinCodeId" class="text-danger"></span>
+									<input asp-for="SelectedPincodeId" type="hidden" id="SelectedPincodeId" name="SelectedPincodeId" value="@Model?.PinCodeId" />
+									<input type="hidden" asp-for="PinCodeId" id="PinCodeId" />
+									<div id="pincode-loading" class="loading-spinner">
+										<i class="fas fa-spinner fa-spin"></i>
+									</div>
+								</div>
+							</div>
+							<div class="row">
+							<div class="col-md-6">
 						<div class="form-group">
 							<label class="input-group-label" for="StateText"> State:</label>
 							<div class="input-group mb-3 autocomplete-wrapper">
@@ -158,6 +198,9 @@
 								</div>
 							</div>
 						</div>
+						</div>
+								<div class="col-md-6">
+
 						<div class="form-group">
 							<label class="input-group-label" for="DistrictText">District:</label>
 							<div class="input-group mb-3 autocomplete-wrapper">
@@ -177,28 +220,12 @@
 							</div>
 						</div>
 
-						
-						<div class="form-group">
-							<label class="input-group-label" for="PinCodeText">Pincode:</label>
-							<div class="input-group mb-3 autocomplete-wrapper">
-								<div class="input-group-prepend">
-									<span class="input-group-text">
-										<i class="fas fa-map-pin"></i>
-										<i class="fa fa-asterisk asterik-style"></i>
-									</span>
-								</div>
-								<input type="text" id="PinCodeText" class="form-control remarks auto-dropdown" required data-placeholder="pincode" placeholder="Type pincode or name" autocomplete="off" />
-								<span asp-validation-for="PinCodeId" class="text-danger"></span>
-								<input asp-for="SelectedPincodeId" type="hidden" id="SelectedPincodeId" name="SelectedPincodeId" value="@Model?.PinCodeId" />
-								<input type="hidden" asp-for="PinCodeId" id="PinCodeId" />
-								<div id="pincode-loading" class="loading-spinner">
-									<i class="fas fa-spinner fa-spin"></i>
-								</div>
 							</div>
-						</div>
+							</div>
+						
 
 						<div class="form-group">
-							<label class="input-group-label" for="Addressline"> Address:</label>
+							<label class="input-group-label" for="Addressline">Street Address:</label>
 							<div class="input-group mb-3">
 								<div class="input-group-prepend">
 									<span class="input-group-text"><i class="fas fa-map-marker-alt"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
@@ -207,6 +234,8 @@
 								<span asp-validation-for="Addressline" class="text-danger"></span>
 							</div>
 						</div>
+						</div>
+
 					</div>
 				</div>
 			</div>
