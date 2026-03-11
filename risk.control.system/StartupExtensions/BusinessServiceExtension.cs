@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Options;
 using Microsoft.FeatureManagement;
 using Microsoft.FeatureManagement.FeatureFilters;
+using Polly;
+using Polly.Extensions.Http;
 using risk.control.system.Controllers.Api.PortalAdmin;
 using risk.control.system.Permission;
 using risk.control.system.Services;
@@ -22,7 +25,13 @@ public static class BusinessServiceExtension
 {
     public static IServiceCollection AddBusinessServices(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddHttpClient();
+        var retryPolicy = HttpPolicyExtensions
+        .HandleTransientHttpError() // Handles 5xx errors and 408 (timeout)
+        .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.NotFound) // Optional: retry on 404
+        .WaitAndRetryAsync(3, retryAttempt =>
+            TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))); // Exponential backoff: 2s, 4s, 8s
+
+        services.AddHttpClient(Options.DefaultName).AddPolicyHandler(retryPolicy);
         services.AddScoped<IUserFaceImageCheckService, UserFaceImageCheckService>();
         services.AddScoped<IOcrService, OcrService>();
         services.AddScoped<IManageAgencyUserService, ManageAgencyUserService>();
@@ -99,7 +108,7 @@ public static class BusinessServiceExtension
         services.AddScoped<IAddInvestigationService, AddInvestigationService>();
         services.AddScoped<IAssessorService, AssessorService>();
         services.AddScoped<ICompanyService, CompanyService>();
-        services.AddScoped<Services.Api.IAgencyService, Services.Api.AgencyService>();
+        services.AddScoped<IAgencyApiService, AgencyApiService>();
         services.AddScoped<IFileStorageService, FileStorageService>();
         services.AddFeatureManagement().AddFeatureFilter<TimeWindowFilter>();
         services.AddScoped<IPhoneService, PhoneService>();
@@ -133,7 +142,7 @@ public static class BusinessServiceExtension
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<ICustomApiClient, CustomApiClient>();
-        services.AddScoped<Services.Agency.IAgencyService, Services.Agency.AgencyService>();
+        services.AddScoped<IAgencyService, AgencyService>();
         services.AddScoped<IAgentSubmitCaseService, AgentSubmitCaseService>();
         services.AddScoped<IAmazonApiService, AmazonApiService>();
         services.AddScoped<ISmsService, SmsService>();

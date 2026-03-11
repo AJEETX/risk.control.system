@@ -17,7 +17,7 @@ namespace risk.control.system.Services.Api
     internal class AgencyAgentService : IAgencyAgentService
     {
         private readonly IDbContextFactory<ApplicationDbContext> _contextFactory;
-        private readonly ILogger<AgencyService> logger;
+        private readonly ILogger<AgencyApiService> logger;
         private readonly IFeatureManager featureManager;
         private readonly IDashboardService dashboardService;
         private readonly IBase64FileService base64FileService;
@@ -25,7 +25,7 @@ namespace risk.control.system.Services.Api
 
         public AgencyAgentService(
             IDbContextFactory<ApplicationDbContext> contextFactory,
-            ILogger<AgencyService> logger,
+            ILogger<AgencyApiService> logger,
             IFeatureManager featureManager,
             IDashboardService dashboardService,
             IBase64FileService base64FileService,
