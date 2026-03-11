@@ -9,7 +9,7 @@ using risk.control.system.Services.Common;
 
 namespace risk.control.system.Services.Api
 {
-    public interface IAgencyService
+    public interface IAgencyApiService
     {
         Task<object[]> AllAgencies();
 
@@ -26,19 +26,19 @@ namespace risk.control.system.Services.Api
         Task<ConcurrentBag<AgentData>> GetAgentWithCases(string userEmail, long id);
     }
 
-    internal class AgencyService : IAgencyService
+    internal class AgencyApiService : IAgencyApiService
     {
         private readonly IDbContextFactory<ApplicationDbContext> _contextFactory;
         private readonly IAgencyInvestigationServiceService agencyInvestigationServiceService;
-        private readonly ILogger<AgencyService> logger;
+        private readonly ILogger<AgencyApiService> logger;
         private readonly ICompanyAgencyApiService empanelledAvailableAgencyService;
         private readonly IAgencyAgentService agencyAgentService;
         private readonly IBase64FileService base64FileService;
 
-        public AgencyService(
+        public AgencyApiService(
             IDbContextFactory<ApplicationDbContext> contextFactory,
             IAgencyInvestigationServiceService agencyInvestigationServiceService,
-            ILogger<AgencyService> logger,
+            ILogger<AgencyApiService> logger,
             ICompanyAgencyApiService empanelledAvailableAgencyService,
             IAgencyAgentService agencyAgentService,
             IBase64FileService base64FileService)

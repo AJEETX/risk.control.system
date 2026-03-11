@@ -75,7 +75,7 @@ namespace risk.control.system.Services.Creator
                     ImagePath = imagePath,
                     ProfilePictureExtension = extension,
                     UpdatedBy = companyUser.Email,
-                    Updated = DateTime.UtcNow
+                    Updated = System.DateTime.UtcNow
                 };
 
                 if (pinCode != null) await EnrichLocation(customer, pinCode);
@@ -94,7 +94,11 @@ namespace risk.control.system.Services.Creator
             var addr = $"{c.Addressline.Trim()}, {p.District.Name}, {p.State.Name}, {p.Country.Code}, {p.Code}";
             var (lat, lon) = await customApiClient.GetCoordinatesFromAddressAsync(addr);
             c.Latitude = lat; c.Longitude = lon;
-            c.CustomerLocationMap = $"https://maps.googleapis.com/maps/api/staticmap?center={lat},{lon}&zoom=14&size=600x300&markers=color:red|{lat},{lon}&key={EnvHelper.Get("GOOGLE_MAP_KEY")}";
+            var latLong = lat + "," + lon;
+
+            var url = string.Format("https://maps.googleapis.com/maps/api/staticmap?center={0}&zoom=14&size={{0}}x{{1}}&maptype=roadmap&markers=color:red%7Clabel:A%7C{0}&key={1}",
+                    latLong, EnvHelper.Get("GOOGLE_MAP_KEY"));
+            c.CustomerLocationMap = url;
         }
     }
 }

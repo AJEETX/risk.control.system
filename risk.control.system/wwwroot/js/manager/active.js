@@ -94,15 +94,19 @@
                 "data": "pincode",
                 "mRender": function (data, type, row) {
                     if (row.pincodeName != '...') {
+                        const formattedUrl = row.personMapAddressUrl
+                            .replace("{0}", "400")
+                            .replace("{1}", "400");
                         return `
-            <div class="map-thumbnail profile-image doc-profile-image">
-                <img src="${row.personMapAddressUrl}"  title="${row.pincodeName}"
-                     class="thumbnail profile-image doc-profile-image preview-map-image open-map-modal"
-                     data-bs-toggle="tooltip"
-                     data-bs-placement="top"
-                     data-img='${row.personMapAddressUrl}'
-                     data-title='Addresss: ${row.pincodeName}' />
-            </div>`;
+                        <div class="map-thumbnail profile-image doc-profile-image">
+                            <img src="${formattedUrl}"  
+                                title="${row.pincodeName}"
+                                 class="thumbnail profile-image doc-profile-image preview-map-image open-map-modal"
+                                 data-bs-toggle="tooltip"
+                                 data-bs-placement="top"
+                                 data-img='${row.personMapAddressUrl}'
+                                 data-title='Addresss: ${row.pincodeName}' />
+                        </div>`;
                     } else {
                         return '<img src="/img/no-map.jpeg" class="profile-image doc-profile-image" title="No address" data-bs-toggle="tooltip" />';
                     }
