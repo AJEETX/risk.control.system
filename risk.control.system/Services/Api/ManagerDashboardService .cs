@@ -78,7 +78,7 @@ namespace risk.control.system.Services.Api
             await using var _context = _contextFactory.CreateDbContext();
 
             // Pass the context into GetCases
-            var cases = GetCases(_context).Where(c => c.PolicyDetail.InsuranceType == insuranceType);
+            var cases = GetCases(_context).Where(c => !c.Deleted && c.PolicyDetail.InsuranceType == insuranceType);
 
             var companyUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
 

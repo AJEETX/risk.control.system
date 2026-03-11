@@ -13,11 +13,11 @@ namespace risk.control.system.Controllers.Api.Company
     {
         private readonly ILogger<CompanyController> logger;
         private readonly ICompanyUserApiService companyUserApiService;
-        private readonly IAgencyService agencyService;
+        private readonly IAgencyApiService agencyService;
 
         public CompanyController(ILogger<CompanyController> logger,
             ICompanyUserApiService companyUserApiService,
-            IAgencyService agencyService
+            IAgencyApiService agencyService
             )
         {
             this.logger = logger;
