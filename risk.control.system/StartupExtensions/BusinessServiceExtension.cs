@@ -1,9 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.Extensions.Options;
 using Microsoft.FeatureManagement;
 using Microsoft.FeatureManagement.FeatureFilters;
-using Polly;
-using Polly.Extensions.Http;
 using risk.control.system.Controllers.Api.PortalAdmin;
 using risk.control.system.Permission;
 using risk.control.system.Services;
@@ -25,13 +22,14 @@ public static class BusinessServiceExtension
 {
     public static IServiceCollection AddBusinessServices(this IServiceCollection services, IConfiguration configuration)
     {
-        var retryPolicy = HttpPolicyExtensions
-        .HandleTransientHttpError() // Handles 5xx errors and 408 (timeout)
-        .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.NotFound) // Optional: retry on 404
-        .WaitAndRetryAsync(3, retryAttempt =>
-            TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))); // Exponential backoff: 2s, 4s, 8s
+        //var retryPolicy = HttpPolicyExtensions
+        //.HandleTransientHttpError() // Handles 5xx errors and 408 (timeout)
+        //.OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.NotFound) // Optional: retry on 404
+        //.WaitAndRetryAsync(3, retryAttempt =>
+        //    TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))); // Exponential backoff: 2s, 4s, 8s
 
-        services.AddHttpClient(Options.DefaultName).AddPolicyHandler(retryPolicy);
+        //services.AddHttpClient(Options.DefaultName).AddPolicyHandler(retryPolicy);
+        services.AddHttpClient();
         services.AddScoped<IUserFaceImageCheckService, UserFaceImageCheckService>();
         services.AddScoped<IOcrService, OcrService>();
         services.AddScoped<IManageAgencyUserService, ManageAgencyUserService>();
