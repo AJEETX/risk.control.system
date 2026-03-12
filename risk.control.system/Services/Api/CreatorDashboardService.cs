@@ -93,10 +93,10 @@ namespace risk.control.system.Services.Api
 
             // Compute counts in-memory
             int claimAssign = investigations.Count(c => c.InsuranceType == InsuranceType.CLAIM && assignableSubStatuses.Contains(c.SubStatus));
-            int claimActive = investigations.Count(c => c.InsuranceType == InsuranceType.CLAIM && c.Status == CONSTANTS.CASE_STATUS.INPROGRESS && !activeExcludedSubStatuses.Contains(c.SubStatus));
+            int claimActive = investigations.Count(c => c.InsuranceType == InsuranceType.CLAIM && c.Status == CONSTANTS.CASE_STATUS.INPROGRESS && !CONSTANTS.ActiveSubStatuses.Contains(c.SubStatus));
 
             int underwritingAssign = investigations.Count(c => c.InsuranceType == InsuranceType.UNDERWRITING && assignableSubStatuses.Contains(c.SubStatus));
-            int underwritingActive = investigations.Count(c => c.InsuranceType == InsuranceType.UNDERWRITING && c.Status == CONSTANTS.CASE_STATUS.INPROGRESS && !activeExcludedSubStatuses.Contains(c.SubStatus));
+            int underwritingActive = investigations.Count(c => c.InsuranceType == InsuranceType.UNDERWRITING && c.Status == CONSTANTS.CASE_STATUS.INPROGRESS && !CONSTANTS.ActiveSubStatuses.Contains(c.SubStatus));
 
             int filesUpload = files.Count(f => !f.DirectAssign);
             int filesUploadAssign = files.Count(f => f.DirectAssign);

@@ -238,7 +238,7 @@ $(document).ready(function () {
                 type: 'red',
                 buttons: {
                     confirm: {
-                        text: "Withdraw case",
+                        text: "Withdraw",
                         btnClass: 'btn-danger',
                         action: function () {
                             withdrawAskConfirmation = false;
