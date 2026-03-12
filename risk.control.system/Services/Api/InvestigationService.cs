@@ -100,8 +100,8 @@ namespace risk.control.system.Services.Api
                 10 => isAsc ? query.OrderBy(a => a.ORIGIN) : query.OrderByDescending(a => a.ORIGIN),
                 11 => isAsc ? query.OrderBy(a => a.Created) : query.OrderByDescending(a => a.Created),
                 12 => isAsc ? query.OrderBy(a => a.Updated) : query.OrderByDescending(a => a.Updated),
-                // Default fallback (Usually ID or Created Date)
-                _ => isAsc ? query.OrderByDescending(a => a.Id) : query.OrderBy(a => a.Id)
+                // Default fallback (Updated Date)
+                _ => isAsc ? query.OrderByDescending(a => a.Updated) : query.OrderBy(a => a.Updated)
             };
             // 5. Paginate and Project (Only fetch what you need)
             var pagedRawData = await query
@@ -187,12 +187,10 @@ namespace risk.control.system.Services.Api
                     Customer = await customerTask,
                     Name = customerName,
                     Policy = policyName,
-                    IsUploaded = i.IsUploaded,
                     Origin = Origin,
                     SubStatus = i.SubStatus,
                     Ready2Assign = ready2Assign,
                     Service = investigationService,
-                    Location = i.ORIGIN.GetEnumDisplayName(),
                     Created = i.Created.ToString("dd-MM-yyyy"),
                     ServiceType = serviceType,
                     TimePending = timePending,
@@ -374,7 +372,6 @@ namespace risk.control.system.Services.Api
                     BeneficiaryPhoto = await beneTask,
                     SubStatus = a.SubStatus,
                     Created = a.Created.ToString("dd-MM-yyyy"),
-                    Location = a.SubStatus,
                     TimePending = GetCreatorTimePending(a.AllocatedToAgencyTime.Value, a.CreatorSla),
                     TimeElapsed = DateTime.UtcNow.Subtract(a.Updated.GetValueOrDefault()).TotalSeconds,
                     Service = investigationService,

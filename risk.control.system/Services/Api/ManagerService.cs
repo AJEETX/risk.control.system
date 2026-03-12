@@ -44,9 +44,7 @@ namespace risk.control.system.Services.Api
             var query = _context.Investigations
                 .Where(a => !a.Deleted && a.ClientCompanyId == companyUser.ClientCompanyId &&
                     a.Status == CONSTANTS.CASE_STATUS.INPROGRESS &&
-                    (a.SubStatus != CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR ||
-                    a.SubStatus != CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.DRAFTED_BY_CREATOR ||
-                    a.SubStatus != CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.EDITED_BY_CREATOR));
+                    !CONSTANTS.ActiveSubStatuses.Contains(a.SubStatus));
 
             int totalRecords = await query.CountAsync(); // Get total count before pagination
 
