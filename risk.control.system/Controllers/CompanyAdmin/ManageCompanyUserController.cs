@@ -59,7 +59,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             var userEmail = HttpContext.User?.Identity?.Name;
             try
             {
-                var model = await _manageCompanyUserService.GetUserCreationModelAsync(User.Identity.Name);
+                var model = await _manageCompanyUserService.GetUserCreationModelAsync(userEmail);
                 if (model == null)
                 {
                     _notifyService.Error("User or Company not found.");
