@@ -101,13 +101,13 @@ namespace risk.control.system.Services.Company
 
         private async Task<List<SelectListItem>> GetAvailableRoles(long companyId, long? editingUserId)
         {
-            var usersInCompany = _context.ApplicationUser.AsNoTracking()
-                .Where(c => !c.Deleted && c.ClientCompanyId == companyId && c.Id != (editingUserId ?? 0));
+            var usersInCompany = await _context.ApplicationUser.AsNoTracking()
+                .Where(c => !c.Deleted && c.ClientCompanyId == companyId && c.Id != (editingUserId ?? 0))?.ToListAsync();
 
             bool isManagerTaken = false;
             foreach (var user in usersInCompany)
             {
-                if (await _userManager.IsInRoleAsync(user, "Manager")) // Simplified check
+                if (await _userManager.IsInRoleAsync(user, MANAGER.DISPLAY_NAME)) // Simplified check
                 {
                     isManagerTaken = true;
                     break;
