@@ -90,7 +90,6 @@
                     img += '<img class="profile-image doc-profile-image" src="' + row.ownerDetail + '" />'; // Thumbnail image with class 'thumbnail'
                     img += '</span>';
                     return img;
-
                 }
             },
             {
@@ -204,12 +203,6 @@
                 "mRender": function (data, type, row) {
                     var buttons = "";
                     buttons += `<a data-id="${row.id}" class="active-claims btn btn-xs btn-info"><i class="fa fa-search"></i> Detail</a>&nbsp;`
-
-                    if (row.autoAllocated) {
-                    }
-                    //if (row.withdrawable) {
-                    //    buttons += '<a href="withdraw?Id=' + row.id + '" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i> Withdraw</a>&nbsp;'
-                    //}
                     return buttons;
                 }
             },
