@@ -26,7 +26,6 @@
         public string ServiceType { get; set; }
         public string Status { get; set; }
         public string SubStatus { get; set; }
-        public string Location { get; set; }
         public string Created { get; set; }
         public string TimePending { get; set; }
         public double TimeElapsed { get; set; }
