@@ -28,6 +28,7 @@ namespace risk.control.system.AppConstant
 
         //WEBSITE SETTINGS
 
+        public const string WEBSITE_SITE_URL = "icheckify.co.in";
         public const string WEBSITE_SITE_MENU_LOGO = "/img/logo.png";
         public static readonly string FTP_SITE = "ftp://ftp.drivehq.com/holosync/";
         public static readonly string FTP_SITE_LOG = "its.aby@email.com";
@@ -43,110 +44,39 @@ namespace risk.control.system.AppConstant
         public const string ALL_DISTRICT = "All Districts";
         public const string ALL_DISTRICT_CODE = "-1";
 
-        public const string ALL_PINCODE = "All PinCodes";
-        public const string ALL_PINCODE_CODE = "-1";
-
-        public const string BACK = "Back";
         public const string CANCEL = "Cancel";
         public const string CREATE = "Add";
         public const string EDIT = "Edit";
         public const string DELETE = "Delete";
-        public const string ALLOCATE = "Allocate";
         public const string VIEW = "View";
         public const string DETAILS = "Details";
 
         // LABELS / ACTIONS
-        public const string CLIENT_COMPANIY_PROFILE = "Company Profile";
-
         public const string SERVICE = "Service";
+
         public const string SERVICES = "Services";
-        public const string VERIFY_LOCATION = "Verify location";
-        public const string CUSTOMER_VERIFY_LOCATION = "Customer Verification location detail";
-        public const string INVESTIGATION_SERVICE = "Type of service";
-        public const string BENEFICIARY = "Beneficiary Relation";
         public const string CASE_ENABLER = "Reason To Verify";
         public const string COST_CENTRE = "Cost centre";
-        public const string CASE_OUTCOME = "Case outcome";
-        public const string CASE_SUBSTATUS = "Case sub status";
-        public const string LINE_OF_BUSINESS = "Line of business";
         public const string PINCODE = "Pincode";
-        public const string RECORD = "Record";
         public const string ROLE = "Role";
         public const string STATE = "State";
         public const string USER = "User";
         public const string COMPANY_USERS = "Manage Users";
-        public const string VENDOR_USERS = "Agency Users";
         public const string VENDOR = "Agency";
-        public const string VENDORS = "Agency";
-        public const string MANAGE_VENDORS = "Manage Agencys";
-        public const string EMPANELLED_VENDORS = "Empanelled Agency";
-        public const string DEPANELLED_VENDORS = "Depanelled Agency";
-        public const string MANAGE_VENDOR = "Manage Agency";
-        public const string CASE_PROFILE = "Case Profile";
-        public const string VERIFICTION_LOCATIONS = "Locations to verify";
-        public const string EMPANEL = "Go to Empanel Vendors";
-        public const string SELECT_TO_EMPANEL = "Select to Empanel Vendors";
-        public const string BROADCAST = "Broadcast";
-        public const string ASSIGN = "Assign";
-        public const string ALLOCATE_TO_VENDOR = "Allocate To Agency";
-        public const string SUBMIT_REPORT = "Submit Report";
-        public const string CREATE_SELECTED_CASES = "Create selected cases";
-
         public const string AGENTS = "Agents";
-        public const string SELECT_CASE_TO_START = "Select Claim case to Verify";
-        public const string AVAILABLE_VENDORS = "Available Agency";
-        public const string DEPANEL_VENDORS = "Go to Depanel Agency";
-        public const string SELECT_TO_DEPANEL_VENDORS = "Select to Depanel Agency";
-        public const string MANAGE_VENDOR_USER = "Manage Agency user";
-        public const string EDIT_VENDOR = "Edit Agency";
-        public const string PROFILE = "Profile";
         public const string MANAGE_USERS = "Manage users";
-        public const string AUDIT_LOG = "Audit log";
-
         public const string MANAGE_SERVICE = "Manage service";
-        public const string ADD_SERVICE = "Add service";
-        public const string MULTIPLE_UPLOAD = "Multi-Upload";
-        public const string PINCODE_UPLOAD = "Pincode upload";
-        public const string PINCODE_SAMPLE = "Upload sample file to upload in csv format";
-        public const string UPLOADED_SAMPLE = "Uploaded Records";
-        public const string NO_RECORDS_FOUND = "No Records Found";
-
-        public const string UPLOAD = "Upload Sample";
-        public const string UPLOAD_CASE = "Upload";
-        public const string UPLOADED_CASES = "Uploaded Cases";
-        public const string SAMPLE_PINCODE_FILE_TYPE = "csv";
-        public const string DOWNLOAD = "Download";
-        public static string SAMPLE_PINCODE_FILE = $"Sample csv file for pincode upload";
 
         // MENUS / SUBMENUS
 
         public const string DASHBOARD = "DASHBOARD";
         public const string INVESTIGATION_CLAIM = "CLAIMS";
-        public const string INVESTIGATION_CASE_SETTINGS = "CASE SETTINGS";
         public const string COMPANY_SETTING = "COMPANY SETTING";
-        public const string INVESTIGATION_CASE_STATUS = "Case status";
-        public const string INVESTIGATION_CLAIMS_CASE = "Claim";
-        public const string INVESTIGATION_CLAIMS_CASE_READY_TO_ASSIGN = "Claim (ready to assign)";
-        public const string INVESTIGATION_CLAIMS_CASE_DRAFT = "Claim (draft)";
-        public const string INVESTIGATION_CLAIMS_OPEN = "Claim (open)";
-        public const string INVESTIGATION_CLAIMS_SUBMITTED_BY_AGENT = "Claim case (report)";
-        public const string INVESTIGATION_CLAIMS_CASE_DETAILS = "Claim case details";
-        public const string CUSTOMER_DETAILS = "Customer details";
-        public const string BENEFICIARY_DETAILS = "Beneficiary details";
-        public const string MAILBOX = "MAILBOX";
-        public const string INBOX = "Inbox";
-        public const string COMPOSE = "Compose";
-        public const string SENT_MAIL = "Sent";
-        public const string OUTBOX = "Outbox";
-        public const string TRASH_MAIL = "Trash";
-        public const string DRAFT_MAIL = "Draft";
         public const string INVESTIGATION_UNDERWRITINGS = "Underwriting";
         public const string USER_ROLES = "USERS/ROLES";
         public const string ADMIN_SETTING = "ADMIN SETTING";
         public const string GLOBAL_SETTINGS = "Global-settings";
         public const string GENERAL_SETUP = "GENERAL SETUP";
-        public const string UPLOAD_FILE = "UPLOAD FILE";
-        public const string UPLOAD_DATABASE = "UPLOAD DB";
         public const string AUDIT_LOGS = "Audit Log";
 
         //457990

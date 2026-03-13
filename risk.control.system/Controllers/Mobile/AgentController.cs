@@ -208,7 +208,7 @@ namespace risk.control.system.Controllers.Mobile
         private async Task SendVerificationSmsAsync(string countryCode, string email, string mobile, string pin)
         {
             string message = $"Dear {email},\n\n" +
-                             $"iCheckify-App PIN: {pin}\n\n" +
+                             $"App PIN: {pin}\n\n" +
                              $"{portal_base_url}";
             await smsService.DoSendSmsAsync(countryCode, mobile, message);
         }
