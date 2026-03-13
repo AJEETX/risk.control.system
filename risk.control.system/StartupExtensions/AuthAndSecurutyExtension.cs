@@ -215,19 +215,19 @@ public static class AuthAndSecurutyExtension
             c.SwaggerDoc("v1", new OpenApiInfo
             {
                 Version = "v1",
-                Title = "iCheckify Utility",
-                Description = "iCheckify API ",
-                TermsOfService = new Uri("https://icheckify.co.in"),
+                Title = "Utility",
+                Description = "API ",
+                TermsOfService = new Uri("https://" + Applicationsettings.WEBSITE_SITE_URL),
                 Contact = new OpenApiContact
                 {
-                    Name = "iCheckify Team",
-                    Email = "hi@icheckify.co.in",
-                    Url = new Uri("https://icheckify.co.in"),
+                    Name = "Team",
+                    Email = "hi@" + Applicationsettings.WEBSITE_SITE_URL,
+                    Url = new Uri("https://" + Applicationsettings.WEBSITE_SITE_URL),
                 },
                 License = new OpenApiLicense
                 {
                     Name = "Use under OpenApiLicense",
-                    Url = new Uri("https://icheckify.co.in"),
+                    Url = new Uri("https://" + Applicationsettings.WEBSITE_SITE_URL),
                 }
             });
         });

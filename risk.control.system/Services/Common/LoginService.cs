@@ -153,7 +153,7 @@ namespace risk.control.system.Services.Common
 
             cache.Remove(cacheKey);
 
-            var username = $"{cleanIsd}{cleanMobile}@icheckify.co.in";
+            var username = $"{cleanIsd}{cleanMobile}@" + Applicationsettings.WEBSITE_SITE_URL;
             var user = await _userManager.FindByNameAsync(username);
 
             if (user == null)

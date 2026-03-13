@@ -1,81 +1,78 @@
 ﻿@model LoginViewModel
 
 @{
-    ViewData["Title"] = "Login: icheckify";
-    Layout = null;
+	ViewData["Title"] = "Login";
+	Layout = null;
 }
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>icheckify: login</title>
-    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
-    <link rel="icon" href="/favicon.ico" type="image/x-icon">
-    <link rel="stylesheet" href="~/plugins/fontawesome-free/css/all.min.css">
-    <link rel="stylesheet" href="~/css/jquery-ui.css">
-    <link rel="stylesheet" href="~/css/login.css">
-    <link rel="stylesheet" href="~/css/cookie.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="
-        default-src 'none';
-        connect-src 'self';
-        script-src 'self';
-        style-src 'self';
-        font-src 'self';
-        img-src 'self' data: https://hostedscan.com;
-        frame-src 'self';
-        form-action 'self';
-        upgrade-insecure-requests;
-    " />
-
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>icheckify: login</title>
+	<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+	<link rel="icon" href="/favicon.ico" type="image/x-icon">
+	<link rel="stylesheet" href="~/plugins/fontawesome-free/css/all.min.css">
+	<link rel="stylesheet" href="~/css/jquery-ui.css">
+	<link rel="stylesheet" href="~/css/login.css">
+	<link rel="stylesheet" href="~/css/cookie.css">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="Content-Security-Policy" content="
+	default-src 'none';
+	connect-src 'self';
+	script-src 'self';
+	style-src 'self';
+	font-src 'self';
+	img-src 'self' data:;
+	frame-src 'self';
+	form-action 'self';
+	upgrade-insecure-requests;
+	" />
 </head>
 <body>
-    <div class="submit-progress hidden">
-        <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
-    </div>
-    <div class="container">
-        <input type="checkbox" id="flip">
-        <div class="cover">
-            <div class="front">
-                <img src="~/img/icheckify-cover.gif" alt="icheckify" />
-                @* <div class="text">
+	<div class="submit-progress hidden">
+		<i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+	</div>
+	<div class="container">
+		<input type="checkbox" id="flip">
+		<div class="cover">
+			<div class="front">
+				<img src="~/img/icheckify-cover.gif" alt="icheckify" />
+				@* <div class="text">
                 <span class="text-2">Simple verification process</span>
                 </div> *@
-            </div>
-            <div class="back">
-                <img class="backImg" src="~/img/front-image.gif" alt="reset" />
-                @* <div class="text">
+			</div>
+			<div class="back">
+				<img class="backImg" src="~/img/front-image.gif" alt="reset" />
+				@* <div class="text">
                 <span class="text-1">Complete miles of journey <br> with one step</span>
                 <span class="text-2">Let's get started</span>
                 </div> *@
-            </div>
-        </div>
-        <div class="forms">
-            <a target="_blank" href="https://hostedscan.com"><img id="hostedscan" src="~/img/hostedscan.png" alt="HostedScan" /></a>
+			</div>
+		</div>
+		<div class="forms">
+			<a target="_blank" href="https://hostedscan.com"><img id="hostedscan" src="~/img/hostedscan.png" alt="HostedScan" /></a>
 
-            <div class="form-content">
+			<div class="form-content">
 
-                <partial name="_LoginPartial" model="Model" />
+				<partial name="_LoginPartial" model="Model" />
 
-                @{
-                    var forgotPassword = new ForgotPasswordViewModel();
-                }
-                <partial name="_ResetPartial" model="@forgotPassword" />
-            </div>
-        </div>
-        
-        <partial name="_CookieConsentPartial" />
-        <partial name="_TermsConditions" />
-        
-    </div>
-    
+				@{
+					var forgotPassword = new ForgotPasswordViewModel();
+				}
+				<partial name="_ResetPartial" model="@forgotPassword" />
+			</div>
+		</div>
+
+		<partial name="_CookieConsentPartial" />
+		<partial name="_TermsConditions" />
+	</div>
 </body>
 <script src="~/js/jquery-3.7.1.js"></script>
 <script src="~/js/jquery-ui.js"></script>
 <script src="~/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
 @{
-    await Html.RenderPartialAsync("_ValidationScriptsPartial");
+	await Html.RenderPartialAsync("_ValidationScriptsPartial");
 }
 <script src="~/js/login.js"></script>
 <script src="~/js/common/cookie.js"></script>
