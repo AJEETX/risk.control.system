@@ -166,9 +166,9 @@
 
         <div class="card-footer bg-white border-top">
             <div class="row float-right">
-                <a id="back" asp-controller="AvailableAgency" asp-action="Agencies" class="btn btn-sm btn-outline-secondary" data-bs-toggle="tooltip" title="Back to Active Agencies">
+                <a id="back" asp-controller="AvailableAgency" asp-action="Agencies" class="btn btn-sm btn-outline-secondary" data-bs-toggle="tooltip" title="Back to Available Agencies">
                     <i class="fas fa-arrow-left"></i>
-                    <span class="badge badge-light"> <i class="fas fa-handshake"></i> </span> @Applicationsettings.BACK
+					<span class="badge badge-light"> <i class="fas fa-hand-pointer"></i> </span> @Applicationsettings.BACK
                 </a>
                 <div class="btn-group">
                     <a asp-controller="AvailableAgencyUser" asp-action="Users" asp-route-id="@Model.VendorId" class="btn btn-sm btn-success mx-1">
