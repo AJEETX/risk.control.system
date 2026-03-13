@@ -6,7 +6,7 @@
 	<form id="create-form" asp-action="Create" enctype="multipart/form-data">
 		<div class="card shadow-lg border-1 rounded-lg">
 			<div class="card-header bg-secondary text-white text-center">
-				<h3 class="card-title"><i class="fas fa-cog"></i> Add @Applicationsettings.SERVICE</h3>
+				<h3 class="card-title"><i class="fas fa-cog"></i> Add Service</h3>
 			</div>
 			<div class="card-body">
 				<div class="submit-progress hidden">
@@ -21,7 +21,7 @@
 						<div class="form-group text-right">
 							<a id="cancel" asp-controller="EmpanelledAgencyService" asp-action="Service" asp-route-id="@Model.Vendor.VendorId" class="btn btn-secondary">
 								<i class="fa fa-window-close"></i>
-								@Applicationsettings.CANCEL
+								Cancel
 							</a>
 							<button disabled id="create" type="submit" class="btn btn-success">
 								<i class="fas fa-cog"></i> Add Service
