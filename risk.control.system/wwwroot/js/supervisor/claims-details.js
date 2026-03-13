@@ -43,7 +43,7 @@
                                 $(".submit-progress").removeClass("hidden");
                             }, 1);
                            
-                            $('#submit-case').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> DECLINE");
+                            $('#submit-case').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Decline");
                             disableAllInteractiveElements();
 
                             $('#create-form').submit();
