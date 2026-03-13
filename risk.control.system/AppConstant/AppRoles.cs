@@ -66,7 +66,7 @@ namespace risk.control.system.AppConstant
     {
         public const string DISPLAY_NAME = "PORTAL_ADMIN";
         public const string CODE = "admin";
-        public const string USERNAME = "admin@icheckify.co.in";
+        public const string USERNAME = "admin@" + WEBSITE_SITE_URL;
         public const string EMAIL = USERNAME;
         public const string FIRST_NAME = "Simmy";
         public const string LAST_NAME = "Collins";
