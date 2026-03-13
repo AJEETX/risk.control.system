@@ -117,7 +117,7 @@
 			<!-- this row will not appear when printing -->
 			<div class="row no-print">
 				<div class="col-xs-12">
-					<a id="back" asp-action="ApprovedDetail" asp-route-id="@Model.CaseId" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
+					<a id="back" asp-action="ApprovedDetail" asp-route-id="@Model.CaseId" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> Back</a>
 
 					<a href="@Url.Action("PrintInvoice", new { id = Model.VendorInvoiceId })" target="_blank" class="btn btn-primary"><i class="fa fa-print"></i> Show Invoice</a>
 				</div>

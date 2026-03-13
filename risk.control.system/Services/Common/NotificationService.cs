@@ -25,7 +25,7 @@ namespace risk.control.system.Services.Common
         private readonly ApplicationDbContext context;
         private readonly RoleManager<ApplicationRole> roleManager;
         private readonly ISmsService smsService;
-        private static string logo = "https://icheckify.co.in";
+        private static string logo = Applicationsettings.WEBSITE_SITE_URL;
 
         public NotificationService(ApplicationDbContext context,
             RoleManager<ApplicationRole> roleManager,

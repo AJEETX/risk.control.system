@@ -197,10 +197,10 @@ namespace risk.control.system.Controllers.Api
 
         [AllowAnonymous]
         [HttpGet("test-sms")]
-        public async Task<IActionResult> Sms(string countryCode = "au", string mobile = "61432854196", string message = "Testing by icheckify")
+        public async Task<IActionResult> Sms(string countryCode = "au", string mobile = "61432854196", string message = "Testing")
         {
             string msg = $"Dear {mobile} user,\n\n" +
-                             $"iCheckify: {message}\n\n" +
+                             $"{message}\n\n" +
                              $"Thanks\n{baseUrl}";
             var response = await smsService.SendSmsAsync(countryCode, mobile, msg);
             return Ok(new { message = response });

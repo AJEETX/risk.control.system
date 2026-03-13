@@ -27,9 +27,9 @@
 								 class="shadow-lg border profile-img img-fluid rounded-circle"
 								 alt="User Profile" />
 						</div>
-                        
+
 						<h4 class="font-weight-bold">@Model.Name</h4>
-                        
+
 						@if (Model.Status.ToString().Equals("ACTIVE", StringComparison.OrdinalIgnoreCase))
 						{
 							<div class="alert alert-success py-1 px-3 d-inline-block shadow-sm">
@@ -42,7 +42,7 @@
 						}
 
 						<p class="text-muted mt-2"><i class="fas fa-calendar-alt"></i> Active Since: @Model.ActivatedDate?.ToString("dd-MMM-yyyy")</p>
-                        
+
 						<hr />
 
 						<div id="agency-rating" class="mb-3">
@@ -125,7 +125,6 @@
 									</div>
 								</div>
 
-                        
 								<div class="info-box">
 									<span class="info-box-icon bg-secondary"><i class="fas fa-city"></i></span>
 									<div class="info-box-content">
@@ -158,7 +157,6 @@
 								</div>
 							</div>
 						</div>
-
 					</div>
 				</div>
 			</div>
@@ -168,10 +166,10 @@
 				<div class="form-group">
 					<a id="back" asp-controller="EmpanelledAgency" asp-action="Agencies" class="btn btn-sm btn-outline-secondary" data-bs-toggle="tooltip" title="Back to Active Agencies">
 						<i class="fas fa-arrow-left"></i>
-						<span class="badge badge-light"> <i class="fas fa-handshake"></i> </span> @Applicationsettings.BACK
+						<span class="badge badge-light"> <i class="fas fa-handshake"></i> </span> Back
 					</a>
 					<a asp-controller="EmpanelledAgencyUser" asp-action="Users" asp-route-id="@Model.VendorId" class="btn btn-sm btn-success" data-bs-toggle="tooltip" title="User count = @Model.SelectedCountryId"><i class="fas fa-user-friends"></i>  Users (@Model.SelectedCountryId)</a>
-					<a asp-controller="EmpanelledAgencyService" asp-action="Service" asp-route-id="@Model.VendorId" class="btn btn-sm btn-danger" data-bs-toggle="tooltip" title="Agency Services count = @Model.VendorInvestigationServiceTypes.Count"><i class="fas fa-cogs"></i>  @Applicationsettings.SERVICE (@Model.VendorInvestigationServiceTypes.Count)</a>
+					<a asp-controller="EmpanelledAgencyService" asp-action="Service" asp-route-id="@Model.VendorId" class="btn btn-sm btn-danger" data-bs-toggle="tooltip" title="Agency Services count = @Model.VendorInvestigationServiceTypes.Count"><i class="fas fa-cogs"></i>  Service (@Model.VendorInvestigationServiceTypes.Count)</a>
 				</div>
 			</div>
 		</div>

@@ -1,11 +1,10 @@
 ﻿$(document).ready(function () {
-
     const cookiePopup = $("#cookiePopup");
     const cookieManagePopup = $("#cookieManagePopup");
 
-    if (!getCookie("icheckify.pageLoaded")) {
+    if (!getCookie("pageLoaded")) {
         clearAllCookies();
-        setCookie("icheckify.pageLoaded", "True");
+        setCookie("pageLoaded", "True");
     }
 
     if (!getCookie("cookieConsent")) {
@@ -35,9 +34,8 @@
 
     // Save preferences
     $("#savePreferences").on("click", function () {
-
         const analyticsCookies = $("#analyticsCookies").is(":checked");
-        const perfomanceCookies = $("#perfomanceCookies").is(":checked");
+        const perfomanceCookies = $("#performanceCookies").is(":checked");
 
         // Save to localStorage only
         //localStorage.setItem("analyticsCookies", analyticsCookies);
@@ -73,7 +71,6 @@
             .catch((err) => console.error(err));
     });
 
-
     // Cancel manage
     $("#cancelManage").on("click", function () {
         cookieManagePopup.fadeOut();
@@ -81,13 +78,11 @@
     });
 });
 
-
 // ------------------------------
 // UPDATED FUNCTIONS
 // ------------------------------
 
 function acceptCookies() {
-
     var token = $('input[name="__RequestVerificationToken"]').val();
 
     fetch('/api/auth/AcceptCookies', {
@@ -110,7 +105,6 @@ function acceptCookies() {
 }
 
 async function revokeCookies() {
-
     const token = $('input[name="__RequestVerificationToken"]').val();
 
     await fetch('/api/auth/RevokeCookies',
@@ -128,7 +122,6 @@ async function revokeCookies() {
         setCookie("cookieConsent", "Accepted", 365);
     }
 }
-
 
 // ------------------------------
 // Cookie utility functions

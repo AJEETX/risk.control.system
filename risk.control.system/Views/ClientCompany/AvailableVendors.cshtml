@@ -1,7 +1,7 @@
 ﻿@model IEnumerable<risk.control.system.Models.Vendor>
 
 @{
-	ViewData["Title"] = @Applicationsettings.SERVICE;
+	ViewData["Title"] = "Service";
 }
 
 <section class="content">
@@ -84,10 +84,10 @@
 
 						<a asp-controller="ClientCompany" asp-action="Details" asp-route-id="@ViewBag.CompanyId" class="btn btn-secondary">
 							<i class="fa fa-window-close"></i>
-							@Applicationsettings.CANCEL
+							Cancel
 						</a>
 						<button disabled="disabled" id="manage-vendors" type="submit" class="btn btn-success">
-							<i class="fas fa-thumbs-up" aria-hidden="true"></i> @Applicationsettings.SELECT_TO_EMPANEL
+							<i class="fas fa-thumbs-up" aria-hidden="true"></i> Empanel
 						</button>
 					</div>
 				</div>
