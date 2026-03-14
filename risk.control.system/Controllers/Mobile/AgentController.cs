@@ -15,7 +15,6 @@ using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services.Agency;
 using risk.control.system.Services.Agent;
-using risk.control.system.Services.Api;
 using risk.control.system.Services.Common;
 using risk.control.system.Services.Report;
 
@@ -26,29 +25,28 @@ namespace risk.control.system.Controllers.Mobile
     public class AgentController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
-        private readonly IAgencyInvestigationDetailService vendorInvestigationDetailService;
-        private readonly RoleManager<ApplicationRole> roleManager;
-        private readonly IAgentAnswerService answerService;
-        private readonly IMediaIdfyService mediaIdfyService;
-        private readonly IDocumentIdfyService documentIdfyService;
-        private readonly IAgentFaceIdfyService agentFaceIdfyService;
-        private readonly ILogger<AgentController> logger;
-        private readonly ICloneReportService cloneReportService;
-        private readonly IFaceIdfyService agentIdService;
-        private readonly IAgencyInvestigationService service;
-        private readonly IAmazonApiService compareFaces;
-        private readonly UserManager<ApplicationUser> userVendorManager;
-        private readonly IAgentService agentService;
-        private readonly IFeatureManager featureManager;
-        private readonly IBackgroundJobClient backgroundJobClient;
-        private readonly IWebHostEnvironment webHostEnvironment;
-        private readonly ISmsService smsService;
-        private readonly IMailService mailboxService;
-        private string portal_base_url = string.Empty;
+        private readonly IProcessSubmittedReportService _processSubmittedReportService;
+        private readonly RoleManager<ApplicationRole> _roleManager;
+        private readonly IAgentAnswerService _answerService;
+        private readonly IMediaIdfyService _mediaIdfyService;
+        private readonly IDocumentIdfyService _documentIdfyService;
+        private readonly IAgentFaceIdfyService _agentFaceIdfyService;
+        private readonly ILogger<AgentController> _logger;
+        private readonly ICloneReportService _cloneReportService;
+        private readonly IFaceIdfyService _agentIdService;
+        private readonly IAmazonApiService _compareFaces;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IAgentService _agentService;
+        private readonly IFeatureManager _featureManager;
+        private readonly IBackgroundJobClient _backgroundJobClient;
+        private readonly IWebHostEnvironment _env;
+        private readonly ISmsService _smsService;
+        private readonly IMailService _mailService;
+        private string _portalBaseUrl = string.Empty;
 
         //test PAN FNLPM8635N
         public AgentController(ApplicationDbContext context,
-            IAgencyInvestigationDetailService vendorInvestigationDetailService,
+            IProcessSubmittedReportService processSubmittedReportService,
             RoleManager<ApplicationRole> roleManager,
             IAgentAnswerService answerService,
             IMediaIdfyService mediaIdfyService,
@@ -58,9 +56,8 @@ namespace risk.control.system.Controllers.Mobile
             ICloneReportService cloneReportService,
             IConfiguration configuration,
             IFaceIdfyService agentIdService,
-            IAgencyInvestigationService service,
             IAmazonApiService compareFaces,
-            UserManager<ApplicationUser> userVendorManager,
+            UserManager<ApplicationUser> userManager,
              IHttpContextAccessor httpContextAccessor,
             IAgentService agentService,
             IFeatureManager featureManager,
@@ -70,27 +67,26 @@ namespace risk.control.system.Controllers.Mobile
             IMailService mailboxService)
         {
             this._context = context;
-            this.vendorInvestigationDetailService = vendorInvestigationDetailService;
-            this.roleManager = roleManager;
-            this.answerService = answerService;
-            this.mediaIdfyService = mediaIdfyService;
-            this.documentIdfyService = documentIdfyService;
-            this.agentFaceIdfyService = agentFaceIdfyService;
-            this.logger = logger;
-            this.cloneReportService = cloneReportService;
-            this.agentIdService = agentIdService;
-            this.service = service;
-            this.compareFaces = compareFaces;
-            this.userVendorManager = userVendorManager;
-            this.agentService = agentService;
-            this.featureManager = featureManager;
-            this.backgroundJobClient = backgroundJobClient;
-            this.webHostEnvironment = webHostEnvironment;
-            smsService = SmsService;
-            this.mailboxService = mailboxService;
+            this._processSubmittedReportService = processSubmittedReportService;
+            this._roleManager = roleManager;
+            this._answerService = answerService;
+            this._mediaIdfyService = mediaIdfyService;
+            this._documentIdfyService = documentIdfyService;
+            this._agentFaceIdfyService = agentFaceIdfyService;
+            this._logger = logger;
+            this._cloneReportService = cloneReportService;
+            this._agentIdService = agentIdService;
+            this._compareFaces = compareFaces;
+            this._userManager = userManager;
+            this._agentService = agentService;
+            this._featureManager = featureManager;
+            this._backgroundJobClient = backgroundJobClient;
+            this._env = webHostEnvironment;
+            _smsService = SmsService;
+            this._mailService = mailboxService;
             var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
             var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
-            portal_base_url = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
+            _portalBaseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
         }
 
         [HttpPost("pin")]
@@ -103,7 +99,7 @@ namespace risk.control.system.Controllers.Mobile
                 {
                     return BadRequest($"Empty email");
                 }
-                var user2Onboard = await agentService.GetPin(agentEmail, portal_base_url);
+                var user2Onboard = await _agentService.GetPin(agentEmail, _portalBaseUrl);
 
                 if (user2Onboard == null)
                 {
@@ -119,7 +115,7 @@ namespace risk.control.system.Controllers.Mobile
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred for {UserEmail}.", agentEmail);
+                _logger.LogError(ex, "Error occurred for {UserEmail}.", agentEmail);
                 return BadRequest($"Agent does not exist or Error");
             }
         }
@@ -134,7 +130,7 @@ namespace risk.control.system.Controllers.Mobile
                 {
                     return BadRequest($"Empty mobile number");
                 }
-                var user2Onboard = await agentService.ResetUid(mobile.TrimStart('+'), portal_base_url, sendSMS);
+                var user2Onboard = await _agentService.ResetUid(mobile.TrimStart('+'), _portalBaseUrl, sendSMS);
 
                 if (user2Onboard == null)
                 {
@@ -145,7 +141,7 @@ namespace risk.control.system.Controllers.Mobile
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred for {Mobile}.", mobile);
+                _logger.LogError(ex, "Error occurred for {Mobile}.", mobile);
                 return BadRequest($"mobile number and/or Agent does not exist");
             }
         }
@@ -173,11 +169,11 @@ namespace risk.control.system.Controllers.Mobile
                         return BadRequest($"UID {request.Uid} already exists.");
                     }
 
-                    var agentRole = await roleManager.FindByNameAsync(AppRoles.AGENT.ToString());
+                    var agentRole = await _roleManager.FindByNameAsync(AppRoles.AGENT.ToString());
                     var matchingUsers = await _context.ApplicationUser.Include(u => u.Country).Where(u => (u.Country.ISDCode + u.PhoneNumber) == normalizedMobile).ToListAsync();
                     foreach (var user in matchingUsers)
                     {
-                        var isAgent = await userVendorManager.IsInRoleAsync(user, agentRole.Name);
+                        var isAgent = await _userManager.IsInRoleAsync(user, agentRole.Name);
                         if (isAgent && string.IsNullOrWhiteSpace(user.MobileUId) && user.Active)
                         {
                             user.MobileUId = request.Uid;
@@ -200,7 +196,7 @@ namespace risk.control.system.Controllers.Mobile
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred for {Mobile}.", request.Mobile);
+                _logger.LogError(ex, "Error occurred for {Mobile}.", request.Mobile);
                 return BadRequest("An error occurred while verifying the mobile number.");
             }
         }
@@ -209,8 +205,8 @@ namespace risk.control.system.Controllers.Mobile
         {
             string message = $"Dear {email},\n\n" +
                              $"App PIN: {pin}\n\n" +
-                             $"{portal_base_url}";
-            await smsService.DoSendSmsAsync(countryCode, mobile, message);
+                             $"{_portalBaseUrl}";
+            await _smsService.DoSendSmsAsync(countryCode, mobile, message);
         }
 
         [HttpPost("VerifyId")]
@@ -242,8 +238,8 @@ namespace risk.control.system.Controllers.Mobile
                 }
 
                 var image = Convert.FromBase64String(request.Image);
-                var registeredImage = await System.IO.File.ReadAllBytesAsync(Path.Combine(webHostEnvironment.ContentRootPath, mobileUidExist.ProfilePictureUrl));
-                var matched = await compareFaces.FaceMatch(registeredImage, image);
+                var registeredImage = await System.IO.File.ReadAllBytesAsync(Path.Combine(_env.ContentRootPath, mobileUidExist.ProfilePictureUrl));
+                var matched = await _compareFaces.FaceMatch(registeredImage, image);
                 if (matched.Item1)
                 {
                     return Ok(new { Email = mobileUidExist.Email, Pin = mobileUidExist.SecretPin });
@@ -253,7 +249,7 @@ namespace risk.control.system.Controllers.Mobile
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred for {Uid}.", request.Uid);
+                _logger.LogError(ex, "Error occurred for {Uid}.", request.Uid);
                 return BadRequest("face matcherror " + ex.StackTrace);
             }
         }
@@ -322,7 +318,7 @@ namespace risk.control.system.Controllers.Mobile
                 {
                     return Unauthorized("Invalid User !!!");
                 }
-                if (await featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED))
+                if (await _featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED))
                 {
                     if (string.IsNullOrWhiteSpace(agent.MobileUId))
                     {
@@ -350,7 +346,7 @@ namespace risk.control.system.Controllers.Mobile
                 .ThenInclude(c => c.PinCode)
                 .Include(c => c.CustomerDetail)
                 .ThenInclude(c => c.State)
-               .Include(c => c.CustomerDetail)
+                .Include(c => c.CustomerDetail)
                 .ThenInclude(c => c.Country)
                 .Include(c => c.CustomerDetail)
                 .ThenInclude(c => c.District)
@@ -366,7 +362,7 @@ namespace risk.control.system.Controllers.Mobile
                         Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId),
                         claimType = c.PolicyDetail.InsuranceType == InsuranceType.CLAIM ? ClaimType.DEATH.GetEnumDisplayName() : ClaimType.HEALTH.GetEnumDisplayName(),
                         DocumentPhoto = c.PolicyDetail.DocumentPath != null ?
-                        Convert.ToBase64String(System.IO.File.ReadAllBytes(Path.Combine(webHostEnvironment.ContentRootPath, c.PolicyDetail.DocumentPath))) :
+                        Convert.ToBase64String(System.IO.File.ReadAllBytes(Path.Combine(_env.ContentRootPath, c.PolicyDetail.DocumentPath))) :
                         Applicationsettings.NO_POLICY_IMAGE,
                         CustomerName = c.CustomerDetail.Name,
                         CustomerEmail = email,
@@ -375,7 +371,7 @@ namespace risk.control.system.Controllers.Mobile
                         c.CustomerDetail.Addressline,
                         c.CustomerDetail.PinCode.Code,
                         CustomerPhoto = c?.CustomerDetail.ImagePath != null ?
-                        Convert.ToBase64String(System.IO.File.ReadAllBytes(Path.Combine(webHostEnvironment.ContentRootPath, c?.CustomerDetail.ImagePath))) :
+                        Convert.ToBase64String(System.IO.File.ReadAllBytes(Path.Combine(_env.ContentRootPath, c?.CustomerDetail.ImagePath))) :
                         Applicationsettings.USER_PHOTO,
                         Country = c.CustomerDetail.Country.Name,
                         State = c.CustomerDetail.State.Name,
@@ -384,7 +380,7 @@ namespace risk.control.system.Controllers.Mobile
                         {
                             c.BeneficiaryDetail.BeneficiaryDetailId,
                             Photo = c.BeneficiaryDetail?.ImagePath != null ?
-                            Convert.ToBase64String(System.IO.File.ReadAllBytes(Path.Combine(webHostEnvironment.ContentRootPath, c.BeneficiaryDetail.ImagePath))) :
+                            Convert.ToBase64String(System.IO.File.ReadAllBytes(Path.Combine(_env.ContentRootPath, c.BeneficiaryDetail.ImagePath))) :
                             Applicationsettings.USER_PHOTO,
                             c.BeneficiaryDetail.Country.Name,
                             BeneficiaryName = c.BeneficiaryDetail.Name,
@@ -398,7 +394,7 @@ namespace risk.control.system.Controllers.Mobile
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred for {Agent}.", email);
+                _logger.LogError(ex, "Error occurred for {Agent}.", email);
                 return StatusCode(500, $"Error occurred for {email}");
             }
         }
@@ -419,7 +415,7 @@ namespace risk.control.system.Controllers.Mobile
                 {
                     return Unauthorized("Invalid User !!!");
                 }
-                if (await featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED))
+                if (await _featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED))
                 {
                     if (string.IsNullOrWhiteSpace(agent.MobileUId))
                     {
@@ -473,7 +469,7 @@ namespace risk.control.system.Controllers.Mobile
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred for {Email}.", email);
+                _logger.LogError(ex, "Error occurred for {Email}.", email);
                 return StatusCode(500);
             }
         }
@@ -494,7 +490,7 @@ namespace risk.control.system.Controllers.Mobile
                 {
                     return Unauthorized("Invalid User !!!");
                 }
-                if (await featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED))
+                if (await _featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED))
                 {
                     if (string.IsNullOrWhiteSpace(agent.MobileUId))
                     {
@@ -527,18 +523,18 @@ namespace risk.control.system.Controllers.Mobile
                 var vendorUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == email && c.Role == AppRoles.AGENT);
 
                 object locations = null;
-                if (await featureManager.IsEnabledAsync(FeatureFlags.ENABLE_REAL_TIME_REPORT_TEMPlATE))
+                if (await _featureManager.IsEnabledAsync(FeatureFlags.ENABLE_REAL_TIME_REPORT_TEMPlATE))
                 {
-                    locations = await cloneReportService.GetReportTemplate(caseId, agent.Email);
+                    locations = await _cloneReportService.GetReportTemplate(caseId, agent.Email);
                 }
-                var docPath = Path.Combine(webHostEnvironment.ContentRootPath, claim.PolicyDetail.DocumentPath);
+                var docPath = Path.Combine(_env.ContentRootPath, claim.PolicyDetail.DocumentPath);
                 var docByte = System.IO.File.ReadAllBytes(docPath);
                 var docBase64 = Convert.ToBase64String(docByte);
                 var documentPhoto = claim.PolicyDetail.DocumentPath != null ? docBase64 : Applicationsettings.NO_POLICY_IMAGE;
                 var customerPhoto = claim.CustomerDetail.ImagePath != null ?
-                            Convert.ToBase64String(System.IO.File.ReadAllBytes(Path.Combine(webHostEnvironment.ContentRootPath, claim.CustomerDetail.ImagePath))) : Applicationsettings.USER_PHOTO;
+                            Convert.ToBase64String(System.IO.File.ReadAllBytes(Path.Combine(_env.ContentRootPath, claim.CustomerDetail.ImagePath))) : Applicationsettings.USER_PHOTO;
                 var beneficiaryPhoto = beneficiary.ImagePath != null ?
-                            Convert.ToBase64String(System.IO.File.ReadAllBytes(Path.Combine(webHostEnvironment.ContentRootPath, beneficiary.ImagePath))) : Applicationsettings.USER_PHOTO;
+                            Convert.ToBase64String(System.IO.File.ReadAllBytes(Path.Combine(_env.ContentRootPath, beneficiary.ImagePath))) : Applicationsettings.USER_PHOTO;
                 return Ok(
                     new
                     {
@@ -585,7 +581,7 @@ namespace risk.control.system.Controllers.Mobile
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred for {CaseId} for {Email}.", caseId, email);
+                _logger.LogError(ex, "Error occurred for {CaseId} for {Email}.", caseId, email);
                 return StatusCode(500);
             }
         }
@@ -606,12 +602,12 @@ namespace risk.control.system.Controllers.Mobile
                 {
                     return Unauthorized("Invalid User !!!");
                 }
-                var locations = await cloneReportService.GetReportTemplate(caseId, agent.Email);
+                var locations = await _cloneReportService.GetReportTemplate(caseId, agent.Email);
                 return Ok(locations);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred for {CaseId} for {Email}.", caseId, email);
+                _logger.LogError(ex, "Error occurred for {CaseId} for {Email}.", caseId, email);
                 return StatusCode(500);
             }
         }
@@ -637,7 +633,7 @@ namespace risk.control.system.Controllers.Mobile
                 {
                     return Unauthorized("Invalid User !!!");
                 }
-                if (await featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED))
+                if (await _featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED))
                 {
                     if (string.IsNullOrWhiteSpace(vendorUser.MobileUId))
                     {
@@ -647,20 +643,20 @@ namespace risk.control.system.Controllers.Mobile
                 var isAgentReportName = data.ReportName == DigitalIdReportType.AGENT_FACE.GetEnumDisplayName();
                 if (isAgentReportName)
                 {
-                    var response = await agentFaceIdfyService.CaptureAgentId(data);
+                    var response = await _agentFaceIdfyService.CaptureAgentId(data);
                     response.Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId);
                     return Ok(response);
                 }
                 else
                 {
-                    var response = await agentIdService.CaptureFaceId(data);
+                    var response = await _agentIdService.CaptureFaceId(data);
                     response.Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId);
                     return Ok(response);
                 }
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred for {Email}.", data.Email);
+                _logger.LogError(ex, "Error occurred for {Email}.", data.Email);
                 return StatusCode(500);
             }
         }
@@ -686,20 +682,20 @@ namespace risk.control.system.Controllers.Mobile
                 {
                     return Unauthorized("Invalid User !!!");
                 }
-                if (await featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED))
+                if (await _featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED))
                 {
                     if (string.IsNullOrWhiteSpace(vendorUser.MobileUId))
                     {
                         return StatusCode(401, new { message = "Offboarded Agent." });
                     }
                 }
-                var response = await documentIdfyService.CaptureDocumentId(data);
+                var response = await _documentIdfyService.CaptureDocumentId(data);
                 response.Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId);
                 return Ok(response);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred for {Email}.", data.Email);
+                _logger.LogError(ex, "Error occurred for {Email}.", data.Email);
                 return StatusCode(500);
             }
         }
@@ -731,20 +727,20 @@ namespace risk.control.system.Controllers.Mobile
                 {
                     return Unauthorized("Invalid User !!!");
                 }
-                if (await featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED))
+                if (await _featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED))
                 {
                     if (string.IsNullOrWhiteSpace(vendorUser.MobileUId))
                     {
                         return StatusCode(401, new { message = "Offboarded Agent." });
                     }
                 }
-                var response = await mediaIdfyService.CaptureMedia(data);
+                var response = await _mediaIdfyService.CaptureMedia(data);
                 response.Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId);
                 return Ok(response);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred for {Email}.", data.Email);
+                _logger.LogError(ex, "Error occurred for {Email}.", data.Email);
                 return StatusCode(500);
             }
         }
@@ -767,7 +763,7 @@ namespace risk.control.system.Controllers.Mobile
                 {
                     return BadRequest("Some answers are missing.");
                 }
-                var answerSubmitted = await answerService.CaptureAnswers(email, locationName, caseId, Questions);
+                var answerSubmitted = await _answerService.CaptureAnswers(email, locationName, caseId, Questions);
                 if (answerSubmitted)
                     return Ok(new { success = answerSubmitted });
                 else
@@ -775,7 +771,7 @@ namespace risk.control.system.Controllers.Mobile
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred for {CaseId} for {Email}.", caseId, email);
+                _logger.LogError(ex, "Error occurred for {CaseId} for {Email}.", caseId, email);
                 return StatusCode(500);
             }
         }
@@ -800,22 +796,22 @@ namespace risk.control.system.Controllers.Mobile
                 {
                     return Unauthorized("Invalid User !!!");
                 }
-                if (await featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED))
+                if (await _featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED))
                 {
                     if (string.IsNullOrWhiteSpace(agent.MobileUId))
                     {
                         return StatusCode(401, new { message = "Offboarded Agent." });
                     }
                 }
-                var (vendor, contract) = await vendorInvestigationDetailService.SubmitToVendorSupervisor(data.Email, data.CaseId, data.Remarks);
+                var (vendor, contract) = await _processSubmittedReportService.SubmitToVendorSupervisor(data.Email, data.CaseId, data.Remarks);
 
-                backgroundJobClient.Enqueue(() => mailboxService.NotifyCaseReportSubmitToVendorSupervisor(data.Email, data.CaseId, portal_base_url));
+                _backgroundJobClient.Enqueue(() => _mailService.NotifyCaseReportSubmitToVendorSupervisor(data.Email, data.CaseId, _portalBaseUrl));
 
                 return Ok(new { data, Registered = agent.Active && !string.IsNullOrWhiteSpace(agent.MobileUId) });
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred for {Email}.", data.Email);
+                _logger.LogError(ex, "Error occurred for {Email}.", data.Email);
                 return StatusCode(500);
             }
         }
