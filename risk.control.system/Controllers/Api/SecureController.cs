@@ -19,26 +19,26 @@ namespace risk.control.system.Controllers.Api
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class SwaggerController : ControllerBase
+    public class SecureController : ControllerBase
     {
         private readonly ITokenService tokenService;
-        private readonly UserManager<Models.ApplicationUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly IAmazonApiService _amazonApiService;
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly IPdfGenerativeService pdfGenerativeService;
         private readonly IPhoneService phoneService;
-        private readonly SignInManager<Models.ApplicationUser> _signInManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IFeatureManager featureManager;
         private readonly ISmsService smsService;
         private readonly ApplicationDbContext _context;
         private readonly string baseUrl;
 
-        public SwaggerController(UserManager<Models.ApplicationUser> userManager,
+        public SecureController(UserManager<ApplicationUser> userManager,
             IAmazonApiService amazonApiService,
             IWebHostEnvironment webHostEnvironment,
             IPdfGenerativeService generateService,
             IPhoneService phoneService,
-            SignInManager<Models.ApplicationUser> signInManager,
+            SignInManager<ApplicationUser> signInManager,
              IHttpContextAccessor httpContextAccessor,
             IFeatureManager featureManager,
             ISmsService SmsService,
