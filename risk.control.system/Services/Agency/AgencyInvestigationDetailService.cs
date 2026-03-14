@@ -15,8 +15,6 @@ namespace risk.control.system.Services.Agency
 
         Task<InvestigationTask> AssignToVendorAgent(string vendorAgentEmail, string currentUser, long vendorId, long caseId);
 
-        Task<(Vendor, string)> SubmitToVendorSupervisor(string userEmail, long caseId, string remarks);
-
         Task<CaseTransactionModel> GetClaimDetailsReport(string currentUserEmail, long caseId);
     }
 
@@ -176,43 +174,6 @@ namespace risk.control.system.Services.Agency
 
                 await timelineService.UpdateTaskStatus(caseTask.Id, currentUser);
                 return caseTask;
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Error occurred.");
-                throw;
-            }
-        }
-
-        public async Task<(Vendor, string)> SubmitToVendorSupervisor(string userEmail, long caseId, string remarks)
-        {
-            try
-            {
-                var agent = await context.ApplicationUser.AsNoTracking().Include(u => u.Vendor).FirstOrDefaultAsync(a => a.Email.Trim().ToLower() == userEmail.Trim().ToLower());
-
-                var submitted2Supervisor = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR;
-
-                var caseTask = await GetCases().Include(c => c.InvestigationReport)
-                    .FirstOrDefaultAsync(c => c.Id == caseId);
-
-                caseTask.Updated = DateTime.UtcNow;
-                caseTask.UpdatedBy = agent.Email;
-                caseTask.SubStatus = submitted2Supervisor;
-                caseTask.SubmittedToSupervisorTime = DateTime.UtcNow;
-                caseTask.CaseOwner = agent.Vendor.Email;
-                var claimReport = caseTask.InvestigationReport;
-
-                claimReport.AgentRemarks = remarks;
-                claimReport.AgentRemarksUpdated = DateTime.UtcNow;
-                claimReport.AgentEmail = userEmail;
-
-                context.Investigations.Update(caseTask);
-
-                var rows = await context.SaveChangesAsync(null, false);
-
-                await timelineService.UpdateTaskStatus(caseTask.Id, userEmail);
-
-                return (agent.Vendor, caseTask.PolicyDetail.ContractNumber);
             }
             catch (Exception ex)
             {

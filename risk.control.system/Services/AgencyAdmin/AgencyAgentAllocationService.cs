@@ -7,10 +7,7 @@ namespace risk.control.system.Services.AgencyAdmin
 {
     public interface IAgencyAgentAllocationService
     {
-        Task<AllocateVendorAgentResult> AllocateAsync(
-            string selectedCase,
-            long claimId,
-            string? allocatedByEmail);
+        Task<AllocateVendorAgentResult> AllocateAsync(string selectedCase, long caseId, string? allocatedByEmail);
     }
 
     internal class AgencyAgentAllocationService : IAgencyAgentAllocationService
@@ -19,20 +16,14 @@ namespace risk.control.system.Services.AgencyAdmin
         private readonly IAgencyInvestigationDetailService _vendorInvestigationDetailService;
         private readonly ILogger<AgencyAgentAllocationService> _logger;
 
-        public AgencyAgentAllocationService(
-            ApplicationDbContext context,
-            IAgencyInvestigationDetailService vendorInvestigationDetailService,
-            ILogger<AgencyAgentAllocationService> logger)
+        public AgencyAgentAllocationService(ApplicationDbContext context, IAgencyInvestigationDetailService vendorInvestigationDetailService, ILogger<AgencyAgentAllocationService> logger)
         {
             _context = context;
             _vendorInvestigationDetailService = vendorInvestigationDetailService;
             _logger = logger;
         }
 
-        public async Task<AllocateVendorAgentResult> AllocateAsync(
-            string selectedCase,
-            long claimId,
-            string? allocatedByEmail)
+        public async Task<AllocateVendorAgentResult> AllocateAsync(string selectedCase, long caseId, string? allocatedByEmail)
         {
             try
             {
@@ -58,18 +49,14 @@ namespace risk.control.system.Services.AgencyAdmin
                     };
                 }
 
-                var claim = await _vendorInvestigationDetailService.AssignToVendorAgent(
-                    vendorAgent.Email,
-                    allocatedByEmail,
-                    vendorAgent.VendorId.Value,
-                    claimId);
+                var claim = await _vendorInvestigationDetailService.AssignToVendorAgent(vendorAgent.Email, allocatedByEmail, vendorAgent.VendorId.Value, caseId);
 
                 if (claim == null)
                 {
                     return new AllocateVendorAgentResult
                     {
                         Success = false,
-                        ErrorMessage = $"Error occurred while assigning case {claimId}"
+                        ErrorMessage = $"Error occurred while assigning case {caseId}"
                     };
                 }
 
@@ -85,7 +72,7 @@ namespace risk.control.system.Services.AgencyAdmin
             {
                 _logger.LogError(ex,
                     "Allocation failed for Case {ClaimId} by {User}",
-                    claimId,
+                    caseId,
                     allocatedByEmail ?? "Anonymous");
 
                 return new AllocateVendorAgentResult
