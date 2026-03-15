@@ -138,7 +138,7 @@
                     var img = '';
                     var title = row.directAssign ? "Assigned" : "Uploaded";
                     if (row.status == 'Error' && row.recordCount == 0 && row.message != "Error uploading the file") {
-                        img += `<div class='btn-xs upload-exceed' title='Limit exceeded' data-bs-toggle='tooltip'> <i class='fas fa-times-circle i-orangered'></i> Limit exceed</div>`;
+                        img += `<div class='btn-xs upload-exceed' title='Limit exceeded' data-bs-toggle='tooltip'> <i class='fas fa-times-circle i-orangered'></i> Exceeded</div>`;
                     }
                     else if (row.hasError && row.message == "Error uploading the file") {
                         img += `
