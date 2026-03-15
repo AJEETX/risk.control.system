@@ -40,23 +40,23 @@
 		</div>
 	</div>
 
-		<form id="create-form" asp-action="Create" enctype="multipart/form-data" method="post" autocomplete="off">
-			<input type="hidden" asp-for="Email" id="mailAddress" />
-			<input type="hidden" asp-for="DomainName" id="domainAddress" name="domainAddress" />
-			<div class="card shadow-lg border-1 rounded-lg mb-4">
+	<form id="create-form" asp-action="Create" enctype="multipart/form-data" method="post" autocomplete="off">
+		<input type="hidden" asp-for="Email" id="mailAddress" />
+		<input type="hidden" asp-for="DomainName" id="domainAddress" name="domainAddress" />
+		<div class="card shadow-lg border-1 rounded-lg mb-4">
 			<div class="card-header justify-content-center">
 				<h3 class="card-title"><i class="fas fa-edit mr-2"></i><strong> Step 2: Agency Information </strong></h3>
 			</div>
 			<partial name="Vendor/_Create" model="Model" />
-			</div>
-		</form>
+		</div>
+	</form>
 </section>
 
 @section Scripts {
 	@{
 		await Html.RenderPartialAsync("_ValidationScriptsPartial");
 	}
-	<script src="~/js/manager/create-agency.js"></script>
+	<script src="~/js/manager/create-entity.js"></script>
 	<script src="~/js/common/address-with-pincode.js"></script>
 	<script src="~/js/company-admin/add-phone-bank-validate.js"></script>
 	<script src="~/js/common/logo-upload.js"></script>

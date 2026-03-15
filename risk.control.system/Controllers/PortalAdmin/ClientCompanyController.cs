@@ -20,7 +20,7 @@ namespace risk.control.system.Controllers
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{MANAGER.DISPLAY_NAME}")]
     public class ClientCompanyController : Controller
     {
-        private readonly string portal_base_url = string.Empty;
+        private readonly string _baseUrl = string.Empty;
         private const string vendorMapSize = "800x800";
         private readonly ILogger<ClientCompanyController> logger;
         private readonly IManageAgencyService agencyCreateEditService;
@@ -58,7 +58,7 @@ namespace risk.control.system.Controllers
             this.userManager = userManager;
             var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
             var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
-            portal_base_url = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
+            _baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
         }
 
         // GET: ClientCompanies/Create
@@ -107,7 +107,7 @@ namespace risk.control.system.Controllers
             clientCompany.AddressLongitude = companyCoordinates.Longitude;
             clientCompany.AddressMapLocation = url;
             var isdCode = (await _context.Country.FirstOrDefaultAsync(c => c.CountryId == clientCompany.SelectedCountryId))?.ISDCode;
-            await smsService.DoSendSmsAsync(pinCode.Country.Code, isdCode + clientCompany.PhoneNumber, "Company account created. \n\nDomain : " + clientCompany.Email);
+            await smsService.DoSendSmsAsync(pinCode.Country.Code, isdCode + clientCompany.PhoneNumber, "Company account created. \nDomain : " + clientCompany.Email + "\n" + _baseUrl);
 
             //clientCompany.Description = "New company added.";
             clientCompany.AgreementDate = DateTime.UtcNow;
@@ -212,7 +212,8 @@ namespace risk.control.system.Controllers
                 notifyService.Error("Company not found!");
                 return this.RedirectToAction<DashboardController>(x => x.Index());
             }
-
+            var userCount = await _context.ApplicationUser.CountAsync(c => c.ClientCompanyId == clientCompany.ClientCompanyId && !c.Deleted);
+            clientCompany.UserCount = userCount;
             return View(clientCompany);
         }
 
@@ -292,7 +293,7 @@ namespace risk.control.system.Controllers
                 _context.ClientCompany.Update(clientCompany);
                 await _context.SaveChangesAsync();
 
-                await smsService.DoSendSmsAsync(pinCode.Country.Code, pinCode.Country.ISDCode + clientCompany.PhoneNumber, "Company account edited. \n\nDomain : " + clientCompany.Email);
+                await smsService.DoSendSmsAsync(pinCode.Country.Code, pinCode.Country.ISDCode + clientCompany.PhoneNumber, "Company account edited. \n\nDomain : " + clientCompany.Email + "\n" + _baseUrl);
                 notifyService.Custom($"Company edited successfully.", 3, "orange", "fas fa-building");
                 return RedirectToAction(nameof(ClientCompanyController.Details), "ClientCompany", new { id = clientCompany.ClientCompanyId });
             }
@@ -420,7 +421,7 @@ namespace risk.control.system.Controllers
 
             try
             {
-                var result = await agencyCreateEditService.EditAsync(userEmail, model, portal_base_url);
+                var result = await agencyCreateEditService.EditAsync(userEmail, model, _baseUrl);
                 if (!result.Success)
                 {
                     foreach (var error in result.Errors)

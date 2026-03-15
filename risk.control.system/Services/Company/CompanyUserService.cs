@@ -95,7 +95,7 @@ namespace risk.control.system.Services.Company
                 await _userManager.AddToRoleAsync(model, model.Role.ToString());
 
                 var country = await _context.Country.FindAsync(model.CountryId);
-                await _sms.DoSendSmsAsync(country.Code, country.ISDCode + model.PhoneNumber, $"User created\nEmail: {model.Email} \n \r {portal_base_url}");
+                await _sms.DoSendSmsAsync(country.Code, country.ISDCode + model.PhoneNumber, $"User created\nEmail: {model.Email} \n {portal_base_url}");
 
                 return Success($"User <b>{model.Email} </b>created successfully.");
             }

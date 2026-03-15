@@ -82,7 +82,7 @@ namespace risk.control.system.Services.Common
 
         public MvcBreadcrumbNode GetVendorDetailPath(long caseId, long vendorId)
         {
-            return new MvcBreadcrumbNode(nameof(CreatorController.VendorDetail), ControllerName<CreatorController>.Name, "Agency Detail")
+            return new MvcBreadcrumbNode(nameof(CreatorController.AgencyProfile), ControllerName<CreatorController>.Name, "Agency Profile")
             {
                 Parent = GetEmpanelledVendorsPath(caseId, vendorId),
                 RouteValues = new { id = vendorId, selectedcase = caseId }
