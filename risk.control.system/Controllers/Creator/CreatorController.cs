@@ -115,7 +115,7 @@ namespace risk.control.system.Controllers.Creator
             }
         }
 
-        public async Task<IActionResult> VendorDetail(long id, long selectedcase)
+        public async Task<IActionResult> AgencyProfile(long id, long selectedcase)
         {
             if (id <= 0 || selectedcase <= 0)
             {

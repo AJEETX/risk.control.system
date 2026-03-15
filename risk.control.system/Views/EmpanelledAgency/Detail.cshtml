@@ -4,7 +4,7 @@
 	ViewData["Title"] = @Applicationsettings.DETAILS;
 }
 <section class="content">
-	<input type="hidden" id="UserCount" value="@Model.SelectedCountryId" />
+	<input type="hidden" id="UserCount" value="@Model.UserCount" />
 	<input type="hidden" id="ServiceCount" value="@Model.VendorInvestigationServiceTypes.Count" />
 	<input type="hidden" id="Isd" value="@Model?.Country.ISDCode" />
 	<input type="hidden" id="countryCode" value="@Model?.Country.Code" />
@@ -67,14 +67,14 @@
 						<div class="col-md-6">
 							<div class="small-box bg-light border">
 								<div class="inner">
-									<h3>@Model.SelectedDistrictId</h3>
+									<h3>@Model.CompletedCasesCount</h3>
 									<p>Cases Completed</p>
 								</div>
 								<div class="icon"><i class="fas fa-check-double text-success"></i></div>
 							</div>
 							<div class="small-box bg-light border">
 								<div class="inner">
-									<h3>@Model.SelectedStateId</h3>
+									<h3>@Model.CurrentCasesCount</h3>
 									<p>Current Cases</p>
 								</div>
 								<div class="icon"><i class="fas fa-hourglass-half text-info"></i></div>
@@ -168,7 +168,7 @@
 						<i class="fas fa-arrow-left"></i>
 						<span class="badge badge-light"> <i class="fas fa-handshake"></i> </span> Back
 					</a>
-					<a asp-controller="EmpanelledAgencyUser" asp-action="Users" asp-route-id="@Model.VendorId" class="btn btn-sm btn-success" data-bs-toggle="tooltip" title="User count = @Model.SelectedCountryId"><i class="fas fa-user-friends"></i>  Users (@Model.SelectedCountryId)</a>
+					<a asp-controller="EmpanelledAgencyUser" asp-action="Users" asp-route-id="@Model.VendorId" class="btn btn-sm btn-success" data-bs-toggle="tooltip" title="User count = @Model.UserCount"><i class="fas fa-user-friends"></i>  Users (@Model.UserCount)</a>
 					<a asp-controller="EmpanelledAgencyService" asp-action="Service" asp-route-id="@Model.VendorId" class="btn btn-sm btn-danger" data-bs-toggle="tooltip" title="Agency Services count = @Model.VendorInvestigationServiceTypes.Count"><i class="fas fa-cogs"></i>  Service (@Model.VendorInvestigationServiceTypes.Count)</a>
 				</div>
 			</div>

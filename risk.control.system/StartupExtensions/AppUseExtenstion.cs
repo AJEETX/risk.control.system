@@ -19,7 +19,7 @@ public static class AppUseExtenstion
         }
         else
         {
-            app.UseExceptionHandler("/Home/Error");
+            app.UseExceptionHandler("/Home/Index");
             app.UseHsts();
         }
         app.UseHangfireDashboard("/hangfire", new DashboardOptions
