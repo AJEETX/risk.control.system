@@ -154,7 +154,7 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    buttons += `<a data-id="${row.id}" class="btn btn-xs btn-info"><i class="fas fa-search"></i> Agency Info</a>`
+                    buttons += `<a data-id="${row.id}" class="btn btn-xs btn-info"><i class="fas fa-search"></i> Agency Profile</a>`
                     return buttons;
                 }
             }],
@@ -196,9 +196,9 @@
         $("body").addClass("submit-progress-bg");
         setTimeout(() => $(".submit-progress").removeClass("hidden"), 1);
 
-        showSpinnerOnButton(element, "Agency Info");
+        showSpinnerOnButton(element, "Agency Profile");
 
-        const url = `/Creator/VendorDetail/${encodeURIComponent(id)}?selectedcase=${claimId}`;
+        const url = `/Creator/AgencyProfile/${encodeURIComponent(id)}?selectedcase=${claimId}`;
 
         setTimeout(() => {
             window.location.href = url;

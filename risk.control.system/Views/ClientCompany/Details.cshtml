@@ -1,348 +1,349 @@
-﻿    @model risk.control.system.Models.ClientCompany
+﻿@model risk.control.system.Models.ClientCompany
 
 @{
-    ViewData["Title"] = "Manage Company";
+	ViewData["Title"] = "Manage Company";
 }
 <section class="content">
-    <input type="hidden" id="Latitude" asp-for="@Model.PinCode.Latitude" />
-    <input type="hidden" id="Longitude" asp-for="@Model.PinCode.Longitude" />
-    <div id="article" class="card card-secondary direct-chat-warning expand-card">
-        <div class="card-header">
-            <h3 class="card-title"><i class="fas fa-building"></i> Company Profile</h3>
-        </div>
+	<input type="hidden" id="Latitude" asp-for="@Model.PinCode.Latitude" />
+	<input type="hidden" id="Longitude" asp-for="@Model.PinCode.Longitude" />
+	<input type="hidden" id="UserCount" asp-for="@Model.UserCount" />
+	<div id="article" class="card card-secondary direct-chat-warning expand-card">
+		<div class="card-header">
+			<h3 class="card-title"><i class="fas fa-building"></i> Company Profile</h3>
+		</div>
 
-        <div class="card-body">
-            <div class="submit-progress hidden">
-                <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
-            </div>
-            <div class="row">
-                <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
-                    <div class="card bg-light d-flex flex-fill">
-                        <div class="card-footer">
-                            <i class="fas fa-building"></i> Company Details
-                        </div>
-                        <div class="progress">
-                            <i class="far fa-bookmark bookmark-green"></i>
-                            <div class="progress-bar progress-bar-green" role="progressbar">
-                                <i class="fas fa-building"></i>
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-7">
-                                    <p class="text-muted text-sm">
-                                        <i class="fa fa-globe"></i>  <b>@Model.Email</b>
-                                    </p>
-                                    <ul class="ml-4 mb-0 fa-ul text-muted">
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="fas fa-building"></i>
-                                            </span>
-                                            Company Name: <b> @Model.Name</b>
-                                        </li>
-                                       @*  <li class="small">
+		<div class="card-body">
+			<div class="submit-progress hidden">
+				<i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+			</div>
+			<div class="row">
+				<div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
+					<div class="card bg-light d-flex flex-fill">
+						<div class="card-footer">
+							<i class="fas fa-building"></i> Company Details
+						</div>
+						<div class="progress">
+							<i class="far fa-bookmark bookmark-green"></i>
+							<div class="progress-bar progress-bar-green" role="progressbar">
+								<i class="fas fa-building"></i>
+							</div>
+						</div>
+						<div class="card-body">
+							<div class="row">
+								<div class="col-7">
+									<p class="text-muted text-sm">
+										<i class="fa fa-globe"></i>  <b>@Model.Email</b>
+									</p>
+									<ul class="ml-4 mb-0 fa-ul text-muted">
+										<li class="small">
+											<span class="fa-li">
+												<i class="fas fa-building"></i>
+											</span>
+											Company Name: <b> @Model.Name</b>
+										</li>
+										@*  <li class="small">
                                             <span class="fa-li">
                                                 <i class="fas fa-code"></i>
                                             </span>
                                             Company Code: <b> @Model.Code</b>
                                         </li> *@
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="far fa-building"></i>
-                                            </span>
-                                            Branch:<b> @Model.Branch</b>
-                                        </li>
-                                        @* <li class="small">
+										<li class="small">
+											<span class="fa-li">
+												<i class="far fa-building"></i>
+											</span>
+											Branch:<b> @Model.Branch</b>
+										</li>
+										@* <li class="small">
                                             <span class="fa-li">
                                                 <i class="fas fa-tools"></i>
                                             </span>
                                             Detail :<b>  @Model.Description</b>
                                         </li> *@
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="fas fa-phone"></i>
-                                            </span>
-                                            Mobile #: <b>  @Model.PhoneNumber</b>
-                                        </li>
+										<li class="small">
+											<span class="fa-li">
+												<i class="fas fa-phone"></i>
+											</span>
+											Mobile #: <b>  @Model.PhoneNumber</b>
+										</li>
 
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="fas fa-home"></i>
-                                            </span>
-                                            Address: <b>@Model.Addressline @Model.District.Name @Model.State.Name @Model.PinCode.Code</b>
-                                        </li>
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="fas fa-key"></i>
-                                            </span>
-                                            License Type: <b>@Html.DisplayFor(model => model.LicenseType)</b>
-                                        </li>
-                                        @{
-                                            if (Model.LicenseType == LicenseType.Trial)
-                                            {
-                                                var expiryDate = Model.ExpiryDate.Value.ToString("dd-MMM-yyyy");
+										<li class="small">
+											<span class="fa-li">
+												<i class="fas fa-home"></i>
+											</span>
+											Address: <b>@Model.Addressline @Model.District.Name @Model.State.Name @Model.PinCode.Code</b>
+										</li>
+										<li class="small">
+											<span class="fa-li">
+												<i class="fas fa-key"></i>
+											</span>
+											License Type: <b>@Html.DisplayFor(model => model.LicenseType)</b>
+										</li>
+										@{
+											if (Model.LicenseType == LicenseType.Trial)
+											{
+												var expiryDate = Model.ExpiryDate.Value.ToString("dd-MMM-yyyy");
 
-                                                <li class="small">
-                                                    <span class="fa-li">
-                                                        <i class="fas fa-calendar-check"></i>
-                                                    </span>
-                                                    License Expiry Date:<b> @Html.DisplayFor(model => expiryDate)</b>
-                                                </li>
-                                                <li class="small">
-                                                    <span class="fa-li">
-                                                        <i class="fas fa-coins"></i>
-                                                    </span>
-                                                    MAX Cases: <b>@Html.DisplayFor(model => model.TotalCreatedClaimAllowed)</b>
-                                                </li>
-                                            }
-                                        }
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="fas fa-coins"></i>
-                                            </span>
-                                            MAX Assign_ready: <b>@Html.DisplayFor(model => model.TotalToAssignMaxAllowed)</b>
-                                        </li>
-                                       @*  <li class="small">
+												<li class="small">
+													<span class="fa-li">
+														<i class="fas fa-calendar-check"></i>
+													</span>
+													License Expiry Date:<b> @Html.DisplayFor(model => expiryDate)</b>
+												</li>
+												<li class="small">
+													<span class="fa-li">
+														<i class="fas fa-coins"></i>
+													</span>
+													MAX Cases: <b>@Html.DisplayFor(model => model.TotalCreatedClaimAllowed)</b>
+												</li>
+											}
+										}
+										<li class="small">
+											<span class="fa-li">
+												<i class="fas fa-coins"></i>
+											</span>
+											MAX Assign_ready: <b>@Html.DisplayFor(model => model.TotalToAssignMaxAllowed)</b>
+										</li>
+										@*  <li class="small">
                                             <span class="fa-li">
                                                 <i class="fas fa-sitemap"></i>
                                             </span>
                                             Whitelist Ip Addresses : <b>  @Model.WhitelistIpAddress</b>
                                         </li> *@
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="fas fa-project-diagram"></i>
-                                            </span>
-                                            Creator Sla (day(s):  <a href="#">  @Model.CreatorSla</a>
-                                        </li>
+										<li class="small">
+											<span class="fa-li">
+												<i class="fas fa-project-diagram"></i>
+											</span>
+											Creator Sla (day(s):  <a href="#">  @Model.CreatorSla</a>
+										</li>
 
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="fas fa-project-diagram"></i>
-                                            </span>
-                                            Assessor Sla(day(s):  <a href="#">  @Model.AssessorSla</a>
-                                        </li>
+										<li class="small">
+											<span class="fa-li">
+												<i class="fas fa-project-diagram"></i>
+											</span>
+											Assessor Sla(day(s):  <a href="#">  @Model.AssessorSla</a>
+										</li>
 
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="fas fa-project-diagram"></i>
-                                            </span>
-                                            Supervisor Sla(day(s):  <a href="#">  @Model.SupervisorSla</a>
-                                        </li>
+										<li class="small">
+											<span class="fa-li">
+												<i class="fas fa-project-diagram"></i>
+											</span>
+											Supervisor Sla(day(s):  <a href="#">  @Model.SupervisorSla</a>
+										</li>
 
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="fas fa-project-diagram"></i>
-                                            </span>
-                                            Agent Sla(day(s):  <a href="#">  @Model.AgentSla</a>
-                                        </li>
-                                    </ul>
-                                </div>
-                                <div class="col-5 text-center">
-                                    <p class="text-muted text-sm">
-                                    </p>
-                                    <p class="text-muted text-sm">
-                                        @if (Model?.DocumentUrl is not null)
-                                        {
-                                            <img id="documentImage" class="img-fluid" src="/Document/GetCompanyDocument/@Model.ClientCompanyId">
-                                        }
-                                        else
-                                        {
-                                            <img id="documentImage" alt="user-avatar"
-                                                 class="img-fluid form-Image" src="@Applicationsettings.NO_IMAGE">
-                                        }
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
-                    <div class="card bg-light d-flex flex-fill">
-                        <div class="card-footer">
-                            <i class="fas fa-sitemap"></i> APIs Details
-                        </div>
-                        <div class="progress">
-                            <i class="far fa-bookmark bookmark-green"></i>
-                            <div class="progress-bar progress-bar-green" role="progressbar">
-                                <i class="fas fa-sitemap"></i>
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-12">
-                                    <p class="text-muted text-sm">
-                                        <i class="fas fa-code-branch"></i> <b> External URl : </b>
-                                    </p>
-                                    <ul class="ml-4 mb-0 fa-ul text-muted">
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="fas fa-project-diagram"></i>
-                                            </span>
-                                            API endpoint:  <a href="#">  @Model.PanIdfyUrl</a>
-                                        </li>
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="fas fa-key"></i>
-                                            </span>
-                                            Api Key:  <b>  @Model.PanAPIData</b>
-                                        </li>
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="fas fa-code"></i>
-                                            </span>
-                                            Api Host:  <b>  @Model.PanAPIHost</b>
-                                        </li>
+										<li class="small">
+											<span class="fa-li">
+												<i class="fas fa-project-diagram"></i>
+											</span>
+											Agent Sla(day(s):  <a href="#">  @Model.AgentSla</a>
+										</li>
+									</ul>
+								</div>
+								<div class="col-5 text-center">
+									<p class="text-muted text-sm">
+									</p>
+									<p class="text-muted text-sm">
+										@if (Model?.DocumentUrl is not null)
+										{
+											<img id="documentImage" class="img-fluid" src="/Document/GetCompanyDocument/@Model.ClientCompanyId">
+										}
+										else
+										{
+											<img id="documentImage" alt="user-avatar"
+												 class="img-fluid form-Image" src="@Applicationsettings.NO_IMAGE">
+										}
+									</p>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
+					<div class="card bg-light d-flex flex-fill">
+						<div class="card-footer">
+							<i class="fas fa-sitemap"></i> APIs Details
+						</div>
+						<div class="progress">
+							<i class="far fa-bookmark bookmark-green"></i>
+							<div class="progress-bar progress-bar-green" role="progressbar">
+								<i class="fas fa-sitemap"></i>
+							</div>
+						</div>
+						<div class="card-body">
+							<div class="row">
+								<div class="col-12">
+									<p class="text-muted text-sm">
+										<i class="fas fa-code-branch"></i> <b> External URl : </b>
+									</p>
+									<ul class="ml-4 mb-0 fa-ul text-muted">
+										<li class="small">
+											<span class="fa-li">
+												<i class="fas fa-project-diagram"></i>
+											</span>
+											API endpoint:  <a href="#">  @Model.PanIdfyUrl</a>
+										</li>
+										<li class="small">
+											<span class="fa-li">
+												<i class="fas fa-key"></i>
+											</span>
+											Api Key:  <b>  @Model.PanAPIData</b>
+										</li>
+										<li class="small">
+											<span class="fa-li">
+												<i class="fas fa-code"></i>
+											</span>
+											Api Host:  <b>  @Model.PanAPIHost</b>
+										</li>
 
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="fas fa-project-diagram"></i>
-                                            </span>
-                                            Passport API endpoint:  <a href="#">  @Model.PassportApiUrl</a>
-                                        </li>
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="fas fa-key"></i>
-                                            </span>
-                                            Passport Api Key:  <b>  @Model.PassportApiData</b>
-                                        </li>
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="fas fa-code"></i>
-                                            </span>
-                                            Passport Api Host:  <b>  @Model.PassportApiHost</b>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-6">
-                                    <p class="text-muted text-sm">
-                                        <i class="fas fa-tools"></i> <b> Settings : </b>
-                                    </p>
-                                    <ul class="ml-4 mb-0 fa-ul text-muted">
+										<li class="small">
+											<span class="fa-li">
+												<i class="fas fa-project-diagram"></i>
+											</span>
+											Passport API endpoint:  <a href="#">  @Model.PassportApiUrl</a>
+										</li>
+										<li class="small">
+											<span class="fa-li">
+												<i class="fas fa-key"></i>
+											</span>
+											Passport Api Key:  <b>  @Model.PassportApiData</b>
+										</li>
+										<li class="small">
+											<span class="fa-li">
+												<i class="fas fa-code"></i>
+											</span>
+											Passport Api Host:  <b>  @Model.PassportApiHost</b>
+										</li>
+									</ul>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-6">
+									<p class="text-muted text-sm">
+										<i class="fas fa-tools"></i> <b> Settings : </b>
+									</p>
+									<ul class="ml-4 mb-0 fa-ul text-muted">
 
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="far fa-paper-plane"></i>
-                                            </span>
-                                            Auto-Allocation <b>YES</b>
-                                        </li>
+										<li class="small">
+											<span class="fa-li">
+												<i class="far fa-paper-plane"></i>
+											</span>
+											Auto-Allocation <b>YES</b>
+										</li>
 
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="fa fa-upload"></i>
-                                            </span>
-                                            AI enabled: <b>@Html.DisplayFor(model => model.AiEnabled)</b>
-                                        </li>
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="fas fa-key"></i>
-                                            </span>
-                                            Edit Profile <b>@Html.DisplayFor(model => model.CanChangePassword) </b>
-                                        </li>
+										<li class="small">
+											<span class="fa-li">
+												<i class="fa fa-upload"></i>
+											</span>
+											AI enabled: <b>@Html.DisplayFor(model => model.AiEnabled)</b>
+										</li>
+										<li class="small">
+											<span class="fa-li">
+												<i class="fas fa-key"></i>
+											</span>
+											Edit Profile <b>@Html.DisplayFor(model => model.CanChangePassword) </b>
+										</li>
 
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="fas fa-comments"></i>
-                                            </span>
-                                            Set Prefilled data: <b>@Html.DisplayFor(model => model.HasSampleData)</b>
-                                        </li>
-                                    </ul>
-                                </div>
-                                <div class="col-6">
-                                    ---
-                                    <ul class="ml-4 mb-0 fa-ul text-muted">
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="fas fa-business-time"></i>
-                                            </span>
-                                            Verify Pan: <b>  @Html.DisplayFor(model => model.VerifyPan)</b>
-                                        </li>
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="fas fa-business-time"></i>
-                                            </span>
-                                            Verify Passport: <b>  @Html.DisplayFor(model => model.VerifyPassport)</b>
-                                        </li>
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="fas fa-business-time"></i>
-                                            </span>
-                                            Enable Passport: <b>  @Html.DisplayFor(model => model.EnablePassport)</b>
-                                        </li>
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="fas fa-business-time"></i>
-                                            </span>
-                                            Enable Media: <b>  @Html.DisplayFor(model => model.EnableMedia)</b>
-                                        </li>
+										<li class="small">
+											<span class="fa-li">
+												<i class="fas fa-comments"></i>
+											</span>
+											Set Prefilled data: <b>@Html.DisplayFor(model => model.HasSampleData)</b>
+										</li>
+									</ul>
+								</div>
+								<div class="col-6">
+									---
+									<ul class="ml-4 mb-0 fa-ul text-muted">
+										<li class="small">
+											<span class="fa-li">
+												<i class="fas fa-business-time"></i>
+											</span>
+											Verify Pan: <b>  @Html.DisplayFor(model => model.VerifyPan)</b>
+										</li>
+										<li class="small">
+											<span class="fa-li">
+												<i class="fas fa-business-time"></i>
+											</span>
+											Verify Passport: <b>  @Html.DisplayFor(model => model.VerifyPassport)</b>
+										</li>
+										<li class="small">
+											<span class="fa-li">
+												<i class="fas fa-business-time"></i>
+											</span>
+											Enable Passport: <b>  @Html.DisplayFor(model => model.EnablePassport)</b>
+										</li>
+										<li class="small">
+											<span class="fa-li">
+												<i class="fas fa-business-time"></i>
+											</span>
+											Enable Media: <b>  @Html.DisplayFor(model => model.EnableMedia)</b>
+										</li>
 
-                                        @*
+										@*
                                         <li class="small">
                                             <span class="fa-li">
                                                 <i class="fas fa-comments"></i>
                                             </span>
                                             Edit Report(Supervisor): <b>@Html.DisplayFor(model => model.UpdateAgentReport)</b>
                                         </li> *@
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="fas fa-comments"></i>
-                                            </span>
-                                            Edit Answer(Supervisor): <b>@Html.DisplayFor(model => model.UpdateAgentAnswer)</b>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
-                    <div class="card bg-light d-flex flex-fill">
-                        <div class="card-footer">
-                            <i class="fas fa-map-marked-alt"></i> Map View
-                        </div>
-                        <div class="progress">
-                            <i class="far fa-bookmark bookmark-green"></i>
-                            <div class="progress-bar progress-bar-green" role="progressbar">
-                                <i class="fas fa-map-marked-alt"></i>
-                            </div>
-                        </div>
-                        <div class="card-body">
+										<li class="small">
+											<span class="fa-li">
+												<i class="fas fa-comments"></i>
+											</span>
+											Edit Answer(Supervisor): <b>@Html.DisplayFor(model => model.UpdateAgentAnswer)</b>
+										</li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
+					<div class="card bg-light d-flex flex-fill">
+						<div class="card-footer">
+							<i class="fas fa-map-marked-alt"></i> Map View
+						</div>
+						<div class="progress">
+							<i class="far fa-bookmark bookmark-green"></i>
+							<div class="progress-bar progress-bar-green" role="progressbar">
+								<i class="fas fa-map-marked-alt"></i>
+							</div>
+						</div>
+						<div class="card-body">
 
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div id="company-map">
-                                        <img id="company-map-url" src="@Model.AddressMapLocation" />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="card-footer">
-            <div class="row float-right">
-                <div class="col-md-12">
-                    <div class="form-group">
+							<div class="row">
+								<div class="col-md-12">
+									<div id="company-map">
+										<img id="company-map-url" src="@Model.AddressMapLocation" />
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="card-footer">
+			<div class="row float-right">
+				<div class="col-md-12">
+					<div class="form-group">
 
-                        <a id="back" asp-controller="ClientCompany" asp-action="Companies" class="btn btn-outline-secondary">
-                        <i class="fas fa-arrow-left"></i>
-                        Back
-                    </a>
-                        <a id="edit-profile" asp-controller="ClientCompany" asp-action="Edit" asp-route-id="@Model.ClientCompanyId" class="btn btn-warning"><i class='fas fa-building'></i> Profile</a>
-                    <a id="users" asp-controller="CompanyUser" asp-action="Index" asp-route-id="@Model.ClientCompanyId" class="btn btn-success"><i class="fas fa-user-plus"></i> Users</a>
-                    @*<a asp-controller="ClientCompany" asp-action="EmpanelledVendors" asp-route-id="@Model.ClientCompanyId" class="btn btn-success"><i class="fas fa-user-secret"></i>  @Applicationsettings.VENDOR</a>*@
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+						<a id="back" asp-controller="ClientCompany" asp-action="Companies" class="btn btn-outline-secondary">
+							<i class="fas fa-arrow-left"></i>
+							Back
+						</a>
+						<a id="edit-profile" asp-controller="ClientCompany" asp-action="Edit" asp-route-id="@Model.ClientCompanyId" class="btn btn-warning"><i class='fas fa-building'></i> Profile</a>
+						<a id="users" asp-controller="CompanyUser" asp-action="Index" asp-route-id="@Model.ClientCompanyId" class="btn btn-success"><i class="fas fa-user-plus"></i> Users (@Model.UserCount)</a>
+						@*<a asp-controller="ClientCompany" asp-action="EmpanelledVendors" asp-route-id="@Model.ClientCompanyId" class="btn btn-success"><i class="fas fa-user-secret"></i>  @Applicationsettings.VENDOR</a>*@
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 </section>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-    <script src="~/js/common/companies.js"></script>
+	@{
+		await Html.RenderPartialAsync("_ValidationScriptsPartial");
+	}
+	<script src="~/js/common/companies.js"></script>
 }

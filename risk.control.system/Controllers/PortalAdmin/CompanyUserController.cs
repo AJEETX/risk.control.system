@@ -74,7 +74,7 @@ namespace risk.control.system.Controllers.PortalAdmin
         public IActionResult Create(long id)
         {
             var company = _context.ClientCompany.Include(c => c.Country).FirstOrDefault(v => v.ClientCompanyId == id);
-            var model = new ApplicationUser { Country = company.Country, CountryId = company.CountryId, ClientCompany = company };
+            var model = new ApplicationUser { Country = company.Country, CountryId = company.CountryId, ClientCompany = company, ClientCompanyId = company.ClientCompanyId };
             ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
 
             var agencysPage = new MvcBreadcrumbNode("Companies", "ClientCompany", "Admin Settings");

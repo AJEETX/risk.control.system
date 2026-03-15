@@ -87,15 +87,30 @@
 
     // Handle blur event
     if ($emailInput) {
-        $emailInput.on("blur", function () {
+        $emailInput.on("input", function () {
             if ($(this).val()) {
                 CheckIfEmailValid($(this).val());
             }
         });
 
-        // Handle keydown event
-        $emailInput.on("keydown", function (event) {
-            return alphaOnly(event);
+        $emailInput.on("input", function () {
+            let val = $(this).val();
+
+            // 1. Remove any character that isn't a letter or a hyphen
+            let cleaned = val.replace(/[^a-z-]/g, '');
+
+            // 2. Prevent hyphen as the FIRST character
+            if (cleaned.startsWith('-')) {
+                cleaned = cleaned.substring(1);
+            }
+
+            // 3. Optional: Prevent double hyphens (common in domain rules)
+            cleaned = cleaned.replace(/-{2,}/g, '-');
+
+            // Update the input value only if it changed
+            if (val !== cleaned) {
+                $(this).val(cleaned);
+            }
         });
 
         // Handle click event
@@ -121,11 +136,28 @@ function CheckIfEmailValid() {
 // Example function: Allow only alphabetical characters
 function alphaOnly(event) {
     const key = event.key;
-    if (!/^[a-zA-Z]$/.test(key) && key !== "Backspace" && key !== "Tab") {
-        event.preventDefault();
-        return false;
+
+    // 1. Allow functional keys (Navigation & Deletion)
+    const isControlKey = [
+        'Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete', 'Enter'
+    ].includes(key);
+
+    if (isControlKey) {
+        return true;
     }
-    return true;
+
+    // 2. Define allowed characters (Letters and Hyphen)
+    // We use a case-insensitive regex including the hyphen
+    const isAllowedChar = /^[a-zA-Z-]$/.test(key);
+
+    if (isAllowedChar) {
+        return true;
+    }
+
+    // 3. If it's not allowed, kill the event completely
+    event.preventDefault();
+    event.stopPropagation(); // Prevents other scripts from interfering
+    return false;
 }
 function checkDomain() {
     $("#domainAddress").val('');
