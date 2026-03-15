@@ -1,9 +1,42 @@
 ﻿@{
 	ViewData["Title"] = "Error";
+	// Retrieve the activity ID for support tracking
+	var requestId = System.Diagnostics.Activity.Current?.Id ?? Context.TraceIdentifier;
 }
 
-<div class="text-center mt-5">
-	<h1 class="display-4 text-danger">Something went wrong</h1>
-	<p class="lead">An unexpected error occurred. Please try again later.</p>
-	<a class="btn btn-primary mt-3" href="/Dashboard/Index">Go back to home</a>
+<div class="container mt-5">
+	<div class="row justify-content-center">
+		<div class="col-md-8 col-lg-6 text-center">
+			<div class="mb-4">
+				<i class="fas fa-exclamation-triangle text-danger fa-5x mb-3"></i>
+				<h1 class="display-5 fw-bold text-dark">Something went wrong</h1>
+			</div>
+
+			<div class="card border-0 shadow-sm mb-4">
+				<div class="card-body p-4">
+					<p class="lead text-secondary mb-0">
+						An unexpected error occurred while processing your request.
+						Our team has been notified.
+					</p>
+				</div>
+			</div>
+
+			@if (!string.IsNullOrEmpty(requestId))
+			{
+				<div class="mb-4">
+					<small class="text-muted d-block">Support Reference ID:</small>
+					<code class="bg-light p-1 rounded text-break">@requestId</code>
+				</div>
+			}
+
+			<div class="d-grid gap-2 d-sm-flex justify-content-sm-center mt-2">
+				<a href="/Dashboard/Index" class="btn btn-primary btn-lg px-4 gap-3">
+					<i class="fas fa-home me-2"></i>Back to Dashboard
+				</a>
+				<button onclick="location.reload()" class="btn btn-outline-secondary btn-lg px-4">
+					<i class="fas fa-redo me-2"></i>Try Again
+				</button>
+			</div>
+		</div>
+	</div>
 </div>

@@ -19,12 +19,17 @@ var env = builder.Environment;
 //    .SetApplicationName("iCheckify");
 // Set up logging
 
+builder.Configuration
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+    .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
+
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Error()
     .Enrich.FromLogContext()
     .Enrich.WithProperty("Application", "iCheckify")
     .WriteTo.File(
         path: "Logs/log-.json",
+        shared: true,
         rollingInterval: RollingInterval.Day,
         retainedFileCountLimit: 30,
         formatter: new Serilog.Formatting.Json.JsonFormatter()
@@ -32,10 +37,6 @@ Log.Logger = new LoggerConfiguration()
     .CreateLogger();
 
 builder.Host.UseSerilog();
-
-builder.Configuration
-    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-    .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
 
 builder.Services.AddBundleFiles();
 
@@ -58,6 +59,8 @@ try
 {
     Log.Information("Starting web host");
     var app = builder.Build();
+
+    app.UseExceptionHandler("/Home/Error");
 
     await app.UseServices(builder.Configuration);
     AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
