@@ -19,7 +19,7 @@
         $(this).closest('.input-group').css('border', '1px solid #dc3545');
     });
     // Call validateInput with selectors and patterns
-    validateInput('#emailAddress', /[^a-z]/g); // Allow only alphabet characters (no spaces)
+    validateInput('#emailAddress', /[^a-z-]/g); // Allow only alphabet characters (no spaces)
     validateInput('#ContractNumber, #IFSCCode, #Code', /[^a-zA-Z0-9]/g); // Allow only alphanumeric characters (no spaces)
     validateInput('#CauseOfLoss, #Description, #Addressline, #Comments', /[^a-zA-Z0-9 .,-]/g); // Allow alphanumeric, spaces, comma, dot, dash
     validateInput('#CustomerName, #BeneficiaryName, #StateId, #DistrictId, #FirstName, #LastName, #Name, #Branch, #BankName', /[^a-zA-Z ]/g); // Allow alphabets and spaces

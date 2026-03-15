@@ -107,9 +107,9 @@ namespace risk.control.system.Services.AgencyAdmin
 
             // HACKY
             var currentCases = await _agencyCaseLoadService.GetAgencyIdsLoad(new List<long> { vendor.VendorId });
-            vendor.SelectedCountryId = vendorUserCount;
-            vendor.SelectedStateId = currentCases.FirstOrDefault().CaseCount;
-            vendor.SelectedDistrictId = vendorAllCasesCount;
+            vendor.UserCount = vendorUserCount;
+            vendor.CurrentCasesCount = currentCases.FirstOrDefault().CaseCount;
+            vendor.CompletedCasesCount = vendorAllCasesCount;
             return vendor;
         }
 

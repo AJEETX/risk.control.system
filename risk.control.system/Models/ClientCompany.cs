@@ -124,6 +124,9 @@ namespace risk.control.system.Models
         [NotMapped]
         public long SelectedCountryId { get; set; }
 
+        [NotMapped]
+        public int UserCount { get; set; }
+
         public override string ToString()
         {
             return $"Insurance Company Information:\n" +
