@@ -169,7 +169,7 @@
 					<a asp-controller="Country" asp-action="Index" is-active-page class="navlink-border nav-link @Url.MakeActiveClass("Country", "")
 						@Url.MakeActiveClass("State", "") @Url.MakeActiveClass("District", "") @Url.MakeActiveClass("PinCodes", "")
 						@Url.MakeActiveClass("Global", "")
-						@Url.MakeActiveClass("Audit", "")">
+						@Url.MakeActiveClass("Home", "")">
 						<i class="nav-icon fas fa-wrench"></i>
 						<p class="sidebar-menu-header-label">
 							@Applicationsettings.GENERAL_SETUP
@@ -219,6 +219,14 @@
 						<i class="nav-icon fas fa-wrench"></i>
 						<p>
 							@Applicationsettings.GLOBAL_SETTINGS
+						</p>
+					</a>
+				</li>
+				<li class="nav-item">
+					<a is-active-page asp-controller="Home" asp-action="ErrorLog" class="actual-link nav-link @Url.MakeActiveClass("Home", "")">
+						<i class="nav-icon fas fa-file-medical-alt"></i>
+						<p>
+							Error Logs
 						</p>
 					</a>
 				</li>

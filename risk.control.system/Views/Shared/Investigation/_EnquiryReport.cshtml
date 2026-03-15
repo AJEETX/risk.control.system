@@ -14,6 +14,8 @@
             </div>
         </div>
         <div class="card-body">
+                <div class="table-responsive">
+
             @foreach (var request in Model.ClaimsInvestigation.InvestigationReport.EnquiryRequests)
                 @if (!string.IsNullOrWhiteSpace(request?.DescriptiveAnswer))
                 {
@@ -83,7 +85,9 @@
                         </tr>
                     </table>
                 }
-        </div>
+        
+            </div>
+            </div>
     </div>
 </div>
 }

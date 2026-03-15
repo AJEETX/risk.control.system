@@ -10,7 +10,7 @@
 	<input type="hidden" id="countryCode" value="@Model?.Country.Code" />
 	<input type="hidden" asp-for="MobileAppUrl" />
 
-	<div class="card shadow-lg border-0 rounded-lg">
+	<div class="card shadow-lg border-1 rounded-lg">
 		<div class="card-header bg-secondary text-white">
 			<h3 class="card-title"><i class="fas fa-building mr-2"></i> Agency Profile</h3>
 		</div>
@@ -56,7 +56,7 @@
 							</div>
 						</div>
 
-						<a id="edit-profile" asp-controller="EmpanelledAgency" asp-action="Edit" asp-route-id="@Model.VendorId" class="btn btn-outline-warning btn-block">
+						<a id="edit-profile" asp-controller="EmpanelledAgency" asp-action="Edit" asp-route-id="@Model.VendorId" class="btn btn-outline-warning btn-block mb-4">
 							<i class='fas fa-edit'></i> Edit Profile
 						</a>
 					</div>
@@ -81,7 +81,7 @@
 							</div>
 
 							<h5 class="text-primary border-bottom pb-2"><i class="fas fa-wallet mr-1"></i> Banking Details</h5>
-							<div class="bg-light p-3 rounded shadow-sm border">
+							<div class="bg-light mb-4 p-3 rounded shadow-sm border">
 								<div class="info-box">
 									<span class="info-box-icon bg-info"><i class="fas fa-landmark"></i></span>
 									<div class="info-box-content">
@@ -108,7 +108,7 @@
 							</div>
 						</div>
 						<div class="col-md-6">
-							<h5 class="text-primary border-bottom pb-2"><i class="fas fa-map-marker-alt"></i> Contact & Address</h5>
+							<h5 class="text-primary border-bottom pb-2"><i class="fas fa-map-marker-alt"></i> Domain & Address</h5>
 							<div class="bg-light p-3 rounded shadow-sm border">
 								<div class="info-box">
 									<span class="info-box-icon bg-primary"><i class="fas fa-envelope"></i></span>
