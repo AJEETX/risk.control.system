@@ -148,7 +148,7 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    buttons += '<button disabled id=edit' + row.id + ' href="/CompanyUser/Edit?userId=' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-pen"></i> Edit</button>&nbsp;'
+                    buttons += '<button id=' + row.id + ' href="/CompanyUser/Edit/' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-pen"></i> Edit</button>&nbsp;'
                     //buttons += '<a href="/CompanyUserRoles/Index?userId=' + row.id + '"  class="btn btn-xs btn-info"><i class="fas fa-pen"></i> Roles</a>'
                     return buttons;
                 }
@@ -164,7 +164,7 @@
         "drawCallback": function (settings, start, end, max, total, pre) {
             $('#dataTable tbody').on('click', '.btn-warning', function (e) {
                 e.preventDefault(); // Prevent the default anchor behavior
-                var id = $(this).attr('id').replace('edit', ''); // Extract the ID from the button's ID attribute
+                var id = $(this).attr('id'); // Extract the ID from the button's ID attribute
                 showedit(id); // Call the getdetails function with the ID
                 window.location.href = $(this).attr('href'); // Navigate to the edit page
             });
@@ -196,12 +196,12 @@ function showedit(id) {
     setTimeout(function () {
         $(".submit-progress").removeClass("hidden");
     }, 1);
-    var editbtn = $('a#edit' + id + '.btn.btn-xs.btn-warning')
+    var editbtn = $('button#' + id + '.btn.btn-xs.btn-warning')
     // Disable all buttons, submit inputs, and anchors
     $('button, input[type="submit"], a').prop('disabled', true);
 
     // Add a class to visually indicate disabled state for anchors
-    $('a').addClass('disabled-anchor').on('click', function (e) {
+    $('button').addClass('disabled-anchor').on('click', function (e) {
         e.preventDefault(); // Prevent default action for anchor clicks
     });
     editbtn.html("<i class='fas fa-sync fa-spin'></i> Edit");

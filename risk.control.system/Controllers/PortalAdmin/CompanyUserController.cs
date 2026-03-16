@@ -136,15 +136,15 @@ namespace risk.control.system.Controllers.PortalAdmin
         }
 
         [Breadcrumb("Edit ")]
-        public async Task<IActionResult> Edit(long? userId)
+        public async Task<IActionResult> Edit(long? id)
         {
-            if (userId == null || userId <= 0)
+            if (id == null || id <= 0)
             {
                 notifyService.Error("Company not found");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
 
-            var user = await _context.ApplicationUser.Include(u => u.ClientCompany).Include(c => c.Country).FirstOrDefaultAsync(v => v.Id == userId);
+            var user = await _context.ApplicationUser.Include(c => c.Country).FirstOrDefaultAsync(v => v.Id == id);
             if (user == null)
             {
                 notifyService.Error("Company not found");
@@ -153,8 +153,8 @@ namespace risk.control.system.Controllers.PortalAdmin
 
             var agencysPage = new MvcBreadcrumbNode("Companies", "ClientCompany", "Admin Settings");
             var agency2Page = new MvcBreadcrumbNode("Companies", "ClientCompany", "Companies") { Parent = agencysPage, };
-            var agencyPage = new MvcBreadcrumbNode("Details", "ClientCompany", "Company Profile") { Parent = agency2Page, RouteValues = new { id = user.ClientCompany.ClientCompanyId } };
-            var createPage = new MvcBreadcrumbNode("Index", "CompanyUser", $"Users") { Parent = agencyPage, RouteValues = new { id = user.ClientCompany.ClientCompanyId } };
+            var agencyPage = new MvcBreadcrumbNode("Details", "ClientCompany", "Company Profile") { Parent = agency2Page, RouteValues = new { id = user.ClientCompanyId } };
+            var createPage = new MvcBreadcrumbNode("Index", "CompanyUser", $"Users") { Parent = agencyPage, RouteValues = new { id = user.ClientCompanyId } };
             var editPage = new MvcBreadcrumbNode("Edit", "CompanyUser", $"Edit User") { Parent = createPage };
             ViewData["BreadcrumbNode"] = editPage;
             user.IsPasswordChangeRequired = await featureManager.IsEnabledAsync(nameof(FeatureFlags.FIRST_LOGIN_CONFIRMATION)) ? !user.IsPasswordChangeRequired : true;

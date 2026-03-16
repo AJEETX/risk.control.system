@@ -56,7 +56,7 @@ public static class AppUseExtenstion
         app.UseAuthentication();
         app.UseAuthorization();
 
-        app.UseMiddleware<SecurityMiddleware>(configuration["HttpStatusErrorCodes"]);
+        app.UseMiddleware<SecurityMiddleware>();
         app.UseMiddleware<CookieConsentMiddleware>();
 
         app.UseRateLimiter();
