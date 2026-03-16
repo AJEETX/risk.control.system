@@ -16,8 +16,8 @@ namespace risk.control.system.AppConstant
 
         public static readonly string USER_MOBILE = "400000000";
         public static readonly string HEXdATA = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-        public static readonly string ValidIssuer = "icheckify";
-        public static readonly string ValidAudience = "canarahdfclife";
+        public static readonly string ValidIssuer = "policy-intel";
+        public static readonly string ValidAudience = "insurance";
         public static readonly int TokenTimeoutMinutes = 5;
 
         //public const string APP_URL = "https://ickeckify-apk.s3.ap-southeast-2.amazonaws.com/demo/app-release.apk";
@@ -28,8 +28,9 @@ namespace risk.control.system.AppConstant
 
         //WEBSITE SETTINGS
 
-        public const string WEBSITE_SITE_URL = "icheckify.co.in";
-        public const string WEBSITE_SITE_MENU_LOGO = "/img/logo.png";
+        public const string WEBSITE_NAME = "policy-intel";
+        public const string WEBSITE_SITE_URL = "policy-intel.biz";
+        public const string WEBSITE_SITE_LOGO = "/img/logo.png";
         public static readonly string FTP_SITE = "ftp://ftp.drivehq.com/holosync/";
         public static readonly string FTP_SITE_LOG = "its.aby@email.com";
         public static readonly string FTP_SITE_DATA = "C0##ect10n";
