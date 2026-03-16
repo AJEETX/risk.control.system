@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.DataProtection;
+using risk.control.system.AppConstant;
 using risk.control.system.StartupExtensions;
 using Serilog;
 
@@ -17,7 +18,7 @@ if (!Directory.Exists(keysPath)) Directory.CreateDirectory(keysPath);
 
 builder.Services.AddDataProtection()
     .PersistKeysToFileSystem(new DirectoryInfo(keysPath))
-    .SetApplicationName("iCheckify");
+    .SetApplicationName(Applicationsettings.WEBSITE_NAME);
 
 builder.Configuration
     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
@@ -26,7 +27,7 @@ builder.Configuration
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Error()
     .Enrich.FromLogContext()
-    .Enrich.WithProperty("Application", "iCheckify")
+    .Enrich.WithProperty("Application", Applicationsettings.WEBSITE_NAME)
     .WriteTo.File(
         path: "Logs/log-.json",
         shared: true,
@@ -59,8 +60,6 @@ try
 {
     Log.Information("Starting web host");
     var app = builder.Build();
-
-    app.UseExceptionHandler("/Home/Error");
 
     await app.UseServices(builder.Configuration);
     AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);

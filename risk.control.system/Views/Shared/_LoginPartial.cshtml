@@ -1,15 +1,15 @@
 ﻿@model LoginViewModel
 <div class="login-form">
-    <img class="login-logo" src="/img/iCheckifyLogo.png" alt="logo"/>™️
+    <img class="login-logo" src="@Applicationsettings.WEBSITE_SITE_LOGO" alt="logo" title="Policy Intel" />™️
 
     <div id="title" class="title" title="Login">
         Login
-        <sup class="fa fa-info-circle password-info-icon"></sup> 
+        <sup class="fa fa-info-circle password-info-icon"></sup>
         <a  class="microsoft" href="/Account/AzureLogin" title="Azure AD Login">
             <img src="~/img/microsoft-icon.png" class="microsoft mr-2" alt="microsoft" />
         </a>
     </div>
-    
+
     <form id="login-form" asp-controller="Account" method="post">
         @Html.AntiForgeryToken()
         <input name="agent_login" title="agent_login" type="text" id="agent_login" value="">
@@ -30,10 +30,10 @@
                 {
                     <input asp-for=Password id="Password" type="password" title="password" class="form-control remarks" placeholder="Enter your password" value="@Applicationsettings.TestingData" autocomplete="off" required />
                 }
-                else 
+                else
                 {
                     <input asp-for=Password id="Password" type="password" title="password" class="form-control remarks" placeholder="Enter your password" autocomplete="off" required />
-                
+
                 }
             </div>
             <p class="account">By clicking <strong><span class="fa fa-key" aria-hidden="true"></span> Login</strong>, you agree to <a class="termsLink" href="#">Terms & Conditions!</a></p>
@@ -43,7 +43,7 @@
             <div class="text-muted text-sm">Forgot Password? <span class="far fa-hand-point-right" aria-hidden="true"></span> <label for="flip" class="login-link"> Click Here</label></div>
         </div>
     </form>
-    
+
     <div class="error-message">
         @if (Model?.LoginError != null)
         {
