@@ -1,6 +1,4 @@
-﻿using Microsoft.FeatureManagement;
-
-using risk.control.system.Models;
+﻿using risk.control.system.Models;
 using risk.control.system.Services.Common;
 
 namespace risk.control.system.Middleware
@@ -9,22 +7,14 @@ namespace risk.control.system.Middleware
     {
         private readonly RequestDelegate _next;
         private readonly ILogger<SecurityMiddleware> _logger;
-        private readonly IFeatureManager featureManager;
         private readonly IJwtService tokenService;
-        private readonly IConfiguration config;
-        private string[] errStatusCodes;
 
         public SecurityMiddleware(RequestDelegate next, ILogger<SecurityMiddleware> logger,
-            string httpStatusErrorCodes, IFeatureManager featureManager,
-            IJwtService tokenService,
-            IConfiguration config)
+            IJwtService tokenService)
         {
             _next = next;
             _logger = logger;
-            this.featureManager = featureManager;
             this.tokenService = tokenService;
-            this.config = config;
-            errStatusCodes = httpStatusErrorCodes.Split(',');
         }
 
         public async Task Invoke(HttpContext context)

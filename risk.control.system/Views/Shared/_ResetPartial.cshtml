@@ -1,11 +1,10 @@
 ﻿@model ForgotPasswordViewModel
 <div class="signup-form">
-    <img class="login-logo" src="/img/iCheckifyLogo.png" alt="login logo" />™️
+    <img class="login-logo" src="@Applicationsettings.WEBSITE_SITE_LOGO" alt="login logo" title="Policy Intel" />™️
 
     <div class="title" title="Get Password !!!">
         Password
         <sup class="fa fa-info-circle password-info-icon"></sup>
-
     </div>
     <form id="reset-form" asp-controller="Account" asp-action="Forgot" method="post" autocomplete="off">
         @Html.AntiForgeryToken()
@@ -25,7 +24,7 @@
             <div class="input-box">
                 <div class="input-group-prepend">
                     <span class="form-group input-group mb-3 input-group-text country-code-text" data-bs-toggle="tooltip" title="Country Code">
-                        <img id="country-flag" src="~/flags/blank-flag.png" class="flag-icon" data-bs-toggle="tooltip" alt="country flag"/>
+                        <img id="country-flag" src="~/flags/blank-flag.png" class="flag-icon" data-bs-toggle="tooltip" alt="country flag" />
                     </span>
                 </div>
                 @* <i class="fa fa-globe left-padd" aria-hidden="true" title="Country code"></i> *@
