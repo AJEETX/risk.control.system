@@ -409,7 +409,7 @@
                                     icon: 'fas fa-trash',
                                     buttons: {
                                         ok: {
-                                            text: 'Close',
+                                            text: 'OK',
                                             btnClass: 'btn-default',
                                         }
                                     }
@@ -508,7 +508,7 @@
                 closeIcon: true,
                 buttons: {
                     cancel: {
-                        text: "Close",
+                        text: "OK",
                         btnClass: 'btn-warning'
                     }
                 }
@@ -574,7 +574,7 @@
                 icon: 'fas fa-trash',
                 buttons: {
                     cancel: {
-                        text: "Close",
+                        text: "OK",
                         btnClass: 'btn-danger'
                     }
                 }
@@ -622,7 +622,7 @@
                         buttons: {
                             ok: {
                                 text: "OK",
-                                btnClass: 'btn-danger'
+                                btnClass: 'btn-default'
                             }
                         }
                     });
@@ -674,7 +674,7 @@
                                 closeIcon: true,
                                 buttons: {
                                     cancel: {
-                                        text: "CLOSE",
+                                        text: "OK",
                                         btnClass: 'btn-danger'
                                     }
                                 }
@@ -693,7 +693,7 @@
                         closeIcon: true,
                         buttons: {
                             cancel: {
-                                text: "CLOSE",
+                                text: "OK",
                                 btnClass: 'btn-danger'
                             }
                         }
@@ -711,7 +711,7 @@
                     closeIcon: true,
                     buttons: {
                         cancel: {
-                            text: "CLOSE",
+                            text: "OK",
                             btnClass: 'btn-danger'
                         }
                     }

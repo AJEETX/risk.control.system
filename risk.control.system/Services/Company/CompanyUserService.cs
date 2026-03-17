@@ -66,6 +66,10 @@ namespace risk.control.system.Services.Company
 
                 var fullEmail = $"{model.Email.Trim().ToLower(CultureInfo.InvariantCulture)}@{emailSuffix.Trim().ToLower(CultureInfo.InvariantCulture)}";
 
+                var userCount = await _userManager.Users.AsNoTracking().CountAsync(u => u.Email == fullEmail.ToLower());
+                if (userCount > 0)
+                    return Fail($"User <b>{fullEmail}</b> already exists.");
+
                 if (await _userManager.Users.AnyAsync(u => u.Email == fullEmail && !u.Deleted))
                     return Fail($"User <b>{fullEmail}</b> already exists.");
 

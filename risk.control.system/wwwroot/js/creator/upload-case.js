@@ -348,8 +348,8 @@
                                     closeIcon: true,
                                     buttons: {
                                         cancel: {
-                                            text: "CLOSE",
-                                            btnClass: 'btn-danger'
+                                            text: "OK",
+                                            btnClass: 'btn-default'
                                         }
                                     }
                                 });

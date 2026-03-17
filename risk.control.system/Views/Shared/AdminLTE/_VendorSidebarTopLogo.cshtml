@@ -7,13 +7,14 @@
 {
     var user = await userManager.GetUserAsync(User);
     var firstName = user?.FirstName ?? "User";
+    var truncatedName = firstName.Length > 15 ? firstName.Substring(0, 15) + "..." : firstName;
 
     <div class="user-panel mt-3 pb-3 mb-3 d-flex">
         <div class="image">
             <img class="elevation-2 sidebar-profile img-circle" src="/Document/GetUserProfileImage/@user.Id" alt="Profile">
         </div>
         <a class="d-block">
-            <div data-bs-toggle="tooltip" title="User Firstname" id="user-firstname">@firstName</div>
+            <div data-bs-toggle="tooltip" title="@firstName" id="user-firstname">@truncatedName</div>
             <div id="user-role">
                 @if (User.IsInRole(AGENCY_ADMIN.DISPLAY_NAME))
                 {
