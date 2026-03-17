@@ -46,10 +46,10 @@ namespace risk.control.system.Controllers.Common
 
             var newDomain = input.Trim().ToLower(CultureInfo.InvariantCulture) + domainData.GetEnumDisplayName();
 
-            var agenccompanyCount = await _context.ClientCompany.AsNoTracking().CountAsync(u => u.Email.Trim().ToLower() == newDomain && !u.Deleted);
+            var agencyCompanyCount = await _context.ClientCompany.AsNoTracking().CountAsync(u => u.Email.Trim().ToLower() == newDomain && !u.Deleted);
             var agencyCount = await _context.Vendor.AsNoTracking().CountAsync(u => u.Email.Trim().ToLower() == newDomain);
 
-            return agencyCount == 0 && agenccompanyCount == 0 ? 0 : 1;
+            return agencyCount == 0 && agencyCompanyCount == 0 ? 0 : 1;
         }
 
         [HttpGet("GetUserEmail")]

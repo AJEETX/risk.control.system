@@ -74,8 +74,9 @@
     });
 
     $("#create-form").validate();
+    const $emailInput = $("#emailAddress");
 
-    $('input#emailAddress').on('input change focus blur', function () {
+    $emailInput.on('input change focus blur', function () {
         if ($(this).val() !== '' && $(this).val().length > 4) {
             $('#check-domain').prop('disabled', false).removeClass('disabled-btn').addClass('enabled-btn');
         } else {
@@ -83,16 +84,10 @@
             $('#check-domain').prop('disabled', true).removeClass('enabled-btn').addClass('disabled-btn');
         }
     });
-    const $emailInput = $("#emailAddress");
 
     // Handle blur event
     if ($emailInput) {
-        $emailInput.on("input", function () {
-            if ($(this).val()) {
-                CheckIfEmailValid($(this).val());
-            }
-        });
-
+        
         $emailInput.on("input", function () {
             let val = $(this).val();
 
@@ -122,16 +117,6 @@
         checkDomain();
     });
 });
-//ActivatedDate.max = new Date().toISOString().split("T")[0];
-function CheckIfEmailValid() {
-    var name = $('#emailAddress').val();
-    if (name && name.length > 4) {
-        $('#check-email').prop('disabled', false);
-    }
-    else {
-        $('#check-email').css('disabled', true);
-    }
-}
 
 // Example function: Allow only alphabetical characters
 function alphaOnly(event) {

@@ -135,7 +135,8 @@
     $("#create-form").validate();
     $("#edit-form").validate();
 
-    $('input#emailAddress').on('input change focus blur', function () {
+    const $emailInput = $("#emailAddress");
+    $emailInput.on('input change focus blur', function () {
         if ($(this).val() !== '' && $(this).val().length > 4) {
             $('#check-email').prop('disabled', false).removeClass('disabled-btn').addClass('enabled-btn');
         } else {
@@ -144,15 +145,33 @@
         }
     });
 
-    $("input#emailAddress").on({
-        keydown: function (e) {
-            if (e.which === 32)
-                return false;
-        },
-        change: function () {
-            this.value = this.value.replace(/\s/g, "");
-        }
-    });
+    if ($emailInput) {
+
+        $emailInput.on("input", function () {
+            let val = $(this).val();
+
+            // 1. Remove any character that isn't a letter or a hyphen
+            let cleaned = val.replace(/[^a-z-]/g, '');
+
+            // 2. Prevent hyphen as the FIRST character
+            if (cleaned.startsWith('-')) {
+                cleaned = cleaned.substring(1);
+            }
+
+            // 3. Optional: Prevent double hyphens (common in domain rules)
+            cleaned = cleaned.replace(/-{2,}/g, '-');
+
+            // Update the input value only if it changed
+            if (val !== cleaned) {
+                $(this).val(cleaned);
+            }
+        });
+
+        // Handle click event
+        $emailInput.on("click", function () {
+            $(this).select();
+        });
+    }
     $('#check-email').on('click', function () {
         checkUserEmail();
     });
@@ -162,10 +181,6 @@
     });
 });
 
-function alphaOnly(event) {
-    var key = event.keyCode;
-    return ((key >= 65 && key <= 90) || key == 8);
-};
 function checkUserEmail() {
     const $detailsFieldset = $('#details-fields');
     var url = "/api/VerifyEntity/GetUserEmail";
@@ -201,16 +216,6 @@ function checkUserEmail() {
                 $("#result").empty();
             }
         });
-    }
-}
-
-function CheckIfEmailValid() {
-    var name = $('#email').val();
-    if (name && name.length > 4) {
-        $('#check-email').prop('disabled', false);
-    }
-    else {
-        $('#check-email').css('disabled', true);
     }
 }
 

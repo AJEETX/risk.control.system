@@ -20,7 +20,7 @@
             @if (Model?.Name is not null)
             {
                 var displayName = Model.Name.Length > 15 ? Model.Name.Substring(0, 15) + "..." : Model.Name;
-                <span class="brand-text font-weight-bold" title="@Model.Name">@displayName</span>
+                <span class="brand-text font-weight-bold" title="@Model.Name" data-bs-toggle="tooltip">@displayName</span>
             }
             else
             {
@@ -54,10 +54,7 @@
                 @if (User.IsInRole(AGENT.DISPLAY_NAME))
                     {
                     <partial name="AdminLTE/_VendorSidebarAgent" />
-
                 }
-
-
             </ul>
         </nav>
         <!-- /.sidebar-menu -->

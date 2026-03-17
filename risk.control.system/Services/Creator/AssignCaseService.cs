@@ -109,7 +109,10 @@ namespace risk.control.system.Services
                     .FirstOrDefaultAsync(c => c.ClientCompanyId == companyUser.ClientCompanyId);
 
             // 1. Pre-fetch initial load for ALL eligible vendors once to save DB hits
-            var allVendorIds = company.EmpanelledVendors.Select(v => v.VendorId).ToList();
+            var allVendorIds = company.EmpanelledVendors.Select(v => v.VendorId)?.ToList();
+
+            if (!allVendorIds.Any()) return new List<long>(); // No vendors, skip allocation
+
             var initialLoads = await _agencyCaseLoadService.GetAgencyIdsLoad(allVendorIds);
 
             // Create a local thread-safe dictionary to track "Work-in-Progress" load
@@ -266,6 +269,9 @@ namespace risk.control.system.Services
                 }
                 await using var context = await _contextFactory.CreateDbContextAsync();
                 var cases2Assign = context.Investigations
+                    .Include(c => c.PolicyDetail)
+                    .Include(c => c.CustomerDetail)
+                    .Include(c => c.BeneficiaryDetail)
                     .Include(c => c.InvestigationTimeline)
                        .Where(v => claims.Contains(v.Id));
                 var currentUser = await context.ApplicationUser.AsNoTracking().Include(c => c.ClientCompany).FirstOrDefaultAsync(u => u.Email == userEmail);
