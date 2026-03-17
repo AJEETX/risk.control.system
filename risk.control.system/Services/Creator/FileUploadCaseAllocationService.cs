@@ -62,7 +62,10 @@ namespace risk.control.system.Services.Creator
                     .FirstOrDefaultAsync(c => c.ClientCompanyId == companyUser.ClientCompanyId);
 
             // 1. Get initial DB load for ALL potential vendors once
-            var allVendorIds = company.EmpanelledVendors.Select(v => v.VendorId).ToList();
+            var allVendorIds = company.EmpanelledVendors.Select(v => v.VendorId)?.ToList();
+
+            if (!allVendorIds.Any()) return new List<long>(); // No vendors, no allocations
+
             var vendorLoadList = await GetAgencyIdsLoad(allVendorIds);
 
             // Convert to a Dictionary for fast lookup and local updates
@@ -235,6 +238,9 @@ namespace risk.control.system.Services.Creator
                 }
                 await using var context = await _contextFactory.CreateDbContextAsync();
                 var cases2Assign = context.Investigations
+                    .Include(c => c.PolicyDetail)
+                    .Include(c => c.CustomerDetail)
+                    .Include(c => c.BeneficiaryDetail)
                     .Include(c => c.InvestigationTimeline)
                        .Where(v => caseIds.Contains(v.Id));
                 var currentUser = await context.ApplicationUser.AsNoTracking().Include(c => c.ClientCompany).FirstOrDefaultAsync(u => u.Email == userEmail);

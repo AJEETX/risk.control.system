@@ -157,7 +157,7 @@ namespace risk.control.system.Services.Company
             company.PinCodeId = model.SelectedPincodeId;
 
             var textInfo = CultureInfo.CurrentCulture.TextInfo;
-            company.Name = WebUtility.HtmlEncode(textInfo.ToTitleCase(company.Name.ToLower()));
+            company.Name = WebUtility.HtmlEncode(textInfo.ToTitleCase(model.Name.ToLower()));
 
             company.PhoneNumber = WebUtility.HtmlEncode(model.PhoneNumber.TrimStart('0'));
             company.Branch = WebUtility.HtmlEncode(model.Branch);
