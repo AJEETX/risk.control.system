@@ -30,7 +30,7 @@ namespace risk.control.system.AppConstant
 
         public const string WEBSITE_NAME = "policy-intel";
         public const string WEBSITE_SITE_URL = "policy-intel.biz";
-        public const string WEBSITE_SITE_LOGO = "/img/logo.png";
+        public const string WEBSITE_SITE_LOGO = "/img/logo.jpeg";
         public static readonly string FTP_SITE = "ftp://ftp.drivehq.com/holosync/";
         public static readonly string FTP_SITE_LOG = "its.aby@email.com";
         public static readonly string FTP_SITE_DATA = "C0##ect10n";
