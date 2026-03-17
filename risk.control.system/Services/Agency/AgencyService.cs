@@ -3,7 +3,6 @@ using System.Net;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.FeatureManagement;
 using risk.control.system.AppConstant;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
@@ -21,23 +20,17 @@ namespace risk.control.system.Services.Agency
 
     internal class AgencyService : IAgencyService
     {
-        private readonly ApplicationDbContext context;
-        private readonly RoleManager<ApplicationRole> roleManager;
-        private readonly ISmsService smsService;
-        private readonly IFileStorageService fileStorageService;
-        private readonly IFeatureManager featureManager;
+        private readonly ApplicationDbContext _context;
+        private readonly RoleManager<ApplicationRole> _roleManager;
+        private readonly IFileStorageService _fileStorageService;
 
         public AgencyService(ApplicationDbContext context,
             RoleManager<ApplicationRole> roleManager,
-            ISmsService SmsService,
-            IFileStorageService fileStorageService,
-            IFeatureManager featureManager)
+            IFileStorageService fileStorageService)
         {
-            this.context = context;
-            this.roleManager = roleManager;
-            smsService = SmsService;
-            this.fileStorageService = fileStorageService;
-            this.featureManager = featureManager;
+            this._context = context;
+            this._roleManager = roleManager;
+            this._fileStorageService = fileStorageService;
         }
 
         public async Task<bool> CreateAgency(Vendor vendor, string userEmail, string domainAddress, string portal_base_url)
@@ -46,9 +39,19 @@ namespace risk.control.system.Services.Agency
 
             vendor.Email = vendor.Email.ToLower() + domainData.GetEnumDisplayName();
 
+            var companyExist = await _context.ClientCompany.AsNoTracking().AnyAsync(u => u.Email.Trim().ToLower() == vendor.Email && !u.Deleted);
+            if (companyExist)
+            {
+                return false;
+            }
+            var agencyExist = await _context.Vendor.AsNoTracking().AnyAsync(u => u.Email.Trim().ToLower() == vendor.Email);
+            if (agencyExist)
+            {
+                return false;
+            }
             if (vendor.Document is not null)
             {
-                var (fileName, relativePath) = await fileStorageService.SaveAsync(vendor.Document, vendor.Email);
+                var (fileName, relativePath) = await _fileStorageService.SaveAsync(vendor.Document, vendor.Email);
 
                 vendor.DocumentImageExtension = Path.GetExtension(fileName);
                 vendor.DocumentUrl = relativePath;
@@ -71,12 +74,12 @@ namespace risk.control.system.Services.Agency
             vendor.StateId = vendor.SelectedStateId;
             vendor.CountryId = vendor.SelectedCountryId;
 
-            var pinCode = await context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).FirstOrDefaultAsync(s => s.PinCodeId == vendor.SelectedPincodeId);
+            var pinCode = await _context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).FirstOrDefaultAsync(s => s.PinCodeId == vendor.SelectedPincodeId);
 
-            context.Add(vendor);
+            _context.Add(vendor);
 
-            var managerRole = await roleManager.FindByNameAsync(MANAGER.DISPLAY_NAME);
-            var companyUser = await context.ApplicationUser.Include(c => c.ClientCompany).FirstOrDefaultAsync(c => c.Email == userEmail);
+            var managerRole = await _roleManager.FindByNameAsync(MANAGER.DISPLAY_NAME);
+            var companyUser = await _context.ApplicationUser.Include(c => c.ClientCompany).FirstOrDefaultAsync(c => c.Email == userEmail);
 
             var notification = new StatusNotification
             {
@@ -87,8 +90,8 @@ namespace risk.control.system.Services.Agency
                 Status = "Created",
                 NotifierUserEmail = userEmail
             };
-            context.Notifications.Add(notification);
-            var rowsAffected = await context.SaveChangesAsync();
+            _context.Notifications.Add(notification);
+            var rowsAffected = await _context.SaveChangesAsync();
             //if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
             //{
             //    await smsService.DoSendSmsAsync(pinCode.Country.Code, pinCode.Country.ISDCode + vendor.PhoneNumber, "Agency created. \nDomain : " + vendor.Email + "\n" + portal_base_url);
@@ -101,14 +104,14 @@ namespace risk.control.system.Services.Agency
         {
             if (vendor.Document is not null)
             {
-                var (fileName, relativePath) = await fileStorageService.SaveAsync(vendor.Document, vendor.Email);
+                var (fileName, relativePath) = await _fileStorageService.SaveAsync(vendor.Document, vendor.Email);
 
                 vendor.DocumentImageExtension = Path.GetExtension(fileName);
                 vendor.DocumentUrl = relativePath;
             }
             else
             {
-                var existingVendor = await context.Vendor.AsNoTracking().FirstOrDefaultAsync(c => c.VendorId == vendor.VendorId);
+                var existingVendor = await _context.Vendor.AsNoTracking().FirstOrDefaultAsync(c => c.VendorId == vendor.VendorId);
                 if (existingVendor.DocumentUrl != null)
                 {
                     vendor.DocumentImageExtension = existingVendor.DocumentImageExtension;
@@ -124,12 +127,12 @@ namespace risk.control.system.Services.Agency
             vendor.CountryId = vendor.SelectedCountryId;
             vendor.BankName = WebUtility.HtmlEncode(vendor.BankName.ToUpper());
             vendor.IFSCCode = WebUtility.HtmlEncode(vendor.IFSCCode.ToUpper());
-            var pinCode = await context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).FirstOrDefaultAsync(s => s.PinCodeId == vendor.SelectedPincodeId);
+            var pinCode = await _context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).FirstOrDefaultAsync(s => s.PinCodeId == vendor.SelectedPincodeId);
             vendor.IsUpdated = true;
             vendor.Updated = DateTime.UtcNow;
             vendor.UpdatedBy = userEmail;
-            context.Vendor.Update(vendor);
-            var rowsAffected = await context.SaveChangesAsync();
+            _context.Vendor.Update(vendor);
+            var rowsAffected = await _context.SaveChangesAsync();
             //if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
             //{
             //    await smsService.DoSendSmsAsync(pinCode.Country.Code, pinCode.Country.ISDCode + vendor.PhoneNumber, "Agency edited. \n\nDomain : " + vendor.Email + "\n" + portal_base_url);
