@@ -82,6 +82,11 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 });
+const path = document.getElementById('logoPath').value;
+localStorage.setItem('siteLogo', path);
+
+const websiteName = document.getElementById('websiteName').value;
+localStorage.setItem('websiteName', websiteName);
 
 $(document).ready(function () {
     validateMobile('#mobile', /[^0-9]/g); // Allow numeric only no spaces
