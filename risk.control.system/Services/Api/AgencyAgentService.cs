@@ -114,9 +114,6 @@ namespace risk.control.system.Services.Api
                     {
                         Id = agent.Id,
                         Photo = photo,
-                        Email = agent.Role == AppRoles.AGENT && !string.IsNullOrWhiteSpace(agent.MobileUId)
-                            ? $"<a href='/Agency/EditUser?agentId={agent.Id}'>{agent.Email}</a>"
-                            : $"<a href='/Agency/EditUser?agentId={agent.Id}'>{agent.Email}</a><span title='Onboarding incomplete !!!' data-toggle='tooltip'><i class='fa fa-asterisk asterik-style'></i></span>",
                         Name = $"{agent.FirstName} {agent.LastName}",
                         Phone = $"(+{agent.Country.ISDCode}) {agent.PhoneNumber}",
                         Addressline = $"{agent.Addressline}, {agent.District.Name}, {agent.State.Code}, {agent.Country.Code}",
