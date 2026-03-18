@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.FeatureManagement;
 using risk.control.system.AppConstant;
-using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services.Common;
@@ -120,10 +119,8 @@ namespace risk.control.system.Services.Api
                         Country = agent.Country.Code,
                         Flag = $"/flags/{agent.Country.Code.ToLower()}.png",
                         Active = agent.Active,
-                        Roles = agent.Role != null ? $"<span class='badge badge-light'>{agent.Role.GetEnumDisplayName()}</span>" : "<span class='badge badge-light'>...</span>",
                         Count = claimCount,
                         UpdateBy = agent.UpdatedBy,
-                        Role = agent.Role.GetEnumDisplayName(),
                         AgentOnboarded = agent.Role != AppRoles.AGENT || !string.IsNullOrWhiteSpace(agent.MobileUId),
                         RawEmail = agent.Email,
                         PersonMapAddressUrl = string.Format(map, "300", "300"),
