@@ -31,6 +31,12 @@
     }
 });
 
+const path = document.getElementById('logoPath').value;
+localStorage.setItem('siteLogo', path);
+
+const websiteName = document.getElementById('websiteName').value;
+localStorage.setItem('websiteName', websiteName);
+
 document.addEventListener("DOMContentLoaded", function () {
     // Reference to the modal and close button
     var termsModal = document.getElementById('termsModal');

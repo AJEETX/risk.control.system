@@ -35,25 +35,25 @@
                 return '<input type="checkbox" name="id[]" value="' + $('<div/>').text(data).html() + '">';
             }
         },
-            {
-                orderable: false, targets: [0, 2, 3, 4]
-            }, // Disable ordering for specific columns
-            {
-                className: 'max-width-column', // Apply the CSS class,
-                targets: 1                      // Index of the column to style
-            },
-            {
-                className: 'max-width-column-number', // Apply the CSS class,
-                targets: 3                      // Index of the column to style
-            },
-            {
-                className: 'max-width-column', // Apply the CSS class,
-                targets: 5                      // Index of the column to style
-            },
-            {
-                className: 'max-width-column', // Apply the CSS class,
-                targets: 8                      // Index of the column to style
-            }
+        {
+            orderable: false, targets: [0, 2, 3, 4]
+        }, // Disable ordering for specific columns
+        {
+            className: 'max-width-column', // Apply the CSS class,
+            targets: 1                      // Index of the column to style
+        },
+        {
+            className: 'max-width-column-number', // Apply the CSS class,
+            targets: 3                      // Index of the column to style
+        },
+        {
+            className: 'max-width-column', // Apply the CSS class,
+            targets: 5                      // Index of the column to style
+        },
+        {
+            className: 'max-width-column', // Apply the CSS class,
+            targets: 8                      // Index of the column to style
+        }
         ],
         order: [[10, 'asc']],
         fixedHeader: true,
@@ -75,9 +75,9 @@
                 }
             },
             {
-                "data": "email",
+                "data": "rawEmail",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.rawEmail + '" data-bs-toggle="tooltip">' + row.rawEmail + '</span>';
+                    return '<span title="' + data + '" data-bs-toggle="tooltip">' + data + '</span>';
                 }
             },
             {
@@ -108,15 +108,13 @@
                         return img;
                     }
                     else {
-
                         return '<img src="/img/no-user.png" class="profile-image doc-profile-image" title="No Photo" data-bs-toggle="tooltip" />'
                     }
-
 
                     return '<span title="' + row.personMapAddressUrl + '" data-bs-toggle="tooltip">' + data + '</span>';
                 }
             },
-            
+
             {
                 "data": "distance",
                 "mRender": function (data, type, row) {
@@ -201,9 +199,9 @@
     }).on('mouseleave', '.map-thumbnail', function () {
         $(this).find('.full-driving-map').hide(); // Hide full map
     });
-    // Handle click on checkbox to set state of "Select all" control    
+    // Handle click on checkbox to set state of "Select all" control   
     $('#dataTable tbody').on('change', 'input[type="radio"]', function () {
-        // If checkbox is not checked        
+        // If checkbox is not checked       
         if (this.checked) {
             // Get the selected row
             var selectedRow = $(this).closest('tr');
@@ -240,7 +238,7 @@
             $.confirm({
                 title: "Confirm Allocate",
                 content: "Are you sure to allocate?",
-    
+
                 icon: 'fas fa-external-link-alt',
                 type: 'red',
                 closeIcon: true,
