@@ -1,8 +1,6 @@
-﻿using risk.control.system.Helpers;
-using SixLabors.ImageSharp;
+﻿using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Jpeg;
 using SixLabors.ImageSharp.Formats.Png;
-using SixLabors.ImageSharp.Processing;
 
 namespace risk.control.system.Services.Agent
 {
@@ -17,7 +15,7 @@ namespace risk.control.system.Services.Agent
         {
             using var stream = new MemoryStream(imageByte);
             using var image = Image.Load(stream);
-            using var waterMarkedImage = image.Clone(ctx => ctx.ApplyScalingWaterMark());
+            //using var waterMarkedImage = image.Clone(ctx => ctx.ApplyScalingWaterMark());
             using MemoryStream streamOut = new MemoryStream();
             if (onlyExtension == ".png")
             {
@@ -25,7 +23,7 @@ namespace risk.control.system.Services.Agent
                 {
                     CompressionLevel = PngCompressionLevel.BestCompression
                 };
-                waterMarkedImage.Save(streamOut, pngEncoder);
+                image.Save(streamOut, pngEncoder);
             }
             else if (onlyExtension == ".jpg" || onlyExtension == ".jpeg")
             {
@@ -33,7 +31,7 @@ namespace risk.control.system.Services.Agent
                 {
                     Quality = quality, // Adjust this value for desired compression quality
                 };
-                waterMarkedImage.Save(streamOut, jpgEncoder);
+                image.Save(streamOut, jpgEncoder);
             }
             var imageOutByte = streamOut.ToArray();
             return imageOutByte;

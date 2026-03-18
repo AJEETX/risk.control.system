@@ -370,7 +370,7 @@
 						<div class="card  border-success">
 							<div class="card-header text-muted border-bottom-0">
 								<h3 class="card-title">
-									<i class="far fa-comment"></i> remarks (@Model.ClaimsInvestigation?.PolicyDetail.InsuranceType.GetEnumDisplayName())
+									<i class="far fa-comment"></i> Agent remarks (@Model.ClaimsInvestigation?.PolicyDetail.InsuranceType.GetEnumDisplayName())
 									<span class="hover-text">
 										<i class="fas fa-info-circle"></i>
 										<span class="tooltip-text" id="information">
@@ -390,7 +390,7 @@
 							<div class="progress">
 								<i class="far fa-bookmark bookmark-green"></i>
 								<div class="progress-bar progress-bar-green" role="progressbar">
-									remarks (@Model.ClaimsInvestigation?.PolicyDetail.InsuranceType.GetEnumDisplayName())
+									Agent remarks (@Model.ClaimsInvestigation?.PolicyDetail.InsuranceType.GetEnumDisplayName())
 								</div>
 							</div>
 							<div class="card-footer text-muted border-bottom-0">
@@ -433,7 +433,7 @@
 
 							<div class="card-header">
 								<h3 class="card-title">
-									<i class="fas fa-user-edit"></i> Supervisor comments:
+									<i class="fas fa-user-edit"></i> Agency comments:
 									<span class="hover-text">
 										<i class="fas fa-info-circle"></i>
 										<span class="tooltip-text" id="information">
@@ -452,11 +452,11 @@
 							<div class="progress">
 								<i class="far fa-bookmark bookmark-green"></i>
 								<div class="progress-bar progress-bar-green" role="progressbar">
-									supervisor comments
+									agency comments
 								</div>
 							</div>
 							<div class="card-footer text-muted border-bottom-0">
-								<i class="fas fa-user-shield"></i>  Supervisor :<span class="badge badge-light">  @Model?.ClaimsInvestigation.InvestigationReport.SupervisorEmail </span>
+								<i class="fas fa-user-shield"></i>  Remarks by:<span class="badge badge-light">  @Model?.ClaimsInvestigation.InvestigationReport.SupervisorEmail </span>
 							</div>
 							<div class="card-body">
 
@@ -466,7 +466,7 @@
 											<table class="table table-bordered table-sm table-hover">
 												<thead class="thead-light">
 													<tr>
-														<th>Supervisor Remarks</th>
+														<th>Remarks</th>
 														<th class="w-25">Document</th>
 													</tr>
 												</thead>
@@ -502,7 +502,6 @@
 							</div>
 						</div>
 						// <partial name="_AgentChat" model="@Model" />
-
 					}
 				</div>
 			</div>

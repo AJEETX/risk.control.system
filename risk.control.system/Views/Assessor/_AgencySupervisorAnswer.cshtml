@@ -6,18 +6,18 @@
 
         <div class="card-header">
             <h3 class="card-title">
-                <i class="fas fa-user-edit"></i> Supervisor comments:
+                <i class="fas fa-user-edit"></i> Agency comments:
                 <span class="hover-text">
                     <i class="fas fa-info-circle"></i>
                     <span class="tooltip-text" id="information">
                         <span>
-                            <i class="fas fa-user-shield"></i><b> @Model?.CaseTask.InvestigationReport?.SupervisorEmail</b> comments.
+                            <i class="fas fa-user-shield"></i><b> Agency</b> comments.
                         </span>
                     </span>
                 </span>
             </h3>
             <div class="card-tools">
-                <span data-bs-toggle="tooltip" title=" Supervisor :  @Model?.CaseTask.InvestigationReport?.SupervisorEmail" class="badge badge-light">
+                <span data-bs-toggle="tooltip" title=" Agency:" class="badge badge-light">
                     <i class="nav-icon fas fa-clock"></i> @Model.CaseTask.InvestigationReport?.SupervisorRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt")
                 </span>
             </div>
@@ -25,11 +25,11 @@
         <div class="progress">
             <i class="far fa-bookmark bookmark-green"></i>
             <div class="progress-bar progress-bar-green" role="progressbar">
-                supervisor comments
+                agency comments
             </div>
         </div>
         <div class="card-footer text-muted border-bottom-0">
-            <i class="fas fa-user-shield"></i>  Supervisor :<span class="badge badge-light">  @Model?.CaseTask.InvestigationReport.SupervisorEmail </span>
+            <i class="fas fa-user-shield"></i>  Remarks by :<span class="badge badge-light">  @Model?.CaseTask.InvestigationReport.SupervisorEmail </span>
         </div>
         <div class="card-body">
             <div class="row">
@@ -39,7 +39,7 @@
                         <table class="table table-bordered table-sm table-hover">
                             <thead class="thead-light">
                                 <tr>
-                                    <th>Supervisor Remarks</th>
+                                    <th> Remarks</th>
                                     <th class="w-30">Document</th>
                                 </tr>
                             </thead>

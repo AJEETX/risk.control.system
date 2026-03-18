@@ -37,12 +37,12 @@
                     <div class="card  border-success">
                         <div class="card-header text-muted border-bottom-0">
                             <h3 class="card-title">
-                                <i class="far fa-comment"></i> Agency comment  (@Model.ClaimsInvestigation?.PolicyDetail.InsuranceType.GetEnumDisplayName())
+                                <i class="far fa-comment"></i> Agent comment  (@Model.ClaimsInvestigation?.PolicyDetail.InsuranceType.GetEnumDisplayName())
                                 <span class="hover-text">
                                     <i class="fas fa-info-circle"></i>
                                     <span class="tooltip-text" id="information">
                                         <span>
-                                            <i class="far fa-comment"></i><b> Agency comment (@Model.ClaimsInvestigation?.PolicyDetail.InsuranceType.GetEnumDisplayName())</b>
+                                            <i class="far fa-comment"></i><b> Agent comment (@Model.ClaimsInvestigation?.PolicyDetail.InsuranceType.GetEnumDisplayName())</b>
                                         </span>
 
                                     </span>
@@ -59,7 +59,7 @@
                         <div class="progress">
                             <i class="far fa-bookmark bookmark-green"></i>
                             <div class="progress-bar progress-bar-green" role="progressbar">
-                                agency comment (@Model.ClaimsInvestigation?.PolicyDetail.InsuranceType.GetEnumDisplayName())
+                                agent comment (@Model.ClaimsInvestigation?.PolicyDetail.InsuranceType.GetEnumDisplayName())
                             </div>
                         </div>
                         <div class="card-footer text-muted border-bottom-0">
@@ -108,12 +108,12 @@
 
                         <div class="card-header">
                             <h3 class="card-title">
-                                <i class="fas fa-user-edit"></i> Supervisor comments:
+                                <i class="fas fa-user-edit"></i> Agency comments:
                                 <span class="hover-text">
                                     <i class="fas fa-info-circle"></i>
                                     <span class="tooltip-text" id="information">
                                         <span>
-                                            <i class="fas fa-user-shield"></i><b> @Model?.ClaimsInvestigation.InvestigationReport?.SupervisorEmail</b> comments.
+                                            <i class="fas fa-user-shield"></i><b> Agency</b> comments.
                                         </span>
 
                                     </span>
@@ -129,11 +129,11 @@
                         <div class="progress">
                             <i class="far fa-bookmark bookmark-green"></i>
                             <div class="progress-bar progress-bar-green" role="progressbar">
-                                supervisor comments
+                                agency comments
                             </div>
                         </div>
                         <div class="card-footer text-muted border-bottom-0">
-                            <i class="fas fa-user-shield"></i>  Supervisor :<span class="badge badge-light">  @Model?.ClaimsInvestigation.InvestigationReport.SupervisorEmail </span>
+                            <i class="fas fa-user-shield"></i>  Remarks by :<span class="badge badge-light">  @Model?.ClaimsInvestigation.InvestigationReport.SupervisorEmail </span>
                         </div>
                         <div class="card-body">
 
@@ -144,7 +144,7 @@
                                             <thead class="thead-light">
                                                 <tr>
                                                     <th class="w-25">Time</th>
-                                                    <th>Supervisor Response</th>
+                                                    <th>Agency Response</th>
                                                     <th class="w-25">Document</th>
                                                 </tr>
                                             </thead>
