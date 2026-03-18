@@ -8,7 +8,6 @@
 <section class="content">
 	<form id="create-form" method="post" asp-controller="CaseAction" asp-action="ProcessCaseReport">
 		<input type="hidden" id="claimId" name="claimId" value="@Model.CaseTask.Id" />
-		<input type="hidden" id="CaseLocationId" name="CaseLocationId" value="@Model.Beneficiary.BeneficiaryDetailId" />
 		<input type="hidden" id="policyDetailId" value="@Model.CaseTask?.PolicyDetail.PolicyDetailId" />
 		<input type="hidden" id="customerDetailId" value="@Model.CaseTask?.CustomerDetail.CustomerDetailId" />
 		<input type="hidden" id="beneficiaryId" value="@Model.Beneficiary?.BeneficiaryDetailId" />

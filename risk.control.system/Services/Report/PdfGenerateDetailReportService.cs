@@ -194,7 +194,7 @@ namespace risk.control.system.Services.Report
 
             section = AddRemarks(section, "Agent Remarks", investigation.InvestigationReport.AgentRemarks);
             section = AddRemarks(section, "Agent Edited Remarks", investigation.InvestigationReport.AgentRemarksEdit);
-            section = AddRemarks(section, "Supervisor Remarks", investigation.InvestigationReport.SupervisorRemarks);
+            section = AddRemarks(section, "Agency Remarks", investigation.InvestigationReport.SupervisorRemarks);
             return section;
         }
         private void AddLogoImage(TableCellBuilder cellBuilder)

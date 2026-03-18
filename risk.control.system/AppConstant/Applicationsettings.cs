@@ -14,7 +14,7 @@ namespace risk.control.system.AppConstant
 
         public static readonly string SAMPLE_MOBILE_AUSTRALIA = EnvHelper.Get("SAMPLE_MOBILE_AUSTRALIA");
 
-        public static readonly string USER_MOBILE = "400000000";
+        public static readonly string AGENT_MOBILE = EnvHelper.Get("AGENT_MOBILE");
         public static readonly string HEXdATA = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         public static readonly string ValidIssuer = EnvHelper.Get("WEBSITE_NAME");
         public static readonly string ValidAudience = "insurance";
@@ -22,9 +22,6 @@ namespace risk.control.system.AppConstant
 
         //public const string APP_URL = "https://ickeckify-apk.s3.ap-southeast-2.amazonaws.com/demo/app-release.apk";
         public static string APP_URL = EnvHelper.Get("APP_URL");
-
-        public const string AZURE_APP_DEMO_URL = "icheckify-demo.azurewebsites.net";
-        public const string AZURE_APP_URL = "icheckify.azurewebsites.net";
 
         //WEBSITE SETTINGS
 
