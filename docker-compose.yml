@@ -9,6 +9,9 @@ services:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: https://+:8081
       APP_URL: "https://ickeckify-apk.s3.ap-southeast-2.amazonaws.com/demo/app-release.apk"
+      WEBSITE_SITE_URL: "policy-intel.biz"
+      WEBSITE_NAME: "policy-intel"
+      WEBSITE_SITE_LOGO: "/img/logo.jpeg"
       COUNTRY: "AU"
       SAMPLE_MOBILE_AUSTRALIA: "432854196"
       SAMPLE_MOBILE_INDIA: "9958389949"
