@@ -16,7 +16,7 @@ namespace risk.control.system.AppConstant
 
         public static readonly string USER_MOBILE = "400000000";
         public static readonly string HEXdATA = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-        public static readonly string ValidIssuer = "policy-intel";
+        public static readonly string ValidIssuer = EnvHelper.Get("WEBSITE_NAME");
         public static readonly string ValidAudience = "insurance";
         public static readonly int TokenTimeoutMinutes = 5;
 
@@ -28,9 +28,9 @@ namespace risk.control.system.AppConstant
 
         //WEBSITE SETTINGS
 
-        public const string WEBSITE_NAME = "policy-intel";
-        public const string WEBSITE_SITE_URL = "policy-intel.biz";
-        public const string WEBSITE_SITE_LOGO = "/img/logo.jpeg";
+        public static string WEBSITE_NAME = EnvHelper.Get("WEBSITE_NAME");
+        public static string WEBSITE_SITE_URL = EnvHelper.Get("WEBSITE_SITE_URL");
+        public static string WEBSITE_SITE_LOGO = EnvHelper.Get("WEBSITE_SITE_LOGO");
         public static readonly string FTP_SITE = "ftp://ftp.drivehq.com/holosync/";
         public static readonly string FTP_SITE_LOG = "its.aby@email.com";
         public static readonly string FTP_SITE_DATA = "C0##ect10n";
