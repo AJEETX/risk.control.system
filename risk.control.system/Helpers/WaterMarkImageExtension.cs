@@ -9,7 +9,7 @@ using Size = SixLabors.ImageSharp.Size;
 
 namespace risk.control.system.Helpers
 {
-    public static class CompressImageExtension
+    public static class WaterMarkImageExtension
     {
         public static IImageProcessingContext ApplyScalingWaterMark(this IImageProcessingContext processingContext)
         {

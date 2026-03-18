@@ -15,6 +15,7 @@ services:
       COUNTRY: "AU"
       SAMPLE_MOBILE_AUSTRALIA: "432854196"
       SAMPLE_MOBILE_INDIA: "9958389949"
+      AGENT_MOBILE: "432854196"
       FtpKey: "C0##ect10n"
       SMS_Url: "http://192.168.1.103:8080/message"
       SMS_Sim: "1"
