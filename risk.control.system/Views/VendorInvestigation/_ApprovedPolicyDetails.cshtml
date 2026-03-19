@@ -399,28 +399,36 @@
 
 							<div class="card-body">
 								<div class="row">
+									<div class="col-12">
+										<div class="table-responsive">
+											<table class="table table-bordered table-sm table-hover">
 
-									<div class="col-4">
-										<span>
-											<i class="far fa-comment"></i> Remarks?
-										</span>
-									</div>
-
-									<div class="col-8">
-										<span>
-											<i class="far fa-comment"></i>
-											@if (string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.InvestigationReport.AgentRemarksEdit))
-											{
-												@Model.ClaimsInvestigation.InvestigationReport?.AgentRemarks
-											}
-											else
-											{
-												@Model.ClaimsInvestigation.InvestigationReport.AgentRemarksEdit
-											}
-										</span>
+												<thead class="thead-light">
+													<tr>
+														<th> Agent Remarks</th>
+													</tr>
+												</thead>
+												<tbody>
+													<tr>
+														<td class="text-start">
+															<div class="bg-light rounded p-2 text-muted">
+																@if (@Model.ClaimsInvestigation.InvestigationReport?.AgentRemarksEdit != null)
+																{
+																	@Model.ClaimsInvestigation.InvestigationReport?.AgentRemarksEdit
+																}
+																else
+																{
+																	@Model.ClaimsInvestigation.InvestigationReport?.AgentRemarks
+																}
+															</div>
+														</td>
+                                        
+													</tr>
+												</tbody>
+											</table>
+										</div>
 									</div>
 								</div>
-								<br />
 							</div>
 						</div>
 
