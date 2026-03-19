@@ -20,6 +20,13 @@ namespace risk.control.system.Controllers.Common
                 Secure = true,
                 SameSite = SameSiteMode.Strict
             });
+            Response.Cookies.Append("essentialCookies", true.ToString(), new CookieOptions
+            {
+                Expires = DateTimeOffset.UtcNow.AddDays(365),
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict
+            });
             Response.Cookies.Append("analyticsCookies", true.ToString(), new CookieOptions
             {
                 Expires = DateTimeOffset.UtcNow.AddDays(365),
@@ -45,6 +52,13 @@ namespace risk.control.system.Controllers.Common
             Response.Cookies.Append("cookieConsent", "Accepted", new CookieOptions
             {
                 Expires = DateTimeOffset.UtcNow.AddDays(365), // Persistent for 1 year
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict
+            });
+            Response.Cookies.Append("essentialCookies", true.ToString(), new CookieOptions
+            {
+                Expires = DateTimeOffset.UtcNow.AddDays(365),
                 HttpOnly = true,
                 Secure = true,
                 SameSite = SameSiteMode.Strict
@@ -83,6 +97,13 @@ namespace risk.control.system.Controllers.Common
                 Secure = true,
                 SameSite = SameSiteMode.Strict
             });
+            Response.Cookies.Append("essentialCookies", preferences.EssentialCookies.ToString(), new CookieOptions
+            {
+                Expires = DateTimeOffset.UtcNow.AddDays(365),
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict
+            });
             Response.Cookies.Append("analyticsCookies", preferences.AnalyticsCookies.ToString(), new CookieOptions
             {
                 Expires = DateTimeOffset.UtcNow.AddDays(365),
@@ -104,6 +125,7 @@ namespace risk.control.system.Controllers.Common
 
     public class CookiePreferences
     {
+        public bool EssentialCookies { get; } = true; // Essential cookies are always enabled
         public bool AnalyticsCookies { get; set; }
         public bool PerfomanceCookies { get; set; }
     }
