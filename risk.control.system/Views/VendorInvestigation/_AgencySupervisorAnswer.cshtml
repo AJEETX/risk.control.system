@@ -1,7 +1,9 @@
 ﻿@model CaseAgencyModel
 
-<div class="col-md-6 col-6 d-flex align-items-stretch flex-column">
+<div class="col-12 col-md-6">
+
     <div class="card bg-light border-success">
+
         <div class="card-header">
             <h3 class="card-title">
                 <i class="fas fa-user-edit"></i> Agency comments:
@@ -9,18 +11,16 @@
                     <i class="fas fa-info-circle"></i>
                     <span class="tooltip-text" id="information">
                         <span>
-                            <i class="fas fa-user-shield"></i>Remarks by:<b> @Model?.InvestigationReport?.SupervisorEmail</b> comments
+                            <i class="fas fa-user-shield"></i><b> Agency</b> comments.
                         </span>
-
                     </span>
                 </span>
             </h3>
             <div class="card-tools">
-                <span data-bs-toggle="tooltip" title=" Agency report time" class="badge badge-light">
-                    <i class="nav-icon fas fa-clock"></i> @Model.InvestigationReport?.SupervisorRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt")
+                <span data-bs-toggle="tooltip" title=" Agency:" class="badge badge-light">
+                    <i class="nav-icon fas fa-clock"></i> @Model.CaseTask.InvestigationReport?.SupervisorRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt")
                 </span>
             </div>
-
         </div>
         <div class="progress">
             <i class="far fa-bookmark bookmark-green"></i>
@@ -29,47 +29,50 @@
             </div>
         </div>
         <div class="card-footer text-muted border-bottom-0">
-            <i class="fas fa-user-shield"></i>  Remarks by:<span class="badge badge-light">  @Model.InvestigationReport.SupervisorEmail </span>
+            <i class="fas fa-user-shield"></i>  Remarks by :<span class="badge badge-light">  @Model?.CaseTask.InvestigationReport.SupervisorEmail </span>
         </div>
-       
         <div class="card-body">
             <div class="row">
                 <div class="col-12">
-                    <table id="dataTable" class="table-bordered table-hover dt-responsive nowrap w-100">
-                        <thead>
-                            <tr>
-                                <th>
-                                    Remarks
-                                </th>
-                                <th>
-                                    Document
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>
-                                    @Model.InvestigationReport?.SupervisorRemarks
 
-                                </td>
-                                <td>
-                                    @if (Model.InvestigationReport?.SupervisorAttachment != null)
-                                    {
-                                        <img title="enquiry document" id="enquiryDocument" class="img-fluid doc-profile-image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.InvestigationReport?.SupervisorAttachment))">
-                                        <a asp-controller="Download" asp-action="SupervisorFileAttachment"
-                                           asp-route-id="@Model.InvestigationReport.Id" class="mailbox-attachment-name"><i class="fas fa-paperclip"></i> </a>
-                                    }
-                                    else
-                                    {
-                                        <img title="enquiry document" id="enquiryDocument" alt="face image" class="img-fluid doc-profile-image" src=@Applicationsettings.NO_IMAGE>
-                                    }
-                                </td>
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-sm table-hover">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th> Remarks</th>
+                                    <th class="w-30">Document</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="text-start">
+                                        <div class="bg-light rounded p-2 text-muted">
+                                            @Model.CaseTask.InvestigationReport?.SupervisorRemarks
+                                        </div>
+                                    </td>
 
-                            </tr>
-                        </tbody>
-                    </table>
+                                    <td>
+                                        @if (Model.CaseTask.InvestigationReport?.SupervisorAttachment != null)
+                                        {
+                                            <img class="img-fluid doc-profile-image" src="data:image/*;base64,@(Convert.ToBase64String(Model.CaseTask.InvestigationReport.SupervisorAttachment))" alt="Attachment">
+
+                                            <a asp-controller="Download"
+                                                   asp-action="SupervisorFileAttachment"
+                                                   asp-route-id="@Model.CaseTask.InvestigationReport.Id"
+                                                   class="mailbox-attachment-name">
+                                                <i class="fas fa-paperclip"></i>
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <img src="@Applicationsettings.NO_IMAGE" alt="No Document" class="img-thumbnail doc-preview">
+                                        }
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-
             </div>
         </div>
     </div>
