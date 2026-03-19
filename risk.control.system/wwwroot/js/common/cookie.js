@@ -14,7 +14,14 @@
     // Accept all cookies
     $("#acceptCookies").on("click", function () {
         cookiePopup.fadeOut(300, function () {
-            $("#email").focus();
+            var $email = $("#email");
+            if ($email) {
+                $email.focus();
+            }
+            var $countryIsdDisplay = $("#CountryIsdDisplay");
+            if ($countryIsdDisplay) {
+                $countryIsdDisplay.focus();
+            }
         });
         acceptCookies();
     });
@@ -36,10 +43,6 @@
     $("#savePreferences").on("click", function () {
         const analyticsCookies = $("#analyticsCookies").is(":checked");
         const perfomanceCookies = $("#performanceCookies").is(":checked");
-
-        // Save to localStorage only
-        //localStorage.setItem("analyticsCookies", analyticsCookies);
-        //localStorage.setItem("perfomanceCookies", perfomanceCookies);
 
         const token = $('input[name="__RequestVerificationToken"]').val();
 
@@ -65,7 +68,14 @@
 
                 // Close popup + focus email box
                 cookieManagePopup.fadeOut(300, function () {
-                    $("#email").focus();
+                    var $email = $("#email");
+                    if ($email) {
+                        $email.focus();
+                    }
+                    var $countryIsdDisplay = $("#CountryIsdDisplay");
+                    if ($countryIsdDisplay) {
+                        $countryIsdDisplay.focus();
+                    }
                 });
             })
             .catch((err) => console.error(err));
