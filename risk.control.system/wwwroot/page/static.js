@@ -1,6 +1,6 @@
-﻿const savedLogo = localStorage.getItem('siteLogo');
-if (savedLogo) {
-    document.querySelector('.login-logo').src = savedLogo;
+﻿const logoPath = localStorage.getItem('logoPath');
+if (logoPath) {
+    document.querySelector('.login-logo').src = logoPath;
 }
 
 const websiteName = localStorage.getItem('websiteName');

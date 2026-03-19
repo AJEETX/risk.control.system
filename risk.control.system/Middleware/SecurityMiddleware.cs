@@ -105,7 +105,7 @@ namespace risk.control.system.Middleware
             {
                 return authHeader.Substring("Bearer ".Length).Trim();
             }
-            return null;
+            return null!;
         }
     }
 }
