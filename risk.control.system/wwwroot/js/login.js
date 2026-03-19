@@ -83,7 +83,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 const path = document.getElementById('logoPath').value;
-localStorage.setItem('siteLogo', path);
+localStorage.setItem('logoPath', path);
 
 const websiteName = document.getElementById('websiteName').value;
 localStorage.setItem('websiteName', websiteName);
