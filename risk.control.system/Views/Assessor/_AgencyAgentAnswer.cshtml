@@ -11,7 +11,7 @@
         <div class="card bg-light d-flex flex-fill border-success">
             <div class="card-header text-muted border-bottom-0">
                 <h3 class="card-title">
-                    <i class="far fa-comment"></i> Remarks (@Model.CaseTask?.PolicyDetail.InsuranceType.GetEnumDisplayName())
+                    <i class="far fa-comment"></i> Agent Remarks (@Model.CaseTask?.PolicyDetail.InsuranceType.GetEnumDisplayName())
                     <span class="hover-text">
                         <i class="fas fa-info-circle"></i>
                         <span class="tooltip-text" id="information">
@@ -36,35 +36,34 @@
             </div>
             <div class="card-body text-muted text-sm">
                 <div class="row">
-                    <div class="col-4">
-                        <span>
-                            <i class="far fa-comment"></i> Remarks?
-                        </span>
-                    </div>
-                    <div class="col-8">
-                        <span>
-                            <i class="far fa-comment"></i> @Model.CaseTask.InvestigationReport?.AgentRemarks
-                        </span>
-                    </div>
-                </div>
-                <hr />
+                    <div class="col-12">
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-sm table-hover">
 
-                @if (Model.CaseTask.UpdateAgentAnswer)
-                {
-                    <div class="row">
-                        <div class="col-4">
-                            <span>
-                                <i class="far fa-comment"></i> Edited Remarks?
-                            </span>
-                        </div>
-
-                        <div class="col-8">
-                            <span>
-                                <i class="far fa-comment"></i> @Model.CaseTask.InvestigationReport?.AgentRemarksEdit
-                            </span>
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th> Agent Remarks</th>
+                                        <th class="w-30">Edited Remarks</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="text-start">
+                                            <div class="bg-light rounded p-2 text-muted">
+                                                @Model.CaseTask.InvestigationReport?.AgentRemarks
+                                            </div>
+                                        </td>
+                                        <td class="text-start">
+                                            <div class="bg-light rounded p-2 text-muted">
+                                                @Model.CaseTask.InvestigationReport?.AgentRemarksEdit
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                    </table>
                         </div>
                     </div>
-                }
+            </div>
             </div>
         </div>
         @* <partial name="_Chat" model="@Model" /> *@
