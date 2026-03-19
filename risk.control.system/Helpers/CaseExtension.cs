@@ -7,6 +7,7 @@ namespace risk.control.system.Helpers
         public static bool IsValidCaseDetail(this PolicyDetail policyDetail)
         {
             return policyDetail != null &&
+               !string.IsNullOrWhiteSpace(policyDetail.DocumentPath.Trim()) &&
                !string.IsNullOrWhiteSpace(policyDetail.ContractNumber.Trim()) &&
                 policyDetail.InsuranceType != null &&
                 policyDetail.InvestigationServiceTypeId > 0 &&
@@ -33,6 +34,7 @@ namespace risk.control.system.Helpers
         {
             return customerDetail != null &&
                !string.IsNullOrWhiteSpace(customerDetail.Name) &&
+               !string.IsNullOrWhiteSpace(customerDetail.ImagePath) &&
                 customerDetail.DateOfBirth != null &&
                 policyDetail.ContractIssueDate > (customerDetail.DateOfBirth.GetValueOrDefault()) &&
                !string.IsNullOrWhiteSpace(customerDetail.PhoneNumber) &&
@@ -49,6 +51,7 @@ namespace risk.control.system.Helpers
         {
             return beneficiaryDetail != null &&
                 !string.IsNullOrWhiteSpace(beneficiaryDetail.Name) &&
+                !string.IsNullOrWhiteSpace(beneficiaryDetail.ImagePath) &&
                 beneficiaryDetail.DateOfBirth != null &&
                 policyDetail.ContractIssueDate > (beneficiaryDetail.DateOfBirth.GetValueOrDefault()) &&
                 !string.IsNullOrWhiteSpace(beneficiaryDetail.PhoneNumber) &&

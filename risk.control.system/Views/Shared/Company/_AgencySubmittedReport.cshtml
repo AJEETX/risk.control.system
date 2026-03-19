@@ -29,78 +29,73 @@
             <partial name="_Location" model="@template" />
         </div>
         <div class="row">
-            <div class="col-12 col-md-6">
                 @if (!string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.InvestigationReport?.AgentRemarks))
                 {
                     var questionTime = @Model.ClaimsInvestigation.InvestigationReport.AgentRemarksUpdated != null ?
                     @Model.ClaimsInvestigation.InvestigationReport.AgentRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt") : null;
-                    <div class="card  border-success">
+                <div class="col-12 col-md-6">
+                    <div class="card bg-light d-flex flex-fill border-success">
                         <div class="card-header text-muted border-bottom-0">
                             <h3 class="card-title">
-                                <i class="far fa-comment"></i> Agent comment  (@Model.ClaimsInvestigation?.PolicyDetail.InsuranceType.GetEnumDisplayName())
+                                <i class="far fa-comment"></i> Agent Remarks (@Model.ClaimsInvestigation?.PolicyDetail.InsuranceType.GetEnumDisplayName())
                                 <span class="hover-text">
                                     <i class="fas fa-info-circle"></i>
                                     <span class="tooltip-text" id="information">
                                         <span>
-                                            <i class="far fa-comment"></i><b> Agent comment (@Model.ClaimsInvestigation?.PolicyDetail.InsuranceType.GetEnumDisplayName())</b>
+                                            <i class='far fa-hand-point-right'></i> Review <i class="far fa-comment"></i> Questionnaire (@Model.ClaimsInvestigation?.PolicyDetail.InsuranceType.GetEnumDisplayName())
                                         </span>
-
                                     </span>
                                 </span>
                             </h3>
                             <div class="card-tools">
-                                <span data-bs-toggle="tooltip" title="Agent report time" class="badge badge-light">
-                                    <i class="nav-icon fas fa-clock"></i>
-                                    @Model.ClaimsInvestigation.InvestigationReport?.AgentRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt")
-                                </span>
-
+                                <span data-bs-toggle="tooltip" title="Agent report time" class="badge badge-light"> <i class="nav-icon fas fa-clock"></i> @questionTime </span>
                             </div>
                         </div>
                         <div class="progress">
                             <i class="far fa-bookmark bookmark-green"></i>
                             <div class="progress-bar progress-bar-green" role="progressbar">
-                                agent comment (@Model.ClaimsInvestigation?.PolicyDetail.InsuranceType.GetEnumDisplayName())
+                                Agent remarks (@Model.ClaimsInvestigation?.PolicyDetail.InsuranceType.GetEnumDisplayName())
                             </div>
                         </div>
                         <div class="card-footer text-muted border-bottom-0">
-                            <i class="fas fa-user-shield"></i>  Agent:<span class="badge badge-light">  @Model.ClaimsInvestigation.InvestigationReport.AgentEmail </span>
+                            <i class="fas fa-user-shield"></i>  Agent :<span class="badge badge-light">  @Model.ClaimsInvestigation.InvestigationReport.AgentEmail </span>
                         </div>
-
-                        <div class="card-body">
+                        <div class="card-body text-muted text-sm">
                             <div class="row">
-                                <div class="col-4">
-                                    <span>
-                                        <i class="far fa-comment"></i> Remarks?
-                                    </span>
+                                <div class="col-12">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered table-sm table-hover">
 
-                                </div>
-                                <div class="col-8">
-                                    <span>
-                                        <i class="far fa-comment"></i> @Model.ClaimsInvestigation.InvestigationReport?.AgentRemarks
-                                    </span>
+                                            <thead class="thead-light">
+                                                <tr>
+                                                    <th> Agent Remarks</th>
+                                                    <th class="w-30">Edited Remarks</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td class="text-start">
+                                                        <div class="bg-light rounded p-2 text-muted">
+                                                            @Model.ClaimsInvestigation.InvestigationReport?.AgentRemarks
+                                                        </div>
+                                                    </td>
+                                                    <td class="text-start">
+                                                        <div class="bg-light rounded p-2 text-muted">
+                                                            @Model.ClaimsInvestigation.InvestigationReport?.AgentRemarksEdit
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
                             </div>
-                            <br />
-                            <div class="row">
-                                <div class="col-4">
-                                    <span>
-                                        <i class="far fa-comment"></i> Edited Remarks?
-                                    </span>
-
-                                </div>
-                                <div class="col-8">
-                                    <span>
-                                        <i class="far fa-comment"></i> @Model.ClaimsInvestigation.InvestigationReport?.AgentRemarksEdit
-                                    </span>
-
-                                </div>
-                            </div>
-
                         </div>
                     </div>
+                    @* <partial name="_Chat" model="@Model" /> *@
+                </div>
 
                 }
-            </div>
             <div class="col-12 col-md-6">
                 @if (!string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.InvestigationReport?.SupervisorRemarks))
                 {
@@ -140,31 +135,15 @@
                             <div class="row">
                                 <div class="col-12">
                                     <div class="table-responsive">
-                                        <table class="table table-bordered table-sm table-hover align-middle text-center">
+                                        <table class="table table-bordered table-sm table-hover">
                                             <thead class="thead-light">
                                                 <tr>
-                                                    <th class="w-25">Time</th>
-                                                    <th>Agency Response</th>
+                                                    <th>Remarks</th>
                                                     <th class="w-25">Document</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 <tr>
-                                                    <td>
-                                                        @{
-                                                            string displayTime = string.Empty;
-                                                            var time = @Model.ClaimsInvestigation.InvestigationReport?.SupervisorRemarksUpdated;
-                                                            if (time is not null)
-                                                            {
-                                                                displayTime = time.Value.ToString("dd-MMM-yyy HH:mm");
-                                                            }
-                                                            if (time == null)
-                                                            {
-                                                                displayTime = @Model.ClaimsInvestigation.InvestigationReport.Created.ToString("dd-MMM-yyy HH:mm");
-                                                            }
-                                                        }
-                                                        <span class="badge badge-light">@displayTime</span>
-                                                    </td>
                                                     <td class="text-start">
                                                         <div class="bg-light rounded p-2 text-muted">
 
