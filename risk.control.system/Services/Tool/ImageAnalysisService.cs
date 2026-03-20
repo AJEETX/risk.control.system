@@ -25,8 +25,8 @@ namespace risk.control.system.Services.Tool
 
         public async Task<ImageAnalysisViewModel> AnalyzeImageAsync(IFormFile file)
         {
-            var filePath = Path.Combine(_uploadPath, file.FileName);
-            var elaPath = Path.Combine(_uploadPath, "ela_" + file.FileName);
+            var filePath = Path.Combine(_uploadPath, Path.GetFileName(file.FileName));
+            var elaPath = Path.Combine(_uploadPath, "ela_" + Path.GetFileName(file.FileName));
 
             // Save original file
             using (var stream = new FileStream(filePath, FileMode.Create))
@@ -40,8 +40,8 @@ namespace risk.control.system.Services.Tool
 
             var model = new ImageAnalysisViewModel
             {
-                OriginalImageUrl = $"/uploads/{file.FileName}",
-                ElaImageUrl = $"/uploads/ela_{file.FileName}",
+                OriginalImageUrl = $"/uploads/{Path.GetFileName(file.FileName)}",
+                ElaImageUrl = $"/uploads/ela_{Path.GetFileName(file.FileName)}",
                 MetadataFlagged = isSuspicious,
                 ElaScore = Math.Round(score, 2)
             };

@@ -153,14 +153,34 @@ public static class AuthAndSecurutyExtension
                     {
                         context.Response.StatusCode = StatusCodes.Status401Unauthorized;
                     }
-                    //// DYNAMIC PATH LOGIC: Check if user was trying to access /Tools
-                    //else if (context.Request.Path.StartsWithSegments("/Tools"))
-                    //{
-                    //    context.Response.Redirect("/Tools/Try" + context.Request.QueryString);
-                    //}
                     else
                     {
-                        context.Response.Redirect(AppCookie.LOGIN_PATH + context.Request.QueryString);
+                        var queryString = context.Request.QueryString.Value;
+                        var loginPath = AppCookie.LOGIN_PATH;
+
+                        // 1. Extract the ReturnUrl from the query string
+                        var queryParams = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(queryString);
+
+                        if (queryParams.TryGetValue("ReturnUrl", out var returnUrl))
+                        {
+                            // 2. Perform the "IsLocal" check manually
+                            // A local URL must start with '/' and NOT start with '//' or '\/'
+                            string url = returnUrl.ToString();
+                            bool isLocal = !string.IsNullOrEmpty(url) &&
+                                           url[0] == '/' &&
+                                           (url.Length == 1 || (url[1] != '/' && url[1] != '\\'));
+
+                            if (!isLocal)
+                            {
+                                // If it's an external/malicious URL, strip the QueryString
+                                // and just go to the clean login page.
+                                context.Response.Redirect(loginPath);
+                                return Task.CompletedTask;
+                            }
+                        }
+
+                        // 3. If it's safe or has no ReturnUrl, proceed as normal
+                        context.Response.Redirect(loginPath + queryString);
                     }
                     return Task.CompletedTask;
                 },

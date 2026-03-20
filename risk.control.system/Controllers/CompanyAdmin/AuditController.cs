@@ -23,7 +23,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
         // GET: Audit
         public IActionResult Index()
         {
-            return RedirectToAction("Profile");
+            return RedirectToAction(nameof(Profile));
         }
 
         [Breadcrumb("Audit Log")]
@@ -132,7 +132,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
 
         // GET: Audit/Details/5
         [Breadcrumb("Detail ", FromAction = nameof(Profile))]
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Detail(int? id)
         {
             if (id == null || _context.AuditLogs == null)
             {

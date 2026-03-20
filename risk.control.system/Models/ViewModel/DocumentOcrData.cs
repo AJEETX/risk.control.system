@@ -1,8 +1,12 @@
-﻿namespace risk.control.system.Models.ViewModel
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace risk.control.system.Models.ViewModel
 {
     public class DocumentOcrData
     {
+        [Required]
         public IFormFile DocumentImage { get; set; }
+
         public int RemainingTries { get; set; } = 5;
     }
 }

@@ -45,8 +45,13 @@ namespace risk.control.system.Controllers.Tools
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> OcrDocument(DocumentOcrData data)
         {
+            if (data.DocumentImage == null || data.DocumentImage.Length == 0)
+            {
+                ModelState.AddModelError("DocumentImage", "Please upload a valid image file.");
+            }
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
             // 1. Get current user and check limit

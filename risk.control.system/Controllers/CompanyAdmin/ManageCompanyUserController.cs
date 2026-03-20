@@ -80,6 +80,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
         public async Task<IActionResult> Create(ApplicationUser model, string emailSuffix)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
+            emailSuffix = emailSuffix.Replace("\n", "").Replace("\r", "").Trim();
             try
             {
                 if (!ModelState.IsValid)
@@ -139,6 +140,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
         public async Task<IActionResult> Edit(string id, ApplicationUser model)
         {
             var currentUser = User.Identity?.Name;
+            id = id.Replace("\n", "").Replace("\r", "").Trim();
             try
             {
                 if (!ModelState.IsValid)
@@ -175,6 +177,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
         public async Task<IActionResult> Delete(string userId)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
+            userId = userId.Replace("\n", "").Replace("\r", "").Trim();
             try
             {
                 if (string.IsNullOrWhiteSpace(userId))

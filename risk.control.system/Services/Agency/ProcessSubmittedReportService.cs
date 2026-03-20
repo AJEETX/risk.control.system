@@ -27,14 +27,16 @@ namespace risk.control.system.Services.Agency
 
         public async Task<InvestigationTask> ProcessAgentReport(string userEmail, string supervisorRemarks, long caseId, SupervisorRemarkType reportUpdateStatus, IFormFile? document = null, string editRemarks = "")
         {
+            var sanitizedEmail = userEmail?.Replace("\n", "").Replace("\r", "");
+
             if (reportUpdateStatus == SupervisorRemarkType.OK)
             {
-                return await ApproveAgentReport(userEmail, caseId, supervisorRemarks, reportUpdateStatus, document, editRemarks);
+                return await ApproveAgentReport(sanitizedEmail, caseId, supervisorRemarks, reportUpdateStatus, document, editRemarks);
             }
             else
             {
                 //PUT th case back in review list :: Assign back to Agent
-                return await ReAllocateToVendorAgent(userEmail, caseId, supervisorRemarks, reportUpdateStatus);
+                return await ReAllocateToVendorAgent(sanitizedEmail, caseId, supervisorRemarks, reportUpdateStatus);
             }
         }
 
@@ -70,7 +72,9 @@ namespace risk.control.system.Services.Agency
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred submit case {Id}. {UserEmail}", caseId, userEmail);
+                var sanitizedEmail = userEmail?.Replace("\n", "").Replace("\r", "");
+
+                logger.LogError(ex, "Error occurred submit case {Id}. {UserEmail}", caseId, sanitizedEmail);
                 return (null, string.Empty);
             }
         }

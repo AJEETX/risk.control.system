@@ -149,6 +149,7 @@ namespace risk.control.system.Controllers.Manager
         public async Task<IActionResult> Edit(string id, ApplicationUser model)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
+            var sanitizedId = id.Replace("\n", "").Replace("\r", "");
             try
             {
                 if (!ModelState.IsValid)
@@ -158,7 +159,7 @@ namespace risk.control.system.Controllers.Manager
                     return View(model);
                 }
 
-                var result = await _manageAgencyUserService.EditAgencyUserAsync(ModelState, id, model, userEmail, _baseUrl);
+                var result = await _manageAgencyUserService.EditAgencyUserAsync(ModelState, sanitizedId, model, userEmail, _baseUrl);
 
                 if (!result.Success)
                 {
@@ -173,7 +174,7 @@ namespace risk.control.system.Controllers.Manager
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error editing {AgencyId}. {UserEmail}.", id, userEmail);
+                _logger.LogError(ex, "Error editing {AgencyId}. {UserEmail}.", sanitizedId, userEmail);
                 _notifyService.Error("OOPS !!!..Error editing User. Try again.");
             }
             return RedirectToAction(nameof(Users), ControllerName<EmpanelledAgencyUserController>.Name, new { id = model.VendorId });
@@ -229,7 +230,8 @@ namespace risk.control.system.Controllers.Manager
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error deleting {AgencyUser}. {UserEmail}.", email, userEmail);
+                var sanitizedEmail = email.Replace("\n", "").Replace("\r", "");
+                _logger.LogError(ex, "Error deleting {AgencyUser}. {UserEmail}.", sanitizedEmail, userEmail);
                 _notifyService.Error("Error deleting user. Try again");
             }
             return RedirectToAction(nameof(Users), new { id = vendorId });
