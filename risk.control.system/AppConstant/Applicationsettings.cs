@@ -50,10 +50,8 @@ namespace risk.control.system.AppConstant
         public const string DETAILS = "Details";
 
         // LABELS / ACTIONS
-        public const string SERVICE = "Service";
-
-        public const string SERVICES = "Services";
         public const string CASE_ENABLER = "Reason To Verify";
+
         public const string COST_CENTRE = "Cost centre";
         public const string PINCODE = "Pincode";
         public const string ROLE = "Role";
@@ -61,9 +59,10 @@ namespace risk.control.system.AppConstant
         public const string USER = "User";
         public const string COMPANY_USERS = "Manage Users";
         public const string VENDOR = "Agency";
-        public const string AGENTS = "Agents";
         public const string MANAGE_USERS = "Manage users";
         public const string MANAGE_SERVICE = "Manage service";
+        public const string DOCUMENT = "Document";
+        public const string CASE = "Case";
 
         // MENUS / SUBMENUS
 
@@ -87,8 +86,6 @@ namespace risk.control.system.AppConstant
         public const string CURRENT_PINCODE4 = "3150";
         public const string CURRENT_PINCODE5 = "3125";
         public const string CURRENT_PINCODE6 = "3124";
-        //public const string CURRENT_DISTRICT = "Forest Hill";
-        //public const string CURRENT_STATE = "VIC";
 
         public const string INSURER = "Insurer life";
         public const string INSURERDOMAIN = "insurer.com";

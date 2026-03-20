@@ -23,12 +23,12 @@
             try
             {
                 var matched = await compareFaces.FaceMatch(registeredImage, faceImageBytes);
-                return matched.Item1 ? (matched.Item2.ToString(), processImageService.ProcessCompress(faceImageBytes, onlyExtension, 10, 99, matched.Item3), matched.Item2) : ("0", processImageService.ProcessCompress(faceImageBytes, onlyExtension, 10, 99, matched.Item3), 0);
+                return matched.Item1 ? (matched.Item2.ToString(), processImageService.CompressImage(faceImageBytes), matched.Item2) : ("0", processImageService.CompressImage(faceImageBytes), 0);
             }
             catch (Exception ex)
             {
                 logger.LogError(ex, "Failed face match");
-                return ("0", processImageService.ProcessCompress(faceImageBytes, onlyExtension), 0);
+                return ("0", processImageService.CompressImage(faceImageBytes), 0);
             }
         }
     }

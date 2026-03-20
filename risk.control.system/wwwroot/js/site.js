@@ -384,7 +384,18 @@ function clearAllNotifications() {
 }
 
 $(document).ready(function () {
+    // Targets both the company logo and the user profile image
+    $('.brand-image, .sidebar-profile').on('load', function () {
+        $(this).addClass('loaded');
+    }).each(function () {
+        // Handle cached images
+        if (this.complete) $(this).trigger('load');
+    });
 
+    // Fallback: If the image fails to load, stop the pulsing
+    $('.brand-image, .sidebar-profile').on('error', function () {
+        $(this).removeClass('sidebar-profile brand-image');
+    });
     $("#PhoneNumber").on("keydown", function (e) {
         // Prevent first character being 0 (also covers numpad 0)
         if (this.selectionStart === 0 && (e.key === "0" || e.code === "Numpad0")) {
