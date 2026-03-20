@@ -69,8 +69,6 @@ namespace risk.control.system.Controllers.Common
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> GetInvestigationServicesByInsuranceType(string insuranceType)
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
-
             try
             {
                 InsuranceType type;
@@ -83,7 +81,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while getting investigation types for user {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error occurred while getting investigation types");
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -211,8 +209,6 @@ namespace risk.control.system.Controllers.Common
         [HttpGet("IsMobileNumber")]
         public async Task<IActionResult> IsMobileNumber(string phone, int countryCode)
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
-
             try
             {
                 if (string.IsNullOrWhiteSpace(phone))
@@ -237,7 +233,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while checking mobile for user {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error occurred while checking mobile");
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -245,8 +241,6 @@ namespace risk.control.system.Controllers.Common
         [HttpGet("get-bsb")]
         public IActionResult GetBSBDetails(string code)
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
-
             try
             {
                 var bsbDetail = _context.BsbInfo.AsNoTracking().FirstOrDefault(b => b.BSB == code);
@@ -254,7 +248,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while getting bsb details for user {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error occurred while getting bsb details");
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }

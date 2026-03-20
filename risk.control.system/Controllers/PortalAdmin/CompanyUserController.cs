@@ -91,6 +91,7 @@ namespace risk.control.system.Controllers.PortalAdmin
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ApplicationUser user, string emailSuffix)
         {
+            emailSuffix = emailSuffix.Replace("\n", "").Replace("\r", "").Trim();
             var userFullEmail = user.Email.Trim().ToLower() + "@" + emailSuffix;
             if (user.ProfileImage != null && user.ProfileImage.Length > 0)
             {

@@ -64,6 +64,7 @@ namespace risk.control.system.Services.Common
             try
             {
                 using var _context = await _contextFactory.CreateDbContextAsync();
+                senderUserEmail = senderUserEmail.Replace("\n", "").Replace("\r", "").Trim();
 
                 // 1. Fetch the user (sender) details
                 var applicationUser = await _context.ApplicationUser
@@ -119,6 +120,7 @@ namespace risk.control.system.Services.Common
                 var caseTask = await _context.Investigations.AsNoTracking()
                     .Include(i => i.PolicyDetail)
                     .FirstOrDefaultAsync(v => v.Id == caseId);
+                userEmail = userEmail.Replace("\n", "").Replace("\r", "").Trim();
 
                 var applicationUser = await _context.ApplicationUser.AsNoTracking()
                     .FirstOrDefaultAsync(c => c.Email == userEmail);
@@ -184,6 +186,7 @@ namespace risk.control.system.Services.Common
                     .Include(i => i.PolicyDetail)
                     .FirstOrDefaultAsync(v => v.Id == caseId);
 
+                userEmail = userEmail.Replace("\n", "").Replace("\r", "").Trim();
                 var senderUser = await _context.ApplicationUser.AsNoTracking()
                     .FirstOrDefaultAsync(c => c.Email == userEmail);
 
@@ -227,6 +230,7 @@ namespace risk.control.system.Services.Common
                 using var _context = await _contextFactory.CreateDbContextAsync();
 
                 // 1. Fetch shared dependencies once
+                senderUserEmail = senderUserEmail.Replace("\n", "").Replace("\r", "").Trim();
                 var applicationUser = await _context.ApplicationUser.AsNoTracking()
                     .Include(i => i.Country)
                     .FirstOrDefaultAsync(c => c.Email == senderUserEmail);
@@ -274,6 +278,7 @@ namespace risk.control.system.Services.Common
                 using var _context = await _contextFactory.CreateDbContextAsync();
 
                 // 1. Fetch user data (Sender and Recipient are the same here)
+                senderUserEmail = senderUserEmail.Replace("\n", "").Replace("\r", "").Trim();
                 var applicationUser = await _context.ApplicationUser.AsNoTracking()
                     .Include(i => i.Country)
                     .FirstOrDefaultAsync(c => c.Email == senderUserEmail);
@@ -323,6 +328,7 @@ namespace risk.control.system.Services.Common
                 .Where(u => _context.UserRoles.Any(ur => ur.UserId == u.Id && ur.RoleId == creatorRole.Id))
                 .ToListAsync();
 
+            senderUserEmail = senderUserEmail.Replace("\n", "").Replace("\r", "").Trim();
             await SendNotificationInternal(caseId, senderUserEmail, creatorRole.Id, caseTask.ClientCompanyId, null,
                 WarningSymbol, caseTask.SubStatus, $"Case #{caseId} Withdrawn", url, recipients);
         }
@@ -355,6 +361,8 @@ namespace risk.control.system.Services.Common
                 // We pass the agentEmail to the engine.
                 // Note: Ensure SendNotificationInternal is updated to map 'agentEmail'
                 // to the 'AgenctUserEmail' property in the StatusNotification object.
+                senderUserEmail = senderUserEmail.Replace("\n", "").Replace("\r", "").Trim();
+                agentEmail = agentEmail.Replace("\n", "").Replace("\r", "").Trim();
                 await SendNotificationInternal(
                     caseId: caseId,
                     senderUserEmail: senderUserEmail,
@@ -406,6 +414,7 @@ namespace risk.control.system.Services.Common
                 );
 
                 // 5. Trigger Engine for Agency Admin
+                senderUserEmail = senderUserEmail.Replace("\n", "").Replace("\r", "").Trim();
                 await SendNotificationInternal(
                     caseId: caseId,
                     senderUserEmail: senderUserEmail,
@@ -463,6 +472,7 @@ namespace risk.control.system.Services.Common
                 );
 
                 // 4. Trigger the Internal Engine
+                senderUserEmail = senderUserEmail.Replace("\n", "").Replace("\r", "").Trim();
                 await SendNotificationInternal(
                     caseId: caseId,
                     senderUserEmail: senderUserEmail,
@@ -492,7 +502,7 @@ namespace risk.control.system.Services.Common
                 var caseTask = await _context.Investigations.AsNoTracking()
                     .Include(i => i.PolicyDetail)
                     .FirstOrDefaultAsync(v => v.Id == caseId);
-
+                senderUserEmail = senderUserEmail.Replace("\n", "").Replace("\r", "").Trim();
                 var senderUser = await _context.ApplicationUser.AsNoTracking()
                     .FirstOrDefaultAsync(u => u.Email == senderUserEmail);
 
@@ -544,6 +554,7 @@ namespace risk.control.system.Services.Common
                     .Include(i => i.PolicyDetail)
                     .FirstOrDefaultAsync(v => v.Id == caseId);
 
+                senderUserEmail = senderUserEmail.Replace("\n", "").Replace("\r", "").Trim();
                 var senderUser = await _context.ApplicationUser.AsNoTracking()
                     .FirstOrDefaultAsync(c => c.Email == senderUserEmail);
 
@@ -591,6 +602,7 @@ namespace risk.control.system.Services.Common
                 .Where(u => _context.UserRoles.Any(ur => ur.UserId == u.Id && ur.RoleId == assessorRole.Id))
                 .ToListAsync();
 
+            senderUserEmail = senderUserEmail.Replace("\n", "").Replace("\r", "").Trim();
             await SendNotificationInternal(caseId, senderUserEmail, assessorRole.Id, caseTask.ClientCompanyId, null,
                 BlueSymbol, caseTask.SubStatus, $"Reply Submitted for Case #{caseId}", url, recipients);
         }
@@ -615,6 +627,7 @@ namespace risk.control.system.Services.Common
                 var recipients = await GetUsersByRoleAsync(null, vendorId, supervisorRole.Id, agencyAdminRole.Id);
 
                 // 4. Fire the internal engine
+                senderUserEmail = senderUserEmail.Replace("\n", "").Replace("\r", "").Trim();
                 await SendNotificationInternal(
                     caseId: caseId,
                     senderUserEmail: senderUserEmail,

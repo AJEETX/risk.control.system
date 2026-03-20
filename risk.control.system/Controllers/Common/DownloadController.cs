@@ -40,7 +40,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while getting file attachment for user {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error occurred while getting file attachment");
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -66,7 +66,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while getting file attachment for user {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error occurred while getting file attachment");
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -95,7 +95,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while getting file attachment for user {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error occurred while getting file attachment");
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }

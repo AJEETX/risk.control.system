@@ -89,6 +89,7 @@ namespace risk.control.system.Controllers.Manager
         public async Task<IActionResult> Create(ApplicationUser model, string emailSuffix)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
+            emailSuffix = emailSuffix.Replace("\n", "").Replace("\r", "").Trim();
             try
             {
                 if (!ModelState.IsValid)
@@ -154,6 +155,7 @@ namespace risk.control.system.Controllers.Manager
         public async Task<IActionResult> Edit(string id, ApplicationUser model)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
+            var sanitisedId = id.Replace("\n", "").Replace("\r", "").Trim();
             try
             {
                 if (!ModelState.IsValid)
@@ -165,7 +167,7 @@ namespace risk.control.system.Controllers.Manager
                 }
                 var result = await _agencyUserCreateEditService.EditVendorUserAsync(new EditVendorUserRequest
                 {
-                    UserId = id,
+                    UserId = sanitisedId,
                     Model = model,
                     UpdatedBy = User?.Identity?.Name
                 },
@@ -183,7 +185,7 @@ namespace risk.control.system.Controllers.Manager
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error editing {UserId}. {UserEmail}.", id, userEmail);
+                _logger.LogError(ex, "Error editing {UserId}. {UserEmail}.", sanitisedId, userEmail);
                 _notifyService.Error("Error editing User. Try again.");
             }
             return RedirectToAction(nameof(Users), ControllerName<AvailableAgencyUserController>.Name, new { id = model.VendorId });
@@ -223,6 +225,7 @@ namespace risk.control.system.Controllers.Manager
         public async Task<IActionResult> Delete(string email, long vendorId)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
+            var sanitisedEmail = email.Replace("\n", "").Replace("\r", "").Trim();
             if (!ModelState.IsValid)
             {
                 _notifyService.Error("OOPS !!!..Contact Admin");
@@ -230,7 +233,7 @@ namespace risk.control.system.Controllers.Manager
             }
             try
             {
-                var (result, message) = await _manageAgencyUserService.SoftDeleteUserAsync(email, User.Identity?.Name);
+                var (result, message) = await _manageAgencyUserService.SoftDeleteUserAsync(sanitisedEmail, User.Identity?.Name);
 
                 if (result)
                 {
@@ -243,7 +246,7 @@ namespace risk.control.system.Controllers.Manager
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error deleting {UserId}. {UserEmail}.", email, userEmail);
+                _logger.LogError(ex, "Error deleting {UserId}. {UserEmail}.", sanitisedEmail, userEmail);
                 _notifyService.Error("Error deleting User. Try again.");
             }
             return RedirectToAction(nameof(Users), ControllerName<AvailableAgencyUserController>.Name, new { id = vendorId });

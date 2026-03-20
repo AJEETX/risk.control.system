@@ -40,6 +40,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> GetReportTemplates(string? insuranceType)
         {
             if (!ModelState.IsValid)

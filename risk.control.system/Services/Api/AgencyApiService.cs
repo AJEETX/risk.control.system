@@ -116,86 +116,38 @@ namespace risk.control.system.Services.Api
 
         public async Task<object[]> GetAllEmpanelledAgenciesAsync(string userEmail)
         {
-            try
-            {
-                var emapanelledAgencies = await empanelledAvailableAgencyService.GetAllEmpanelledAgenciesAsync(userEmail);
-                return emapanelledAgencies;
-            }
-            catch (Exception)
-            {
-                logger.LogError("Error in GetAllEmpanelledAgenciesAsync for user {UserEmail}", userEmail);
-                throw;
-            }
+            var emapanelledAgencies = await empanelledAvailableAgencyService.GetAllEmpanelledAgenciesAsync(userEmail);
+            return emapanelledAgencies;
         }
 
         public async Task<object[]> GetEmpanelledAgency(string userEmail, long caseId)
         {
-            try
-            {
-                var empanelledAgenciesForCase = await empanelledAvailableAgencyService.GetEmpanelledAgency(userEmail, caseId);
-                return empanelledAgenciesForCase;
-            }
-            catch (Exception)
-            {
-                logger.LogError("Error in GetEmpanelledAgency for user {UserEmail} and caseId {CaseId}", userEmail, caseId);
-                throw;
-            }
+            var empanelledAgenciesForCase = await empanelledAvailableAgencyService.GetEmpanelledAgency(userEmail, caseId);
+            return empanelledAgenciesForCase;
         }
 
         public async Task<object[]> GetAvailableAgencies(string userEmail)
         {
-            try
-            {
-                var availableAgencies = await empanelledAvailableAgencyService.GetAvailableAgencies(userEmail);
-                return availableAgencies;
-            }
-            catch (Exception)
-            {
-                logger.LogError("Error in GetAvailableAgencies for user {UserEmail}", userEmail);
-                throw;
-            }
+            var availableAgencies = await empanelledAvailableAgencyService.GetAvailableAgencies(userEmail);
+            return availableAgencies;
         }
 
         public async Task<List<AgencyServiceResponse>> GetAgencyService(long vendorId)
         {
-            try
-            {
-                var agencyServices = await agencyInvestigationServiceService.GetAgencyService(vendorId);
-                return agencyServices;
-            }
-            catch (Exception)
-            {
-                logger.LogError("Error in GetAgencyService for vendorId {VendorId}", vendorId);
-                throw;
-            }
+            var agencyServices = await agencyInvestigationServiceService.GetAgencyService(vendorId);
+            return agencyServices;
         }
 
         public async Task<List<AgencyServiceResponse>> AllServices(string userEmail)
         {
-            try
-            {
-                var agencyAllServices = await agencyInvestigationServiceService.AllServices(userEmail);
-                return agencyAllServices;
-            }
-            catch (Exception)
-            {
-                logger.LogError("Error in AllServices for user {UserEmail}", userEmail);
-                throw;
-            }
+            var agencyAllServices = await agencyInvestigationServiceService.AllServices(userEmail);
+            return agencyAllServices;
         }
 
         public async Task<ConcurrentBag<AgentData>> GetAgentWithCases(string userEmail, long caseId)
         {
-            try
-            {
-                var agentsWithCases = await agencyAgentService.GetAgentWithCases(userEmail, caseId);
-                return agentsWithCases;
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Error in GetAgentWithCases...{UserEmail}", userEmail);
-                throw;
-            }
+            var agentsWithCases = await agencyAgentService.GetAgentWithCases(userEmail, caseId);
+            return agentsWithCases;
         }
     }
 }

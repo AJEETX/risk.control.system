@@ -69,7 +69,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
                 await _service.LoadMetadataAsync(model);
                 return View(model);
             }
-
+            emailSuffix = emailSuffix.Replace("\n", "").Replace("\r", "").Trim();
             var result = await _createEditService.CreateVendorUserAsync(new CreateVendorUserRequest
             {
                 User = model,
@@ -108,7 +108,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
                 await _service.LoadMetadataAsync(model);
                 return View(model);
             }
-
+            id = id.Replace("\n", "").Replace("\r", "").Trim();
             var result = await _createEditService.EditVendorUserAsync(new EditVendorUserRequest
             {
                 UserId = id,
@@ -142,6 +142,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string email)
         {
+            email = email.Replace("\n", "").Replace("\r", "").Trim();
             var success = await _service.SoftDeleteUserAsync(email, User.Identity?.Name);
             if (success)
             {
