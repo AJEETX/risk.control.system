@@ -1,17 +1,17 @@
-﻿using Amazon.Rekognition.Model;
-
-using SixLabors.ImageSharp;
+﻿using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.Processing;
 
 using Image = SixLabors.ImageSharp.Image;
+
 namespace risk.control.system.Helpers
 {
     public static class ImageConverterToPng
     {
-        static int maxWidth = 100;
-        static int maxHeight = 100;
-        public static byte[] ConvertToPng(byte[] imageBytes, string onlyExtension = "png")
+        private static int maxWidth = 100;
+        private static int maxHeight = 100;
+
+        public static byte[] ConvertToPng(byte[] imageBytes)
         {
             if (imageBytes == null || imageBytes.Length == 0)
                 throw new ArgumentException("Input image data is null or empty.", nameof(imageBytes));
@@ -19,7 +19,9 @@ namespace risk.control.system.Helpers
             try
             {
                 using var inputStream = new MemoryStream(imageBytes);
-                using var image = Image.Load(inputStream); 
+                using var image = Image.Load(inputStream);
+
+                // 1. Resize if necessary while maintaining aspect ratio
                 if (image.Width > maxWidth || image.Height > maxHeight)
                 {
                     image.Mutate(x => x.Resize(new ResizeOptions
@@ -31,14 +33,17 @@ namespace risk.control.system.Helpers
 
                 using var outputStream = new MemoryStream();
 
+                // 2. Configure PNG Encoder
+                // Note: PngColorType.Rgb is fine, but RgbWithAlpha is safer if
+                // the source image has transparency (like a logo).
                 var pngEncoder = new PngEncoder
                 {
                     CompressionLevel = PngCompressionLevel.BestCompression,
-                    ColorType = PngColorType.Rgb
+                    TransparentColorMode = PngTransparentColorMode.Preserve,
+                    ColorType = PngColorType.RgbWithAlpha
                 };
+
                 image.Save(outputStream, pngEncoder);
-                int width = image.Width;
-                int height = image.Height;
                 return outputStream.ToArray();
             }
             catch (UnknownImageFormatException)
@@ -47,17 +52,17 @@ namespace risk.control.system.Helpers
             }
             catch (Exception ex)
             {
-                throw new InvalidOperationException("Failed to convert image to the specified format.", ex);
+                throw new InvalidOperationException("Failed to convert image to PNG.", ex);
             }
         }
 
-        public static byte[] ConvertToPngFromUrl(IWebHostEnvironment webHostEnvironment, string imageUrl)
+        public static byte[] ConvertToPngFromPath(IWebHostEnvironment webHostEnvironment, string imagePath)
         {
-            if (string.IsNullOrWhiteSpace(imageUrl))
-                throw new ArgumentException("Input image URL is null or empty.", nameof(imageUrl));
+            if (string.IsNullOrWhiteSpace(imagePath))
+                throw new ArgumentException("Input image URL is null or empty.", nameof(imagePath));
             try
             {
-                var imageBytes = File.ReadAllBytes(Path.Combine(webHostEnvironment.ContentRootPath, imageUrl));
+                var imageBytes = File.ReadAllBytes(Path.Combine(webHostEnvironment.ContentRootPath, imagePath));
                 return ResizeCropToPng(imageBytes);
             }
             catch (Exception ex)
@@ -65,23 +70,27 @@ namespace risk.control.system.Helpers
                 throw new InvalidOperationException("Failed to download or convert image from URL.", ex);
             }
         }
-        
-        public static byte[] ResizeCropToPng(byte[] imageBytes,  int width = 150, int height = 150)
+
+        private static byte[] ResizeCropToPng(byte[] imageBytes, int width = 150, int height = 150)
         {
             using var image = Image.Load(imageBytes);
 
+            // Resize and Crop to fill the 150x150 area perfectly
             image.Mutate(x => x.Resize(new ResizeOptions
             {
-                Mode = ResizeMode.Crop,   // fills and crops
+                Mode = ResizeMode.Crop,
                 Size = new Size(width, height),
-                Position = AnchorPositionMode.Center
+                Position = AnchorPositionMode.Center // Keeps the face/center of the image
             }));
 
             using var ms = new MemoryStream();
-            image.Save(ms, new PngEncoder());
+            // Using a faster compression for thumbnails
+            image.Save(ms, new PngEncoder
+            {
+                CompressionLevel = PngCompressionLevel.DefaultCompression
+            });
 
             return ms.ToArray();
         }
-
     }
 }

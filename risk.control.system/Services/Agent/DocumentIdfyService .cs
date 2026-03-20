@@ -91,8 +91,10 @@ internal class DocumentIdfyService : IDocumentIdfyService
             //var (ocrText, Pan, maskedImage) = await ocrTask;
             var (dist, distM, dur, durS, mapUrl) = await mapTask;
             documentReport.LocationMapUrl = mapUrl;
+            documentReport.Distance = dist;
             documentReport.DistanceInMetres = distM;
             documentReport.DurationInSeconds = durS;
+            documentReport.Duration = dur;
             documentReport.LocationAddress = await addressTask;
             documentReport.LongLat = $"Latitude = {lat}, Longitude = {lon}";
             documentReport.LongLatTime = DateTime.UtcNow;
@@ -131,7 +133,7 @@ internal class DocumentIdfyService : IDocumentIdfyService
             }
             else
             {
-                var compressed = processImageService.ProcessCompress(docImage, doc.ImageExtension);
+                var compressed = processImageService.CompressImage(docImage);
                 await File.WriteAllBytesAsync(doc.FilePath, compressed);
                 doc.ImageValid = true;
                 doc.LocationInfo = ocrResult.FirstOrDefault()?.Description;
@@ -141,7 +143,7 @@ internal class DocumentIdfyService : IDocumentIdfyService
         {
             doc.ImageValid = false;
             doc.LocationInfo = "No OCR data detected";
-            await File.WriteAllBytesAsync(doc.FilePath, processImageService.ProcessCompress(docImage, doc.ImageExtension));
+            await File.WriteAllBytesAsync(doc.FilePath, processImageService.CompressImage(docImage));
         }
         doc.ValidationExecuted = true;
     }

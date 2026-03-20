@@ -84,7 +84,7 @@ namespace risk.control.system.Services.Report
                     {
                         try
                         {
-                            var pngBytes = ImageConverterToPng.ConvertToPngFromUrl(webHostEnvironment, face.FilePath);
+                            var pngBytes = ImageConverterToPng.ConvertToPngFromPath(webHostEnvironment, face.FilePath);
                             rowBuilder.AddCell().AddParagraph().AddInlineImage(pngBytes);
                         }
                         catch (Exception ex)
