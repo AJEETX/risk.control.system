@@ -52,7 +52,7 @@ public class OcrService : IOcrService
                 string panNumber = panBlock?.Text ?? "Not Found";
                 if (panBlock == null)
                 {
-                    var compressedDocumentImage = processImageService.ProcessCompress(bytes, doc.ImageExtension);
+                    var compressedDocumentImage = processImageService.CompressImage(bytes);
                     await File.WriteAllBytesAsync(doc.FilePath, compressedDocumentImage);
                     doc.ImageValid = true;
                     doc.LocationInfo = ocrText;
@@ -63,7 +63,7 @@ public class OcrService : IOcrService
                 var boundingBox = panBlock.Geometry.BoundingBox;
                 var maskedImageBytes = await MaskPanNumber(bytes, boundingBox);
 
-                var compressedPanImage = processImageService.ProcessCompress(maskedImageBytes, doc.ImageExtension);
+                var compressedPanImage = processImageService.CompressImage(maskedImageBytes);
                 await File.WriteAllBytesAsync(doc.FilePath, compressedPanImage);
                 doc.ImageValid = true;
 
@@ -72,7 +72,7 @@ public class OcrService : IOcrService
             }
             else
             {
-                var compressed = processImageService.ProcessCompress(bytes, doc.ImageExtension);
+                var compressed = processImageService.CompressImage(bytes);
                 await File.WriteAllBytesAsync(doc.FilePath, compressed);
                 doc.ImageValid = false;
                 doc.LocationInfo = ocrText;

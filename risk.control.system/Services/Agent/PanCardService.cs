@@ -86,7 +86,7 @@ namespace risk.control.system.Services.Agent
                 #endregion PAN IMAGE PROCESSING
 
                 var image = Convert.FromBase64String(maskedImage.MaskedImage);
-                var savedMaskedImage = processImageService.ProcessCompress(image, onlyExtension);
+                var savedMaskedImage = processImageService.CompressImage(image);
                 await File.WriteAllBytesAsync(filePath, savedMaskedImage);
 
                 doc.LocationInfo = maskedImage.DocType + " data: ";
@@ -101,7 +101,7 @@ namespace risk.control.system.Services.Agent
             {
                 logger.LogError(ex, "Error occurred.");
                 var image = Convert.FromBase64String(maskedImage.MaskedImage);
-                await File.WriteAllBytesAsync(filePath, processImageService.ProcessCompress(image, onlyExtension));
+                await File.WriteAllBytesAsync(filePath, processImageService.CompressImage(image));
                 doc.LongLatTime = DateTime.UtcNow;
                 doc.LocationInfo = "no data: ";
             }

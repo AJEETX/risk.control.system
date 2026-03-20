@@ -41,43 +41,43 @@
 						<p class="text-muted mt-2"><i class="fas fa-calendar-alt"></i> Active Since: @Model.ActivatedDate?.ToString("dd-MMM-yyyy")</p>
 
 						<hr />
-					<p class="text-muted text-sm">
-						<i class="fa fa-star"></i>  <b>Rating: </b>
-					</p>
-					<ul class="ml-4 mb-0 fa-ul text-muted">
-						<li class="small">
-							<div id="agency-rating">
-								<img src="/img/StarFade.gif" class="rating" id="1" alt="star" />
-								<img src="/img/StarFade.gif" class="rating" id="2" alt="star" />
-								<img src="/img/StarFade.gif" class="rating" id="3" alt="star" />
-								<img src="/img/StarFade.gif" class="rating" id="4" alt="star" />
-								<img src="/img/StarFade.gif" class="rating" id="5" alt="star" />
-								<span id="rating-result">
-									<span class="badge badge-light">(@Model.RateCount)</span>
-									@if (Model.RateCount != null && Model.RateCount > 0)
-									{
-										decimal a = @Model.RateTotal.Value / @Model.RateCount.Value;
-										<sup class="avr"> @a</sup>
-									}
-								</span>
-								<div class="dropdown-divider"></div>
-								<div id="rating-result-data" class="badge badge-light">
+						<p class="text-muted text-sm">
+							<i class="fa fa-star"></i>  <b>Rating: </b>
+						</p>
+						<ul class="ml-4 mb-0 fa-ul text-muted">
+							<li class="small">
+								<div id="agency-rating">
+									<img src="/img/StarFade.gif" class="rating" id="1" alt="star" />
+									<img src="/img/StarFade.gif" class="rating" id="2" alt="star" />
+									<img src="/img/StarFade.gif" class="rating" id="3" alt="star" />
+									<img src="/img/StarFade.gif" class="rating" id="4" alt="star" />
+									<img src="/img/StarFade.gif" class="rating" id="5" alt="star" />
+									<span id="rating-result">
+										<span class="badge badge-light">(@Model.RateCount)</span>
+										@if (Model.RateCount != null && Model.RateCount > 0)
+										{
+											decimal a = @Model.RateTotal.Value / @Model.RateCount.Value;
+											<sup class="avr"> @a</sup>
+										}
+									</span>
+									<div class="dropdown-divider"></div>
+									<div id="rating-result-data" class="badge badge-light">
+									</div>
 								</div>
-							</div>
-						</li>
-					</ul>
-					<div class="dropdown-divider"></div>
-					<div class="card-footer">
-						<div class="row">
-							<div class="col-md-12">
-								<div class="form-group">
-									<label class="card-header shadow-lg rounded-lg text-sm bg-light" title="Agents (@Model.SelectedCountryId)" data-bs-toggle="tooltip"><i class="fa fa-user-secret"></i>  Agents (@Model.SelectedCountryId)</label>
-									<label class="card-header shadow-lg rounded-lg text-sm bg-light" title="Service (@Model.VendorInvestigationServiceTypes.Count)" data-bs-toggle="tooltip"><i class="fas fa-cogs"></i>  @Applicationsettings.SERVICE (@Model.VendorInvestigationServiceTypes.Count)</label>
+							</li>
+						</ul>
+						<div class="dropdown-divider"></div>
+						<div class="card-footer">
+							<div class="row">
+								<div class="col-md-12">
+									<div class="form-group">
+										<label class="card-header shadow-lg rounded-lg text-sm bg-light" title="Agents (@Model.SelectedCountryId)" data-bs-toggle="tooltip"><i class="fa fa-user-secret"></i>  Agents (@Model.SelectedCountryId)</label>
+										<label class="card-header shadow-lg rounded-lg text-sm bg-light" title="Service (@Model.VendorInvestigationServiceTypes.Count)" data-bs-toggle="tooltip"><i class="fas fa-cogs"></i>  Service (@Model.VendorInvestigationServiceTypes.Count)</label>
+									</div>
 								</div>
 							</div>
 						</div>
 					</div>
-				</div>
 				</div>
 				<div class="col-md-8">
 					<div class="row">
@@ -183,8 +183,8 @@
 				<div class="col-md-12">
 					<div class="form-group">
 						<a id="back" asp-controller="Creator" asp-action="EmpanelledVendors"
-						asp-route-id="@Model.SelectedPincodeId" asp-route-vendorId="@Model.VendorId"
-						class="btn btn-outline-secondary" data-bs-toggle="tooltip" title="Back to Empanelled Agencies">
+							   asp-route-id="@Model.SelectedPincodeId" asp-route-vendorId="@Model.VendorId"
+							   class="btn btn-outline-secondary" data-bs-toggle="tooltip" title="Back to Empanelled Agencies">
 							<i class="fas fa-arrow-left"></i>
 							<span class="badge badge-light"> <i class="fas fa-tasks"></i> </span> Back
 						</a>

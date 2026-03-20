@@ -10,10 +10,12 @@ namespace risk.control.system.Controllers.Common
     public class ErrorLogController : Controller
     {
         private readonly IWebHostEnvironment _env;
+        private readonly ILogger<ErrorLogController> _logger;
 
-        public ErrorLogController(IWebHostEnvironment env)
+        public ErrorLogController(IWebHostEnvironment env, ILogger<ErrorLogController> logger)
         {
             _env = env;
+            _logger = logger;
         }
 
         public IActionResult Index()
@@ -47,13 +49,22 @@ namespace risk.control.system.Controllers.Common
         [HttpGet]
         public async Task<IActionResult> Download(string fileName)
         {
+            // 1. Security: Path.GetFileName prevents directory traversal (e.g., "../../appsettings.json")
             var safeFileName = Path.GetFileName(fileName);
 
-            var filePath = Path.Combine(_env.ContentRootPath, "Logs", safeFileName);
-            if (!System.IO.File.Exists(filePath)) return NotFound();
+            // 2. Point to your specific Logs directory
+            var relativePath = Path.Combine("Logs", safeFileName);
+            var fullPath = Path.Combine(_env.ContentRootPath, relativePath);
 
-            var bytes = await System.IO.File.ReadAllBytesAsync(filePath);
-            return File(bytes, "application/json", fileName);
+            if (!System.IO.File.Exists(fullPath))
+            {
+                _logger.LogWarning("Log file not found: {FileName}", safeFileName);
+                return NotFound("Log file not found.");
+            }
+
+            // 3. Serve the file efficiently
+            // We specify the content type and the download name for the browser
+            return PhysicalFile(fullPath, "application/json", safeFileName);
         }
     }
 }
