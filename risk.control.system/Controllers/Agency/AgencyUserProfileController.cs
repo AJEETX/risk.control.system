@@ -81,6 +81,7 @@ namespace risk.control.system.Controllers.Agency
         public async Task<IActionResult> Edit(string id, ApplicationUser model)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
+            var sanitisedId = id.Replace("\n", "").Replace("\r", "").Trim();
             try
             {
                 if (!ModelState.IsValid)
@@ -89,12 +90,12 @@ namespace risk.control.system.Controllers.Agency
                     await _agencyUserService.LoadModel(model, userEmail);
                     return View(model);
                 }
-                if (id != model.Id.ToString())
+                if (sanitisedId != model.Id.ToString())
                 {
                     _notifyService.Error("OOPS !!!..Contact Admin");
                     return this.RedirectToAction<DashboardController>(x => x.Index());
                 }
-                var result = await _agencyUserService.UpdateUserAsync(id, model, userEmail, _baseUrl);
+                var result = await _agencyUserService.UpdateUserAsync(sanitisedId, model, userEmail, _baseUrl);
 
                 if (!result.Success)
                 {
@@ -111,7 +112,7 @@ namespace risk.control.system.Controllers.Agency
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error editing {UserId} for {UserEmail}", id, userEmail ?? "Anonymous");
+                _logger.LogError(ex, "Error editing {UserId} for {UserEmail}", sanitisedId, userEmail ?? "Anonymous");
                 _notifyService.Error("OOPS !!!..Contact Admin");
             }
             return this.RedirectToAction<DashboardController>(x => x.Index());

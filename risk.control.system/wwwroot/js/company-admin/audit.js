@@ -27,15 +27,34 @@
             {
                 className: 'max-width-column-name', // Apply the CSS class,
                 targets: 2                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column-name', // Apply the CSS class,
+                targets: 3                      // Index of the column to style
             }],
         columns: [
-            { data: 'userId' },
-            { data: 'type' },
-            { data: 'tableName' },
+            {
+                data: 'userId',
+                render: function (data) {
+                    return `<span title=${data} data-bs-toggle="tooltip">${data} </span>`
+                }
+            },
+            {
+                data: 'type',
+                render: function (data) {
+                    return `<span title=${data} data-bs-toggle="tooltip">${data} </span>`
+                }
+            },
+            {
+                data: 'tableName',
+                render: function (data) {
+                    return `<span title=${data} data-bs-toggle="tooltip">${data} </span>`
+                }
+            },
             {
                 data: 'dateTime',
                 render: function (data) {
-                    return data ? new Date(data).toLocaleString() : '';
+                    return `<span title="${new Date(data).toLocaleString()}" data-bs-toggle="tooltip">${new Date(data).toLocaleString()} </span>`
                 }
             },
             {
@@ -60,7 +79,7 @@
 
                     return display.length > 50
                         ? `<div title="${encoded}"><small>${encoded.substring(0, 50)}...</small></div>`
-                        : `<small>${encoded}</small>`;
+                        : `<div data-bs-toggle="tooltip" title="${encoded}"><small>${encoded}</small></div>`;
                 }
             },
             {
@@ -85,7 +104,7 @@
 
                     return data.length > 50
                         ? `<div title="${encoded}"><small>${data.substring(0, 50)}...</small></div>`
-                        : `<small>${encoded}</small>`;
+                        : `<div data-bs-toggle="tooltip" title="${encoded}"><small>${encoded}</small></div>`;
                 }
             },
             {
@@ -93,19 +112,41 @@
                 orderable: false,
                 searchable: false,
                 render: function (data) {
-                    return '<a id=details' + data + ' href="/Audit/Details?Id=' + data + '" class="btn btn-xs btn-info"><i class="fa fa-search"></i> Detail</a>'
+                    return `<a data-id="${data}" class="btn btn-xs btn-info"><i class="fa fa-search"></i> Detail</a>&nbsp;`
                 }
             }
         ],
         "drawCallback": function (settings, start, end, max, total, pre) {
-            $('#dataTable tbody').on('click', '.btn-info', function (e) {
-                e.preventDefault(); // Prevent the default anchor behavior
-                var id = $(this).attr('id').replace('details', ''); // Extract the ID from the button's ID attribute
-                getaudit(id); // Call the getdetails function with the ID
-                window.location.href = $(this).attr('href'); // Navigate to the delete page
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (el) {
+                return new bootstrap.Tooltip(el, {
+                    html: true,
+                    sanitize: false   // ⬅⬅⬅ THIS IS THE FIX
+                });
             });
         }
     });
+    $('body').on('click', 'a.btn-info', function (e) {
+        e.preventDefault();
+        const id = $(this).data('id');
+        showdetail(id, this);
+    });
+    function showdetail(id, element) {
+        id = String(id).replace(/[^a-zA-Z0-9_-]/g, "");
+        $("body").addClass("submit-progress-bg");
+        setTimeout(() => $(".submit-progress").removeClass("hidden"), 1);
+
+        showSpinnerOnButton(element, "Detail");
+
+        const editUrl = `/Audit/Detail/${encodeURIComponent(id)}`;
+
+        setTimeout(() => {
+            window.location.href = editUrl;
+        }, 1000);
+    }
+    function showSpinnerOnButton(selector, spinnerText) {
+        $(selector).html(`<i class='fas fa-sync fa-spin'></i> ${spinnerText}`);
+    }
 });
 function getaudit(id) {
     $("body").addClass("submit-progress-bg");

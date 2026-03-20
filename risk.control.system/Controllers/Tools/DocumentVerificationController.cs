@@ -37,10 +37,19 @@ namespace risk.control.system.Controllers.Tools
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Upload(IFormFile file)
         {
-            if (file == null || file.Length == 0) return RedirectToAction(nameof(Index));
-            if (!ModelState.IsValid) return BadRequest(ModelState);
+            // 1. Formal Validation
+            if (file == null || file.Length == 0)
+            {
+                ModelState.AddModelError("file", "A valid document file is required.");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState); // Or return View(Index) with errors
+            }
 
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return Unauthorized();
@@ -63,8 +72,8 @@ namespace risk.control.system.Controllers.Tools
                 logger.LogError("Error processing document verification. {UserId}", _userManager.GetUserId(User) ?? "Anonymous");
                 var model = new ImageAnalysisViewModel
                 {
-                    OriginalImageUrl = $"/uploads/{file.FileName}",
-                    ElaImageUrl = $"/uploads/ela_{file.FileName}",
+                    OriginalImageUrl = $"/uploads/{Path.GetFileName(file.FileName)}",
+                    ElaImageUrl = $"/uploads/ela_{Path.GetFileName(file.FileName)}",
                     MetadataFlagged = true,
                     ElaScore = Math.Round(0.0, 2),
                     RemainingTries = 5 - user.DocumentAnalysisCount,

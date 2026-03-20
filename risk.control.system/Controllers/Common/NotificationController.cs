@@ -37,7 +37,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while clear notifications for user {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error occurred while clear notifications");
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -56,7 +56,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while marking notifications for user {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error occurred while marking notifications");
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -80,7 +80,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while getting notifications for user {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error occurred while getting notifications");
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }

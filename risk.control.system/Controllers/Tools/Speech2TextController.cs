@@ -43,7 +43,6 @@ namespace risk.control.system.Controllers.Tools
             if (!ModelState.IsValid) return BadRequest(ModelState);
             var user = await _userManager.GetUserAsync(User);
             if (user == null || user.Speech2TextCount >= 5) return RedirectToAction("Index");
-
             if (input.SpeechInputData == null || input.SpeechInputData.Length == 0)
             {
                 ModelState.AddModelError("", "Please upload a valid audio file.");

@@ -62,7 +62,8 @@ internal class AgentAnswerService : IAgentAnswerService
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed capture Answer for {CaseId}. {AgentEmail}", caseId, agentEmail);
+            var sanitizedEmail = agentEmail?.Replace("\n", "").Replace("\r", "").Trim();
+            logger.LogError(ex, "Failed capture Answer for {CaseId}. {AgentEmail}", caseId, sanitizedEmail);
             return false;
         }
     }

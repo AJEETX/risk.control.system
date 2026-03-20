@@ -47,7 +47,9 @@ namespace risk.control.system.Controllers.Common
         [HttpGet]
         public async Task<IActionResult> Download(string fileName)
         {
-            var filePath = Path.Combine(_env.ContentRootPath, "Logs", fileName);
+            var safeFileName = Path.GetFileName(fileName);
+
+            var filePath = Path.Combine(_env.ContentRootPath, "Logs", safeFileName);
             if (!System.IO.File.Exists(filePath)) return NotFound();
 
             var bytes = await System.IO.File.ReadAllBytesAsync(filePath);

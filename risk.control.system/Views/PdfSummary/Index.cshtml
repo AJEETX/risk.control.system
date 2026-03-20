@@ -6,7 +6,7 @@
 }
 <section class="content py-4">
     <div id="article" class="card shadow-lg border-0 summarizer-card">
-        
+
         <div class="card-header d-flex align-items-center bg-info">
             <i class="fas fa-file-pdf mr-2"></i>
             <h5 class="mb-0 font-weight-bold">PDF Summarizer</h5>
@@ -24,8 +24,9 @@
             <div class="submit-progress hidden">
             <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
         </div>
-        
+
             <form id="summaryForm" enctype="multipart/form-data">
+                @Html.AntiForgeryToken()
                 <div class="row">
                     <div class="col-md-6 mb-4 text-center">
                         <label class="h6 font-weight-bold text-secondary mb-3" for="drop-zone">
@@ -33,12 +34,12 @@
                         </label>
                         <div id="drop-zone" class="pdf-drop-zone d-flex flex-column align-items-center justify-content-center p-4">
                             <input id="pdfFile" name="pdfFile" type="file" class="d-none" accept=".pdf" required />
-                            
+
                             <div class="text-center">
                                 <img id="previewDoc" src="/img/pdf-placeholder.png" alt="PDF Icon" class="pdf-icon-preview mb-3" />
                                 <h6 class="text-info font-weight-bold">Drop PDF Here</h6>
                                 <p class="small text-muted mb-0">or click to browse your files</p>
-                                
+
                                 <div id="fileNameDisplay" class="badge badge-light p-2 mt-3 d-none text-truncate border"></div>
                             </div>
                         </div>
@@ -59,14 +60,14 @@
                             </div>
 
                             <textarea id="summaryResult" class="form-control summary-box shadow-sm"
-                                      placeholder="AI analysis will appear here. Points will be organized by relevance..." 
+                                      placeholder="AI analysis will appear here. Points will be organized by relevance..."
                                       readonly></textarea>
                         </div>
                     </div>
                 </div>
 
                 <div class="mt-2">
-                    <button type="submit" id="btnSubmit" 
+                    <button type="submit" id="btnSubmit"
                             class="btn btn-outline-info btn-lg w-100 shadow rounded-pill btn-generate-summary"
                             @(Model.RemainingTries <= 0 ? "disabled" : "")>
                         @if (Model.RemainingTries <= 0)

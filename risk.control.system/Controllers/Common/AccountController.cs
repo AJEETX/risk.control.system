@@ -189,6 +189,7 @@ namespace risk.control.system.Controllers.Common
         public async Task<IActionResult> Forgot(ForgotPasswordViewModel input)
         {
             ForgotPassword model;
+            input?.Email = input?.Email.Replace("\n", "").Replace("\r", "").Trim();
             if (!ModelState.IsValid)
             {
                 model = await _accountService.CreateDefaultForgotPasswordModel(input?.Email);

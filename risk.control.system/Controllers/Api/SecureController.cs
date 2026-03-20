@@ -19,6 +19,7 @@ namespace risk.control.system.Controllers.Api
 {
     [Route("api/[controller]")]
     [ApiController]
+    [IgnoreAntiforgeryToken]
     public class SecureController : ControllerBase
     {
         private readonly ITokenService tokenService;
@@ -122,53 +123,53 @@ namespace risk.control.system.Controllers.Api
             });
         }
 
-        [AllowAnonymous]
-        [HttpPost("refresh-token")]
-        public async Task<IActionResult> RefreshToken([FromBody] string refreshToken)
-        {
-            var tokenEntity = await _context.RefreshTokens
-                .FirstOrDefaultAsync(t => t.Token == refreshToken);
+        //[AllowAnonymous]
+        //[HttpPost("refresh-token")]
+        //public async Task<IActionResult> RefreshToken([FromBody] string refreshToken)
+        //{
+        //    var tokenEntity = await _context.RefreshTokens
+        //        .FirstOrDefaultAsync(t => t.Token == refreshToken);
 
-            if (tokenEntity == null || tokenEntity.IsRevoked || tokenEntity.IsUsed)
-                return Unauthorized("Invalid or expired refresh token.");
+        //    if (tokenEntity == null || tokenEntity.IsRevoked || tokenEntity.IsUsed)
+        //        return Unauthorized("Invalid or expired refresh token.");
 
-            if (tokenEntity.ExpiryDate <= DateTime.UtcNow)
-                return Unauthorized("Refresh token has expired.");
+        //    if (tokenEntity.ExpiryDate <= DateTime.UtcNow)
+        //        return Unauthorized("Refresh token has expired.");
 
-            var user = await _userManager.FindByIdAsync(tokenEntity.UserId);
-            if (user == null)
-                return Unauthorized("User not found.");
+        //    var user = await _userManager.FindByIdAsync(tokenEntity.UserId);
+        //    if (user == null)
+        //        return Unauthorized("User not found.");
 
-            // Mark the current refresh token as used
-            tokenEntity.IsUsed = true;
-            _context.RefreshTokens.Update(tokenEntity);
-            await _context.SaveChangesAsync();
+        //    // Mark the current refresh token as used
+        //    tokenEntity.IsUsed = true;
+        //    _context.RefreshTokens.Update(tokenEntity);
+        //    await _context.SaveChangesAsync();
 
-            // Generate new tokens
-            var newAccessToken = tokenService.GenerateJwtToken(user);
-            var newRefreshToken = await tokenService.GenerateRefreshTokenAsync(user.Email);
+        //    // Generate new tokens
+        //    var newAccessToken = tokenService.GenerateJwtToken(user);
+        //    var newRefreshToken = await tokenService.GenerateRefreshTokenAsync(user.Email);
 
-            return Ok(new TokenResponse
-            {
-                AccessToken = newAccessToken,
-                RefreshToken = newRefreshToken.Token,
-                ExpiresAt = DateTime.UtcNow.AddMinutes(15) // Matches access token lifetime
-            });
-        }
+        //    return Ok(new TokenResponse
+        //    {
+        //        AccessToken = newAccessToken,
+        //        RefreshToken = newRefreshToken.Token,
+        //        ExpiresAt = DateTime.UtcNow.AddMinutes(15) // Matches access token lifetime
+        //    });
+        //}
 
-        [Authorize]
-        [HttpPost("logout")]
-        public async Task<IActionResult> RevokeToken([FromBody] string refreshToken)
-        {
-            var tokenEntity = await _context.RefreshTokens.FirstOrDefaultAsync(t => t.Token == refreshToken);
-            if (tokenEntity == null)
-                return NotFound("Token not found.");
+        //[Authorize]
+        //[HttpPost("logout")]
+        //public async Task<IActionResult> RevokeToken([FromBody] string refreshToken)
+        //{
+        //    var tokenEntity = await _context.RefreshTokens.FirstOrDefaultAsync(t => t.Token == refreshToken);
+        //    if (tokenEntity == null)
+        //        return NotFound("Token not found.");
 
-            tokenEntity.IsRevoked = true;
-            _context.RefreshTokens.Update(tokenEntity);
-            await _context.SaveChangesAsync();
-            return Ok("Token revoked successfully.");
-        }
+        //    tokenEntity.IsRevoked = true;
+        //    _context.RefreshTokens.Update(tokenEntity);
+        //    await _context.SaveChangesAsync();
+        //    return Ok("Token revoked successfully.");
+        //}
 
         [AllowAnonymous]
         [HttpGet("test-2-get-jwt-token")]
