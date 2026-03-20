@@ -64,6 +64,7 @@ namespace risk.control.system.Controllers.Manager
         public async Task<IActionResult> Create(Vendor model, string domainAddress)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
+            domainAddress = domainAddress.Replace("\n", "").Replace("\r", "").Trim();
             try
             {
                 if (!ModelState.IsValid)

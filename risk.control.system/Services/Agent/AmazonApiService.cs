@@ -41,12 +41,12 @@ namespace risk.control.system.Services.Agent
 
         public async Task<CollectionStatus> EnsureCollectionExistsAsync(string collectionId)
         {
+            var sanitizedId = collectionId?.Replace("\n", "").Replace("\r", "");
             try
             {
-                // Try to describe the collection to see if it exists
                 var response = await _rekognitionClient.DescribeCollectionAsync(new DescribeCollectionRequest
                 {
-                    CollectionId = collectionId
+                    CollectionId = sanitizedId
                 });
                 if (response.UserCount > 0)
                 {
@@ -55,11 +55,10 @@ namespace risk.control.system.Services.Agent
             }
             catch (Amazon.Rekognition.Model.ResourceNotFoundException ex)
             {
-                // If not found, create it
-                _logger.LogInformation($"Collection {collectionId} not found. Creating new collection.{ex.Message}");
+                _logger.LogInformation($"Collection {sanitizedId} not found. Creating new collection.{ex.Message}");
                 var createdResponse = await _rekognitionClient.CreateCollectionAsync(new CreateCollectionRequest
                 {
-                    CollectionId = collectionId
+                    CollectionId = sanitizedId
                 });
                 return createdResponse.StatusCode == (int)System.Net.HttpStatusCode.OK ? CollectionStatus.Created : CollectionStatus.Failed;
             }
@@ -74,21 +73,23 @@ namespace risk.control.system.Services.Agent
         {
             try
             {
+                var sanitizedId = collectionId?.Replace("\n", "").Replace("\r", "");
+
                 var response = await _rekognitionClient.DescribeCollectionAsync(new DescribeCollectionRequest
                 {
-                    CollectionId = collectionId
+                    CollectionId = sanitizedId
                 });
                 if (response.HttpStatusCode == System.Net.HttpStatusCode.OK && response.UserCount > 0)
                 {
                     var request = new DeleteCollectionRequest
                     {
-                        CollectionId = collectionId
+                        CollectionId = sanitizedId
                     };
                     return await _rekognitionClient.DeleteCollectionAsync(request);
                 }
                 else
                 {
-                    _logger.LogInformation($"Collection {collectionId} does not exist. No need to delete.");
+                    _logger.LogInformation($"Collection {sanitizedId} does not exist. No need to delete.");
                     return new DeleteCollectionResponse { StatusCode = (int)System.Net.HttpStatusCode.NotFound };
                 }
             }
@@ -116,9 +117,10 @@ namespace risk.control.system.Services.Agent
 
         public async Task<DeleteFacesResponse> DeleteFacesAsync(string collectionId, List<string> faceIds)
         {
+            var sanitizedId = collectionId?.Replace("\n", "").Replace("\r", "");
             var request = new DeleteFacesRequest
             {
-                CollectionId = collectionId,
+                CollectionId = sanitizedId,
                 FaceIds = faceIds
             };
             return await _rekognitionClient.DeleteFacesAsync(request);

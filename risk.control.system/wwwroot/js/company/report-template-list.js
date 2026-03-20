@@ -10,6 +10,7 @@
             url: '/ReportTemplate/GetReportTemplates',
             type: 'POST',
             data: function (d) {
+                d.__RequestVerificationToken= $('input[name="__RequestVerificationToken"]').val(),
                 d.insuranceType = $('#caseTypeFilter').val(); // <--- sends filter value
             },
             error: DataTableErrorHandler

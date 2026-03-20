@@ -28,6 +28,7 @@
 			</div>
 
 			<form asp-action="Upload" method="post" enctype="multipart/form-data" id="analysisForm">
+				@Html.AntiForgeryToken()
 				<div class="row">
 					@* Left Side: Drop Zone (Stays as is) *@
 					<div class="col-md-6 mb-4 text-center border-right">

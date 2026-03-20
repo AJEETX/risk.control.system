@@ -79,7 +79,7 @@ internal class DocumentIdfyService : IDocumentIdfyService
             //var ocrTask = ocrService.ExtractTextDataAsync(documentReport, docImage);
             var googleTask = googleApi.DetectTextAsync(documentReport.FilePath);
             var addressTask = httpClientService.GetRawAddress(lat, lon);
-            var mapTask = customApiCLient.GetMap(expected.lat, expected.lon, double.Parse(lat), double.Parse(lon), "Start", "End", "300", "300", "green", "red");
+            var mapTask = customApiCLient.GetMap(expected.lat, expected.lon, double.Parse(lat), double.Parse(lon), "S", "E", "300", "300", "green", "red");
 
             await Task.WhenAll(
                 googleTask,
@@ -113,7 +113,8 @@ internal class DocumentIdfyService : IDocumentIdfyService
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed Document file capture/processing for Case {CaseId}. {AgentEmail}", data.CaseId, data.Email);
+            var sanitizedEmail = data.Email?.Replace("\n", "").Replace("\r", "").Trim();
+            logger.LogError(ex, "Failed Document file capture/processing for Case {CaseId}. {AgentEmail}", data.CaseId, sanitizedEmail);
             return await HandleError(claim, documentReport);
         }
     }

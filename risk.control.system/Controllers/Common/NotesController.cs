@@ -35,7 +35,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred adding notes for Case {Id} for user {UserEmail}", model.CaseId, userEmail);
+                _logger.LogError(ex, "Error occurred adding notes for Case {Id}", model.CaseId);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }

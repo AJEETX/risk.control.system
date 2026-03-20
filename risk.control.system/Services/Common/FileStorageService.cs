@@ -3,17 +3,22 @@
     public interface IFileStorageService
     {
         Task<(string FileName, string RelativePath)> SaveAsync(IFormFile file, string category, string? subFolder = null, string? subSubFolder = null, string[]? allowedTypes = null);
+
         Task<(string FileName, string RelativePath)> SaveAsync(byte[] data, string extension, string category, string? subFolder = null, string? subSubFolder = null, string[]? allowedExtensions = null);
+
         Task<(string FileName, string RelativePath)> SaveMediaAsync(IFormFile file, string category, string? subFolder = null, string? subSubFolder = null);
     }
+
     internal class FileStorageService : IFileStorageService
     {
         private const string RootFolder = "Document";
         private readonly IWebHostEnvironment env;
+
         public FileStorageService(IWebHostEnvironment env)
         {
             this.env = env;
         }
+
         public async Task<(string FileName, string RelativePath)> SaveMediaAsync(IFormFile file, string category, string? subFolder = null, string? subSubFolder = null)
         {
             if (file == null || file.Length == 0)
@@ -114,23 +119,24 @@
 
         private string GetOrCreateFolder(string category, string? subFolder, string? subSubFolder)
         {
-            var folder = Path.Combine(env.ContentRootPath, RootFolder,        // ALWAYS start with Document/
-                category           // Policy, Agency, Company
-            );
+            string mainFolder = Path.GetFileName(category);
+            var folder = Path.Combine(env.ContentRootPath, RootFolder, mainFolder);          // Policy, Agency, Company
 
             if (!Directory.Exists(folder))
                 Directory.CreateDirectory(folder);
 
-            if (!string.IsNullOrWhiteSpace(subFolder))
+            string cleanSubFolder = Path.GetFileName(subFolder);
+            if (!string.IsNullOrWhiteSpace(cleanSubFolder))
             {
-                folder = Path.Combine(folder, subFolder);
+                folder = Path.Combine(folder, cleanSubFolder);
 
                 if (!Directory.Exists(folder))
                     Directory.CreateDirectory(folder);
             }
-            if (!string.IsNullOrWhiteSpace(subSubFolder))
+            string cleanSubSubFolder = Path.GetFileName(subSubFolder);
+            if (!string.IsNullOrWhiteSpace(cleanSubSubFolder))
             {
-                folder = Path.Combine(folder, subSubFolder);
+                folder = Path.Combine(folder, cleanSubSubFolder);
 
                 if (!Directory.Exists(folder))
                     Directory.CreateDirectory(folder);

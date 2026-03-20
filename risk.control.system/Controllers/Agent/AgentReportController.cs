@@ -13,19 +13,25 @@ namespace risk.control.system.Controllers.Agent
     public class AgentReportController : Controller
     {
         private readonly IAgentAnswerService answerService;
+        private readonly IDocumentIdfyService documentIdfyService;
+        private readonly IFaceIdfyService agentIdService;
+        private readonly IAgentFaceIdfyService agentFaceIdfyService;
         private readonly IMediaIdfyService mediaIdfyService;
         private readonly INotyfService notifyService;
-        private readonly IAgentSubmitCaseService agentService;
 
         public AgentReportController(IAgentAnswerService answerService,
+            IDocumentIdfyService documentIdfyService,
+            IFaceIdfyService agentIdService,
+            IAgentFaceIdfyService agentFaceIdfyService,
             IMediaIdfyService mediaIdfyService,
-            INotyfService notifyService,
-            IAgentSubmitCaseService agentService)
+            INotyfService notifyService)
         {
             this.answerService = answerService;
+            this.documentIdfyService = documentIdfyService;
+            this.agentIdService = agentIdService;
+            this.agentFaceIdfyService = agentFaceIdfyService;
             this.mediaIdfyService = mediaIdfyService;
             this.notifyService = notifyService;
-            this.agentService = agentService;
         }
 
         public IActionResult Index()
@@ -35,66 +41,66 @@ namespace risk.control.system.Controllers.Agent
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SubmitFaceImage(string reportName, string locationName, long locationId, long Id, string latitude, string longitude, long caseId, IFormFile Image, bool isAgent = false)
+        public async Task<IActionResult> SubmitFaceImage(FaceData model, bool isAgent)
         {
+            model.Email = HttpContext.User.Identity.Name;
+            ModelState.Remove(nameof(model.Email));
             if (!ModelState.IsValid)
             {
-                return BadRequest("Invalid image.");
+                return BadRequest("Invalid Data.");
             }
-            var userEmail = HttpContext.User.Identity.Name;
-            if (Image != null && Image.Length > 0)
+            if (model.Image == null || model.Image.Length == 0)
+                return Json(new { success = false, message = "No file provided." });
+
+            if (isAgent)
             {
-                var response = await agentService.PostAgentId(userEmail, reportName, locationName, locationId, caseId, Id, latitude, longitude, isAgent, Image);
+                var response = await agentFaceIdfyService.CaptureAgentId(model);
                 return Json(new { success = true, image = response.Image });
             }
-            return Json(new { success = false });
+            else
+            {
+                var response = await agentIdService.CaptureFaceId(model);
+                return Json(new { success = true, image = response.Image });
+            }
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SubmitDocumentImage(string reportName, string locationName, long locationId, long Id, string latitude, string longitude, long caseId, IFormFile Image)
+        public async Task<IActionResult> SubmitDocumentImage(DocumentData model)
         {
+            model.Email = HttpContext.User.Identity.Name;
+            ModelState.Remove(nameof(model.Email));
             if (!ModelState.IsValid)
             {
                 return BadRequest("Invalid image.");
             }
-            var userEmail = HttpContext.User.Identity.Name;
-            if (Image != null && Image.Length > 0)
-            {
-                var response = await agentService.PostDocumentId(userEmail, reportName, locationName, locationId, caseId, Id, latitude, longitude, Image);
-                return Json(new { success = true, image = response.Image });
-            }
-            return Json(new { success = false });
+            if (model.Image == null || model.Image.Length == 0)
+                return Json(new { success = false, message = "No file provided." });
+
+            var result = await documentIdfyService.CaptureDocumentId(model);
+            return Json(new { success = true, image = result.Image });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SubmitMediaFile(long caseId, IFormFile Image, string latitude, string longitude, string reportName, string locationName)
+        public async Task<IActionResult> SubmitMediaFile(DocumentData model)
         {
+            model.Email = HttpContext.User.Identity.Name;
+            ModelState.Remove(nameof(model.Email));
             if (!ModelState.IsValid)
             {
-                return BadRequest("Invalid media file.");
+                return BadRequest("Invalid data.");
             }
-            if (Image == null || Image.Length == 0)
+            if (model.Image == null || model.Image.Length == 0)
                 return Json(new { success = false, message = "No file provided." });
             var userEmail = HttpContext.User.Identity.Name;
-            var extension = Path.GetExtension(Image.FileName).ToLower();
+            var extension = Path.GetExtension(model.Image.FileName).ToLower();
 
             var supportedExtensions = new[] { ".mp4", ".webm", ".mov", ".mp3", ".wav", ".aac" };
             if (!supportedExtensions.Contains(extension))
                 return Json(new { success = false, message = "Unsupported media format." });
-            var locationLongLat = string.IsNullOrWhiteSpace(latitude) || string.IsNullOrWhiteSpace(longitude) ? string.Empty : $"{latitude}/{longitude}";
 
-            var data = new DocumentData
-            {
-                LocationName = locationName,
-                ReportName = reportName,
-                Email = userEmail,
-                CaseId = caseId,
-                Image = Image,
-                LocationLatLong = locationLongLat
-            };
-            var response = await mediaIdfyService.CaptureMedia(data);
+            var response = await mediaIdfyService.CaptureMedia(model);
             return Json(new
             {
                 success = true,

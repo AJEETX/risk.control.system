@@ -28,8 +28,6 @@ namespace risk.control.system.Controllers.Common
         [HttpGet("SearchCountry")]
         public IActionResult SearchCountry(string term = "")
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
-
             try
             {
                 var allCountries = _context.Country.AsNoTracking().ToList();
@@ -61,7 +59,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while getting countries for user {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error occurred while getting countries");
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -69,8 +67,6 @@ namespace risk.control.system.Controllers.Common
         [HttpGet("SearchState")]
         public IActionResult SearchState(long countryId, string term = "")
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
-
             try
             {
                 if (string.IsNullOrEmpty(term?.Trim()))
@@ -92,7 +88,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while getting states for user {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error occurred while getting states");
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -100,8 +96,6 @@ namespace risk.control.system.Controllers.Common
         [HttpGet("SearchDistrictTerm")]
         public IActionResult SearchDistrictTerm(long stateId, long countryId, string term = "")
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
-
             try
             {
                 var districts = string.IsNullOrEmpty(term?.Trim())
@@ -139,7 +133,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while getting districts for user {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error occurred while getting districts");
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -147,8 +141,6 @@ namespace risk.control.system.Controllers.Common
         [HttpGet("SearchDistrict")]
         public IActionResult SearchDistrict(long stateId, long countryId, string term = "")
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
-
             try
             {
                 var districts = string.IsNullOrEmpty(term?.Trim())
@@ -191,7 +183,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while getting districts for user {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error occurred while getting districts");
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -199,8 +191,6 @@ namespace risk.control.system.Controllers.Common
         [HttpGet("GetCountryName")]
         public IActionResult GetCountryName(long id)
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
-
             try
             {
                 var country = _context.Country.AsNoTracking().Where(x => x.CountryId == id).OrderBy(x => x.Name).Take(10) // Filter based on user input
@@ -210,7 +200,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while getting countries for user {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error occurred while getting countries");
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -218,8 +208,6 @@ namespace risk.control.system.Controllers.Common
         [HttpGet("GetStateName")]
         public IActionResult GetStateName(long id, long countryId)
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
-
             try
             {
                 var state = _context.State.AsNoTracking().Where(x => x.StateId == id && x.CountryId == countryId).OrderBy(x => x.Name).Take(10) // Filter based on user input
@@ -229,7 +217,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while getting states for user {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error occurred while getting states");
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -237,8 +225,6 @@ namespace risk.control.system.Controllers.Common
         [HttpGet("GetStateNameForCountry")]
         public IActionResult GetStateNameForCountry(long countryId, long? id = null)
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
-
             try
             {
                 var states = _context.State.AsNoTracking()
@@ -258,7 +244,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while getting states for country for user {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error occurred while getting states for country");
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -266,8 +252,6 @@ namespace risk.control.system.Controllers.Common
         [HttpGet("GetDistrictName")]
         public IActionResult GetDistrictName(long id, long stateId, long countryId)
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
-
             try
             {
                 if (id == -1)
@@ -286,7 +270,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while getting districts for user {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error occurred while getting districts");
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -294,8 +278,6 @@ namespace risk.control.system.Controllers.Common
         [HttpGet("GetDistrictNameForAgency")]
         public IActionResult GetDistrictNameForAgency(long id, long stateId, long countryId, long lob, long serviceId, long vendorId)
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
-
             try
             {
                 var districts = _context.District.AsNoTracking().Where(x => x.StateId == stateId && x.CountryId == countryId).OrderBy(x => x.Name)//.Take(10) // Filter based on user input
@@ -315,7 +297,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while getting districts for agency for user {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error occurred while getting districts for agency");
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -323,8 +305,6 @@ namespace risk.control.system.Controllers.Common
         [HttpGet("GetPincode")]
         public IActionResult GetPincode(long id, long countryId)
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
-
             try
             {
                 var userClaim = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
@@ -341,7 +321,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while getting investigations for user {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error occurred while getting investigations");
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -349,8 +329,6 @@ namespace risk.control.system.Controllers.Common
         [HttpGet("GetPincodeSuggestions")]
         public IActionResult GetPincodeSuggestions(long countryId, string term = "")
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
-
             try
             {
                 // Check if the term is empty or null
@@ -433,7 +411,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while getting pincodes for user {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error occurred while getting pincodes");
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -441,8 +419,6 @@ namespace risk.control.system.Controllers.Common
         [HttpGet("GetCountrySuggestions")]
         public IActionResult GetCountrySuggestions(string term = "")
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
-
             try
             {
                 var allCountries = _context.Country.AsNoTracking().ToList();
@@ -474,7 +450,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while getting country for user {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error occurred while getting country");
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }

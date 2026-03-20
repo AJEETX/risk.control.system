@@ -75,7 +75,7 @@ internal class AgentFaceIdfyService : IAgentFaceIdfyService
             var faceTask = faceMatchService.GetFaceMatchAsync(registeredImage, faceBytes, Path.GetExtension(faceImageFileName));
             var weatherTask = weatherInfoService.GetWeatherAsync(lat, lon);
             var addressTask = httpClientService.GetRawAddress(lat, lon);
-            var mapTask = customApiClient.GetMap(expectedCoords.lat, expectedCoords.lon, double.Parse(lat), double.Parse(lon), "Start", "End", "300", "300", "green", "red");
+            var mapTask = customApiClient.GetMap(expectedCoords.lat, expectedCoords.lon, double.Parse(lat), double.Parse(lon), "S", "E", "300", "300", "green", "red");
 
             await Task.WhenAll(faceTask, weatherTask, addressTask, mapTask);
 
@@ -104,7 +104,8 @@ internal class AgentFaceIdfyService : IAgentFaceIdfyService
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed Agent face Id match for CaseId {Id}. {AgentEmail}", data.CaseId, data.Email);
+            var sanitizedEmail = data.Email?.Replace("\n", "").Replace("\r", "").Trim();
+            logger.LogError(ex, "Failed Agent face Id match for CaseId {Id}. {AgentEmail}", data.CaseId, sanitizedEmail);
             return await HandleError(claim, agentIdReport);
         }
     }

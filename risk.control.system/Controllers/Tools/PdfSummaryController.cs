@@ -44,8 +44,26 @@ public class PdfSummaryController : Controller
     }
 
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Summarize(IFormFile pdfFile)
     {
+        if (pdfFile == null || pdfFile.Length == 0)
+        {
+            ModelState.AddModelError("pdfFile", "Please upload a PDF file.");
+        }
+        // Check file size (e.g., limit to 10 MB)
+        if (pdfFile.Length > 10 * 1024 * 1024)
+            return BadRequest("File too large.");
+
+        // Whitelist extensions (but note: extensions can be spoofed)
+        var extension = Path.GetExtension(pdfFile.FileName).ToLowerInvariant();
+        if (extension != ".pdf")
+            return BadRequest("Only PDF files allowed.");
+
+        // Better: Validate MIME type
+        if (pdfFile.ContentType != "application/pdf")
+            return BadRequest("Invalid file type.");
+
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
@@ -61,23 +79,6 @@ public class PdfSummaryController : Controller
         {
             return StatusCode(403, new { errorMessage = "PDF Summary limit reached (5/5)." });
         }
-
-        if (pdfFile == null || pdfFile.Length == 0)
-        {
-            return BadRequest(new { errorMessage = "Please upload a valid PDF file." });
-        }
-        // Check file size (e.g., limit to 10 MB)
-        if (pdfFile.Length > 10 * 1024 * 1024)
-            return BadRequest("File too large.");
-
-        // Whitelist extensions (but note: extensions can be spoofed)
-        var extension = Path.GetExtension(pdfFile.FileName).ToLowerInvariant();
-        if (extension != ".pdf")
-            return BadRequest("Only PDF files allowed.");
-
-        // Better: Validate MIME type
-        if (pdfFile.ContentType != "application/pdf")
-            return BadRequest("Invalid file type.");
 
         // Best: Check PDF magic bytes (header signature)
         using var stream = pdfFile.OpenReadStream();

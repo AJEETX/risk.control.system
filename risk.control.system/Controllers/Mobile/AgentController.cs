@@ -22,6 +22,8 @@ namespace risk.control.system.Controllers.Mobile
 {
     [Route("api/[controller]")]
     [ApiController]
+    [IgnoreAntiforgeryToken]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
     public class AgentController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
@@ -93,12 +95,14 @@ namespace risk.control.system.Controllers.Mobile
         [AllowAnonymous]
         public async Task<IActionResult> GetAgentPin(string agentEmail)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            agentEmail = agentEmail?.Replace("\n", "").Replace("\r", "").Trim();
+
             try
             {
-                if (string.IsNullOrWhiteSpace(agentEmail))
-                {
-                    return BadRequest($"Empty email");
-                }
                 var user2Onboard = await _agentService.GetPin(agentEmail, _portalBaseUrl);
 
                 if (user2Onboard == null)
@@ -116,7 +120,7 @@ namespace risk.control.system.Controllers.Mobile
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error occurred for {UserEmail}.", agentEmail);
-                return BadRequest($"Agent does not exist or Error");
+                return StatusCode(500, $"Error occurred getting PIN. {agentEmail}.");
             }
         }
 
@@ -124,13 +128,14 @@ namespace risk.control.system.Controllers.Mobile
         [AllowAnonymous]
         public async Task<IActionResult> ResetUid([Required] string mobile, bool sendSMS = false)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            mobile = mobile.Replace(" ", "").Replace("-", "").Replace("\n", "").Replace("\r", "").TrimStart('+');
             try
             {
-                if (string.IsNullOrWhiteSpace(mobile))
-                {
-                    return BadRequest($"Empty mobile number");
-                }
-                var user2Onboard = await _agentService.ResetUid(mobile.TrimStart('+'), _portalBaseUrl, sendSMS);
+                var user2Onboard = await _agentService.ResetUid(mobile, _portalBaseUrl, sendSMS);
 
                 if (user2Onboard == null)
                 {
@@ -142,7 +147,7 @@ namespace risk.control.system.Controllers.Mobile
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error occurred for {Mobile}.", mobile);
-                return BadRequest($"mobile number and/or Agent does not exist");
+                return StatusCode(500, $"mobile number {mobile} and/or Agent does not exist");
             }
         }
 
@@ -150,17 +155,13 @@ namespace risk.control.system.Controllers.Mobile
         [AllowAnonymous]
         public async Task<IActionResult> VerifyMobile(VerifyMobileRequest request)
         {
-            if (request is null)
+            if (!ModelState.IsValid)
             {
-                return BadRequest("Request body cannot be null or empty.");
+                return BadRequest(ModelState);
             }
-            if (string.IsNullOrWhiteSpace(request.Mobile) || request.Mobile.Length < 11 || string.IsNullOrWhiteSpace(request.Uid) || request.Uid.Length < 5)
-            {
-                return BadRequest("Invalid request parameters.");
-            }
+            var normalizedMobile = request.Mobile.Replace(" ", "").Replace("-", "").Replace("\n", "").Replace("\r", "").TrimStart('+');
             try
             {
-                var normalizedMobile = request.Mobile.TrimStart('+');
                 var userWithUid = await _context.ApplicationUser.Include(u => u.Country).FirstOrDefaultAsync(v => v.MobileUId == request.Uid);
                 if (!request.SendSMSForRetry)
                 {
@@ -196,8 +197,8 @@ namespace risk.control.system.Controllers.Mobile
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred for {Mobile}.", request.Mobile);
-                return BadRequest("An error occurred while verifying the mobile number.");
+                _logger.LogError(ex, "Error occurred for {Mobile}.", normalizedMobile);
+                return StatusCode(500, $"An error occurred while verifying the mobile number {normalizedMobile}.");
             }
         }
 
@@ -213,20 +214,17 @@ namespace risk.control.system.Controllers.Mobile
         [AllowAnonymous]
         public async Task<IActionResult> VerifyId(VerifyIdRequest request)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var sanitizedUid = request.Uid?.Replace("\n", "").Replace("\r", "").Replace(" ", "").Replace("-", "").Trim();
             try
             {
-                if (request is null)
-                {
-                    return BadRequest("Request body cannot be null or empty.");
-                }
-                if (string.IsNullOrWhiteSpace(request.Uid) || string.IsNullOrWhiteSpace(request.Image))
-                {
-                    return BadRequest("Uid And/Or Image is empty/null");
-                }
-                var mobileUidExist = await _context.ApplicationUser.FirstOrDefaultAsync(v => v.MobileUId == request.Uid);
+                var mobileUidExist = await _context.ApplicationUser.FirstOrDefaultAsync(v => v.MobileUId == sanitizedUid);
                 if (mobileUidExist == null)
                 {
-                    return BadRequest($"{nameof(request.Uid)} {request.Uid} not exists");
+                    return BadRequest($"{nameof(request.Uid)} {sanitizedUid} not exists");
                 }
                 if (mobileUidExist.ProfilePictureUrl == null || string.IsNullOrWhiteSpace(mobileUidExist.ProfilePictureUrl))
                 {
@@ -249,8 +247,8 @@ namespace risk.control.system.Controllers.Mobile
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred for {Uid}.", request.Uid);
-                return BadRequest("face matcherror " + ex.StackTrace);
+                _logger.LogError(ex, "Error occurred for {Uid}.", sanitizedUid);
+                return StatusCode(500, "Error occurred verifying Face match");
             }
         }
 
@@ -301,17 +299,16 @@ namespace risk.control.system.Controllers.Mobile
         //}
 
         //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
         [HttpGet("agent")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
         public async Task<IActionResult> GetAll(string email)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            email = email.Replace("\n", "").Replace("\r", "").Trim();
             try
             {
-                if (string.IsNullOrWhiteSpace(email))
-                {
-                    return BadRequest("Email is empty/null");
-                }
                 var agent = await _context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == email);
 
                 if (agent == null || agent.Role != AppRoles.AGENT || !agent.Active)
@@ -400,15 +397,15 @@ namespace risk.control.system.Controllers.Mobile
         }
 
         [HttpGet("agent-map")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
         public async Task<IActionResult> IndexMap(string email)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            email = email.Replace("\n", "").Replace("\r", "").Trim();
             try
             {
-                if (string.IsNullOrWhiteSpace(email))
-                {
-                    return BadRequest("Email is empty/null");
-                }
                 var agent = await _context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == email);
 
                 if (agent == null || agent.Role != AppRoles.AGENT || !agent.Active)
@@ -470,20 +467,20 @@ namespace risk.control.system.Controllers.Mobile
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error occurred for {Email}.", email);
-                return StatusCode(500);
+                return StatusCode(500, $"Error occurred for {email}.");
             }
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
         [HttpGet("get")]
         public async Task<IActionResult> Get(long caseId, string email)
         {
+            if (!ModelState.IsValid || caseId < 1)
+            {
+                return BadRequest(ModelState);
+            }
+            email = email.Replace("\n", "").Replace("\r", "").Trim();
             try
             {
-                if (caseId < 1 || string.IsNullOrWhiteSpace(email))
-                {
-                    return BadRequest("Invalid caseId And/Or Email is empty/null");
-                }
                 var agent = await _context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == email);
 
                 if (agent == null || agent.Role != AppRoles.AGENT || !agent.Active)
@@ -582,20 +579,20 @@ namespace risk.control.system.Controllers.Mobile
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error occurred for {CaseId} for {Email}.", caseId, email);
-                return StatusCode(500);
+                return StatusCode(500, $"Error occurred for {caseId} for {email}.");
             }
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
         [HttpGet("get-template")]
         public async Task<IActionResult> GetCaseReportTemplate(long caseId, string email)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            email = email.Replace("\n", "").Replace("\r", "").Trim();
             try
             {
-                if (caseId < 1 || string.IsNullOrWhiteSpace(email))
-                {
-                    return BadRequest("Invalid caseId And/Or Email is empty/null");
-                }
                 var agent = await _context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == email);
 
                 if (agent == null || agent.Role != AppRoles.AGENT || !agent.Active)
@@ -608,25 +605,20 @@ namespace risk.control.system.Controllers.Mobile
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error occurred for {CaseId} for {Email}.", caseId, email);
-                return StatusCode(500);
+                return StatusCode(500, $"Error occurred for {caseId} for {email}.");
             }
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
         [HttpPost("faceid")]
         public async Task<IActionResult> FaceId(FaceData data)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            data.Email = data.Email.Replace("\n", "").Replace("\r", "").Trim();
             try
             {
-                if (data == null)
-                {
-                    return BadRequest("Request body cannot be null or empty.");
-                }
-                if (data.Image == null || string.IsNullOrEmpty(data.LocationLatLong))
-                {
-                    return BadRequest("All fields (Image, LatLong) are required and must be valid.");
-                }
-
                 var vendorUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == data.Email && c.Role == AppRoles.AGENT);
 
                 if (vendorUser == null || vendorUser.Role != AppRoles.AGENT || !vendorUser.Active)
@@ -657,25 +649,20 @@ namespace risk.control.system.Controllers.Mobile
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error occurred for {Email}.", data.Email);
-                return StatusCode(500);
+                return StatusCode(500, $"Error occurred for {data.Email}");
             }
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
         [HttpPost("documentid")]
         public async Task<IActionResult> DocumentId(DocumentData data)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            data.Email = data.Email.Replace("\n", "").Replace("\r", "").Trim();
             try
             {
-                if (data == null)
-                {
-                    return BadRequest("Request body cannot be null or empty.");
-                }
-                if (data.Image == null || string.IsNullOrEmpty(data.LocationLatLong))
-                {
-                    return BadRequest("All fields (Image, LatLong) are required and must be valid.");
-                }
-
                 var vendorUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == data.Email && c.Role == AppRoles.AGENT);
 
                 if (vendorUser == null || vendorUser.Role != AppRoles.AGENT || !vendorUser.Active)
@@ -696,14 +683,17 @@ namespace risk.control.system.Controllers.Mobile
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error occurred for {Email}.", data.Email);
-                return StatusCode(500);
+                return StatusCode(500, $"Error occurred for {data.Email}");
             }
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
         [HttpPost("media")]
         public async Task<IActionResult> Media(DocumentData data)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             try
             {
                 if (data == null)
@@ -741,16 +731,23 @@ namespace risk.control.system.Controllers.Mobile
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error occurred for {Email}.", data.Email);
-                return StatusCode(500);
+                return StatusCode(500, $"Error occurred for {data.Email}");
             }
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
         [HttpPost("answers")]
         public async Task<IActionResult> Answers(string email, string LocationLatLong, string locationName, long caseId, List<QuestionTemplate> Questions)
         {
             try
             {
+                var isDataValid = !string.IsNullOrWhiteSpace(email) &&
+                    !string.IsNullOrEmpty(LocationLatLong) &&
+                    !string.IsNullOrEmpty(locationName) && caseId > 0 || Questions != null || Questions.Any();
+                if (!isDataValid)
+                {
+                    return BadRequest("Invalid input parameters. Email, LocationLatLong, locationName, caseId and Questions are required.");
+                }
+                email = email.Replace("\n", "").Replace("\r", "").Trim();
                 foreach (var question in Questions)
                 {
                     if (question.IsRequired && string.IsNullOrEmpty(question.AnswerText))
@@ -771,22 +768,24 @@ namespace risk.control.system.Controllers.Mobile
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred for {CaseId} for {Email}.", caseId, email);
-                return StatusCode(500);
+                _logger.LogError(ex, "Error occurred for {Email}.", email);
+                return StatusCode(500, $"Error occurred for {email}");
             }
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
         [HttpPost("submit")]
         public async Task<IActionResult> Submit(SubmitData data)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            data.Email = data.Email.Replace("\n", "").Replace("\r", "").Trim();
             try
             {
-                if (data == null)
-                {
-                    return BadRequest("Request body cannot be null or empty.");
-                }
-                if (string.IsNullOrWhiteSpace(data.Email) || string.IsNullOrWhiteSpace(data.Remarks) || data.CaseId < 1)
+                bool isDataValid = !string.IsNullOrWhiteSpace(data.Email) && !string.IsNullOrWhiteSpace(data.Remarks) && data.CaseId >= 1;
+
+                if (!isDataValid)
                 {
                     return BadRequest("All fields (Email, Remarks, CaseId) are required and must be valid.");
                 }
@@ -812,7 +811,7 @@ namespace risk.control.system.Controllers.Mobile
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error occurred for {Email}.", data.Email);
-                return StatusCode(500);
+                return StatusCode(500, $"Error occurred for {data.Email}.");
             }
         }
     }
