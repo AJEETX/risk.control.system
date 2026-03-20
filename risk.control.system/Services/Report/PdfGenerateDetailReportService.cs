@@ -10,6 +10,7 @@ namespace risk.control.system.Services.Report
     {
         Task<SectionBuilder> Build(SectionBuilder section, InvestigationTask investigation, ReportTemplate investigationReport, bool isClaim = true);
     }
+
     internal class PdfGenerateDetailReportService : IPdfGenerateDetailReportService
     {
         internal static readonly FontBuilder FNT9 = Fonts.Helvetica(9f);
@@ -35,8 +36,10 @@ namespace risk.control.system.Services.Report
 
         internal static readonly FontBuilder FNT16_R =
             Fonts.Helvetica(16f).SetColor(Gehtsoft.PDFFlow.Models.Shared.Color.Red);
+
         internal static readonly FontBuilder FNT16_G =
             Fonts.Helvetica(16f).SetColor(Gehtsoft.PDFFlow.Models.Shared.Color.Green);
+
         internal static readonly FontBuilder FNT17 = Fonts.Helvetica(17f);
         internal static readonly FontBuilder FNT18 = Fonts.Helvetica(18f);
 
@@ -57,6 +60,7 @@ namespace risk.control.system.Services.Report
             this.env = env;
             this.questionService = questionService;
         }
+
         public async Task<SectionBuilder> Build(SectionBuilder section, InvestigationTask investigation, ReportTemplate investigationReport, bool isClaim = true)
         {
             var paragraph = section.AddParagraph();
@@ -111,10 +115,8 @@ namespace risk.control.system.Services.Report
                     section.AddParagraph().AddText(""); // More space if needed
                     section.AddParagraph().AddText("");
 
-
                     locationCount++;
                 }
-
             }
 
             section.AddParagraph().AddText("");
@@ -155,7 +157,7 @@ namespace risk.control.system.Services.Report
                     {
                         try
                         {
-                            var pngBytes = ImageConverterToPng.ConvertToPng(request.QuestionImageAttachment, request.QuestionImageFileExtension);
+                            var pngBytes = ImageConverterToPng.ConvertToPng(request.QuestionImageAttachment);
                             rowBuilder.AddCell().AddParagraph().AddInlineImage(pngBytes);
                         }
                         catch (Exception ex)
@@ -174,7 +176,7 @@ namespace risk.control.system.Services.Report
                     {
                         try
                         {
-                            var pngBytes = ImageConverterToPng.ConvertToPng(request.AnswerImageAttachment, request.AnswerImageFileExtension);
+                            var pngBytes = ImageConverterToPng.ConvertToPng(request.AnswerImageAttachment);
                             rowBuilder.AddCell().AddParagraph().AddInlineImage(pngBytes);
                         }
                         catch (Exception ex)
@@ -197,6 +199,7 @@ namespace risk.control.system.Services.Report
             section = AddRemarks(section, "Agency Remarks", investigation.InvestigationReport.SupervisorRemarks);
             return section;
         }
+
         private void AddLogoImage(TableCellBuilder cellBuilder)
         {
             cellBuilder
@@ -204,7 +207,8 @@ namespace risk.control.system.Services.Report
             cellBuilder
                 .AddImage("").SetHeight(340);
         }
-        SectionBuilder AddRemarks(SectionBuilder section, string title, string content)
+
+        private SectionBuilder AddRemarks(SectionBuilder section, string title, string content)
         {
             var table = section.AddTable()
                                .SetBorder(Stroke.Solid);
@@ -227,6 +231,5 @@ namespace risk.control.system.Services.Report
 
             return section;
         }
-
     }
 }
