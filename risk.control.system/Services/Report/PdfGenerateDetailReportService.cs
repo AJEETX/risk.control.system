@@ -63,7 +63,7 @@ namespace risk.control.system.Services.Report
 
             try
             {
-                var pngBytes = ImageConverterToPng.ConvertToPngFromUrl(env, investigation.Vendor.DocumentImageExtension);
+                var pngBytes = ImageConverterToPng.ConvertToPngFromPath(env, investigation.Vendor.DocumentImageExtension);
 
                 paragraph.AddInlineImage(pngBytes)
                      .SetWidth(150); // optional small space between image and text

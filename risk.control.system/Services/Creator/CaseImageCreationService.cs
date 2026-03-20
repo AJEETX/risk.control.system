@@ -58,8 +58,6 @@ namespace risk.control.system.Services
             if (image.ImageData != null)
             {
                 return image.ImageData;
-                //var compressed = CompressImage.ProcessCompress(image.ImageData, ".jpg");
-                //return compressed;
             }
             return null;
         }

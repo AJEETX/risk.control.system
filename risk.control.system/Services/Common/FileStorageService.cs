@@ -1,4 +1,6 @@
-﻿namespace risk.control.system.Services.Common
+﻿using risk.control.system.AppConstant;
+
+namespace risk.control.system.Services.Common
 {
     public interface IFileStorageService
     {
@@ -119,34 +121,50 @@
 
         private string GetOrCreateFolder(string category, string? subFolder, string? subSubFolder)
         {
-            string mainFolder = Path.GetFileName(category);
-            var folder = Path.Combine(env.ContentRootPath, RootFolder, mainFolder);          // Policy, Agency, Company
+            // 1. Establish the absolute root
+            string rootPath = Path.GetFullPath(Path.Combine(env.ContentRootPath, Applicationsettings.DOCUMENT));
 
-            if (!Directory.Exists(folder))
-                Directory.CreateDirectory(folder);
-
-            string cleanSubFolder = Path.GetFileName(subFolder);
-            if (!string.IsNullOrWhiteSpace(cleanSubFolder))
+            // 2. Helper to sanitize segments
+            string Sanitize(string? input)
             {
-                folder = Path.Combine(folder, cleanSubFolder);
+                if (string.IsNullOrWhiteSpace(input) || input == ".") return string.Empty;
 
-                if (!Directory.Exists(folder))
-                    Directory.CreateDirectory(folder);
+                // Block ".." specifically to prevent traversal
+                if (input.Contains(".."))
+                    throw new ArgumentException("Invalid path segment: Parent directory traversal is forbidden.");
+
+                // Strip drive roots or absolute indicators (e.g., "C:\")
+                return Path.GetFileName(input);
             }
-            string cleanSubSubFolder = Path.GetFileName(subSubFolder);
-            if (!string.IsNullOrWhiteSpace(cleanSubSubFolder))
+
+            // 3. Combine safely
+            string combined = Path.Combine(rootPath, Sanitize(category), Sanitize(subFolder), Sanitize(subSubFolder));
+
+            // 4. Final Canonicalization
+            string finalPath = Path.GetFullPath(combined);
+
+            // 5. Boundary Check
+            string rootWithSeparator = rootPath.EndsWith(Path.DirectorySeparatorChar.ToString())
+                ? rootPath
+                : rootPath + Path.DirectorySeparatorChar;
+
+            if (!finalPath.StartsWith(rootWithSeparator, System.StringComparison.OrdinalIgnoreCase) && finalPath != rootPath)
             {
-                folder = Path.Combine(folder, cleanSubSubFolder);
-
-                if (!Directory.Exists(folder))
-                    Directory.CreateDirectory(folder);
+                throw new System.UnauthorizedAccessException("Path security violation: Attempted to escape root directory.");
             }
-            return folder;
+
+            // 6. Create (Handles nested creation automatically)
+            if (!Directory.Exists(finalPath))
+            {
+                Directory.CreateDirectory(finalPath);
+            }
+
+            return finalPath;
         }
 
         private static string BuildRelativePath(string category, string? subFolder, string? subSubFolder, string fileName)
         {
-            var path = Path.Combine(RootFolder, category, subFolder ?? "", subSubFolder ?? "", fileName).Replace("\\", "/");
+            var path = Path.Combine(Applicationsettings.DOCUMENT, category, subFolder ?? "", subSubFolder ?? "", fileName).Replace("\\", "/").Replace("\n", "").Replace("\r", "");
 
             return path;
         }

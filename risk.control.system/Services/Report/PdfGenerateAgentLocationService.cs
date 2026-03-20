@@ -93,7 +93,7 @@ namespace risk.control.system.Services.Report
                 {
                     try
                     {
-                        var pngBytes = ImageConverterToPng.ConvertToPngFromUrl(webHostEnvironment, loc.AgentIdReport.FilePath);
+                        var pngBytes = ImageConverterToPng.ConvertToPngFromPath(webHostEnvironment, loc.AgentIdReport.FilePath);
                         rowBuilder.AddCell().AddParagraph().AddInlineImage(pngBytes)
                       .SetWidth(100);
                     }

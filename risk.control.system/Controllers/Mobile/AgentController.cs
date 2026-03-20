@@ -119,8 +119,9 @@ namespace risk.control.system.Controllers.Mobile
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred for {UserEmail}.", agentEmail);
-                return StatusCode(500, $"Error occurred getting PIN. {agentEmail}.");
+                var safeEmail = (agentEmail ?? string.Empty).Replace("\n", "").Replace("\r", "").Trim();
+                _logger.LogError(ex, "Error occurred for {UserEmail}.", safeEmail);
+                return StatusCode(500, $"Error occurred getting PIN. {safeEmail}.");
             }
         }
 
@@ -391,8 +392,9 @@ namespace risk.control.system.Controllers.Mobile
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred for {Agent}.", email);
-                return StatusCode(500, $"Error occurred for {email}");
+                var safeEmail = (email ?? string.Empty).Replace("\n", "").Replace("\r", "").Trim();
+                _logger.LogError(ex, "Error occurred for {Agent}.", safeEmail);
+                return StatusCode(500, $"Error occurred for {safeEmail}");
             }
         }
 
@@ -466,8 +468,9 @@ namespace risk.control.system.Controllers.Mobile
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred for {Email}.", email);
-                return StatusCode(500, $"Error occurred for {email}.");
+                var safeEmail = (email ?? string.Empty).Replace("\n", "").Replace("\r", "").Trim();
+                _logger.LogError(ex, "Error occurred for {Email}.", safeEmail);
+                return StatusCode(500, $"Error occurred for {safeEmail}.");
             }
         }
 
@@ -578,8 +581,9 @@ namespace risk.control.system.Controllers.Mobile
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred for {CaseId} for {Email}.", caseId, email);
-                return StatusCode(500, $"Error occurred for {caseId} for {email}.");
+                var safeEmail = (email ?? string.Empty).Replace("\n", "").Replace("\r", "").Trim();
+                _logger.LogError(ex, "Error occurred for {CaseId} for {Email}.", caseId, safeEmail);
+                return StatusCode(500, $"Error occurred for {caseId} for {safeEmail}.");
             }
         }
 
@@ -604,8 +608,9 @@ namespace risk.control.system.Controllers.Mobile
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred for {CaseId} for {Email}.", caseId, email);
-                return StatusCode(500, $"Error occurred for {caseId} for {email}.");
+                var safeEmail = (email ?? string.Empty).Replace("\n", "").Replace("\r", "").Trim();
+                _logger.LogError(ex, "Error occurred for {CaseId} for {Email}.", caseId, safeEmail);
+                return StatusCode(500, $"Error occurred for {caseId} for {safeEmail}.");
             }
         }
 
@@ -648,8 +653,9 @@ namespace risk.control.system.Controllers.Mobile
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred for {Email}.", data.Email);
-                return StatusCode(500, $"Error occurred for {data.Email}");
+                var safeEmail = (data.Email ?? string.Empty).Replace("\n", "").Replace("\r", "").Trim();
+                _logger.LogError(ex, "Error occurred for {Email}.", safeEmail);
+                return StatusCode(500, $"Error occurred for {safeEmail}");
             }
         }
 
@@ -682,8 +688,9 @@ namespace risk.control.system.Controllers.Mobile
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred for {Email}.", data.Email);
-                return StatusCode(500, $"Error occurred for {data.Email}");
+                var safeEmail = (data.Email ?? string.Empty).Replace("\n", "").Replace("\r", "").Trim();
+                _logger.LogError(ex, "Error occurred for {Email}.", safeEmail);
+                return StatusCode(500, $"Error occurred for {safeEmail}");
             }
         }
 
@@ -730,8 +737,9 @@ namespace risk.control.system.Controllers.Mobile
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred for {Email}.", data.Email);
-                return StatusCode(500, $"Error occurred for {data.Email}");
+                var safeEmail = (data.Email ?? string.Empty).Replace("\n", "").Replace("\r", "").Trim();
+                _logger.LogError(ex, "Error occurred for {Email}.", safeEmail);
+                return StatusCode(500, $"Error occurred for {safeEmail}");
             }
         }
 
@@ -768,8 +776,9 @@ namespace risk.control.system.Controllers.Mobile
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred for {Email}.", email);
-                return StatusCode(500, $"Error occurred for {email}");
+                var safeEmail = (email ?? string.Empty).Replace("\n", "").Replace("\r", "").Trim();
+                _logger.LogError(ex, "Error occurred for {Email}.", safeEmail);
+                return StatusCode(500, $"Error occurred for {safeEmail}");
             }
         }
 
@@ -810,8 +819,9 @@ namespace risk.control.system.Controllers.Mobile
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred for {Email}.", data.Email);
-                return StatusCode(500, $"Error occurred for {data.Email}.");
+                var safeEmail = (data.Email ?? string.Empty).Replace("\n", "").Replace("\r", "").Trim();
+                _logger.LogError(ex, "Error occurred for {Email}.", safeEmail);
+                return StatusCode(500, $"Error occurred for {safeEmail}.");
             }
         }
     }
