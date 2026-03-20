@@ -65,10 +65,27 @@ button.accept-policy {
 
 .brand-link .brand-image {
     width: 3rem;
+    background-color: #e9ecef;
+    animation: img-pulse 1.5s infinite ease-in-out;
+    opacity: .8
+}
+.brand-image.loaded {
+    animation: none;
+    background-color: transparent;
 }
 
-.brand-image {
-    opacity: .8
+@keyframes img-pulse {
+    0% {
+        opacity: 0.6;
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0.6;
+    }
 }
 
 .brand-text {
@@ -2652,6 +2669,27 @@ input#checkall {
     height: 60px !important;
     object-fit: cover;
     border: 3px solid #fff;
+    animation: profile-pulse 1.5s infinite ease-in-out;
+}
+
+    /* Stop the pulse and clear background once loaded */
+    .sidebar-profile.loaded {
+        animation: none;
+        background-color: transparent;
+    }
+
+@keyframes profile-pulse {
+    0% {
+        background-color: #f4f6f9;
+    }
+
+    50% {
+        background-color: #dee2e6;
+    }
+
+    100% {
+        background-color: #f4f6f9;
+    }
 }
 
 /* Username and email */
