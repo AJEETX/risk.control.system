@@ -39,6 +39,7 @@ namespace risk.control.system.Controllers.Tools
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Compare(FaceMatchData data)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);

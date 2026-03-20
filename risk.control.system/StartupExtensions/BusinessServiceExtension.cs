@@ -141,7 +141,6 @@ public static class BusinessServiceExtension
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<ICustomApiClient, CustomApiClient>();
         services.AddScoped<IAgencyService, AgencyService>();
-        services.AddScoped<IAgentSubmitCaseService, AgentSubmitCaseService>();
         services.AddScoped<IAmazonApiService, AmazonApiService>();
         services.AddScoped<ISmsService, SmsService>();
         services.AddScoped<IInvoiceService, InvoiceService>();

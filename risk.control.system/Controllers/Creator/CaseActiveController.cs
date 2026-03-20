@@ -61,6 +61,7 @@ namespace risk.control.system.Controllers.Creator
         public async Task<IActionResult> Active(string jobId = "")
         {
             var userEmail = HttpContext.User.Identity.Name;
+            jobId = jobId.Replace("\n", "").Replace("\r", "").Trim();
             try
             {
                 var pendingCount = await _caseActiveService.GetPendingUploadCount(userEmail);

@@ -80,17 +80,18 @@ $(document).ready(function () {
         }
 
         var formData = new FormData();
-        formData.append("Id", faceId);
+        //formData.append("Id", faceId);
         formData.append("Image", file);
-        formData.append("latitude", latitude);
-        formData.append("longitude", longitude);
-        formData.append("caseId", caseId);
-        formData.append("locationId", locationId);
+        //formData.append("Latitude", latitude);
+        //formData.append("Longitude", longitude);
+        formData.append("LocationLatLong", latitude + '/' + longitude);
+        formData.append("CaseId", caseId);
+        //formData.append("LocationId", locationId);
 
         var isAgent = button.data("isagent") === true || button.data("isagent") === "true";
-        formData.append("reportName", reportName);
-        formData.append("locationName", locationName);
-        formData.append("isAgent", isAgent);
+        formData.append("ReportName", reportName);
+        formData.append("LocationName", locationName);
+        formData.append("IsAgent", isAgent);
 
         // Get anti-forgery token
         var token = $('input[name="__RequestVerificationToken"]').val();
@@ -152,14 +153,15 @@ $(document).ready(function () {
         }
 
         var formData = new FormData();
-        formData.append("Id", docId);
+        //formData.append("Id", docId);
         formData.append("Image", file);
-        formData.append("latitude", latitude);
-        formData.append("longitude", longitude);
-        formData.append("caseId", caseId);
-        formData.append("locationId", locationId);
-        formData.append("reportName", reportName);
-        formData.append("locationName", locationName);
+        //formData.append("Latitude", latitude);
+        //formData.append("Longitude", longitude);
+        formData.append("CaseId", caseId);
+        //formData.append("LocationId", locationId);
+        formData.append("ReportName", reportName);
+        formData.append("LocationName", locationName);
+        formData.append("LocationLatLong", latitude + '/' + longitude);
         // Get anti-forgery token
         var token = $('input[name="__RequestVerificationToken"]').val();
         formData.append("__RequestVerificationToken", token);
@@ -215,13 +217,14 @@ $(document).ready(function () {
         }
 
         var formData = new FormData();
-        formData.append("Id", docId);
+        //formData.append("Id", docId);
         formData.append("Image", file);
-        formData.append("latitude", latitude);
-        formData.append("longitude", longitude);
+        //formData.append("latitude", latitude);
+        //formData.append("longitude", longitude);
         formData.append("caseId", caseId);
         formData.append("reportName", reportName);
         formData.append("locationName", locationName);
+        formData.append("LocationLatLong", latitude + '/' + longitude);
         // Get anti-forgery token
         var token = $('input[name="__RequestVerificationToken"]').val();
         formData.append("__RequestVerificationToken", token);
