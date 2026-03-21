@@ -40,7 +40,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
         [Breadcrumb("Agency Profile ", FromAction = nameof(Index))]
         public async Task<IActionResult> Profile()
         {
-            var userEmail = User.Identity?.Name;
+            var userEmail = User.Identity?.Name!;
             try
             {
                 var vendor = await _profileService.GetAgencyProfileAsync(userEmail);
@@ -62,7 +62,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
         [Breadcrumb("Edit Agency", FromAction = nameof(Profile))]
         public async Task<IActionResult> Edit()
         {
-            var userEmail = User.Identity?.Name;
+            var userEmail = User.Identity?.Name!;
             try
             {
                 var vendor = await _profileService.GetAgencyForEditAsync(userEmail);
@@ -84,7 +84,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(Vendor model)
         {
-            var userEmail = User.Identity?.Name;
+            var userEmail = User.Identity?.Name!;
             if (!ModelState.IsValid)
             {
                 await _profileService.LoadAgencyMetadataAsync(model, userEmail);

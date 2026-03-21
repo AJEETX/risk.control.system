@@ -18,7 +18,7 @@ namespace risk.control.system.Models
         protected IDbContextFactory<ApplicationDbContext> _contextFactory => services.GetRequiredService<IDbContextFactory<ApplicationDbContext>>();
         public DbSet<Audit> AuditLogs { get; set; }
 
-        public virtual async Task<int> SaveChangesAsync(string userId = null, bool notseed = true)
+        public virtual async Task<int> SaveChangesAsync(string? userId = null, bool notseed = true)
         {
             if (notseed)
             {
@@ -28,7 +28,7 @@ namespace risk.control.system.Models
             return result;
         }
 
-        private async Task OnBeforeSaveChanges(string userId)
+        private async Task OnBeforeSaveChanges(string? userId)
         {
             var userEmail = userId ?? httpContext?.HttpContext?.User?.Identity.Name;
             await using var _context = await _contextFactory.CreateDbContextAsync();

@@ -54,7 +54,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
         [Breadcrumb("Agents", FromAction = nameof(Allocate))]
         public async Task<IActionResult> SelectVendorAgent(long id)
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
             try
             {
                 if (!ModelState.IsValid || id < 1)
@@ -79,7 +79,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
         [Breadcrumb("Re-Allocate", FromAction = nameof(CaseReport))]
         public async Task<IActionResult> ReSelectVendorAgent(long id)
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
             try
             {
                 if (!ModelState.IsValid || id < 1)
@@ -109,7 +109,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
         [Breadcrumb("Submit", FromAction = nameof(CaseReport))]
         public async Task<IActionResult> GetInvestigateReport(long id)
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
             try
             {
                 if (!ModelState.IsValid || id < 1)
@@ -139,7 +139,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
         [Breadcrumb(title: "Details", FromAction = nameof(Allocate))]
         public async Task<IActionResult> CaseDetail(long id)
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
             try
             {
                 if (!ModelState.IsValid || id < 1)
@@ -162,7 +162,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
         [Breadcrumb(title: "Details", FromAction = nameof(Open))]
         public async Task<IActionResult> Detail(long id)
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
             try
             {
                 if (!ModelState.IsValid || id < 1)
@@ -191,7 +191,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
         [Breadcrumb("Details", FromAction = nameof(Completed))]
         public async Task<IActionResult> CompletedDetail(long id)
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
             if (!ModelState.IsValid || id < 1)
             {
                 _notifyService.Error("NOT FOUND !!!..");
@@ -214,7 +214,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
         [Breadcrumb("Reply Enquiry", FromAction = nameof(Allocate))]
         public async Task<IActionResult> ReplyEnquiry(long id)
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
 
             if (!ModelState.IsValid || id < 1)
             {
@@ -238,7 +238,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
                 }
                 var invoice = await _invoiceService.GetInvoice(id);
 
-                ViewData["BreadcrumbNode"] = _navigationService.GetInvoiceBreadcrumb(id, invoice.CaseId.Value, "VendorInvestigation", "VendorInvestigation", "Cases", "Approved", "Approved", "CompletedDetail");
+                ViewData["BreadcrumbNode"] = _navigationService.GetInvoiceBreadcrumb(id, invoice.CaseId!.Value, "VendorInvestigation", "VendorInvestigation", "Cases", "Approved", "Approved", "CompletedDetail");
 
                 return View(invoice);
             }

@@ -43,12 +43,11 @@ namespace risk.control.system.Services.Api
             try
             {
                 // 1. Get initial data (Vendor info & Feature flag)
-                ApplicationUser vendorUser;
+                ApplicationUser? vendorUser;
                 bool onboardingEnabled;
                 using (var context = await _contextFactory.CreateDbContextAsync())
                 {
-                    vendorUser = await context.ApplicationUser.AsNoTracking()
-                        .FirstOrDefaultAsync(c => c.Email == userEmail);
+                    vendorUser = await context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == userEmail);
                     onboardingEnabled = await featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED);
                 }
 
@@ -72,7 +71,7 @@ namespace risk.control.system.Services.Api
                 }
 
                 // 3. Fetch Case Task
-                InvestigationTask caseTask;
+                InvestigationTask? caseTask;
                 using (var context = await _contextFactory.CreateDbContextAsync())
                 {
                     caseTask = await context.Investigations.AsNoTracking()
@@ -87,9 +86,9 @@ namespace risk.control.system.Services.Api
                 // 4. External Service calls (Ensure these don't share the 'main' context)
                 var agentCaseCounts = await dashboardService.CalculateAgentCaseStatus(userEmail);
 
-                var IsUW = caseTask.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING;
-                string locationLat = IsUW ? caseTask.CustomerDetail.Latitude : caseTask.BeneficiaryDetail.Latitude;
-                string locationLng = IsUW ? caseTask.CustomerDetail.Longitude : caseTask.BeneficiaryDetail.Longitude;
+                var IsUW = caseTask.PolicyDetail!.InsuranceType == InsuranceType.UNDERWRITING;
+                string locationLat = IsUW ? caseTask.CustomerDetail!.Latitude! : caseTask.BeneficiaryDetail!.Latitude!;
+                string locationLng = IsUW ? caseTask.CustomerDetail!.Longitude! : caseTask.BeneficiaryDetail!.Longitude!;
 
                 var agentList = new ConcurrentBag<AgentData>();
 
@@ -101,8 +100,8 @@ namespace risk.control.system.Services.Api
                     // API calls are safe to parallelize as they don't use DbContext
                     var (distance, distanceInMetre, duration, durationInSec, map) =
                         await customApiClient.GetMap(
-                            double.Parse(agent.AddressLatitude),
-                            double.Parse(agent.AddressLongitude),
+                            double.Parse(agent.AddressLatitude!),
+                            double.Parse(agent.AddressLongitude!),
                             double.Parse(locationLat),
                             double.Parse(locationLng));
 
@@ -114,23 +113,23 @@ namespace risk.control.system.Services.Api
                         Id = agent.Id,
                         Photo = photo,
                         Name = $"{agent.FirstName} {agent.LastName}",
-                        Phone = $"(+{agent.Country.ISDCode}) {agent.PhoneNumber}",
-                        Addressline = $"{agent.Addressline}, {agent.District.Name}, {agent.State.Code}, {agent.Country.Code}",
+                        Phone = $"(+{agent.Country!.ISDCode}) {agent.PhoneNumber}",
+                        Addressline = $"{agent.Addressline}, {agent.District!.Name}, {agent.State!.Code}, {agent.Country.Code}",
                         Country = agent.Country.Code,
                         Flag = $"/flags/{agent.Country.Code.ToLower()}.png",
                         Active = agent.Active,
                         Count = claimCount,
-                        UpdateBy = agent.UpdatedBy,
+                        UpdateBy = agent.UpdatedBy ?? "",
                         AgentOnboarded = agent.Role != AppRoles.AGENT || !string.IsNullOrWhiteSpace(agent.MobileUId),
-                        RawEmail = agent.Email,
+                        RawEmail = agent.Email!,
                         PersonMapAddressUrl = string.Format(map, "300", "300"),
                         MapDetails = mapDetails,
-                        PinCode = agent.PinCode.Code,
+                        PinCode = agent.PinCode!.Code,
                         Distance = distance,
                         DistanceInMetres = distanceInMetre,
                         Duration = duration,
                         DurationInSeconds = durationInSec,
-                        AddressLocationInfo = IsUW ? caseTask.CustomerDetail.AddressLocationInfo : caseTask.BeneficiaryDetail.AddressLocationInfo
+                        AddressLocationInfo = IsUW ? caseTask.CustomerDetail!.AddressLocationInfo : caseTask.BeneficiaryDetail!.AddressLocationInfo
                     });
                 });
 

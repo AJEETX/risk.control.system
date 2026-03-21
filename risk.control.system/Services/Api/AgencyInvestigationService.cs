@@ -75,13 +75,13 @@ namespace risk.control.system.Services.Api
             if (!string.IsNullOrWhiteSpace(search))
             {
                 query = query.Where(a =>
-                    a.PolicyDetail.ContractNumber.Contains(search) ||
-                    a.ClientCompany.Name.Contains(search) ||
-                     (a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING ? a.CustomerDetail.Name.Contains(search) : a.BeneficiaryDetail.Name.Contains(search)) ||
-                     (a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING ? a.CustomerDetail.PinCode.Code.ToString().Contains(search) : a.BeneficiaryDetail.PinCode.ToString().Contains(search)) ||
-                     (a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING ? a.CustomerDetail.PinCode.Name.ToLower().ToString().Contains(search) : a.BeneficiaryDetail.PinCode.Name.ToLower().Contains(search)) ||
-                     (a.PolicyDetail.InvestigationServiceType.Name.Contains(search)) ||
-                    a.PolicyDetail.InsuranceType.GetEnumDisplayName().ToLower().Contains(search));
+                    a.PolicyDetail!.ContractNumber.Contains(search) ||
+                    a.ClientCompany!.Name.Contains(search) ||
+                     (a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING ? a.CustomerDetail!.Name.Contains(search) : a.BeneficiaryDetail!.Name.Contains(search)) ||
+                     (a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING ? a.CustomerDetail!.PinCode!.Code.ToString().Contains(search) : a.BeneficiaryDetail!.PinCode!.ToString().Contains(search)) ||
+                     (a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING ? a.CustomerDetail!.PinCode!.Name.ToLower().ToString().Contains(search) : a.BeneficiaryDetail!.PinCode!.Name.ToLower().Contains(search)) ||
+                     (a.PolicyDetail.InvestigationServiceType!.Name.Contains(search)) ||
+                    a.PolicyDetail.InsuranceType!.GetEnumDisplayName().ToLower().Contains(search));
             }
 
             int recordsFiltered = await query.CountAsync();
@@ -93,26 +93,26 @@ namespace risk.control.system.Services.Api
 
             query = orderColumn switch
             {
-                1 => asc ? query.OrderBy(x => x.PolicyDetail.ContractNumber) : query.OrderByDescending(x => x.PolicyDetail.ContractNumber),
-                2 => asc ? query.OrderBy(x => (double)x.PolicyDetail.SumAssuredValue)
-                         : query.OrderByDescending(x => (double)x.PolicyDetail.SumAssuredValue),
-                3 => asc ? query.OrderBy(x => x.ClientCompany.Name)
-                         : query.OrderByDescending(x => x.ClientCompany.Name),
-                4 => asc ? query.OrderBy(x => (x.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING) ? x.CustomerDetail.PinCode.Code : x.BeneficiaryDetail.PinCode.Code)
-                            : query.OrderByDescending(x => (x.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING) ? x.CustomerDetail.PinCode.Code : x.BeneficiaryDetail.PinCode.Code),
+                1 => asc ? query.OrderBy(x => x.PolicyDetail!.ContractNumber) : query.OrderByDescending(x => x.PolicyDetail!.ContractNumber),
+                2 => asc ? query.OrderBy(x => (double)x.PolicyDetail!.SumAssuredValue)
+                         : query.OrderByDescending(x => (double)x.PolicyDetail!.SumAssuredValue),
+                3 => asc ? query.OrderBy(x => x.ClientCompany!.Name)
+                         : query.OrderByDescending(x => x.ClientCompany!.Name),
+                4 => asc ? query.OrderBy(x => (x.PolicyDetail!.InsuranceType == InsuranceType.UNDERWRITING) ? x.CustomerDetail!.PinCode!.Code : x.BeneficiaryDetail!.PinCode!.Code)
+                            : query.OrderByDescending(x => (x.PolicyDetail!.InsuranceType == InsuranceType.UNDERWRITING) ? x.CustomerDetail!.PinCode!.Code : x.BeneficiaryDetail!.PinCode!.Code),
                 7 => asc
                         ? query.OrderBy(x =>
-                            x.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING
-                                ? x.CustomerDetail.Name
-                                : x.BeneficiaryDetail.Name)
+                            x.PolicyDetail!.InsuranceType == InsuranceType.UNDERWRITING
+                                ? x.CustomerDetail!.Name
+                                : x.BeneficiaryDetail!.Name)
                         : query.OrderByDescending(x =>
-                            x.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING
-                                ? x.CustomerDetail.PinCode.Code
-                                : x.BeneficiaryDetail.PinCode.Code),
-                8 => asc ? query.OrderBy(x => x.PolicyDetail.InsuranceType.GetEnumDisplayName())
-                                                         : query.OrderByDescending(x => x.PolicyDetail.InsuranceType.GetEnumDisplayName()),
-                9 => asc ? query.OrderBy(x => x.PolicyDetail.InvestigationServiceType.Name)
-                                         : query.OrderByDescending(x => x.PolicyDetail.InvestigationServiceType.Name),
+                            x.PolicyDetail!.InsuranceType == InsuranceType.UNDERWRITING
+                                ? x.CustomerDetail!.PinCode!.Code
+                                : x.BeneficiaryDetail!.PinCode!.Code),
+                8 => asc ? query.OrderBy(x => x.PolicyDetail!.InsuranceType!.GetEnumDisplayName())
+                                                         : query.OrderByDescending(x => x.PolicyDetail!.InsuranceType!.GetEnumDisplayName()),
+                9 => asc ? query.OrderBy(x => x.PolicyDetail!.InvestigationServiceType!.Name)
+                                         : query.OrderByDescending(x => x.PolicyDetail!.InvestigationServiceType!.Name),
                 11 => asc ? query.OrderBy(x => x.Created)
                 : query.OrderByDescending(x => x.Created),
                 12 => asc
@@ -121,14 +121,14 @@ namespace risk.control.system.Services.Api
                                 ? a.AllocatedToAgencyTime
                                 : a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR
                                     ? a.ReviewByAssessorTime
-                                    : a.Created)
+                                    : a.Updated)
                         : query.OrderByDescending(a =>
                             a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR
                                 ? a.AllocatedToAgencyTime
                                 : a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR
                                     ? a.ReviewByAssessorTime
-                                    : a.Created),
-                _ => query.OrderByDescending(x => x.Created)
+                                    : a.Updated),
+                _ => query.OrderByDescending(x => x.Updated)
             };
 
             var pagedRawData = await query
@@ -138,10 +138,10 @@ namespace risk.control.system.Services.Api
                 {
                     investigation = a,
                     a.Id,
-                    policyId = a.PolicyDetail.ContractNumber,
+                    policyId = a.PolicyDetail!.ContractNumber,
                     PolicyNum = a.GetPolicyNum(a.PolicyDetail.ContractNumber),
                     InsuranceType = a.PolicyDetail.InsuranceType,
-                    ServiceTypeName = a.PolicyDetail.InvestigationServiceType.Name,
+                    ServiceTypeName = a.PolicyDetail!.InvestigationServiceType!.Name,
                     ContractNumber = a.PolicyDetail.ContractNumber,
                     PolicyDocumentPath = a.PolicyDetail.DocumentPath,
                     SumAssuredValue = a.PolicyDetail.SumAssuredValue,
@@ -158,26 +158,26 @@ namespace risk.control.system.Services.Api
                     a.ReviewByAssessorTime,
                     CustomerName = a.CustomerDetail != null ? a.CustomerDetail.Name : null,
                     customerImagePath = a.CustomerDetail != null ? a.CustomerDetail.ImagePath : Applicationsettings.NO_USER,
-                    CustomerLocationMap = a.CustomerDetail.CustomerLocationMap,
+                    CustomerLocationMap = a.CustomerDetail!.CustomerLocationMap,
                     CustomerDetailAddressLocationInfo = a.CustomerDetail.AddressLocationInfo,
                     customerAddressline = a.CustomerDetail != null ? a.CustomerDetail.Addressline : string.Empty,
-                    customerDistrict = a.CustomerDetail != null ? a.CustomerDetail.District.Name : string.Empty,
-                    customerState = a.CustomerDetail != null ? a.CustomerDetail.State.Name : string.Empty,
-                    customerPincode = a.CustomerDetail != null ? a.CustomerDetail.PinCode.Code : 0,
-                    CustomerDetailLatitude = a.CustomerDetail.Latitude,
+                    customerDistrict = a.CustomerDetail != null ? a.CustomerDetail.District!.Name : string.Empty,
+                    customerState = a.CustomerDetail != null ? a.CustomerDetail.State!.Name : string.Empty,
+                    customerPincode = a.CustomerDetail != null ? a.CustomerDetail!.PinCode!.Code : 0,
+                    CustomerDetailLatitude = a.CustomerDetail!.Latitude,
                     CustomerDetailLongitude = a.CustomerDetail.Longitude,
                     BeneficiaryName = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.Name : null,
                     beneficiaryImagePath = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.ImagePath : Applicationsettings.NO_USER,
-                    BeneficiaryLocationMap = a.BeneficiaryDetail.BeneficiaryLocationMap,
+                    BeneficiaryLocationMap = a.BeneficiaryDetail!.BeneficiaryLocationMap,
                     beneficiaryAddressline = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.Addressline : string.Empty,
-                    beneficiaryDistrict = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.District.Name : string.Empty,
-                    beneficiaryState = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.State.Name : string.Empty,
-                    beneficiaryPincode = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.PinCode.Code : 0,
-                    BeneficiaryDetailLatitude = a.BeneficiaryDetail.Latitude,
+                    beneficiaryDistrict = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.District!.Name : string.Empty,
+                    beneficiaryState = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.State!.Name : string.Empty,
+                    beneficiaryPincode = a.BeneficiaryDetail != null ? a.BeneficiaryDetail!.PinCode!.Code : 0,
+                    BeneficiaryDetailLatitude = a.BeneficiaryDetail!.Latitude,
                     BeneficiaryDetailLongitude = a.BeneficiaryDetail.Longitude,
                     BeneficiaryAddressLocationInfo = a.BeneficiaryDetail.AddressLocationInfo,
                     a.AllocatedToAgencyTime,
-                    ClientCompanyDocumentUrl = a.ClientCompany.DocumentUrl,
+                    ClientCompanyDocumentUrl = a.ClientCompany!.DocumentUrl,
                     ClientCompanyName = a.ClientCompany.Name,
                     GetTimeElapsed = DateTime.UtcNow.Subtract(
                         (a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR && a.AllocatedToAgencyTime.HasValue) ?
@@ -192,14 +192,14 @@ namespace risk.control.system.Services.Api
             var finalDataTasks = pagedRawData.Select(async a =>
             {
                 var isUW = a.InsuranceType == InsuranceType.UNDERWRITING;
-                var culture = CustomExtensions.GetCultureByCountry(vendorUser.Country.Code);
+                var culture = CustomExtensions.GetCultureByCountry(vendorUser.Country!.Code);
                 var pincode = isUW ? a.customerPincode : a.beneficiaryPincode;
                 var customerAddress = a.customerAddressline + ',' + a.customerDistrict + ',' + a.customerState;
                 var beneficiaryAddress = a.beneficiaryAddressline + ',' + a.beneficiaryDistrict + ',' + a.beneficiaryState;
                 var pincodeName = isUW ? customerAddress : beneficiaryAddress;
                 var personName = isUW ? a.CustomerName : a.BeneficiaryName;
-                var policy = a.InsuranceType.GetEnumDisplayName();
-                var serviceType = a.InsuranceType.GetEnumDisplayName();
+                var policy = a.InsuranceType!.GetEnumDisplayName();
+                var serviceType = a.InsuranceType!.GetEnumDisplayName();
                 var service = a.ServiceTypeName;
                 var timePending = GetSupervisorNewTimePending(a.investigation);
                 var beneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryName) ?
@@ -208,15 +208,15 @@ namespace risk.control.system.Services.Api
                 //var timeElapsed = (!isQueryCase && a.AllocatedToAgencyTime.HasValue) ? DateTime.UtcNow.Subtract(a.AllocatedToAgencyTime.Value).TotalSeconds :
                 //    DateTime.UtcNow.Subtract(a.ReviewByAssessorTime.Value).TotalSeconds;
                 var personMapAddressUrl = isUW ?
-                        string.Format(a.CustomerLocationMap, "400", "400") : string.Format(a.BeneficiaryLocationMap, "400", "400");
+                        string.Format(a.CustomerLocationMap!, "400", "400") : string.Format(a.BeneficiaryLocationMap!, "400", "400");
                 var addressLocationInfoTask = isUW ?
-                    weatherInfoService.GetWeatherAsync(a.CustomerDetailLatitude, a.CustomerDetailLongitude) :
-                        weatherInfoService.GetWeatherAsync(a.BeneficiaryDetailLatitude, a.BeneficiaryDetailLongitude);
+                    weatherInfoService.GetWeatherAsync(a.CustomerDetailLatitude!, a.CustomerDetailLongitude!) :
+                        weatherInfoService.GetWeatherAsync(a.BeneficiaryDetailLatitude!, a.BeneficiaryDetailLongitude!);
 
-                var ownerDetailTask = base64FileService.GetBase64FileAsync(a.ClientCompanyDocumentUrl);
-                var documentTask = base64FileService.GetBase64FileAsync(a.PolicyDocumentPath, Applicationsettings.NO_POLICY_IMAGE);
-                var customerPhotoTask = base64FileService.GetBase64FileAsync(isUW ? a.customerImagePath : a.beneficiaryImagePath);
-                var beneficiaryPhotoTask = base64FileService.GetBase64FileAsync(a.beneficiaryImagePath, Applicationsettings.NO_USER);
+                var ownerDetailTask = base64FileService.GetBase64FileAsync(a.ClientCompanyDocumentUrl!);
+                var documentTask = base64FileService.GetBase64FileAsync(a.PolicyDocumentPath!, Applicationsettings.NO_POLICY_IMAGE);
+                var customerPhotoTask = base64FileService.GetBase64FileAsync(isUW ? a.customerImagePath! : a.beneficiaryImagePath!);
+                var beneficiaryPhotoTask = base64FileService.GetBase64FileAsync(a.beneficiaryImagePath!, Applicationsettings.NO_USER);
 
                 // Wait for all images for THIS case to load
                 await Task.WhenAll(ownerDetailTask, documentTask, customerPhotoTask, beneficiaryPhotoTask, addressLocationInfoTask);
@@ -234,7 +234,7 @@ namespace risk.control.system.Services.Api
                     AssignedToAgency = a.AssignedToAgency,
                     Document = await documentTask,
                     Customer = await customerPhotoTask,
-                    Name = personName,
+                    Name = personName!,
                     Policy = policy,
                     Status = a.Status,
                     ServiceType = serviceType,
@@ -253,12 +253,7 @@ namespace risk.control.system.Services.Api
             });
 
             var finalData = (await Task.WhenAll(finalDataTasks));
-            //if (orderColumn == 12)
-            //{
-            //    finalData = asc
-            //        ? finalData.OrderBy(x => x.TimeElapsed).ToArray()
-            //        : finalData.OrderByDescending(x => x.TimeElapsed).ToArray();
-            //}
+
             // -----------------------------
             // MARK VIEWED (BULK UPDATE)
             // -----------------------------
@@ -324,13 +319,13 @@ namespace risk.control.system.Services.Api
                 search = search.Trim();
 
                 query = query.Where(a =>
-                    a.PolicyDetail.ContractNumber.Contains(search) ||
-                    (a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING ? a.CustomerDetail.Name.Contains(search) : a.BeneficiaryDetail.Name.Contains(search)) ||
-                     (a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING ? a.CustomerDetail.PinCode.Code.ToString().Contains(search) : a.BeneficiaryDetail.PinCode.ToString().Contains(search)) ||
-                     (a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING ? a.CustomerDetail.PinCode.Name.ToLower().ToString().Contains(search) : a.BeneficiaryDetail.PinCode.Name.ToLower().Contains(search)) ||
-                    a.ClientCompany.Name.Contains(search) ||
-                    a.PolicyDetail.InsuranceType.GetEnumDisplayName().Contains(search) ||
-                    a.PolicyDetail.InvestigationServiceType.Name.Contains(search)
+                    a.PolicyDetail!.ContractNumber.Contains(search) ||
+                    (a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING ? a.CustomerDetail!.Name.Contains(search) : a.BeneficiaryDetail!.Name.Contains(search)) ||
+                     (a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING ? a.CustomerDetail!.PinCode!.Code.ToString().Contains(search) : a.BeneficiaryDetail!.PinCode!.ToString().Contains(search)) ||
+                     (a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING ? a.CustomerDetail!.PinCode!.Name.ToLower().ToString().Contains(search) : a.BeneficiaryDetail!.PinCode!.Name.ToLower().Contains(search)) ||
+                    a.ClientCompany!.Name.Contains(search) ||
+                    a.PolicyDetail.InsuranceType!.GetEnumDisplayName().Contains(search) ||
+                    a.PolicyDetail.InvestigationServiceType!.Name.Contains(search)
                 );
             }
             int recordsFiltered = await query.CountAsync();
@@ -338,15 +333,15 @@ namespace risk.control.system.Services.Api
             bool asc = orderDir == "asc";
             query = orderColumn switch
             {
-                1 => asc ? query.OrderBy(x => x.PolicyDetail.SumAssuredValue) : query.OrderByDescending(x => x.PolicyDetail.SumAssuredValue),
+                1 => asc ? query.OrderBy(x => x.PolicyDetail!.SumAssuredValue) : query.OrderByDescending(x => x.PolicyDetail!.SumAssuredValue),
 
                 2 => asc
-                    ? query.OrderBy(x => x.CustomerDetail.Name)
-                    : query.OrderByDescending(x => x.CustomerDetail.Name),
+                    ? query.OrderBy(x => x.CustomerDetail!.Name)
+                    : query.OrderByDescending(x => x.CustomerDetail!.Name),
 
                 3 => asc
-                    ? query.OrderBy(x => x.ClientCompany.Name)
-                    : query.OrderByDescending(x => x.ClientCompany.Name),
+                    ? query.OrderBy(x => x.ClientCompany!.Name)
+                    : query.OrderByDescending(x => x.ClientCompany!.Name),
                 4 => asc
                         ? query.OrderBy(x => x.SelectedAgentDrivingDistance)
                         : query.OrderByDescending(x => x.SelectedAgentDrivingDistance),
@@ -355,15 +350,15 @@ namespace risk.control.system.Services.Api
                 : query.OrderByDescending(x => x.SelectedAgentDrivingDuration),
 
                 8 => asc
-                ? query.OrderBy(x => x.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING ? x.CustomerDetail.Name : x.BeneficiaryDetail.Name)
-                : query.OrderByDescending(x => x.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING ? x.BeneficiaryDetail.Name : x.CustomerDetail.Name),
+                ? query.OrderBy(x => x.PolicyDetail!.InsuranceType == InsuranceType.UNDERWRITING ? x.CustomerDetail!.Name : x.BeneficiaryDetail!.Name)
+                : query.OrderByDescending(x => x.PolicyDetail!.InsuranceType == InsuranceType.UNDERWRITING ? x.BeneficiaryDetail!.Name : x.CustomerDetail!.Name),
 
                 9 => asc
-                ? query.OrderBy(x => x.PolicyDetail.InsuranceType)
-                : query.OrderByDescending(x => x.PolicyDetail.InsuranceType),
+                ? query.OrderBy(x => x.PolicyDetail!.InsuranceType)
+                : query.OrderByDescending(x => x.PolicyDetail!.InsuranceType),
                 10 => asc
-                ? query.OrderBy(x => x.PolicyDetail.InvestigationServiceType.Name)
-                : query.OrderByDescending(x => x.PolicyDetail.InvestigationServiceType.Name),
+                ? query.OrderBy(x => x.PolicyDetail!.InvestigationServiceType!.Name)
+                : query.OrderByDescending(x => x.PolicyDetail!.InvestigationServiceType!.Name),
                 11 => asc
                 ? query.OrderBy(x => x.Created)
                 : query.OrderByDescending(x => x.Created),
@@ -372,14 +367,14 @@ namespace risk.control.system.Services.Api
                     x.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT ? x.TaskToAgentTime :
                     x.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR ? x.SubmittedToAssessorTime :
                     x.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR ? x.EnquiryReplyByAgencyTime :
-                    x.Created)  // fallback
+                    x.Updated)  // fallback
                 : query.OrderByDescending(x =>
                     x.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT ? x.TaskToAgentTime :
                     x.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR ? x.SubmittedToAssessorTime :
                     x.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR ? x.EnquiryReplyByAgencyTime :
-                    x.Created),  // fallback,
+                    x.Updated),  // fallback,
 
-                _ => query.OrderByDescending(x => x.Created)
+                _ => query.OrderByDescending(x => x.Updated)
             };
 
             var pagedRawData = await query
@@ -389,10 +384,10 @@ namespace risk.control.system.Services.Api
                 {
                     investigation = a,
                     a.Id,
-                    policyId = a.PolicyDetail.ContractNumber,
+                    policyId = a.PolicyDetail!.ContractNumber,
                     PolicyNum = a.GetPolicyNum(a.PolicyDetail.ContractNumber),
                     InsuranceType = a.PolicyDetail.InsuranceType,
-                    ServiceTypeName = a.PolicyDetail.InvestigationServiceType.Name,
+                    ServiceTypeName = a.PolicyDetail.InvestigationServiceType!.Name,
                     ContractNumber = a.PolicyDetail.ContractNumber,
                     PolicyDocumentPath = a.PolicyDetail.DocumentPath,
                     SumAssuredValue = a.PolicyDetail.SumAssuredValue,
@@ -409,26 +404,26 @@ namespace risk.control.system.Services.Api
                     a.AssignedToAgency,
                     CustomerName = a.CustomerDetail != null ? a.CustomerDetail.Name : null,
                     customerImagePath = a.CustomerDetail != null ? a.CustomerDetail.ImagePath : Applicationsettings.NO_USER,
-                    CustomerLocationMap = a.CustomerDetail.CustomerLocationMap,
+                    CustomerLocationMap = a.CustomerDetail!.CustomerLocationMap,
                     CustomerDetailAddressLocationInfo = a.CustomerDetail.AddressLocationInfo,
                     customerAddressline = a.CustomerDetail != null ? a.CustomerDetail.Addressline : string.Empty,
-                    customerDistrict = a.CustomerDetail != null ? a.CustomerDetail.District.Name : string.Empty,
-                    customerState = a.CustomerDetail != null ? a.CustomerDetail.State.Name : string.Empty,
-                    customerPincode = a.CustomerDetail != null ? a.CustomerDetail.PinCode.Code : 0,
-                    CustomerDetailLatitude = a.CustomerDetail.Latitude,
+                    customerDistrict = a.CustomerDetail != null ? a.CustomerDetail.District!.Name : string.Empty,
+                    customerState = a.CustomerDetail != null ? a.CustomerDetail.State!.Name : string.Empty,
+                    customerPincode = a.CustomerDetail != null ? a.CustomerDetail!.PinCode!.Code : 0,
+                    CustomerDetailLatitude = a.CustomerDetail!.Latitude,
                     CustomerDetailLongitude = a.CustomerDetail.Longitude,
                     BeneficiaryName = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.Name : null,
                     beneficiaryImagePath = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.ImagePath : Applicationsettings.NO_USER,
-                    BeneficiaryLocationMap = a.BeneficiaryDetail.BeneficiaryLocationMap,
+                    BeneficiaryLocationMap = a.BeneficiaryDetail!.BeneficiaryLocationMap,
                     beneficiaryAddressline = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.Addressline : string.Empty,
-                    beneficiaryDistrict = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.District.Name : string.Empty,
-                    beneficiaryState = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.State.Name : string.Empty,
-                    beneficiaryPincode = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.PinCode.Code : 0,
-                    BeneficiaryDetailLatitude = a.BeneficiaryDetail.Latitude,
+                    beneficiaryDistrict = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.District!.Name : string.Empty,
+                    beneficiaryState = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.State!.Name : string.Empty,
+                    beneficiaryPincode = a.BeneficiaryDetail != null ? a.BeneficiaryDetail!.PinCode!.Code : 0,
+                    BeneficiaryDetailLatitude = a.BeneficiaryDetail!.Latitude,
                     BeneficiaryDetailLongitude = a.BeneficiaryDetail.Longitude,
                     BeneficiaryAddressLocationInfo = a.BeneficiaryDetail.AddressLocationInfo,
                     a.AllocatedToAgencyTime,
-                    ClientCompanyDocumentUrl = a.ClientCompany.DocumentUrl,
+                    ClientCompanyDocumentUrl = a.ClientCompany!.DocumentUrl,
                     ClientCompanyName = a.ClientCompany.Name,
                     a.SelectedAgentDrivingMap,
                     a.SelectedAgentDrivingDistance,
@@ -441,17 +436,17 @@ namespace risk.control.system.Services.Api
             var finalDataTasks = pagedRawData.Select(async a =>
             {
                 var isUW = a.InsuranceType == InsuranceType.UNDERWRITING;
-                var culture = CustomExtensions.GetCultureByCountry(vendorUser.Country.Code);
+                var culture = CustomExtensions.GetCultureByCountry(vendorUser.Country!.Code);
                 var pincode = isUW ? a.customerPincode : a.beneficiaryPincode;
                 var customerAddress = a.customerAddressline + ',' + a.customerDistrict + ',' + a.customerState;
                 var beneficiaryAddress = a.beneficiaryAddressline + ',' + a.beneficiaryDistrict + ',' + a.beneficiaryState;
                 var pincodeName = isUW ? customerAddress : beneficiaryAddress;
-                var policy = $"<span class='badge badge-light'>{a.InsuranceType.GetEnumDisplayName()}</span>";
+                var policy = $"<span class='badge badge-light'>{a.InsuranceType!.GetEnumDisplayName()}</span>";
                 var beneficiaryName = a.BeneficiaryName;
 
-                var documentTask = base64FileService.GetBase64FileAsync(a.PolicyDocumentPath, Applicationsettings.NO_POLICY_IMAGE);
-                var customerPhotoTask = base64FileService.GetBase64FileAsync(isUW ? a.customerImagePath : a.beneficiaryImagePath);
-                var beneficiaryPhotoTask = base64FileService.GetBase64FileAsync(a.beneficiaryImagePath, Applicationsettings.NO_USER);
+                var documentTask = base64FileService.GetBase64FileAsync(a.PolicyDocumentPath!, Applicationsettings.NO_POLICY_IMAGE);
+                var customerPhotoTask = base64FileService.GetBase64FileAsync(isUW ? a.customerImagePath! : a.beneficiaryImagePath!);
+                var beneficiaryPhotoTask = base64FileService.GetBase64FileAsync(a.beneficiaryImagePath!, Applicationsettings.NO_USER);
                 var ownerImageTask = base64FileService.GetBase64FileAsync(await GetOwner(a.investigation), Applicationsettings.NO_USER);
                 var ownerEmailTask = GetOwnerEmail(a.investigation);
 
@@ -472,18 +467,18 @@ namespace risk.control.system.Services.Api
                     Company = a.ClientCompanyName,
                     Document = await documentTask,
                     Customer = await customerPhotoTask,
-                    Name = a.CustomerName,
+                    Name = a.CustomerName!,
                     Policy = policy,
                     Status = a.Status,
-                    ServiceType = a.InsuranceType.GetEnumDisplayName(),
+                    ServiceType = a.InsuranceType!.GetEnumDisplayName(),
                     Service = a.ServiceTypeName,
                     Location = a.SubStatus,
                     Created = a.Created.ToString("dd-MM-yyyy"),
                     timePending = GetSupervisorOpenTimePending(a.investigation),
                     TimeElapsed = GetTimeElapsed(a.investigation),
                     BeneficiaryPhoto = await beneficiaryPhotoTask,
-                    BeneficiaryName = beneficiaryName,
-                    PersonMapAddressUrl = string.Format(a.SelectedAgentDrivingMap, "300", "300"),
+                    BeneficiaryName = beneficiaryName!,
+                    PersonMapAddressUrl = string.Format(a.SelectedAgentDrivingMap!, "300", "300"),
                     Distance = a.SelectedAgentDrivingDistance,
                     Duration = a.SelectedAgentDrivingDuration
                 };
@@ -520,11 +515,11 @@ namespace risk.control.system.Services.Api
         private static double GetTimeElapsed(InvestigationTask caseTask)
         {
             var timeElapsed = DateTime.UtcNow.Subtract(caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT ?
-                caseTask.TaskToAgentTime.Value :
+                caseTask.TaskToAgentTime!.Value :
                                                      caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR ?
-                                                     caseTask.SubmittedToAssessorTime.Value :
+                                                     caseTask.SubmittedToAssessorTime!.Value :
                                                      caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR ?
-                                                     caseTask.EnquiryReplyByAgencyTime.Value : caseTask.Created).TotalSeconds;
+                                                     caseTask.EnquiryReplyByAgencyTime!.Value : caseTask.Created).TotalSeconds;
             return timeElapsed;
         }
 
@@ -563,13 +558,13 @@ namespace risk.control.system.Services.Api
             if (!string.IsNullOrWhiteSpace(search))
             {
                 query = query.Where(a =>
-                    a.PolicyDetail.ContractNumber.Contains(search) ||
-                    a.ClientCompany.Name.Contains(search) ||
-                     (a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING ? a.CustomerDetail.Name.Contains(search) : a.BeneficiaryDetail.Name.Contains(search)) ||
-                     (a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING ? a.CustomerDetail.PinCode.Code.ToString().Contains(search) : a.BeneficiaryDetail.PinCode.ToString().Contains(search)) ||
-                     (a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING ? a.CustomerDetail.PinCode.Name.ToLower().ToString().Contains(search) : a.BeneficiaryDetail.PinCode.Name.ToLower().Contains(search)) ||
-                     (a.PolicyDetail.InvestigationServiceType.Name.Contains(search)) ||
-                    a.PolicyDetail.InsuranceType.GetEnumDisplayName().ToLower().Contains(search));
+                    a.PolicyDetail!.ContractNumber.Contains(search) ||
+                    a.ClientCompany!.Name.Contains(search) ||
+                     (a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING ? a.CustomerDetail!.Name.Contains(search) : a.BeneficiaryDetail!.Name.Contains(search)) ||
+                     (a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING ? a.CustomerDetail!.PinCode!.Code.ToString().Contains(search) : a.BeneficiaryDetail!.PinCode!.ToString().Contains(search)) ||
+                     (a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING ? a.CustomerDetail!.PinCode!.Name.ToLower().ToString().Contains(search) : a.BeneficiaryDetail!.PinCode!.Name.ToLower().Contains(search)) ||
+                     (a.PolicyDetail.InvestigationServiceType!.Name.Contains(search)) ||
+                    a.PolicyDetail.InsuranceType!.GetEnumDisplayName().ToLower().Contains(search));
             }
 
             int recordsFiltered = await query.CountAsync();
@@ -577,26 +572,26 @@ namespace risk.control.system.Services.Api
 
             query = orderColumn switch
             {
-                1 => asc ? query.OrderBy(x => x.PolicyDetail.ContractNumber) : query.OrderByDescending(x => x.PolicyDetail.ContractNumber),
-                2 => asc ? query.OrderBy(x => (double)x.PolicyDetail.SumAssuredValue)
-                         : query.OrderByDescending(x => (double)x.PolicyDetail.SumAssuredValue),
-                3 => asc ? query.OrderBy(x => x.ClientCompany.Name)
-                         : query.OrderByDescending(x => x.ClientCompany.Name),
-                4 => asc ? query.OrderBy(x => (x.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING) ? x.CustomerDetail.PinCode.Code : x.BeneficiaryDetail.PinCode.Code)
-                            : query.OrderByDescending(x => (x.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING) ? x.CustomerDetail.PinCode.Code : x.BeneficiaryDetail.PinCode.Code),
+                1 => asc ? query.OrderBy(x => x.PolicyDetail!.ContractNumber) : query.OrderByDescending(x => x.PolicyDetail!.ContractNumber),
+                2 => asc ? query.OrderBy(x => (double)x.PolicyDetail!.SumAssuredValue)
+                         : query.OrderByDescending(x => (double)x.PolicyDetail!.SumAssuredValue),
+                3 => asc ? query.OrderBy(x => x.ClientCompany!.Name)
+                         : query.OrderByDescending(x => x.ClientCompany!.Name),
+                4 => asc ? query.OrderBy(x => (x.PolicyDetail!.InsuranceType == InsuranceType.UNDERWRITING) ? x.CustomerDetail!.PinCode!.Code : x.BeneficiaryDetail!.PinCode!.Code)
+                            : query.OrderByDescending(x => (x.PolicyDetail!.InsuranceType == InsuranceType.UNDERWRITING) ? x.CustomerDetail!.PinCode!.Code : x.BeneficiaryDetail!.PinCode!.Code),
                 7 => asc
                         ? query.OrderBy(x =>
-                            x.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING
-                                ? x.CustomerDetail.Name
-                                : x.BeneficiaryDetail.Name)
+                            x.PolicyDetail!.InsuranceType == InsuranceType.UNDERWRITING
+                                ? x.CustomerDetail!.Name
+                                : x.BeneficiaryDetail!.Name)
                         : query.OrderByDescending(x =>
-                            x.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING
-                                ? x.CustomerDetail.PinCode.Code
-                                : x.BeneficiaryDetail.PinCode.Code),
-                8 => asc ? query.OrderBy(x => x.PolicyDetail.InsuranceType.GetEnumDisplayName())
-                                                         : query.OrderByDescending(x => x.PolicyDetail.InsuranceType.GetEnumDisplayName()),
-                9 => asc ? query.OrderBy(x => x.PolicyDetail.InvestigationServiceType.Name)
-                                         : query.OrderByDescending(x => x.PolicyDetail.InvestigationServiceType.Name),
+                            x.PolicyDetail!.InsuranceType == InsuranceType.UNDERWRITING
+                                ? x.CustomerDetail!.PinCode!.Code
+                                : x.BeneficiaryDetail!.PinCode!.Code),
+                8 => asc ? query.OrderBy(x => x.PolicyDetail!.InsuranceType!.GetEnumDisplayName())
+                                                         : query.OrderByDescending(x => x.PolicyDetail!.InsuranceType!.GetEnumDisplayName()),
+                9 => asc ? query.OrderBy(x => x.PolicyDetail!.InvestigationServiceType!.Name)
+                                         : query.OrderByDescending(x => x.PolicyDetail!.InvestigationServiceType!.Name),
                 10 => asc ? query.OrderBy(x => x.Created)
                 : query.OrderByDescending(x => x.Created),
                 11 => asc
@@ -614,10 +609,10 @@ namespace risk.control.system.Services.Api
                 {
                     investigation = a,
                     a.Id,
-                    policyId = a.PolicyDetail.ContractNumber,
+                    policyId = a.PolicyDetail!.ContractNumber,
                     PolicyNum = a.GetPolicyNum(a.PolicyDetail.ContractNumber),
                     InsuranceType = a.PolicyDetail.InsuranceType,
-                    ServiceTypeName = a.PolicyDetail.InvestigationServiceType.Name,
+                    ServiceTypeName = a.PolicyDetail.InvestigationServiceType!.Name,
                     ContractNumber = a.PolicyDetail.ContractNumber,
                     PolicyDocumentPath = a.PolicyDetail.DocumentPath,
                     SumAssuredValue = a.PolicyDetail.SumAssuredValue,
@@ -634,26 +629,26 @@ namespace risk.control.system.Services.Api
                     a.ProcessedByAssessorTime,
                     CustomerName = a.CustomerDetail != null ? a.CustomerDetail.Name : null,
                     customerImagePath = a.CustomerDetail != null ? a.CustomerDetail.ImagePath : Applicationsettings.NO_USER,
-                    CustomerLocationMap = a.CustomerDetail.CustomerLocationMap,
+                    CustomerLocationMap = a.CustomerDetail!.CustomerLocationMap,
                     CustomerDetailAddressLocationInfo = a.CustomerDetail.AddressLocationInfo,
                     customerAddressline = a.CustomerDetail != null ? a.CustomerDetail.Addressline : string.Empty,
-                    customerDistrict = a.CustomerDetail != null ? a.CustomerDetail.District.Name : string.Empty,
-                    customerState = a.CustomerDetail != null ? a.CustomerDetail.State.Name : string.Empty,
-                    customerPincode = a.CustomerDetail != null ? a.CustomerDetail.PinCode.Code : 0,
-                    CustomerDetailLatitude = a.CustomerDetail.Latitude,
+                    customerDistrict = a.CustomerDetail != null ? a.CustomerDetail.District!.Name : string.Empty,
+                    customerState = a.CustomerDetail != null ? a.CustomerDetail.State!.Name : string.Empty,
+                    customerPincode = a.CustomerDetail != null ? a.CustomerDetail!.PinCode!.Code : 0,
+                    CustomerDetailLatitude = a.CustomerDetail!.Latitude,
                     CustomerDetailLongitude = a.CustomerDetail.Longitude,
                     BeneficiaryName = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.Name : null,
                     beneficiaryImagePath = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.ImagePath : Applicationsettings.NO_USER,
-                    BeneficiaryLocationMap = a.BeneficiaryDetail.BeneficiaryLocationMap,
+                    BeneficiaryLocationMap = a.BeneficiaryDetail!.BeneficiaryLocationMap,
                     beneficiaryAddressline = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.Addressline : string.Empty,
-                    beneficiaryDistrict = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.District.Name : string.Empty,
-                    beneficiaryState = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.State.Name : string.Empty,
-                    beneficiaryPincode = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.PinCode.Code : 0,
-                    BeneficiaryDetailLatitude = a.BeneficiaryDetail.Latitude,
+                    beneficiaryDistrict = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.District!.Name : string.Empty,
+                    beneficiaryState = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.State!.Name : string.Empty,
+                    beneficiaryPincode = a.BeneficiaryDetail != null ? a.BeneficiaryDetail!.PinCode!.Code : 0,
+                    BeneficiaryDetailLatitude = a.BeneficiaryDetail!.Latitude,
                     BeneficiaryDetailLongitude = a.BeneficiaryDetail.Longitude,
                     BeneficiaryAddressLocationInfo = a.BeneficiaryDetail.AddressLocationInfo,
                     a.AllocatedToAgencyTime,
-                    ClientCompanyDocumentUrl = a.ClientCompany.DocumentUrl,
+                    ClientCompanyDocumentUrl = a.ClientCompany!.DocumentUrl,
                     ClientCompanyName = a.ClientCompany.Name,
                     a.SelectedAgentDrivingDistance,
                     a.SelectedAgentDrivingDuration
@@ -661,29 +656,29 @@ namespace risk.control.system.Services.Api
             var finalData = pagedRawData.Select(async a =>
             {
                 var isUW = a.InsuranceType == InsuranceType.UNDERWRITING;
-                var culture = CustomExtensions.GetCultureByCountry(vendorUser.Country.Code);
+                var culture = CustomExtensions.GetCultureByCountry(vendorUser.Country!.Code);
                 var pincode = isUW ? a.customerPincode : a.beneficiaryPincode;
                 var customerAddress = a.customerAddressline + ',' + a.customerDistrict + ',' + a.customerState;
                 var beneficiaryAddress = a.beneficiaryAddressline + ',' + a.beneficiaryDistrict + ',' + a.beneficiaryState;
                 var pincodeName = isUW ? customerAddress : beneficiaryAddress;
                 var personName = isUW ? a.CustomerName : a.BeneficiaryName;
-                var policy = a.InsuranceType.GetEnumDisplayName();
-                var serviceType = a.InsuranceType.GetEnumDisplayName();
+                var policy = a.InsuranceType!.GetEnumDisplayName();
+                var serviceType = a.InsuranceType!.GetEnumDisplayName();
                 var service = a.ServiceTypeName;
                 var timePending = GetSupervisorCompletedTime(a.investigation);
                 var policyNum = a.PolicyNum;
                 var beneficiaryName = a.BeneficiaryName;
                 var timeElapsed = a.AllocatedToAgencyTime.HasValue ? DateTime.UtcNow.Subtract(a.AllocatedToAgencyTime.Value).TotalSeconds : 0;
                 var isQueryCase = a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR;
-                var personMapAddressUrl = isUW ? string.Format(a.CustomerLocationMap, "400", "400") : string.Format(a.BeneficiaryLocationMap, "400", "400");
+                var personMapAddressUrl = isUW ? string.Format(a.CustomerLocationMap!, "400", "400") : string.Format(a.BeneficiaryLocationMap!, "400", "400");
                 var addressLocationInfoTask = isUW ?
-                    weatherInfoService.GetWeatherAsync(a.CustomerDetailLatitude, a.CustomerDetailLongitude) :
-                        weatherInfoService.GetWeatherAsync(a.BeneficiaryDetailLatitude, a.BeneficiaryDetailLongitude);
+                    weatherInfoService.GetWeatherAsync(a.CustomerDetailLatitude!, a.CustomerDetailLongitude!) :
+                        weatherInfoService.GetWeatherAsync(a.BeneficiaryDetailLatitude!, a.BeneficiaryDetailLongitude!);
 
-                var ownerDetailTask = base64FileService.GetBase64FileAsync(a.ClientCompanyDocumentUrl);
-                var documentTask = base64FileService.GetBase64FileAsync(a.PolicyDocumentPath, Applicationsettings.NO_POLICY_IMAGE);
-                var customerPhotoTask = base64FileService.GetBase64FileAsync(isUW ? a.customerImagePath : a.beneficiaryImagePath);
-                var beneficiaryPhotoTask = base64FileService.GetBase64FileAsync(a.beneficiaryImagePath, Applicationsettings.NO_USER);
+                var ownerDetailTask = base64FileService.GetBase64FileAsync(a.ClientCompanyDocumentUrl!);
+                var documentTask = base64FileService.GetBase64FileAsync(a.PolicyDocumentPath!, Applicationsettings.NO_POLICY_IMAGE);
+                var customerPhotoTask = base64FileService.GetBase64FileAsync(isUW ? a.customerImagePath! : a.beneficiaryImagePath!);
+                var beneficiaryPhotoTask = base64FileService.GetBase64FileAsync(a.beneficiaryImagePath!, Applicationsettings.NO_USER);
 
                 // Wait for all images for THIS case to load
                 await Task.WhenAll(ownerDetailTask, documentTask, customerPhotoTask, beneficiaryPhotoTask);
@@ -700,7 +695,7 @@ namespace risk.control.system.Services.Api
                     AssignedToAgency = a.AssignedToAgency,
                     Document = await documentTask,
                     Customer = await customerPhotoTask,
-                    Name = personName,
+                    Name = personName!,
                     Policy = policy,
                     Status = a.Status,
                     ServiceType = serviceType,
@@ -710,7 +705,7 @@ namespace risk.control.system.Services.Api
                     timePending = timePending,
                     PolicyNum = policyNum,
                     BeneficiaryPhoto = await beneficiaryPhotoTask,
-                    BeneficiaryName = beneficiaryName,
+                    BeneficiaryName = beneficiaryName!,
                     TimeElapsed = timeElapsed,
                     IsNewAssigned = a.IsNewAssignedToAgency,
                     IsQueryCase = isQueryCase,
@@ -760,13 +755,13 @@ namespace risk.control.system.Services.Api
             if (!string.IsNullOrWhiteSpace(search))
             {
                 query = query.Where(a =>
-                    a.PolicyDetail.ContractNumber.Contains(search) ||
-                    a.ClientCompany.Name.Contains(search) ||
-                     (a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING ? a.CustomerDetail.Name.Contains(search) : a.BeneficiaryDetail.Name.Contains(search)) ||
-                     (a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING ? a.CustomerDetail.PinCode.Code.ToString().Contains(search) : a.BeneficiaryDetail.PinCode.ToString().Contains(search)) ||
-                     (a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING ? a.CustomerDetail.PinCode.Name.ToLower().ToString().Contains(search) : a.BeneficiaryDetail.PinCode.Name.ToLower().Contains(search)) ||
-                     (a.PolicyDetail.InvestigationServiceType.Name.Contains(search)) ||
-                    a.PolicyDetail.InsuranceType.GetEnumDisplayName().ToLower().Contains(search));
+                    a.PolicyDetail!.ContractNumber.Contains(search) ||
+                    a.ClientCompany!.Name.Contains(search) ||
+                     (a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING ? a.CustomerDetail!.Name.Contains(search) : a.BeneficiaryDetail!.Name.Contains(search)) ||
+                     (a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING ? a.CustomerDetail!.PinCode!.Code.ToString().Contains(search) : a.BeneficiaryDetail!.PinCode!.ToString().Contains(search)) ||
+                     (a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING ? a.CustomerDetail!.PinCode!.Name.ToLower().ToString().Contains(search) : a.BeneficiaryDetail!.PinCode!.Name.ToLower().Contains(search)) ||
+                     (a.PolicyDetail.InvestigationServiceType!.Name.Contains(search)) ||
+                    a.PolicyDetail.InsuranceType!.GetEnumDisplayName().ToLower().Contains(search));
             }
 
             int recordsFiltered = await query.CountAsync();
@@ -778,26 +773,26 @@ namespace risk.control.system.Services.Api
 
             query = orderColumn switch
             {
-                1 => asc ? query.OrderBy(x => x.PolicyDetail.ContractNumber) : query.OrderByDescending(x => x.PolicyDetail.ContractNumber),
-                2 => asc ? query.OrderBy(x => (double)x.PolicyDetail.SumAssuredValue)
-                         : query.OrderByDescending(x => (double)x.PolicyDetail.SumAssuredValue),
-                3 => asc ? query.OrderBy(x => x.ClientCompany.Name)
-                         : query.OrderByDescending(x => x.ClientCompany.Name),
-                4 => asc ? query.OrderBy(x => (x.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING) ? x.CustomerDetail.PinCode.Code : x.BeneficiaryDetail.PinCode.Code)
-                            : query.OrderByDescending(x => (x.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING) ? x.CustomerDetail.PinCode.Code : x.BeneficiaryDetail.PinCode.Code),
+                1 => asc ? query.OrderBy(x => x.PolicyDetail!.ContractNumber) : query.OrderByDescending(x => x.PolicyDetail!.ContractNumber),
+                2 => asc ? query.OrderBy(x => (double)x.PolicyDetail!.SumAssuredValue)
+                         : query.OrderByDescending(x => (double)x.PolicyDetail!.SumAssuredValue),
+                3 => asc ? query.OrderBy(x => x.ClientCompany!.Name)
+                         : query.OrderByDescending(x => x.ClientCompany!.Name),
+                4 => asc ? query.OrderBy(x => (x.PolicyDetail!.InsuranceType == InsuranceType.UNDERWRITING) ? x.CustomerDetail!.PinCode!.Code : x.BeneficiaryDetail!.PinCode!.Code)
+                            : query.OrderByDescending(x => (x.PolicyDetail!.InsuranceType == InsuranceType.UNDERWRITING) ? x.CustomerDetail!.PinCode!.Code : x.BeneficiaryDetail!.PinCode!.Code),
                 7 => asc
                         ? query.OrderBy(x =>
-                            x.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING
-                                ? x.CustomerDetail.Name
-                                : x.BeneficiaryDetail.Name)
+                            x.PolicyDetail!.InsuranceType == InsuranceType.UNDERWRITING
+                                ? x.CustomerDetail!.Name
+                                : x.BeneficiaryDetail!.Name)
                         : query.OrderByDescending(x =>
-                            x.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING
-                                ? x.CustomerDetail.PinCode.Code
-                                : x.BeneficiaryDetail.PinCode.Code),
-                8 => asc ? query.OrderBy(x => x.PolicyDetail.InsuranceType.GetEnumDisplayName())
-                                                         : query.OrderByDescending(x => x.PolicyDetail.InsuranceType.GetEnumDisplayName()),
-                9 => asc ? query.OrderBy(x => x.PolicyDetail.InvestigationServiceType.Name)
-                                         : query.OrderByDescending(x => x.PolicyDetail.InvestigationServiceType.Name),
+                            x.PolicyDetail!.InsuranceType == InsuranceType.UNDERWRITING
+                                ? x.CustomerDetail!.PinCode!.Code
+                                : x.BeneficiaryDetail!.PinCode!.Code),
+                8 => asc ? query.OrderBy(x => x.PolicyDetail!.InsuranceType!.GetEnumDisplayName())
+                                                         : query.OrderByDescending(x => x.PolicyDetail!.InsuranceType!.GetEnumDisplayName()),
+                9 => asc ? query.OrderBy(x => x.PolicyDetail!.InvestigationServiceType!.Name)
+                                         : query.OrderByDescending(x => x.PolicyDetail!.InvestigationServiceType!.Name),
                 10 => asc ? query.OrderBy(x => x.Created)
                 : query.OrderByDescending(x => x.Created),
                 11 => asc
@@ -814,10 +809,10 @@ namespace risk.control.system.Services.Api
                 {
                     investigation = a,
                     a.Id,
-                    policyId = a.PolicyDetail.ContractNumber,
+                    policyId = a.PolicyDetail!.ContractNumber,
                     PolicyNum = a.GetPolicyNum(a.PolicyDetail.ContractNumber),
                     InsuranceType = a.PolicyDetail.InsuranceType,
-                    ServiceTypeName = a.PolicyDetail.InvestigationServiceType.Name,
+                    ServiceTypeName = a.PolicyDetail.InvestigationServiceType!.Name,
                     ContractNumber = a.PolicyDetail.ContractNumber,
                     PolicyDocumentPath = a.PolicyDetail.DocumentPath,
                     SumAssuredValue = a.PolicyDetail.SumAssuredValue,
@@ -830,25 +825,25 @@ namespace risk.control.system.Services.Api
                     a.SubmittedToSupervisorTime,
                     CustomerName = a.CustomerDetail != null ? a.CustomerDetail.Name : null,
                     customerImagePath = a.CustomerDetail != null ? a.CustomerDetail.ImagePath : Applicationsettings.NO_USER,
-                    CustomerLocationMap = a.CustomerDetail.CustomerLocationMap,
+                    CustomerLocationMap = a.CustomerDetail!.CustomerLocationMap,
                     CustomerDetailAddressLocationInfo = a.CustomerDetail.AddressLocationInfo,
                     customerAddressline = a.CustomerDetail != null ? a.CustomerDetail.Addressline : string.Empty,
-                    customerDistrict = a.CustomerDetail != null ? a.CustomerDetail.District.Name : string.Empty,
-                    customerState = a.CustomerDetail != null ? a.CustomerDetail.State.Name : string.Empty,
-                    customerPincode = a.CustomerDetail != null ? a.CustomerDetail.PinCode.Code : 0,
-                    CustomerDetailLatitude = a.CustomerDetail.Latitude,
+                    customerDistrict = a.CustomerDetail != null ? a.CustomerDetail.District!.Name : string.Empty,
+                    customerState = a.CustomerDetail != null ? a.CustomerDetail.State!.Name : string.Empty,
+                    customerPincode = a.CustomerDetail != null ? a.CustomerDetail!.PinCode!.Code : 0,
+                    CustomerDetailLatitude = a.CustomerDetail!.Latitude,
                     CustomerDetailLongitude = a.CustomerDetail.Longitude,
                     BeneficiaryName = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.Name : null,
                     beneficiaryImagePath = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.ImagePath : Applicationsettings.NO_USER,
-                    BeneficiaryLocationMap = a.BeneficiaryDetail.BeneficiaryLocationMap,
+                    BeneficiaryLocationMap = a.BeneficiaryDetail!.BeneficiaryLocationMap,
                     beneficiaryAddressline = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.Addressline : string.Empty,
-                    beneficiaryDistrict = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.District.Name : string.Empty,
-                    beneficiaryState = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.State.Name : string.Empty,
-                    beneficiaryPincode = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.PinCode.Code : 0,
-                    BeneficiaryDetailLatitude = a.BeneficiaryDetail.Latitude,
-                    BeneficiaryDetailLongitude = a.BeneficiaryDetail.Longitude,
+                    beneficiaryDistrict = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.District!.Name : string.Empty,
+                    beneficiaryState = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.State!.Name : string.Empty,
+                    beneficiaryPincode = a.BeneficiaryDetail != null ? a.BeneficiaryDetail!.PinCode!.Code : 0,
+                    BeneficiaryDetailLatitude = a.BeneficiaryDetail!.Latitude,
+                    BeneficiaryDetailLongitude = a.BeneficiaryDetail!.Longitude,
                     BeneficiaryAddressLocationInfo = a.BeneficiaryDetail.AddressLocationInfo,
-                    ClientCompanyDocumentUrl = a.ClientCompany.DocumentUrl,
+                    ClientCompanyDocumentUrl = a.ClientCompany!.DocumentUrl,
                     ClientCompanyName = a.ClientCompany.Name,
                     a.SelectedAgentDrivingDistance,
                     a.SelectedAgentDrivingDuration
@@ -857,14 +852,14 @@ namespace risk.control.system.Services.Api
             var data = await Task.WhenAll(pagedRawData.Select(async a =>
             {
                 var isUW = a.InsuranceType == InsuranceType.UNDERWRITING;
-                var culture = CustomExtensions.GetCultureByCountry(vendorUser.Country.Code);
+                var culture = CustomExtensions.GetCultureByCountry(vendorUser.Country!.Code);
                 var pincode = isUW ? a.customerPincode : a.beneficiaryPincode;
                 var customerAddress = a.customerAddressline + ',' + a.customerDistrict + ',' + a.customerState;
                 var beneficiaryAddress = a.beneficiaryAddressline + ',' + a.beneficiaryDistrict + ',' + a.beneficiaryState;
                 var pincodeName = isUW ? customerAddress : beneficiaryAddress;
                 var personName = isUW ? a.CustomerName : a.BeneficiaryName;
-                var policy = a.InsuranceType.GetEnumDisplayName();
-                var serviceType = a.InsuranceType.GetEnumDisplayName();
+                var policy = a.InsuranceType!.GetEnumDisplayName();
+                var serviceType = a.InsuranceType!.GetEnumDisplayName();
                 var service = a.ServiceTypeName;
                 var timePending = GetSupervisorSubmittedByAgent(a.investigation);
                 var policyNum = a.PolicyNum;
@@ -872,15 +867,15 @@ namespace risk.control.system.Services.Api
                 var timeElapsed = a.SubmittedToSupervisorTime.HasValue ? DateTime.UtcNow.Subtract(a.SubmittedToSupervisorTime.Value).TotalSeconds : 0;
                 var isQueryCase = a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR;
                 var personMapAddressUrl = isUW ?
-                        string.Format(a.CustomerLocationMap, "400", "400") : string.Format(a.BeneficiaryLocationMap, "400", "400");
+                        string.Format(a.CustomerLocationMap!, "400", "400") : string.Format(a.BeneficiaryLocationMap!, "400", "400");
                 var addressLocationInfoTask = isUW ?
-                    weatherInfoService.GetWeatherAsync(a.CustomerDetailLatitude, a.CustomerDetailLongitude) :
-                        weatherInfoService.GetWeatherAsync(a.BeneficiaryDetailLatitude, a.BeneficiaryDetailLongitude);
+                    weatherInfoService.GetWeatherAsync(a.CustomerDetailLatitude!, a.CustomerDetailLongitude!) :
+                        weatherInfoService.GetWeatherAsync(a.BeneficiaryDetailLatitude!, a.BeneficiaryDetailLongitude!);
 
-                var ownerDetailTask = base64FileService.GetBase64FileAsync(a.ClientCompanyDocumentUrl);
-                var documentTask = base64FileService.GetBase64FileAsync(a.PolicyDocumentPath, Applicationsettings.NO_POLICY_IMAGE);
-                var customerPhotoTask = base64FileService.GetBase64FileAsync(isUW ? a.customerImagePath : a.beneficiaryImagePath);
-                var beneficiaryPhotoTask = base64FileService.GetBase64FileAsync(a.beneficiaryImagePath, Applicationsettings.NO_USER);
+                var ownerDetailTask = base64FileService.GetBase64FileAsync(a.ClientCompanyDocumentUrl!);
+                var documentTask = base64FileService.GetBase64FileAsync(a.PolicyDocumentPath!, Applicationsettings.NO_POLICY_IMAGE);
+                var customerPhotoTask = base64FileService.GetBase64FileAsync(isUW ? a.customerImagePath! : a.beneficiaryImagePath!);
+                var beneficiaryPhotoTask = base64FileService.GetBase64FileAsync(a.beneficiaryImagePath!, Applicationsettings.NO_USER);
 
                 // Wait for all images for THIS case to load
                 await Task.WhenAll(ownerDetailTask, documentTask, customerPhotoTask, beneficiaryPhotoTask, addressLocationInfoTask);
@@ -897,7 +892,7 @@ namespace risk.control.system.Services.Api
                     AssignedToAgency = a.AssignedToAgency,
                     Document = await documentTask,
                     Customer = await customerPhotoTask,
-                    Name = personName,
+                    Name = personName!,
                     Policy = policy,
                     Status = a.Status,
                     ServiceType = serviceType,
@@ -907,7 +902,7 @@ namespace risk.control.system.Services.Api
                     timePending = timePending,
                     PolicyNum = policyNum,
                     BeneficiaryPhoto = await beneficiaryPhotoTask,
-                    BeneficiaryName = beneficiaryName,
+                    BeneficiaryName = beneficiaryName!,
                     TimeElapsed = timeElapsed,
                     IsNewAssigned = a.IsNewAssignedToAgency,
                     IsQueryCase = isQueryCase,
@@ -942,7 +937,7 @@ namespace risk.control.system.Services.Api
 
         private static string GetSupervisorCompletedTime(InvestigationTask caseTask)
         {
-            DateTime timeToCompare = caseTask.ProcessedByAssessorTime.Value;
+            DateTime timeToCompare = caseTask.ProcessedByAssessorTime!.Value;
 
             if (DateTime.UtcNow.Subtract(timeToCompare).Days >= 1)
                 return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(timeToCompare).Days} day</span>");
@@ -965,7 +960,7 @@ namespace risk.control.system.Services.Api
 
         private static string GetSupervisorSubmittedByAgent(InvestigationTask caseTask)
         {
-            DateTime timeToCompare = caseTask.SubmittedToSupervisorTime.Value;
+            DateTime timeToCompare = caseTask.SubmittedToSupervisorTime!.Value;
 
             if (DateTime.UtcNow.Subtract(timeToCompare).Days >= 1)
                 return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(timeToCompare).Days} day</span>");
@@ -988,7 +983,7 @@ namespace risk.control.system.Services.Api
 
         private static string GetSupervisorNewTimePending(InvestigationTask caseTask)
         {
-            DateTime timeToCompare = caseTask.AllocatedToAgencyTime.Value;
+            DateTime timeToCompare = caseTask.AllocatedToAgencyTime!.Value;
 
             if (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR)
             {
@@ -1016,7 +1011,7 @@ namespace risk.control.system.Services.Api
 
         private static string GetSupervisorOpenTimePending(InvestigationTask caseTask)
         {
-            DateTime timeToCompare = caseTask.TaskToAgentTime.Value;
+            DateTime timeToCompare = caseTask.TaskToAgentTime!.Value;
             if (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT)
             {
                 timeToCompare = caseTask.TaskToAgentTime.GetValueOrDefault();
@@ -1056,11 +1051,11 @@ namespace risk.control.system.Services.Api
             await using var _context = _contextFactory.CreateDbContext();
             if (caseTask.SubStatus == allocated2agent)
             {
-                ownerEmail = caseTask.TaskedAgentEmail;
+                ownerEmail = caseTask.TaskedAgentEmail!;
                 var agencyUser = await _context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == ownerEmail);
                 if (agencyUser != null && !string.IsNullOrWhiteSpace(agencyUser.Email))
                 {
-                    return agencyUser?.Email;
+                    return agencyUser.Email;
                 }
             }
             else if (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR || caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR)
@@ -1083,7 +1078,7 @@ namespace risk.control.system.Services.Api
 
             if (caseTask.SubStatus == allocated2agent)
             {
-                ownerEmail = caseTask.TaskedAgentEmail;
+                ownerEmail = caseTask.TaskedAgentEmail!;
                 var agencyUser = _context.ApplicationUser.FirstOrDefault(u => u.Email == ownerEmail);
                 if (agencyUser != null && !string.IsNullOrWhiteSpace(agencyUser?.ProfilePictureUrl))
                 {

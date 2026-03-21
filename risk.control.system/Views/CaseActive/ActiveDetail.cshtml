@@ -60,7 +60,7 @@
 			</span>
 			<b><i class='far fa-hand-point-right'></i></b>
 			<span class="badge badge-info" data-bs-toggle="tooltip"
-				  title="Owner : @Model.ClaimsInvestigation.CaseOwner">
+				  title="Owner : @Model.ClaimsInvestigation!.CaseOwner">
 				<b>
 					@Model.ClaimsInvestigation.CaseOwner
 				</b>
@@ -101,7 +101,7 @@
 				<!-- Report template will load here -->
 			</div>
 		</div>
-		<input type="hidden" id="caseIdHidden" value="@Model.ClaimsInvestigation.Id" />
+		<input type="hidden" id="caseIdHidden" value="@Model.ClaimsInvestigation!.Id" />
 		<partial name="Investigation/_TimelineReport" model="@Model" />
 	</div>
 	<div class="card-footer">

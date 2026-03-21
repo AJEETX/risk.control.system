@@ -45,42 +45,42 @@ namespace risk.control.system.Services.Agency
                 .Include(c => c.PolicyDetail)
                 .Include(c => c.InvestigationTimeline)
                 .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.CaseEnabler)
+                .ThenInclude(c => c!.CaseEnabler)
                  .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.InvestigationServiceType)
+                .ThenInclude(c => c!.InvestigationServiceType)
                  .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.CostCentre)
+                .ThenInclude(c => c!.CostCentre)
                 .Include(c => c.ClientCompany)
-                .ThenInclude(c => c.Country)
+                .ThenInclude(c => c!.Country)
                 .Include(c => c.Vendor)
                 .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.PinCode)
+                .ThenInclude(c => c!.PinCode)
                 .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.District)
+                .ThenInclude(c => c!.District)
                 .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.State)
+                .ThenInclude(c => c!.State)
                 .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.Country)
+                .ThenInclude(c => c!.Country)
                 .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.BeneficiaryRelation)
+                .ThenInclude(c => c!.BeneficiaryRelation)
                 .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.Country)
+                .ThenInclude(c => c!.Country)
                 .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.State)
+                .ThenInclude(c => c!.State)
                 .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.District)
+                .ThenInclude(c => c!.District)
                 .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.PinCode)
+                .ThenInclude(c => c!.PinCode)
                 .FirstOrDefaultAsync(m => m.Id == caseId);
 
-            var lastHistory = caseTask.InvestigationTimeline.OrderByDescending(h => h.StatusChangedAt).FirstOrDefault();
+            var lastHistory = caseTask!.InvestigationTimeline.OrderByDescending(h => h.StatusChangedAt).FirstOrDefault();
 
-            var maskedCustomerContact = new string('*', caseTask.CustomerDetail.PhoneNumber.ToString().Length - 4) + caseTask.CustomerDetail.PhoneNumber.ToString().Substring(caseTask.CustomerDetail.PhoneNumber.ToString().Length - 4);
+            var maskedCustomerContact = new string('*', caseTask.CustomerDetail!.PhoneNumber.ToString().Length - 4) + caseTask.CustomerDetail.PhoneNumber.ToString().Substring(caseTask.CustomerDetail.PhoneNumber.ToString().Length - 4);
             caseTask.CustomerDetail.PhoneNumber = maskedCustomerContact;
-            var maskedBeneficiaryContact = new string('*', caseTask.BeneficiaryDetail.PhoneNumber.ToString().Length - 4) + caseTask.BeneficiaryDetail.PhoneNumber.ToString().Substring(caseTask.BeneficiaryDetail.PhoneNumber.ToString().Length - 4);
+            var maskedBeneficiaryContact = new string('*', caseTask.BeneficiaryDetail!.PhoneNumber.ToString().Length - 4) + caseTask.BeneficiaryDetail.PhoneNumber.ToString().Substring(caseTask.BeneficiaryDetail.PhoneNumber.ToString().Length - 4);
             caseTask.BeneficiaryDetail.PhoneNumber = maskedBeneficiaryContact;
 
-            var timeTaken = DateTime.UtcNow - lastHistory.StatusChangedAt;
+            var timeTaken = DateTime.UtcNow - lastHistory!.StatusChangedAt;
             var model = new CaseTransactionModel
             {
                 ClaimsInvestigation = caseTask,
@@ -89,7 +89,7 @@ namespace risk.control.system.Services.Agency
                 Assigned = caseTask.Status == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER,
                 TimeTaken = timeTaken.ToString(@"hh\:mm\:ss") ?? "-",
                 Withdrawable = (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR),
-                Currency = CustomExtensions.GetCultureByCountry(caseTask.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol
+                Currency = CustomExtensions.GetCultureByCountry(caseTask.ClientCompany!.Country!.Code.ToUpper()).NumberFormat.CurrencySymbol
             };
 
             return model;
@@ -105,19 +105,19 @@ namespace risk.control.system.Services.Agency
                 .Include(c => c.District)
                 .Include(c => c.State)
                 .Include(c => c.Country)
-                .FirstOrDefaultAsync(c => c.BeneficiaryDetailId == caseAllocate2Agent.BeneficiaryDetail.BeneficiaryDetailId);
+                .FirstOrDefaultAsync(c => c.BeneficiaryDetailId == caseAllocate2Agent!.BeneficiaryDetail!.BeneficiaryDetailId);
 
-            var maskedCustomerContact = new string('*', caseAllocate2Agent.CustomerDetail.PhoneNumber.ToString().Length - 4) + caseAllocate2Agent.CustomerDetail.PhoneNumber.ToString().Substring(caseAllocate2Agent.CustomerDetail.PhoneNumber.ToString().Length - 4);
+            var maskedCustomerContact = new string('*', caseAllocate2Agent!.CustomerDetail!.PhoneNumber.ToString().Length - 4) + caseAllocate2Agent.CustomerDetail.PhoneNumber.ToString().Substring(caseAllocate2Agent.CustomerDetail.PhoneNumber.ToString().Length - 4);
             caseAllocate2Agent.CustomerDetail.PhoneNumber = maskedCustomerContact;
-            var maskedBeneficiaryContact = new string('*', beneficiaryDetail.PhoneNumber.ToString().Length - 4) + beneficiaryDetail.PhoneNumber.ToString().Substring(beneficiaryDetail.PhoneNumber.ToString().Length - 4);
-            caseAllocate2Agent.BeneficiaryDetail.PhoneNumber = maskedBeneficiaryContact;
+            var maskedBeneficiaryContact = new string('*', beneficiaryDetail!.PhoneNumber.ToString().Length - 4) + beneficiaryDetail.PhoneNumber.ToString().Substring(beneficiaryDetail.PhoneNumber.ToString().Length - 4);
+            caseAllocate2Agent.BeneficiaryDetail!.PhoneNumber = maskedBeneficiaryContact;
             beneficiaryDetail.PhoneNumber = maskedBeneficiaryContact;
 
             var model = new CaseAgencyAgentModel
             {
                 Beneficiary = beneficiaryDetail,
                 ClaimsInvestigation = caseAllocate2Agent,
-                Currency = CustomExtensions.GetCultureByCountry(caseAllocate2Agent.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol
+                Currency = CustomExtensions.GetCultureByCountry(caseAllocate2Agent.ClientCompany!.Country!.Code.ToUpper()).NumberFormat.CurrencySymbol
             };
             return model;
         }
@@ -140,19 +140,19 @@ namespace risk.control.system.Services.Agency
                 int durationInSeconds;
                 string LocationLatitude = string.Empty;
                 string LocationLongitude = string.Empty;
-                if (caseTask.PolicyDetail?.InsuranceType == InsuranceType.UNDERWRITING)
+                if (caseTask!.PolicyDetail?.InsuranceType == InsuranceType.UNDERWRITING)
                 {
-                    LocationLatitude = caseTask.CustomerDetail?.Latitude;
-                    LocationLongitude = caseTask.CustomerDetail?.Longitude;
+                    LocationLatitude = caseTask.CustomerDetail?.Latitude!;
+                    LocationLongitude = caseTask.CustomerDetail?.Longitude!;
                 }
                 else
                 {
-                    LocationLatitude = caseTask.BeneficiaryDetail?.Latitude;
-                    LocationLongitude = caseTask.BeneficiaryDetail?.Longitude;
+                    LocationLatitude = caseTask.BeneficiaryDetail?.Latitude!;
+                    LocationLongitude = caseTask.BeneficiaryDetail?.Longitude!;
                 }
                 (drivingDistance, distanceInMeters, drivingDuration, durationInSeconds, drivingMap) = await customApiCLient.GetMap(
-                  double.Parse(agentUser.AddressLatitude),
-                  double.Parse(agentUser.AddressLongitude),
+                  double.Parse(agentUser.AddressLatitude!),
+                  double.Parse(agentUser.AddressLongitude!),
                    double.Parse(LocationLatitude),
                     double.Parse(LocationLongitude));
                 caseTask.AllocatingSupervisordEmail = currentUser;
@@ -281,32 +281,32 @@ namespace risk.control.system.Services.Agency
                 .Include(c => c.PolicyDetail)
                 .Include(c => c.InvestigationTimeline)
                 .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.CaseEnabler)
+                .ThenInclude(c => c!.CaseEnabler)
                  .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.InvestigationServiceType)
+                .ThenInclude(c => c!.InvestigationServiceType)
                  .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.CostCentre)
+                .ThenInclude(c => c!.CostCentre)
                 .Include(c => c.ClientCompany)
-                .ThenInclude(c => c.Country)
+                .ThenInclude(c => c!.Country)
                 .Include(c => c.Vendor)
                 .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.PinCode)
+                .ThenInclude(c => c!.PinCode)
                 .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.District)
+                .ThenInclude(c => c!.District)
                 .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.State)
+                .ThenInclude(c => c!.State)
                 .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.Country)
+                .ThenInclude(c => c!.Country)
                 .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.BeneficiaryRelation)
+                .ThenInclude(c => c!.BeneficiaryRelation)
                 .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.Country)
+                .ThenInclude(c => c!.Country)
                 .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.State)
+                .ThenInclude(c => c!.State)
                 .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.District)
+                .ThenInclude(c => c!.District)
                 .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.PinCode);
+                .ThenInclude(c => c!.PinCode);
             return caseTasks;
         }
     }

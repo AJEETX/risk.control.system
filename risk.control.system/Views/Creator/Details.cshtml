@@ -4,8 +4,8 @@
 	ViewData["Title"] = "Details";
 
 	// Initialize variables
-	bool policyExists = Model.ClaimsInvestigation.PolicyDetail != null;
-	bool customerExist = Model.ClaimsInvestigation.CustomerDetail != null;
+	bool policyExists = Model.ClaimsInvestigation!.PolicyDetail != null;
+	bool customerExist = Model.ClaimsInvestigation!.CustomerDetail != null;
 	bool beneficiaryExist = Model.Beneficiary?.BeneficiaryDetailId > 0;
 
 	string customerProgressbarMessage = customerExist ? "customer" : "add customer";
@@ -128,8 +128,8 @@
 		</div>
 		<form id="create-form" method="post" asp-controller="AssignCase" asp-action="AssignAutoSingle">
 			<input type="hidden" id="customerDetailId" value="@Model.ClaimsInvestigation?.CustomerDetail?.CustomerDetailId" />
-			<input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.Id" />
-			<input type="hidden" id="claims" name="claims" value="@Model.ClaimsInvestigation.Id" />
+			<input type="hidden" id="claimId" name="claimId" value="@Model?.ClaimsInvestigation!.Id" />
+			<input type="hidden" id="claims" name="claims" value="@Model?.ClaimsInvestigation!.Id" />
 			<input type="hidden" id="beneficiaryId" value="@Model.Beneficiary?.BeneficiaryDetailId" />
 			<div class="card-footer d-flex  justify-content-center align-items-center">
 				<div class="row">
@@ -161,7 +161,7 @@
 									<button type="submit" id="assign-list" class="btn btn-warning btn-sm">
 										<span class="badge badge-warning"> <i class="fas fa-random"></i></span><b> Assign</b><sub> auto </sub>
 									</button>
-									<a id="assign-manual" href="/Creator/EmpanelledVendors/@Model.ClaimsInvestigation.Id?fromEditPage=true" class="btn btn-info btn-sm">
+									<a id="assign-manual" href="/Creator/EmpanelledVendors/@Model?.ClaimsInvestigation!.Id?fromEditPage=true" class="btn btn-info btn-sm">
 										<span class="badge badge-info"> <i class="fas fa-external-link-alt"></i></span><b> Assign</b><sub> manual </sub>
 									</a>
 								}

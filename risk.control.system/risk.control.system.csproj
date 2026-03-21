@@ -88,9 +88,6 @@
 		<None Update="Seeds\Files\indian_states.csv">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="Seeds\Files\india_pincode.csv">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</None>
 		<None Update="Seeds\Files\india_pincode_full.csv">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>

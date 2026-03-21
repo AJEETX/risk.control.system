@@ -58,7 +58,7 @@ namespace risk.control.system.Services.Api
                 .GroupBy(s => s.ActiveUser.Email)
                 .Select(g => new
                 {
-                    Email = g.Key,
+                    Email = g.Key!,
                     LastSeen = g.Max(x => x.Updated ?? x.Created),
                     LoggedOut = g.All(x => x.LoggedOut)
                 })
@@ -79,10 +79,10 @@ namespace risk.control.system.Services.Api
             for (int i = 0; i < companyUsers.Count; i++)
             {
                 var user = companyUsers[i];
-                latestSessions.TryGetValue(user.Email, out var session);
+                latestSessions.TryGetValue(user.Email!, out var session);
 
                 string status, statusName, icon;
-                if (session == null || session.LoggedOut || session.LastSeen == null)
+                if (session == null || session.LoggedOut)
                 {
                     status = "#DED5D5";
                     statusName = "Offline";
@@ -106,17 +106,17 @@ namespace risk.control.system.Services.Api
                     Name = $"{user.FirstName} {user.LastName}",
                     Email = $"<a href=/Company/EditUser?userId={user.Id}>{user.Email}</a>",
                     RawEmail = user.Email,
-                    Phone = $"(+{user.Country.ISDCode}) {user.PhoneNumber}",
+                    Phone = $"(+{user.Country!.ISDCode}) {user.PhoneNumber}",
                     Photo = photo,
                     Active = user.Active,
-                    Addressline = $"{user.Addressline}, {user.District.Name}",
+                    Addressline = $"{user.Addressline}, {user.District!.Name}",
                     District = user.District.Name,
-                    State = user.State.Code,
+                    State = user.State!.Code,
                     StateName = user.State.Name,
                     Country = user.Country.Code,
                     Flag = $"/flags/{user.Country.Code.ToLower()}.png",
-                    Role = user.Role.GetEnumDisplayName(),
-                    Pincode = user.PinCode.Code,
+                    Role = user.Role!.GetEnumDisplayName(),
+                    Pincode = user.PinCode!.Code,
                     PincodeName = $"{user.PinCode.Name} - {user.PinCode.Code}",
                     OnlineStatus = status,
                     OnlineStatusName = statusName,
@@ -155,7 +155,7 @@ namespace risk.control.system.Services.Api
             // Dictionary of last seen per email
             var lastSeenDict = sessionLookup
                 .GroupBy(s => s.ActiveUser.Email)
-                .ToDictionary(g => g.Key, g => g.Max(s => s.Updated));
+                .ToDictionary(g => g.Key!, g => g.Max(s => s.Updated));
 
             // Fetch all users for the company (excluding deleted and current user)
             var users = await context.ApplicationUser.AsNoTracking()
@@ -176,7 +176,7 @@ namespace risk.control.system.Services.Api
             foreach (var user in users)
             {
                 // Compute online status
-                lastSeenDict.TryGetValue(user.Email, out var lastSeen);
+                lastSeenDict.TryGetValue(user.Email!, out var lastSeen);
                 var minutesAway = lastSeen.HasValue ? (int)(now - lastSeen.Value).TotalMinutes : int.MaxValue;
 
                 var (status, statusName, icon) = minutesAway switch
@@ -196,17 +196,17 @@ namespace risk.control.system.Services.Api
                     Name = $"{user.FirstName} {user.LastName}",
                     Email = $"<a href='/CompanyUser/Edit?userId={user.Id}'>{user.Email}</a>",
                     RawEmail = user.Email,
-                    Phone = $"(+{user.Country.ISDCode}) {user.PhoneNumber}",
+                    Phone = $"(+{user.Country!.ISDCode}) {user.PhoneNumber}",
                     Photo = photo,
                     Active = user.Active,
-                    Addressline = $"{user.Addressline}, {user.District.Name}",
+                    Addressline = $"{user.Addressline}, {user.District!.Name}",
                     District = user.District.Name,
-                    State = user.State.Code,
+                    State = user.State!.Code,
                     StateName = user.State.Name,
                     Country = user.Country.Code,
                     Flag = $"/flags/{user.Country.Code.ToLower()}.png",
-                    Roles = user.Role.GetEnumDisplayName(),
-                    Pincode = user.PinCode.Code,
+                    Roles = user.Role!.GetEnumDisplayName(),
+                    Pincode = user.PinCode!.Code,
                     PincodeName = $"{user.PinCode.Name} - {user.PinCode.Code}",
                     OnlineStatus = status,
                     OnlineStatusName = statusName,

@@ -6,8 +6,8 @@
 
 <section class="content">
 	<input type="hidden" id="vendorId" value="@Model.VendorId" />
-	<input type="hidden" id="Isd" value="@Model?.Country.ISDCode" />
-	<input type="hidden" id="countryCode" value="@Model?.Country.Code" />
+	<input type="hidden" id="Isd" value="@Model?.Country!.ISDCode" />
+	<input type="hidden" id="countryCode" value="@Model?.Country!.Code" />
 	<div class="card shadow-lg border-1 rounded-lg">
 		<div class="card-header bg-secondary text-white text-center">
 			<h3 class="card-title"><i class="fas fa-building"></i>  Agency Profile</h3>
@@ -20,7 +20,7 @@
 				<div class="col-md-4 border-right">
 					<div class="text-center">
 						<div class="profile-img-container mb-3">
-							<img src="/Document/GetAgencyDocument/@Model.VendorId"
+							<img src="/Document/GetAgencyDocument/@Model?.VendorId"
 								 class="shadow-lg border profile-img img-fluid rounded-circle"
 								 alt="User Profile" />
 						</div>
@@ -72,7 +72,7 @@
 								<div class="col-md-12">
 									<div class="form-group">
 										<label class="card-header shadow-lg rounded-lg text-sm bg-light" title="Agents (@Model.SelectedCountryId)" data-bs-toggle="tooltip"><i class="fa fa-user-secret"></i>  Agents (@Model.SelectedCountryId)</label>
-										<label class="card-header shadow-lg rounded-lg text-sm bg-light" title="Service (@Model.VendorInvestigationServiceTypes.Count)" data-bs-toggle="tooltip"><i class="fas fa-cogs"></i>  Service (@Model.VendorInvestigationServiceTypes.Count)</label>
+										<label class="card-header shadow-lg rounded-lg text-sm bg-light" title="Service (@Model.VendorInvestigationServiceTypes!.Count)" data-bs-toggle="tooltip"><i class="fas fa-cogs"></i>  Service (@Model.VendorInvestigationServiceTypes.Count)</label>
 									</div>
 								</div>
 							</div>
@@ -146,7 +146,7 @@
 									<span class="info-box-icon bg-secondary"><i class="fas fa-city"></i></span>
 									<div class="info-box-content">
 										<span class="info-box-text">District</span>
-										<span class="info-box-number">@Model.District.Name</span>
+										<span class="info-box-number">@Model.District!.Name</span>
 									</div>
 								</div>
 
@@ -154,7 +154,7 @@
 									<span class="info-box-icon bg-danger"><i class="fas fa-flag"></i></span>
 									<div class="info-box-content">
 										<span class="info-box-text">State</span>
-										<span class="info-box-number">@Model.State.Name</span>
+										<span class="info-box-number">@Model.State!.Name</span>
 									</div>
 								</div>
 
@@ -162,14 +162,14 @@
 									<span class="info-box-icon bg-dark"><i class="fas fa-globe"></i></span>
 									<div class="info-box-content">
 										<span class="info-box-text">Country</span>
-										<span class="info-box-number">@Model.Country.Name</span>
+										<span class="info-box-number">@Model.Country!.Name</span>
 									</div>
 								</div>
 								<div class="info-box">
 									<span class="info-box-icon bg-warning"><i class="fas fa-map-pin"></i></span>
 									<div class="info-box-content">
 										<span class="info-box-text">Pin Code</span>
-										<span class="info-box-number">@Model.PinCode.Name - @Model.PinCode.Code</span>
+										<span class="info-box-number">@Model.PinCode!.Name - @Model.PinCode.Code</span>
 									</div>
 								</div>
 							</div>

@@ -21,7 +21,7 @@ namespace risk.control.system.Controllers.Api.Company
             this.logger = logger;
         }
 
-        [Authorize(Roles = $"{CREATOR.DISPLAY_NAME}")]
+        [Authorize(Roles = CREATOR.DISPLAY_NAME)]
         [HttpGet("GetAuto")]
         public async Task<IActionResult> GetAuto(int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc")
         {
@@ -60,7 +60,7 @@ namespace risk.control.system.Controllers.Api.Company
         }
 
         [HttpGet("GetFilesData/{uploadId?}")]
-        public async Task<IActionResult> GetFilesData(int draw, int start, int length, int orderColumn, string orderDir, int uploadId = 0, string searchTerm = null)
+        public async Task<IActionResult> GetFilesData(int draw, int start, int length, int orderColumn, string orderDir, int uploadId = 0, string? searchTerm = null)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 

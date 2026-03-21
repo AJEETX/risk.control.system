@@ -74,7 +74,7 @@ namespace risk.control.system.Models
         public string? AddressMapLocation { get; set; }
         public string? AddressLatitude { get; set; }
         public string? AddressLongitude { get; set; }
-        public List<Vendor>? EmpanelledVendors { get; set; } = new();
+        public List<Vendor> EmpanelledVendors { get; set; } = new();
         public bool VerifyPan { get; set; } = false;
         public bool VerifyPassport { get; set; } = false;
         public bool EnablePassport { get; set; } = false;

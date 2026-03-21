@@ -24,7 +24,7 @@ namespace risk.control.system.Controllers.PortalAdmin
             this.notifyService = notifyService;
         }
 
-        public async Task<IActionResult> Index(string id = null)
+        public async Task<IActionResult> Index(string? id = null)
         {
             var roles = await _roleManager.Roles.ToListAsync();
 

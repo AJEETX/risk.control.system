@@ -2,13 +2,14 @@
 {
     public class UploadResult
     {
-        public InvestigationTask InvestigationTask { get; set; }
-        public List<UploadError> ErrorDetail { get; set; }
-        public List<string> Errors { get; set; }
+        public InvestigationTask? InvestigationTask { get; set; }
+        public List<UploadError>? ErrorDetail { get; set; }
+        public List<string>? Errors { get; set; }
     }
+
     public class UploadError
     {
-        public string UploadData { get; set; }
-        public string Error { get; set; }
+        public string? UploadData { get; set; }
+        public string? Error { get; set; }
     }
 }

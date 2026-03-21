@@ -75,12 +75,12 @@ namespace risk.control.system.Services.Agent
             if (caseTask == null)
             {
                 _logger.LogWarning("Investigation case {CaseId} not found", selectedCaseId);
-                return null;
+                return null!;
             }
 
             // Mask sensitive phone numbers
-            caseTask.CustomerDetail.PhoneNumber = MaskPhoneNumber(caseTask.CustomerDetail?.PhoneNumber);
-            caseTask.BeneficiaryDetail.PhoneNumber = MaskPhoneNumber(caseTask.BeneficiaryDetail?.PhoneNumber);
+            caseTask.CustomerDetail.PhoneNumber = MaskPhoneNumber(caseTask.CustomerDetail?.PhoneNumber!);
+            caseTask.BeneficiaryDetail.PhoneNumber = MaskPhoneNumber(caseTask.BeneficiaryDetail?.PhoneNumber!);
             _logger.LogInformation("Masked phone numbers for case {CaseId}", selectedCaseId);
 
             // Assign agent email
@@ -167,7 +167,7 @@ namespace risk.control.system.Services.Agent
             if (caseTask == null)
             {
                 _logger.LogWarning("Investigation case {CaseId} not found for agent {UserEmail}", id, currentUserEmail);
-                return null;
+                return null!;
             }
 
             _logger.LogInformation("Investigation case {CaseId} found. Fetching related data...", id);
@@ -218,7 +218,7 @@ namespace risk.control.system.Services.Agent
 
         public async Task<InvestigationTask> GetCaseById(long id)
         {
-            var _case = await _context.Investigations
+            var caseDetail = await _context.Investigations
                 .Include(c => c.InvestigationReport)
                 .ThenInclude(c => c.ReportTemplate)
                 .ThenInclude(c => c.LocationReport)
@@ -241,12 +241,12 @@ namespace risk.control.system.Services.Agent
                 .ThenInclude(c => c.Country)
                 .Include(c => c.CaseNotes)
                 .FirstOrDefaultAsync(c => c.Id == id);
-            return _case;
+            return caseDetail!;
         }
 
         public async Task<InvestigationTask> GetCaseByIdForMedia(long id)
         {
-            var claim = await _context.Investigations
+            var caseDetail = await _context.Investigations
                  .Include(c => c.PolicyDetail)
                  .Include(c => c.CustomerDetail)
                  .Include(c => c.BeneficiaryDetail)
@@ -254,17 +254,17 @@ namespace risk.control.system.Services.Agent
                 .ThenInclude(c => c.ReportTemplate)
                 .ThenInclude(c => c.LocationReport)
                 .FirstOrDefaultAsync(c => c.Id == id);
-            return claim;
+            return caseDetail!;
         }
 
         public async Task<InvestigationTask> GetCaseByIdForQuestions(long id)
         {
-            var claim = await _context.Investigations
+            var caseDetail = await _context.Investigations
                     .Include(c => c.InvestigationReport)
                     .ThenInclude(c => c.ReportTemplate)
                     .ThenInclude(c => c.LocationReport)
                     .FirstOrDefaultAsync(c => c.Id == id);
-            return claim;
+            return caseDetail!;
         }
 
         public async Task<InvestigationTask> GetCaseDetailForAgentDetail(long id)
@@ -275,7 +275,7 @@ namespace risk.control.system.Services.Agent
                 .Include(c => c.CustomerDetail)
                 .Where(c => !c.Deleted)
                 .FirstOrDefaultAsync(c => c.Id == id);
-            return caseDetail;
+            return caseDetail!;
         }
 
         public async Task<InvestigationTask> GetNotesOfCase(long id)
@@ -284,7 +284,7 @@ namespace risk.control.system.Services.Agent
                .Include(c => c.CaseNotes)
                 .Where(c => !c.Deleted)
                 .FirstOrDefaultAsync(c => c.Id == id);
-            return caseInvestigation;
+            return caseInvestigation!;
         }
 
         private static string FormatTime(TimeSpan time)
