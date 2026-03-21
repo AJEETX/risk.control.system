@@ -15,7 +15,7 @@
             <div class="submit-progress hidden">
                 <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
             </div>
-            @if (userRole.Value.Contains(PORTAL_ADMIN.DISPLAY_NAME))
+            @if (userRole!.Value.Contains(PORTAL_ADMIN.DISPLAY_NAME))
             {
                 <partial name="_PortalAdmin" model="@Model" />
             }
@@ -50,7 +50,7 @@
         </div>
     </div>
 </section>
-@if (userRole.Value.Contains(COMPANY_ADMIN.DISPLAY_NAME) || 
+@if (userRole.Value.Contains(COMPANY_ADMIN.DISPLAY_NAME) ||
    userRole.Value.Contains(CREATOR.DISPLAY_NAME) ||
     userRole.Value.Contains(ASSESSOR.DISPLAY_NAME) ||
     userRole.Value.Contains(MANAGER.DISPLAY_NAME)

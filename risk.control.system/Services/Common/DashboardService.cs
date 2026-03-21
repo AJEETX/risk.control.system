@@ -180,7 +180,7 @@ namespace risk.control.system.Services.Common
                             caseCurrentStatus.Created > monthName.Date &&
                             caseCurrentStatus.Created <= monthName.AddMonths(1))
                         {
-                            if (caseCurrentStatus.PolicyDetail.InsuranceType == InsuranceType.CLAIM && !caseCurrentStatus.Deleted)
+                            if (caseCurrentStatus.PolicyDetail!.InsuranceType == InsuranceType.CLAIM && !caseCurrentStatus.Deleted)
                             {
                                 claimsWithSameStatus.Add(caseCurrentStatus);
                             }
@@ -216,7 +216,7 @@ namespace risk.control.system.Services.Common
                         var caseCurrentStatus = _case.OrderByDescending(o => o.Created).FirstOrDefault();
                         if (userSubStatuses.Contains(caseCurrentStatus.SubStatus) && caseCurrentStatus.Created > monthName.Date && caseCurrentStatus.Created <= monthName.AddMonths(1))
                         {
-                            if (caseCurrentStatus.PolicyDetail.InsuranceType == InsuranceType.CLAIM)
+                            if (caseCurrentStatus.PolicyDetail!.InsuranceType == InsuranceType.CLAIM)
                             {
                                 claimsWithSameStatus.Add(caseCurrentStatus);
                             }

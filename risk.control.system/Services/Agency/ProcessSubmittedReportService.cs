@@ -29,15 +29,7 @@ namespace risk.control.system.Services.Agency
         {
             var sanitizedEmail = userEmail?.Replace("\n", "").Replace("\r", "");
 
-            if (reportUpdateStatus == SupervisorRemarkType.OK)
-            {
-                return await ApproveAgentReport(sanitizedEmail, caseId, supervisorRemarks, reportUpdateStatus, document, editRemarks);
-            }
-            else
-            {
-                //PUT th case back in review list :: Assign back to Agent
-                return await ReAllocateToVendorAgent(sanitizedEmail, caseId, supervisorRemarks, reportUpdateStatus);
-            }
+            return await ApproveAgentReport(sanitizedEmail, caseId, supervisorRemarks, reportUpdateStatus, document, editRemarks);
         }
 
         public async Task<(Vendor, string)> SubmitToVendorSupervisor(string userEmail, long caseId, string remarks)
@@ -127,7 +119,7 @@ namespace risk.control.system.Services.Agency
 
                 await timelineService.UpdateTaskStatus(caseTask.Id, userEmail);
 
-                return rowsAffected ? caseTask : null;
+                return rowsAffected ? caseTask : null!;
             }
             catch (Exception ex)
             {
@@ -148,10 +140,6 @@ namespace risk.control.system.Services.Agency
                     .Include(c => c.PolicyDetail)
                     .Include(p => p.ClientCompany)
                     .FirstOrDefaultAsync(v => v.Id == caseId);
-
-                //var report = claimsCaseToAllocateToVendor.InvestigationReport;
-                //report.SupervisorRemarkType = reportUpdateStatus;
-                //report.SupervisorRemarks = supervisorRemarks;
                 caseToAllocateToVendor.CaseOwner = agencyUser.Email;
                 caseToAllocateToVendor.TaskedAgentEmail = agencyUser.Email;
                 caseToAllocateToVendor.Updated = DateTime.UtcNow;
@@ -163,7 +151,7 @@ namespace risk.control.system.Services.Agency
                 var rowsAffected = await context.SaveChangesAsync(null, false) > 0;
 
                 await timelineService.UpdateTaskStatus(caseToAllocateToVendor.Id, userEmail);
-                return rowsAffected ? caseToAllocateToVendor : null;
+                return rowsAffected ? caseToAllocateToVendor : null!;
             }
             catch (Exception ex)
             {

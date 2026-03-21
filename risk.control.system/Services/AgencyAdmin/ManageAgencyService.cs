@@ -46,7 +46,7 @@ namespace risk.control.system.Services.AgencyAdmin
         {
             var errors = new Dictionary<string, string>();
 
-            _validateImageService.ValidateImage(model.Document, errors);
+            _validateImageService.ValidateImage(model.Document!, errors);
 
             //await ValidatePhoneAsync(model, errors);
             if (errors.Any())
@@ -80,7 +80,7 @@ namespace risk.control.system.Services.AgencyAdmin
         public async Task<Vendor> GetVendorAsync(string userEmail, long id)
         {
             var vendor = await _context.Vendor.AsNoTracking().Include(v => v.Country).FirstOrDefaultAsync(v => v.VendorId == id);
-            vendor.SelectedByCompany = await _context.ApplicationUser.AsNoTracking().AnyAsync(u => u.Email.ToLower() == userEmail.ToLower() && u.IsSuperAdmin);
+            vendor.SelectedByCompany = await _context.ApplicationUser.AsNoTracking().AnyAsync(u => u.Email.Equals(userEmail, StringComparison.CurrentCultureIgnoreCase) && u.IsSuperAdmin);
 
             return vendor;
         }

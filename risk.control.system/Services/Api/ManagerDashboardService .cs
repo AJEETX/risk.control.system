@@ -78,11 +78,11 @@ namespace risk.control.system.Services.Api
             await using var _context = _contextFactory.CreateDbContext();
 
             // Pass the context into GetCases
-            var cases = GetCases(_context).Where(c => !c.Deleted && c.PolicyDetail.InsuranceType == insuranceType);
+            var cases = GetCases(_context).Where(c => !c.Deleted && c.PolicyDetail!.InsuranceType == insuranceType);
 
             var companyUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
 
-            var count = await cases.CountAsync(a => a.ClientCompanyId == companyUser.ClientCompanyId &&
+            var count = await cases.CountAsync(a => a.ClientCompanyId == companyUser!.ClientCompanyId &&
                     a.Status == CONSTANTS.CASE_STATUS.INPROGRESS &&
                     !CONSTANTS.ActiveSubStatuses.Contains(a.SubStatus));
 
@@ -92,10 +92,10 @@ namespace risk.control.system.Services.Api
         private async Task<int> GetCompanyManagerApproved(string userEmail, InsuranceType insuranceType)
         {
             await using var _context = _contextFactory.CreateDbContext();
-            var cases = GetCases(_context).Where(c => c.PolicyDetail.InsuranceType == insuranceType);
+            var cases = GetCases(_context).Where(c => c.PolicyDetail!.InsuranceType == insuranceType);
             var companyUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
 
-            var count = await cases.CountAsync(c => c.ClientCompanyId == companyUser.ClientCompanyId &&
+            var count = await cases.CountAsync(c => c.ClientCompanyId == companyUser!.ClientCompanyId &&
                 c.Status == CONSTANTS.CASE_STATUS.FINISHED &&
                 c.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR
                 );
@@ -106,10 +106,10 @@ namespace risk.control.system.Services.Api
         private async Task<int> GetManagerReject(string userEmail, InsuranceType insuranceType)
         {
             await using var _context = _contextFactory.CreateDbContext();
-            var cases = GetCases(_context).Where(c => c.PolicyDetail.InsuranceType == insuranceType);
+            var cases = GetCases(_context).Where(c => c.PolicyDetail!.InsuranceType == insuranceType);
             var companyUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
 
-            var count = await cases.CountAsync(c => c.ClientCompanyId == companyUser.ClientCompanyId &&
+            var count = await cases.CountAsync(c => c.ClientCompanyId == companyUser!.ClientCompanyId &&
                 c.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR && c.Status == CONSTANTS.CASE_STATUS.FINISHED);
 
             return count;
@@ -119,7 +119,7 @@ namespace risk.control.system.Services.Api
         {
             await using var _context = _contextFactory.CreateDbContext();
             var companyUser = await _context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == userEmail);
-            var empAgencies = await _context.ClientCompany.Include(c => c.EmpanelledVendors).FirstOrDefaultAsync(c => c.ClientCompanyId == companyUser.ClientCompanyId);
+            var empAgencies = await _context.ClientCompany.Include(c => c.EmpanelledVendors).FirstOrDefaultAsync(c => c.ClientCompanyId == companyUser!.ClientCompanyId);
             var count = empAgencies.EmpanelledVendors.Count(v => !v.Deleted);
             return count;
         }
@@ -131,10 +131,10 @@ namespace risk.control.system.Services.Api
             var companyUser = await _context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == userEmail);
             var company = await _context.ClientCompany
                .Include(c => c.EmpanelledVendors)
-               .FirstOrDefaultAsync(c => c.ClientCompanyId == companyUser.ClientCompanyId);
+               .FirstOrDefaultAsync(c => c.ClientCompanyId == companyUser!.ClientCompanyId);
 
             var availableVendors = await _context.Vendor
-                .CountAsync(v => !company.EmpanelledVendors.Contains(v) && v.CountryId == companyUser.CountryId && !v.Deleted);
+                .CountAsync(v => !company!.EmpanelledVendors.Contains(v) && v.CountryId == companyUser!.CountryId && !v.Deleted);
             return availableVendors;
         }
 

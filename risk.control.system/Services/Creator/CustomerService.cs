@@ -160,7 +160,7 @@ namespace risk.control.system.Services.Creator
             {
                 InvestigationTaskId = id,
                 Addressline = "12 Main Road",
-                PhoneNumber = pinCode.Country.Code.ToLower() == "au" ? Applicationsettings.SAMPLE_MOBILE_AUSTRALIA : Applicationsettings.SAMPLE_MOBILE_INDIA,
+                PhoneNumber = pinCode.Country.Code.Equals("au", StringComparison.CurrentCultureIgnoreCase) ? Applicationsettings.SAMPLE_MOBILE_AUSTRALIA : Applicationsettings.SAMPLE_MOBILE_INDIA,
                 DateOfBirth = DateTime.UtcNow.AddYears(-30).AddDays(20),
                 Education = Education.PROFESSIONAL,
                 Income = Income.UPPER_INCOME,

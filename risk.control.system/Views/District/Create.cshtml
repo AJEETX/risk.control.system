@@ -34,7 +34,7 @@
 								   class="form-control remarks"
 								   data-placeholder="country"
 								   asp-for="CountryId"
-								   value="@Model.Country.Name" />
+								   value="@Model?.Country!.Name" />
 						}
 						else
 						{
@@ -74,38 +74,38 @@
 							<span class="input-group-text"><i class="fas fa-city"></i> <i class="fa fa-asterisk asterik-style"></i></span>
 						</div>
 						<input id="Name" type="text" asp-for="Name" class="form-control remarks title-name" required placeholder="District Name" minlength="2" maxlength="50">
-							<span asp-validation-for="Name" class="text-danger"></span>
-						</div>
+						<span asp-validation-for="Name" class="text-danger"></span>
 					</div>
-
-					<div class="form-group">
-						<span class="input-group-label"> Distict Code:</span>
-						<div class="input-group mb-3">
-							<div class="input-group-prepend">
-								<span class="input-group-text"><i class="fas fa-code"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-							</div>
-							<input type="text" id="Code" asp-for="Code" class="form-control remarks title-name" required placeholder="District Code" minlength="2" maxlength="20">
-								<span asp-validation-for="Code" class="text-danger"></span>
-							</div>
-						</div>
-
-						<div class="form-group text-right">
-							<a id="back" asp-action="Profile" class="btn btn-secondary ignore-validation">
-								<i class="fa fa-window-close"></i>
-								Cancel
-							</a>
-							<button id="create" type="submit" class="btn btn-success">
-								<i class="fas fa-city"></i> Add New
-							</button>
-						</div>
-					</form>
 				</div>
-			</div>
-		</section>
-		@section Scripts {
-			@{
-				await Html.RenderPartialAsync("_ValidationScriptsPartial");
-			}
-			<script src="~/js/common/form-valid.js"></script>
-			<script src="~/js/company-admin/district.js"></script>
-		}
+
+				<div class="form-group">
+					<span class="input-group-label"> Distict Code:</span>
+					<div class="input-group mb-3">
+						<div class="input-group-prepend">
+							<span class="input-group-text"><i class="fas fa-code"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+						</div>
+						<input type="text" id="Code" asp-for="Code" class="form-control remarks title-name" required placeholder="District Code" minlength="2" maxlength="20">
+						<span asp-validation-for="Code" class="text-danger"></span>
+					</div>
+				</div>
+
+				<div class="form-group text-right">
+					<a id="back" asp-action="Profile" class="btn btn-secondary ignore-validation">
+						<i class="fa fa-window-close"></i>
+						Cancel
+					</a>
+					<button id="create" type="submit" class="btn btn-success">
+						<i class="fas fa-city"></i> Add New
+					</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</section>
+@section Scripts {
+	@{
+		await Html.RenderPartialAsync("_ValidationScriptsPartial");
+	}
+	<script src="~/js/common/form-valid.js"></script>
+	<script src="~/js/company-admin/district.js"></script>
+}

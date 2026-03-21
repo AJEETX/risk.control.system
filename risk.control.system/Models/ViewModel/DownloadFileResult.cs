@@ -11,7 +11,6 @@
 
     public class DownloadErrorFileResult
     {
-        public Stream FileStream { get; set; }
         public byte[] FileBytes { get; set; } // Added for in-memory data
         public string FileName { get; set; }
         public string ContentType { get; set; }

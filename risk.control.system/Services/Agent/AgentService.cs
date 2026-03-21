@@ -177,11 +177,11 @@ namespace risk.control.system.Services.Agent
             var agentRole = await roleManager.FindByNameAsync(AGENT.DISPLAY_NAME);
 
             var user2Onboards = context.ApplicationUser.Include(c => c.Country).Where(
-                u => u.Country.ISDCode + u.PhoneNumber.TrimStart('+') == mobile.TrimStart('+') && !string.IsNullOrWhiteSpace(u.MobileUId));
+                u => u.Country!.ISDCode + u.PhoneNumber!.TrimStart('+') == mobile.TrimStart('+') && !string.IsNullOrWhiteSpace(u.MobileUId));
 
             foreach (var user2Onboard in user2Onboards)
             {
-                var isAgent = await userVendorManager.IsInRoleAsync(user2Onboard, agentRole?.Name);
+                var isAgent = await userVendorManager.IsInRoleAsync(user2Onboard, agentRole!.Name!);
                 if (isAgent)
                 {
                     user2Onboard.MobileUId = string.Empty;
@@ -195,7 +195,7 @@ namespace risk.control.system.Services.Agent
                         string message = $"Dear {user2Onboard.Email}\n";
                         message += $"Uid reset for mobile: {mobile}\n";
                         message += $"{portal_base_url}";
-                        await smsService.DoSendSmsAsync(user2Onboard.Country.Code, mobile, message);
+                        await smsService.DoSendSmsAsync(user2Onboard!.Country!.Code, mobile, message);
                     }
                     return user2Onboard;
                 }

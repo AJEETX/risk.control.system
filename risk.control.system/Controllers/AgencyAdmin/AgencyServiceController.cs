@@ -38,7 +38,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
         [Breadcrumb("Add Service")]
         public async Task<IActionResult> Create()
         {
-            var userEmail = User.Identity?.Name;
+            var userEmail = User.Identity?.Name!;
             try
             {
                 var model = await _service.PrepareCreateViewModelAsync(userEmail);
@@ -61,9 +61,10 @@ namespace risk.control.system.Controllers.AgencyAdmin
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(VendorInvestigationServiceType serviceModel)
         {
+            var userEmail = User.Identity?.Name!;
             try
             {
-                var result = await _typeManager.CreateAsync(serviceModel, User.Identity?.Name);
+                var result = await _typeManager.CreateAsync(serviceModel, userEmail);
                 if (!result.Success)
                 {
                     _notifyService.Custom(result.Message, 3, "red", "fas fa-cog");
@@ -107,9 +108,10 @@ namespace risk.control.system.Controllers.AgencyAdmin
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(VendorInvestigationServiceType serviceModel)
         {
+            var userEmail = User.Identity?.Name!;
             try
             {
-                var result = await _typeManager.EditAsync(serviceModel, User.Identity?.Name);
+                var result = await _typeManager.EditAsync(serviceModel, userEmail);
                 if (!result.Success)
                 {
                     _notifyService.Custom(result.Message, 3, "red", "fas fa-cog");

@@ -100,12 +100,12 @@ namespace risk.control.system.Controllers.Company
         {
             Response.ContentType = "text/event-stream";
             // Important: Disable buffering so the browser gets data immediately
-            Response.Headers.Add("Connection", "keep-alive");
+            Response.Headers.Append("Connection", "keep-alive");
 
             var user = await _userManager.FindByEmailAsync(email);
             if (user == null)
             {
-                await Response.WriteAsync("data: ERROR_UserNotFound\n\n"); // Added \n\n
+                await Response.WriteAsync("data: ERROR_UserNotFound\n\n", cancellationToken: cancellationToken); // Added \n\n
                 await Response.Body.FlushAsync(cancellationToken);
                 return;
             }

@@ -50,8 +50,8 @@
 
 <article>
 	<input type="hidden" id="customerDetailId" value="@Model.ClaimsInvestigation?.CustomerDetail?.CustomerDetailId" />
-	<input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.Id" />
-	<input type="hidden" id="policyDetailId" value="@Model.ClaimsInvestigation?.PolicyDetail.PolicyDetailId" />
+	<input type="hidden" id="claimId" name="claimId" value="@Model?.ClaimsInvestigation!.Id" />
+	<input type="hidden" id="policyDetailId" value="@Model?.ClaimsInvestigation?.PolicyDetail!.PolicyDetailId" />
 	<input type="hidden" id="beneficiaryId" value="@Model.Beneficiary?.BeneficiaryDetailId" />
 	<input type="hidden" id="vendorId" value="@Model.vendorId" />
 	<div class="bb-blog-inner">
@@ -118,14 +118,14 @@
 	</div>
 </div>
 
-<input type="hidden" id="caseIdHidden" value="@Model.ClaimsInvestigation.Id" />
+<input type="hidden" id="caseIdHidden" value="@Model?.ClaimsInvestigation!.Id" />
 <div class="card shadow-lg border-1 rounded-lg">
 	<button id="refreshTable" class="btn btn-default"> <i id="refreshIcon" class="fas fa-sync"></i> Refresh</button>
 </div>
 <form id="radioButtons" method="post" asp-controller="AssignCase" asp-action="AllocateSingle2Vendor">
 	<div class="card-body">
 
-		<input type="hidden" id="caseId" name="caseId" value="@Model.ClaimsInvestigation.Id" />
+		<input type="hidden" id="caseId" name="caseId" value="@Model?.ClaimsInvestigation!.Id" />
 		<table id="dataTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
 			<thead>
 				<tr>
@@ -153,11 +153,11 @@
 		<div class="row float-right">
 			<div class="col-md-12">
 				<a id="back"
-					   asp-controller="@(Model.FromEditPage ? "Creator" : "CaseCreateEdit")"
+					   asp-controller="@(Model!.FromEditPage ? "Creator" : "CaseCreateEdit")"
 					   asp-action="@(Model.FromEditPage ? "Details" : "New")"
-					   asp-route-id="@(Model.FromEditPage? Model.ClaimsInvestigation.Id : null)"
+					   asp-route-id="@(Model.FromEditPage ? Model?.ClaimsInvestigation!.Id : null)"
 					   class="btn btn-sm btn-outline-secondary"
-					   data-bs-toggle="tooltip" title="@(Model.FromEditPage ? "Back to Case detail" : "Back to Add/Assign cases")">
+					   data-bs-toggle="tooltip" title="@(Model!.FromEditPage ? "Back to Case detail" : "Back to Add/Assign cases")">
 					<i class="fas fa-arrow-left"></i><span class="badge badge-light"> <i class="fa fa-random"></i> </span> Back
 				</a>
 				<button disabled="disabled" id="allocatedcase" type="submit" class="btn btn-sm btn-info">

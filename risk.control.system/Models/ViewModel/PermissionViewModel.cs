@@ -2,9 +2,9 @@
 {
     public class PermissionsViewModel
     {
-        public string RoleName { get; set; }
-        public string RoleId { get; set; }
-        public List<PermissionViewModel> PermissionViewModels { get; set; }
+        public string? RoleName { get; set; }
+        public string? RoleId { get; set; }
+        public List<PermissionViewModel>? PermissionViewModels { get; set; }
     }
 
     public class PermissionViewModel
@@ -14,8 +14,8 @@
 
     public class RoleClaimsViewModel
     {
-        public string Type { get; set; }
-        public string Value { get; set; }
+        public string? Type { get; set; }
+        public string? Value { get; set; }
         public bool Selected { get; set; }
     }
 }

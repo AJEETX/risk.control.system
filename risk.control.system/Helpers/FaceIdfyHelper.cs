@@ -8,8 +8,8 @@ namespace risk.control.system.Helpers
         public static string GetRegisteredImagePath(InvestigationTask claim, bool isCustomerVerification)
         {
             return isCustomerVerification
-                ? claim.CustomerDetail.ImagePath
-                : claim.BeneficiaryDetail.ImagePath;
+                ? claim.CustomerDetail!.ImagePath!
+                : claim.BeneficiaryDetail!.ImagePath!;
         }
 
         public static void MapMetadataToReport(FaceIdReport face, LocationReport loc, FaceData data, string path, string ext, string lat, string lon)
@@ -31,7 +31,7 @@ namespace risk.control.system.Helpers
         {
             return new AppiCheckifyResponse
             {
-                BeneficiaryId = claim.BeneficiaryDetail.BeneficiaryDetailId,
+                BeneficiaryId = claim.BeneficiaryDetail!.BeneficiaryDetailId,
                 Image = img,
                 LocationImage = face.FilePath,
                 LocationLongLat = face.LongLat,
