@@ -87,11 +87,6 @@ namespace risk.control.system.AppConstant
         public const string CURRENT_PINCODE5 = "3125";
         public const string CURRENT_PINCODE6 = "3124";
 
-        public const string INSURER = "Insurer life";
-        public const string INSURERDOMAIN = "insurer.com";
-        public const string INSURERLOGO = "/img/insurer.jpg";
-
-        public const string CANARA = "Canara Hsbc";
         public const string CANARADOMAIN = "canarahsbc.com";
         public const string CANARALOGO = "/img/chl.jpg";
 

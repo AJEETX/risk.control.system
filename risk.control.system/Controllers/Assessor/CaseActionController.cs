@@ -52,7 +52,7 @@ namespace risk.control.system.Controllers.Assessor
             if (!ModelState.IsValid || string.IsNullOrWhiteSpace(assessorRemarks) || claimId < 1 || string.IsNullOrWhiteSpace(assessorRemarkType))
             {
                 _notifyService.Custom($"Error!!! Try again", 3, "red", "far fa-file-powerpoint");
-                return RedirectToAction(nameof(AssessorController.Assessor), ControllerName<AssessorController>.Name);
+                return RedirectToAction(nameof(AssessorController.Assess), ControllerName<AssessorController>.Name);
             }
             var userEmail = HttpContext.User?.Identity?.Name;
             try
@@ -77,19 +77,19 @@ namespace risk.control.system.Controllers.Assessor
                     {
                         _notifyService.Custom($"Case <b> #{contract}</b> Re-Assigned", 3, "yellow", "far fa-file-powerpoint");
                     }
-                    return RedirectToAction(nameof(AssessorController.Assessor), ControllerName<AssessorController>.Name);
+                    return RedirectToAction(nameof(AssessorController.Assess), ControllerName<AssessorController>.Name);
                 }
                 else
                 {
                     _notifyService.Custom($"Error!!! Try again", 3, "red", "far fa-file-powerpoint");
-                    return RedirectToAction(nameof(AssessorController.Assessor), ControllerName<AssessorController>.Name);
+                    return RedirectToAction(nameof(AssessorController.Assess), ControllerName<AssessorController>.Name);
                 }
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error withdrawing case {Id}. {UserEmail}", claimId, userEmail);
                 _notifyService.Error("Error processing case. Try again.");
-                return RedirectToAction(nameof(AssessorController.Assessor), ControllerName<AssessorController>.Name);
+                return RedirectToAction(nameof(AssessorController.Assess), ControllerName<AssessorController>.Name);
             }
         }
     }
