@@ -28,31 +28,37 @@ namespace risk.control.system.Models.ViewModel
         [Required]
         [EmailAddress]
         [DisplayName("Email")]
-        public string Email { get; set; }
+        public string? Email { get; set; }
+
         [Required]
-        public string CountryId { get; set; }
+        public string? CountryId { get; set; }
+
         [Required]
-        public string Mobile { get; set; }
+        public string? Mobile { get; set; }
+
         public string? ResetError { get; set; }
     }
+
     public class ForgotPasswordResult
     {
         public long? Id { get; set; }
-        public string CountryCode { get; set; }
-        public byte[] ProfilePicture { get; set; }
-        public string ProfileImage { get; set; }
+        public string? CountryCode { get; set; }
+        public byte[]? ProfilePicture { get; set; }
+        public string? ProfileImage { get; set; }
     }
+
     public class OtpLoginModel
     {
-        public string CountryIsd { get; set; }
-        public string MobileNumber { get; set; }
+        public string? CountryIsd { get; set; }
+        public string? MobileNumber { get; set; }
         public string? UserEnteredOtp { get; set; }
         public string? LoginError { get; set; }
     }
+
     public class OtpRequest
     {
-        public string CountryIsd { get; set; }
-        public string MobileNumber { get; set; }
-        public string BaseUrl { get; set; }
+        public string? CountryIsd { get; set; }
+        public string? MobileNumber { get; set; }
+        public string? BaseUrl { get; set; }
     }
 }

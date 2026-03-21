@@ -157,7 +157,7 @@ namespace risk.control.system.Controllers.Creator
                 _notifyService.Information($"Limit available = <b>{status.AvailableCount}</b>");
         }
 
-        private IActionResult RedirectToDashboard(string errorMessage, string logDetail = null)
+        private IActionResult RedirectToDashboard(string errorMessage, string? logDetail = null)
         {
             if (!string.IsNullOrEmpty(logDetail))
             {

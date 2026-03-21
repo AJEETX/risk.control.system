@@ -28,7 +28,7 @@
                     var cookieConsent = context.Request.Cookies["CookieConsent"];
                     context.Items["HasCookieConsent"] = cookieConsent == "Accepted";
 
-                    var timeout = double.Parse(config["SESSION_TIMEOUT_SEC"]);
+                    var timeout = double.Parse(config["SESSION_TIMEOUT_SEC"]!);
                     context.Items.Add("timeout", timeout);
                     Console.WriteLine("timeout (sec): " + timeout);
                 }

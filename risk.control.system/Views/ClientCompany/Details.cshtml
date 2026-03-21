@@ -4,8 +4,8 @@
 	ViewData["Title"] = "Manage Company";
 }
 <section class="content">
-	<input type="hidden" id="Latitude" asp-for="@Model.PinCode.Latitude" />
-	<input type="hidden" id="Longitude" asp-for="@Model.PinCode.Longitude" />
+	<input type="hidden" id="Latitude" asp-for="@Model.PinCode!.Latitude" />
+	<input type="hidden" id="Longitude" asp-for="@Model.PinCode!.Longitude" />
 	<input type="hidden" id="UserCount" asp-for="@Model.UserCount" />
 	<div id="article" class="card card-secondary direct-chat-warning expand-card">
 		<div class="card-header">
@@ -70,7 +70,7 @@
 											<span class="fa-li">
 												<i class="fas fa-home"></i>
 											</span>
-											Address: <b>@Model.Addressline @Model.District.Name @Model.State.Name @Model.PinCode.Code</b>
+											Address: <b>@Model.Addressline @Model.District!.Name @Model.State!.Name @Model.PinCode!.Code</b>
 										</li>
 										<li class="small">
 											<span class="fa-li">
@@ -81,7 +81,7 @@
 										@{
 											if (Model.LicenseType == LicenseType.Trial)
 											{
-												var expiryDate = Model.ExpiryDate.Value.ToString("dd-MMM-yyyy");
+												var expiryDate = Model.ExpiryDate!.Value.ToString("dd-MMM-yyyy");
 
 												<li class="small">
 													<span class="fa-li">
@@ -179,7 +179,7 @@
 											<span class="fa-li">
 												<i class="fas fa-project-diagram"></i>
 											</span>
-											API endpoint:  <a href="#">  @Model.PanIdfyUrl</a>
+											API endpoint:  <a href="#">  @Model!.PanIdfyUrl</a>
 										</li>
 										<li class="small">
 											<span class="fa-li">

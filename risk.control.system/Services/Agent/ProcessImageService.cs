@@ -83,7 +83,7 @@ namespace risk.control.system.Services.Agent
                             dateSize.Width + 20,
                             dateSize.Height + 10);
 
-                        //ctx.Fill(Color.White.WithAlpha(0.5f), dateRect);
+                        ctx.Fill(Color.White.WithAlpha(0.5f), dateRect);
                         ctx.Draw(Color.Gray.WithAlpha(0.5f), borderThickness / 2, dateRect);
                         ctx.DrawText(dateOptions, timestamp, Color.Black.WithAlpha(0.8f));
 

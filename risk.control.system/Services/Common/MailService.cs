@@ -669,7 +669,7 @@ namespace risk.control.system.Services.Common
             string message,
             string url,
             List<ApplicationUser> smsRecipients,
-            string agentEmail = null) // Added as optional parameter
+            string? agentEmail = null) // Added as optional parameter
         {
             using var _context = await _contextFactory.CreateDbContextAsync();
 

@@ -6,10 +6,8 @@ namespace risk.control.system.Permission
 {
     internal class PermissionAuthorizationHandler : AuthorizationHandler<PermissionRequirement>
     {
-
         public PermissionAuthorizationHandler()
         {
-
         }
 
         protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, PermissionRequirement requirement)
@@ -19,7 +17,7 @@ namespace risk.control.system.Permission
                 return;
             }
             var permissionss = context.User.Claims.Where(x => x.Type == Applicationsettings.PERMISSION &&
-                                                            x.Value.ToLower() == requirement.Permission.ToLower() &&
+                                                            x.Value.Equals(requirement.Permission, StringComparison.CurrentCultureIgnoreCase) &&
                                                             x.Issuer == "LOCAL AUTHORITY");
             if (permissionss.Any())
             {

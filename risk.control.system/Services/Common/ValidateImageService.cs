@@ -4,7 +4,7 @@ namespace risk.control.system.Services.Common
 {
     public interface IValidateImageService
     {
-        void ValidateImage(IFormFile image, Dictionary<string, string> errors);
+        void ValidateImage(IFormFile? image, Dictionary<string, string> errors);
     }
 
     public class ValidateImageService : IValidateImageService
@@ -13,11 +13,11 @@ namespace risk.control.system.Services.Common
         private static readonly HashSet<string> AllowedExt = new() { ".jpg", ".jpeg", ".png" };
         private static readonly HashSet<string> AllowedMime = new() { "image/jpeg", "image/png" };
 
-        public void ValidateImage(IFormFile image, Dictionary<string, string> errors)
+        public void ValidateImage(IFormFile? image, Dictionary<string, string> errors)
         {
             if (image == null || image.Length == 0)
             {
-                errors[image.Name] = "Invalid image";
+                errors["image"] = "Invalid image";
                 return;
             }
 

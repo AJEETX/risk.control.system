@@ -18,7 +18,7 @@ namespace risk.control.system.Helpers
             using (var writer = new StringWriter())
             {
                 var viewEngine = controller.HttpContext.RequestServices.GetService(typeof(ICompositeViewEngine)) as ICompositeViewEngine;
-                var viewResult = viewEngine.FindView(controller.ControllerContext, viewName, !partial);
+                var viewResult = viewEngine!.FindView(controller.ControllerContext, viewName, !partial);
 
                 if (!viewResult.Success)
                     throw new FileNotFoundException($"View '{viewName}' not found.");

@@ -2,7 +2,7 @@
 
 @{
 	ViewData["Title"] = @Applicationsettings.EDIT;
-	var email = Model.Vendor.Email;
+	var email = Model.Vendor!.Email;
 }
 <section class="content">
 	<form id="edit-form" asp-action="Edit" enctype="multipart/form-data">
