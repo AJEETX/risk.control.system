@@ -55,7 +55,6 @@ namespace risk.control.system.Seeds
                 StateId = companyPinCode.StateId,
                 DistrictId = companyPinCode.DistrictId,
                 PinCodeId = companyPinCode.PinCodeId,
-                //Description = "CORPORATE OFFICE ",
                 Email = input.DOMAIN,
                 DocumentUrl = relativePath,
                 PhoneNumber = input.PHONE,
