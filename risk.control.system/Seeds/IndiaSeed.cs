@@ -17,44 +17,175 @@ namespace risk.control.system.Seeds
             var indiaPincodes = await PinCodeStateSeed.CsvRead_IndiaAsync();
             var indianStates = indiaPincodes
                 .Where(s =>
-                string.Equals( s.StateName, "haryana", StringComparison.OrdinalIgnoreCase)
+                string.Equals(s.StateName, "haryana", StringComparison.OrdinalIgnoreCase)
                 ||
                 string.Equals(s.StateName, "delhi", StringComparison.OrdinalIgnoreCase)
-                //||
-                //s.StateCode.ToLower() == "up"
+                ||
+                s.StateCode.ToLower() == "up"
                 )
                 .Select(g => g.StateCode).Distinct()?.ToList();
             var filteredInPincodes = indiaPincodes.Where(g => indianStates.Contains(g.StateCode))?.ToList();
             await PinCodeStateSeed.SeedPincode(context, filteredInPincodes, india);
             await context.SaveChangesAsync(null, false);
 
-            var proper = new SeedInput
+            var checker = new SeedInput
             {
                 COUNTRY = COUNTRY_CODE,
-                DOMAIN = "proper.com",
-                PHOTO = "/img/proper.png",
-                NAME = "Proper",
+                PINCODE = PINCODE,
+                DOMAIN = "checker.in",
+                NAME = "Checker Inc India",
+                PHOTO = "/img/checker.png",
                 ADDRESSLINE = "12 MG Road",
                 BRANCH = "Main Office",
                 IFSC = "SBIN0001234",
                 BANK = "State Bank of India",
+                PHONE = "9876543210"
+            };
+            var crucible = new SeedInput
+            {
+                COUNTRY = COUNTRY_CODE,
                 PINCODE = PINCODE,
+                DOMAIN = "crucible.in",
+                NAME = "Crucible Inc India",
+                PHOTO = "/img/crucible.jpg",
+                ADDRESSLINE = "67 Mehrauli Road",
+                BRANCH = "Gurgaon",
+                IFSC = "SBIN0001234",
+                BANK = "State Bank of India",
+                PHONE = "9876543210"
+            };
+            var cyber = new SeedInput
+            {
+                COUNTRY = COUNTRY_CODE,
+                PINCODE = PINCODE,
+                DOMAIN = "cyber.com",
+                NAME = "Cyber Inc India",
+                PHOTO = "/img/cyber.png",
+                ADDRESSLINE = "67 Mehrauli Road",
+                BRANCH = "Gurgaon",
+                IFSC = "SBIN0001234",
+                BANK = "State Bank of India",
                 PHONE = "9876543210"
             };
             var honest = new SeedInput
             {
                 COUNTRY = COUNTRY_CODE,
-                DOMAIN = "honest.com",
+                PINCODE = PINCODE,
+                DOMAIN = "honest.in",
                 PHOTO = "/img/honest.png",
-                NAME = "Honest",
+                NAME = "Honest Inc India",
                 ADDRESSLINE = "67 Mehrauli Road",
                 BRANCH = "Gurgaon",
                 IFSC = "SBIN0001234",
                 BANK = "State Bank of India",
-                PINCODE = PINCODE,
                 PHONE = "9876543210"
             };
-            var agencies = new List<SeedInput> { proper, honest };
+            var hubris = new SeedInput
+            {
+                COUNTRY = COUNTRY_CODE,
+                PINCODE = PINCODE,
+                DOMAIN = "hubris.in",
+                NAME = "Hubris Inc India",
+                PHOTO = "/img/hubris.jpg",
+                ADDRESSLINE = "67 Mehrauli Road",
+                BRANCH = "Gurgaon",
+                IFSC = "SBIN0001234",
+                BANK = "State Bank of India",
+                PHONE = "9876543210"
+            };
+            var investigate = new SeedInput
+            {
+                COUNTRY = COUNTRY_CODE,
+                PINCODE = PINCODE,
+                DOMAIN = "investigate.in",
+                NAME = "Investigate Inc India",
+                PHOTO = "/img/investigate.png",
+                ADDRESSLINE = "67 Mehrauli Road",
+                BRANCH = "Gurgaon",
+                IFSC = "SBIN0001234",
+                BANK = "State Bank of India",
+                PHONE = "9876543210"
+            };
+            var investigation = new SeedInput
+            {
+                COUNTRY = COUNTRY_CODE,
+                PINCODE = PINCODE,
+                DOMAIN = "investigation.in",
+                NAME = "Investigation Inc India",
+                PHOTO = "/img/investigation.png",
+                ADDRESSLINE = "67 Mehrauli Road",
+                BRANCH = "Gurgaon",
+                IFSC = "SBIN0001234",
+                BANK = "State Bank of India",
+                PHONE = "9876543210"
+            };
+            var nicer = new SeedInput
+            {
+                COUNTRY = COUNTRY_CODE,
+                PINCODE = PINCODE,
+                DOMAIN = "nicer.in",
+                NAME = "Nicer Inc India",
+                PHOTO = "/img/nicer.png",
+                ADDRESSLINE = "67 Mehrauli Road",
+                BRANCH = "Gurgaon",
+                IFSC = "SBIN0001234",
+                BANK = "State Bank of India",
+                PHONE = "9876543210"
+            };
+            var proper = new SeedInput
+            {
+                COUNTRY = COUNTRY_CODE,
+                PINCODE = PINCODE,
+                DOMAIN = "proper.in",
+                PHOTO = "/img/proper.png",
+                NAME = "Proper Inc India",
+                ADDRESSLINE = "12 MG Road",
+                BRANCH = "Main Office",
+                IFSC = "SBIN0001234",
+                BANK = "State Bank of India",
+                PHONE = "9876543210"
+            };
+            var sample = new SeedInput
+            {
+                COUNTRY = COUNTRY_CODE,
+                PINCODE = PINCODE,
+                DOMAIN = "sample.in",
+                NAME = "Sample Inc India",
+                PHOTO = "/img/sample.png",
+                ADDRESSLINE = "67 Mehrauli Road",
+                BRANCH = "Gurgaon",
+                IFSC = "SBIN0001234",
+                BANK = "State Bank of India",
+                PHONE = "9876543210"
+            };
+            var verify = new SeedInput
+            {
+                COUNTRY = COUNTRY_CODE,
+                PINCODE = PINCODE,
+                DOMAIN = "verify.in",
+                NAME = "Verify Inc India",
+                PHOTO = "/img/verify.png",
+                ADDRESSLINE = "12 MG Road",
+                BRANCH = "Main Office",
+                IFSC = "SBIN0001234",
+                BANK = "State Bank of India",
+                PHONE = "9876543210"
+            };
+            var zoom = new SeedInput
+            {
+                COUNTRY = COUNTRY_CODE,
+                PINCODE = PINCODE,
+                DOMAIN = "zoom.in",
+                NAME = "Zoom Inc India",
+                PHOTO = "/img/zoom.png",
+                ADDRESSLINE = "67 Mehrauli Road",
+                BRANCH = "Gurgaon",
+                IFSC = "SBIN0001234",
+                BANK = "State Bank of India",
+                PHONE = "9876543210"
+            };
+
+            var agencies = new List<SeedInput> { checker, crucible, cyber, honest, hubris, investigate, investigation, nicer, proper, sample, verify, zoom };
             var vendors = new List<Vendor> { };
 
             foreach (var agency in agencies)
@@ -66,8 +197,8 @@ namespace risk.control.system.Seeds
             var insurer = new SeedInput
             {
                 COUNTRY = COUNTRY_CODE,
-                DOMAIN = "can-hsbc.com",
-                NAME = "Can-Hsbc",
+                DOMAIN = "insurer.in",
+                NAME = "Insurance Inc India",
                 PHOTO = "/img/insurer.jpg",
                 ADDRESSLINE = "139 Sector 44",
                 BRANCH = "Head Office",
@@ -77,9 +208,10 @@ namespace risk.control.system.Seeds
                 PHONE = "9876543210"
             };
             var companies = new List<SeedInput> { insurer };
+            var agencies2Empanel = vendors.Take(vendors.Count / 2).ToList();
             foreach (var company in companies)
             {
-                _ = await Insurer.Seed(context, vendors, webHostEnvironment, customApiCLient, userManager, company, fileStorageService);
+                _ = await Insurer.Seed(context, agencies2Empanel, webHostEnvironment, customApiCLient, userManager, company, fileStorageService);
             }
             await context.SaveChangesAsync(null, false);
             var pincode = indiaPincodes.FirstOrDefault(p => p.Code == PINCODE);

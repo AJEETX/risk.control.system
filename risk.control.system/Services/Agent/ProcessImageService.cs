@@ -83,7 +83,7 @@ namespace risk.control.system.Services.Agent
                             dateSize.Width + 20,
                             dateSize.Height + 10);
 
-                        ctx.Fill(Color.White.WithAlpha(0.5f), dateRect);
+                        //ctx.Fill(Color.White.WithAlpha(0.5f), dateRect);
                         ctx.Draw(Color.Gray.WithAlpha(0.5f), borderThickness / 2, dateRect);
                         ctx.DrawText(dateOptions, timestamp, Color.Black.WithAlpha(0.8f));
 
@@ -116,7 +116,7 @@ namespace risk.control.system.Services.Agent
                         IPath slantedRectPath = new RectangularPolygon(mainRect).Transform(rotationMatrix);
 
                         // Draw background and border
-                        ctx.Fill(Color.Black.WithAlpha(0.6f), slantedRectPath);
+                        //ctx.Fill(Color.Black.WithAlpha(0.6f), slantedRectPath);
                         ctx.Draw(Color.Silver, borderThickness, slantedRectPath);
 
                         // --- 6. SCALED 3D TEXT LAYERS ---
