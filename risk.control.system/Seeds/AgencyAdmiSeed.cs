@@ -10,7 +10,7 @@ namespace risk.control.system.Seeds
     {
         public static async Task Seed(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, UserManager<ApplicationUser> userManager, Vendor vendor, PinCode pinCode, IFileStorageService fileStorageService)
         {
-            var noUserImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", @Applicationsettings.NO_USER);
+            var noUserImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", NO_USER);
             string adminEmailwithSuffix = AGENCY_ADMIN.CODE + "@" + vendor.Email;
 
             string adminImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", Path.GetFileName(AGENCY_ADMIN.PROFILE_IMAGE));

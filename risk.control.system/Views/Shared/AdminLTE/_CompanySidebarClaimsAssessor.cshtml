@@ -10,8 +10,8 @@
         </a>
     </li>
     <li class="nav-item">
-        <a is-active-page asp-controller="Assessor" asp-action="Assessor" class="actual-link nav-link
-                            @Url.MakeActiveClass("Assessor","Assessor")
+        <a is-active-page asp-controller="Assessor" asp-action="Assess" class="actual-link nav-link
+                            @Url.MakeActiveClass("Assessor","Assess")
                                 @Url.MakeActiveClass("Assessor","SendEnquiry")
                             @Url.MakeActiveClass("Assessor","PreviousReports")
                     @Url.MakeActiveClass("Assessor","GetInvestigateReport")">
@@ -32,7 +32,7 @@
     </li>
     <li class="nav-item">
         <a is-active-page asp-controller="Assessor" asp-action="Approved" class="actual-link nav-link @Url.MakeActiveClass("Assessor","Approved")
-                                                        @Url.MakeActiveClass("Assessor","ApprovedDetail") 
+                                                        @Url.MakeActiveClass("Assessor","ApprovedDetail")
                                                             @Url.MakeActiveClass("Assessor","ShowInvoice")
                                                             @Url.MakeActiveClass("Assessor","PrintInvoice")">
             <i class="far fa-thumbs-up nav-icon"></i>

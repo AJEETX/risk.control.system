@@ -89,7 +89,7 @@ namespace risk.control.system.Controllers.Assessor
                     _backgroundJobClient.Enqueue(() => _mailService.NotifySubmitQueryToAgency(userEmail, claimId, _baseUrl));
 
                     _notifyService.Success("Enquiry Sent to Agency");
-                    return RedirectToAction(nameof(AssessorController.Assessor), ControllerName<AssessorController>.Name);
+                    return RedirectToAction(nameof(AssessorController.Assess), ControllerName<AssessorController>.Name);
                 }
                 _notifyService.Error("OOPs !!!..Error sending query");
                 return this.RedirectToAction<DashboardController>(x => x.Index());

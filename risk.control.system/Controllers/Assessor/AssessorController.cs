@@ -36,16 +36,16 @@ namespace risk.control.system.Controllers.Assessor
 
         public IActionResult Index()
         {
-            return RedirectToAction(nameof(Assessor));
+            return RedirectToAction(nameof(Assess));
         }
 
         [Breadcrumb("Assess(report)")]
-        public IActionResult Assessor()
+        public IActionResult Assess()
         {
             return View();
         }
 
-        [Breadcrumb(title: "Report", FromAction = nameof(Assessor))]
+        [Breadcrumb(title: "Report", FromAction = nameof(Assess))]
         public async Task<IActionResult> GetInvestigateReport(long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name;

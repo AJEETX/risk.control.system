@@ -40,7 +40,7 @@ namespace risk.control.system.Seeds
             }
             var extension = Path.GetExtension(agencyImagePath);
             var (fileName, relativePath) = await fileStorageService.SaveAsync(agencyImage, extension, input.DOMAIN);
-            var checker = new Vendor
+            var agency = new Vendor
             {
                 Name = input.NAME,
                 Addressline = input.ADDRESSLINE,
@@ -65,7 +65,7 @@ namespace risk.control.system.Seeds
                 AddressLongitude = addressCoordinates.Longitude
             };
 
-            var checkerAgency = await context.Vendor.AddAsync(checker);
+            var addedAgency = await context.Vendor.AddAsync(agency);
             await context.SaveChangesAsync(null, false);
             var agencyServices = new List<VendorInvestigationServiceType>();
             foreach (var state in states)
@@ -74,7 +74,7 @@ namespace risk.control.system.Seeds
                 {
                     var vendorService = new VendorInvestigationServiceType
                     {
-                        VendorId = checkerAgency.Entity.VendorId,
+                        VendorId = addedAgency.Entity.VendorId,
                         InvestigationServiceTypeId = service.InvestigationServiceTypeId,
                         Price = 399,
                         InsuranceType = service.InsuranceType,
@@ -88,12 +88,12 @@ namespace risk.control.system.Seeds
                 }
             }
 
-            checker.VendorInvestigationServiceTypes = agencyServices;
+            agency.VendorInvestigationServiceTypes = agencyServices;
 
             await context.SaveChangesAsync(null, false);
-            await AgencyUserSeed.Seed(context, webHostEnvironment, vendorUserManager, checkerAgency.Entity, customApiCLient, fileStorageService);
+            await AgencyUserSeed.Seed(context, webHostEnvironment, vendorUserManager, addedAgency.Entity, customApiCLient, fileStorageService);
 
-            return checkerAgency.Entity;
+            return addedAgency.Entity;
         }
     }
 }
