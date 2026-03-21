@@ -7,7 +7,7 @@ namespace risk.control.system.Services.AgencyAdmin
 {
     public interface IAgencyQueryReplyService
     {
-        Task<InvestigationTask> SubmitQueryReplyToCompany(string userEmail, long caseId, EnquiryRequest request, List<EnquiryRequest> requests, IFormFile document);
+        Task<InvestigationTask> SubmitQueryReplyToCompany(string userEmail, long caseId, EnquiryRequest request, List<EnquiryRequest> requests, IFormFile? document);
     }
 
     internal class AgencyQueryReplyService : IAgencyQueryReplyService
@@ -23,7 +23,7 @@ namespace risk.control.system.Services.AgencyAdmin
             this.timelineService = timelineService;
         }
 
-        public async Task<InvestigationTask> SubmitQueryReplyToCompany(string userEmail, long caseId, EnquiryRequest request, List<EnquiryRequest> requests, IFormFile document)
+        public async Task<InvestigationTask> SubmitQueryReplyToCompany(string userEmail, long caseId, EnquiryRequest request, List<EnquiryRequest> requests, IFormFile? document)
         {
             try
             {
@@ -38,14 +38,14 @@ namespace risk.control.system.Services.AgencyAdmin
                 .FirstOrDefaultAsync(c => c.Id == caseId);
 
                 var replyByAgency = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR;
-                caseTask.CaseOwner = caseTask.ClientCompany.Email;
+                caseTask.CaseOwner = caseTask.ClientCompany!.Email;
                 caseTask.SubStatus = replyByAgency;
                 caseTask.UpdatedBy = userEmail;
                 caseTask.AssignedToAgency = false;
                 caseTask.EnquiryReplyByAgencyTime = DateTime.UtcNow;
                 caseTask.SubmittedToAssessorTime = DateTime.UtcNow;
-                var enquiryRequest = caseTask.InvestigationReport.EnquiryRequest;
-                enquiryRequest.DescriptiveAnswer = request.DescriptiveAnswer;
+                var enquiryRequest = caseTask.InvestigationReport!.EnquiryRequest;
+                enquiryRequest!.DescriptiveAnswer = request.DescriptiveAnswer;
 
                 enquiryRequest.Updated = DateTime.UtcNow;
                 enquiryRequest.UpdatedBy = userEmail;
@@ -78,7 +78,7 @@ namespace risk.control.system.Services.AgencyAdmin
                 var rowsUpdated = await context.SaveChangesAsync(null, false) > 0;
                 await timelineService.UpdateTaskStatus(caseTask.Id, userEmail);
 
-                return rowsUpdated ? caseTask : null;
+                return rowsUpdated ? caseTask : null!;
             }
             catch (Exception ex)
             {

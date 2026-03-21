@@ -34,11 +34,11 @@ namespace risk.control.system.Services.Api
             IBase64FileService base64FileService,
             IFeatureManager featureManager)
         {
-            awayThresholdInMinutes = int.Parse(config["LOGIN_SESSION_INACTIVE_MIN"]);
-            onlineThresholdInMinutes = int.Parse(config["LOGIN_SESSION_ACTIVE_MIN"]);
-            sessionTimeoutInSeconds = int.Parse(config["SESSION_TIMEOUT_SEC"]);
+            awayThresholdInMinutes = int.Parse(config["LOGIN_SESSION_INACTIVE_MIN"]!);
+            onlineThresholdInMinutes = int.Parse(config["LOGIN_SESSION_ACTIVE_MIN"]!);
+            sessionTimeoutInSeconds = int.Parse(config["SESSION_TIMEOUT_SEC"]!);
             sessionTimeoutinMinutes = sessionTimeoutInSeconds / 60;
-            cutoffTime = DateTime.UtcNow.AddSeconds(-double.Parse(config["SESSION_TIMEOUT_SEC"]));
+            cutoffTime = DateTime.UtcNow.AddSeconds(-double.Parse(config["SESSION_TIMEOUT_SEC"]!));
             _contextFactory = contextFactory;
             this.dashboardService = dashboardService;
             this.base64FileService = base64FileService;
@@ -65,7 +65,7 @@ namespace risk.control.system.Services.Api
                 .GroupBy(s => s.ActiveUser.Email)
                 .Select(g => new
                 {
-                    Email = g.Key,
+                    Email = g.Key!,
                     LastSeen = g.Max(x => x.Updated),
                     LoggedOut = g.All(x => x.LoggedOut)
                 })
@@ -107,22 +107,22 @@ namespace risk.control.system.Services.Api
                     u.UpdatedBy,
                     u.MobileUId,
                     u.IsPasswordChangeRequired,
-                    Country = new { u.Country.Code, u.Country.ISDCode },
-                    State = new { u.State.Code, u.State.Name },
-                    District = new { u.District.Name },
-                    PinCode = new { u.PinCode.Code, u.PinCode.Name }
+                    Country = new { u.Country!.Code, u.Country.ISDCode },
+                    State = new { u.State!.Code, u.State.Name },
+                    District = new { u.District!.Name },
+                    PinCode = new { u.PinCode!.Code, u.PinCode.Name }
                 })
                 .ToListAsync();
 
             // 6. Map to response
             var responseTasks = users.Select(async u =>
             {
-                caseCounts.TryGetValue(u.Email, out var count);
+                caseCounts.TryGetValue(u.Email!, out var count);
 
                 string status = "#DED5D5", statusName = "Offline", icon = "fa fa-circle-o";
 
                 // Use the lookup you already fetched in Step 2!
-                if (sessionLookup.TryGetValue(u.Email, out var session) && !session.LoggedOut)
+                if (sessionLookup.TryGetValue(u.Email!, out var session) && !session.LoggedOut)
                 {
                     var lastSeen = session.LastSeen ?? u.Created; // Fallback to created if null
                     var minutesAway = (int)(DateTime.UtcNow - lastSeen).TotalMinutes;
@@ -136,7 +136,7 @@ namespace risk.control.system.Services.Api
                     };
                 }
 
-                var photo = await base64FileService.GetBase64FileAsync(u.ProfilePictureUrl, Applicationsettings.NO_USER);
+                var photo = await base64FileService.GetBase64FileAsync(u.ProfilePictureUrl!, Applicationsettings.NO_USER);
                 return new UserDetailResponse
                 {
                     Id = u.Id,
@@ -196,7 +196,7 @@ namespace risk.control.system.Services.Api
                 .GroupBy(s => s.ActiveUser.Email)
                 .Select(g => new
                 {
-                    Email = g.Key,
+                    Email = g.Key!,
                     LastSeen = g.Max(x => x.Updated ?? x.Created),
                     LoggedOut = g.All(x => x.LoggedOut)
                 })
@@ -221,10 +221,10 @@ namespace risk.control.system.Services.Api
                 var user = vendorUsers[i];
 
                 // Lookup last session
-                latestSessions.TryGetValue(user.Email, out var session);
+                latestSessions.TryGetValue(user.Email!, out var session);
 
                 string status, statusName, icon;
-                if (session == null || session.LoggedOut || session.LastSeen == null)
+                if (session == null || session.LoggedOut)
                 {
                     status = "#DED5D5";
                     statusName = "Offline";
@@ -241,7 +241,7 @@ namespace risk.control.system.Services.Api
                         _ => ("#DED5D5", "Offline", "fa fa-circle-o")
                     };
                 }
-                var photo = await base64FileService.GetBase64FileAsync(user.ProfilePictureUrl, Applicationsettings.NO_USER);
+                var photo = await base64FileService.GetBase64FileAsync(user.ProfilePictureUrl!, Applicationsettings.NO_USER);
 
                 activeUsersDetails.Add(new UserDetailResponse
                 {
@@ -251,17 +251,17 @@ namespace risk.control.system.Services.Api
                         ? user.Email
                         : user.Email + "</a><span title=\"Onboarding incomplete !!!\" data-toggle=\"tooltip\"><i class='fa fa-asterisk asterik-style'></i></span>",
                     RawEmail = user.Email,
-                    Phone = $"(+{user.Country.ISDCode}) {user.PhoneNumber}",
+                    Phone = $"(+{user.Country!.ISDCode}) {user.PhoneNumber}",
                     Photo = photo,
                     Active = user.Active,
-                    Addressline = $"{user.Addressline}, {user.District.Name}",
-                    State = user.State.Code,
+                    Addressline = $"{user.Addressline}, {user.District!.Name}",
+                    State = user.State!.Code,
                     StateName = user.State.Name,
-                    Pincode = user.PinCode.Code,
+                    Pincode = user.PinCode!.Code,
                     PincodeName = $"{user.PinCode.Name} - {user.PinCode.Code}",
                     Country = user.Country.Code,
                     Flag = $"/flags/{user.Country.Code.ToLower()}.png",
-                    Roles = user.Role.GetEnumDisplayName(),
+                    Roles = user.Role!.GetEnumDisplayName(),
                     Updated = (user.Updated ?? user.Created).ToString("dd-MM-yyyy"),
                     UpdatedBy = user.UpdatedBy,
                     OnlineStatus = status,

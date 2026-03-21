@@ -55,20 +55,20 @@
 									}
 								</td>
 								<td>
-									@Html.DisplayFor(modelItem => item.Name)
+									@Html.DisplayFor(modelItem => item!.Name)
 								</td>
 
 								<td>
-									@Html.DisplayFor(modelItem => item.Email)
+									@Html.DisplayFor(modelItem => item!.Email)
 								</td>
 								<td>
-									@Html.DisplayFor(modelItem => item.Addressline)
+									@Html.DisplayFor(modelItem => item!.Addressline)
 								</td>
 								<td>
-									@Html.DisplayFor(modelItem => item.State.Name)
+									@Html.DisplayFor(modelItem => item!.State!.Name)
 								</td>
 								<td>
-									<a class="btn btn-xs btn-info" asp-action="VendorDetail" asp-route-backurl="EmpanelledVendors" asp-route-id="@item.VendorId" asp-route-CompanyId="@ViewBag.CompanyId">
+									<a class="btn btn-xs btn-info" asp-action="VendorDetail" asp-route-backurl="EmpanelledVendors" asp-route-id="@item!.VendorId" asp-route-CompanyId="@ViewBag.CompanyId">
 										<i class="fa fa-search"></i> @Applicationsettings.DETAILS
 									</a>
 								</td>

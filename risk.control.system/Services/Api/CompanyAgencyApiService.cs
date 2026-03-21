@@ -48,13 +48,13 @@ namespace risk.control.system.Services.Api
                 .Include(c => c.EmpanelledVendors).ThenInclude(v => v.Country)
                 .Include(c => c.EmpanelledVendors).ThenInclude(v => v.PinCode)
                 .Include(c => c.EmpanelledVendors).ThenInclude(v => v.Ratings)
-                .FirstOrDefaultAsync(c => c.ClientCompanyId == companyUser.ClientCompanyId.Value);
+                .FirstOrDefaultAsync(c => c.ClientCompanyId == companyUser!.ClientCompanyId!.Value);
             if (company == null) return Array.Empty<object>();
 
             var vendorTasks = company.EmpanelledVendors
                 .Where(v => !v.Deleted)
                 .OrderBy(v => v.Name)
-                .Select(v => MapVendor(v, companyUser, claimsCases));
+                .Select(v => MapVendor(v, companyUser!, claimsCases));
 
             var result = await Task.WhenAll(vendorTasks);
 
@@ -70,10 +70,10 @@ namespace risk.control.system.Services.Api
             var companyUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == userEmail);
             var company = await _context.ClientCompany.AsNoTracking()
                 .Include(c => c.EmpanelledVendors)
-                .FirstOrDefaultAsync(c => c.ClientCompanyId == companyUser.ClientCompanyId);
+                .FirstOrDefaultAsync(c => c.ClientCompanyId == companyUser!.ClientCompanyId);
 
             var availableVendors = await _context.Vendor
-                .Where(v => !company.EmpanelledVendors.Contains(v) && !v.Deleted && v.CountryId == company.CountryId)
+                .Where(v => !company!.EmpanelledVendors.Contains(v) && !v.Deleted && v.CountryId == company.CountryId)
                 .Include(v => v.ApplicationUser)
                 .Include(v => v.Country)
                 .Include(v => v.PinCode)
@@ -85,7 +85,7 @@ namespace risk.control.system.Services.Api
             var result =
                 availableVendors?.Select(async u =>
                 {
-                    var documentImage = await base64FileService.GetBase64FileAsync(u.DocumentUrl, Applicationsettings.NO_IMAGE);
+                    var documentImage = await base64FileService.GetBase64FileAsync(u.DocumentUrl!, Applicationsettings.NO_IMAGE);
                     return new
                     {
                         Id = u.VendorId,
@@ -93,10 +93,10 @@ namespace risk.control.system.Services.Api
                         Domain = u.Email,
                         Name = u.Name,
                         Address = u.Addressline,
-                        District = u.District.Name,
-                        State = u.State.Name,
-                        PinCode = $"{u.PinCode.Name} - {u.PinCode.Code}",
-                        Country = u.Country.Code,
+                        District = u.District!.Name,
+                        State = u.State!.Name,
+                        PinCode = $"{u.PinCode!.Name} - {u.PinCode.Code}",
+                        Country = u.Country!.Code,
                         Flag = "/flags/" + u.Country.Code.ToLower() + ".png",
                         Updated = u.Updated.HasValue ? u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy"),
                         UpdateBy = u.UpdatedBy,
@@ -135,7 +135,7 @@ namespace risk.control.system.Services.Api
                     .ThenInclude(v => v.PinCode)
                 .Include(c => c.EmpanelledVendors)
                     .ThenInclude(v => v.Ratings)
-                .FirstOrDefaultAsync(c => c.ClientCompanyId == companyUser.ClientCompanyId);
+                .FirstOrDefaultAsync(c => c.ClientCompanyId == companyUser!.ClientCompanyId);
 
             if (company == null)
             {
@@ -145,7 +145,7 @@ namespace risk.control.system.Services.Api
                 .Select(async u =>
                 {
                     var hasService = GetPinCodeAndServiceForTheCase(caseId, u.VendorId);
-                    var document = base64FileService.GetBase64FileAsync(u.DocumentUrl, Applicationsettings.NO_IMAGE);
+                    var document = base64FileService.GetBase64FileAsync(u.DocumentUrl!, Applicationsettings.NO_IMAGE);
                     await Task.WhenAll(document, hasService);
                     return new
                     {
@@ -154,11 +154,11 @@ namespace risk.control.system.Services.Api
                         Domain = u.Email,
                         Name = u.Name,
                         Address = $"{u.Addressline}",
-                        District = u.District.Name,
-                        State = u.State.Code,
-                        Country = u.Country.Name,
+                        District = u.District!.Name,
+                        State = u.State!.Code,
+                        Country = u.Country!.Name,
                         CountryCode = u.Country.Code,
-                        PinCode = $"{u.PinCode.Name} - {u.PinCode.Code}",
+                        PinCode = $"{u.PinCode!.Name} - {u.PinCode.Code}",
                         Flag = $"/flags/{u.Country.Code.ToLower()}.png",
                         Updated = u.Updated?.ToString("dd-MM-yyyy") ?? u.Created.ToString("dd-MM-yyyy"),
                         UpdateBy = u.UpdatedBy,
@@ -231,11 +231,9 @@ namespace risk.control.system.Services.Api
             return hasService ?? false;
         }
 
-        private static bool IsActiveVendor(Vendor v) => !v.Deleted && v.Status == VendorStatus.ACTIVE;
-
         private async Task<object> MapVendor(Vendor u, ApplicationUser companyUser, List<InvestigationTask> caseTasks)
         {
-            var document = await base64FileService.GetBase64FileAsync(u.DocumentUrl, Applicationsettings.NO_IMAGE);
+            var document = await base64FileService.GetBase64FileAsync(u.DocumentUrl!, Applicationsettings.NO_IMAGE);
             return new
             {
                 Id = u.VendorId,
@@ -243,12 +241,12 @@ namespace risk.control.system.Services.Api
                 Domain = GetDomain(u, companyUser),
                 Name = u.Name,
                 Address = u.Addressline,
-                District = u.District.Name,
-                StateCode = u.State.Code,
-                State = u.State.Name,
-                Active = u.Status.Value,
-                CountryCode = u.Country.Code,
-                PinCode = $"{u.PinCode.Name} - {u.PinCode.Code}",
+                District = u.District!.Name,
+                StateCode = u.State!.Code,
+                State = u.State!.Name,
+                Active = u.Status!.Value,
+                CountryCode = u.Country!.Code,
+                PinCode = $"{u.PinCode!.Name} - {u.PinCode.Code}",
                 Country = u.Country.Name,
                 Flag = $"/flags/{u.Country.Code.ToLower()}.png",
                 Updated = (u.Updated ?? u.Created).ToString("dd-MM-yyyy"),

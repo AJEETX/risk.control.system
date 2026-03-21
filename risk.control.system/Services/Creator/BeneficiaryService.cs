@@ -58,10 +58,10 @@ namespace risk.control.system.Services.Creator
 
             BeneficiaryDetail model;
 
-            if (user.ClientCompany.HasSampleData)
+            if (user.ClientCompany!.HasSampleData)
             {
                 // Fetch existing detail if sample data is enabled
-                model = await GetBeneficiaryDetailAsync(investigationId, user.ClientCompany.CountryId.Value);
+                model = await GetBeneficiaryDetailAsync(investigationId, user.ClientCompany.CountryId!.Value);
             }
             else
             {
@@ -82,7 +82,7 @@ namespace risk.control.system.Services.Creator
         {
             var errors = new Dictionary<string, string>();
 
-            validateImageService.ValidateImage(model.ProfileImage, errors);
+            validateImageService.ValidateImage(model.ProfileImage!, errors);
             await ValidatePhoneAsync(model, errors);
 
             if (errors.Any())
@@ -109,8 +109,8 @@ namespace risk.control.system.Services.Creator
                 DateOfBirth = DateTime.UtcNow.AddYears(-25).AddMonths(3),
                 Income = Income.MEDIUM_INCOME,
                 Name = NameGenerator.GenerateName(),
-                BeneficiaryRelationId = beneRelation.BeneficiaryRelationId,
-                Country = pinCode.Country,
+                BeneficiaryRelationId = beneRelation!.BeneficiaryRelationId,
+                Country = pinCode!.Country,
                 CountryId = pinCode.CountryId,
                 SelectedCountryId = pinCode.CountryId.GetValueOrDefault(),
                 StateId = pinCode.StateId,
@@ -119,7 +119,7 @@ namespace risk.control.system.Services.Creator
                 SelectedDistrictId = pinCode.DistrictId.GetValueOrDefault(),
                 PinCodeId = pinCode.PinCodeId,
                 SelectedPincodeId = pinCode.PinCodeId,
-                PhoneNumber = pinCode.Country.Code.ToLower() == "au" ? Applicationsettings.SAMPLE_MOBILE_AUSTRALIA : Applicationsettings.SAMPLE_MOBILE_INDIA,
+                PhoneNumber = pinCode.Country!.Code.Equals("au", StringComparison.CurrentCultureIgnoreCase) ? Applicationsettings.SAMPLE_MOBILE_AUSTRALIA : Applicationsettings.SAMPLE_MOBILE_INDIA,
             };
             return model;
         }
@@ -135,9 +135,9 @@ namespace risk.control.system.Services.Creator
                 .FirstOrDefaultAsync(v => v.InvestigationTaskId == investigationId)
                 ?? throw new KeyNotFoundException($"Beneficiary for Task {investigationId} not found.");
 
-            var user = await _context.ApplicationUser.AsNoTracking().Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == userEmail);
+            var user = await _context.ApplicationUser.AsNoTracking().Include(c => c.ClientCompany).ThenInclude(c => c!.Country).FirstOrDefaultAsync(c => c.Email == userEmail);
 
-            await PopulateMetadataAsync(model, user);
+            await PopulateMetadataAsync(model, user!);
 
             return model;
         }
@@ -165,7 +165,7 @@ namespace risk.control.system.Services.Creator
 
         public async Task PrepareFailedPostModelAsync(BeneficiaryDetail model, string userEmail)
         {
-            var user = await _context.ApplicationUser.AsNoTracking().Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == userEmail);
+            var user = await _context.ApplicationUser.AsNoTracking().Include(c => c.ClientCompany).ThenInclude(c => c!.Country).FirstOrDefaultAsync(c => c.Email == userEmail);
 
             model.CountryId = model.SelectedCountryId > 0 ? model.SelectedCountryId : model.CountryId;
             model.StateId = model.SelectedStateId;
@@ -173,13 +173,13 @@ namespace risk.control.system.Services.Creator
             model.PinCodeId = model.SelectedPincodeId;
             model.Country = await _context.Country.AsNoTracking().FirstOrDefaultAsync(c => c.CountryId == model.CountryId);
 
-            await PopulateMetadataAsync(model, user);
+            await PopulateMetadataAsync(model, user!);
         }
 
         private async Task PopulateMetadataAsync(BeneficiaryDetail model, ApplicationUser user)
         {
             // 1. Set Localized Currency
-            model.CurrencySymbol = CustomExtensions.GetCultureByCountry(user.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
+            model.CurrencySymbol = CustomExtensions.GetCultureByCountry(user!.ClientCompany!.Country!.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
             // 2. Load Relations from DB
             model.BeneficiaryRelations = await _context.BeneficiaryRelation.AsNoTracking().Select(r => new SelectListItem

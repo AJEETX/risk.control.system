@@ -119,7 +119,7 @@
 										<div class="input-group">
 											<div class="input-group-prepend">
 												@{
-													var imgPath = "/flags/" + @Model.Country.Code.ToLower() + ".png";
+													var imgPath = "/flags/" + @Model!.Country!.Code.ToLower() + ".png";
 												}
 												<span class="input-group-text country-code-text" data-bs-toggle="tooltip" title="Country Code :+@Model?.Country.ISDCode">
 													<img src="@imgPath" class="flag-icon" data-bs-toggle="tooltip" alt="flag" />  +@Model?.Country.ISDCode<i class="fa fa-asterisk asterik-style"></i>
@@ -144,7 +144,7 @@
 											<div class="input-group-prepend">
 												<span class="input-group-text"><i class="nav-icon fas fa-file-invoice"></i> <i class="fa fa-asterisk asterik-style"></i></span>
 											</div>
-											@if (Model.Role == AppRoles.COMPANY_ADMIN)
+											@if (Model!.Role == AppRoles.COMPANY_ADMIN)
 											{
 												<select readonly asp-for="@Model.Role" class="form-control remarks">
 													<option value="@AppRoles.COMPANY_ADMIN">@COMPANY_ADMIN.DISPLAY_NAME</option>
@@ -207,31 +207,31 @@
 					</div>
 				</div>
 			</div>
-				<div class="card-footer">
-					<div class="row">
-						<div class="col-md-12">
-							<div class="form-group text-right">
-								<a id="cancel" asp-controller="CompanyUser" asp-action="Index" asp-route-id="@Model.ClientCompanyId" class="btn btn-secondary">
-									<i class="fa fa-window-close"></i>
-									Cancel
-								</a>
-								<button id="edit" type="submit" class="btn btn-warning">
-									<i class="fas fa-user-plus"></i> Save User
-								</button>
-							</div>
+			<div class="card-footer">
+				<div class="row">
+					<div class="col-md-12">
+						<div class="form-group text-right">
+							<a id="cancel" asp-controller="CompanyUser" asp-action="Index" asp-route-id="@Model.ClientCompanyId" class="btn btn-secondary">
+								<i class="fa fa-window-close"></i>
+								Cancel
+							</a>
+							<button id="edit" type="submit" class="btn btn-warning">
+								<i class="fas fa-user-plus"></i> Save User
+							</button>
 						</div>
 					</div>
 				</div>
 			</div>
-			</form>
 		</div>
-	</section>
+	</form>
+</div>
+</section>
 
-	@section Scripts {
-		@{
-			await Html.RenderPartialAsync("_ValidationScriptsPartial");
-		}
-		<script src="~/js/company-admin/client-company-users-edit.js"></script>
-		<script src="~/js/common/address-with-pincode.js"></script>
-		<script src="~/js/common/form-validation.js"></script>
+@section Scripts {
+	@{
+		await Html.RenderPartialAsync("_ValidationScriptsPartial");
 	}
+	<script src="~/js/company-admin/client-company-users-edit.js"></script>
+	<script src="~/js/common/address-with-pincode.js"></script>
+	<script src="~/js/common/form-validation.js"></script>
+}

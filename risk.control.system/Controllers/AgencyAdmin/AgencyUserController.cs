@@ -43,9 +43,10 @@ namespace risk.control.system.Controllers.AgencyAdmin
         [Breadcrumb("Add User")]
         public async Task<IActionResult> Create()
         {
+            var userEmail = HttpContext.User?.Identity?.Name!;
             try
             {
-                var model = await _service.PrepareCreateModelAsync(User.Identity?.Name);
+                var model = await _service.PrepareCreateModelAsync(userEmail);
                 if (model == null)
                 {
                     _notifyService.Error("User or Agency not found.");
@@ -70,11 +71,12 @@ namespace risk.control.system.Controllers.AgencyAdmin
                 return View(model);
             }
             emailSuffix = emailSuffix.Replace("\n", "").Replace("\r", "").Trim();
+            var userEmail = HttpContext.User?.Identity?.Name!;
             var result = await _createEditService.CreateVendorUserAsync(new CreateVendorUserRequest
             {
                 User = model,
                 EmailSuffix = emailSuffix,
-                CreatedBy = User.Identity?.Name
+                CreatedBy = userEmail
             }, ModelState, _baseUrl);
 
             if (!result.Success)
@@ -109,11 +111,12 @@ namespace risk.control.system.Controllers.AgencyAdmin
                 return View(model);
             }
             id = id.Replace("\n", "").Replace("\r", "").Trim();
+            var userEmail = HttpContext.User?.Identity?.Name!;
             var result = await _createEditService.EditVendorUserAsync(new EditVendorUserRequest
             {
                 UserId = id,
                 Model = model,
-                UpdatedBy = User.Identity?.Name
+                UpdatedBy = userEmail
             }, ModelState, _baseUrl);
 
             if (!result.Success)
@@ -143,7 +146,8 @@ namespace risk.control.system.Controllers.AgencyAdmin
         public async Task<IActionResult> DeleteConfirmed(string email)
         {
             email = email.Replace("\n", "").Replace("\r", "").Trim();
-            var success = await _service.SoftDeleteUserAsync(email, User.Identity?.Name);
+            var userEmail = HttpContext.User?.Identity?.Name!;
+            var success = await _service.SoftDeleteUserAsync(email, userEmail);
             if (success)
             {
                 _notifyService.Custom($"User <b> {email} </b> deleted.", 3, "red", "fas fa-user-minus");

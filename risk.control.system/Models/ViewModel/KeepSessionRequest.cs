@@ -2,6 +2,6 @@
 {
     public class KeepSessionRequest
     {
-        public string CurrentPage { get; set; }
+        public string? CurrentPage { get; set; }
     }
 }

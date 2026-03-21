@@ -58,13 +58,13 @@ namespace risk.control.system.Controllers.AgencyAdmin
 
             try
             {
-                var (vendor, contract) = await _processSubmittedReportService.SubmitToVendorSupervisor(userEmail, caseId, WebUtility.HtmlDecode(remarks));
+                var (vendor, contract) = await _processSubmittedReportService.SubmitToVendorSupervisor(userEmail!, caseId, WebUtility.HtmlDecode(remarks));
                 if (vendor == null)
                 {
                     _notifyService.Error("OOPs !!!..Error submitting.");
                     return RedirectToAction(nameof(AgentController.GetInvestigate), ControllerName<AgentController>.Name, new { id = caseId });
                 }
-                _backgroundJobClient.Enqueue(() => _mailService.NotifyCaseReportSubmitToVendorSupervisor(userEmail, caseId, _baseUrl));
+                _backgroundJobClient.Enqueue(() => _mailService.NotifyCaseReportSubmitToVendorSupervisor(userEmail!, caseId, _baseUrl));
 
                 _notifyService.Custom($"Case <b> #{contract}</b> report submitted", 3, "green", "far fa-file-powerpoint");
 
@@ -82,7 +82,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ProcessReport(string supervisorRemarks, long claimId, string remarks, IFormFile? supervisorAttachment)
         {
-            string userEmail = HttpContext?.User?.Identity.Name;
+            string userEmail = HttpContext?.User?.Identity?.Name!;
             if (!ModelState.IsValid || claimId < 1)
             {
                 _notifyService.Error("Error in submitting report");
@@ -114,20 +114,11 @@ namespace risk.control.system.Controllers.AgencyAdmin
                         return RedirectToAction(nameof(VendorInvestigationController.GetInvestigateReport), ControllerName<VendorInvestigationController>.Name, new { selectedcase = claimId });
                     }
                 }
-                var reportUpdateStatus = SupervisorRemarkType.OK;
+                var success = await _processSubmittedReportService.ProcessAgentReport(userEmail, supervisorRemarks, claimId, SupervisorRemarkType.OK, supervisorAttachment, remarks);
+                _backgroundJobClient.Enqueue(() => _mailService.NotifyCaseReportSubmitToCompany(userEmail, claimId, _baseUrl));
 
-                var success = await _processSubmittedReportService.ProcessAgentReport(userEmail, supervisorRemarks, claimId, reportUpdateStatus, supervisorAttachment, remarks);
+                _notifyService.Custom($"Case <b> #{success.PolicyDetail!.ContractNumber}</b>  Report submitted to Company", 3, "green", "far fa-file-powerpoint");
 
-                if (success != null)
-                {
-                    _backgroundJobClient.Enqueue(() => _mailService.NotifyCaseReportSubmitToCompany(userEmail, claimId, _baseUrl));
-
-                    _notifyService.Custom($"Case <b> #{success.PolicyDetail.ContractNumber}</b>  Report submitted to Company", 3, "green", "far fa-file-powerpoint");
-                }
-                else
-                {
-                    _notifyService.Custom($"Case <b> #{success.PolicyDetail.ContractNumber}</b>  Report sent to review", 3, "orange", "far fa-file-powerpoint");
-                }
                 return RedirectToAction(nameof(VendorInvestigationController.CaseReport), ControllerName<VendorInvestigationController>.Name);
             }
             catch (Exception ex)

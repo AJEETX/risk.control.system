@@ -1,7 +1,4 @@
-﻿using Google.Api;
-
-using risk.control.system.Models;
-using risk.control.system.Models.ViewModel;
+﻿using risk.control.system.Models;
 
 namespace risk.control.system.Helpers
 {
@@ -21,7 +18,7 @@ namespace risk.control.system.Helpers
         public static void DetermineMediaType(MediaReport media, string contentType)
         {
             string[] videoExtensions = { ".mp4", ".webm", ".avi", ".mov", ".mkv" };
-            bool isVideo = contentType.ToLower().StartsWith("video/") ||
+            bool isVideo = contentType.StartsWith("video/", StringComparison.CurrentCultureIgnoreCase) ||
                            videoExtensions.Contains(media.ImageExtension.ToLower());
 
             media.MediaType = isVideo ? MediaType.VIDEO : MediaType.AUDIO;
