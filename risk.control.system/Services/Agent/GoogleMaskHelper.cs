@@ -29,7 +29,7 @@ namespace risk.control.system.Services.Agent
 
                 var panNumber = allText.Substring(panTextPre + txt2Find.Length + 1, 10);
 
-                var annotation = textAnnotations.FirstOrDefault(t => t.Description.Trim().ToUpper() == panNumber.Trim().ToUpper());
+                var annotation = textAnnotations.FirstOrDefault(t => t.Description.Trim().Equals(panNumber.Trim(), StringComparison.CurrentCultureIgnoreCase));
                 if (annotation is null)
                 {
                     return inputImage;
@@ -93,7 +93,7 @@ namespace risk.control.system.Services.Agent
                     Style = SKPaintStyle.Fill
                 };
 
-                var annotation = textAnnotations.FirstOrDefault(t => t.Description.Trim().ToUpper() == passportNumber.Trim().ToUpper());
+                var annotation = textAnnotations.FirstOrDefault(t => t.Description.Trim().Equals(passportNumber.Trim(), StringComparison.CurrentCultureIgnoreCase));
 
                 var allVertices = annotation.BoundingPoly.Vertices;
 

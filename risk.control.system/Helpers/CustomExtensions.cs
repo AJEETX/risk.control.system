@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.Reflection;
 using System.Text.RegularExpressions;
@@ -91,12 +90,12 @@ namespace risk.control.system.Helpers
 
         public static string GetEnumDisplayName(this Enum value)
         {
-            FieldInfo fi = value.GetType().GetField(value.ToString());
+            FieldInfo fi = value.GetType().GetField(value.ToString())!;
 
             DisplayAttribute[] attributes = (DisplayAttribute[])fi.GetCustomAttributes(typeof(DisplayAttribute), false);
 
             if (attributes != null && attributes.Length > 0)
-                return attributes[0].Name;
+                return attributes[0].Name!;
             else
                 return value.ToString();
         }
@@ -132,38 +131,10 @@ namespace risk.control.system.Helpers
                 var displayAttribute = field.GetCustomAttribute<DisplayAttribute>();
                 if (displayAttribute != null && displayAttribute.Name == displayName)
                 {
-                    return (TEnum)field.GetValue(null);
+                    return (TEnum)field.GetValue(null)!;
                 }
             }
             return null; // Return null if no match is found
-        }
-
-        public static IEnumerable<SelectListItem> GetEnumSelectList<TEnum>() where TEnum : Enum
-        {
-            return Enum.GetValues(typeof(TEnum))
-                       .Cast<TEnum>()
-                       .Select(e => new SelectListItem
-                       {
-                           Text = e.GetDisplayName(), // Fetches Display Name if available
-                           Value = e.ToString() // Enum value as string
-                       });
-        }
-
-        private static string GetDisplayName(this Enum value)
-        {
-            var displayAttribute = value.GetType()
-                                        .GetField(value.ToString())
-                                        .GetCustomAttributes(typeof(System.ComponentModel.DataAnnotations.DisplayAttribute), false)
-                                        .FirstOrDefault() as System.ComponentModel.DataAnnotations.DisplayAttribute;
-            return displayAttribute != null ? displayAttribute.Name : value.ToString();
-        }
-
-        public static IEnumerable<SelectListItem> GetEnumSelectListWithDefaultValue<TEnum>(this IHtmlHelper htmlHelper, TEnum defaultValue)
-            where TEnum : struct
-        {
-            var selectList = htmlHelper.GetEnumSelectList<TEnum>().ToList();
-            selectList.Single(x => x.Value == $"{(int)(object)defaultValue}").Selected = true;
-            return selectList;
         }
     }
 }

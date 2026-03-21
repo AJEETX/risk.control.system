@@ -50,7 +50,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ReplyQuery(long claimId, CaseAgencyModel request, IFormFile? document)
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
             if (!ModelState.IsValid)
             {
                 _notifyService.Error("NOT FOUND !!!..");
@@ -83,7 +83,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
                     }
                 }
 
-                request.InvestigationReport.EnquiryRequest.DescriptiveAnswer = HttpUtility.HtmlEncode(request.InvestigationReport.EnquiryRequest.DescriptiveAnswer);
+                request.InvestigationReport!.EnquiryRequest!.DescriptiveAnswer = HttpUtility.HtmlEncode(request.InvestigationReport.EnquiryRequest.DescriptiveAnswer);
 
                 var claim = await _agencyQueryReplyService.SubmitQueryReplyToCompany(userEmail, claimId, request.InvestigationReport.EnquiryRequest, request.InvestigationReport.EnquiryRequests, document);
 

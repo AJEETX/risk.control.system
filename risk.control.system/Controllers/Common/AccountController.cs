@@ -48,7 +48,7 @@ namespace risk.control.system.Controllers.Common
 
         [HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> Login(string returnUrl = null)
+        public async Task<IActionResult> Login(string? returnUrl = null)
         {
             var setPassword = await _featureManager.IsEnabledAsync(FeatureFlags.SHOW_PASSWORD_ON_LOGIN);
             if (!string.IsNullOrEmpty(returnUrl) && !Url.IsLocalUrl(returnUrl))
@@ -110,7 +110,7 @@ namespace risk.control.system.Controllers.Common
 
         [HttpGet]
         [AllowAnonymous]
-        public IActionResult AzureLogin(string returnUrl = "/")
+        public IActionResult AzureLogin(string? returnUrl = "/")
         {
             return Challenge(
                 new AuthenticationProperties { RedirectUri = returnUrl },
@@ -120,7 +120,7 @@ namespace risk.control.system.Controllers.Common
         [HttpGet]
         public async Task<IActionResult> Logout()
         {
-            var email = User?.Identity?.Name;
+            var email = User?.Identity?.Name!;
 
             await _accountService.Logout(email);
 

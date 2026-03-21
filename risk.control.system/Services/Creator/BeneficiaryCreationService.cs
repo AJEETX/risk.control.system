@@ -49,17 +49,17 @@ namespace risk.control.system.Services.Creator
                     return (null, errors, summaries);
 
                 // 2️⃣ Run independent async operations in parallel
-                var relationTask = extractorService.GetRelationAsync(uploadCase.Relation.Trim());
+                var relationTask = extractorService.GetRelationAsync(uploadCase.Relation!.Trim());
                 var pinCodeTask = extractorService.GetPinCodeAsync(
                     uploadCase.BeneficiaryPincode,
-                    uploadCase.BeneficiaryDistrictName.Trim(),
-                    companyUser.ClientCompany.CountryId!.Value);
+                    uploadCase.BeneficiaryDistrictName!.Trim(),
+                    companyUser.ClientCompany!.CountryId!.Value);
 
                 var imageTask = verifierProcessor.ProcessImage(
                     uploadCase, data, errors, summaries, BENEFICIARY_IMAGE, "Beneficiary");
 
                 var phoneTask = verifierProcessor.ValidatePhone(
-                    companyUser, uploadCase.BeneficiaryContact.Trim(), errors, summaries);
+                    companyUser, uploadCase.BeneficiaryContact!.Trim(), errors, summaries);
 
                 await Task.WhenAll(relationTask, pinCodeTask, imageTask, phoneTask);
 
@@ -92,12 +92,12 @@ namespace risk.control.system.Services.Creator
                 // 4️⃣ Map entity (pure in-memory work)
                 var beneficiary = new BeneficiaryDetail
                 {
-                    Name = WebUtility.HtmlEncode(textInfo.ToTitleCase(uploadCase.BeneficiaryName.ToLower())),
+                    Name = WebUtility.HtmlEncode(textInfo.ToTitleCase(uploadCase.BeneficiaryName!.ToLower())),
                     BeneficiaryRelationId = relation.BeneficiaryRelationId,
                     DateOfBirth = dob,
                     Income = income,
                     PhoneNumber = uploadCase.BeneficiaryContact.Trim(),
-                    Addressline = uploadCase.BeneficiaryAddressLine.Trim(),
+                    Addressline = uploadCase.BeneficiaryAddressLine!.Trim(),
                     PinCodeId = pinCode?.PinCodeId,
                     DistrictId = pinCode?.DistrictId,
                     StateId = pinCode?.StateId,
@@ -117,7 +117,7 @@ namespace risk.control.system.Services.Creator
             {
                 logger.LogError(ex,
                     "AddBeneficiary failed in Docker. CaseId={CaseId}, Relation='{Relation}'",
-                    uploadCase.CaseId.Trim(),
+                    uploadCase.CaseId!.Trim(),
                     uploadCase.Relation);
 
                 return (null, errors, summaries);
@@ -126,7 +126,7 @@ namespace risk.control.system.Services.Creator
 
         private async Task EnrichLocationData(BeneficiaryDetail beneficiary, PinCode pin)
         {
-            var fullAddress = $"{beneficiary.Addressline.Trim()}, {pin.District.Name}, {pin.State.Name}, {pin.Country.Code}, {pin.Code}";
+            var fullAddress = $"{beneficiary.Addressline.Trim()}, {pin.District!.Name}, {pin.State!.Name}, {pin.Country!.Code}, {pin.Code}";
             var (lat, lon) = await customApiCLient.GetCoordinatesFromAddressAsync(fullAddress);
 
             beneficiary.Latitude = lat;

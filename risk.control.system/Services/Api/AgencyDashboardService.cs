@@ -44,7 +44,7 @@ namespace risk.control.system.Services.Api
 
                 // Execute the first count
                 var taskCount = await GetCases(_context).CountAsync(c =>
-                    c.VendorId == vendorUser.VendorId &&
+                    c.VendorId == vendorUser!.VendorId &&
                     c.SubStatus == assigned2Agent &&
                     c.TaskedAgentEmail == userEmail);
 
@@ -109,9 +109,9 @@ namespace risk.control.system.Services.Api
         {
             await using var _context = contextFactory.CreateDbContext();
             var vendorUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
-            var query = GetAgencyClaims(_context).Where(a => a.VendorId == vendorUser.VendorId && a.Status != finished);
+            var query = GetAgencyClaims(_context).Where(a => a.VendorId == vendorUser!.VendorId && a.Status != finished);
 
-            if (vendorUser.IsVendorAdmin)
+            if (vendorUser!.IsVendorAdmin)
             {
                 return await query.CountAsync(a => a.SubStatus == assigned2Agent ||
                                                    a.SubStatus == submitted2Assessor ||
@@ -127,14 +127,14 @@ namespace risk.control.system.Services.Api
         {
             await using var _context = contextFactory.CreateDbContext();
             var vendorUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
-            return await GetAgencyClaims(_context).CountAsync(i => i.VendorId == vendorUser.VendorId && i.SubStatus == submitted2Supervisor);
+            return await GetAgencyClaims(_context).CountAsync(i => i.VendorId == vendorUser!.VendorId && i.SubStatus == submitted2Supervisor);
         }
 
         private async Task<int> GetAgencyAllocateCount(string userEmail)
         {
             await using var _context = contextFactory.CreateDbContext();
             var vendorUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
-            return await GetAgencyClaims(_context).CountAsync(i => i.VendorId == vendorUser.VendorId &&
+            return await GetAgencyClaims(_context).CountAsync(i => i.VendorId == vendorUser!.VendorId &&
                 (i.SubStatus == allocated || i.SubStatus == requestedAssessor));
         }
 
@@ -142,9 +142,9 @@ namespace risk.control.system.Services.Api
         {
             await using var _context = contextFactory.CreateDbContext();
             var agencyUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
-            var query = GetAgencyClaims(_context).Where(c => c.VendorId == agencyUser.VendorId && c.Status == finished);
+            var query = GetAgencyClaims(_context).Where(c => c.VendorId == agencyUser!.VendorId && c.Status == finished);
 
-            if (agencyUser.IsVendorAdmin)
+            if (agencyUser!.IsVendorAdmin)
             {
                 return await query.CountAsync(item => item.SubStatus == approved || item.SubStatus == rejectd);
             }

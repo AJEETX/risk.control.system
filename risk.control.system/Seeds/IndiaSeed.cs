@@ -21,7 +21,7 @@ namespace risk.control.system.Seeds
                 ||
                 string.Equals(s.StateName, "delhi", StringComparison.OrdinalIgnoreCase)
                 ||
-                s.StateCode.ToLower() == "up"
+                s.StateCode.Equals("up", StringComparison.CurrentCultureIgnoreCase)
                 )
                 .Select(g => g.StateCode).Distinct()?.ToList();
             var filteredInPincodes = indiaPincodes.Where(g => indianStates.Contains(g.StateCode))?.ToList();

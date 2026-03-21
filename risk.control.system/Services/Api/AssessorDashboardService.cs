@@ -38,7 +38,7 @@ namespace risk.control.system.Services.Api
             data.FirstBlockName = "Assess (report)";
             data.FirstBlockCount = await claimsAssessorTask;
             data.UnderwritingCount = await underwritingAssessorTask;
-            data.FirstBlockUrl = "/Assessor/Assessor";
+            data.FirstBlockUrl = "/Assessor/Assess";
 
             data.SecondBlockName = "Enquiry";
             data.SecondBlockCount = await claimsReviewTask;
@@ -61,11 +61,11 @@ namespace risk.control.system.Services.Api
         private async Task<int> GetAssessorAssess(string userEmail, InsuranceType insuranceType)
         {
             await using var _context = _contextFactory.CreateDbContext();
-            var cases = GetCases(_context).Where(c => c.PolicyDetail.InsuranceType == insuranceType);
+            var cases = GetCases(_context).Where(c => c.PolicyDetail!.InsuranceType == insuranceType);
 
             var companyUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == userEmail);
 
-            var count = await cases.CountAsync(i => i.ClientCompanyId == companyUser.ClientCompanyId &&
+            var count = await cases.CountAsync(i => i.ClientCompanyId == companyUser!.ClientCompanyId &&
             i.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR ||
             i.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR
              );
@@ -76,10 +76,10 @@ namespace risk.control.system.Services.Api
         private async Task<int> GetAssessorReview(string userEmail, InsuranceType insuranceType)
         {
             await using var _context = _contextFactory.CreateDbContext();
-            var cases = GetCases(_context).Where(c => c.PolicyDetail.InsuranceType == insuranceType);
+            var cases = GetCases(_context).Where(c => c.PolicyDetail!.InsuranceType == insuranceType);
 
             var companyUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == userEmail);
-            var count = await cases.CountAsync(a => a.ClientCompanyId == companyUser.ClientCompanyId &&
+            var count = await cases.CountAsync(a => a.ClientCompanyId == companyUser!.ClientCompanyId &&
             a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR && a.RequestedAssessordEmail == userEmail);
             return count;
         }
@@ -87,10 +87,10 @@ namespace risk.control.system.Services.Api
         private async Task<int> GetAssessorReject(string userEmail, InsuranceType insuranceType)
         {
             await using var _context = _contextFactory.CreateDbContext();
-            var cases = GetCases(_context).Where(c => c.PolicyDetail.InsuranceType == insuranceType);
+            var cases = GetCases(_context).Where(c => c.PolicyDetail!.InsuranceType == insuranceType);
             var companyUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == userEmail);
 
-            var count = await cases.CountAsync(c => c.ClientCompanyId == companyUser.ClientCompanyId &&
+            var count = await cases.CountAsync(c => c.ClientCompanyId == companyUser!.ClientCompanyId &&
                 c.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR &&
                 c.Status == CONSTANTS.CASE_STATUS.FINISHED && c.SubmittedAssessordEmail == userEmail
                 );
@@ -101,10 +101,10 @@ namespace risk.control.system.Services.Api
         private async Task<int> GetCompanyCompleted(string userEmail, InsuranceType insuranceType)
         {
             await using var _context = _contextFactory.CreateDbContext();
-            var cases = GetCases(_context).Where(c => c.PolicyDetail.InsuranceType == insuranceType);
+            var cases = GetCases(_context).Where(c => c.PolicyDetail!.InsuranceType == insuranceType);
             var companyUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == userEmail);
 
-            var count = await cases.CountAsync(c => c.ClientCompanyId == companyUser.ClientCompanyId &&
+            var count = await cases.CountAsync(c => c.ClientCompanyId == companyUser!.ClientCompanyId &&
                 c.SubmittedAssessordEmail == userEmail &&
                 c.Status == CONSTANTS.CASE_STATUS.FINISHED &&
                 (c.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR)

@@ -5,10 +5,10 @@ namespace risk.control.system.Models.ViewModel
     public class Text2SpeechData
     {
         [Required]
-        public string TextData { get; set; }
+        public string? TextData { get; set; }
 
         [Required]
-        public byte[] TextOutputAudio { get; set; }
+        public byte[]? TextOutputAudio { get; set; }
 
         public int RemainingTries { get; set; } = 5;
     }

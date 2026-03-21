@@ -2,7 +2,7 @@
 
 @{
 	ViewData["Title"] = Applicationsettings.CREATE;
-	var email = Model.ClientCompany.Email;
+	var email = Model.ClientCompany!.Email;
 }
 
 <section class="content">
@@ -47,7 +47,7 @@
 
 	<form id="create-form" asp-action="Create" enctype="multipart/form-data" autocomplete="off">
 		<input type="hidden" asp-for="ClientCompanyId" />
-		<input type="hidden" id="Isd" value="@Model?.Country.ISDCode" />
+		<input type="hidden" id="Isd" value="@Model?.Country!.ISDCode" />
 		<input type="hidden" asp-for="Email" id="mailAddress" />
 		<input type="hidden" id="emailSuffix" name="emailSuffix" value="@email" />
 		<div asp-validation-summary="ModelOnly" class="text-danger"></div>
@@ -134,7 +134,7 @@
 											<div class="input-group">
 												<div class="input-group-prepend">
 													@{
-														var imgPath = "/flags/" + @Model.Country.Code.ToLower() + ".png";
+														var imgPath = "/flags/" + @Model!.Country!.Code.ToLower() + ".png";
 													}
 													<span class="input-group-text country-code-text" data-bs-toggle="tooltip" title="Country Code :+@Model?.Country.ISDCode">
 														<img src="@imgPath" class="flag-icon" data-bs-toggle="tooltip" alt="flag" />  +@Model?.Country.ISDCode<i class="fa fa-asterisk asterik-style"></i>

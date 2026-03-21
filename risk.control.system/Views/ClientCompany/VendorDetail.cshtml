@@ -41,9 +41,9 @@
 							line of business
 						</dt>
 						<dd class="col-sm-8">
-							@foreach (var service in Model.VendorInvestigationServiceTypes)
+							@foreach (var service in Model.VendorInvestigationServiceTypes!)
 							{
-								<span class="badge badge-light">@service.InsuranceType.GetEnumDisplayName()</span>
+								<span class="badge badge-light">@service.InsuranceType!.GetEnumDisplayName()</span>
 							}
 						</dd>
 
@@ -53,7 +53,7 @@
 						<dd class="col-sm-8">
 							@foreach (var service in Model.VendorInvestigationServiceTypes)
 							{
-								<span class="badge badge-light">@service.InvestigationServiceType.Name</span>
+								<span class="badge badge-light">@service.InvestigationServiceType!.Name</span>
 							}
 						</dd>
 
@@ -87,26 +87,26 @@
 							@Html.DisplayNameFor(model => model.District)
 						</dt>
 						<dd class="col-sm-8">
-							@Html.DisplayFor(model => model.District.Name)
+							@Html.DisplayFor(model => model.District!.Name)
 						</dd>
 						<dt class="col-sm-3">
 							@Html.DisplayNameFor(model => model.State)
 						</dt>
 						<dd class="col-sm-8">
-							@Html.DisplayFor(model => model.State.Name)
+							@Html.DisplayFor(model => model.State!.Name)
 						</dd>
 						<dt class="col-sm-3">
 							@Html.DisplayNameFor(model => model.PinCode)
 						</dt>
 						<dd class="col-sm-8">
-							@Html.DisplayFor(model => model.PinCode.Name)
+							@Html.DisplayFor(model => model.PinCode!.Name)
 						</dd>
 
 						<dt class="col-sm-3">
 							@Html.DisplayNameFor(model => model.Country)
 						</dt>
 						<dd class="col-sm-8">
-							@Html.DisplayFor(model => model.Country.Name)
+							@Html.DisplayFor(model => model.Country!.Name)
 						</dd>
 					</dl>
 				</div>

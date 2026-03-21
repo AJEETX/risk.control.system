@@ -46,7 +46,7 @@ namespace risk.control.system.Services.Api
 
             var companyUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(u => u.Email == userEmail);
 
-            var companyUsersCount = await _context.ApplicationUser.CountAsync(u => u.ClientCompanyId == companyUser.ClientCompanyId && !u.Deleted && u.Email != userEmail);
+            var companyUsersCount = await _context.ApplicationUser.CountAsync(u => u.ClientCompanyId == companyUser!.ClientCompanyId && !u.Deleted && u.Email != userEmail);
             var data = new DashboardData();
             data.FirstBlockName = "All Users";
             data.FirstBlockCount = companyUsersCount;

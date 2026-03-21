@@ -10,7 +10,7 @@ namespace risk.control.system.Services.Creator
 
         Task SetUploadSuccess(FileOnFileSystemModel fileData, List<InvestigationTask> claims);
 
-        Task SetFileUploadFailure(FileOnFileSystemModel fileData, string message, bool uploadAndAssign, List<long> claimsIds = null);
+        Task SetFileUploadFailure(FileOnFileSystemModel fileData, string message, bool uploadAndAssign, List<long>? claimsIds = null);
     }
 
     internal class UploadFileStatusService : IUploadFileStatusService
@@ -67,7 +67,7 @@ namespace risk.control.system.Services.Creator
             await context.SaveChangesAsync();
         }
 
-        public async Task SetFileUploadFailure(FileOnFileSystemModel fileData, string message, bool uploadAndAssign, List<long> claimsIds = null)
+        public async Task SetFileUploadFailure(FileOnFileSystemModel fileData, string message, bool uploadAndAssign, List<long>? claimsIds = null)
         {
             fileData.Completed = false;
             fileData.Icon = "fas fa-times-circle i-orangered";
