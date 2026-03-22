@@ -102,7 +102,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             }
             try
             {
-                beneficiaryRelation.Code = beneficiaryRelation.Code?.ToUpper(CultureInfo.InvariantCulture);
+                beneficiaryRelation.Code = beneficiaryRelation.Code!.ToUpper(CultureInfo.InvariantCulture);
 
                 // Check for duplicate code before saving
                 bool exists = await _context.BeneficiaryRelation.AnyAsync(x => x.Code == beneficiaryRelation.Code);
@@ -175,7 +175,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             }
             try
             {
-                beneficiaryRelation.Code = beneficiaryRelation.Code?.ToUpper(CultureInfo.InvariantCulture);
+                beneficiaryRelation.Code = beneficiaryRelation.Code!.ToUpper(CultureInfo.InvariantCulture);
 
                 // Check for duplicate code before saving
                 bool exists = await _context.BeneficiaryRelation.AnyAsync(x => x.Code == beneficiaryRelation.Code && x.BeneficiaryRelationId != id);

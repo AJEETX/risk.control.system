@@ -67,7 +67,7 @@ namespace risk.control.system.Controllers.Manager
             if (id <= 0)
             {
                 _notifyService.Error("OOPS !!!..Error creating user");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
             }
             var model = await _manageAgencyUserService.GetUserCreationModelAsync(id);
             if (model == null)
@@ -83,7 +83,7 @@ namespace risk.control.system.Controllers.Manager
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ApplicationUser model, string emailSuffix)
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
             try
             {
                 if (!ModelState.IsValid)
@@ -121,7 +121,7 @@ namespace risk.control.system.Controllers.Manager
                 if (id <= 0)
                 {
                     _notifyService.Error("OOPS !!!..Contact Admin");
-                    return this.RedirectToAction<DashboardController>(x => x.Index());
+                    return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
                 }
 
                 var agencyUser = await _manageAgencyUserService.GetUserForEditAsync(id);
@@ -129,10 +129,10 @@ namespace risk.control.system.Controllers.Manager
                 if (agencyUser == null)
                 {
                     _notifyService.Error("OOPS !!!..Contact Admin");
-                    return this.RedirectToAction<DashboardController>(x => x.Index());
+                    return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
                 }
 
-                ViewData["BreadcrumbNode"] = _navigationService.GetAgencyUserActionPath(agencyUser.VendorId.Value, ControllerName<EmpanelledAgencyController>.Name, "Active Agencies", "Edit User", "Edit");
+                ViewData["BreadcrumbNode"] = _navigationService.GetAgencyUserActionPath(agencyUser.VendorId!.Value, ControllerName<EmpanelledAgencyController>.Name, "Active Agencies", "Edit User", "Edit");
 
                 return View(agencyUser);
             }
@@ -140,7 +140,7 @@ namespace risk.control.system.Controllers.Manager
             {
                 _logger.LogError(ex, "Error getting {AgencyId}. {UserEmail}.", id, userEmail);
                 _notifyService.Error("Error getting user. Try again");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
             }
         }
 
@@ -148,7 +148,7 @@ namespace risk.control.system.Controllers.Manager
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(string id, ApplicationUser model)
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
             var sanitizedId = id.Replace("\n", "").Replace("\r", "");
             try
             {
@@ -188,17 +188,17 @@ namespace risk.control.system.Controllers.Manager
                 if (id < 1)
                 {
                     _notifyService.Error("OOPS!!!.Id Not Found.Try Again");
-                    return this.RedirectToAction<DashboardController>(x => x.Index());
+                    return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
                 }
 
                 var model = await _manageAgencyUserService.GetUserForDeleteAsync(id);
                 if (model == null)
                 {
                     _notifyService.Error("OOPS!!!. User Not Found.");
-                    return this.RedirectToAction<DashboardController>(x => x.Index());
+                    return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
                 }
 
-                ViewData["BreadcrumbNode"] = _navigationService.GetAgencyUserActionPath(model.VendorId.Value, ControllerName<EmpanelledAgencyController>.Name, "Active Agencies", "Edit User", "Edit");
+                ViewData["BreadcrumbNode"] = _navigationService.GetAgencyUserActionPath(model.VendorId!.Value, ControllerName<EmpanelledAgencyController>.Name, "Active Agencies", "Edit User", "Edit");
 
                 return View(model);
             }
@@ -206,7 +206,7 @@ namespace risk.control.system.Controllers.Manager
             {
                 _logger.LogError(ex, "Error getting {AgencyId}. {UserEmail}.", id, userEmail);
                 _notifyService.Error("Error getting user. Try again");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
             }
         }
 
@@ -214,10 +214,10 @@ namespace risk.control.system.Controllers.Manager
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(string email, long vendorId)
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
             try
             {
-                var (result, message) = await _manageAgencyUserService.SoftDeleteUserAsync(email, User.Identity?.Name);
+                var (result, message) = await _manageAgencyUserService.SoftDeleteUserAsync(email, userEmail);
 
                 if (result)
                 {

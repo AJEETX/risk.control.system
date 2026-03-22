@@ -16,7 +16,7 @@ namespace risk.control.system.Helpers
             {
                 if (beneficiary is null)
                     return string.Empty;
-                return beneficiary.Addressline + " " + beneficiary.District.Name + " " + beneficiary.State.Name + " " + beneficiary.Country.Name + " " + beneficiary.PinCode.Code;
+                return beneficiary.Addressline + " " + beneficiary.District!.Name + " " + beneficiary.State!.Name + " " + beneficiary.Country!.Name + " " + beneficiary.PinCode!.Code;
             }
         }
     }

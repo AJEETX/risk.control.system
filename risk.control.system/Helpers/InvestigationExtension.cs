@@ -11,13 +11,13 @@ namespace risk.control.system.Helpers
             {
                 if (customer is null)
                     return "<span class=\"badge badge-danger\"> <i class=\"fas fa-question\" ></i>  </span>";
-                return string.Join("", "<span class='badge badge-light'>" + customer.PinCode.Code + "</span>");
+                return string.Join("", "<span class='badge badge-light'>" + customer.PinCode!.Code + "</span>");
             }
             else
             {
                 if (beneficiary is null)
                     return "<span class=\"badge badge-danger\"> <i class=\"fas fa-question\" ></i>  </span>";
-                return string.Join("", "<span class='badge badge-light'>" + beneficiary.PinCode.Code + "</span>");
+                return string.Join("", "<span class='badge badge-light'>" + beneficiary.PinCode!.Code + "</span>");
             }
         }
 
@@ -70,10 +70,10 @@ namespace risk.control.system.Helpers
 
         public static string GetAgentTimePending(this InvestigationTask caseTask, bool open = false)
         {
-            DateTime timeToCompare = caseTask.TaskToAgentTime.Value;
+            DateTime timeToCompare = caseTask.TaskToAgentTime!.Value;
             if (open)
             {
-                timeToCompare = caseTask.SubmittedToSupervisorTime.Value;
+                timeToCompare = caseTask.SubmittedToSupervisorTime!.Value;
                 if (DateTime.UtcNow.Subtract(timeToCompare).Days >= caseTask.AgentSla)
                     return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(timeToCompare).Days} day</span>");
                 else if (DateTime.UtcNow.Subtract(timeToCompare).Days >= 3 || DateTime.UtcNow.Subtract(timeToCompare).Days >= caseTask.AgentSla)

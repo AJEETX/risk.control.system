@@ -37,7 +37,7 @@ namespace risk.control.system.Controllers.Creator
         [HttpGet]
         public async Task<IActionResult> Create(long id)
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
             try
             {
                 if (!ModelState.IsValid || id < 1)
@@ -62,7 +62,7 @@ namespace risk.control.system.Controllers.Creator
         [HttpPost]
         public async Task<IActionResult> Create(CustomerDetail model)
         {
-            var userEmail = HttpContext.User.Identity.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
             try
             {
                 if (!ModelState.IsValid)
@@ -97,7 +97,7 @@ namespace risk.control.system.Controllers.Creator
 
         public async Task<IActionResult> Edit(long id)
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
             try
             {
                 if (!ModelState.IsValid || id < 1)
@@ -124,7 +124,7 @@ namespace risk.control.system.Controllers.Creator
         [HttpPost]
         public async Task<IActionResult> Edit(CustomerDetail model)
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
             try
             {
                 if (!ModelState.IsValid)

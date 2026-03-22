@@ -113,7 +113,7 @@ namespace risk.control.system.Controllers.Api
             }
 
             var token = tokenService.GenerateJwtToken(user);
-            var refreshToken = await tokenService.GenerateRefreshTokenAsync(user.Email);
+            var refreshToken = await tokenService.GenerateRefreshTokenAsync(user.Email!);
 
             return Ok(new TokenResponse
             {

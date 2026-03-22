@@ -66,7 +66,7 @@ namespace risk.control.system.Controllers
         public async Task<IActionResult> Create()
         {
             var country = await _context.Country.FirstOrDefaultAsync();
-            var model = new ClientCompany { Country = country, SelectedCountryId = country.CountryId, CountryId = country.CountryId };
+            var model = new ClientCompany { Country = country, SelectedCountryId = country!.CountryId, CountryId = country.CountryId };
             return View(model);
         }
 
@@ -99,7 +99,7 @@ namespace risk.control.system.Controllers
 
             var pinCode = await _context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).FirstOrDefaultAsync(s => s.PinCodeId == clientCompany.SelectedPincodeId);
 
-            var companyAddress = clientCompany.Addressline + ", " + pinCode.District.Name + ", " + pinCode.State.Name + ", " + pinCode.Country.Code;
+            var companyAddress = clientCompany.Addressline + ", " + pinCode!.District!.Name + ", " + pinCode.State!.Name + ", " + pinCode.Country!.Code;
             var companyCoordinates = await customApiCLient.GetCoordinatesFromAddressAsync(companyAddress);
             var companyLatLong = companyCoordinates.Latitude + "," + companyCoordinates.Longitude;
             var url = $"https://maps.googleapis.com/maps/api/staticmap?center={companyLatLong}&zoom=14&size={vendorMapSize}&maptype=roadmap&markers=color:red%7Clabel:S%7C{companyLatLong}&key={EnvHelper.Get("GOOGLE_MAP_KEY")}";
@@ -135,7 +135,7 @@ namespace risk.control.system.Controllers
             if (id < 1 || _context.ClientCompany == null)
             {
                 notifyService.Error("Company not found!");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
             }
 
             var clientCompany = await _context.ClientCompany
@@ -146,7 +146,7 @@ namespace risk.control.system.Controllers
             if (clientCompany == null)
             {
                 notifyService.Error("Company not found!");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
             }
             var hasClaims = await _context.Investigations.AnyAsync(c => c.ClientCompanyId == id && !c.Deleted);
             clientCompany.HasClaims = hasClaims;
@@ -161,7 +161,7 @@ namespace risk.control.system.Controllers
             if (ClientCompanyId <= 0)
             {
                 notifyService.Error("Company not found!");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
             }
             var clientCompany = await _context.ClientCompany.Include(c => c.Country).FirstOrDefaultAsync(c => c.ClientCompanyId == ClientCompanyId);
             if (clientCompany != null)
@@ -181,14 +181,14 @@ namespace risk.control.system.Controllers
                 }
                 await _context.SaveChangesAsync();
 
-                await smsService.DoSendSmsAsync(clientCompany.Country.Code, clientCompany.Country.ISDCode + clientCompany.PhoneNumber, "Company account deleted. \n\nDomain : " + clientCompany.Email);
+                await smsService.DoSendSmsAsync(clientCompany.Country!.Code, clientCompany.Country.ISDCode + clientCompany.PhoneNumber, "Company account deleted. \n\nDomain : " + clientCompany.Email);
 
                 notifyService.Custom($"Company {clientCompany.Email} deleted successfully.", 3, "red", "fas fa-building");
                 return RedirectToAction(nameof(Index));
             }
 
             notifyService.Error("Company not found!");
-            return this.RedirectToAction<DashboardController>(x => x.Index());
+            return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
         }
 
         // GET: ClientCompanies/Details/5
@@ -198,7 +198,7 @@ namespace risk.control.system.Controllers
             if (id < 1 || _context.ClientCompany == null)
             {
                 notifyService.Error("Company not found!");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
             }
 
             var clientCompany = await _context.ClientCompany
@@ -210,7 +210,7 @@ namespace risk.control.system.Controllers
             if (clientCompany == null)
             {
                 notifyService.Error("Company not found!");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
             }
             var userCount = await _context.ApplicationUser.CountAsync(c => c.ClientCompanyId == clientCompany.ClientCompanyId && !c.Deleted);
             clientCompany.UserCount = userCount;
@@ -224,14 +224,14 @@ namespace risk.control.system.Controllers
             if (id <= 0)
             {
                 notifyService.Error("Company not found!");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
             }
 
             var clientCompany = await _context.ClientCompany.Include(c => c.Country).FirstOrDefaultAsync(c => c.ClientCompanyId == id);
             if (clientCompany == null)
             {
                 notifyService.Error("Company not found!");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
             }
 
             var agencysPage = new MvcBreadcrumbNode("Companies", "ClientCompany", "Admin Settings");
@@ -253,7 +253,7 @@ namespace risk.control.system.Controllers
             if (clientCompany is null || clientCompany.SelectedCountryId < 1 || clientCompany.SelectedStateId < 1 || clientCompany.SelectedDistrictId < 1 || clientCompany.SelectedPincodeId < 1)
             {
                 notifyService.Custom($"Please check input fields.", 3, "red", "fas fa-building");
-                return RedirectToAction(nameof(Edit), "ClientCompany", new { id = clientCompany.ClientCompanyId });
+                return RedirectToAction(nameof(Edit), "ClientCompany", new { id = clientCompany!.ClientCompanyId });
             }
             try
             {
@@ -265,16 +265,16 @@ namespace risk.control.system.Controllers
                 }
                 else
                 {
-                    var existingClientCompany = await _context.ClientCompany.AsNoTracking().FirstOrDefaultAsync(c => c.ClientCompanyId == clientCompany.ClientCompanyId);
-                    if (existingClientCompany.DocumentUrl != null)
+                    var existingCompany = await _context.ClientCompany.AsNoTracking().FirstOrDefaultAsync(c => c.ClientCompanyId == clientCompany.ClientCompanyId);
+                    if (existingCompany!.DocumentUrl != null)
                     {
-                        clientCompany.DocumentUrl = existingClientCompany.DocumentUrl;
-                        clientCompany.DocumentImageExtension = existingClientCompany.DocumentImageExtension;
+                        clientCompany.DocumentUrl = existingCompany.DocumentUrl;
+                        clientCompany.DocumentImageExtension = existingCompany.DocumentImageExtension;
                     }
                 }
                 var pinCode = await _context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).FirstOrDefaultAsync(s => s.PinCodeId == clientCompany.SelectedPincodeId);
 
-                var companyAddress = clientCompany.Addressline + ", " + pinCode.District.Name + ", " + pinCode.State.Name + ", " + pinCode.Country.Code;
+                var companyAddress = clientCompany.Addressline + ", " + pinCode!.District!.Name + ", " + pinCode.State!.Name + ", " + pinCode.Country!.Code;
                 var companyCoordinates = await customApiCLient.GetCoordinatesFromAddressAsync(companyAddress);
                 var companyLatLong = companyCoordinates.Latitude + "," + companyCoordinates.Longitude;
                 var url = $"https://maps.googleapis.com/maps/api/staticmap?center={companyLatLong}&zoom=14&size={vendorMapSize}&maptype=roadmap&markers=color:red%7Clabel:S%7C{companyLatLong}&key={EnvHelper.Get("GOOGLE_MAP_KEY")}";
@@ -360,11 +360,11 @@ namespace risk.control.system.Controllers
                 // HACKY
                 var currentCases = await service.GetAgencyIdsLoad(new List<long> { vendor.VendorId });
                 vendor.SelectedCountryId = vendorUserCount;
-                vendor.SelectedStateId = currentCases.FirstOrDefault().CaseCount;
+                vendor.SelectedStateId = currentCases.FirstOrDefault()!.CaseCount;
                 vendor.SelectedDistrictId = vendorAllCasesCount;
 
                 var superAdminUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == currentUserEmail);
-                if (superAdminUser.IsSuperAdmin)
+                if (superAdminUser!.IsSuperAdmin)
                 {
                     vendor.SelectedByCompany = true;
                 }
@@ -372,7 +372,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting {AgencyId} by {UserName}.", id, HttpContext.User.Identity.Name);
+                logger.LogError(ex, "Error getting {AgencyId} by {UserName}.", id, HttpContext.User.Identity?.Name);
                 notifyService.Error("Error getting Agency. Try again.");
                 return RedirectToAction("AvailableVendors", "Vendors");
             }
@@ -396,7 +396,7 @@ namespace risk.control.system.Controllers
                     notifyService.Error("Error getting User. Try again.");
                     return RedirectToAction(nameof(AgencyDetails), "ClientCompany", new { id = id });
                 }
-                vendor.SelectedByCompany = await _context.ApplicationUser.AnyAsync(u => u.Email.ToLower() == userEmail.ToLower() && u.IsSuperAdmin);
+                vendor.SelectedByCompany = await _context.ApplicationUser.AnyAsync(u => u.Email == userEmail && u.IsSuperAdmin);
                 return View(vendor);
             }
             catch (Exception ex)
@@ -411,7 +411,7 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditAgency(long vendorId, Vendor model)
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
             if (!ModelState.IsValid)
             {
                 notifyService.Error("Please correct the errors");
@@ -467,148 +467,148 @@ namespace risk.control.system.Controllers
             return View(model);
         }
 
-        [Breadcrumb("Empanelled Agency(s)")]
-        [HttpGet]
-        public async Task<IActionResult> EmpanelledVendors(long id)
-        {
-            var applicationDbContext = _context.Vendor
-                .Where(v => v.Clients.Any(c => c.ClientCompanyId == id))
-                .Include(v => v.Country)
-                .Include(v => v.PinCode)
-                .Include(v => v.State)
-                .Include(v => v.VendorInvestigationServiceTypes)
-                .ThenInclude(v => v.District)
-                .Include(v => v.VendorInvestigationServiceTypes)
-                .ThenInclude(v => v.InvestigationServiceType)
-                .Include(v => v.VendorInvestigationServiceTypes)
-                .AsQueryable();
+        //[Breadcrumb("Empanelled Agency(s)")]
+        //[HttpGet]
+        //public async Task<IActionResult> EmpanelledVendors(long id)
+        //{
+        //    var vendors = await _context.Vendor
+        //        .Where(v => v.Clients.Any(c => c.ClientCompanyId == id))
+        //        .Include(v => v.Country)
+        //        .Include(v => v.PinCode)
+        //        .Include(v => v.State)
+        //        .Include(v => v.VendorInvestigationServiceTypes)
+        //        .ThenInclude(v => v.District)
+        //        .Include(v => v.VendorInvestigationServiceTypes)
+        //        .ThenInclude(v => v.InvestigationServiceType)
+        //        .Include(v => v.VendorInvestigationServiceTypes)
+        //        .ToListAsync();
 
-            var applicationDbContextResult = await applicationDbContext.ToListAsync();
-            ViewBag.CompanyId = id;
+        //    var applicationDbContextResult = await applicationDbContext.ToListAsync();
+        //    ViewBag.CompanyId = id;
 
-            return View(applicationDbContextResult);
-        }
+        //    return View(applicationDbContextResult);
+        //}
 
-        [Breadcrumb("Available Agency(s)")]
-        [HttpGet]
-        public async Task<IActionResult> AvailableVendors(long id)
-        {
-            var applicationDbContext = _context.Vendor
-                .Where(v => !v.Clients.Any(c => c.ClientCompanyId == id)
-                //&& userVendorids.Contains(v.VendorId)
-                && (v.VendorInvestigationServiceTypes != null) && v.VendorInvestigationServiceTypes.Count > 0)
-                .Include(v => v.Country)
-                .Include(v => v.PinCode)
-                .Include(v => v.State)
-                .Include(v => v.VendorInvestigationServiceTypes)
-                .ThenInclude(v => v.District)
-                .Include(v => v.VendorInvestigationServiceTypes)
-                .ThenInclude(v => v.InvestigationServiceType)
-                .Include(v => v.VendorInvestigationServiceTypes)
-                .AsQueryable();
+        //[Breadcrumb("Available Agency(s)")]
+        //[HttpGet]
+        //public async Task<IActionResult> AvailableVendors(long id)
+        //{
+        //    var applicationDbContext = _context.Vendor
+        //        .Where(v => !v.Clients.Any(c => c.ClientCompanyId == id)
+        //        //&& userVendorids.Contains(v.VendorId)
+        //        && (v.VendorInvestigationServiceTypes != null) && v.VendorInvestigationServiceTypes.Count > 0)
+        //        .Include(v => v.Country)
+        //        .Include(v => v.PinCode)
+        //        .Include(v => v.State)
+        //        .Include(v => v.VendorInvestigationServiceTypes)
+        //        .ThenInclude(v => v.District)
+        //        .Include(v => v.VendorInvestigationServiceTypes)
+        //        .ThenInclude(v => v.InvestigationServiceType)
+        //        .Include(v => v.VendorInvestigationServiceTypes)
+        //        .AsQueryable();
 
-            var applicationDbContextResult = await applicationDbContext.ToListAsync();
-            ViewBag.CompanyId = id;
-            return View(applicationDbContextResult);
-        }
+        //    var applicationDbContextResult = await applicationDbContext.ToListAsync();
+        //    ViewBag.CompanyId = id;
+        //    return View(applicationDbContextResult);
+        //}
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AvailableVendors(long id, List<string> vendors)
-        {
-            if (vendors is not null && vendors.Count > 0)
-            {
-                var company = await _context.ClientCompany.FindAsync(id);
-                if (company != null)
-                {
-                    var empanelledVendors = _context.Vendor.Where(v => vendors.Contains(v.VendorId.ToString()))
-                    .Include(v => v.Country)
-                    .Include(v => v.PinCode)
-                    .Include(v => v.State)
-                    .Include(v => v.VendorInvestigationServiceTypes)
-                    .ThenInclude(v => v.District)
-                    .Include(v => v.VendorInvestigationServiceTypes)
-                    .ThenInclude(v => v.InvestigationServiceType)
-                    .Include(v => v.VendorInvestigationServiceTypes);
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> AvailableVendors(long id, List<string> vendors)
+        //{
+        //    if (vendors is not null && vendors.Count > 0)
+        //    {
+        //        var company = await _context.ClientCompany.FindAsync(id);
+        //        if (company != null)
+        //        {
+        //            var empanelledVendors = _context.Vendor.Where(v => vendors.Contains(v.VendorId.ToString()))
+        //            .Include(v => v.Country)
+        //            .Include(v => v.PinCode)
+        //            .Include(v => v.State)
+        //            .Include(v => v.VendorInvestigationServiceTypes)
+        //            .ThenInclude(v => v.District)
+        //            .Include(v => v.VendorInvestigationServiceTypes)
+        //            .ThenInclude(v => v.InvestigationServiceType)
+        //            .Include(v => v.VendorInvestigationServiceTypes);
 
-                    company.EmpanelledVendors.AddRange(empanelledVendors);
+        //            company.EmpanelledVendors.AddRange(empanelledVendors);
 
-                    foreach (var empanelledVendor in empanelledVendors)
-                    {
-                        empanelledVendor.Clients.Add(company);
-                        _context.Vendor.Update(empanelledVendor);
-                    }
-                    company.Updated = DateTime.UtcNow;
-                    company.UpdatedBy = HttpContext.User?.Identity?.Name;
-                    _context.ClientCompany.Update(company);
-                    var savedRows = await _context.SaveChangesAsync();
-                    notifyService.Custom($"Agency(s) empanelled.", 3, "green", "fas fa-thumbs-up");
-                    return RedirectToAction("Details", new { id = company.ClientCompanyId });
-                }
-            }
-            return Problem();
-        }
+        //            foreach (var empanelledVendor in empanelledVendors)
+        //            {
+        //                empanelledVendor.Clients.Add(company);
+        //                _context.Vendor.Update(empanelledVendor);
+        //            }
+        //            company.Updated = DateTime.UtcNow;
+        //            company.UpdatedBy = HttpContext.User?.Identity?.Name;
+        //            _context.ClientCompany.Update(company);
+        //            var savedRows = await _context.SaveChangesAsync();
+        //            notifyService.Custom($"Agency(s) empanelled.", 3, "green", "fas fa-thumbs-up");
+        //            return RedirectToAction("Details", new { id = company.ClientCompanyId });
+        //        }
+        //    }
+        //    return Problem();
+        //}
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EmpanelledVendors(long id, List<string> vendors)
-        {
-            var company = await _context.ClientCompany.FindAsync(id);
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> EmpanelledVendors(long id, List<string> vendors)
+        //{
+        //    var company = await _context.ClientCompany.FindAsync(id);
 
-            var empanelledVendors = _context.Vendor.Where(v => vendors.Contains(v.VendorId.ToString()))
-                .Where(v => v.Clients.Any(c => c.ClientCompanyId == id))
-                .Include(v => v.Country)
-                .Include(v => v.PinCode)
-                .Include(v => v.State)
-                .Include(v => v.VendorInvestigationServiceTypes)
-                .ThenInclude(v => v.District)
-                .Include(v => v.VendorInvestigationServiceTypes)
-                .ThenInclude(v => v.InvestigationServiceType)
-                .Include(v => v.VendorInvestigationServiceTypes);
-            foreach (var v in empanelledVendors)
-            {
-                company.EmpanelledVendors.Remove(v);
-                v.Clients.Remove(company);
-                _context.Vendor.Update(v);
-            }
-            _context.ClientCompany.Update(company);
-            company.Updated = DateTime.UtcNow;
-            company.UpdatedBy = HttpContext.User?.Identity?.Name;
-            var savedRows = await _context.SaveChangesAsync();
-            notifyService.Custom($"Agency(s) de-panelled.", 3, "red", "far fa-thumbs-down");
-            return RedirectToAction("Details", new { id = company.ClientCompanyId });
-        }
+        //    var empanelledVendors = _context.Vendor.Where(v => vendors.Contains(v.VendorId.ToString()))
+        //        .Where(v => v.Clients.Any(c => c.ClientCompanyId == id))
+        //        .Include(v => v.Country)
+        //        .Include(v => v.PinCode)
+        //        .Include(v => v.State)
+        //        .Include(v => v.VendorInvestigationServiceTypes)
+        //        .ThenInclude(v => v.District)
+        //        .Include(v => v.VendorInvestigationServiceTypes)
+        //        .ThenInclude(v => v.InvestigationServiceType)
+        //        .Include(v => v.VendorInvestigationServiceTypes);
+        //    foreach (var v in empanelledVendors)
+        //    {
+        //        company.EmpanelledVendors.Remove(v);
+        //        v.Clients.Remove(company);
+        //        _context.Vendor.Update(v);
+        //    }
+        //    _context.ClientCompany.Update(company);
+        //    company.Updated = DateTime.UtcNow;
+        //    company.UpdatedBy = HttpContext.User?.Identity?.Name;
+        //    var savedRows = await _context.SaveChangesAsync();
+        //    notifyService.Custom($"Agency(s) de-panelled.", 3, "red", "far fa-thumbs-down");
+        //    return RedirectToAction("Details", new { id = company.ClientCompanyId });
+        //}
 
-        [Breadcrumb("Agency Detail")]
-        public async Task<IActionResult> VendorDetail(string companyId, long id, string backurl)
-        {
-            if (id < 1 || _context.Vendor == null)
-            {
-                notifyService.Error("Agency not found!");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
-            }
+        //[Breadcrumb("Agency Detail")]
+        //public async Task<IActionResult> VendorDetail(string companyId, long id, string backurl)
+        //{
+        //    if (id < 1 || _context.Vendor == null)
+        //    {
+        //        notifyService.Error("Agency not found!");
+        //        return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
+        //    }
 
-            var vendor = await _context.Vendor
-                .Include(v => v.Country)
-                .Include(v => v.PinCode)
-                .Include(v => v.State)
-                .Include(v => v.VendorInvestigationServiceTypes)
-                .Include(v => v.VendorInvestigationServiceTypes)
-                .ThenInclude(v => v.State)
-                .Include(v => v.VendorInvestigationServiceTypes)
-                .ThenInclude(v => v.District)
-                .Include(v => v.VendorInvestigationServiceTypes)
-                .ThenInclude(v => v.InvestigationServiceType)
-                .FirstOrDefaultAsync(m => m.VendorId == id);
-            if (vendor == null)
-            {
-                notifyService.Error("Agency not found!");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
-            }
-            ViewBag.CompanyId = companyId;
-            ViewBag.Backurl = backurl;
+        //    var vendor = await _context.Vendor
+        //        .Include(v => v.Country)
+        //        .Include(v => v.PinCode)
+        //        .Include(v => v.State)
+        //        .Include(v => v.VendorInvestigationServiceTypes)
+        //        .Include(v => v.VendorInvestigationServiceTypes)
+        //        .ThenInclude(v => v.State)
+        //        .Include(v => v.VendorInvestigationServiceTypes)
+        //        .ThenInclude(v => v.District)
+        //        .Include(v => v.VendorInvestigationServiceTypes)
+        //        .ThenInclude(v => v.InvestigationServiceType)
+        //        .FirstOrDefaultAsync(m => m.VendorId == id);
+        //    if (vendor == null)
+        //    {
+        //        notifyService.Error("Agency not found!");
+        //        return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
+        //    }
+        //    ViewBag.CompanyId = companyId;
+        //    ViewBag.Backurl = backurl;
 
-            return View(vendor);
-        }
+        //    return View(vendor);
+        //}
     }
 }

@@ -48,7 +48,7 @@ namespace risk.control.system.Controllers.Assessor
         [Breadcrumb(title: "Report", FromAction = nameof(Assess))]
         public async Task<IActionResult> GetInvestigateReport(long id)
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
 
             try
             {
@@ -65,13 +65,13 @@ namespace risk.control.system.Controllers.Assessor
             {
                 _logger.LogError(ex, "Error occurred getting the case {Id}. {UserEmail}", id, userEmail);
                 _notifyService.Error("OOPs !!!..Contact Admin");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
             }
         }
 
         public async Task<IActionResult> SendEnquiry(long id)
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
 
             try
             {
@@ -90,7 +90,7 @@ namespace risk.control.system.Controllers.Assessor
             {
                 _logger.LogError(ex, "Error occurred getting the enquiry case {Id}. {UserEmail}", id, userEmail);
                 _notifyService.Error("OOPs !!!..Contact Admin");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
             }
         }
 
@@ -103,7 +103,7 @@ namespace risk.control.system.Controllers.Assessor
         [Breadcrumb(title: "Details", FromAction = nameof(Review))]
         public async Task<IActionResult> ReviewDetail(long id)
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
 
             try
             {
@@ -121,7 +121,7 @@ namespace risk.control.system.Controllers.Assessor
             {
                 _logger.LogError(ex, "Error occurred getting the review case detail {Id}. {UserEmail}", id, userEmail);
                 _notifyService.Error("OOPs !!!..Contact Admin");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
             }
         }
 
@@ -134,7 +134,7 @@ namespace risk.control.system.Controllers.Assessor
         [Breadcrumb("Details", FromAction = nameof(Approved))]
         public async Task<IActionResult> ApprovedDetail(long id)
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
 
             try
             {
@@ -155,7 +155,7 @@ namespace risk.control.system.Controllers.Assessor
             {
                 _logger.LogError(ex, "Error occurred getting the approved case detail {Id}. {UserEmail}", id, userEmail);
                 _notifyService.Error("OOPs !!!..Contact Admin");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
             }
         }
 
@@ -168,7 +168,7 @@ namespace risk.control.system.Controllers.Assessor
         [Breadcrumb("Details", FromAction = nameof(Rejected))]
         public async Task<IActionResult> RejectDetail(long id)
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
 
             if (!ModelState.IsValid || id < 1)
             {
@@ -184,7 +184,7 @@ namespace risk.control.system.Controllers.Assessor
             {
                 _logger.LogError(ex, "Error occurred getting the rejected case detail {Id}. {UserEmail}", id, userEmail);
                 _notifyService.Error("OOPs !!!..Contact Admin");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
             }
         }
 
@@ -200,7 +200,7 @@ namespace risk.control.system.Controllers.Assessor
             try
             {
                 var invoice = await _invoiceService.GetInvoice(id);
-                ViewData["BreadcrumbNode"] = _navigationService.GetInvoiceBreadcrumb(id, invoice.CaseId.Value, "Assessor", "Assessor", "Cases", "Approved", "Approved", "ApprovedDetail");
+                ViewData["BreadcrumbNode"] = _navigationService.GetInvoiceBreadcrumb(id, invoice.CaseId!.Value, "Assessor", "Assessor", "Cases", "Approved", "Approved", "ApprovedDetail");
 
                 return View(invoice);
             }
@@ -208,7 +208,7 @@ namespace risk.control.system.Controllers.Assessor
             {
                 _logger.LogError(ex, "Error occurred getting the invoice case detail {Id}. {UserEmail}", id, userEmail);
                 _notifyService.Error("OOPs !!!..Contact Admin");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
             }
         }
 
@@ -219,7 +219,7 @@ namespace risk.control.system.Controllers.Assessor
             if (!ModelState.IsValid || id <= 0)
             {
                 _notifyService.Error("OOPS !!! Case Not Found !!!..");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
             }
 
             try
@@ -232,7 +232,7 @@ namespace risk.control.system.Controllers.Assessor
             {
                 _logger.LogError(ex, "Error occurred priting the invoice case detail {Id}. {UserEmail}", id, userEmail);
                 _notifyService.Error("OOPs !!!..Contact Admin");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
             }
         }
     }

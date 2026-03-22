@@ -41,7 +41,7 @@ namespace risk.control.system.Controllers.Creator
         [Breadcrumb("Add/Assign")]
         public async Task<IActionResult> New()
         {
-            var currentUserEmail = HttpContext.User?.Identity?.Name;
+            var currentUserEmail = HttpContext.User?.Identity?.Name!;
             try
             {
                 var state = await _caseCreateEditService.GetCreationStateAsync(currentUserEmail);
@@ -72,7 +72,7 @@ namespace risk.control.system.Controllers.Creator
         [Breadcrumb("Add New", FromAction = nameof(New))]
         public async Task<IActionResult> Add()
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
             try
             {
                 var model = await _caseCreateEditService.Create(userEmail);
@@ -100,7 +100,7 @@ namespace risk.control.system.Controllers.Creator
         [Breadcrumb(title: "Add Case", FromAction = nameof(New))]
         public async Task<IActionResult> Create()
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
             try
             {
                 var model = await _caseCreateEditService.GetCreateViewModelAsync(userEmail);
@@ -118,7 +118,7 @@ namespace risk.control.system.Controllers.Creator
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CreateCaseViewModel model)
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
             try
             {
                 if (!ModelState.IsValid)
@@ -159,7 +159,7 @@ namespace risk.control.system.Controllers.Creator
 
         public async Task<IActionResult> Edit(long id)
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
             try
             {
                 if (!ModelState.IsValid || id < 0)
@@ -192,7 +192,7 @@ namespace risk.control.system.Controllers.Creator
         [HttpPost]
         public async Task<IActionResult> Edit(EditPolicyDto model)
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
             try
             {
                 if (!ModelState.IsValid)

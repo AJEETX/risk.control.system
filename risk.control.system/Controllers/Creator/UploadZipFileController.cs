@@ -40,7 +40,7 @@ namespace risk.control.system.Controllers.Creator
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> New(IFormFile postedFile, CreateClaims model)
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
             try
             {
                 if (!ModelState.IsValid || Path.GetExtension(Path.GetFileName(postedFile.FileName)) != ".zip")

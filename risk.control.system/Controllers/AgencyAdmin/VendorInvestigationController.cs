@@ -71,7 +71,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
             {
                 _logger.LogError(ex, "Error occurred for {SelectedCase} for {UserEmail}.", id, userEmail ?? "Anonymous");
                 _notifyService.Error("OOPs !!!..Contact Admin");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
             }
         }
 
@@ -96,7 +96,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
             {
                 _logger.LogError(ex, "Error occurred for {SelectedCase} for {UserEmail}.", id, userEmail ?? "Anonymous");
                 _notifyService.Error("OOPs !!!..Contact Admin");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
             }
         }
 
@@ -126,7 +126,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
             {
                 _logger.LogError(ex, "Error occurred for {SelectedCase} for {UserEmail}.", id, userEmail ?? "Anonymous");
                 _notifyService.Error("OOPs !!!..Contact Admin");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
             }
         }
 
@@ -155,7 +155,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
             {
                 _logger.LogError(ex, "Error occurred for {CaseId} for {UserEmail}.", id, userEmail ?? "Anonymous");
                 _notifyService.Error("OOPs !!!..Contact Admin");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
             }
         }
 
@@ -178,7 +178,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
             {
                 _logger.LogError(ex, "Error occurred for {CaseId} for {UserEmail}.", id, userEmail ?? "Anonymous");
                 _notifyService.Error("OOPs !!!..Contact Admin");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
             }
         }
 
@@ -207,7 +207,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
             {
                 _logger.LogError(ex, "Error occurred for {CaseId} for {UserEmail}.", id, userEmail ?? "Anonymous");
                 _notifyService.Error("OOPs !!!..Contact Admin");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
             }
         }
 
@@ -246,7 +246,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
             {
                 _logger.LogError(ex, "Error occurred for {CaseId} for {UserEmail}.", id, userEmail ?? "Anonymous");
                 _notifyService.Error("OOPs !!!..Contact Admin");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
             }
         }
 
@@ -258,7 +258,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
                 if (!ModelState.IsValid || id < 1)
                 {
                     _notifyService.Error("NOT FOUND !!!..");
-                    return this.RedirectToAction<DashboardController>(x => x.Index());
+                    return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
                 }
 
                 var invoice = await _invoiceService.GetInvoice(id);
@@ -269,7 +269,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
             {
                 _logger.LogError(ex, "Error occurred for {CaseId} for {UserEmail}.", id, userEmail ?? "Anonymous");
                 _notifyService.Error("OOPs !!!..Contact Admin");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
             }
         }
     }
