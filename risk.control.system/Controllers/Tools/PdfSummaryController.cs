@@ -52,7 +52,7 @@ public class PdfSummaryController : Controller
             ModelState.AddModelError("pdfFile", "Please upload a PDF file.");
         }
         // Check file size (e.g., limit to 10 MB)
-        if (pdfFile.Length > 10 * 1024 * 1024)
+        if (pdfFile!.Length > 10 * 1024 * 1024)
             return BadRequest("File too large.");
 
         // Whitelist extensions (but note: extensions can be spoofed)
@@ -79,14 +79,6 @@ public class PdfSummaryController : Controller
         {
             return StatusCode(403, new { errorMessage = "PDF Summary limit reached (5/5)." });
         }
-
-        // Best: Check PDF magic bytes (header signature)
-        using var stream = pdfFile.OpenReadStream();
-        var header = new byte[4];
-        await stream.ReadAsync(header, 0, 4);
-        if (!header.SequenceEqual(new byte[] { 0x25, 0x50, 0x44, 0x46 }))  // %PDF
-            return BadRequest("Not a valid PDF file.");
-        stream.Seek(0, SeekOrigin.Begin);  // Reset for further processing
 
         try
         {

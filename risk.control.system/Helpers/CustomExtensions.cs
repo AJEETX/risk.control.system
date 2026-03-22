@@ -85,7 +85,7 @@ namespace risk.control.system.Helpers
                     return "webp";
             }
 
-            return null; // Unknown format
+            return null!; // Unknown format
         }
 
         public static string GetEnumDisplayName(this Enum value)

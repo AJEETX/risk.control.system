@@ -25,7 +25,7 @@ namespace risk.control.system.Controllers.Api.Company
         [HttpGet("GetAuto")]
         public async Task<IActionResult> GetAuto(int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc")
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
 
             try
             {
@@ -44,7 +44,7 @@ namespace risk.control.system.Controllers.Api.Company
         [HttpGet("GetActive")]
         public async Task<IActionResult> GetActive(int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc")
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
 
             try
             {
@@ -62,11 +62,11 @@ namespace risk.control.system.Controllers.Api.Company
         [HttpGet("GetFilesData/{uploadId?}")]
         public async Task<IActionResult> GetFilesData(int draw, int start, int length, int orderColumn, string orderDir, int uploadId = 0, string? searchTerm = null)
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
 
             try
             {
-                var isManager = HttpContext.User.IsInRole(MANAGER.DISPLAY_NAME);
+                var isManager = HttpContext?.User?.IsInRole(MANAGER.DISPLAY_NAME) ?? false;
                 var result = await service.GetFilesData(userEmail, isManager, draw, start, length, orderColumn, orderDir, uploadId, searchTerm);
                 return Ok(new
                 {
@@ -92,11 +92,11 @@ namespace risk.control.system.Controllers.Api.Company
             {
                 return BadRequest("Invalid uploadId parameter.");
             }
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
 
             try
             {
-                var isManager = HttpContext.User.IsInRole(MANAGER.DISPLAY_NAME);
+                var isManager = HttpContext?.User?.IsInRole(MANAGER.DISPLAY_NAME) ?? false;
                 var result = await service.GetFileById(userEmail, isManager, uploadId);
 
                 return Ok(new

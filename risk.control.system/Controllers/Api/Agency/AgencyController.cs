@@ -29,7 +29,7 @@ namespace risk.control.system.Controllers.Api.Agency
         [HttpGet("AllAgencies")]
         public async Task<IActionResult> AllAgencies()
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
 
             try
             {
@@ -47,7 +47,7 @@ namespace risk.control.system.Controllers.Api.Agency
         [HttpGet("AllServices")]
         public async Task<IActionResult> AllServices()
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
 
             try
             {
@@ -68,7 +68,7 @@ namespace risk.control.system.Controllers.Api.Agency
             {
                 return BadRequest("Invalid agency id.");
             }
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
 
             try
             {
@@ -86,7 +86,7 @@ namespace risk.control.system.Controllers.Api.Agency
         [HttpGet("GetUsers")]
         public async Task<IActionResult> GetUsers()
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
 
             try
             {
@@ -107,7 +107,7 @@ namespace risk.control.system.Controllers.Api.Agency
             {
                 return BadRequest("Invalid agent id.");
             }
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
 
             try
             {

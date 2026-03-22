@@ -43,7 +43,7 @@ namespace risk.control.system.Controllers.Agent
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SubmitFaceImage(FaceData model, bool isAgent)
         {
-            model.Email = HttpContext.User.Identity.Name;
+            model.Email = HttpContext?.User?.Identity?.Name!;
             ModelState.Remove(nameof(model.Email));
             if (!ModelState.IsValid)
             {
@@ -68,7 +68,7 @@ namespace risk.control.system.Controllers.Agent
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SubmitDocumentImage(DocumentData model)
         {
-            model.Email = HttpContext.User.Identity.Name;
+            model.Email = HttpContext?.User?.Identity?.Name!;
             ModelState.Remove(nameof(model.Email));
             if (!ModelState.IsValid)
             {
@@ -85,7 +85,8 @@ namespace risk.control.system.Controllers.Agent
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SubmitMediaFile(DocumentData model)
         {
-            model.Email = HttpContext.User.Identity.Name;
+            var userEmail = HttpContext?.User?.Identity?.Name!;
+            model.Email = userEmail;
             ModelState.Remove(nameof(model.Email));
             if (!ModelState.IsValid)
             {
@@ -93,7 +94,6 @@ namespace risk.control.system.Controllers.Agent
             }
             if (model.Image == null || model.Image.Length == 0)
                 return Json(new { success = false, message = "No file provided." });
-            var userEmail = HttpContext.User.Identity.Name;
             var extension = Path.GetExtension(model.Image.FileName).ToLower();
 
             var supportedExtensions = new[] { ".mp4", ".webm", ".mov", ".mp3", ".wav", ".aac" };
@@ -105,7 +105,7 @@ namespace risk.control.system.Controllers.Agent
             {
                 success = true,
                 extension = extension.TrimStart('.'),
-                fileData = Convert.ToBase64String(response.Image)
+                fileData = Convert.ToBase64String(response.Image!)
             });
         }
 
@@ -113,7 +113,7 @@ namespace risk.control.system.Controllers.Agent
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SubmitLocationAnswers(string locationName, long CaseId, List<QuestionTemplate> Questions)
         {
-            var userEmail = HttpContext.User.Identity.Name;
+            var userEmail = HttpContext?.User?.Identity?.Name!;
             if (!ModelState.IsValid)
             {
                 return BadRequest("Invalid data.");

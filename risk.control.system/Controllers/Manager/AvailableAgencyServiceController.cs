@@ -46,7 +46,7 @@ namespace risk.control.system.Controllers.Manager
             if (id <= 0)
             {
                 _notifyService.Error("OOPS !!!..Contact Admin");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
             }
             var model = new ServiceModel { Id = id };
             ViewData["BreadcrumbNode"] = _navigationService.GetAgencyServiceManagerPath(id, ControllerName<AvailableAgencyController>.Name, "Available Agencies");
@@ -66,7 +66,7 @@ namespace risk.control.system.Controllers.Manager
             {
                 _logger.LogError(ex, "Error getting {AgencyId}. {UserEmail}", id, userEmail);
                 _notifyService.Error("Error getting agency service. Try again.");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
             }
         }
 
@@ -74,7 +74,7 @@ namespace risk.control.system.Controllers.Manager
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(VendorInvestigationServiceType service, long VendorId)
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
             try
             {
                 var result = await _agencyServiceTypeManager.CreateAsync(service, userEmail);
@@ -104,7 +104,7 @@ namespace risk.control.system.Controllers.Manager
                 if (id <= 0)
                 {
                     _notifyService.Error("OOPs !!!..Agency Id Not Found");
-                    return this.RedirectToAction<DashboardController>(x => x.Index());
+                    return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
                 }
                 var serviceType = await _agencyService.PrepareEditViewModelAsync(id);
 
@@ -116,7 +116,7 @@ namespace risk.control.system.Controllers.Manager
             {
                 _logger.LogError(ex, "Error getting service for {ServiceId}. {UserEmail}", id, userEmail);
                 _notifyService.Error("Error getting agency service. Try again.");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
             }
         }
 
@@ -124,7 +124,7 @@ namespace risk.control.system.Controllers.Manager
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(VendorInvestigationServiceType service)
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
             try
             {
                 var result = await _agencyServiceTypeManager.EditAsync(service, userEmail);

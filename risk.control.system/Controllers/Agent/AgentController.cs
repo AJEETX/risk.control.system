@@ -39,13 +39,13 @@ namespace risk.control.system.Controllers.Agent
         [Breadcrumb("Submit", FromAction = nameof(Agent))]
         public async Task<IActionResult> GetInvestigate(long id, bool uploaded = false)
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
             try
             {
                 if (!ModelState.IsValid || id < 1)
                 {
                     notifyService.Error("No case selected!!!. Please select case to be investigate.");
-                    return this.RedirectToAction<DashboardController>(x => x.Index());
+                    return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
                 }
 
                 var model = await agentCaseDetailService.GetInvestigate(userEmail, id, uploaded);
@@ -56,7 +56,7 @@ namespace risk.control.system.Controllers.Agent
             {
                 logger.LogError(ex, "Error occurred for case {Id}. {UserEmail}.", id, userEmail ?? "Anonymous");
                 notifyService.Error("OOPs !!!..Contact Admin");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
             }
         }
 
@@ -69,11 +69,11 @@ namespace risk.control.system.Controllers.Agent
         [Breadcrumb(title: "Detail", FromAction = nameof(Submitted))]
         public async Task<IActionResult> SubmittedDetail(long id)
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
             if (!ModelState.IsValid || id == 0)
             {
                 notifyService.Error("NOT FOUND !!!..");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
             }
             try
             {
@@ -85,7 +85,7 @@ namespace risk.control.system.Controllers.Agent
             {
                 logger.LogError(ex, "Error occurred for case {Id}. {UserEmail}.", id, userEmail ?? "Anonymous");
                 notifyService.Error("OOPs !!!..Contact Admin");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
             }
         }
     }

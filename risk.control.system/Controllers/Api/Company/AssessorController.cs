@@ -26,7 +26,7 @@ namespace risk.control.system.Controllers.Api.Company
         [HttpGet("GetInvestigations")]
         public async Task<IActionResult> GetInvestigations(int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc")
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
 
             try
             {
@@ -44,7 +44,7 @@ namespace risk.control.system.Controllers.Api.Company
         [HttpGet("GetReviewCases")]
         public async Task<IActionResult> GetReviewCases(int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc")
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
 
             try
             {
@@ -62,7 +62,7 @@ namespace risk.control.system.Controllers.Api.Company
         [HttpGet("GetApprovededCases")]
         public async Task<IActionResult> GetApprovededCases(int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc")
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
 
             try
             {
@@ -79,7 +79,7 @@ namespace risk.control.system.Controllers.Api.Company
         [HttpGet("GetRejectedCases")]
         public async Task<IActionResult> GetRejectedCases(int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc")
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
 
             try
             {

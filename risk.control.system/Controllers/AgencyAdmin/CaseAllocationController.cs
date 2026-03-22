@@ -42,7 +42,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AllocateToVendorAgent(string selectedcase, long claimId)
         {
-            var userEmail = User?.Identity?.Name;
+            var userEmail = User?.Identity?.Name!;
 
             try
             {
@@ -59,10 +59,10 @@ namespace risk.control.system.Controllers.AgencyAdmin
                 {
                     _notifyService.Error(result.ErrorMessage ?? "OOPs !!!..Contact Admin");
 
-                    return this.RedirectToAction<DashboardController>(x => x.Index());
+                    return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
                 }
 
-                _backgroundJobClient.Enqueue(() => _mailService.NotifyCaseAssignmentToVendorAgent(userEmail, claimId, result.VendorAgentEmail, result.VendorId, baseUrl));
+                _backgroundJobClient.Enqueue(() => _mailService.NotifyCaseAssignmentToVendorAgent(userEmail, claimId, result!.VendorAgentEmail!, result.VendorId, baseUrl));
 
                 _notifyService.Custom($"Case <b>#{result.ContractNumber}</b> Tasked to {result.VendorAgentEmail}", 3, "green", "far fa-file-powerpoint");
 
@@ -74,7 +74,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
 
                 _notifyService.Error("OOPs !!!..Contact Admin");
 
-                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
             }
         }
     }

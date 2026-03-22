@@ -27,20 +27,20 @@ namespace risk.control.system.Controllers.Common
         [HttpGet]
         public async Task<IActionResult> PrintPdfReport(long id)
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
             try
             {
                 if (id < 1)
                 {
                     _notifyService.Error("NOT FOUND !!!..");
-                    return this.RedirectToAction<DashboardController>(x => x.Index());
+                    return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
                 }
 
                 var claim = await _reportPdfService.GetClaimPdfReport(userEmail, id);
 
-                var fileName = Path.GetFileName(claim.ClaimsInvestigation.InvestigationReport.PdfReportFilePath);
+                var fileName = Path.GetFileName(claim.ClaimsInvestigation!.InvestigationReport!.PdfReportFilePath);
                 var memory = new MemoryStream();
-                using var stream = new FileStream(claim.ClaimsInvestigation.InvestigationReport.PdfReportFilePath, FileMode.Open);
+                using var stream = new FileStream(claim.ClaimsInvestigation.InvestigationReport.PdfReportFilePath!, FileMode.Open);
                 await stream.CopyToAsync(memory);
                 memory.Position = 0;
                 //notifyService.Success($"Policy {claim.PolicyDetail.ContractNumber} Report download success !!!");
@@ -48,9 +48,9 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred to Print Pdf for {CaseId} . {UserEmail}", id, HttpContext.User.Identity.Name);
+                _logger.LogError(ex, "Error occurred to Print Pdf for {CaseId} . {UserEmail}", id, userEmail);
                 _notifyService.Error("Error occurred. Try again.");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
             }
         }
     }

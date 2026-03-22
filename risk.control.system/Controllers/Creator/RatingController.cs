@@ -22,7 +22,7 @@ namespace risk.control.system.Controllers.Creator
 
         public async Task<JsonResult> PostRating(int rating, long mid)
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
 
             try
             {
@@ -40,7 +40,7 @@ namespace risk.control.system.Controllers.Creator
                 var rt = new AgencyRating
                 {
                     Rate = rating,
-                    IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString(),
+                    IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "",
                     VendorId = mid,
                     UserEmail = userEmail
                 };
@@ -90,7 +90,7 @@ namespace risk.control.system.Controllers.Creator
                         VendorId = vendorId,
                         Rate = rating,
                         UserEmail = currentUserEmail,
-                        IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString()
+                        IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? ""
                     });
                 }
 

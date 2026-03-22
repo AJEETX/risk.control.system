@@ -46,7 +46,7 @@ namespace risk.control.system.Controllers.Manager
         [Breadcrumb(" Add Agency")]
         public async Task<IActionResult> Create()
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
             try
             {
                 var vendor = await _agencyCreateEditService.GetVendorForEditAsync(userEmail);
@@ -55,7 +55,7 @@ namespace risk.control.system.Controllers.Manager
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error loading Create Agency for {UserEmail}.", userEmail);
-                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
             }
         }
 
@@ -63,7 +63,7 @@ namespace risk.control.system.Controllers.Manager
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Vendor model, string domainAddress)
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
             domainAddress = domainAddress.Replace("\n", "").Replace("\r", "").Trim();
             try
             {
