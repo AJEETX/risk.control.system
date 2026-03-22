@@ -58,7 +58,7 @@ namespace risk.control.system.Controllers.Company
                 {
                     session.UpdatedBy = user.Email;
                     session.Updated = now;
-                    session.CurrentPage = request.CurrentPage;
+                    session.CurrentPage = request.CurrentPage!;
                 }
                 else
                 {
@@ -66,7 +66,7 @@ namespace risk.control.system.Controllers.Company
                     {
                         ActiveUser = user,
                         CreatedUser = email,
-                        CurrentPage = request.CurrentPage,
+                        CurrentPage = request.CurrentPage!,
                         Created = now
                     });
                 }

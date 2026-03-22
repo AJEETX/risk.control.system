@@ -69,7 +69,7 @@ namespace risk.control.system.Services.Report
                    .ThenInclude(l => l.DocumentIds)
                .Include(r => r.LocationReport)
                    .ThenInclude(l => l.Questions)
-                   .FirstOrDefaultAsync(q => q.Id == investigation.ReportTemplateId);
+                   .FirstOrDefaultAsync(q => q.Id == investigation!.ReportTemplateId);
 
             var vendor = context.Vendor.Include(s => s.VendorInvestigationServiceTypes).FirstOrDefault(v => v.VendorId == investigation.VendorId);
             var currentUser = context.ApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == userEmail);

@@ -60,7 +60,7 @@ namespace risk.control.system.Controllers.Manager
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Agencies(List<long> vendors)
         {
-            var userEmail = User.Identity?.Name;
+            var userEmail = User.Identity?.Name!;
 
             // Basic validation stays in controller
             if (!ModelState.IsValid || vendors == null || vendors.Count == 0)
@@ -85,7 +85,7 @@ namespace risk.control.system.Controllers.Manager
 
         public async Task<IActionResult> Edit(long id)
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
             try
             {
                 if (!ModelState.IsValid)
@@ -126,7 +126,7 @@ namespace risk.control.system.Controllers.Manager
                     return View(model);
                 }
 
-                var userEmail = HttpContext.User?.Identity?.Name;
+                var userEmail = HttpContext.User?.Identity?.Name!;
 
                 var result = await _manageAgencyService.EditAsync(userEmail, model, _baseUrl);
                 if (!result.Success)
@@ -184,7 +184,7 @@ namespace risk.control.system.Controllers.Manager
             if (id < 1)
                 return BadRequest(new { message = "Invalid Agency Id." });
 
-            var userEmail = User.Identity?.Name;
+            var userEmail = User.Identity?.Name!;
             var (success, message) = await _manageAgencyService.SoftDeleteAgencyAsync(id, userEmail);
 
             if (!success)

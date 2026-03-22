@@ -35,7 +35,7 @@ namespace risk.control.system.Controllers.Creator
         [Breadcrumb(" Upload File")]
         public async Task<IActionResult> Uploads(int uploadId = 0)
         {
-            var userEmail = User.Identity?.Name;
+            var userEmail = User.Identity?.Name!;
             if (!ModelState.IsValid)
             {
                 return RedirectToDashboard("Invalid request.");
@@ -48,7 +48,7 @@ namespace risk.control.system.Controllers.Creator
 
                 if (result.ShouldSendTrialNotification)
                 {
-                    SendLicenseNotifications(result.LicenseStatus);
+                    SendLicenseNotifications(result.LicenseStatus!);
                 }
 
                 return View(new CreateClaims
@@ -129,7 +129,7 @@ namespace risk.control.system.Controllers.Creator
             {
                 return BadRequest(new { success = false, message = "Error deleting file" });
             }
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
 
             try
             {

@@ -28,7 +28,7 @@ namespace risk.control.system.Controllers.Api.Agency
         [HttpGet("GetNewCases")]
         public async Task<IActionResult> GetNewCases(int draw, int start, int length, string search = "", int orderColumn = 0, string orderDir = "asc")
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
 
             try
             {
@@ -45,7 +45,7 @@ namespace risk.control.system.Controllers.Api.Agency
         [HttpGet("GetOpenCases")]
         public async Task<IActionResult> GetOpenCases(int draw, int start, int length, string search = "", int orderColumn = 0, string orderDir = "asc")
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
 
             try
             {
@@ -62,7 +62,7 @@ namespace risk.control.system.Controllers.Api.Agency
         [HttpGet("GetReport")]
         public async Task<IActionResult> GetReport(int draw, int start, int length, string search = "", int orderColumn = 0, string orderDir = "asc")
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
 
             try
             {
@@ -79,12 +79,12 @@ namespace risk.control.system.Controllers.Api.Agency
         [HttpGet("GetCompleted")]
         public async Task<IActionResult> GetCompleted(int draw, int start, int length, string search = "", int orderColumn = 0, string orderDir = "asc")
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
 
             try
             {
                 var userClaim = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
-                var response = await vendorInvestigationService.GetCompletedCases(userEmail, userClaim, draw, start, length, search, orderColumn, orderDir);
+                var response = await vendorInvestigationService.GetCompletedCases(userEmail, userClaim!, draw, start, length, search, orderColumn, orderDir);
                 return Ok(response);
             }
             catch (Exception ex)

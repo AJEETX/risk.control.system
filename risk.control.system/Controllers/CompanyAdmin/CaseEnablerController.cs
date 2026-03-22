@@ -97,7 +97,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             }
             try
             {
-                caseEnabler.Code = WebUtility.HtmlEncode(caseEnabler.Code?.ToUpper(CultureInfo.InvariantCulture));
+                caseEnabler.Code = WebUtility.HtmlEncode(caseEnabler.Code!.ToUpper(CultureInfo.InvariantCulture));
                 bool exists = await _context.CaseEnabler.AnyAsync(x => x.Code == caseEnabler.Code);
                 if (exists)
                 {
@@ -176,7 +176,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             try
             {
                 // Uppercase normalization
-                caseEnabler.Code = WebUtility.HtmlEncode(caseEnabler.Code?.ToUpper(CultureInfo.InvariantCulture));
+                caseEnabler.Code = WebUtility.HtmlEncode(caseEnabler.Code!.ToUpper(CultureInfo.InvariantCulture));
 
                 // Check for duplicate code before saving
                 bool exists = await _context.CaseEnabler.AnyAsync(x => x.CaseEnablerId != id && x.Code == caseEnabler.Code);

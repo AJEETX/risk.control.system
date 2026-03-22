@@ -55,10 +55,10 @@ namespace risk.control.system.Controllers.CompanyAdmin
             var query = _context.State
                 .Include(s => s.Country)
                 .AsQueryable();
-            var userEmail = HttpContext.User.Identity.Name;
+            var userEmail = HttpContext.User.Identity?.Name;
 
             var user = await _context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == userEmail);
-            if (!user.IsSuperAdmin)
+            if (!user!.IsSuperAdmin)
             {
                 query = query.Where(s => s.CountryId == user.CountryId);
             }
@@ -69,7 +69,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 query = query.Where(p =>
                     p.Code.ToLower().Contains(lowerSearch) ||
                     p.Name.ToLower().Contains(lowerSearch) ||
-                    p.Country.Name.ToLower().Contains(lowerSearch));
+                    p.Country!.Name.ToLower().Contains(lowerSearch));
             }
 
             // Dynamically apply sorting using reflection
@@ -114,7 +114,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 s.Name,
                 s.Code,
                 s.Updated,
-                CountryName = s.Country.Name
+                CountryName = s.Country!.Name
             })
             .ToListAsync();
             // Apply paging
@@ -155,11 +155,11 @@ namespace risk.control.system.Controllers.CompanyAdmin
         [Breadcrumb("Add New", FromAction = nameof(Profile))]
         public async Task<IActionResult> Create()
         {
-            var userEmail = HttpContext.User.Identity.Name;
+            var userEmail = HttpContext.User.Identity?.Name;
 
             var user = await _context.ApplicationUser.Include(u => u.Country).FirstOrDefaultAsync(u => u.Email == userEmail);
 
-            if (user.IsSuperAdmin)
+            if (user!.IsSuperAdmin)
             {
                 return View();
             }
@@ -171,7 +171,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(State state)
         {
-            var userEmail = HttpContext.User.Identity.Name;
+            var userEmail = HttpContext.User.Identity?.Name;
             var user = await _context.ApplicationUser.Include(u => u.Country).FirstOrDefaultAsync(u => u.Email == userEmail);
             if (!ModelState.IsValid)
             {
@@ -180,7 +180,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 // This is the magic line that clears the cached input values
                 ModelState.Clear();
 
-                state.Country = user.Country;
+                state.Country = user!.Country;
                 state.CountryId = user.CountryId.GetValueOrDefault();
                 state.Name = "";
                 state.Code = "";
@@ -197,7 +197,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                     // Clear ModelState here as well
                     ModelState.Clear();
 
-                    state.Country = user.Country;
+                    state.Country = user!.Country;
                     state.CountryId = user.CountryId.GetValueOrDefault();
                     state.SelectedCountryId = user.CountryId.GetValueOrDefault();
                     state.Name = "";
@@ -267,7 +267,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                     ModelState.Remove("Name");
                     ModelState.Remove("Code");
                     var currentState = await _context.State.Include(s => s.Country).FirstOrDefaultAsync(c => c.StateId == id);
-                    currentState.Name = "";
+                    currentState!.Name = "";
                     currentState.Code = "";
                     return View(currentState);
                 }

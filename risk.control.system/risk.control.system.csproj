@@ -98,4 +98,11 @@
 		<Folder Include="wwwroot\report\" />
 		<Folder Include="wwwroot\uploads\" />
 	</ItemGroup>
+	<PropertyGroup>
+		<AnalysisLevel>latest-security</AnalysisLevel>
+
+		<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+
+		<EnableNETAnalyzers>true</EnableNETAnalyzers>
+	</PropertyGroup>
 </Project>

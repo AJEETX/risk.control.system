@@ -7,7 +7,7 @@ namespace risk.control.system.Services.Assessor
 {
     public interface IAssessorQueryService
     {
-        Task<InvestigationTask> SubmitQueryToAgency(string userEmail, long caseId, EnquiryRequest request, List<EnquiryRequest> requests, IFormFile document);
+        Task<InvestigationTask> SubmitQueryToAgency(string userEmail, long caseId, EnquiryRequest request, List<EnquiryRequest> requests, IFormFile? document);
     }
 
     public class AssessorQueryService : IAssessorQueryService
@@ -23,24 +23,24 @@ namespace risk.control.system.Services.Assessor
             this.timelineService = timelineService;
         }
 
-        public async Task<InvestigationTask> SubmitQueryToAgency(string userEmail, long caseId, EnquiryRequest request, List<EnquiryRequest> requests, IFormFile document)
+        public async Task<InvestigationTask> SubmitQueryToAgency(string userEmail, long caseId, EnquiryRequest request, List<EnquiryRequest> requests, IFormFile? document)
         {
             try
             {
                 var caseTask = await context.Investigations
                 .Include(c => c.Vendor)
                 .Include(c => c.InvestigationReport)
-                .ThenInclude(c => c.EnquiryRequest)
+                .ThenInclude(c => c!.EnquiryRequest)
                 .Include(c => c.InvestigationReport)
-                .ThenInclude(c => c.EnquiryRequests)
+                .ThenInclude(c => c!.EnquiryRequests)
                 .Include(c => c.Vendor)
                 .FirstOrDefaultAsync(c => c.Id == caseId);
 
                 var requestedByAssessor = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR;
 
-                caseTask.SubStatus = requestedByAssessor;
+                caseTask!.SubStatus = requestedByAssessor;
                 caseTask.UpdatedBy = userEmail;
-                caseTask.CaseOwner = caseTask.Vendor.Email;
+                caseTask.CaseOwner = caseTask.Vendor!.Email;
                 caseTask.RequestedAssessordEmail = userEmail;
                 caseTask.AssignedToAgency = true;
                 caseTask.IsQueryCase = true;
@@ -53,7 +53,7 @@ namespace risk.control.system.Services.Assessor
                     request.QuestionImageFileExtension = Path.GetExtension(document.FileName);
                     request.QuestionImageFileType = document.ContentType;
                 }
-                caseTask.InvestigationReport.EnquiryRequest = request;
+                caseTask.InvestigationReport!.EnquiryRequest = request;
                 caseTask.InvestigationReport.EnquiryRequests = requests;
                 caseTask.InvestigationReport.Updated = DateTime.UtcNow;
                 caseTask.InvestigationReport.UpdatedBy = userEmail;
@@ -67,7 +67,7 @@ namespace risk.control.system.Services.Assessor
 
                 await timelineService.UpdateTaskStatus(caseTask.Id, userEmail);
 
-                return saved ? caseTask : null;
+                return saved ? caseTask : null!;
             }
             catch (Exception ex)
             {

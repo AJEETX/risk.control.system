@@ -23,7 +23,7 @@ namespace risk.control.system.Controllers.Api.Agency
         [HttpGet("GetNewCases")]
         public async Task<IActionResult> GetNewCases()
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
 
             try
             {
@@ -40,7 +40,7 @@ namespace risk.control.system.Controllers.Api.Agency
         [HttpGet("GetSubmittedCases")]
         public async Task<IActionResult> GetSubmittedCases()
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
 
             try
             {

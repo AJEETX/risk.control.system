@@ -28,7 +28,7 @@ namespace risk.control.system.Controllers.Api.Company
         [HttpGet("Users")]
         public async Task<IActionResult> Users()
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
 
             try
             {
@@ -46,7 +46,7 @@ namespace risk.control.system.Controllers.Api.Company
         [HttpGet("GetAllEmpanelledAgencies")]
         public async Task<IActionResult> GetAllEmpanelledAgencies()
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
 
             try
             {
@@ -68,7 +68,7 @@ namespace risk.control.system.Controllers.Api.Company
             {
                 return BadRequest("Invalid case ID.");
             }
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
 
             try
             {
@@ -85,7 +85,7 @@ namespace risk.control.system.Controllers.Api.Company
         [HttpGet("AvailableAgency")]
         public async Task<IActionResult> AvailableAgency()
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
 
             try
             {
@@ -102,7 +102,7 @@ namespace risk.control.system.Controllers.Api.Company
         [HttpGet("AllServices/{id}")]
         public async Task<IActionResult> AllServices(long id)
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
 
             try
             {

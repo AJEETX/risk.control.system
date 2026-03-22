@@ -63,7 +63,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 if (companyUser is null)
                 {
                     notifyService.Error("OOPs !!!..User Not Found");
-                    return this.RedirectToAction<DashboardController>(x => x.Index());
+                    return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
                 }
                 var clientCompany = await _context.ClientCompany.AsNoTracking()
                     .Include(c => c.Country)
@@ -74,7 +74,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 if (clientCompany == null)
                 {
                     notifyService.Error("OOPs !!!..Company Not Found");
-                    return this.RedirectToAction<DashboardController>(x => x.Index());
+                    return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
                 }
 
                 return View(clientCompany);
@@ -83,7 +83,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             {
                 logger.LogError(ex, "Error getting Company for {UserEmail}.", userEmail);
                 notifyService.Error("Error getting Company. Try again");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
             }
         }
 
@@ -133,7 +133,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                     await Load(model);
                     return View(model);
                 }
-                var userEmail = HttpContext.User?.Identity?.Name;
+                var userEmail = HttpContext.User?.Identity?.Name!;
 
                 var result = await companyService.EditAsync(userEmail, model, portal_base_url);
                 if (!result.Success)

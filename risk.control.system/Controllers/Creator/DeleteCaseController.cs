@@ -30,7 +30,7 @@ namespace risk.control.system.Controllers.Creator
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteAutoConfirmed(long id)
         {
-            var userEmail = User.Identity?.Name;
+            var userEmail = User.Identity?.Name!;
             try
             {
                 var (success, message) = await _deleteService.SoftDeleteCaseAsync(id, userEmail);
@@ -40,7 +40,7 @@ namespace risk.control.system.Controllers.Creator
                     _notifyService.Error(message.Contains("not found", StringComparison.OrdinalIgnoreCase)
                         ? "Not Found!!!..Contact Admin"
                         : message);
-                    return this.RedirectToAction<DashboardController>(x => x.Index());
+                    return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
                 }
 
                 return Json(new { success = true, message });
@@ -58,7 +58,7 @@ namespace risk.control.system.Controllers.Creator
         {
             if (!ModelState.IsValid) return Json(new { success = false, message = "Invalid request." });
 
-            var userEmail = User.Identity?.Name;
+            var userEmail = User.Identity?.Name!;
             try
             {
                 var (success, message) = await _deleteService.SoftDeleteBulkCasesAsync(request.claims, userEmail);

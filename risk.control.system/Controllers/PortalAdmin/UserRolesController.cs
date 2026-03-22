@@ -52,7 +52,7 @@ namespace risk.control.system.Controllers
                     RoleId = role.Id.ToString(),
                     RoleName = role?.Name
                 };
-                if (await userManager.IsInRoleAsync(user, role?.Name))
+                if (await userManager.IsInRoleAsync(user, role?.Name!))
                 {
                     userRoleViewModel.Selected = true;
                 }
@@ -85,9 +85,9 @@ namespace risk.control.system.Controllers
             user.UpdatedBy = HttpContext.User?.Identity?.Name;
             var roles = await userManager.GetRolesAsync(user);
             var result = await userManager.RemoveFromRolesAsync(user, roles);
-            result = await userManager.AddToRolesAsync(user, model.UserRoleViewModel.Where(x => x.Selected).Select(y => y.RoleName));
+            result = await userManager.AddToRolesAsync(user, model.UserRoleViewModel!.Where(x => x.Selected).Select(y => y.RoleName)!);
             var currentUser = await userManager.GetUserAsync(User);
-            await signInManager.RefreshSignInAsync(currentUser);
+            await signInManager.RefreshSignInAsync(currentUser!);
 
             notifyService.Custom($"User role(s) updated successfully.", 3, "orange", "fas fa-user-cog");
             return RedirectToAction(nameof(UserController.Index), "User");

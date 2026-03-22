@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿using System.Security.Cryptography;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -191,7 +192,7 @@ namespace risk.control.system.Services.Common
             string cacheKey = $"{cleanIsd}{cleanMobile}";
 
             // 1. Generate & Cache
-            var otp = new Random().Next(1000, 9999).ToString();
+            var otp = RandomNumberGenerator.GetInt32(1000, 10000).ToString();
             var cacheOptions = new MemoryCacheEntryOptions()
                 .SetAbsoluteExpiration(TimeSpan.FromMinutes(5))
                 .SetSize(1);

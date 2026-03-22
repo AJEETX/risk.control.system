@@ -60,7 +60,7 @@ namespace risk.control.system.Controllers.Tools
             }
             try
             {
-                var model = await imageAnalysisService.AnalyzeImageAsync(file);
+                var model = await imageAnalysisService.AnalyzeImageAsync(file!);
 
                 user.DocumentAnalysisCount++;
                 await _userManager.UpdateAsync(user);
@@ -72,8 +72,8 @@ namespace risk.control.system.Controllers.Tools
                 logger.LogError("Error processing document verification. {UserId}", _userManager.GetUserId(User) ?? "Anonymous");
                 var model = new ImageAnalysisViewModel
                 {
-                    OriginalImageUrl = $"/uploads/{Path.GetFileName(file.FileName)}",
-                    ElaImageUrl = $"/uploads/ela_{Path.GetFileName(file.FileName)}",
+                    OriginalImageUrl = $"/uploads/{Path.GetFileName(file!.FileName)}",
+                    ElaImageUrl = $"/uploads/ela_{Path.GetFileName(file!.FileName)}",
                     MetadataFlagged = true,
                     ElaScore = Math.Round(0.0, 2),
                     RemainingTries = 5 - user.DocumentAnalysisCount,

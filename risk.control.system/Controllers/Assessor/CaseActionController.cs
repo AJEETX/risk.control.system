@@ -54,7 +54,7 @@ namespace risk.control.system.Controllers.Assessor
                 _notifyService.Custom($"Error!!! Try again", 3, "red", "far fa-file-powerpoint");
                 return RedirectToAction(nameof(AssessorController.Assess), ControllerName<AssessorController>.Name);
             }
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
             try
             {
                 if (Enum.TryParse<AssessorRemarkType>(assessorRemarkType, true, out var reportUpdateStatus))
