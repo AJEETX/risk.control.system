@@ -48,7 +48,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Decline(CaseTransactionModel model, long claimId, string policyNumber)
         {
-            string userEmail = HttpContext?.User?.Identity.Name;
+            string userEmail = HttpContext?.User?.Identity?.Name!;
             if (!ModelState.IsValid || model == null || claimId < 1)
             {
                 _notifyService.Error("OOPs !!!..Contact Admin");
@@ -76,7 +76,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> WithdrawCaseFromAgent(CaseTransactionModel model, long claimId, string policyNumber)
         {
-            string userEmail = HttpContext?.User?.Identity.Name;
+            string userEmail = HttpContext?.User?.Identity?.Name!;
             if (!ModelState.IsValid || claimId < 1)
             {
                 _notifyService.Error("OOPs !!!..Contact Admin");

@@ -60,7 +60,7 @@ namespace risk.control.system.Controllers.Creator
         [Breadcrumb(title: "Active")]
         public async Task<IActionResult> Active(string jobId = "")
         {
-            var userEmail = HttpContext.User.Identity.Name;
+            var userEmail = HttpContext.User.Identity?.Name!;
             jobId = jobId.Replace("\n", "").Replace("\r", "").Trim();
             try
             {
@@ -71,18 +71,18 @@ namespace risk.control.system.Controllers.Creator
             {
                 _logger.LogError(ex, "Error occurred getting active case {JobId}. {UserEmail}", jobId, userEmail);
                 _notifyService.Error("OOPs !!!..Contact Admin");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
             }
         }
 
         [Breadcrumb(title: " Details", FromAction = nameof(Active))]
         public async Task<IActionResult> ActiveDetail(long id)
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
             if (!ModelState.IsValid || id <= 0)
             {
                 _notifyService.Error("OOPS !!! Case Not Found !!!..");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
             }
             try
             {
@@ -94,7 +94,7 @@ namespace risk.control.system.Controllers.Creator
             {
                 _logger.LogError(ex, "Error occurred active case detail {Id}. {UserEmail}", id, userEmail);
                 _notifyService.Error("OOPs !!!..Contact Admin");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
             }
         }
 

@@ -80,7 +80,9 @@ namespace risk.control.system.Services.Api
                 .Include(v => v.District)
                 .Include(v => v.State)
                 .Include(v => v.VendorInvestigationServiceTypes)
-                .OrderBy(u => u.Name).ToListAsync();
+                .OrderByDescending(u => u.Updated)
+                .ThenBy(u => u.Name)
+                .ToListAsync();
 
             var result =
                 availableVendors?.Select(async u =>
@@ -141,7 +143,9 @@ namespace risk.control.system.Services.Api
             {
                 return null!;
             }
-            var result = company.EmpanelledVendors?.Where(v => !v.Deleted && v.Status == VendorStatus.ACTIVE).OrderBy(u => u.Name)
+            var result = company.EmpanelledVendors?.Where(v => !v.Deleted && v.Status == VendorStatus.ACTIVE)
+                .OrderByDescending(u => u.Updated)
+                .ThenBy(u => u.Name)
                 .Select(async u =>
                 {
                     var hasService = GetPinCodeAndServiceForTheCase(caseId, u.VendorId);

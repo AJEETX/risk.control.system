@@ -59,7 +59,7 @@ namespace risk.control.system.Controllers.PortalAdmin
                 try
                 {
                     var globalSettings = await _context.GlobalSettings.FirstOrDefaultAsync(x => x.GlobalSettingsId == id);
-                    globalSettings.SendSMS = await manager.IsEnabledAsync(nameof(FeatureFlags.SMS4ADMIN));
+                    globalSettings!.SendSMS = await manager.IsEnabledAsync(nameof(FeatureFlags.SMS4ADMIN));
                     globalSettings.CanChangePassword = settings.CanChangePassword;
                     globalSettings.ShowTimer = settings.ShowTimer;
                     globalSettings.ShowDetailFooter = settings.ShowDetailFooter;

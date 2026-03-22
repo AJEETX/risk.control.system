@@ -61,7 +61,7 @@ namespace risk.control.system.Controllers.Manager
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Agencies(List<long> vendors)
         {
-            var userEmail = User.Identity?.Name;
+            var userEmail = User.Identity?.Name!;
 
             // Basic validation
             if (!ModelState.IsValid || vendors == null || vendors.Count == 0)
@@ -113,7 +113,7 @@ namespace risk.control.system.Controllers.Manager
 
         public async Task<IActionResult> Edit(long id)
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
             try
             {
                 if (!ModelState.IsValid)
@@ -143,7 +143,7 @@ namespace risk.control.system.Controllers.Manager
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(long vendorId, Vendor model)
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
             try
             {
                 if (!ModelState.IsValid)

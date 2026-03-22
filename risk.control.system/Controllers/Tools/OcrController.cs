@@ -68,7 +68,7 @@ namespace risk.control.system.Controllers.Tools
             try
             {
                 // 2. Perform the OCR Task
-                var (file, path) = await _fileStorageService.SaveAsync(data.DocumentImage, "tool");
+                var (file, path) = await _fileStorageService.SaveAsync(data.DocumentImage!, "tool");
                 var ocrData = await _googleService.DetectTextAsync(path);
 
                 if (ocrData == null || ocrData.Count == 0)

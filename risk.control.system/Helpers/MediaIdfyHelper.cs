@@ -19,7 +19,7 @@ namespace risk.control.system.Helpers
         {
             string[] videoExtensions = { ".mp4", ".webm", ".avi", ".mov", ".mkv" };
             bool isVideo = contentType.StartsWith("video/", StringComparison.CurrentCultureIgnoreCase) ||
-                           videoExtensions.Contains(media.ImageExtension.ToLower());
+                           videoExtensions.Contains(media.ImageExtension!.ToLower());
 
             media.MediaType = isVideo ? MediaType.VIDEO : MediaType.AUDIO;
         }

@@ -7,9 +7,9 @@ namespace risk.control.system.Helpers
         public static string MakeActiveClass(this IUrlHelper urlHelper, string controller, string action)
         {
             string result = "active";
-            string controllerName = urlHelper.ActionContext.RouteData.Values["controller"].ToString();
-            string methodName = urlHelper.ActionContext.RouteData.Values["action"].ToString();
-            if (string.IsNullOrEmpty(controllerName)) return null;
+            string controllerName = urlHelper.ActionContext.RouteData.Values["controller"]!.ToString()!;
+            string methodName = urlHelper.ActionContext.RouteData.Values["action"]!.ToString()!;
+            if (string.IsNullOrEmpty(controllerName)) return null!;
             if (controllerName.Equals(controller, StringComparison.OrdinalIgnoreCase))
             {
                 if (string.IsNullOrWhiteSpace(action) || methodName.Equals(action, StringComparison.OrdinalIgnoreCase))

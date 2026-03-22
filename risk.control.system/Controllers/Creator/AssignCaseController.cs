@@ -41,7 +41,7 @@ namespace risk.control.system.Controllers.Creator
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AssignAuto(List<long> claims)
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
             try
             {
                 if (!ModelState.IsValid || claims == null || claims.Count == 0)
@@ -74,7 +74,7 @@ namespace risk.control.system.Controllers.Creator
         [HttpPost]
         public async Task<IActionResult> AllocateSingle2Vendor(long selectedcase, long caseId)
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
             try
             {
                 if (!ModelState.IsValid || selectedcase < 1 || caseId < 1)
@@ -109,7 +109,7 @@ namespace risk.control.system.Controllers.Creator
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AssignAutoSingle(long claims)
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
             try
             {
                 if (!ModelState.IsValid || claims < 1)

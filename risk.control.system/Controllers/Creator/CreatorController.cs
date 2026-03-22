@@ -70,7 +70,7 @@ namespace risk.control.system.Controllers.Creator
         [HttpGet]
         public async Task<IActionResult> EmpanelledVendors(long id, long vendorId = 0, bool fromEditPage = false)
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
             try
             {
                 if (!ModelState.IsValid || id < 1)
@@ -96,7 +96,7 @@ namespace risk.control.system.Controllers.Creator
         [Breadcrumb("Details", FromAction = "New", FromController = typeof(CaseCreateEditController))]
         public async Task<IActionResult> Details(long id)
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
             if (!ModelState.IsValid || id < 1)
             {
                 _notifyService.Error("Case Not Found.Try Again");

@@ -28,7 +28,7 @@ namespace risk.control.system.Controllers.Common
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ClearAllNotifications()
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
 
             try
             {
@@ -46,7 +46,7 @@ namespace risk.control.system.Controllers.Common
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> MarkAsRead(NotificationRequest request)
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
 
             try
             {
@@ -64,7 +64,7 @@ namespace risk.control.system.Controllers.Common
         [HttpGet("GetNotifications")]
         public async Task<ActionResult> GetNotifications()
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
 
             try
             {

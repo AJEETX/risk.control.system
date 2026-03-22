@@ -56,10 +56,10 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 .Include(p => p.Country)
                 .Include(p => p.State)
                 .AsQueryable();
-            var userEmail = HttpContext.User.Identity.Name;
+            var userEmail = HttpContext.User.Identity?.Name!;
 
             var user = await _context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == userEmail);
-            if (!user.IsSuperAdmin)
+            if (!user!.IsSuperAdmin)
             {
                 query = query.Where(s => s.CountryId == user.CountryId);
             }
@@ -69,8 +69,8 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 query = query.Where(p =>
                     p.Code.ToLower().Contains(lowerSearch) ||
                     p.Name.ToLower().Contains(lowerSearch) ||
-                    p.State.Name.ToLower().Contains(lowerSearch) ||
-                    p.Country.Name.ToLower().Contains(lowerSearch));
+                    p.State!.Name.ToLower().Contains(lowerSearch) ||
+                    p.Country!.Name.ToLower().Contains(lowerSearch));
             }
             // Determine column to sort by
             string sortColumn = orderColumn switch
@@ -117,8 +117,8 @@ namespace risk.control.system.Controllers.CompanyAdmin
                     p.Code,
                     p.Name,
                     p.Updated,
-                    State = p.State.Name,
-                    Country = p.Country.Name
+                    State = p.State!.Name,
+                    Country = p.Country!.Name
                 })
                 .ToListAsync();
 
@@ -157,13 +157,13 @@ namespace risk.control.system.Controllers.CompanyAdmin
         [Breadcrumb("Add New", FromAction = nameof(Profile))]
         public async Task<IActionResult> Create()
         {
-            var userEmail = HttpContext.User.Identity.Name;
+            var userEmail = HttpContext.User.Identity?.Name;
 
             var user = await _context.ApplicationUser.Include(a => a.Country).FirstOrDefaultAsync(u => u.Email == userEmail);
 
             var district = new District
             {
-                IsUpdated = !user.IsSuperAdmin,
+                IsUpdated = !user!.IsSuperAdmin,
                 Country = user.Country,
                 CountryId = user.CountryId.GetValueOrDefault(),
                 SelectedCountryId = user.CountryId.GetValueOrDefault()
@@ -178,13 +178,13 @@ namespace risk.control.system.Controllers.CompanyAdmin
             if (!ModelState.IsValid)
             {
                 notifyService.Custom($"Invalid District data!", 3, "red", "fas fa-city");
-                var userEmail = HttpContext.User.Identity.Name;
+                var userEmail = HttpContext.User.Identity?.Name;
 
                 var user = await _context.ApplicationUser.Include(a => a.Country).FirstOrDefaultAsync(u => u.Email == userEmail);
 
                 return View(new District
                 {
-                    IsUpdated = !user.IsSuperAdmin,
+                    IsUpdated = !user!.IsSuperAdmin,
                     Country = user.Country,
                     CountryId = user.CountryId.GetValueOrDefault(),
                     SelectedCountryId = user.CountryId.GetValueOrDefault()
@@ -198,13 +198,13 @@ namespace risk.control.system.Controllers.CompanyAdmin
                     notifyService.Custom($"Disitrict Code <b>{district.Code}</b> already exists!", 3, "red", "fas fa-city");
                     ModelState.Clear();
 
-                    var userEmail = HttpContext.User.Identity.Name;
+                    var userEmail = HttpContext.User.Identity?.Name;
                     var user = await _context.ApplicationUser.Include(a => a.Country).FirstOrDefaultAsync(u => u.Email == userEmail);
 
                     // 2. Return the fresh object. Name and Code will now be empty in the browser.
                     return View(new District
                     {
-                        IsUpdated = !user.IsSuperAdmin,
+                        IsUpdated = !user!.IsSuperAdmin,
                         Country = user.Country,
                         CountryId = user.CountryId.GetValueOrDefault(),
                         SelectedCountryId = user.CountryId.GetValueOrDefault(),
@@ -214,7 +214,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 }
                 var textInfo = CultureInfo.CurrentCulture.TextInfo;
                 district.Name = WebUtility.HtmlEncode(textInfo.ToTitleCase(district.Name.ToLower()));
-                district.Code = WebUtility.HtmlEncode(district.Code?.ToUpper());
+                district.Code = WebUtility.HtmlEncode(district.Code!.ToUpper());
                 district.Updated = DateTime.UtcNow;
                 district.UpdatedBy = HttpContext.User?.Identity?.Name;
                 district.CountryId = district.SelectedCountryId;
@@ -274,7 +274,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                     ModelState.Remove("Name");
                     ModelState.Remove("Code");
                     var currentDistrict = await _context.District.Include(d => d.Country).Include(d => d.State).FirstOrDefaultAsync(d => d.DistrictId == id);
-                    currentDistrict.Name = "";
+                    currentDistrict!.Name = "";
                     currentDistrict.Code = "";
                     return View(currentDistrict);
                 }

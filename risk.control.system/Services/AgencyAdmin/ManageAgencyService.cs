@@ -80,7 +80,7 @@ namespace risk.control.system.Services.AgencyAdmin
         public async Task<Vendor> GetVendorAsync(string userEmail, long id)
         {
             var vendor = await _context.Vendor.AsNoTracking().Include(v => v.Country).FirstOrDefaultAsync(v => v.VendorId == id);
-            vendor.SelectedByCompany = await _context.ApplicationUser.AsNoTracking().AnyAsync(u => u.Email.Equals(userEmail, StringComparison.CurrentCultureIgnoreCase) && u.IsSuperAdmin);
+            vendor.SelectedByCompany = await _context.ApplicationUser.AsNoTracking().AnyAsync(u => u.Email == userEmail && u.IsSuperAdmin);
 
             return vendor;
         }

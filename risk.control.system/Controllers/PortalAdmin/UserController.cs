@@ -66,23 +66,23 @@ namespace risk.control.system.Controllers.PortalAdmin
                 user.ProfilePictureExtension = Path.GetExtension(fileName);
             }
             user.EmailConfirmed = true;
-            user.Email = user.Email.Trim().ToLower();
+            user.Email = user.Email!.Trim().ToLower();
             user.UserName = user.Email;
             user.Updated = DateTime.UtcNow;
             user.UpdatedBy = HttpContext.User?.Identity?.Name;
-            user.PhoneNumber = user.PhoneNumber.TrimStart('0');
+            user.PhoneNumber = user.PhoneNumber!.TrimStart('0');
             user.PinCodeId = user.SelectedPincodeId;
             user.StateId = user.SelectedStateId;
             user.DistrictId = user.SelectedDistrictId;
             user.CountryId = user.SelectedCountryId;
 
-            IdentityResult result = await userManager.CreateAsync(user, user.Password);
+            IdentityResult result = await userManager.CreateAsync(user, user.Password!);
 
             if (result.Succeeded)
             {
                 notifyService.Custom($"User created successfully.", 3, "green", "fas fa-user-plus");
                 var country = await context.Country.FirstOrDefaultAsync(c => c.CountryId == user.CountryId);
-                await smsService.DoSendSmsAsync(country.Code, country.ISDCode + user.PhoneNumber, "User created. \n\nEmail : " + user.Email);
+                await smsService.DoSendSmsAsync(country!.Code, country.ISDCode + user.PhoneNumber, "User created. \n\nEmail : " + user.Email);
 
                 return RedirectToAction(nameof(Index));
             }
@@ -105,7 +105,7 @@ namespace risk.control.system.Controllers.PortalAdmin
             var applicationUser = await context.ApplicationUser.AsNoTracking()
                 .Include(u => u.Country)
                 .FirstOrDefaultAsync(c => c.Id == id);
-            applicationUser.IsPasswordChangeRequired = await featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION) ? !applicationUser.IsPasswordChangeRequired : true;
+            applicationUser!.IsPasswordChangeRequired = await featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION) ? !applicationUser.IsPasswordChangeRequired : true;
             return View(applicationUser);
         }
 
@@ -146,20 +146,20 @@ namespace risk.control.system.Controllers.PortalAdmin
                 }
                 if (applicationUser?.ProfileImage != null && applicationUser.ProfileImage.Length > 0)
                 {
-                    var (fileName, relativePath) = await fileStorageService.SaveAsync(user.ProfileImage, "admin", "user");
+                    var (fileName, relativePath) = await fileStorageService.SaveAsync(user.ProfileImage!, "admin", "user");
                     user.ProfilePictureUrl = relativePath;
                     user.ProfilePictureExtension = Path.GetExtension(fileName);
                 }
 
                 user.PhoneNumber = applicationUser?.PhoneNumber ?? user.PhoneNumber;
-                user.PhoneNumber = user.PhoneNumber.TrimStart('0');
-                user.FirstName = applicationUser?.FirstName;
-                user.LastName = applicationUser?.LastName;
+                user.PhoneNumber = user.PhoneNumber!.TrimStart('0');
+                user.FirstName = applicationUser?.FirstName!;
+                user.LastName = applicationUser?.LastName!;
                 if (!string.IsNullOrWhiteSpace(applicationUser?.Password))
                 {
                     user.Password = applicationUser.Password;
                 }
-                user.Country = applicationUser.Country;
+                user.Country = applicationUser!.Country;
                 user.Active = applicationUser.Active;
                 user.Addressline = applicationUser.Addressline;
 
@@ -181,16 +181,16 @@ namespace risk.control.system.Controllers.PortalAdmin
                 }
                 var roles = await userManager.GetRolesAsync(user);
                 var roleResult = await userManager.RemoveFromRolesAsync(user, roles);
-                await userManager.AddToRoleAsync(user, user.Role.ToString());
+                await userManager.AddToRoleAsync(user, user.Role.ToString()!);
                 var country = await context.Country.FirstOrDefaultAsync(c => c.CountryId == user.CountryId);
-                await smsService.DoSendSmsAsync(country.Code, country.ISDCode + user.PhoneNumber, "User edited. \n\nEmail : " + user.Email);
+                await smsService.DoSendSmsAsync(country!.Code, country.ISDCode + user.PhoneNumber, "User edited. \n\nEmail : " + user.Email);
                 notifyService.Custom($"User edited successfully.", 3, "orange", "fas fa-user-check");
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception)
             {
                 notifyService.Error("Error !!. The user con't be edited!");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
             }
         }
 
@@ -205,7 +205,7 @@ namespace risk.control.system.Controllers.PortalAdmin
                 if (id <= 0)
                 {
                     notifyService.Error("Not Found!!!..Contact Admin");
-                    return this.RedirectToAction<DashboardController>(x => x.Index());
+                    return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
                 }
                 var appUser = await context.ApplicationUser.FindAsync(id);
                 context.ApplicationUser.Remove(appUser!);

@@ -36,7 +36,7 @@ namespace risk.control.system.Controllers.Common
                 {
                     return NotFound();
                 }
-                return File(fileAttachment.QuestionImageAttachment, fileAttachment.QuestionImageFileType, fileAttachment.QuestionImageFileName + fileAttachment.QuestionImageFileName);
+                return File(fileAttachment.QuestionImageAttachment!, fileAttachment.QuestionImageFileType!, fileAttachment.QuestionImageFileName + fileAttachment.QuestionImageFileName);
             }
             catch (Exception ex)
             {
@@ -62,7 +62,7 @@ namespace risk.control.system.Controllers.Common
                 {
                     return NotFound();
                 }
-                return File(fileAttachment.AnswerImageAttachment, fileAttachment.AnswerImageFileType, fileAttachment.AnswerImageFileName + fileAttachment.AnswerImageFileName);
+                return File(fileAttachment.AnswerImageAttachment!, fileAttachment.AnswerImageFileType!, fileAttachment.AnswerImageFileName + fileAttachment.AnswerImageFileName);
             }
             catch (Exception ex)
             {
@@ -83,7 +83,7 @@ namespace risk.control.system.Controllers.Common
                     return NotFound();
                 }
 
-                var investigation = await _context.Investigations.AsNoTracking().Include(i => i.InvestigationReport).FirstOrDefaultAsync(q => q.InvestigationReport.Id == id);
+                var investigation = await _context.Investigations.AsNoTracking().Include(i => i.InvestigationReport).FirstOrDefaultAsync(q => q.InvestigationReport!.Id == id);
                 if (investigation == null || investigation.InvestigationReport == null)
                 {
                     return NotFound();
@@ -91,7 +91,7 @@ namespace risk.control.system.Controllers.Common
 
                 var fileAttachment = investigation.InvestigationReport;
 
-                return File(fileAttachment.SupervisorAttachment, fileAttachment.SupervisorFileType, fileAttachment.SupervisorFileName + fileAttachment.SupervisorFileName);
+                return File(fileAttachment.SupervisorAttachment!, fileAttachment.SupervisorFileType!, fileAttachment.SupervisorFileName + fileAttachment.SupervisorFileName);
             }
             catch (Exception ex)
             {

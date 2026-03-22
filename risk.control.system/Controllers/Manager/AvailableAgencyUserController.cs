@@ -71,14 +71,14 @@ namespace risk.control.system.Controllers.Manager
             if (id <= 0)
             {
                 _notifyService.Custom($"OOPs !!!..Error creating user.", 3, "red", "fa fa-user");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
             }
 
             var model = await _manageAgencyUserService.GetNewUserCreationModelAsync(id);
             if (model == null)
             {
                 _notifyService.Error("OOPS !!!..Contact Admin");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
             }
             ViewData["BreadcrumbNode"] = _navigationService.GetAgencyUserActionPath(id, ControllerName<AvailableAgencyController>.Name, "Available Agencies", "Add User", "Create");
             return View(model);
@@ -88,7 +88,7 @@ namespace risk.control.system.Controllers.Manager
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ApplicationUser model, string emailSuffix)
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
             emailSuffix = emailSuffix.Replace("\n", "").Replace("\r", "").Trim();
             try
             {
@@ -127,7 +127,7 @@ namespace risk.control.system.Controllers.Manager
             if (!ModelState.IsValid)
             {
                 _notifyService.Error("OOPS !!!..Contact Admin");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
             }
             try
             {
@@ -136,9 +136,9 @@ namespace risk.control.system.Controllers.Manager
                 if (agencyUser == null)
                 {
                     _notifyService.Error("OOPS !!!..Contact Admin");
-                    return this.RedirectToAction<DashboardController>(x => x.Index());
+                    return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
                 }
-                ViewData["BreadcrumbNode"] = _navigationService.GetAgencyUserActionPath(agencyUser.VendorId.Value, ControllerName<AvailableAgencyController>.Name, "Available Agencies", "Edit User", "Edit");
+                ViewData["BreadcrumbNode"] = _navigationService.GetAgencyUserActionPath(agencyUser.VendorId!.Value, ControllerName<AvailableAgencyController>.Name, "Available Agencies", "Edit User", "Edit");
 
                 return View(agencyUser);
             }
@@ -169,7 +169,7 @@ namespace risk.control.system.Controllers.Manager
                 {
                     UserId = sanitisedId,
                     Model = model,
-                    UpdatedBy = User?.Identity?.Name
+                    UpdatedBy = User?.Identity?.Name!
                 },
                 ModelState, _baseUrl);
 
@@ -205,10 +205,10 @@ namespace risk.control.system.Controllers.Manager
                 if (model == null)
                 {
                     _notifyService.Error("OOPS!!!. User Not Found.");
-                    return this.RedirectToAction<DashboardController>(x => x.Index());
+                    return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
                 }
 
-                ViewData["BreadcrumbNode"] = _navigationService.GetAgencyUserActionPath(model.VendorId.Value, ControllerName<AvailableAgencyController>.Name, "Available Agencies", "Delete User", "Delete");
+                ViewData["BreadcrumbNode"] = _navigationService.GetAgencyUserActionPath(model.VendorId!.Value, ControllerName<AvailableAgencyController>.Name, "Available Agencies", "Delete User", "Delete");
 
                 return View(model);
             }
@@ -216,7 +216,7 @@ namespace risk.control.system.Controllers.Manager
             {
                 _logger.LogError(ex, "Error deleting {UserId}. {UserEmail}.", id, userEmail);
                 _notifyService.Error("Error deleting User. Try again.");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
             }
         }
 
@@ -229,11 +229,11 @@ namespace risk.control.system.Controllers.Manager
             if (!ModelState.IsValid)
             {
                 _notifyService.Error("OOPS !!!..Contact Admin");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
             }
             try
             {
-                var (result, message) = await _manageAgencyUserService.SoftDeleteUserAsync(sanitisedEmail, User.Identity?.Name);
+                var (result, message) = await _manageAgencyUserService.SoftDeleteUserAsync(sanitisedEmail, User.Identity?.Name!);
 
                 if (result)
                 {

@@ -147,7 +147,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             {
                 country.IsUpdated = true;
                 country.Updated = DateTime.UtcNow;
-                country.Code = WebUtility.HtmlEncode(country.Code?.ToUpper(CultureInfo.InvariantCulture));
+                country.Code = WebUtility.HtmlEncode(country.Code!.ToUpper(CultureInfo.InvariantCulture));
                 country.Name = WebUtility.HtmlEncode(country.Name);
                 country.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Add(country);
@@ -198,7 +198,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             {
                 try
                 {
-                    country.Code = WebUtility.HtmlEncode(country.Code?.ToUpper(CultureInfo.InvariantCulture));
+                    country.Code = WebUtility.HtmlEncode(country.Code!.ToUpper(CultureInfo.InvariantCulture));
                     country.Name = WebUtility.HtmlEncode(country.Name);
                     country.Updated = DateTime.UtcNow;
                     country.IsUpdated = true;
