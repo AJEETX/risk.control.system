@@ -55,7 +55,7 @@ namespace risk.control.system.Controllers.Manager
                 return RedirectToAction(nameof(Active));
             }
 
-            var userEmail = User.Identity?.Name;
+            var userEmail = User.Identity?.Name!;
 
             try
             {
@@ -67,7 +67,7 @@ namespace risk.control.system.Controllers.Manager
             {
                 _logger.LogError(ex, "Error getting active case {CaseId}. {UserEmail}", id, userEmail);
                 _notifyService.Error("Error getting case detail. Please try again.");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
             }
         }
 
@@ -85,7 +85,7 @@ namespace risk.control.system.Controllers.Manager
                 _notifyService.Error("Case Not Found !!!..");
                 return RedirectToAction(nameof(Approved));
             }
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
             try
             {
                 var model = await _caseDetailService.GetClaimDetailsReport(userEmail, id);
@@ -98,7 +98,7 @@ namespace risk.control.system.Controllers.Manager
                     userEmail,
                     id);
                 _notifyService.Error("Error getting case detail. Try again.");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
             }
         }
 
@@ -111,7 +111,7 @@ namespace risk.control.system.Controllers.Manager
         [Breadcrumb("Details", FromAction = nameof(Rejected))]
         public async Task<IActionResult> RejectDetail(long id)
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
 
             if (!ModelState.IsValid || id < 1)
             {
@@ -130,7 +130,7 @@ namespace risk.control.system.Controllers.Manager
                     userEmail,
                     id);
                 _notifyService.Error("Error getting case detail. Try again.");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
             }
         }
 
@@ -146,7 +146,7 @@ namespace risk.control.system.Controllers.Manager
             try
             {
                 var invoice = await _invoiceService.GetInvoice(id);
-                ViewData["BreadcrumbNode"] = _navigationService.GetInvoiceBreadcrumb(id, invoice.CaseId.Value, "Manager", "Manager", "Cases", "Approved", "Approved", "ApprovedDetail");
+                ViewData["BreadcrumbNode"] = _navigationService.GetInvoiceBreadcrumb(id, invoice.CaseId!.Value, "Manager", "Manager", "Cases", "Approved", "Approved", "ApprovedDetail");
 
                 return View(invoice);
             }
@@ -156,7 +156,7 @@ namespace risk.control.system.Controllers.Manager
                    userEmail,
                    id);
                 _notifyService.Error("Error getting invoice detail. Try again.");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
             }
         }
 
@@ -167,7 +167,7 @@ namespace risk.control.system.Controllers.Manager
             if (!ModelState.IsValid || id <= 0)
             {
                 _notifyService.Error("Case Not Found !!!..");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
             }
 
             try
@@ -182,7 +182,7 @@ namespace risk.control.system.Controllers.Manager
                    userEmail,
                    id);
                 _notifyService.Error("Error printing invoice. Try again.");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
             }
         }
     }

@@ -99,11 +99,11 @@ namespace risk.control.system.Controllers.Common
                 {
                     return Redirect(model.ReturnUrl);
                 }
-                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error in Login for {UserEmail}", User.Identity.Name ?? "Anonymous");
+                _logger.LogError(ex, "Error in Login for {UserEmail}", User?.Identity?.Name ?? "Anonymous");
                 return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred." });
             }
         }
@@ -160,7 +160,8 @@ namespace risk.control.system.Controllers.Common
             }
             try
             {
-                var result = await _accountService.ChangePasswordAsync(model, User, HttpContext.User.Identity.IsAuthenticated, _baseUrl);
+                var autheticated = HttpContext?.User?.Identity?.IsAuthenticated ?? false;
+                var result = await _accountService.ChangePasswordAsync(model, User, autheticated, _baseUrl);
 
                 if (!result.Success)
                 {
@@ -173,11 +174,11 @@ namespace risk.control.system.Controllers.Common
                 }
 
                 _notifyService.Custom($"Password update successful", 3, "orange", "fa fa-unlock");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while changing password for {UserEmail}", User.Identity.Name ?? "Anonymous");
+                _logger.LogError(ex, "Error occurred while changing password for {UserEmail}", User?.Identity?.Name ?? "Anonymous");
                 _notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Login));
             }
@@ -189,26 +190,26 @@ namespace risk.control.system.Controllers.Common
         public async Task<IActionResult> Forgot(ForgotPasswordViewModel input)
         {
             ForgotPassword model;
-            input?.Email = input?.Email.Replace("\n", "").Replace("\r", "").Trim();
+            input?.Email = input?.Email!.Replace("\n", "").Replace("\r", "").Trim();
             if (!ModelState.IsValid)
             {
-                model = await _accountService.CreateDefaultForgotPasswordModel(input?.Email);
+                model = await _accountService.CreateDefaultForgotPasswordModel(input?.Email!);
                 return View(model);
             }
             try
             {
-                var smsResult = await _accountService.ForgotPassword(input.Email, input.Mobile, input.CountryId);
+                var smsResult = await _accountService.ForgotPassword(input?.Email!, input?.Mobile!, input?.CountryId!);
 
                 if (smsResult == null)
                 {
-                    model = await _accountService.CreateDefaultForgotPasswordModel(input?.Email);
+                    model = await _accountService.CreateDefaultForgotPasswordModel(input?.Email!);
                     return View(model);
                 }
                 var successModel = new ForgotPassword
                 {
                     Id = smsResult.Id,
-                    Email = input.Email,
-                    Message = $"{input.CountryId} (0) {input.Mobile}",
+                    Email = input?.Email,
+                    Message = $"{input?.CountryId} (0) {input?.Mobile}",
                     Flag = $"/flags/{smsResult.CountryCode}.png",
                     ProfilePicture = smsResult.ProfilePicture,
                     Reset = true,

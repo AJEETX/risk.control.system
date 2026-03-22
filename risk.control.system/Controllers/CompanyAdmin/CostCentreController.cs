@@ -100,7 +100,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             }
             try
             {
-                costCentre.Code = WebUtility.HtmlEncode(costCentre.Code?.ToUpper(CultureInfo.InvariantCulture));
+                costCentre.Code = WebUtility.HtmlEncode(costCentre.Code!.ToUpper(CultureInfo.InvariantCulture));
 
                 // Check for duplicate code before saving
                 bool exists = await _context.CostCentre
@@ -175,7 +175,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             try
             {
                 // Uppercase normalization
-                costCentre.Code = WebUtility.HtmlEncode(costCentre.Code?.ToUpper(CultureInfo.InvariantCulture));
+                costCentre.Code = WebUtility.HtmlEncode(costCentre.Code!.ToUpper(CultureInfo.InvariantCulture));
 
                 // Check for duplicate code before saving
                 bool exists = await _context.CostCentre.AnyAsync(x => x.Code == costCentre.Code && x.CostCentreId != id);

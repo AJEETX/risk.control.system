@@ -27,13 +27,13 @@ namespace risk.control.system.Helpers
             {
                 if (customer is null)
                     return "<span class=\"badge badge-danger\"> <i class=\"fas fa-question\" ></i>  </span>";
-                return string.Join("", "<span class='badge badge-light'>" + customer.PinCode.Code + "</span>");
+                return string.Join("", "<span class='badge badge-light'>" + customer.PinCode!.Code + "</span>");
             }
             else
             {
                 if (beneficiary is null)
                     return "<span class=\"badge badge-danger\"> <i class=\"fas fa-question\" ></i>  </span>";
-                return string.Join("", "<span class='badge badge-light'>" + beneficiary.PinCode.Code + "</span>");
+                return string.Join("", "<span class='badge badge-light'>" + beneficiary.PinCode!.Code + "</span>");
             }
         }
 
@@ -43,14 +43,14 @@ namespace risk.control.system.Helpers
             {
                 if (customer is not null)
                 {
-                    return (customer.ImagePath);
+                    return (customer.ImagePath!);
                 }
             }
             else
             {
                 if (beneficiary is not null)
                 {
-                    return beneficiary.ImagePath;
+                    return beneficiary.ImagePath!;
                 }
             }
             return Applicationsettings.NO_USER;
@@ -62,13 +62,13 @@ namespace risk.control.system.Helpers
             {
                 if (customer is null)
                     return "...";
-                return customer.Addressline + "," + customer.District?.Name + ", " + customer.State.Name + ", " + customer.PinCode.Code;
+                return customer.Addressline + "," + customer.District?.Name + ", " + customer.State!.Name + ", " + customer.PinCode!.Code;
             }
             else
             {
                 if (beneficiary is null)
                     return "...";
-                return beneficiary.Addressline + "," + beneficiary.District.Name + ", " + beneficiary.State.Name + ", " + beneficiary.PinCode.Code;
+                return beneficiary.Addressline + "," + beneficiary.District!.Name + ", " + beneficiary.State!.Name + ", " + beneficiary.PinCode!.Code;
             }
         }
     }

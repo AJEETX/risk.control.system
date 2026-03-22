@@ -56,7 +56,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
         [Breadcrumb("Add User", FromAction = nameof(Users))]
         public async Task<IActionResult> Create()
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
             try
             {
                 var model = await _manageCompanyUserService.GetUserCreationModelAsync(userEmail);
@@ -71,7 +71,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             {
                 _logger.LogError(ex, "Error creating user for {UserEmail}.", userEmail);
                 _notifyService.Error("Error creating user. Try again");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
             }
         }
 
@@ -79,25 +79,25 @@ namespace risk.control.system.Controllers.CompanyAdmin
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ApplicationUser model, string emailSuffix)
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
             emailSuffix = emailSuffix.Replace("\n", "").Replace("\r", "").Trim();
             try
             {
                 if (!ModelState.IsValid)
                 {
                     _errorNotifyService.ShowErrorNotification(ModelState);
-                    await _manageCompanyUserService.LoadModelAsync(model, User.Identity.Name);
+                    await _manageCompanyUserService.LoadModelAsync(model, userEmail);
                     return View(model);
                 }
 
-                var result = await _manageCompanyUserService.CreateUserAsync(model, emailSuffix, User.Identity.Name, _baseUrl);
+                var result = await _manageCompanyUserService.CreateUserAsync(model, emailSuffix, userEmail, _baseUrl);
 
                 if (!result.Success)
                 {
                     foreach (var error in result.Errors)
                         ModelState.AddModelError(error.Key, error.Value);
                     _errorNotifyService.ShowErrorNotification(ModelState);
-                    await _manageCompanyUserService.LoadModelAsync(model, User.Identity.Name);
+                    await _manageCompanyUserService.LoadModelAsync(model, userEmail);
                     return View(model);
                 }
 
@@ -139,18 +139,18 @@ namespace risk.control.system.Controllers.CompanyAdmin
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(string id, ApplicationUser model)
         {
-            var currentUser = User.Identity?.Name;
+            var userEmail = User.Identity?.Name!;
             id = id.Replace("\n", "").Replace("\r", "").Trim();
             try
             {
                 if (!ModelState.IsValid)
                 {
                     _errorNotifyService.ShowErrorNotification(ModelState);
-                    await _manageCompanyUserService.LoadModelAsync(model, currentUser);
+                    await _manageCompanyUserService.LoadModelAsync(model, userEmail);
                     return View(model);
                 }
 
-                var result = await _manageCompanyUserService.UpdateUserAsync(id, model, currentUser, _baseUrl);
+                var result = await _manageCompanyUserService.UpdateUserAsync(id, model, userEmail, _baseUrl);
 
                 if (!result.Success)
                 {
@@ -158,7 +158,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                         ModelState.AddModelError(error.Key, error.Value);
                     _errorNotifyService.ShowErrorNotification(ModelState);
 
-                    await _manageCompanyUserService.LoadModelAsync(model, currentUser);
+                    await _manageCompanyUserService.LoadModelAsync(model, userEmail);
                     return View(model);
                 }
 

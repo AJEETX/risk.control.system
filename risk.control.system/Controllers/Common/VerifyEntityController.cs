@@ -104,7 +104,7 @@ namespace risk.control.system.Controllers.Common
                 if (!string.IsNullOrWhiteSpace(search))
                 {
                     string loweredSearch = search.Trim();
-                    query = query.Where(a => a.Email.StartsWith(loweredSearch));
+                    query = query.Where(a => a.Email!.StartsWith(loweredSearch));
                 }
 
                 var userEmails = await query
@@ -215,7 +215,7 @@ namespace risk.control.system.Controllers.Common
                     return Ok(new { valid = false, message = "Mobile number is required." });
                 var country = await _context.Country.AsNoTracking().FirstOrDefaultAsync(c => c.ISDCode == countryCode);
 
-                var isMobile = _phoneService.IsValidMobileNumber(phone, country.ISDCode.ToString());
+                var isMobile = _phoneService.IsValidMobileNumber(phone, country!.ISDCode.ToString());
 
                 if (!isMobile)
                 {

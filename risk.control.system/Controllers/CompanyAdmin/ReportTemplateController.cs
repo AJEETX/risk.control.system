@@ -68,7 +68,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                         .ThenInclude(l => l.MediaReports)
                     .Include(r => r.LocationReport)
                         .ThenInclude(l => l.Questions)
-                .Where(q => q.ClientCompanyId == companyUser.ClientCompanyId && !q.IsDeleted && q.UpdatedBy != "system").AsQueryable();
+                .Where(q => q.ClientCompanyId == companyUser!.ClientCompanyId && !q.IsDeleted && q.UpdatedBy != "system").AsQueryable();
 
             if (!string.IsNullOrEmpty(insuranceType))
             {
@@ -80,7 +80,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             if (!string.IsNullOrWhiteSpace(searchValue))
             {
                 query = query.Where(t =>
-                    t.Name.Contains(searchValue) ||
+                    t.Name!.Contains(searchValue) ||
                     t.InsuranceType.GetEnumDisplayName().Contains(searchValue));
             }
 
@@ -111,26 +111,26 @@ namespace risk.control.system.Controllers.CompanyAdmin
 
                     case "faceCount":
                         query = sortDirection == "asc"
-                            ? query.OrderBy(t => t.LocationReport.SelectMany(l => l.FaceIds).Count(i => i.Selected))
-                            : query.OrderByDescending(t => t.LocationReport.SelectMany(l => l.FaceIds).Count(i => i.Selected));
+                            ? query.OrderBy(t => t.LocationReport.SelectMany(l => l.FaceIds!).Count(i => i.Selected))
+                            : query.OrderByDescending(t => t.LocationReport.SelectMany(l => l.FaceIds!).Count(i => i.Selected));
                         break;
 
                     case "docCount":
                         query = sortDirection == "asc"
-                            ? query.OrderBy(t => t.LocationReport.SelectMany(l => l.DocumentIds).Count(i => i.Selected))
-                            : query.OrderByDescending(t => t.LocationReport.SelectMany(l => l.DocumentIds).Count(i => i.Selected));
+                            ? query.OrderBy(t => t.LocationReport.SelectMany(l => l.DocumentIds!).Count(i => i.Selected))
+                            : query.OrderByDescending(t => t.LocationReport.SelectMany(l => l.DocumentIds!).Count(i => i.Selected));
                         break;
 
                     case "mediaCount":
                         query = sortDirection == "asc"
-                            ? query.OrderBy(t => t.LocationReport.SelectMany(l => l.MediaReports).Count(i => i.Selected))
-                            : query.OrderByDescending(t => t.LocationReport.SelectMany(l => l.MediaReports).Count(i => i.Selected));
+                            ? query.OrderBy(t => t.LocationReport.SelectMany(l => l.MediaReports!).Count(i => i.Selected))
+                            : query.OrderByDescending(t => t.LocationReport.SelectMany(l => l.MediaReports!).Count(i => i.Selected));
                         break;
 
                     case "questionCount":
                         query = sortDirection == "asc"
-                            ? query.OrderBy(t => t.LocationReport.SelectMany(l => l.Questions).Count())
-                            : query.OrderByDescending(t => t.LocationReport.SelectMany(l => l.Questions).Count());
+                            ? query.OrderBy(t => t.LocationReport.SelectMany(l => l.Questions!).Count())
+                            : query.OrderByDescending(t => t.LocationReport.SelectMany(l => l.Questions!).Count());
                         break;
 
                     default:
@@ -150,16 +150,16 @@ namespace risk.control.system.Controllers.CompanyAdmin
                     createdOn = t.Created,
                     locations = t.LocationReport.Count,
                     faceCount = t.LocationReport
-                        .SelectMany(l => l.FaceIds)
+                        .SelectMany(l => l.FaceIds!)
                         .Count(i => i.Selected),
                     docCount = t.LocationReport
-                        .SelectMany(l => l.DocumentIds)
+                        .SelectMany(l => l.DocumentIds!)
                         .Count(i => i.Selected),
                     mediaCount = t.LocationReport
-                    .SelectMany(l => l.MediaReports)
+                    .SelectMany(l => l.MediaReports!)
                     .Count(i => i.Selected),
                     questionCount = t.LocationReport
-                    .SelectMany(l => l.Questions)
+                    .SelectMany(l => l.Questions!)
                     .Count()
                 })
                 .ToListAsync();
@@ -206,7 +206,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             }
             try
             {
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                var currentUserEmail = HttpContext.User?.Identity?.Name!;
                 var newTemplate = await cloneService.CreateCloneReportTemplate(templateId, currentUserEmail);
                 if (newTemplate != null)
                 {
@@ -335,7 +335,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                     Options = optionsInput,
                     IsRequired = isRequired
                 };
-                location.Questions.Add(question);
+                location.Questions!.Add(question);
 
                 await context.SaveChangesAsync(null, false);
 
@@ -367,7 +367,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                     .Include(l => l.Questions)
                     .FirstOrDefaultAsync(l => l.Id == locationId);
 
-                if (location.Questions.Count > 1)
+                if (location!.Questions!.Count > 1)
                 {
                     context.Questions.Remove(question);
                     await context.SaveChangesAsync(null, false);
@@ -409,11 +409,11 @@ namespace risk.control.system.Controllers.CompanyAdmin
                     return Json(new { success = false, message = "Location not found." });
                 }
 
-                context.Questions.RemoveRange(location.Questions);
-                context.AgentIdReport.Remove(location.AgentIdReport);
-                context.DigitalIdReport.RemoveRange(location.FaceIds);
-                context.DocumentIdReport.RemoveRange(location.DocumentIds);
-                context.MediaReport.RemoveRange(location.MediaReports);
+                context.Questions.RemoveRange(location.Questions!);
+                context.AgentIdReport.Remove(location.AgentIdReport!);
+                context.DigitalIdReport.RemoveRange(location.FaceIds!);
+                context.DocumentIdReport.RemoveRange(location.DocumentIds!);
+                context.MediaReport.RemoveRange(location.MediaReports!);
 
                 context.LocationReport.Remove(location);
                 await context.SaveChangesAsync(null, false);
@@ -422,7 +422,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error Location Delete for {LocationId}. {UserEmail}.", id, HttpContext.User.Identity.Name);
+                logger.LogError(ex, "Error Location Delete for {LocationId}. {UserEmail}.", id, HttpContext.User.Identity?.Name);
                 return Json(new { success = false, message = "Error Location Delete." });
             }
         }
@@ -449,39 +449,39 @@ namespace risk.control.system.Controllers.CompanyAdmin
 
                 var reportTemplate = await context.ReportTemplates.Include(r => r.LocationReport).FirstOrDefaultAsync(r => r.Id == model.TemplateId);
 
-                var hasAnyLocationName = reportTemplate.LocationReport.Any(l => l.Id != model.LocationId && l.LocationName.Trim().ToLower() == model.LocationName.Trim().ToLower());
+                var hasAnyLocationName = reportTemplate!.LocationReport.Any(l => l.Id != model.LocationId && l.LocationName!.Trim().Equals(model.LocationName!.Trim(), StringComparison.CurrentCultureIgnoreCase));
 
                 if (hasAnyLocationName)
                 {
                     return Json(new { success = false, message = $"Location name {model.LocationName} exists." });
                 }
-                location.LocationName = model.LocationName.Trim().ToUpper();
+                location.LocationName = model.LocationName!.Trim().ToUpper();
 
                 // Update AgentId
                 var agent = location.AgentIdReport;
                 if (agent != null)
-                    agent.Selected = model.AgentId.Selected;
+                    agent.Selected = model.AgentId!.Selected;
 
                 // Update FaceIds
-                foreach (var f in model.FaceIds)
+                foreach (var f in model.FaceIds!)
                 {
-                    var face = location.FaceIds.FirstOrDefault(x => x.Id == f.Id);
+                    var face = location.FaceIds!.FirstOrDefault(x => x.Id == f.Id);
                     if (face != null)
                         face.Selected = f.Selected;
                 }
 
                 // Update DocumentIds
-                foreach (var d in model.DocumentIds)
+                foreach (var d in model.DocumentIds!)
                 {
-                    var doc = location.DocumentIds.FirstOrDefault(x => x.Id == d.Id);
+                    var doc = location.DocumentIds!.FirstOrDefault(x => x.Id == d.Id);
                     if (doc != null)
                         doc.Selected = d.Selected;
                 }
 
                 // Update MediaReports
-                foreach (var m in model.MediaReports)
+                foreach (var m in model.MediaReports!)
                 {
-                    var media = location.MediaReports.FirstOrDefault(x => x.Id == m.Id);
+                    var media = location.MediaReports!.FirstOrDefault(x => x.Id == m.Id);
                     if (media != null)
                         media.Selected = m.Selected;
                 }
@@ -492,7 +492,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error Location Ssave for {LocationId}. {UserEmail}.", model.LocationId, HttpContext.User.Identity.Name);
+                logger.LogError(ex, "Error Location Ssave for {LocationId}. {UserEmail}.", model.LocationId, HttpContext.User.Identity!.Name);
                 return Json(new { success = false, message = "Error Location Save." });
             }
         }
@@ -522,7 +522,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                     return Json(new { success = false, message = "Report Template not found." });
                 }
 
-                var hasAnyLocationName = reportTemplate.LocationReport.Any(l => original.Id != locationId && l.LocationName.Trim().ToLower() == locationName.Trim().ToLower());
+                var hasAnyLocationName = reportTemplate.LocationReport.Any(l => original.Id != locationId && l.LocationName!.Trim().Equals(locationName.Trim(), StringComparison.CurrentCultureIgnoreCase));
 
                 if (hasAnyLocationName)
                 {
@@ -536,12 +536,12 @@ namespace risk.control.system.Controllers.CompanyAdmin
                     Created = DateTime.UtcNow,
                     AgentIdReport = new AgentIdReport
                     {
-                        Selected = original.AgentIdReport.Selected,
+                        Selected = original.AgentIdReport!.Selected,
                         IsRequired = original.AgentIdReport.IsRequired,
                         ReportName = original.AgentIdReport.ReportName,                                          // You can set other properties of Agent here if needed
                         ReportType = original.AgentIdReport.ReportType,  // Default agent
                     },
-                    FaceIds = original.FaceIds.Select(f => new FaceIdReport
+                    FaceIds = original.FaceIds?.Select(f => new FaceIdReport
                     {
                         IsRequired = f.IsRequired,
                         Selected = f.Selected,
@@ -549,7 +549,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                         Has2Face = f.Has2Face,
                         ReportType = f.ReportType
                     }).ToList(),
-                    DocumentIds = original.DocumentIds.Select(d => new DocumentIdReport
+                    DocumentIds = original.DocumentIds?.Select(d => new DocumentIdReport
                     {
                         IsRequired = d.IsRequired,
                         Selected = d.Selected,
@@ -557,7 +557,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                         ReportName = d.ReportName,
                         ReportType = d.ReportType
                     }).ToList(),
-                    MediaReports = original.MediaReports.Select(m => new MediaReport
+                    MediaReports = original.MediaReports?.Select(m => new MediaReport
                     {
                         IsRequired = m.IsRequired,
                         Selected = m.Selected,
@@ -565,7 +565,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                         MediaType = m.MediaType,
                         MediaExtension = m.MediaExtension
                     }).ToList(),
-                    Questions = original.Questions.Select(q => new Question
+                    Questions = original.Questions?.Select(q => new Question
                     {
                         QuestionText = q.QuestionText,
                         QuestionType = q.QuestionType,
@@ -582,7 +582,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error Location Clone for {ReportTemplateId} {LocationId}. {UserEmail}.", reportTemplateId, locationId, HttpContext.User.Identity.Name);
+                logger.LogError(ex, "Error Location Clone for {ReportTemplateId} {LocationId}. {UserEmail}.", reportTemplateId, locationId, HttpContext.User.Identity?.Name);
                 return Json(new { success = false, message = ex.Message });
             }
         }

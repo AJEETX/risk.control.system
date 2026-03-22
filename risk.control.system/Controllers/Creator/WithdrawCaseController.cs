@@ -43,13 +43,13 @@ namespace risk.control.system.Controllers.Creator
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Withdraw(CaseTransactionModel model, long caseId)
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
             try
             {
                 if (!ModelState.IsValid || model == null || caseId < 1)
                 {
                     _notifyService.Error("OOPs !!!..Contact Admin");
-                    return this.RedirectToAction<DashboardController>(x => x.Index());
+                    return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
                 }
 
                 var (policyNumber, vendorId) = await _withdrawCaseService.WithdrawCaseByCompany(userEmail, model, caseId);

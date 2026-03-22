@@ -41,7 +41,7 @@ namespace risk.control.system.Controllers.Common
 
         public async Task<IActionResult> Index()
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
 
             try
             {

@@ -1,4 +1,6 @@
-﻿namespace risk.control.system.Helpers
+﻿using System.Security.Cryptography;
+
+namespace risk.control.system.Helpers
 {
     public static class NameGenerator
     {
@@ -8,8 +10,9 @@
         public static string GenerateName()
         {
             var random = new Random();
-            string firstName = firstNames[random.Next(0, firstNames.Length)];
-            string lastName = lastNames[random.Next(0, lastNames.Length)];
+            int index = RandomNumberGenerator.GetInt32(0, firstNames.Length);
+            string firstName = firstNames[index];
+            string lastName = lastNames[index];
 
             return $"{firstName} {lastName}";
         }

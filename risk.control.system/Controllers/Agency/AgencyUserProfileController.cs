@@ -56,14 +56,14 @@ namespace risk.control.system.Controllers.Agency
                 if (id < 1)
                 {
                     _notifyService.Custom($"No user not found.", 3, "red", "fas fa-user");
-                    return this.RedirectToAction<DashboardController>(x => x.Index());
+                    return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
                 }
 
                 var agencyUser = await _agencyUserService.GetUserAsync(id);
                 if (agencyUser == null)
                 {
                     _notifyService.Custom($"No user not found.", 3, "red", "fas fa-user");
-                    return this.RedirectToAction<DashboardController>(x => x.Index());
+                    return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
                 }
 
                 return View(agencyUser);
@@ -72,7 +72,7 @@ namespace risk.control.system.Controllers.Agency
             {
                 _logger.LogError(ex, "Error getting {UserId} for {UserEmail}", id, HttpContext.User?.Identity?.Name ?? "Anonymous");
                 _notifyService.Error("OOPS !!!..Contact Admin");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
             }
         }
 
@@ -80,7 +80,7 @@ namespace risk.control.system.Controllers.Agency
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(string id, ApplicationUser model)
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
             var sanitisedId = id.Replace("\n", "").Replace("\r", "").Trim();
             try
             {
@@ -93,7 +93,7 @@ namespace risk.control.system.Controllers.Agency
                 if (sanitisedId != model.Id.ToString())
                 {
                     _notifyService.Error("OOPS !!!..Contact Admin");
-                    return this.RedirectToAction<DashboardController>(x => x.Index());
+                    return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
                 }
                 var result = await _agencyUserService.UpdateUserAsync(sanitisedId, model, userEmail, _baseUrl);
 
@@ -115,14 +115,14 @@ namespace risk.control.system.Controllers.Agency
                 _logger.LogError(ex, "Error editing {UserId} for {UserEmail}", sanitisedId, userEmail ?? "Anonymous");
                 _notifyService.Error("OOPS !!!..Contact Admin");
             }
-            return this.RedirectToAction<DashboardController>(x => x.Index());
+            return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
         }
 
         [HttpGet]
         [Breadcrumb("Change Password", FromAction = nameof(DashboardController.Index), FromController = typeof(DashboardController))]
         public async Task<IActionResult> ChangePassword()
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
             try
             {
                 var vendorUser = await _agencyUserService.GetChangePasswordUserAsync(userEmail);
@@ -136,10 +136,10 @@ namespace risk.control.system.Controllers.Agency
             {
                 _logger.LogError(ex, "Error for {UserEmail}", userEmail ?? "Anonymous");
                 _notifyService.Error("OOPS !!!..Contact Admin");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
             }
             _notifyService.Error("OOPS !!!..Contact Admin");
-            return this.RedirectToAction<DashboardController>(x => x.Index());
+            return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
         }
 
         [HttpPost]
@@ -152,9 +152,11 @@ namespace risk.control.system.Controllers.Agency
 
                 return View(model);
             }
+            var userEmail = HttpContext.User?.Identity?.Name!;
+            var authenticated = HttpContext?.User?.Identity?.IsAuthenticated ?? false;
             try
             {
-                var result = await _accountService.ChangePasswordAsync(model, User, HttpContext.User.Identity.IsAuthenticated, _baseUrl);
+                var result = await _accountService.ChangePasswordAsync(model, User, authenticated, _baseUrl);
 
                 if (!result.Success)
                 {
@@ -171,7 +173,7 @@ namespace risk.control.system.Controllers.Agency
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while changing password for {UserEmail}", User.Identity.Name ?? "Anonymous");
+                _logger.LogError(ex, "Error occurred while changing password for {UserEmail}", userEmail ?? "Anonymous");
                 _notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(AccountController.Login), ControllerName<AccountController>.Name);
             }

@@ -48,7 +48,7 @@ namespace risk.control.system.Controllers.Assessor
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SubmitEnquiry([FromForm] CaseAgencyModel request, [FromForm] long claimId, [FromForm] IFormFile? document)
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
             try
             {
                 if (!ModelState.IsValid)
@@ -81,7 +81,7 @@ namespace risk.control.system.Controllers.Assessor
                     }
                 }
 
-                request.InvestigationReport.EnquiryRequest.DescriptiveQuestion = HttpUtility.HtmlEncode(request.InvestigationReport.EnquiryRequest.DescriptiveQuestion);
+                request.InvestigationReport!.EnquiryRequest!.DescriptiveQuestion = HttpUtility.HtmlEncode(request.InvestigationReport.EnquiryRequest.DescriptiveQuestion);
 
                 var model = await _assessorQueryService.SubmitQueryToAgency(userEmail, claimId, request.InvestigationReport.EnquiryRequest, request.InvestigationReport.EnquiryRequests, document);
                 if (model != null)
@@ -92,13 +92,13 @@ namespace risk.control.system.Controllers.Assessor
                     return RedirectToAction(nameof(AssessorController.Assess), ControllerName<AssessorController>.Name);
                 }
                 _notifyService.Error("OOPs !!!..Error sending query");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error submitting query case {Id}. {UserEmail}", claimId, userEmail);
                 _notifyService.Error("Error submitting query. Try again.");
-                return this.RedirectToAction<DashboardController>(x => x.Index());
+                return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
             }
         }
     }

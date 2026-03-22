@@ -32,11 +32,11 @@ namespace risk.control.system.Controllers.Common
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Sms2Customer(SmsModel model)
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
 
             try
             {
-                var customerName = await _notificationService.SendSms2Customer(userEmail, model.CaseId, model.Message);
+                var customerName = await _notificationService.SendSms2Customer(userEmail, model.CaseId, model.Message!);
                 if (string.IsNullOrEmpty(customerName))
                 {
                     return BadRequest("SMS Error !!! No Custmer found.");
@@ -55,11 +55,11 @@ namespace risk.control.system.Controllers.Common
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Sms2Beneficiary(SmsModel model)
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
 
             try
             {
-                var beneficiaryName = await _notificationService.SendSms2Beneficiary(userEmail, model.CaseId, model.Message);
+                var beneficiaryName = await _notificationService.SendSms2Beneficiary(userEmail, model.CaseId, model.Message!);
                 if (string.IsNullOrEmpty(beneficiaryName))
                 {
                     return BadRequest("SMS Error !!! No Beneficiary found.");
@@ -77,11 +77,11 @@ namespace risk.control.system.Controllers.Common
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddNotes(SmsModel model)
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
 
             try
             {
-                var (smsSent, count) = await _caseNotesService.SubmitNotes(userEmail, model.CaseId, model.Message);
+                var (smsSent, count) = await _caseNotesService.SubmitNotes(userEmail, model.CaseId, model.Message!);
                 if (smsSent)
                 {
                     return Ok(new { message = "Notes added: Success", newCount = count });

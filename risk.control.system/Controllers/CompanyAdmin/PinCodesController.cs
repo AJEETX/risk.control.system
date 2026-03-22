@@ -50,10 +50,10 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 .Include(p => p.District)
                 .Include(p => p.State)
                 .AsQueryable();
-            var userEmail = HttpContext.User.Identity.Name;
+            var userEmail = HttpContext.User.Identity?.Name!;
 
             var user = await _context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == userEmail);
-            if (!user.IsSuperAdmin)
+            if (!user!.IsSuperAdmin)
             {
                 query = query.Where(s => s.CountryId == user.CountryId);
             }
@@ -64,9 +64,9 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 query = query.Where(p =>
                     p.Code.ToString().Contains(lowerSearch) ||
                     p.Name.ToLower().Contains(lowerSearch) ||
-                    p.District.Name.ToLower().Contains(lowerSearch) ||
-                    p.State.Name.ToLower().Contains(lowerSearch) ||
-                    p.Country.Name.ToLower().Contains(lowerSearch));
+                    p.District!.Name.ToLower().Contains(lowerSearch) ||
+                    p.State!.Name.ToLower().Contains(lowerSearch) ||
+                    p.Country!.Name.ToLower().Contains(lowerSearch));
             }
             string sortColumn = orderColumn switch
             {
@@ -114,9 +114,9 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 {
                     p.Code,
                     p.Name,
-                    District = p.District.Name,
-                    State = p.State.Name,
-                    Country = p.Country.Name,
+                    District = p.District!.Name,
+                    State = p.State!.Name,
+                    Country = p.Country!.Name,
                     p.Updated,
                     p.PinCodeId
                 })
@@ -170,13 +170,13 @@ namespace risk.control.system.Controllers.CompanyAdmin
         [Breadcrumb("Add New", FromAction = nameof(Profile))]
         public async Task<IActionResult> Create()
         {
-            var userEmail = HttpContext.User.Identity.Name;
+            var userEmail = HttpContext.User.Identity?.Name!;
 
             var user = await _context.ApplicationUser.Include(a => a.Country).FirstOrDefaultAsync(u => u.Email == userEmail);
 
             var pincode = new PinCode
             {
-                IsUpdated = !user.IsSuperAdmin,
+                IsUpdated = !user!.IsSuperAdmin,
                 Country = user.Country,
                 CountryId = user.CountryId.GetValueOrDefault(),
                 SelectedCountryId = user.CountryId.GetValueOrDefault()
@@ -201,12 +201,12 @@ namespace risk.control.system.Controllers.CompanyAdmin
                     notifyService.Custom($"Pincode <b>{pinCode.Code}</b> already exist in Country!", 3, "red", "fas fa-map-pin");
                     ModelState.Clear();
 
-                    var userEmail = HttpContext.User.Identity.Name;
+                    var userEmail = HttpContext.User.Identity?.Name!;
 
                     var user = await _context.ApplicationUser.Include(a => a.Country).FirstOrDefaultAsync(u => u.Email == userEmail);
                     return View(new PinCode
                     {
-                        IsUpdated = !user.IsSuperAdmin,
+                        IsUpdated = !user!.IsSuperAdmin,
                         Country = user.Country,
                         CountryId = user.CountryId.GetValueOrDefault(),
                         SelectedCountryId = user.CountryId.GetValueOrDefault(),

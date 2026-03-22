@@ -22,11 +22,11 @@ namespace risk.control.system.Controllers.Common
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddNotes(SmsModel model)
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
 
             try
             {
-                var (smsSent, count) = await _caseNotesService.SubmitNotes(userEmail, model.CaseId, model.Message);
+                var (smsSent, count) = await _caseNotesService.SubmitNotes(userEmail, model.CaseId, model.Message!);
                 if (smsSent)
                 {
                     return Ok(new { message = "Notes added: Success", newCount = count });

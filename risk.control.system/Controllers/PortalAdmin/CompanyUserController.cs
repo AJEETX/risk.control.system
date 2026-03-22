@@ -74,7 +74,7 @@ namespace risk.control.system.Controllers.PortalAdmin
         public IActionResult Create(long id)
         {
             var company = _context.ClientCompany.Include(c => c.Country).FirstOrDefault(v => v.ClientCompanyId == id);
-            var model = new ApplicationUser { Country = company.Country, CountryId = company.CountryId, ClientCompany = company, ClientCompanyId = company.ClientCompanyId };
+            var model = new ApplicationUser { Country = company!.Country, CountryId = company.CountryId, ClientCompany = company, ClientCompanyId = company.ClientCompanyId };
             ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
 
             var agencysPage = new MvcBreadcrumbNode("Companies", "ClientCompany", "Admin Settings");
@@ -92,7 +92,7 @@ namespace risk.control.system.Controllers.PortalAdmin
         public async Task<IActionResult> Create(ApplicationUser user, string emailSuffix)
         {
             emailSuffix = emailSuffix.Replace("\n", "").Replace("\r", "").Trim();
-            var userFullEmail = user.Email.Trim().ToLower() + "@" + emailSuffix;
+            var userFullEmail = user.Email!.Trim().ToLower() + "@" + emailSuffix;
             if (user.ProfileImage != null && user.ProfileImage.Length > 0)
             {
                 var (fileName, relativePath) = await fileStorageService.SaveAsync(user.ProfileImage, emailSuffix, "user");
@@ -113,12 +113,12 @@ namespace risk.control.system.Controllers.PortalAdmin
             user.Updated = DateTime.Now;
             user.UpdatedBy = HttpContext.User?.Identity?.Name;
             user.Id = 0;
-            user.Role = (AppRoles)Enum.Parse(typeof(AppRoles), user.Role.ToString());
+            user.Role = (AppRoles)Enum.Parse(typeof(AppRoles), user.Role.ToString()!);
             IdentityResult result = await userManager.CreateAsync(user, user.Password);
 
             if (result.Succeeded)
             {
-                await userManager.AddToRoleAsync(user, user.Role.ToString());
+                await userManager.AddToRoleAsync(user, user.Role.ToString()!);
                 var isdCode = _context.Country.FirstOrDefault(c => c.CountryId == user.CountryId)?.ISDCode;
                 await smsService.SendSmsAsync(isdCode + user.PhoneNumber, "Company account created. Domain : " + user.Email);
                 notifyService.Custom($"User created successfully.", 3, "green", "fas fa-user-plus");
@@ -174,8 +174,8 @@ namespace risk.control.system.Controllers.PortalAdmin
                 var user = await userManager.FindByIdAsync(id.ToString());
                 if (applicationUser?.ProfileImage != null && applicationUser.ProfileImage.Length > 0)
                 {
-                    var emailSuffix = user.Email.Split('@').LastOrDefault();
-                    var (fileName, relativePath) = await fileStorageService.SaveAsync(user.ProfileImage, emailSuffix, "user");
+                    var emailSuffix = user!.Email!.Split('@').LastOrDefault();
+                    var (fileName, relativePath) = await fileStorageService.SaveAsync(user.ProfileImage!, emailSuffix!, "user");
                     user.ProfilePictureUrl = relativePath;
                 }
 
@@ -185,15 +185,15 @@ namespace risk.control.system.Controllers.PortalAdmin
                     user.ProfilePictureUrl = applicationUser?.ProfilePictureUrl ?? user.ProfilePictureUrl;
                     user.ProfilePictureExtension = applicationUser?.ProfilePictureExtension ?? user.ProfilePictureExtension;
                     user.PhoneNumber = applicationUser?.PhoneNumber ?? user.PhoneNumber;
-                    user.FirstName = applicationUser?.FirstName;
-                    user.LastName = applicationUser?.LastName;
+                    user.FirstName = applicationUser?.FirstName!;
+                    user.LastName = applicationUser?.LastName!;
                     if (!string.IsNullOrWhiteSpace(applicationUser?.Password))
                     {
                         user.Password = applicationUser.Password;
                     }
-                    user.Addressline = applicationUser.Addressline;
+                    user.Addressline = applicationUser!.Addressline;
                     user.Active = applicationUser.Active;
-                    user.PhoneNumber = user.PhoneNumber.TrimStart('0');
+                    user.PhoneNumber = user.PhoneNumber!.TrimStart('0');
                     user.CountryId = applicationUser.SelectedCountryId;
                     user.StateId = applicationUser.SelectedStateId;
                     user.DistrictId = applicationUser.SelectedDistrictId;
@@ -201,7 +201,7 @@ namespace risk.control.system.Controllers.PortalAdmin
 
                     user.Updated = DateTime.Now;
                     user.Role = applicationUser.Role;
-                    user.Role = (AppRoles)Enum.Parse(typeof(AppRoles), user.Role.ToString());
+                    user.Role = (AppRoles)Enum.Parse(typeof(AppRoles), user.Role.ToString()!);
                     user.PhoneNumber = applicationUser.PhoneNumber;
                     user.UpdatedBy = HttpContext.User?.Identity?.Name;
                     user.SecurityStamp = DateTime.Now.ToString();
@@ -210,10 +210,10 @@ namespace risk.control.system.Controllers.PortalAdmin
                     {
                         var roles = await userManager.GetRolesAsync(user);
                         var roleResult = await userManager.RemoveFromRolesAsync(user, roles);
-                        await userManager.AddToRoleAsync(user, user.Role.ToString());
+                        await userManager.AddToRoleAsync(user, user.Role.ToString()!);
                         notifyService.Custom($"Company user edited successfully.", 3, "orange", "fas fa-user-check");
                         var country = await _context.Country.FirstOrDefaultAsync(c => c.CountryId == user.CountryId);
-                        await smsService.DoSendSmsAsync(country.Code, country.ISDCode + user.PhoneNumber, "Company account edited. \nDomain : " + user.Email + "\n" + portal_base_url);
+                        await smsService.DoSendSmsAsync(country!.Code, country.ISDCode + user.PhoneNumber, "Company account edited. \nDomain : " + user.Email + "\n" + portal_base_url);
 
                         return RedirectToAction(nameof(CompanyUserController.Index), "CompanyUser", new { id = applicationUser.ClientCompanyId });
                     }
@@ -235,17 +235,17 @@ namespace risk.control.system.Controllers.PortalAdmin
             {
                 return Problem("Entity set 'ApplicationDbContext.ApplicationUser'  is null.");
             }
-            var clientCompanyApplicationUser = await _context.ApplicationUser.FindAsync(id);
-            if (clientCompanyApplicationUser != null)
+            var companyUser = await _context.ApplicationUser.FindAsync(id);
+            if (companyUser != null)
             {
-                clientCompanyApplicationUser.Updated = DateTime.UtcNow;
-                clientCompanyApplicationUser.UpdatedBy = HttpContext.User?.Identity?.Name;
-                _context.ApplicationUser.Remove(clientCompanyApplicationUser);
+                companyUser.Updated = DateTime.UtcNow;
+                companyUser.UpdatedBy = HttpContext.User?.Identity?.Name;
+                _context.ApplicationUser.Remove(companyUser);
             }
 
             await _context.SaveChangesAsync();
             notifyService.Error($"User deleted successfully.", 3);
-            return RedirectToAction(nameof(CompanyUserController.Index), "CompanyUser", new { id = clientCompanyApplicationUser.ClientCompanyId });
+            return RedirectToAction(nameof(CompanyUserController.Index), "CompanyUser", new { id = companyUser!.ClientCompanyId });
         }
     }
 }

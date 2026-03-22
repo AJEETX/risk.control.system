@@ -23,7 +23,7 @@ namespace risk.control.system.Controllers.Common
 
         public async Task<JsonResult> GetAgentClaim()
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
 
             try
             {
@@ -35,7 +35,7 @@ namespace risk.control.system.Controllers.Common
                 }
                 _logger.LogInformation("Fetching agent claim data for user {UserEmail} with role {UserRole}", userEmail, userRole);
 
-                Dictionary<string, int> monthlyExpense = null;
+                Dictionary<string, int> monthlyExpense = null!;
 
                 if (userRole.Contains(MANAGER.DISPLAY_NAME) ||
                     userRole.Contains(ASSESSOR.DISPLAY_NAME) ||
@@ -66,7 +66,7 @@ namespace risk.control.system.Controllers.Common
 
         public async Task<JsonResult> GetAgentUnderwriting()
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
 
             try
             {
@@ -101,7 +101,7 @@ namespace risk.control.system.Controllers.Common
 
         public async Task<JsonResult> GetMonthlyClaim()
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
             try
             {
                 var monthlyExpense = await _dashboardService.CalculateMonthlyCaseStatus(userEmail);
@@ -116,7 +116,7 @@ namespace risk.control.system.Controllers.Common
 
         public async Task<JsonResult> GetWeeklyClaim()
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
             try
             {
                 var monthlyExpense = await _dashboardService.CalculateWeeklyCaseStatus(userEmail);
@@ -131,7 +131,7 @@ namespace risk.control.system.Controllers.Common
 
         public async Task<JsonResult> GetWeeklyPieClaim()
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
             try
             {
                 var monthlyExpense = await _dashboardService.CalculateWeeklyCaseStatusPieClaims(userEmail);
@@ -146,7 +146,7 @@ namespace risk.control.system.Controllers.Common
 
         public async Task<JsonResult> GetWeeklyPieUnderwriting()
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
             try
             {
                 var monthlyExpense = await _dashboardService.CalculateWeeklyCaseStatusPieUnderwritings(userEmail);
@@ -161,7 +161,7 @@ namespace risk.control.system.Controllers.Common
 
         public async Task<JsonResult> GetClaimChart()
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
             try
             {
                 var monthlyExpense = await _dashboardService.CalculateCaseChart(userEmail);
@@ -176,7 +176,7 @@ namespace risk.control.system.Controllers.Common
 
         public async Task<JsonResult> GetClaimWeeklyTat()
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name!;
             try
             {
                 var monthlyExpense = await _dashboardService.CalculateTimespan(userEmail);
