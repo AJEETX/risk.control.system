@@ -22,8 +22,6 @@ namespace risk.control.system.Controllers.Mobile
 {
     [Route("api/[controller]")]
     [ApiController]
-    [IgnoreAntiforgeryToken]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
     public class AgentController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
@@ -95,14 +93,12 @@ namespace risk.control.system.Controllers.Mobile
         [AllowAnonymous]
         public async Task<IActionResult> GetAgentPin(string agentEmail)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-            agentEmail = agentEmail.Replace("\n", "").Replace("\r", "").Trim();
-
             try
             {
+                if (string.IsNullOrWhiteSpace(agentEmail))
+                {
+                    return BadRequest($"Empty email");
+                }
                 var user2Onboard = await _agentService.GetPin(agentEmail, _portalBaseUrl);
 
                 if (user2Onboard == null)
@@ -119,9 +115,8 @@ namespace risk.control.system.Controllers.Mobile
             }
             catch (Exception ex)
             {
-                var safeEmail = (agentEmail ?? string.Empty).Replace("\n", "").Replace("\r", "").Trim();
-                _logger.LogError(ex, "Error occurred for {UserEmail}.", safeEmail);
-                return StatusCode(500, $"Error occurred getting PIN. {safeEmail}.");
+                _logger.LogError(ex, "Error occurred for {UserEmail}.", agentEmail);
+                return BadRequest($"Agent does not exist or Error");
             }
         }
 
@@ -129,14 +124,13 @@ namespace risk.control.system.Controllers.Mobile
         [AllowAnonymous]
         public async Task<IActionResult> ResetUid([Required] string mobile, bool sendSMS = false)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-            mobile = mobile.Replace(" ", "").Replace("-", "").Replace("\n", "").Replace("\r", "").TrimStart('+');
             try
             {
-                var user2Onboard = await _agentService.ResetUid(mobile, _portalBaseUrl, sendSMS);
+                if (string.IsNullOrWhiteSpace(mobile))
+                {
+                    return BadRequest($"Empty mobile number");
+                }
+                var user2Onboard = await _agentService.ResetUid(mobile.TrimStart('+'), _portalBaseUrl, sendSMS);
 
                 if (user2Onboard == null)
                 {
@@ -148,7 +142,7 @@ namespace risk.control.system.Controllers.Mobile
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error occurred for {Mobile}.", mobile);
-                return StatusCode(500, $"mobile number {mobile} and/or Agent does not exist");
+                return BadRequest($"mobile number and/or Agent does not exist");
             }
         }
 
@@ -156,13 +150,17 @@ namespace risk.control.system.Controllers.Mobile
         [AllowAnonymous]
         public async Task<IActionResult> VerifyMobile(VerifyMobileRequest request)
         {
-            if (!ModelState.IsValid)
+            if (request is null)
             {
-                return BadRequest(ModelState);
+                return BadRequest("Request body cannot be null or empty.");
             }
-            var normalizedMobile = request.Mobile.Replace(" ", "").Replace("-", "").Replace("\n", "").Replace("\r", "").TrimStart('+');
+            if (string.IsNullOrWhiteSpace(request.Mobile) || request.Mobile.Length < 11 || string.IsNullOrWhiteSpace(request.Uid) || request.Uid.Length < 5)
+            {
+                return BadRequest("Invalid request parameters.");
+            }
             try
             {
+                var normalizedMobile = request.Mobile.TrimStart('+');
                 var userWithUid = await _context.ApplicationUser.Include(u => u.Country).FirstOrDefaultAsync(v => v.MobileUId == request.Uid);
                 if (!request.SendSMSForRetry)
                 {
@@ -172,10 +170,10 @@ namespace risk.control.system.Controllers.Mobile
                     }
 
                     var agentRole = await _roleManager.FindByNameAsync(AppRoles.AGENT.ToString());
-                    var matchingUsers = await _context.ApplicationUser.Include(u => u.Country).Where(u => (u.Country!.ISDCode + u.PhoneNumber) == normalizedMobile).ToListAsync();
+                    var matchingUsers = await _context.ApplicationUser.Include(u => u.Country).Where(u => (u.Country.ISDCode + u.PhoneNumber) == normalizedMobile).ToListAsync();
                     foreach (var user in matchingUsers)
                     {
-                        var isAgent = await _userManager.IsInRoleAsync(user, agentRole!.Name!);
+                        var isAgent = await _userManager.IsInRoleAsync(user, agentRole.Name);
                         if (isAgent && string.IsNullOrWhiteSpace(user.MobileUId) && user.Active)
                         {
                             user.MobileUId = request.Uid;
@@ -183,14 +181,14 @@ namespace risk.control.system.Controllers.Mobile
                             user.SecretPin = pin.ToString("D4");
                             _context.ApplicationUser.Update(user);
                             await _context.SaveChangesAsync();
-                            await SendVerificationSmsAsync(user.Country!.Code, user.Email!, request.Mobile, user.SecretPin);
+                            await SendVerificationSmsAsync(user.Country.Code, user.Email, request.Mobile, user.SecretPin);
                             return Ok(new { user.Email, Pin = user.SecretPin });
                         }
                     }
                 }
                 else if (request.SendSMSForRetry && userWithUid != null)
                 {
-                    await SendVerificationSmsAsync(userWithUid.Country!.Code, userWithUid.Email!, request.Mobile, userWithUid.SecretPin!);
+                    await SendVerificationSmsAsync(userWithUid.Country.Code, userWithUid.Email, request.Mobile, userWithUid.SecretPin);
                     return Ok(new { userWithUid.Email, Pin = userWithUid.SecretPin });
                 }
 
@@ -198,8 +196,8 @@ namespace risk.control.system.Controllers.Mobile
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred for {Mobile}.", normalizedMobile);
-                return StatusCode(500, $"An error occurred while verifying the mobile number {normalizedMobile}.");
+                _logger.LogError(ex, "Error occurred for {Mobile}.", request.Mobile);
+                return BadRequest("An error occurred while verifying the mobile number.");
             }
         }
 
@@ -215,17 +213,20 @@ namespace risk.control.system.Controllers.Mobile
         [AllowAnonymous]
         public async Task<IActionResult> VerifyId(VerifyIdRequest request)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-            var sanitizedUid = request.Uid?.Replace("\n", "").Replace("\r", "").Replace(" ", "").Replace("-", "").Trim();
             try
             {
-                var mobileUidExist = await _context.ApplicationUser.FirstOrDefaultAsync(v => v.MobileUId == sanitizedUid);
+                if (request is null)
+                {
+                    return BadRequest("Request body cannot be null or empty.");
+                }
+                if (string.IsNullOrWhiteSpace(request.Uid) || string.IsNullOrWhiteSpace(request.Image))
+                {
+                    return BadRequest("Uid And/Or Image is empty/null");
+                }
+                var mobileUidExist = await _context.ApplicationUser.FirstOrDefaultAsync(v => v.MobileUId == request.Uid);
                 if (mobileUidExist == null)
                 {
-                    return BadRequest($"{nameof(request.Uid)} {sanitizedUid} not exists");
+                    return BadRequest($"{nameof(request.Uid)} {request.Uid} not exists");
                 }
                 if (mobileUidExist.ProfilePictureUrl == null || string.IsNullOrWhiteSpace(mobileUidExist.ProfilePictureUrl))
                 {
@@ -248,8 +249,8 @@ namespace risk.control.system.Controllers.Mobile
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred for {Uid}.", sanitizedUid);
-                return StatusCode(500, "Error occurred verifying Face match");
+                _logger.LogError(ex, "Error occurred for {Uid}.", request.Uid);
+                return BadRequest("face matcherror " + ex.StackTrace);
             }
         }
 
@@ -300,16 +301,17 @@ namespace risk.control.system.Controllers.Mobile
         //}
 
         //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
         [HttpGet("agent")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
         public async Task<IActionResult> GetAll(string email)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-            email = email.Replace("\n", "").Replace("\r", "").Trim();
             try
             {
+                if (string.IsNullOrWhiteSpace(email))
+                {
+                    return BadRequest("Email is empty/null");
+                }
                 var agent = await _context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == email);
 
                 if (agent == null || agent.Role != AppRoles.AGENT || !agent.Active)
@@ -333,21 +335,21 @@ namespace risk.control.system.Controllers.Mobile
                 var claims = await _context.Investigations
                 .Include(c => c.PolicyDetail)
                .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c!.Country)
+                .ThenInclude(c => c.Country)
                 .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c!.State)
+                .ThenInclude(c => c.State)
                 .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c!.District)
+                .ThenInclude(c => c.District)
                 .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c!.PinCode)
+                .ThenInclude(c => c.PinCode)
                 .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c!.PinCode)
+                .ThenInclude(c => c.PinCode)
                 .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c!.State)
+                .ThenInclude(c => c.State)
                 .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c!.Country)
+                .ThenInclude(c => c.Country)
                 .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c!.District)
+                .ThenInclude(c => c.District)
                 .Where(i => i.VendorId == vendorUser.VendorId &&
                 i.SubStatus == assignedToAgentStatus &&
                 i.TaskedAgentEmail == vendorUser.Email).ToListAsync();
@@ -358,56 +360,55 @@ namespace risk.control.system.Controllers.Mobile
                     {
                         claimId = c.Id,
                         Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId),
-                        claimType = c.PolicyDetail!.InsuranceType == InsuranceType.CLAIM ? ClaimType.DEATH.GetEnumDisplayName() : ClaimType.HEALTH.GetEnumDisplayName(),
+                        claimType = c.PolicyDetail.InsuranceType == InsuranceType.CLAIM ? ClaimType.DEATH.GetEnumDisplayName() : ClaimType.HEALTH.GetEnumDisplayName(),
                         DocumentPhoto = c.PolicyDetail.DocumentPath != null ?
                         Convert.ToBase64String(System.IO.File.ReadAllBytes(Path.Combine(_env.ContentRootPath, c.PolicyDetail.DocumentPath))) :
                         Applicationsettings.NO_POLICY_IMAGE,
-                        CustomerName = c.CustomerDetail!.Name,
+                        CustomerName = c.CustomerDetail.Name,
                         CustomerEmail = email,
                         PolicyNumber = c.PolicyDetail.ContractNumber,
-                        Gender = c.CustomerDetail.Gender!.GetEnumDisplayName(),
+                        Gender = c.CustomerDetail.Gender.GetEnumDisplayName(),
                         c.CustomerDetail.Addressline,
-                        c.CustomerDetail.PinCode!.Code,
+                        c.CustomerDetail.PinCode.Code,
                         CustomerPhoto = c?.CustomerDetail.ImagePath != null ?
-                        Convert.ToBase64String(System.IO.File.ReadAllBytes(Path.Combine(_env.ContentRootPath, c?.CustomerDetail.ImagePath!))) :
+                        Convert.ToBase64String(System.IO.File.ReadAllBytes(Path.Combine(_env.ContentRootPath, c?.CustomerDetail.ImagePath))) :
                         Applicationsettings.USER_PHOTO,
-                        Country = c!.CustomerDetail.Country!.Name,
-                        State = c.CustomerDetail.State!.Name,
-                        District = c.CustomerDetail.District!.Name,
+                        Country = c.CustomerDetail.Country.Name,
+                        State = c.CustomerDetail.State.Name,
+                        District = c.CustomerDetail.District.Name,
                         Locations = new
                         {
-                            c.BeneficiaryDetail!.BeneficiaryDetailId,
+                            c.BeneficiaryDetail.BeneficiaryDetailId,
                             Photo = c.BeneficiaryDetail?.ImagePath != null ?
                             Convert.ToBase64String(System.IO.File.ReadAllBytes(Path.Combine(_env.ContentRootPath, c.BeneficiaryDetail.ImagePath))) :
                             Applicationsettings.USER_PHOTO,
-                            c.BeneficiaryDetail!.Country!.Name,
+                            c.BeneficiaryDetail.Country.Name,
                             BeneficiaryName = c.BeneficiaryDetail.Name,
                             c.BeneficiaryDetail.Addressline,
-                            c.BeneficiaryDetail.PinCode!.Code,
-                            District = c.BeneficiaryDetail.District!.Name,
-                            State = c.BeneficiaryDetail.State!.Name
+                            c.BeneficiaryDetail.PinCode.Code,
+                            District = c.BeneficiaryDetail.District.Name,
+                            State = c.BeneficiaryDetail.State.Name
                         }
                     })?.ToList();
                 return Ok(claim2Agent);
             }
             catch (Exception ex)
             {
-                var safeEmail = (email ?? string.Empty).Replace("\n", "").Replace("\r", "").Trim();
-                _logger.LogError(ex, "Error occurred for {Agent}.", safeEmail);
-                return StatusCode(500, $"Error occurred for {safeEmail}");
+                _logger.LogError(ex, "Error occurred for {Agent}.", email);
+                return StatusCode(500, $"Error occurred for {email}");
             }
         }
 
         [HttpGet("agent-map")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
         public async Task<IActionResult> IndexMap(string email)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-            email = email.Replace("\n", "").Replace("\r", "").Trim();
             try
             {
+                if (string.IsNullOrWhiteSpace(email))
+                {
+                    return BadRequest("Email is empty/null");
+                }
                 var agent = await _context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == email);
 
                 if (agent == null || agent.Role != AppRoles.AGENT || !agent.Active)
@@ -429,21 +430,21 @@ namespace risk.control.system.Controllers.Mobile
                 var claims = await _context.Investigations
                     .Include(c => c.PolicyDetail)
                     .Include(c => c.BeneficiaryDetail)
-                    .ThenInclude(c => c!.PinCode)
+                    .ThenInclude(c => c.PinCode)
                     .Include(c => c.BeneficiaryDetail)
-                    .ThenInclude(c => c!.District)
+                    .ThenInclude(c => c.District)
                     .Include(c => c.BeneficiaryDetail)
-                    .ThenInclude(c => c!.State)
+                    .ThenInclude(c => c.State)
                     .Include(c => c.BeneficiaryDetail)
-                    .ThenInclude(c => c!.Country)
+                    .ThenInclude(c => c.Country)
                     .Include(c => c.CustomerDetail)
-                    .ThenInclude(c => c!.Country)
+                    .ThenInclude(c => c.Country)
                     .Include(c => c.CustomerDetail)
-                    .ThenInclude(c => c!.District)
+                    .ThenInclude(c => c.District)
                     .Include(c => c.CustomerDetail)
-                    .ThenInclude(c => c!.PinCode)
+                    .ThenInclude(c => c.PinCode)
                     .Include(c => c.CustomerDetail)
-                    .ThenInclude(c => c!.State)
+                    .ThenInclude(c => c.State)
                     .Where(i => i.VendorId == vendorUser.VendorId &&
                     i.TaskedAgentEmail == vendorUser.Email &&
                     i.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT).ToListAsync();
@@ -456,34 +457,33 @@ namespace risk.control.system.Controllers.Mobile
                     Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId),
                     Coordinate = new
                     {
-                        Lat = c.PolicyDetail!.InsuranceType == InsuranceType.UNDERWRITING ?
-                            decimal.Parse(c.CustomerDetail!.Latitude!) : decimal.Parse(c.BeneficiaryDetail!.Latitude!),
+                        Lat = c.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING ?
+                            decimal.Parse(c.CustomerDetail.Latitude) : decimal.Parse(c.BeneficiaryDetail.Latitude),
                         Lng = c.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING ?
-                             decimal.Parse(c.CustomerDetail!.Longitude!) : decimal.Parse(c.BeneficiaryDetail!.Longitude!)
+                             decimal.Parse(c.CustomerDetail.Longitude) : decimal.Parse(c.BeneficiaryDetail.Longitude)
                     },
-                    Address = LocationDetail.GetAddress(c.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING, c.CustomerDetail!, c.BeneficiaryDetail!),
+                    Address = LocationDetail.GetAddress(c.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING, c.CustomerDetail, c.BeneficiaryDetail),
                     PolicyNumber = c.PolicyDetail.ContractNumber,
                 });
                 return Ok(claim2Agent);
             }
             catch (Exception ex)
             {
-                var safeEmail = (email ?? string.Empty).Replace("\n", "").Replace("\r", "").Trim();
-                _logger.LogError(ex, "Error occurred for {Email}.", safeEmail);
-                return StatusCode(500, $"Error occurred for {safeEmail}.");
+                _logger.LogError(ex, "Error occurred for {Email}.", email);
+                return StatusCode(500);
             }
         }
 
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
         [HttpGet("get")]
         public async Task<IActionResult> Get(long caseId, string email)
         {
-            if (!ModelState.IsValid || caseId < 1)
-            {
-                return BadRequest(ModelState);
-            }
-            email = email.Replace("\n", "").Replace("\r", "").Trim();
             try
             {
+                if (caseId < 1 || string.IsNullOrWhiteSpace(email))
+                {
+                    return BadRequest("Invalid caseId And/Or Email is empty/null");
+                }
                 var agent = await _context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == email);
 
                 if (agent == null || agent.Role != AppRoles.AGENT || !agent.Active)
@@ -499,17 +499,17 @@ namespace risk.control.system.Controllers.Mobile
                 }
                 var claim = await _context.Investigations
                     .Include(c => c.PolicyDetail)
-                    .ThenInclude(c => c!.CostCentre)
+                    .ThenInclude(c => c.CostCentre)
                     .Include(c => c.PolicyDetail)
-                    .ThenInclude(c => c!.CaseEnabler)
+                    .ThenInclude(c => c.CaseEnabler)
                     .Include(c => c.CustomerDetail)
-                    .ThenInclude(c => c!.District)
+                    .ThenInclude(c => c.District)
                     .Include(c => c.CustomerDetail)
-                    .ThenInclude(c => c!.State)
+                    .ThenInclude(c => c.State)
                     .Include(c => c.CustomerDetail)
-                    .ThenInclude(c => c!.Country)
+                    .ThenInclude(c => c.Country)
                     .Include(c => c.CustomerDetail)
-                    .ThenInclude(c => c!.PinCode)
+                    .ThenInclude(c => c.PinCode)
                     .FirstOrDefaultAsync(c => c.Id == caseId);
 
                 var beneficiary = await _context.BeneficiaryDetail
@@ -522,18 +522,18 @@ namespace risk.control.system.Controllers.Mobile
 
                 var vendorUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == email && c.Role == AppRoles.AGENT);
 
-                object locations = null!;
+                object locations = null;
                 if (await _featureManager.IsEnabledAsync(FeatureFlags.ENABLE_REAL_TIME_REPORT_TEMPlATE))
                 {
-                    locations = await _cloneReportService.GetReportTemplate(caseId, agent.Email!);
+                    locations = await _cloneReportService.GetReportTemplate(caseId, agent.Email);
                 }
-                var docPath = Path.Combine(_env.ContentRootPath, claim!.PolicyDetail!.DocumentPath!);
+                var docPath = Path.Combine(_env.ContentRootPath, claim.PolicyDetail.DocumentPath);
                 var docByte = System.IO.File.ReadAllBytes(docPath);
                 var docBase64 = Convert.ToBase64String(docByte);
                 var documentPhoto = claim.PolicyDetail.DocumentPath != null ? docBase64 : Applicationsettings.NO_POLICY_IMAGE;
-                var customerPhoto = claim.CustomerDetail!.ImagePath != null ?
+                var customerPhoto = claim.CustomerDetail.ImagePath != null ?
                             Convert.ToBase64String(System.IO.File.ReadAllBytes(Path.Combine(_env.ContentRootPath, claim.CustomerDetail.ImagePath))) : Applicationsettings.USER_PHOTO;
-                var beneficiaryPhoto = beneficiary!.ImagePath != null ?
+                var beneficiaryPhoto = beneficiary.ImagePath != null ?
                             Convert.ToBase64String(System.IO.File.ReadAllBytes(Path.Combine(_env.ContentRootPath, beneficiary.ImagePath))) : Applicationsettings.USER_PHOTO;
                 return Ok(
                     new
@@ -547,83 +547,86 @@ namespace risk.control.system.Controllers.Mobile
                             IssueDate = claim.PolicyDetail.ContractIssueDate.ToString("dd-MMM-yyyy"),
                             IncidentDate = claim.PolicyDetail.DateOfIncident.ToString("dd-MMM-yyyy"),
                             Amount = claim.PolicyDetail.SumAssuredValue,
-                            BudgetCentre = claim.PolicyDetail.CostCentre!.Name,
-                            Reason = claim.PolicyDetail.CaseEnabler!.Name
+                            BudgetCentre = claim.PolicyDetail.CostCentre.Name,
+                            Reason = claim.PolicyDetail.CaseEnabler.Name
                         },
                         beneficiary = new
                         {
                             BeneficiaryId = beneficiary.BeneficiaryDetailId,
                             Name = beneficiary.Name,
                             Photo = beneficiaryPhoto,
-                            Relation = beneficiary.BeneficiaryRelation!.Name,
-                            Income = beneficiary.Income!.GetEnumDisplayName(),
+                            Relation = beneficiary.BeneficiaryRelation.Name,
+                            Income = beneficiary.Income.GetEnumDisplayName(),
                             Phone = beneficiary.PhoneNumber,
                             DateOfBirth = beneficiary.DateOfBirth.GetValueOrDefault().ToString("dd-MMM-yyyy"),
-                            Address = beneficiary.Addressline + " " + beneficiary.District!.Name + " " + beneficiary.State!.Name + " " + beneficiary.Country!.Name + " " + beneficiary.PinCode!.Code
+                            Address = beneficiary.Addressline + " " + beneficiary.District.Name + " " + beneficiary.State.Name + " " + beneficiary.Country.Name + " " + beneficiary.PinCode.Code
                         },
                         Customer = new
                         {
                             Name = claim.CustomerDetail.Name,
-                            Occupation = claim.CustomerDetail.Occupation!.GetEnumDisplayName(),
+                            Occupation = claim.CustomerDetail.Occupation.GetEnumDisplayName(),
                             Photo = customerPhoto,
-                            Income = claim.CustomerDetail.Income!.GetEnumDisplayName(),
+                            Income = claim.CustomerDetail.Income.GetEnumDisplayName(),
                             Phone = claim.CustomerDetail.PhoneNumber,
                             DateOfBirth = claim.CustomerDetail.DateOfBirth.GetValueOrDefault().ToString("dd-MMM-yyyy"),
-                            Address = claim.CustomerDetail.Addressline + " " + claim.CustomerDetail.District!.Name + " " + claim.CustomerDetail.State!.Name + " " + claim.CustomerDetail.Country!.Name + " " + claim.CustomerDetail.PinCode!.Code
+                            Address = claim.CustomerDetail.Addressline + " " + claim.CustomerDetail.District.Name + " " + claim.CustomerDetail.State.Name + " " + claim.CustomerDetail.Country.Name + " " + claim.CustomerDetail.PinCode.Code
                         },
                         InvestigationData = new
                         {
                             locations
                         },
                         Remarks = claim?.InvestigationReport?.AgentRemarks,
-                        Registered = vendorUser!.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId)
+                        Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId)
                     });
             }
             catch (Exception ex)
             {
-                var safeEmail = (email ?? string.Empty).Replace("\n", "").Replace("\r", "").Trim();
-                _logger.LogError(ex, "Error occurred for {CaseId} for {Email}.", caseId, safeEmail);
-                return StatusCode(500, $"Error occurred for {caseId} for {safeEmail}.");
+                _logger.LogError(ex, "Error occurred for {CaseId} for {Email}.", caseId, email);
+                return StatusCode(500);
             }
         }
 
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
         [HttpGet("get-template")]
         public async Task<IActionResult> GetCaseReportTemplate(long caseId, string email)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-            email = email.Replace("\n", "").Replace("\r", "").Trim();
             try
             {
+                if (caseId < 1 || string.IsNullOrWhiteSpace(email))
+                {
+                    return BadRequest("Invalid caseId And/Or Email is empty/null");
+                }
                 var agent = await _context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == email);
 
                 if (agent == null || agent.Role != AppRoles.AGENT || !agent.Active)
                 {
                     return Unauthorized("Invalid User !!!");
                 }
-                var locations = await _cloneReportService.GetReportTemplate(caseId, agent.Email!);
+                var locations = await _cloneReportService.GetReportTemplate(caseId, agent.Email);
                 return Ok(locations);
             }
             catch (Exception ex)
             {
-                var safeEmail = (email ?? string.Empty).Replace("\n", "").Replace("\r", "").Trim();
-                _logger.LogError(ex, "Error occurred for {CaseId} for {Email}.", caseId, safeEmail);
-                return StatusCode(500, $"Error occurred for {caseId} for {safeEmail}.");
+                _logger.LogError(ex, "Error occurred for {CaseId} for {Email}.", caseId, email);
+                return StatusCode(500);
             }
         }
 
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
         [HttpPost("faceid")]
         public async Task<IActionResult> FaceId(FaceData data)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-            data.Email = data.Email.Replace("\n", "").Replace("\r", "").Trim();
             try
             {
+                if (data == null)
+                {
+                    return BadRequest("Request body cannot be null or empty.");
+                }
+                if (data.Image == null || string.IsNullOrEmpty(data.LocationLatLong))
+                {
+                    return BadRequest("All fields (Image, LatLong) are required and must be valid.");
+                }
+
                 var vendorUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == data.Email && c.Role == AppRoles.AGENT);
 
                 if (vendorUser == null || vendorUser.Role != AppRoles.AGENT || !vendorUser.Active)
@@ -653,22 +656,26 @@ namespace risk.control.system.Controllers.Mobile
             }
             catch (Exception ex)
             {
-                var safeEmail = (data.Email ?? string.Empty).Replace("\n", "").Replace("\r", "").Trim();
-                _logger.LogError(ex, "Error occurred for {Email}.", safeEmail);
-                return StatusCode(500, $"Error occurred for {safeEmail}");
+                _logger.LogError(ex, "Error occurred for {Email}.", data.Email);
+                return StatusCode(500);
             }
         }
 
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
         [HttpPost("documentid")]
         public async Task<IActionResult> DocumentId(DocumentData data)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-            data.Email = data.Email.Replace("\n", "").Replace("\r", "").Trim();
             try
             {
+                if (data == null)
+                {
+                    return BadRequest("Request body cannot be null or empty.");
+                }
+                if (data.Image == null || string.IsNullOrEmpty(data.LocationLatLong))
+                {
+                    return BadRequest("All fields (Image, LatLong) are required and must be valid.");
+                }
+
                 var vendorUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == data.Email && c.Role == AppRoles.AGENT);
 
                 if (vendorUser == null || vendorUser.Role != AppRoles.AGENT || !vendorUser.Active)
@@ -688,19 +695,15 @@ namespace risk.control.system.Controllers.Mobile
             }
             catch (Exception ex)
             {
-                var safeEmail = (data.Email ?? string.Empty).Replace("\n", "").Replace("\r", "").Trim();
-                _logger.LogError(ex, "Error occurred for {Email}.", safeEmail);
-                return StatusCode(500, $"Error occurred for {safeEmail}");
+                _logger.LogError(ex, "Error occurred for {Email}.", data.Email);
+                return StatusCode(500);
             }
         }
 
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
         [HttpPost("media")]
         public async Task<IActionResult> Media(DocumentData data)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
             try
             {
                 if (data == null)
@@ -737,26 +740,18 @@ namespace risk.control.system.Controllers.Mobile
             }
             catch (Exception ex)
             {
-                var safeEmail = (data.Email ?? string.Empty).Replace("\n", "").Replace("\r", "").Trim();
-                _logger.LogError(ex, "Error occurred for {Email}.", safeEmail);
-                return StatusCode(500, $"Error occurred for {safeEmail}");
+                _logger.LogError(ex, "Error occurred for {Email}.", data.Email);
+                return StatusCode(500);
             }
         }
 
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
         [HttpPost("answers")]
         public async Task<IActionResult> Answers(string email, string LocationLatLong, string locationName, long caseId, List<QuestionTemplate> Questions)
         {
             try
             {
-                var isDataValid = !string.IsNullOrWhiteSpace(email) &&
-                    !string.IsNullOrEmpty(LocationLatLong) &&
-                    !string.IsNullOrEmpty(locationName) && caseId > 0 || Questions != null || Questions!.Any();
-                if (!isDataValid)
-                {
-                    return BadRequest("Invalid input parameters. Email, LocationLatLong, locationName, caseId and Questions are required.");
-                }
-                email = email.Replace("\n", "").Replace("\r", "").Trim();
-                foreach (var question in Questions!)
+                foreach (var question in Questions)
                 {
                     if (question.IsRequired && string.IsNullOrEmpty(question.AnswerText))
                     {
@@ -776,25 +771,22 @@ namespace risk.control.system.Controllers.Mobile
             }
             catch (Exception ex)
             {
-                var safeEmail = (email ?? string.Empty).Replace("\n", "").Replace("\r", "").Trim();
-                _logger.LogError(ex, "Error occurred for {Email}.", safeEmail);
-                return StatusCode(500, $"Error occurred for {safeEmail}");
+                _logger.LogError(ex, "Error occurred for {CaseId} for {Email}.", caseId, email);
+                return StatusCode(500);
             }
         }
 
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
         [HttpPost("submit")]
         public async Task<IActionResult> Submit(SubmitData data)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-            data.Email = data.Email.Replace("\n", "").Replace("\r", "").Trim();
             try
             {
-                bool isDataValid = !string.IsNullOrWhiteSpace(data.Email) && !string.IsNullOrWhiteSpace(data.Remarks) && data.CaseId >= 1;
-
-                if (!isDataValid)
+                if (data == null)
+                {
+                    return BadRequest("Request body cannot be null or empty.");
+                }
+                if (string.IsNullOrWhiteSpace(data.Email) || string.IsNullOrWhiteSpace(data.Remarks) || data.CaseId < 1)
                 {
                     return BadRequest("All fields (Email, Remarks, CaseId) are required and must be valid.");
                 }
@@ -819,9 +811,8 @@ namespace risk.control.system.Controllers.Mobile
             }
             catch (Exception ex)
             {
-                var safeEmail = (data.Email ?? string.Empty).Replace("\n", "").Replace("\r", "").Trim();
-                _logger.LogError(ex, "Error occurred for {Email}.", safeEmail);
-                return StatusCode(500, $"Error occurred for {safeEmail}.");
+                _logger.LogError(ex, "Error occurred for {Email}.", data.Email);
+                return StatusCode(500);
             }
         }
     }
