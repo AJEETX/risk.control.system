@@ -87,10 +87,10 @@ namespace risk.control.system.Services.Api
                             : a.BeneficiaryDetail!.PinCode!.Code),
                 6 => isAsc ? query.OrderBy(a => a.CustomerDetail!.Name) : query.OrderByDescending(a => a.CustomerDetail!.Name),
                 8 => isAsc ? query.OrderBy(a => a.BeneficiaryDetail!.Name) : query.OrderByDescending(a => a.BeneficiaryDetail!.Name),
-                9 => isAsc ? query.OrderBy(a => $"{a.PolicyDetail!.InsuranceType!.GetEnumDisplayName()} ({a.PolicyDetail.InvestigationServiceType!.Name})") : query.OrderByDescending(a => $"{a.PolicyDetail!.InsuranceType!.GetEnumDisplayName()} ({a.PolicyDetail!.InvestigationServiceType!.Name})"),
+                9 => isAsc ? query.OrderBy(a => a.PolicyDetail!.InvestigationServiceType!.Name) : query.OrderByDescending(a => a.PolicyDetail!.InvestigationServiceType!.Name),
                 10 => isAsc ? query.OrderBy(a => a.SubStatus) : query.OrderByDescending(a => a.SubStatus),
                 11 => isAsc ? query.OrderBy(a => a.Created) : query.OrderByDescending(a => a.Created),
-                _ => isAsc ? query.OrderBy(a => a.Updated) : query.OrderByDescending(a => a.Updated)
+                _ => isAsc ? query.OrderBy(a => a.Created) : query.OrderByDescending(a => a.Created)
             };
 
             var pagedList = await query

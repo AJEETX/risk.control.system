@@ -42,7 +42,7 @@ namespace risk.control.system.Services.Api
 
         public async Task<object> GetAuto(string currentUserEmail, int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc")
         {
-            var companyUser = await context.ApplicationUser.AsNoTracking().Include(c => c.Country).Include(c => c.ClientCompany)
+            var companyUser = await context.ApplicationUser.AsNoTracking().Include(c => c.Country)
                 .Where(c => c.Email == currentUserEmail)
                 .FirstOrDefaultAsync();
 
@@ -83,19 +83,17 @@ namespace risk.control.system.Services.Api
                 2 => isAsc ? query.OrderBy(a => (double)a.PolicyDetail!.SumAssuredValue) : query.OrderByDescending(a => (double)a.PolicyDetail!.SumAssuredValue),
                 3 => isAsc
                     ? query.OrderBy(a =>
-                        a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING
+                        a.PolicyDetail!.InsuranceType == InsuranceType.UNDERWRITING
                             ? a.CustomerDetail.PinCode.Code
                             : a.BeneficiaryDetail.PinCode.Code)
                     : query.OrderByDescending(a =>
                         a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING
                             ? a.CustomerDetail.PinCode.Code
                             : a.BeneficiaryDetail.PinCode.Code),
-                4 => isAsc ? query.OrderBy(a => a.ClientCompany.Name) : query.OrderByDescending(a => a.ClientCompany.Name),
-                5 => isAsc ? query.OrderBy(a => a.PolicyDetail.InsuranceType) : query.OrderByDescending(a => a.PolicyDetail.InsuranceType),
+
                 6 => isAsc ? query.OrderBy(a => a.CustomerDetail.Name) : query.OrderByDescending(a => a.CustomerDetail.Name),
-                7 => isAsc ? query.OrderBy(a => a.Status) : query.OrderByDescending(a => a.Status),
                 8 => isAsc ? query.OrderBy(a => a.BeneficiaryDetail.Name) : query.OrderByDescending(a => a.BeneficiaryDetail.Name),
-                9 => isAsc ? query.OrderBy(a => a.PolicyDetail.InvestigationServiceType.Name) : query.OrderByDescending(a => a.PolicyDetail.InvestigationServiceType.Name),
+                9 => isAsc ? query.OrderBy(a => a.PolicyDetail!.InvestigationServiceType!.Name) : query.OrderByDescending(a => a.PolicyDetail!.InvestigationServiceType!.Name),
                 10 => isAsc ? query.OrderBy(a => a.ORIGIN) : query.OrderByDescending(a => a.ORIGIN),
                 11 => isAsc ? query.OrderBy(a => a.Created) : query.OrderByDescending(a => a.Created),
                 12 => isAsc ? query.OrderBy(a => a.Updated) : query.OrderByDescending(a => a.Updated),
@@ -128,16 +126,16 @@ namespace risk.control.system.Services.Api
                     customerImagePath = a.CustomerDetail != null ? a.CustomerDetail.ImagePath : Applicationsettings.NO_USER,
                     CustomerLocationMap = a.CustomerDetail.CustomerLocationMap,
                     customerAddressline = a.CustomerDetail != null ? a.CustomerDetail.Addressline : string.Empty,
-                    customerDistrict = a.CustomerDetail != null ? a.CustomerDetail.District.Name : string.Empty,
-                    customerState = a.CustomerDetail != null ? a.CustomerDetail.State.Name : string.Empty,
-                    customerPincode = a.CustomerDetail != null ? a.CustomerDetail.PinCode.Code : 0,
+                    customerDistrict = a.CustomerDetail != null ? a.CustomerDetail.District!.Name : string.Empty,
+                    customerState = a.CustomerDetail != null ? a.CustomerDetail.State!.Name : string.Empty,
+                    customerPincode = a.CustomerDetail != null ? a.CustomerDetail.PinCode!.Code : 0,
                     BeneficiaryName = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.Name : null,
                     beneficiaryImagePath = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.ImagePath : Applicationsettings.NO_USER,
                     BeneficiaryLocationMap = a.BeneficiaryDetail.BeneficiaryLocationMap,
                     beneficiaryAddressline = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.Addressline : string.Empty,
-                    beneficiaryDistrict = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.District.Name : string.Empty,
-                    beneficiaryState = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.State.Name : string.Empty,
-                    beneficiaryPincode = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.PinCode.Code : 0,
+                    beneficiaryDistrict = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.District!.Name : string.Empty,
+                    beneficiaryState = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.State!.Name : string.Empty,
+                    beneficiaryPincode = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.PinCode!.Code : 0,
                 }).ToListAsync();
 
             int recordsFiltered = await query.CountAsync();
@@ -198,7 +196,7 @@ namespace risk.control.system.Services.Api
                     TimeElapsed = timeElapsed,
                     BeneficiaryFullName = i.BeneficiaryName ?? "?",
                     CustomerFullName = i.CustomerName ?? "?",
-                    PersonMapAddressUrl = personMapAddressUrl
+                    PersonMapAddressUrl = personMapAddressUrl!
                 };
             });
 
@@ -230,7 +228,6 @@ namespace risk.control.system.Services.Api
         {
             var companyUser = await context.ApplicationUser.AsNoTracking()
                 .Include(u => u.Country)
-                .Include(u => u.ClientCompany)
                 .FirstOrDefaultAsync(c => c.Email == currentUserEmail);
 
             var query = context.Investigations.AsNoTracking().Where(a => !a.Deleted && a.CreatedUser == currentUserEmail);
@@ -264,7 +261,7 @@ namespace risk.control.system.Services.Api
 
             int recordsFiltered = await query.CountAsync();
 
-            bool isAsc = orderDir == "asc";
+            bool isAsc = string.Equals(orderDir, "asc", StringComparison.OrdinalIgnoreCase);
             query = orderColumn switch
             {
                 0 => isAsc ? query.OrderBy(a => a.PolicyDetail!.ContractNumber) : query.OrderByDescending(a => a.PolicyDetail!.ContractNumber),
@@ -280,7 +277,7 @@ namespace risk.control.system.Services.Api
                             : a.BeneficiaryDetail!.PinCode!.Code),
                 6 => isAsc ? query.OrderBy(a => a.CustomerDetail!.Name) : query.OrderByDescending(a => a.CustomerDetail!.Name),
                 8 => isAsc ? query.OrderBy(a => a.BeneficiaryDetail!.Name) : query.OrderByDescending(a => a.BeneficiaryDetail!.Name),
-                9 => isAsc ? query.OrderBy(a => $"{a.PolicyDetail!.InsuranceType!.GetEnumDisplayName()} ({a.PolicyDetail!.InvestigationServiceType!.Name})") : query.OrderByDescending(a => $"{a.PolicyDetail.InsuranceType.GetEnumDisplayName()} ({a.PolicyDetail.InvestigationServiceType.Name})"),
+                9 => isAsc ? query.OrderBy(a => a.PolicyDetail!.InvestigationServiceType!.Name) : query.OrderByDescending(a => a.PolicyDetail!.InvestigationServiceType!.Name),
                 10 => isAsc ? query.OrderBy(a => a.SubStatus) : query.OrderByDescending(a => a.SubStatus),
                 11 => isAsc ? query.OrderBy(a => a.Created) : query.OrderByDescending(a => a.Created),
                 _ => isAsc ? query.OrderBy(a => a.Updated) : query.OrderByDescending(a => a.Updated)
