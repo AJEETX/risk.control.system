@@ -36,7 +36,8 @@ namespace risk.control.system.Services.Agent
 
                 using (var image = Image.Load(inputStream))
                 {
-                    // --- 1. AUTO-RESIZE (Optional: 1200px max width) ---
+                    image.Mutate(x => x.AutoOrient());
+                    // --- CRITICAL FIX 1: AutoOrient ---
                     const int maxWidth = 1200;
                     if (image.Width > maxWidth)
                     {
@@ -47,7 +48,8 @@ namespace risk.control.system.Services.Agent
                         }));
                     }
 
-                    // --- 2. AUTO-SCALE CALCULATIONS (Based on new size) ---
+                    // --- AUTO-SCALE CALCULATIONS ---
+                    // Recalculate base scale after AutoOrient, just in case orientation swapped Width/Height
                     float baseScale = Math.Min(image.Width, image.Height);
                     float mainFontSize = baseScale * 0.12f;
                     float dateFontSize = baseScale * 0.045f;
@@ -57,7 +59,7 @@ namespace risk.control.system.Services.Agent
                     float borderThickness = Math.Max(1f, baseScale * 0.005f);
                     float shadowOffset = Math.Max(1f, mainFontSize * 0.04f);
 
-                    // --- 3. SETUP FONTS ---
+                    // Setup Fonts (Standard Arial or First Available)
                     if (!SystemFonts.Collection.TryGet("Arial", out var family))
                         family = SystemFonts.Collection.Families.First();
 
@@ -68,7 +70,7 @@ namespace risk.control.system.Services.Agent
 
                     image.Mutate(ctx =>
                     {
-                        // --- 4. SCALED TIMESTAMP (Top Right) ---
+                        // --- 1. FIXED TIMESTAMP (Top Right) ---
                         var dateOptions = new RichTextOptions(dateFont)
                         {
                             HorizontalAlignment = HorizontalAlignment.Right,
@@ -87,7 +89,7 @@ namespace risk.control.system.Services.Agent
                         ctx.Draw(Color.Gray.WithAlpha(0.5f), borderThickness / 2, dateRect);
                         ctx.DrawText(dateOptions, timestamp, Color.Black.WithAlpha(0.8f));
 
-                        // --- 5. SCALED SLANTED WATERMARK ---
+                        // --- 2. FIXED SLANTED WATERMARK ---
                         var centerPoint = new PointF(image.Width / 2, image.Height * 0.85f);
                         float radians = -20f * (MathF.PI / 180f);
                         var rotationMatrix = Matrix3x2.CreateRotation(radians, centerPoint);
@@ -106,7 +108,7 @@ namespace risk.control.system.Services.Agent
                             textSize.Width + (hPadding * 2),
                             textSize.Height + (vPadding * 2));
 
-                        // Final vertical nudge for visual centering
+                        // Standard visual nudge for All-Caps centering
                         float verticalNudge = mainFont.Size * 0.15f;
                         var textLocation = new PointF(
                             centerPoint.X - (textSize.Width / 2),
@@ -115,22 +117,24 @@ namespace risk.control.system.Services.Agent
 
                         IPath slantedRectPath = new RectangularPolygon(mainRect).Transform(rotationMatrix);
 
-                        // Draw background and border
-                        //ctx.Fill(Color.Black.WithAlpha(0.6f), slantedRectPath);
+                        // --- CRITICAL FIX 3: Solid Background for 3D Text ---
+                        // In your 'broken' image, the 3D effect is messy. 
+                        // A very dark, mostly opaque background provides a clean 'stamp' surface.
+                        //ctx.Fill(Color.Black.WithAlpha(0.9f), slantedRectPath);
                         ctx.Draw(Color.Silver, borderThickness, slantedRectPath);
 
-                        // --- 6. SCALED 3D TEXT LAYERS ---
+                        // --- 3D TEXT LAYERS (No conflicts now thanks to AutoOrient) ---
                         var textDrawOptions = new DrawingOptions { Transform = rotationMatrix };
 
                         // Shadow
                         ctx.DrawText(textDrawOptions, watermarkText, mainFont, Color.Black,
                                      new PointF(textLocation.X + shadowOffset, textLocation.Y + shadowOffset));
 
-                        // Main Text
+                        // Main Text (White)
                         ctx.DrawText(textDrawOptions, watermarkText, mainFont, Color.White, textLocation);
                     });
 
-                    // Save with Jpeg Quality compression
+                    // Save with dynamic Jpeg Quality
                     image.Save(outputStream, new JpegEncoder { Quality = quality });
                 }
 
@@ -139,7 +143,7 @@ namespace risk.control.system.Services.Agent
             catch (UnknownImageFormatException ex)
             {
                 _logger.LogError(ex, "Format Error: Data is not a valid image.");
-                return imageBytes;
+                return imageBytes; // Return original on error
             }
         }
 
