@@ -2541,7 +2541,7 @@ input#checkall {
 }
 
 .isNewAssigned {
-    background-color: #FCFCC4;
+    background-color: #d4edda; /* Light green background */
 }
 
 #notificationList {

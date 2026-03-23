@@ -140,7 +140,7 @@
                     var buttons = '';
                     buttons += `<a data-id="${row.id}" class="btn btn-xs btn-warning"><i class="fas fa-edit"></i> Edit</a> &nbsp;`;
                     if (row.role !== "AGENCY_ADMIN") {
-                        buttons += `<a data-id="${row.id}" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i> Delete</a>`;
+                        buttons += `<button data-id="${row.id}" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i> Delete</button>`;
                     } else {
                         buttons += '<button disabled class="btn btn-xs btn-danger"><i class="fa fa-trash"></i> Delete</button>';
                     }
@@ -233,12 +233,12 @@
         $(selector).html(`<i class='fas fa-sync fa-spin'></i> ${spinnerText}`);
     }
     // Event delegation for dynamically generated Edit and Delete buttons
-    $('body').on('click', 'a.btn-warning', function (e) {
+    $('body').on('click', '.btn-warning', function (e) {
         e.preventDefault();
         const id = $(this).data('id');
         showedit(id, this);
     });
-    $('body').on('click', 'a.btn-danger', function (e) {
+    $('body').on('click', '.btn-danger', function (e) {
         e.preventDefault();
         const id = $(this).data('id');
         showdetail(id, this);

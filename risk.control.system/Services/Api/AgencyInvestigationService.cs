@@ -109,8 +109,8 @@ namespace risk.control.system.Services.Api
                             x.PolicyDetail!.InsuranceType == InsuranceType.UNDERWRITING
                                 ? x.CustomerDetail!.PinCode!.Code
                                 : x.BeneficiaryDetail!.PinCode!.Code),
-                8 => asc ? query.OrderBy(x => x.PolicyDetail!.InsuranceType!.GetEnumDisplayName())
-                                                         : query.OrderByDescending(x => x.PolicyDetail!.InsuranceType!.GetEnumDisplayName()),
+                8 => asc ? query.OrderBy(x => x.PolicyDetail!.InsuranceType)
+                                                         : query.OrderByDescending(x => x.PolicyDetail!.InsuranceType),
                 9 => asc ? query.OrderBy(x => x.PolicyDetail!.InvestigationServiceType!.Name)
                                          : query.OrderByDescending(x => x.PolicyDetail!.InvestigationServiceType!.Name),
                 11 => asc ? query.OrderBy(x => x.Created)
@@ -120,13 +120,13 @@ namespace risk.control.system.Services.Api
                             a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR
                                 ? a.AllocatedToAgencyTime
                                 : a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR
-                                    ? a.ReviewByAssessorTime
+                                    ? a.EnquiredByAssessorTime
                                     : a.Updated)
                         : query.OrderByDescending(a =>
                             a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR
                                 ? a.AllocatedToAgencyTime
                                 : a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR
-                                    ? a.ReviewByAssessorTime
+                                    ? a.EnquiredByAssessorTime
                                     : a.Updated),
                 _ => query.OrderByDescending(x => x.Updated)
             };
@@ -155,7 +155,7 @@ namespace risk.control.system.Services.Api
                     a.ORIGIN,
                     a.IsNewAssignedToAgency,
                     a.AssignedToAgency,
-                    a.ReviewByAssessorTime,
+                    a.EnquiredByAssessorTime,
                     CustomerName = a.CustomerDetail != null ? a.CustomerDetail.Name : null,
                     customerImagePath = a.CustomerDetail != null ? a.CustomerDetail.ImagePath : Applicationsettings.NO_USER,
                     CustomerLocationMap = a.CustomerDetail!.CustomerLocationMap,
@@ -182,8 +182,8 @@ namespace risk.control.system.Services.Api
                     GetTimeElapsed = DateTime.UtcNow.Subtract(
                         (a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR && a.AllocatedToAgencyTime.HasValue) ?
                         a.AllocatedToAgencyTime.Value :
-                        (a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR && a.ReviewByAssessorTime.HasValue) ?
-                        a.ReviewByAssessorTime.Value : a.Created).TotalSeconds
+                        (a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR && a.EnquiredByAssessorTime.HasValue) ?
+                        a.EnquiredByAssessorTime.Value : a.Created).TotalSeconds
                 }).ToListAsync();
 
             // -----------------------------
@@ -780,6 +780,8 @@ namespace risk.control.system.Services.Api
                          : query.OrderByDescending(x => x.ClientCompany!.Name),
                 4 => asc ? query.OrderBy(x => (x.PolicyDetail!.InsuranceType == InsuranceType.UNDERWRITING) ? x.CustomerDetail!.PinCode!.Code : x.BeneficiaryDetail!.PinCode!.Code)
                             : query.OrderByDescending(x => (x.PolicyDetail!.InsuranceType == InsuranceType.UNDERWRITING) ? x.CustomerDetail!.PinCode!.Code : x.BeneficiaryDetail!.PinCode!.Code),
+                5 => asc ? query.OrderBy(x => x.SelectedAgentDrivingDistance) : query.OrderByDescending(x => x.SelectedAgentDrivingDistance),
+                6 => asc ? query.OrderBy(x => x.SelectedAgentDrivingDistance) : query.OrderByDescending(x => x.SelectedAgentDrivingDistance),
                 7 => asc
                         ? query.OrderBy(x =>
                             x.PolicyDetail!.InsuranceType == InsuranceType.UNDERWRITING
@@ -791,11 +793,19 @@ namespace risk.control.system.Services.Api
                                 : x.BeneficiaryDetail!.PinCode!.Code),
                 8 => asc ? query.OrderBy(x => x.PolicyDetail!.InsuranceType!.GetEnumDisplayName())
                                                          : query.OrderByDescending(x => x.PolicyDetail!.InsuranceType!.GetEnumDisplayName()),
-                9 => asc ? query.OrderBy(x => x.PolicyDetail!.InvestigationServiceType!.Name)
-                                         : query.OrderByDescending(x => x.PolicyDetail!.InvestigationServiceType!.Name),
-                10 => asc ? query.OrderBy(x => x.Created)
+                9 => asc ? query.OrderBy(x => x.PolicyDetail!.InsuranceType == InsuranceType.UNDERWRITING
+                                ? x.CustomerDetail!.Name
+                                : x.BeneficiaryDetail!.Name)
+                                         : query.OrderByDescending(x => x.PolicyDetail!.InsuranceType == InsuranceType.UNDERWRITING
+                                ? x.CustomerDetail!.Name
+                                : x.BeneficiaryDetail!.Name),
+                10 => asc ? query.OrderBy(x => x.PolicyDetail!.InsuranceType)
+                                         : query.OrderByDescending(x => x.PolicyDetail!.InsuranceType),
+                11 => asc ? query.OrderBy(x => x.PolicyDetail!.InvestigationServiceType!.Name)
+                : query.OrderByDescending(x => x.PolicyDetail!.InvestigationServiceType!.Name),
+                12 => asc ? query.OrderBy(x => x.Created)
                 : query.OrderByDescending(x => x.Created),
-                11 => asc
+                13 => asc
                         ? query.OrderBy(x => x.SubmittedToSupervisorTime == null)
                                .ThenByDescending(x => x.SubmittedToSupervisorTime)
                         : query.OrderBy(x => x.SubmittedToSupervisorTime == null)
