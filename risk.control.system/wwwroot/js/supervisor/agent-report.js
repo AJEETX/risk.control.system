@@ -187,6 +187,9 @@
         "rowCallback": function (row, data, index) {
             if (data.isNewAssigned) {
                 $('td', row).addClass('isNewAssigned');
+                setTimeout(function () {
+                    $('td', row).removeClass('isNewAssigned');
+                }, 3000);
             }
         },
         "drawCallback": function (settings, start, end, max, total, pre) {
