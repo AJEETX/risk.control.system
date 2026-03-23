@@ -16,7 +16,7 @@
                     length: d.length || 10,
                     caseType: $('#caseTypeFilter').val() || "",  // Send selected filter value
                     search: d.search?.value || "", // Instead of empty string, send "all"
-                    orderColumn: d.order?.[0]?.column ?? 15,
+                    orderColumn: d.order?.[0]?.column ?? 11,
                     orderDir: d.order?.[0]?.dir || "asc"
                 };
             },
@@ -48,10 +48,10 @@
                 targets: 9                      // Index of the column to style
             },
             {
-                'targets': 16, // Index for the "Case Type" column
+                'targets': 15, // Index for the "Case Type" column
                 'name': 'policy' // Name for the "Case Type" column
             }],
-        order: [[15, 'asc']],
+        order: [[11, 'asc']],
         responsive: true,
         fixedHeader: true,
         processing: true,
@@ -189,12 +189,12 @@
                     return buttons;
                 }
             },
-            {
-                "data": "timePending",
-                "mRender": function (data, type, row) {
-                    return '<span title="' + row.timePending + '" data-bs-toggle="tooltip">' + data + '</span>'
-                }
-            },
+            //{
+            //    "data": "timePending",
+            //    "mRender": function (data, type, row) {
+            //        return '<span title="' + row.timePending + '" data-bs-toggle="tooltip">' + data + '</span>'
+            //    }
+            //},
             {
                 "sDefaultContent": "",
                 "bSortable": false,

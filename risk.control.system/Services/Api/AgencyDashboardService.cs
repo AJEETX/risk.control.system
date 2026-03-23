@@ -108,7 +108,7 @@ namespace risk.control.system.Services.Api
         private async Task<int> GetSuperVisorActiveCount(string userEmail)
         {
             await using var _context = contextFactory.CreateDbContext();
-            var vendorUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
+            var vendorUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == userEmail);
             var query = GetAgencyClaims(_context).Where(a => a.VendorId == vendorUser!.VendorId && a.Status != finished);
 
             if (vendorUser!.IsVendorAdmin)
@@ -126,14 +126,14 @@ namespace risk.control.system.Services.Api
         private async Task<int> GetAgencyVerifiedCount(string userEmail)
         {
             await using var _context = contextFactory.CreateDbContext();
-            var vendorUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
+            var vendorUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == userEmail);
             return await GetAgencyClaims(_context).CountAsync(i => i.VendorId == vendorUser!.VendorId && i.SubStatus == submitted2Supervisor);
         }
 
         private async Task<int> GetAgencyAllocateCount(string userEmail)
         {
             await using var _context = contextFactory.CreateDbContext();
-            var vendorUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
+            var vendorUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == userEmail);
             return await GetAgencyClaims(_context).CountAsync(i => i.VendorId == vendorUser!.VendorId &&
                 (i.SubStatus == allocated || i.SubStatus == requestedAssessor));
         }
@@ -141,7 +141,7 @@ namespace risk.control.system.Services.Api
         private async Task<int> GetAgencyyCompleted(string userEmail)
         {
             await using var _context = contextFactory.CreateDbContext();
-            var agencyUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
+            var agencyUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == userEmail);
             var query = GetAgencyClaims(_context).Where(c => c.VendorId == agencyUser!.VendorId && c.Status == finished);
 
             if (agencyUser!.IsVendorAdmin)

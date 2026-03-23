@@ -85,7 +85,14 @@ namespace risk.control.system.Services
                 2 => isAsc ? query.OrderBy(i => i.PolicyDetail!.SumAssuredValue) : query.OrderByDescending(i => i.PolicyDetail!.SumAssuredValue),
                 3 => isAsc ? query.OrderBy(i => i.Vendor!.Name) : query.OrderByDescending(i => i.Vendor!.Name),
                 4 => isAsc ? query.OrderBy(i => i.Created) : query.OrderByDescending(i => i.Created),
-                _ => query.OrderByDescending(i => i.Created) // Default sort
+                5 => isAsc ? query.OrderBy(i => i.SelectedAgentDrivingDistance) : query.OrderByDescending(i => i.SelectedAgentDrivingDistance),
+                9 => isAsc ? query.OrderBy(i => i.CustomerDetail.Name) : query.OrderByDescending(i => i.CustomerDetail.Name),
+                11 => isAsc ? query.OrderBy(i => i.BeneficiaryDetail.Name) : query.OrderByDescending(i => i.BeneficiaryDetail.Name),
+                12 => isAsc ? query.OrderBy(i => i.PolicyDetail.InsuranceType) : query.OrderByDescending(i => i.PolicyDetail.InsuranceType),
+                13 => isAsc ? query.OrderBy(i => i.Created) : query.OrderByDescending(i => i.Created),
+                15 => isAsc ? query.OrderBy(i => i.SubmittedToAssessorTime != null ? i.SubmittedToAssessorTime : i.Created) :
+                query.OrderByDescending(i => i.SubmittedToAssessorTime != null ? i.SubmittedToAssessorTime : i.Created),
+                _ => query.OrderByDescending(i => i.SubmittedToAssessorTime != null ? i.SubmittedToAssessorTime : i.Created) // Default sort
             };
 
             // 5. Server-Side Paging & Projection
@@ -269,11 +276,16 @@ namespace risk.control.system.Services
             bool isAsc = orderDir == "asc";
             query = orderColumn switch
             {
-                1 => isAsc ? query.OrderBy(i => i.PolicyDetail!.ContractNumber) : query.OrderByDescending(i => i.PolicyDetail!.ContractNumber),
-                2 => isAsc ? query.OrderBy(i => i.PolicyDetail!.SumAssuredValue) : query.OrderByDescending(i => i.PolicyDetail!.SumAssuredValue),
+                1 => isAsc ? query.OrderBy(i => i.PolicyDetail!.SumAssuredValue) : query.OrderByDescending(i => i.PolicyDetail!.SumAssuredValue),
                 3 => isAsc ? query.OrderBy(i => i.Vendor!.Name) : query.OrderByDescending(i => i.Vendor!.Name),
-                4 => isAsc ? query.OrderBy(i => i.Created) : query.OrderByDescending(i => i.Created),
-                _ => query.OrderByDescending(i => i.Created) // Default sort
+                4 => isAsc ? query.OrderBy(i => i.SelectedAgentDrivingDistance) : query.OrderByDescending(i => i.SelectedAgentDrivingDistance),
+                8 => isAsc ? query.OrderBy(i => i.CustomerDetail.Name) : query.OrderByDescending(i => i.CustomerDetail.Name),
+                10 => isAsc ? query.OrderBy(i => i.BeneficiaryDetail.Name) : query.OrderByDescending(i => i.BeneficiaryDetail.Name),
+                11 => isAsc ? query.OrderBy(i => i.PolicyDetail.InsuranceType) : query.OrderByDescending(i => i.PolicyDetail.InsuranceType),
+                12 => isAsc ? query.OrderBy(i => i.Created) : query.OrderByDescending(i => i.Created),
+                14 => isAsc ? query.OrderBy(i => i.EnquiredByAssessorTime != null ? i.EnquiredByAssessorTime : i.Created) :
+                query.OrderByDescending(i => i.EnquiredByAssessorTime != null ? i.EnquiredByAssessorTime : i.Created),
+                _ => query.OrderBy(i => i.EnquiredByAssessorTime != null ? i.EnquiredByAssessorTime : i.Created) // Default sort
             };
 
             // 5. Server-Side Paging & Projection
@@ -386,7 +398,7 @@ namespace risk.control.system.Services
             };
         }
 
-        public static string GetAssessorReviewTime(DateTime EnquiredByAssessorTime, int AssessorSla)
+        private static string GetAssessorReviewTime(DateTime EnquiredByAssessorTime, int AssessorSla)
         {
             DateTime time2Compare = EnquiredByAssessorTime;
             if (DateTime.UtcNow.Subtract(time2Compare).Days >= AssessorSla)
@@ -572,7 +584,7 @@ namespace risk.control.system.Services
             };
         }
 
-        public static string GetAssessorCompletedTime(DateTime ProcessedByAssessorTime)
+        private static string GetAssessorCompletedTime(DateTime ProcessedByAssessorTime)
         {
             DateTime time2Compare = ProcessedByAssessorTime;
 

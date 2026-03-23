@@ -126,7 +126,7 @@ namespace risk.control.system.Services.Agency
         {
             try
             {
-                var caseTask = await context.Investigations.AsNoTracking()
+                var caseTask = await context.Investigations
                     .Include(c => c.InvestigationReport)
                     .Include(c => c.PolicyDetail)
                     .Include(c => c.CustomerDetail)
