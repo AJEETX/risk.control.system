@@ -34,7 +34,7 @@
                     start: d.start || 0,
                     length: d.length || 10,
                     search: d.search?.value || "", // Instead of empty string, send "all"
-                    orderColumn: d.order?.[0]?.column ?? 12, // Default to column 15
+                    orderColumn: d.order?.[0]?.column ?? 14, // Default to column 15
                     orderDir: d.order?.[0]?.dir || "desc"
                 };
             },
@@ -73,7 +73,7 @@
             className: 'max-width-column-name', // Apply the CSS class,
             targets: 11                      // Index of the column to style
         }],
-        order: [[12, 'asc']],
+        order: [[14, 'asc']],
         responsive: true,
         fixedHeader: true,
         processing: true,
