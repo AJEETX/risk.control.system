@@ -139,6 +139,9 @@ $(document).ready(function () {
         "rowCallback": function (row, data, index) {
             if (data.isNewAssigned) {
                 $('td', row).addClass('isNewAssigned');
+                setTimeout(function () {
+                    $('td', row).removeClass('isNewAssigned');
+                }, 3000);
             }
         }
     });

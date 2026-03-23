@@ -27,16 +27,15 @@ namespace risk.control.system.Services.Agency
 
         public async Task<InvestigationTask> ProcessAgentReport(string userEmail, string supervisorRemarks, long caseId, SupervisorRemarkType reportUpdateStatus, IFormFile? document = null, string editRemarks = "")
         {
-            var sanitizedEmail = userEmail?.Replace("\n", "").Replace("\r", "");
 
-            return await ApproveAgentReport(sanitizedEmail, caseId, supervisorRemarks, reportUpdateStatus, document, editRemarks);
+            return await ApproveAgentReport(userEmail, caseId, supervisorRemarks, reportUpdateStatus, document, editRemarks);
         }
 
         public async Task<(Vendor, string)> SubmitToVendorSupervisor(string userEmail, long caseId, string remarks)
         {
             try
             {
-                var agent = await context.ApplicationUser.Include(u => u.Vendor).FirstOrDefaultAsync(a => a.Email.Trim().ToLower() == userEmail.Trim().ToLower());
+                var agent = await context.ApplicationUser.AsNoTracking().Include(u => u.Vendor).FirstOrDefaultAsync(a => a.Email == userEmail.Trim().ToLower());
 
                 var submitted2Supervisor = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR;
 
@@ -44,10 +43,10 @@ namespace risk.control.system.Services.Agency
                     .FirstOrDefaultAsync(c => c.Id == caseId);
 
                 caseTask.Updated = DateTime.UtcNow;
-                caseTask.UpdatedBy = agent.Email;
+                caseTask.UpdatedBy = agent!.Email;
                 caseTask.SubStatus = submitted2Supervisor;
                 caseTask.SubmittedToSupervisorTime = DateTime.UtcNow;
-                caseTask.CaseOwner = agent.Vendor.Email;
+                caseTask.CaseOwner = agent.Vendor!.Email;
                 var claimReport = caseTask.InvestigationReport;
 
                 claimReport.AgentRemarks = remarks;
@@ -60,14 +59,14 @@ namespace risk.control.system.Services.Agency
 
                 await timelineService.UpdateTaskStatus(caseTask.Id, userEmail);
 
-                return (agent.Vendor, caseTask.PolicyDetail.ContractNumber);
+                return (agent.Vendor, caseTask.PolicyDetail!.ContractNumber);
             }
             catch (Exception ex)
             {
                 var sanitizedEmail = userEmail?.Replace("\n", "").Replace("\r", "");
 
                 logger.LogError(ex, "Error occurred submit case {Id}. {UserEmail}", caseId, sanitizedEmail);
-                return (null, string.Empty);
+                return (null!, string.Empty);
             }
         }
 
@@ -89,7 +88,7 @@ namespace risk.control.system.Services.Agency
                 caseTask.Updated = DateTime.UtcNow;
                 caseTask.UpdatedBy = userEmail;
                 caseTask.SubStatus = submitted2Assessor;
-                caseTask.CaseOwner = caseTask.ClientCompany.Email;
+                caseTask.CaseOwner = caseTask.ClientCompany!.Email;
                 caseTask.SubmittedToAssessorTime = DateTime.UtcNow;
                 var report = caseTask.InvestigationReport;
                 var edited = report.AgentRemarks.Trim() != editRemarks.Trim();

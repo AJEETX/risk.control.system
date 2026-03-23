@@ -30,7 +30,6 @@ namespace risk.control.system.Services.Api
     {
         private readonly IDbContextFactory<ApplicationDbContext> _contextFactory;
         private readonly IAgencyInvestigationServiceService agencyInvestigationServiceService;
-        private readonly ILogger<AgencyApiService> logger;
         private readonly ICompanyAgencyApiService empanelledAvailableAgencyService;
         private readonly IAgencyAgentService agencyAgentService;
         private readonly IBase64FileService base64FileService;
@@ -38,14 +37,12 @@ namespace risk.control.system.Services.Api
         public AgencyApiService(
             IDbContextFactory<ApplicationDbContext> contextFactory,
             IAgencyInvestigationServiceService agencyInvestigationServiceService,
-            ILogger<AgencyApiService> logger,
             ICompanyAgencyApiService empanelledAvailableAgencyService,
             IAgencyAgentService agencyAgentService,
             IBase64FileService base64FileService)
         {
             _contextFactory = contextFactory;
             this.agencyInvestigationServiceService = agencyInvestigationServiceService;
-            this.logger = logger;
             this.empanelledAvailableAgencyService = empanelledAvailableAgencyService;
             this.agencyAgentService = agencyAgentService;
             this.base64FileService = base64FileService;

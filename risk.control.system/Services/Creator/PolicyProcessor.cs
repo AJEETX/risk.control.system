@@ -71,49 +71,51 @@ namespace risk.control.system.Services.Creator
         private async Task<InvestigationServiceType> GetServiceType(string code, InsuranceType type)
         {
             using var context = await _contextFactory.CreateDbContextAsync();
-            if (string.IsNullOrWhiteSpace(code))
+
+            // 1. Prepare the search term to ensure the query is "SARGable" (index-friendly)
+            var normalizedCode = code?.Trim().ToLower();
+            var hasCode = !string.IsNullOrWhiteSpace(normalizedCode);
+
+            // 2. Try the most specific match first
+            InvestigationServiceType service = null!;
+
+            if (hasCode)
             {
-                var service = await context.InvestigationServiceType.FirstOrDefaultAsync(i => i.InsuranceType == type);
-                if (service == null)
-                {
-                    service = await context.InvestigationServiceType.FirstOrDefaultAsync();
-                }
-                return service;
+                service = await context.InvestigationServiceType
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(s => s.Code.ToLower() == normalizedCode && s.InsuranceType == type);
             }
-            else
+
+            // 3. Fallback 1: Match by InsuranceType only
+            if (service == null)
             {
-                var services = await context.InvestigationServiceType
-                .FirstOrDefaultAsync(b => b.Code.ToLower() == code.ToLower() && b.InsuranceType == type);
-                if (services == null)
-                {
-                    services = await context.InvestigationServiceType.FirstOrDefaultAsync(b => b.InsuranceType == type);
-                    if (services == null)
-                    {
-                        services = await context.InvestigationServiceType.FirstOrDefaultAsync();
-                    }
-                }
-                return services;
+                service = await context.InvestigationServiceType
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(s => s.InsuranceType == type);
             }
+
+            // 4. Fallback 2: Get the absolute default (first record)
+            return service ?? await context.InvestigationServiceType.AsNoTracking().FirstOrDefaultAsync();
         }
 
         private async Task<CaseEnabler> GetCaseEnabler(string reason)
         {
             using var context = await _contextFactory.CreateDbContextAsync();
             if (string.IsNullOrWhiteSpace(reason))
-                return await context.CaseEnabler.FirstOrDefaultAsync();
+                return await context.CaseEnabler.AsNoTracking().FirstOrDefaultAsync();
 
-            return await context.CaseEnabler.FirstOrDefaultAsync(c => c.Code.ToLower() == reason.Trim().ToLower())
-                ?? await context.CaseEnabler.FirstOrDefaultAsync();
+            return await context.CaseEnabler.AsNoTracking().FirstOrDefaultAsync(c => c.Code.ToLower() == reason.Trim().ToLower())
+                ?? await context.CaseEnabler.AsNoTracking().FirstOrDefaultAsync();
         }
 
         private async Task<CostCentre> GetCostCentre(string department)
         {
             using var context = await _contextFactory.CreateDbContextAsync();
             if (string.IsNullOrWhiteSpace(department))
-                return await context.CostCentre.FirstOrDefaultAsync();
+                return await context.CostCentre.AsNoTracking().FirstOrDefaultAsync();
 
-            return await context.CostCentre.FirstOrDefaultAsync(c => c.Code.ToLower() == department.Trim().ToLower())
-                ?? await context.CostCentre.FirstOrDefaultAsync();
+            return await context.CostCentre.AsNoTracking().FirstOrDefaultAsync(c => c.Code.ToLower() == department.Trim().ToLower())
+                ?? await context.CostCentre.AsNoTracking().FirstOrDefaultAsync();
         }
     }
 }
