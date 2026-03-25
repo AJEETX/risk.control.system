@@ -49,12 +49,18 @@ namespace risk.control.system.Controllers.Common
         [HttpGet]
         public async Task<IActionResult> Download(string fileName)
         {
-            // 1. Security: Path.GetFileName prevents directory traversal (e.g., "../../appsettings.json")
             var safeFileName = Path.GetFileName(fileName);
 
-            // 2. Point to your specific Logs directory
+            string logsDirectory = Path.GetFullPath(Path.Combine(_env.ContentRootPath, "Logs"));
+
             var relativePath = Path.Combine("Logs", safeFileName);
-            var fullPath = Path.Combine(_env.ContentRootPath, relativePath);
+            var fullPath = Path.GetFullPath(Path.Combine(_env.ContentRootPath, relativePath));
+
+            if (!fullPath.StartsWith(logsDirectory, StringComparison.OrdinalIgnoreCase))
+            {
+                _logger.LogWarning("Malicious path detected: {FileName}", safeFileName);
+                return BadRequest("Invalid file name.");
+            }
 
             if (!System.IO.File.Exists(fullPath))
             {
@@ -62,8 +68,6 @@ namespace risk.control.system.Controllers.Common
                 return NotFound("Log file not found.");
             }
 
-            // 3. Serve the file efficiently
-            // We specify the content type and the download name for the browser
             return PhysicalFile(fullPath, "application/json", safeFileName);
         }
     }
