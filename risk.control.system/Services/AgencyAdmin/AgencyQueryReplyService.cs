@@ -41,6 +41,7 @@ namespace risk.control.system.Services.AgencyAdmin
                 caseTask!.CaseOwner = caseTask.ClientCompany!.Email;
                 caseTask.SubStatus = replyByAgency;
                 caseTask.UpdatedBy = userEmail;
+                caseTask.AllocatingSupervisordEmail = userEmail;
                 caseTask.AssignedToAgency = false;
                 caseTask.EnquiryReplyByAgencyTime = DateTime.UtcNow;
                 caseTask.SubmittedToAssessorTime = DateTime.UtcNow;
