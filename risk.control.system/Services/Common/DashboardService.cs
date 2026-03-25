@@ -63,7 +63,7 @@ namespace risk.control.system.Services.Common
             }
 
             var claimsCases = _context.Investigations.AsNoTracking()
-               .Include(c => c.PolicyDetail).Where(c => c.PolicyDetail.InsuranceType == insuranceType &&
+               .Include(c => c.PolicyDetail).Where(c => c.PolicyDetail!.InsuranceType == insuranceType &&
                !c.Deleted && c.VendorId.HasValue &&
                                 (c.SubStatus == allocatedStatus ||
                                 c.SubStatus == assignedToAgentStatus ||
@@ -73,7 +73,7 @@ namespace risk.control.system.Services.Common
             int countOfCases = 0;
             foreach (var claimsCase in claimsCases)
             {
-                if (!vendorCaseCount.TryGetValue(claimsCase.VendorId.Value.ToString(), out countOfCases))
+                if (!vendorCaseCount.TryGetValue(claimsCase.VendorId!.Value.ToString(), out countOfCases))
                 {
                     vendorCaseCount.Add(claimsCase.VendorId.Value.ToString(), 1);
                 }
@@ -125,24 +125,24 @@ namespace risk.control.system.Services.Common
                             c.Status == CONSTANTS.CASE_STATUS.INPROGRESS &&
                             c.SubStatus == assignedToAgentStatus &&
                             c.TaskedAgentEmail != null)
-                .GroupBy(c => c.TaskedAgentEmail.Trim().ToLower())
+                .GroupBy(c => c.TaskedAgentEmail!.Trim().ToLower())
                 .Select(g => new { Email = g.Key, Count = g.Count() })
                 .ToListAsync();
 
             // 4. Merge results into the final dictionary
-            var result = agentEmails.ToDictionary(email => email, _ => 0);
+            var result = agentEmails.ToDictionary(email => email!, _ => 0);
 
             foreach (var item in caseCountsByAgent)
             {
                 // Find the original casing email in our dictionary to update the count
-                var match = agentEmails.FirstOrDefault(e => e.Trim().ToLower() == item.Email);
+                var match = agentEmails.FirstOrDefault(e => e!.Trim().ToLower() == item.Email);
                 if (match != null)
                 {
                     result[match] = item.Count;
                 }
             }
 
-            return result;
+            return result!;
         }
 
         public async Task<Dictionary<string, (int count1, int count2)>> CalculateCaseChart(string userEmail)
@@ -176,7 +176,7 @@ namespace risk.control.system.Services.Common
                     foreach (var _case in cases)
                     {
                         var caseCurrentStatus = _case.OrderByDescending(o => o.Created).FirstOrDefault();
-                        if (userSubStatuses.Contains(caseCurrentStatus.SubStatus) &&
+                        if (userSubStatuses!.Contains(caseCurrentStatus!.SubStatus) &&
                             caseCurrentStatus.Created > monthName.Date &&
                             caseCurrentStatus.Created <= monthName.AddMonths(1))
                         {
@@ -214,7 +214,7 @@ namespace risk.control.system.Services.Common
                     foreach (var _case in cases)
                     {
                         var caseCurrentStatus = _case.OrderByDescending(o => o.Created).FirstOrDefault();
-                        if (userSubStatuses.Contains(caseCurrentStatus.SubStatus) && caseCurrentStatus.Created > monthName.Date && caseCurrentStatus.Created <= monthName.AddMonths(1))
+                        if (userSubStatuses!.Contains(caseCurrentStatus!.SubStatus) && caseCurrentStatus.Created > monthName.Date && caseCurrentStatus.Created <= monthName.AddMonths(1))
                         {
                             if (caseCurrentStatus.PolicyDetail!.InsuranceType == InsuranceType.CLAIM)
                             {
@@ -247,7 +247,7 @@ namespace risk.control.system.Services.Common
                         (companyUser.Role == AppRoles.ASSESSOR || companyUser.IsClientAdmin || d.UpdatedBy == userEmail) &&
                        d.ClientCompanyId == companyUser.ClientCompanyId &&
                        d.Created > DateTime.UtcNow.AddMonths(-7) && !d.Deleted);
-                var userSubStatuses = tdetail.Select(s => s.SubStatus).Distinct()?.ToList();
+                var userSubStatuses = tdetail.Select(s => s.SubStatus).Distinct().ToList();
 
                 var cases = tdetail.GroupBy(g => g.Id);
 
@@ -259,7 +259,7 @@ namespace risk.control.system.Services.Common
                     {
                         var caseCurrentStatus = _case.OrderByDescending(o => o.Created).FirstOrDefault();
 
-                        if (caseCurrentStatus.PolicyDetail.InsuranceType == InsuranceType.CLAIM && !caseCurrentStatus.Deleted)
+                        if (caseCurrentStatus!.PolicyDetail!.InsuranceType == InsuranceType.CLAIM && !caseCurrentStatus.Deleted)
                         {
                             claimsWithSameStatus.Add(caseCurrentStatus);
                         }
@@ -280,7 +280,7 @@ namespace risk.control.system.Services.Common
                         (vendorUser.IsVendorAdmin ? true : d.UpdatedBy == userEmail) &&
                      d.VendorId == vendorUser.VendorId &&
                        d.Created > DateTime.UtcNow.AddMonths(-7) && !d.Deleted);
-                var userSubStatuses = tdetail.Select(s => s.SubStatus).Distinct()?.ToList();
+                var userSubStatuses = tdetail.Select(s => s.SubStatus).Distinct().ToList();
 
                 var cases = tdetail.GroupBy(g => g.Id);
 
@@ -292,7 +292,7 @@ namespace risk.control.system.Services.Common
                     {
                         var caseCurrentStatus = _case.OrderByDescending(o => o.Created).FirstOrDefault();
 
-                        if (caseCurrentStatus.PolicyDetail.InsuranceType == InsuranceType.CLAIM && !caseCurrentStatus.Deleted)
+                        if (caseCurrentStatus!.PolicyDetail!.InsuranceType == InsuranceType.CLAIM && !caseCurrentStatus.Deleted)
                         {
                             claimsWithSameStatus.Add(caseCurrentStatus);
                         }
@@ -325,9 +325,9 @@ namespace risk.control.system.Services.Common
                     (companyUser.Role == AppRoles.ASSESSOR || companyUser.IsClientAdmin || d.UpdatedBy == userEmail) &&
                     d.Created > DateTime.UtcNow.AddDays(-28) && !d.Deleted);
 
-                var userSubStatuses = tdetail.Select(s => s.SubStatus).Distinct()?.ToList();
+                var userSubStatuses = tdetail.Select(s => s.SubStatus).Distinct().ToList();
 
-                var caseLogs = tdetail.GroupBy(g => g.SubStatus)?.ToList();
+                var caseLogs = tdetail.GroupBy(g => g.SubStatus).ToList();
 
                 var workDays = new List<int> { 1, 2, 3, 4, 5 };
                 var casesWithSameStatus = new List<InvestigationTask> { };
@@ -363,9 +363,9 @@ namespace risk.control.system.Services.Common
                     (vendorUser.IsVendorAdmin || d.UpdatedBy == userEmail) &&
                     d.Created > DateTime.UtcNow.AddDays(-28) && !d.Deleted);
 
-                var userSubStatuses = tdetail.Select(s => s.SubStatus).Distinct()?.ToList();
+                var userSubStatuses = tdetail.Select(s => s.SubStatus).Distinct().ToList();
 
-                var caseLogs = tdetail.GroupBy(g => g.SubStatus)?.ToList();
+                var caseLogs = tdetail.GroupBy(g => g.SubStatus).ToList();
 
                 var workDays = new List<int> { 1, 2, 3, 4, 5 };
                 var casesWithSameStatus = new List<InvestigationTask> { };
@@ -415,7 +415,7 @@ namespace risk.control.system.Services.Common
                     (companyUser.Role == AppRoles.ASSESSOR || companyUser.IsClientAdmin || d.UpdatedBy == userEmail) &&
                     d.ClientCompanyId == companyUser.ClientCompanyId);
 
-                var userSubStatuses = tdetail.Select(s => s.SubStatus).Distinct()?.ToList();
+                var userSubStatuses = tdetail.Select(s => s.SubStatus).Distinct().ToList();
 
                 var cases = tdetail.GroupBy(g => g.Id);
 
@@ -429,7 +429,7 @@ namespace risk.control.system.Services.Common
 
                         if (caseCurrentStatus != null && caseCurrentStatus.SubStatus == subStatus && !caseCurrentStatus.Deleted)
                         {
-                            if (caseCurrentStatus.PolicyDetail.InsuranceType == InsuranceType.CLAIM)
+                            if (caseCurrentStatus.PolicyDetail!.InsuranceType == InsuranceType.CLAIM)
                             {
                                 claimsWithSameStatus.Add(caseCurrentStatus);
                             }
@@ -448,7 +448,7 @@ namespace risk.control.system.Services.Common
                     (vendorUser.IsVendorAdmin || d.UpdatedBy == userEmail) &&
                     d.VendorId == vendorUser.VendorId && !d.Deleted);
 
-                var userSubStatuses = tdetail.Select(s => s.SubStatus).Distinct()?.ToList();
+                var userSubStatuses = tdetail.Select(s => s.SubStatus).Distinct().ToList();
 
                 var cases = tdetail.GroupBy(g => g.Id);
 
@@ -460,7 +460,7 @@ namespace risk.control.system.Services.Common
                     {
                         var caseCurrentStatus = _case.OrderByDescending(o => o.Created).FirstOrDefault();
 
-                        if (caseCurrentStatus.PolicyDetail.InsuranceType == InsuranceType.CLAIM && !caseCurrentStatus.Deleted)
+                        if (caseCurrentStatus!.PolicyDetail!.InsuranceType == InsuranceType.CLAIM && !caseCurrentStatus.Deleted)
                         {
                             claimsWithSameStatus.Add(caseCurrentStatus);
                         }
@@ -510,7 +510,7 @@ namespace risk.control.system.Services.Common
                     ) &&
                     d.ClientCompanyId == companyUser.ClientCompanyId);
 
-                var userSubStatuses = tdetail.Select(s => s.SubStatus).Distinct()?.ToList();
+                var userSubStatuses = tdetail.Select(s => s.SubStatus).Distinct().ToList();
 
                 var cases = tdetail.GroupBy(g => g.Id);
 
@@ -524,7 +524,7 @@ namespace risk.control.system.Services.Common
                         if (caseCurrentStatus != null &&
                             caseCurrentStatus.SubStatus == subStatus &&
                             !caseCurrentStatus.Deleted &&
-                            caseCurrentStatus.PolicyDetail.InsuranceType == insuranceType)
+                            caseCurrentStatus.PolicyDetail!.InsuranceType == insuranceType)
                         {
                             casesWithSameStatus.Add(caseCurrentStatus);
                         }
@@ -538,7 +538,7 @@ namespace risk.control.system.Services.Common
                     (vendorUser.IsVendorAdmin || d.UpdatedBy == userEmail) &&
                     d.VendorId == vendorUser.VendorId);
 
-                var userSubStatuses = tdetail.Select(s => s.SubStatus).Distinct()?.ToList();
+                var userSubStatuses = tdetail.Select(s => s.SubStatus).Distinct().ToList();
 
                 var cases = tdetail.GroupBy(g => g.Id);
 
@@ -563,13 +563,13 @@ namespace risk.control.system.Services.Common
 
     public class TatDetail
     {
-        public string Name { get; set; }
-        public List<int> Data { get; set; }
+        public string Name { get; set; } = default!;
+        public List<int> Data { get; set; } = default!;
     }
 
     public class TatResult
     {
-        public List<TatDetail> TatDetails { get; set; }
+        public List<TatDetail> TatDetails { get; set; } = default!;
         public int Count { get; set; }
     }
 }

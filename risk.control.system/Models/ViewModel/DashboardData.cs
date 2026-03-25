@@ -2,25 +2,25 @@
 {
     public class DashboardData
     {
-        public string FirstBlockName { get; set; }
+        public string FirstBlockName { get; set; } = default!;
         public int FirstBlockCount { get; set; }
         public string FirstBlockUrl { get; set; } = string.Empty;
 
-        public string SecondBlockName { get; set; }
+        public string SecondBlockName { get; set; } = default!;
         public int SecondBlockCount { get; set; }
         public string SecondBlockUrl { get; set; } = string.Empty;
-        public string SecondBBlockName { get; set; }
+        public string SecondBBlockName { get; set; } = default!;
         public int SecondBBlockCount { get; set; }
         public string SecondBBlockUrl { get; set; } = string.Empty;
-        public string ThirdBlockName { get; set; }
+        public string ThirdBlockName { get; set; } = default!;
         public int ThirdBlockCount { get; set; }
         public string ThirdBlockUrl { get; set; } = string.Empty;
 
-        public string LastBlockName { get; set; }
+        public string LastBlockName { get; set; } = default!;
         public int LastBlockCount { get; set; }
         public string LastBlockUrl { get; set; } = string.Empty;
 
-        public string BulkUploadBlockName { get; set; }
+        public string BulkUploadBlockName { get; set; } = default!;
         public int BulkUploadBlockCount { get; set; }
         public int BulkUploadAssignCount { get; set; }
         public string BulkUploadBlockUrl { get; set; } = string.Empty;

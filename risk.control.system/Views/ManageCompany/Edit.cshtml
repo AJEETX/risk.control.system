@@ -16,15 +16,15 @@
 				</div>
 				<input type="hidden" asp-for="ClientCompanyId" />
 				<input type="hidden" id="CountryId" value="@Model?.CountryId" />
-				<input type="hidden" id="Isd" value="@Model?.Country.ISDCode" />
-				<input type="hidden" id="countryCode" value="@Model?.Country.Code" />
+				<input type="hidden" id="Isd" value="@Model?.Country?.ISDCode" />
+				<input type="hidden" id="countryCode" value="@Model?.Country?.Code" />
 				<input asp-for="SelectedCountryId" type="hidden" id="SelectedCountryId" name="SelectedCountryId" value="@Model?.CountryId" />
 
 				<div asp-validation-summary="ModelOnly" class="text-danger"></div>
 				<div class="row">
 					<div class="col-md-6">
 						<div class="bg-light p-3 rounded mb-3 border">
-							<i class="fas fa fa-globe mr-2"></i>Company Domain: <span class="font-weight-bold blue">@Model.Email</span>
+							<i class="fas fa fa-globe mr-2"></i>Company Domain: <span class="font-weight-bold blue">@Model?.Email</span>
 
 							<input type="hidden" id="email" asp-for="Email" />
 
@@ -35,7 +35,7 @@
 							</h6>
 						<div class="form-group text-center">
 							<div class="profile-img-container mb-2">
-								<img id="createProfileImage" class="form-Image" src="/Document/GetCompanyDocument/@Model.ClientCompanyId" title="Logo" alt="Logo" data-bs-toggle="tooltip" />
+								<img id="createProfileImage" class="form-Image" src="/Document/GetCompanyDocument/@Model?.ClientCompanyId" title="Logo" alt="Logo" data-bs-toggle="tooltip" />
 							</div>
 
 							<div class="control-label">Company Logo <i class="fa fa-asterisk asterik-style-logo"></i></div>
@@ -76,10 +76,10 @@
 								<div class="input-group">
 									<div class="input-group-prepend">
 										@{
-											var imgPath = "/flags/" + @Model.Country.Code.ToLower() + ".png";
+											var imgPath = "/flags/" + @Model?.Country?.Code.ToLower() + ".png";
 										}
-										<span class="input-group-text country-code-text" data-bs-toggle="tooltip" title="Country Code :+@Model?.Country.ISDCode">
-											<img src="@imgPath" class="flag-icon" data-bs-toggle="tooltip" title="@Model.Country.Name" alt="flag" />  +@Model?.Country.ISDCode
+										<span class="input-group-text country-code-text" data-bs-toggle="tooltip" title="Country Code :+@Model?.Country?.ISDCode">
+											<img src="@imgPath" class="flag-icon" data-bs-toggle="tooltip" title="@Model?.Country?.Name" alt="flag" />  +@Model?.Country?.ISDCode
 										</span>
 									</div>
 									<input id="PhoneNumber" type="text" asp-for="PhoneNumber" class="form-control remarks" required maxlength="10" placeholder="Mobile # only (e.g., 9876543210)" data-bs-toggle="tooltip" />
@@ -99,7 +99,7 @@
 					</div>
 					<div class="col-md-6">
 						<div class="bg-light p-3 rounded mb-3 border">
-							<i class="fas  fa-lightbulb-o mr-2"></i><span>Active Since:</span> <span class="font-weight-bold"> @Model.ActivatedDate?.ToString("dd-MMM-yyyy")</span>
+							<i class="fas  fa-lightbulb-o mr-2"></i><span>Active Since:</span> <span class="font-weight-bold"> @Model?.ActivatedDate?.ToString("dd-MMM-yyyy")</span>
 						</div>
 						<div class="bg-light p-3 rounded mb-3 border">
 							<h6 class="text-secondary border-bottom pb-2 mb-3">
@@ -181,12 +181,12 @@
 							<label class="input-group-label" for="StateText"> State:</label>
 							<div class="input-group mb-3 autocomplete-wrapper">
 								@{
-									var img = "/flags/" + @Model.Country.Code.ToLower() + ".png";
+									var img = "/flags/" + @Model?.Country?.Code.ToLower() + ".png";
 								}
 								<div class="input-group-prepend">
 
-									<span class="input-group-text country-code-text" data-bs-toggle="tooltip" title="Registered Country: @Model?.Country.Name">
-										<img src="@img" class="flag-icon" data-bs-toggle="tooltip" alt="flag" /> @Model?.Country.Code<i class="fa fa-asterisk asterik-style-info"></i>
+									<span class="input-group-text country-code-text" data-bs-toggle="tooltip" title="Registered Country: @Model?.Country?.Name">
+										<img src="@img" class="flag-icon" data-bs-toggle="tooltip" alt="flag" /> @Model?.Country?.Code<i class="fa fa-asterisk asterik-style-info"></i>
 									</span>
 								</div>
 								<input readonly type="text" id="StateText" class="form-control remarks" data-placeholder="state" data-bs-toggle="tooltip" placeholder="..." tabindex="-1" title="Auto-selected based on Pincode" />

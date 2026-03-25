@@ -64,12 +64,12 @@ namespace risk.control.system.Services.Api
                  u.DocumentUrl,
                  u.Email,
                  u.Name,
-                 ISDCode = u.Country.ISDCode,
+                 ISDCode = u.Country!.ISDCode,
                  u.Addressline,
-                 DistrictName = u.District.Name,
-                 StateCode = u.State.Code,
+                 DistrictName = u.District!.Name,
+                 StateCode = u.State!.Code,
                  CountryCode = u.Country.Code,
-                 PinCodeValue = $"{u.PinCode.Name} - {u.PinCode.Code}",
+                 PinCodeValue = $"{u.PinCode!.Name} - {u.PinCode.Code}",
                  u.Status,
                  u.Updated,
                  u.Created,
@@ -80,7 +80,7 @@ namespace risk.control.system.Services.Api
 
             var result = agencyData.Select(async u =>
             {
-                var documentImage = await base64FileService.GetBase64FileAsync(u.DocumentUrl, Applicationsettings.NO_IMAGE);
+                var documentImage = await base64FileService.GetBase64FileAsync(u.DocumentUrl!, Applicationsettings.NO_IMAGE);
 
                 return new
                 {
@@ -92,11 +92,11 @@ namespace risk.control.system.Services.Api
                     Country = u.CountryCode,
                     Flag = $"/flags/{u.CountryCode.ToLower()}.png",
                     Pincode = u.PinCodeValue,
-                    Status = $"<span class='badge badge-light'>{u.Status.GetEnumDisplayName()}</span>",
+                    Status = $"<span class='badge badge-light'>{u.Status!.GetEnumDisplayName()}</span>",
                     Updated = (u.Updated ?? u.Created).ToString("dd-MM-yyyy"),
                     u.UpdatedBy,
                     VendorName = u.Email,
-                    RawStatus = u.Status.GetEnumDisplayName(),
+                    RawStatus = u.Status!.GetEnumDisplayName(),
                     u.IsUpdated,
                     LastModified = u.Updated
                 };

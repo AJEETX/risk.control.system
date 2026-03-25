@@ -1,5 +1,4 @@
-﻿using System.Net;
-using System.Reflection;
+﻿using System.Reflection;
 using System.Threading.RateLimiting;
 using AspNetCoreHero.ToastNotification;
 using Microsoft.AspNetCore.Http.Features;
@@ -23,8 +22,6 @@ namespace risk.control.system.StartupExtensions
                 options.IncludeSubDomains = true;              // apply to all subdomains
                 options.Preload = true;                        // optional, for browser preload lists
             });
-
-            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls13;
 
             services.AddBreadcrumbs(Assembly.GetExecutingAssembly(), options =>
             {
@@ -109,8 +106,8 @@ namespace risk.control.system.StartupExtensions
                         partitionKey: partitionKey,
                         factory: _ => new FixedWindowRateLimiterOptions
                         {
-                            PermitLimit = int.Parse(configuration["RateLimit:PerUserOrIP"]),               // ⬅ max requests
-                            Window = TimeSpan.FromMinutes(int.Parse(configuration["RateLimit:PerUserOrIPWindowInMinute"])),
+                            PermitLimit = int.Parse(configuration["RateLimit:PerUserOrIP"]!),               // ⬅ max requests
+                            Window = TimeSpan.FromMinutes(int.Parse(configuration["RateLimit:PerUserOrIPWindowInMinute"]!)),
                             QueueLimit = 0,
                             AutoReplenishment = true
                         });

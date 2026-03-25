@@ -37,7 +37,7 @@ namespace risk.control.system.Services.Common
                             c.VendorId.HasValue &&
                             c.AssignedToAgency &&
                             relevantStatuses.Contains(c.SubStatus))
-                .GroupBy(c => c.VendorId.Value)
+                .GroupBy(c => c.VendorId!.Value)
                 .ToDictionary(g => g.Key, g => g.Count());
 
             // Create the list of VendorIdWithCases

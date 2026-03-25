@@ -44,7 +44,7 @@ namespace risk.control.system.Models
         public virtual ClientCompany? ClientCompany { get; set; }
 
         [Display(Name = "Note To Recipient")]
-        public string NoteToRecipient { get; set; }
+        public string NoteToRecipient { get; set; } = default!;
 
         [Display(Name = "Sub Total")]
         public decimal SubTotal { get; set; }

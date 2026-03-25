@@ -120,7 +120,7 @@ namespace risk.control.system.Services.Api
             await using var _context = _contextFactory.CreateDbContext();
             var companyUser = await _context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == userEmail);
             var empAgencies = await _context.ClientCompany.Include(c => c.EmpanelledVendors).FirstOrDefaultAsync(c => c.ClientCompanyId == companyUser!.ClientCompanyId);
-            var count = empAgencies.EmpanelledVendors.Count(v => !v.Deleted);
+            var count = empAgencies!.EmpanelledVendors.Count(v => !v.Deleted);
             return count;
         }
 

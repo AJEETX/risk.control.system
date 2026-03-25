@@ -22,7 +22,7 @@ namespace risk.control.system.Services.Common
             var caseTask = await _context.Investigations
                .Include(c => c.CaseNotes)
                .FirstOrDefaultAsync(c => c.Id == claimId);
-            caseTask.CaseNotes.Add(new CaseNote
+            caseTask!.CaseNotes!.Add(new CaseNote
             {
                 Comment = notes,
                 SenderEmail = userEmail,

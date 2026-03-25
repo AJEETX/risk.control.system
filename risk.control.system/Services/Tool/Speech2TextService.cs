@@ -1,4 +1,4 @@
-﻿using System.Net;
+﻿using System.Text.Json;
 using Amazon.S3;
 using Amazon.S3.Model;
 using Amazon.S3.Transfer;
@@ -17,17 +17,19 @@ namespace risk.control.system.Services.Tool
     {
         private readonly IAmazonS3 s3Client;
         private readonly IAmazonTranscribeService transcribeClient;
+        private readonly IHttpClientFactory clientFactory;
 
-        public Speech2TextService(IAmazonS3 s3Client, IAmazonTranscribeService transcribeClient)
+        public Speech2TextService(IAmazonS3 s3Client, IAmazonTranscribeService transcribeClient, IHttpClientFactory clientFactory)
         {
             this.s3Client = s3Client;
             this.transcribeClient = transcribeClient;
+            this.clientFactory = clientFactory;
         }
 
         public async Task<string> ConvertSpeech(Speech2TextData input)
         {
             string bucketName = "icheckify-bucket";
-            string fileName = $"{Guid.NewGuid()}_{input.SpeechInputData.FileName}";
+            string fileName = $"{Guid.NewGuid()}_{input.SpeechInputData!.FileName}";
             string transcribedText = "";
 
             try
@@ -80,13 +82,23 @@ namespace risk.control.system.Services.Tool
 
                 if (status.TranscriptionJobStatus == TranscriptionJobStatus.COMPLETED)
                 {
-                    // 5. Download the result JSON
-                    using (var webClient = new WebClient())
+
+                    var httpClient = clientFactory.CreateClient();
+                    try
                     {
-                        var jsonResult = webClient.DownloadString(status.Transcript.TranscriptFileUri);
-                        // Simple parsing (you might want to use System.Text.Json for complex results)
-                        dynamic result = Newtonsoft.Json.JsonConvert.DeserializeObject(jsonResult);
-                        transcribedText = result.results.transcripts[0].transcript;
+                        // Use the optimized GetFromJsonAsync to skip the manual string-to-json step
+                        var result = await httpClient.GetFromJsonAsync<JsonElement>(status.Transcript.TranscriptFileUri);
+
+                        // Access the data using System.Text.Json's property navigation
+                        transcribedText = result.GetProperty("results")
+                                                .GetProperty("transcripts")[0]
+                                                .GetProperty("transcript")
+                                                .GetString()!;
+                    }
+                    catch (HttpRequestException e)
+                    {
+                        // Handle potential connection issues (like the one in your earlier logs!)
+                        Console.WriteLine($"Request error: {e.Message}");
                     }
                 }
             }

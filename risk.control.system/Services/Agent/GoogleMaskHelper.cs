@@ -23,7 +23,7 @@ namespace risk.control.system.Services.Agent
                     Style = SKPaintStyle.Fill
                 };
 
-                var allText = textAnnotations.FirstOrDefault().Description;
+                var allText = textAnnotations.FirstOrDefault()!.Description;
 
                 var panTextPre = allText.IndexOf(txt2Find);
 
@@ -95,7 +95,7 @@ namespace risk.control.system.Services.Agent
 
                 var annotation = textAnnotations.FirstOrDefault(t => t.Description.Trim().Equals(passportNumber.Trim(), StringComparison.CurrentCultureIgnoreCase));
 
-                var allVertices = annotation.BoundingPoly.Vertices;
+                var allVertices = annotation!.BoundingPoly.Vertices;
 
                 var left = allVertices[0].X;
 

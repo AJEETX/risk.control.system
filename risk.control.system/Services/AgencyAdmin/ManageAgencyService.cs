@@ -80,7 +80,7 @@ namespace risk.control.system.Services.AgencyAdmin
         public async Task<Vendor> GetVendorAsync(string userEmail, long id)
         {
             var vendor = await _context.Vendor.AsNoTracking().Include(v => v.Country).FirstOrDefaultAsync(v => v.VendorId == id);
-            vendor.SelectedByCompany = await _context.ApplicationUser.AsNoTracking().AnyAsync(u => u.Email == userEmail && u.IsSuperAdmin);
+            vendor!.SelectedByCompany = await _context.ApplicationUser.AsNoTracking().AnyAsync(u => u.Email == userEmail && u.IsSuperAdmin);
 
             return vendor;
         }
@@ -99,16 +99,16 @@ namespace risk.control.system.Services.AgencyAdmin
             var approvedStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR;
             var rejectedStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR;
 
-            var vendorAllCasesCount = await _context.Investigations.CountAsync(c => c.VendorId == vendor.VendorId && !c.Deleted &&
+            var vendorAllCasesCount = await _context.Investigations.CountAsync(c => c.VendorId == vendor!.VendorId && !c.Deleted &&
                       (c.SubStatus == approvedStatus ||
                       c.SubStatus == rejectedStatus));
 
-            var vendorUserCount = await _context.ApplicationUser.CountAsync(c => c.VendorId == vendor.VendorId && !c.Deleted);
+            var vendorUserCount = await _context.ApplicationUser.CountAsync(c => c.VendorId == vendor!.VendorId && !c.Deleted);
 
             // HACKY
-            var currentCases = await _agencyCaseLoadService.GetAgencyIdsLoad(new List<long> { vendor.VendorId });
+            var currentCases = await _agencyCaseLoadService.GetAgencyIdsLoad(new List<long> { vendor!.VendorId });
             vendor.UserCount = vendorUserCount;
-            vendor.CurrentCasesCount = currentCases.FirstOrDefault().CaseCount;
+            vendor.CurrentCasesCount = currentCases.FirstOrDefault()!.CaseCount;
             vendor.CompletedCasesCount = vendorAllCasesCount;
             return vendor;
         }
@@ -118,9 +118,9 @@ namespace risk.control.system.Services.AgencyAdmin
             var companyUser = await _context.ApplicationUser.Include(c => c.Country).Include(c => c.ClientCompany).FirstOrDefaultAsync(c => c.Email == userEmail);
             var vendor = new Vendor
             {
-                CountryId = companyUser.ClientCompany.CountryId,
+                CountryId = companyUser!.ClientCompany!.CountryId,
                 Country = companyUser.ClientCompany.Country,
-                SelectedCountryId = companyUser.ClientCompany.CountryId.Value
+                SelectedCountryId = companyUser.ClientCompany.CountryId!.Value
             };
             return vendor;
         }
@@ -156,7 +156,7 @@ namespace risk.control.system.Services.AgencyAdmin
 
                 return (true, $"Agency {vendor.Email} and its users deleted successfully.");
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 await transaction.RollbackAsync();
                 return (false, "Error deleting agency. Please try again.");

@@ -2,19 +2,19 @@
 {
     public class DownloadFileResult
     {
-        public Stream FileStream { get; set; }
-        public string FileName { get; set; }
+        public Stream FileStream { get; set; } = default!;
+        public string FileName { get; set; } = default!;
         public string ContentType { get; set; } = "application/zip";
-        public string ErrorMessage { get; set; }
+        public string ErrorMessage { get; set; } = default!;
         public bool Success => string.IsNullOrEmpty(ErrorMessage);
     }
 
     public class DownloadErrorFileResult
     {
-        public byte[] FileBytes { get; set; } // Added for in-memory data
-        public string FileName { get; set; }
-        public string ContentType { get; set; }
-        public string ErrorMessage { get; set; }
+        public byte[] FileBytes { get; set; } = default!;// Added for in-memory data
+        public string FileName { get; set; } = default!;
+        public string ContentType { get; set; } = default!;
+        public string ErrorMessage { get; set; } = default!;
         public bool Success => string.IsNullOrEmpty(ErrorMessage);
     }
 }

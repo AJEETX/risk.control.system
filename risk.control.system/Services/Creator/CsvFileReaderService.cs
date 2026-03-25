@@ -27,7 +27,7 @@ namespace risk.control.system.Services.Creator
             var validRecords = new List<UploadCase>();
             var errors = new List<string>();
 
-            var filePath = Path.Combine(_environment.ContentRootPath, uploadFileData.FilePath);
+            var filePath = Path.Combine(_environment.ContentRootPath, uploadFileData.FilePath!);
 
             if (!File.Exists(filePath))
             {

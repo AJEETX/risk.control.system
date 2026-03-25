@@ -1,15 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace risk.control.system.Models.ViewModel
 {
     public class FileModel
     {
         public int Id { get; set; }
-        public string Name { get; set; }
-        public string FileType { get; set; }
-        public string Extension { get; set; }
-        public string Description { get; set; }
+        public string Name { get; set; } = default!;
+        public string FileType { get; set; } = default!;
+        public string Extension { get; set; } = default!;
+        public string Description { get; set; } = default!;
         public long? CompanyId { get; set; }
         public bool? Completed { get; set; }
         public string? Icon { get; set; } = "fas fa-sync fa-spin i-grey";
@@ -20,7 +19,7 @@ namespace risk.control.system.Models.ViewModel
         public List<CaseListModel>? CaseIds { get; set; } = new();
         public CREATEDBY AutoOrManual { get; set; } = CREATEDBY.MANUAL;
         public ORIGIN FileOrFtp { get; set; } = ORIGIN.FILE;
-        public string UploadedBy { get; set; }
+        public string UploadedBy { get; set; } = default!;
         public DateTime CreatedOn { get; set; }
         public DateTime? CompletedOn { get; set; }
         public int TimeTakenSeconds { get; set; } = 0;

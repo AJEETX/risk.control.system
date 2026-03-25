@@ -83,6 +83,6 @@ namespace risk.control.system.Models
         public string? SelectedAgentDrivingDuration { get; set; } = default!;
 
         public int? SelectedAgentDrivingDurationInSeconds { get; set; } = default!;
-        public ICollection<InvestigationTimeline> InvestigationTimeline { get; set; }
+        public ICollection<InvestigationTimeline> InvestigationTimeline { get; set; } = new List<InvestigationTimeline>();
     }
 }

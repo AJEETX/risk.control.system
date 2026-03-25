@@ -1,9 +1,9 @@
 ﻿@using risk.control.system.Helpers
 @model CaseTransactionModel
+@using System.Globalization
 
 @{
 	ViewData["Title"] = "Details";
-
 }
 
 <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
@@ -36,7 +36,7 @@
 						<b>@Model.ClaimsInvestigation?.PolicyDetail?.ContractNumber</b>
 					</h2>
 					<p class="text-muted text-sm">
-						Case Type: <b> @Model.ClaimsInvestigation?.PolicyDetail?.InsuranceType.GetEnumDisplayName() </b>
+						Case Type: <b> @Model.ClaimsInvestigation?.PolicyDetail?.InsuranceType?.GetEnumDisplayName() </b>
 					</p>
 					<ul class="ml-4 mb-0 fa-ul text-muted">
 						<li class="small">
@@ -45,7 +45,10 @@
 						</li>
 						<li class="small">
 							<span class="fa-li"><i class="fas fa-money-bill-wave"></i></span>
-							Assured Amount (@Model.Currency): <b> @Model.ClaimsInvestigation?.PolicyDetail?.SumAssuredValue</b>
+							@{
+								var sumAssuredValue = string.Format(@Model.Culture, "{0:c}", @Model.ClaimsInvestigation?.PolicyDetail?.SumAssuredValue);
+							}
+							Assured Amount (@Model.Currency): <b> @sumAssuredValue</b>
 						</li>
 						<li class="small">
 							<span class="fa-li"><i class="fas fa-bolt"></i></span>

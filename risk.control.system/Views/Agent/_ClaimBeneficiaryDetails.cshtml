@@ -15,8 +15,8 @@
 			currentBAgeinYrs = (int)age / 365;
 		}
 	}
-	var map = string.Format(Model.Beneficiary.BeneficiaryLocationMap, "400", "400");
-	var beneficiarySMSCount = Model.CaseTask.CaseMessages.Where(x => !x.IsCustomer).Count();
+	var map = string.Format(Model.Beneficiary?.BeneficiaryLocationMap!, "400", "400");
+	var beneficiarySMSCount = Model.CaseTask?.CaseMessages!.Where(x => !x.IsCustomer).Count();
 
 	<div class="col-12 col-sm-6 d-flex align-items-stretch flex-column">
 		<div class="card bg-light d-flex flex-fill">
@@ -54,7 +54,7 @@
 					<div class="col-7">
 						<h2 class="lead"><b>@Model.Beneficiary?.Name</b></h2>
 						<p class="text-muted text-sm">
-							<b>Relation: </b> @Model.Beneficiary?.BeneficiaryRelation.Name
+							<b>Relation: </b> @Model.Beneficiary?.BeneficiaryRelation?.Name
 						</p>
 						<ul class="ml-4 mb-0 fa-ul text-muted">
 							<li class="small">

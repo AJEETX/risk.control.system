@@ -28,18 +28,18 @@
 		<div id="main-container">
 			<input type="hidden" id="timeout" name="timeout" value="@timeout" />
 			<input type="hidden" id="tools" name="tools" value="true" />
-			@if (SignInManager.IsSignedIn(User))
+			@if (SignInManager.IsSignedIn(User!))
 			{
 				var admin = _context.ApplicationUser.Include(c => c.Country).FirstOrDefault(c => c.Email == userEmail);
 				var navigationModel = new TopNavigation
 				{
-					UserId = admin.Id,
+					UserId = admin!.Id,
 					Email = admin.Email,
 					CanChangePassword = true,
-					CountryCode = admin.Country.Code,
-					Country = $"{admin.Country.Name} ({admin.Country.Code})",
-					IsdCode = $"(+{admin.Country.ISDCode})",
-					CurrencyCode = $"{admin.Country.CurrencyCode} ({CustomExtensions.GetCultureByCountry(admin.Country.Code.ToUpper()).NumberFormat.CurrencySymbol})",
+					CountryCode = admin.Country?.Code,
+					Country = $"{admin.Country?.Name} ({admin.Country?.Code})",
+					IsdCode = $"(+{admin.Country?.ISDCode})",
+					CurrencyCode = $"{admin.Country?.CurrencyCode} ({CustomExtensions.GetCultureByCountry(admin.Country!.Code!.ToUpper()).NumberFormat.CurrencySymbol})",
 					CurrencyName = $"{admin.Country.CurrencyName} ({CustomExtensions.GetCultureByCountry(admin.Country.Code.ToUpper()).NumberFormat.CurrencySymbol})",
 					Language = admin.Country.Language
 				};

@@ -65,25 +65,34 @@ namespace risk.control.system.Controllers.Common
         }
 
         [HttpGet("SearchState")]
-        public IActionResult SearchState(long countryId, string term = "")
+        public async Task<IActionResult> SearchState(long countryId, string term = "")
         {
             try
             {
-                if (string.IsNullOrEmpty(term?.Trim()))
-                    return Ok(_context.State.AsNoTracking().Where(x => x.CountryId == countryId)?
-                        .OrderBy(x => x.Name)
-                     .Take(10)
-                     .Select(x => new { StateId = x.StateId, StateName = x.Name })?.ToList());
+                var searchTerm = term?.Trim();
 
-                var states = _context.State.AsNoTracking().Where(x => x.CountryId == countryId && x.Name.ToLower().Contains(term.ToLower()))
-                        .OrderBy(x => x.Name)
-                     .Take(10)
-                        .Select(c => new
-                        {
-                            StateId = c.StateId,
-                            StateName = c.Name
-                        })?
-                        .ToList();
+                // 2. Build the query
+                var query = _context.State
+                    .AsNoTracking()
+                    .Where(x => x.CountryId == countryId);
+
+                if (!string.IsNullOrWhiteSpace(searchTerm))
+                {
+                    // 3. Use ILike (Postgres) or Like (SQLite) safely
+                    // EF.Functions.Like is the most cross-platform compatible way
+                    // to handle "contains" searches without forcing .ToLower() on the column.
+                    query = query.Where(x => EF.Functions.Like(x.Name, $"%{searchTerm}%"));
+                }
+                ;
+                var states = await query
+                    .OrderBy(x => x.Name)
+                    .Take(10)
+                    .Select(x => new
+                    {
+                        StateId = x.StateId,
+                        StateName = x.Name
+                    })
+                    .ToListAsync();
                 return Ok(states);
             }
             catch (Exception ex)
@@ -94,31 +103,29 @@ namespace risk.control.system.Controllers.Common
         }
 
         [HttpGet("SearchDistrictTerm")]
-        public IActionResult SearchDistrictTerm(long stateId, long countryId, string term = "")
+        public async Task<IActionResult> SearchDistrictTerm(long stateId, long countryId, string term = "")
         {
             try
             {
-                var districts = string.IsNullOrEmpty(term?.Trim())
-                ? _context.District.AsNoTracking()
-                    .Where(x => x.CountryId == countryId && x.StateId == stateId)
+                var searchTerm = term?.Trim();
+                var query = _context.District
+                    .AsNoTracking()
+                    .Where(x => x.CountryId == countryId && x.StateId == stateId);
+
+                if (!string.IsNullOrWhiteSpace(searchTerm))
+                {
+                    query = query.Where(x => EF.Functions.Like(x.Name, $"%{searchTerm}%"));
+                }
+
+                var districts = await query
                     .OrderBy(x => x.Name)
                     .Take(10)
                     .Select(x => new
                     {
                         DistrictId = x.DistrictId,
-                        DistrictName = $"{x.Name}"
+                        DistrictName = x.Name
                     })
-                    .ToList()
-                : _context.District.AsNoTracking()
-                    .Where(x => x.CountryId == countryId && x.StateId == stateId && x.Name.ToLower().Contains(term.ToLower()))
-                    .OrderBy(x => x.Name)
-                    .Take(10)
-                    .Select(x => new
-                    {
-                        DistrictId = x.DistrictId,
-                        DistrictName = $"{x.Name}"
-                    })
-                    .ToList();
+                    .ToListAsync();
 
                 // Add the "ALL DISTRICTS" option to the response
                 var result = new List<object>
@@ -139,41 +146,39 @@ namespace risk.control.system.Controllers.Common
         }
 
         [HttpGet("SearchDistrict")]
-        public IActionResult SearchDistrict(long stateId, long countryId, string term = "")
+        public async Task<IActionResult> SearchDistrict(long stateId, long countryId, string term = "")
         {
             try
             {
-                var districts = string.IsNullOrEmpty(term?.Trim())
-                ? _context.District.AsNoTracking()
-                    .Where(x => x.CountryId == countryId && x.StateId == stateId)
+                var searchTerm = term?.Trim();
+                var query = _context.District
+                    .AsNoTracking()
+                    .Where(x => x.CountryId == countryId && x.StateId == stateId);
+
+                if (!string.IsNullOrWhiteSpace(searchTerm))
+                {
+                    query = query.Where(x => EF.Functions.Like(x.Name, $"%{searchTerm}%"));
+                }
+
+                var districts = await query
                     .OrderBy(x => x.Name)
                     .Take(10)
                     .Select(x => new
                     {
                         DistrictId = x.DistrictId,
-                        DistrictName = $"{x.Name}"
+                        DistrictName = x.Name
                     })
-                    .ToList()
-                : _context.District.AsNoTracking()
-                    .Where(x => x.CountryId == countryId && x.StateId == stateId && x.Name.ToLower().Contains(term.ToLower()))
-                    .OrderBy(x => x.Name)
-                    .Take(10)
-                    .Select(x => new
-                    {
-                        DistrictId = x.DistrictId,
-                        DistrictName = $"{x.Name}"
-                    })
-                    .ToList();
+                    .ToListAsync();
 
                 // Add the "ALL DISTRICTS" option to the response
                 var result = new List<object>
-            {
-                new
                 {
-                    DistrictId = -1, // Special value for "ALL DISTRICTS"
-                    DistrictName = Applicationsettings.ALL_DISTRICT
-                }
-            };
+                    new
+                    {
+                        DistrictId = -1, // Special value for "ALL DISTRICTS"
+                        DistrictName = Applicationsettings.ALL_DISTRICT
+                    }
+                };
 
                 // Append the queried districts to the result
                 result.AddRange(districts);
@@ -312,7 +317,7 @@ namespace risk.control.system.Controllers.Common
 
                 var response = new
                 {
-                    DistrictId = pincode.DistrictId,
+                    DistrictId = pincode!.DistrictId,
                     StateId = pincode.StateId,
                     PincodeName = $"{pincode.Name} - {pincode.Code}",
                     PincodeId = pincode.PinCodeId
@@ -347,9 +352,9 @@ namespace risk.control.system.Controllers.Common
                             Pincode = x.Code,
                             Name = x.Name,
                             StateId = x.StateId,
-                            StateName = x.State.Name,
+                            StateName = x.State!.Name,
                             DistricId = x.DistrictId,
-                            DistrictName = x.District.Name
+                            DistrictName = x.District!.Name
                         })?
                         .ToList();
                     return Ok(allpincodes);
@@ -372,12 +377,12 @@ namespace risk.control.system.Controllers.Common
 
                 if (!string.IsNullOrWhiteSpace(nameFilter))
                 {
+                    var filter = $"%{nameFilter}%";
                     // Search pincodes that match either name or pincode
-                    pincodesQuery = _context.PinCode.AsNoTracking()
-                        .Where(x => x.CountryId == countryId &&
-                        (x.Name.ToLower().Contains(nameFilter.ToLower()) ||
-                        x.Code.ToString().Contains(nameFilter.ToLower()))
-                        );
+                    pincodesQuery = pincodesQuery.Where(x =>
+                        EF.Functions.Like(x.Name, filter) ||
+                        EF.Functions.Like(x.Code.ToString(), filter) // Still heavy, see note below
+                    );
                 }
                 else
                 {
@@ -400,9 +405,9 @@ namespace risk.control.system.Controllers.Common
                             Pincode = x.Code,
                             Name = x.Name,
                             StateId = x.StateId,
-                            StateName = x.State.Name,
+                            StateName = x.State!.Name,
                             DistrictId = x.DistrictId,
-                            DistrictName = x.District.Name
+                            DistrictName = x.District!.Name
                         })?
                     .ToList();
 

@@ -60,8 +60,7 @@ namespace risk.control.system.Models
                    $"Enquiry Request={(EnquiryRequest != null ? EnquiryRequest.ToString() : "null")}, " +
                    $"Enquiry Requests Count={EnquiryRequests?.Count}, " +
                    $"Ai Summary={AiSummary}, " +
-                   $"Ai Summary Updated={AiSummaryUpdated}, " +
-                   $"Report={ReportTemplate.ToString()}";
+                   $"Ai Summary Updated={AiSummaryUpdated}";
         }
 
     }

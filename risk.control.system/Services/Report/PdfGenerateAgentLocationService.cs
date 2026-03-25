@@ -97,7 +97,7 @@ namespace risk.control.system.Services.Report
                         rowBuilder.AddCell().AddParagraph().AddInlineImage(pngBytes)
                       .SetWidth(100);
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
                         rowBuilder.AddCell().AddParagraph().AddText("Invalid image").SetFont(FNT9);
                         throw;

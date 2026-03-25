@@ -51,7 +51,7 @@ namespace risk.control.system.Services.Creator
         public async Task<(string Path, string Extension)> ProcessImage(UploadCase uc, byte[] zipData, List<UploadError> errs, List<string> sums, string imageName, string caseEntityName)
         {
             var extension = Path.GetExtension(imageName).ToLower();
-            var imageData = await caseImageCreationService.GetImagesWithDataInSubfolder(zipData, uc.CaseId?.ToLower(), imageName);
+            var imageData = await caseImageCreationService.GetImagesWithDataInSubfolder(zipData, uc.CaseId?.ToLower()!, imageName);
 
             if (imageData == null)
             {
@@ -70,7 +70,7 @@ namespace risk.control.system.Services.Creator
             if (!await featureManager.IsEnabledAsync(FeatureFlags.VALIDATE_PHONE)) return;
 
             using var context = await _contextFactory.CreateDbContextAsync();
-            var country = await context.Country.FirstOrDefaultAsync(c => c.CountryId == user.ClientCompany.CountryId);
+            var country = await context.Country.FirstOrDefaultAsync(c => c.CountryId == user.ClientCompany!.CountryId);
 
             if (country == null || !phoneService.IsValidMobileNumber(contactNumber, country.ISDCode.ToString()))
             {

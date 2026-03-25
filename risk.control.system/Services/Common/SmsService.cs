@@ -53,7 +53,7 @@ namespace risk.control.system.Services.Common
                 var httpClient = httpClientFactory.CreateClient();
                 httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authToken);
 
-                var newContent = new { message = message, phoneNumbers = new List<string> { mobile }, simNumber = int.Parse(sim) };
+                var newContent = new { message = message, phoneNumbers = new List<string> { mobile }, simNumber = int.Parse(sim!) };
                 var jsonContent = JsonConvert.SerializeObject(newContent);
                 var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 

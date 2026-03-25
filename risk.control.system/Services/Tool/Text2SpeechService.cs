@@ -35,10 +35,10 @@ namespace risk.control.system.Services.Tool
                     return memoryStream.ToArray();
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // Log your error here
-                return new byte[0];
+                return [];
             }
         }
     }

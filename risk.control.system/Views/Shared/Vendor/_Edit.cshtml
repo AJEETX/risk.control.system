@@ -1,12 +1,12 @@
 ﻿@model risk.control.system.Models.Vendor
 
 <div class="row">
-	<input type="hidden" id="Isd" value="@Model?.Country.ISDCode" />
-	<input type="hidden" id="countryCode" value="@Model?.Country.Code" />
+	<input type="hidden" id="Isd" value="@Model?.Country?.ISDCode" />
+	<input type="hidden" id="countryCode" value="@Model?.Country?.Code" />
 	<div class="col-md-6">
 
 		<div class="bg-light p-3 rounded mb-3 border">
-			<i class="fas fa fa-globe mr-2"></i>Agency Domain: <span class="font-weight-bold blue">@Model.Email</span>
+			<i class="fas fa fa-globe mr-2"></i>Agency Domain: <span class="font-weight-bold blue">@Model?.Email</span>
 
 			<input type="hidden" id="email" asp-for="Email" />
 
@@ -65,7 +65,7 @@
         
 				<select required id="Status" asp-for="Status" class="form-control remarks"
 						asp-items="Html.GetEnumSelectList<VendorStatus>()"
-						disabled="@(Model.SelectedByCompany ? "disabled" : null)">
+						disabled="@(Model!.SelectedByCompany ? "disabled" : null)">
 					<option value="">--- SELECT ---</option>
 				</select>
 
@@ -147,7 +147,7 @@
 					<div class="input-group-prepend">
 					<span class="input-group-text"><i class="fas fa-map-marker-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
 					</div>
-					<input type="text" id="Addressline" asp-for="Addressline" class="form-control remarks" type="text" placeholder="Street Address..." required maxlength="70" />
+					<input type="text" id="Addressline" asp-for="Addressline" class="form-control remarks" placeholder="Street Address..." required maxlength="70" />
 					<span asp-validation-for="Addressline" class="text-danger"></span>
 				</div>
 			</div>

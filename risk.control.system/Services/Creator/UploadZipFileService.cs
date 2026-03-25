@@ -39,15 +39,15 @@ namespace risk.control.system.Services.Creator
                 await using var context = await _contextFactory.CreateDbContextAsync();
                 var companyUser = await context.ApplicationUser.AsNoTracking().Include(u => u.ClientCompany).FirstOrDefaultAsync(c => c.Email == userEmail);
 
-                var uploadFileData = await context.FilesOnFileSystem.FirstOrDefaultAsync(f => f.Id == uploadId && f.CompanyId == companyUser.ClientCompanyId && f.UploadedBy == userEmail && !f.Deleted);
+                var uploadFileData = await context.FilesOnFileSystem.FirstOrDefaultAsync(f => f.Id == uploadId && f.CompanyId == companyUser!.ClientCompanyId && f.UploadedBy == userEmail && !f.Deleted);
 
-                var (zipFileByteData, validRecords, errors) = await csvFileReaderService.ReadPipeDelimitedCsvFromZip(uploadFileData);
+                var (zipFileByteData, validRecords, errors) = await csvFileReaderService.ReadPipeDelimitedCsvFromZip(uploadFileData!);
 
-                var totalClaimsCreated = await context.Investigations.CountAsync(c => !c.Deleted && c.ClientCompanyId == companyUser.ClientCompanyId);
+                var totalClaimsCreated = await context.Investigations.CountAsync(c => !c.Deleted && c.ClientCompanyId == companyUser!.ClientCompanyId);
 
-                await uploadFileDataProcessor.Process(companyUser, validRecords, totalClaimsCreated, uploadFileData, url, errors, uploadAndAssign);
+                await uploadFileDataProcessor.Process(companyUser!, validRecords, totalClaimsCreated, uploadFileData!, url, errors, uploadAndAssign);
 
-                await uploadFileInitiator.StartProcess(companyUser, validRecords, zipFileByteData, uploadFileData, totalClaimsCreated, url, uploadAndAssign);
+                await uploadFileInitiator.StartProcess(companyUser!, validRecords, zipFileByteData, uploadFileData!, totalClaimsCreated, url, uploadAndAssign);
             }
             catch (Exception ex)
             {

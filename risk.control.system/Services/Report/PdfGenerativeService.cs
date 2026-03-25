@@ -33,17 +33,17 @@ namespace risk.control.system.Services.Report
                     .Include(c => c.CustomerDetail)
                     .Include(c => c.BeneficiaryDetail)
                     .Include(c => c.ClientCompany)
-                    .ThenInclude(c => c.Country)
+                    .ThenInclude(c => c!.Country)
                     .Include(c => c.PolicyDetail)
                     .Include(c => c.InvestigationReport)
-                    .ThenInclude(c => c.EnquiryRequests)
+                    .ThenInclude(c => c!.EnquiryRequests)
                 .FirstOrDefault(c => c.Id == investigationTaskId);
 
             var policy = context.PolicyDetail
                 .Include(p => p.CaseEnabler)
                 .Include(p => p.CostCentre)
                 .Include(p => p.InvestigationServiceType)
-                .FirstOrDefault(p => p.PolicyDetailId == investigation.PolicyDetail.PolicyDetailId);
+                .FirstOrDefault(p => p.PolicyDetailId == investigation!.PolicyDetail!.PolicyDetailId);
 
             var customer = context.CustomerDetail
                 .Include(c => c.District)
@@ -71,37 +71,37 @@ namespace risk.control.system.Services.Report
                    .ThenInclude(l => l.Questions)
                    .FirstOrDefaultAsync(q => q.Id == investigation!.ReportTemplateId);
 
-            var vendor = context.Vendor.Include(s => s.VendorInvestigationServiceTypes).FirstOrDefault(v => v.VendorId == investigation.VendorId);
+            var vendor = context.Vendor.Include(s => s.VendorInvestigationServiceTypes).FirstOrDefault(v => v.VendorId == investigation!.VendorId);
             var currentUser = context.ApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
-            var investigationServiced = vendor.VendorInvestigationServiceTypes.FirstOrDefault(s => s.InvestigationServiceTypeId == policy.InvestigationServiceTypeId);
+            var investigationServiced = vendor!.VendorInvestigationServiceTypes!.FirstOrDefault(s => s.InvestigationServiceTypeId == policy!.InvestigationServiceTypeId);
             if (investigationServiced == null)
             {
-                investigationServiced = vendor.VendorInvestigationServiceTypes.FirstOrDefault();
+                investigationServiced = vendor.VendorInvestigationServiceTypes!.FirstOrDefault();
             }
-            var investigatService = context.InvestigationServiceType.FirstOrDefault(i => i.InvestigationServiceTypeId == policy.InvestigationServiceTypeId);
+            var investigatService = context.InvestigationServiceType.FirstOrDefault(i => i.InvestigationServiceTypeId == policy!.InvestigationServiceTypeId);
 
             var invoice = new VendorInvoice
             {
-                ClientCompanyId = currentUser.ClientCompany.ClientCompanyId,
-                GrandTotal = investigationServiced.Price + investigationServiced.Price * (1 / 10),
+                ClientCompanyId = currentUser!.ClientCompany!.ClientCompanyId,
+                GrandTotal = investigationServiced!.Price + investigationServiced.Price * (1 / 10),
                 NoteToRecipient = "Auto generated Invoice",
                 Updated = DateTime.UtcNow,
                 Vendor = vendor,
                 ClientCompany = currentUser.ClientCompany,
                 UpdatedBy = userEmail,
                 VendorId = vendor.VendorId,
-                InvestigationReportId = investigation.InvestigationReport?.Id,
+                InvestigationReportId = investigation!.InvestigationReport?.Id,
                 SubTotal = investigationServiced.Price,
                 TaxAmount = investigationServiced.Price * (1m / 10m),
                 InvestigationServiceType = investigatService,
                 CaseId = investigationTaskId,
-                Currency = CustomExtensions.GetCultureByCountry(investigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol
+                Currency = CustomExtensions.GetCultureByCountry(investigation.ClientCompany!.Country!.Code.ToUpper()).NumberFormat.CurrencySymbol
             };
 
             context.VendorInvoice.Add(invoice);
             await context.SaveChangesAsync(null, false);
 
-            var reportFilename = await pdfGenerate.BuildInvestigationPdfReport(investigation, policy, customer, beneficiary, investigationReport);
+            var reportFilename = await pdfGenerate.BuildInvestigationPdfReport(investigation, policy!, customer!, beneficiary!, investigationReport!);
 
             return reportFilename;
         }

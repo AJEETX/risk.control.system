@@ -45,9 +45,9 @@ namespace risk.control.system.Services.Company
         public async Task<ApplicationUser> GetUserCreationModelAsync(string currentUserEmail)
         {
             var companyUser = await GetCurrentUserWithCompany(currentUserEmail);
-            if (companyUser?.ClientCompany == null) return null;
+            if (companyUser?.ClientCompany == null) return null!;
 
-            var availableRoles = await GetAvailableRoles(companyUser.ClientCompanyId.Value, null);
+            var availableRoles = await GetAvailableRoles(companyUser.ClientCompanyId!.Value, null);
 
             return new ApplicationUser
             {
@@ -65,14 +65,14 @@ namespace risk.control.system.Services.Company
                 .Include(u => u.ClientCompany)
                 .FirstOrDefaultAsync(c => c.Id == id);
 
-            if (companyUser == null) return null;
+            if (companyUser == null) return null!;
 
             // Determine if password change logic is required based on feature flags
             bool isFirstLoginEnabled = await _featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION);
             companyUser.IsPasswordChangeRequired = isFirstLoginEnabled ? !companyUser.IsPasswordChangeRequired : true;
 
             // Load roles, ensuring we don't count the current user as the "taken" manager
-            companyUser.AvailableRoles = await GetAvailableRoles(companyUser.ClientCompanyId.Value, companyUser.Id);
+            companyUser.AvailableRoles = await GetAvailableRoles(companyUser.ClientCompanyId!.Value, companyUser.Id);
 
             return companyUser;
         }
@@ -88,10 +88,10 @@ namespace risk.control.system.Services.Company
         public async Task LoadModelAsync(ApplicationUser model, string currentUserEmail)
         {
             var companyUser = await GetCurrentUserWithCompany(currentUserEmail);
-            var company = companyUser.ClientCompany;
+            var company = companyUser!.ClientCompany;
 
             model.ClientCompany = company;
-            model.Country = company.Country;
+            model.Country = company!.Country;
             model.CountryId = company.CountryId;
             model.StateId = model.SelectedStateId;
             model.DistrictId = model.SelectedDistrictId;
@@ -102,7 +102,7 @@ namespace risk.control.system.Services.Company
         private async Task<List<SelectListItem>> GetAvailableRoles(long companyId, long? editingUserId)
         {
             var usersInCompany = await _context.ApplicationUser.AsNoTracking()
-                .Where(c => !c.Deleted && c.ClientCompanyId == companyId && c.Id != (editingUserId ?? 0))?.ToListAsync();
+                .Where(c => !c.Deleted && c.ClientCompanyId == companyId && c.Id != (editingUserId ?? 0)).ToListAsync();
 
             bool isManagerTaken = false;
             foreach (var user in usersInCompany)
@@ -123,11 +123,15 @@ namespace risk.control.system.Services.Company
                 }).ToList();
         }
 
-        private async Task<ApplicationUser> GetCurrentUserWithCompany(string email)
+        private async Task<ApplicationUser?> GetCurrentUserWithCompany(string email)
         {
-            return await _context.ApplicationUser.AsNoTracking()
+            // Use ArgumentException.ThrowIfNullOrWhiteSpace in .NET 10
+            ArgumentException.ThrowIfNullOrEmpty(email);
+
+            return await _context.ApplicationUser
+                .AsNoTracking()
                 .Include(u => u.ClientCompany)
-                .ThenInclude(c => c.Country)
+                    .ThenInclude(c => c!.Country)
                 .FirstOrDefaultAsync(u => u.Email == email);
         }
 

@@ -27,11 +27,11 @@
 	<div class="wrapper">
 		<div id="main-container">
 			<input type="hidden" id="timeout" name="timeout" value="@timeout" />
-			@if (SignInManager.IsSignedIn(User))
+			@if (SignInManager.IsSignedIn(User!))
 			{
 				var companyUser = _context.ApplicationUser.FirstOrDefault(c => c.Email == userEmail && c.ClientCompanyId > 0);
 				var vendorUser = _context.ApplicationUser.FirstOrDefault(c => c.Email == userEmail && c.VendorId > 0);
-				ClientCompany company = null!;
+				ClientCompany? company = null!;
 				if (companyUser is not null)
 				{
 					company = _context.ClientCompany.Include(c => c.Country).FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
@@ -40,11 +40,11 @@
 					{
 						UserId = companyUser.Id,
 						Email = companyUser.Email,
-						CanChangePassword = company.CanChangePassword,
-						CountryCode = company.Country.Code,
-						Country = $"{company.Country.Name} ({company.Country.Code})",
-						IsdCode = $"(+{company.Country.ISDCode})",
-						CurrencyCode = $" {company.Country.CurrencyCode} ({CustomExtensions.GetCultureByCountry(company.Country.Code.ToUpper()).NumberFormat.CurrencySymbol})",
+						CanChangePassword = company!.CanChangePassword,
+						CountryCode = company.Country?.Code,
+						Country = $"{company.Country?.Name} ({company.Country?.Code})",
+						IsdCode = $"(+{company.Country?.ISDCode})",
+						CurrencyCode = $" {company.Country?.CurrencyCode} ({CustomExtensions.GetCultureByCountry(company.Country!.Code.ToUpper()).NumberFormat.CurrencySymbol})",
 						CurrencyName = $" {company.Country.CurrencyName} ({CustomExtensions.GetCultureByCountry(company.Country.Code.ToUpper()).NumberFormat.CurrencySymbol})",
 						Language = company.Country.Language
 					};
@@ -59,11 +59,11 @@
 					{
 						UserId = vendorUser.Id,
 						Email = vendorUser.Email,
-						CanChangePassword = vendor.CanChangePassword,
-						CountryCode = vendor.Country.Code,
-						Country = $"{vendor.Country.Name} ({vendor.Country.Code})",
-						IsdCode = $"(+{vendor.Country.ISDCode})",
-						CurrencyCode = $" {vendor.Country.CurrencyCode}({CustomExtensions.GetCultureByCountry(vendor.Country.Code.ToUpper()).NumberFormat.CurrencySymbol})",
+						CanChangePassword = vendor!.CanChangePassword,
+						CountryCode = vendor.Country?.Code,
+						Country = $"{vendor.Country?.Name} ({vendor.Country?.Code})",
+						IsdCode = $"(+{vendor.Country?.ISDCode})",
+						CurrencyCode = $" {vendor.Country?.CurrencyCode}({CustomExtensions.GetCultureByCountry(vendor.Country!.Code.ToUpper()).NumberFormat.CurrencySymbol})",
 						CurrencyName = $" {vendor.Country.CurrencyName} ({CustomExtensions.GetCultureByCountry(vendor.Country.Code.ToUpper()).NumberFormat.CurrencySymbol})",
 						Language = vendor.Country.Language
 					};
@@ -75,10 +75,10 @@
 					var admin = _context.ApplicationUser.Include(c => c.Country).FirstOrDefault(c => c.Email == userEmail);
 					var navigationModel = new TopNavigation
 					{
-						UserId = admin.Id,
+						UserId = admin!.Id,
 						Email = admin.Email,
 						CanChangePassword = true,
-						CountryCode = admin.Country.Code,
+						CountryCode = admin.Country!.Code,
 						Country = $"{admin.Country.Name} ({admin.Country.Code})",
 						IsdCode = $"(+{admin.Country.ISDCode})",
 						CurrencyCode = $"{admin.Country.CurrencyCode} ({CustomExtensions.GetCultureByCountry(admin.Country.Code.ToUpper()).NumberFormat.CurrencySymbol})",

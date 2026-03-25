@@ -24,10 +24,10 @@ namespace risk.control.system.Services.Creator
         public async Task<LicenseStatus> GetUploadPermissionsAsync(ApplicationUser user)
         {
             var company = user.ClientCompany;
-            if (company.LicenseType != LicenseType.Trial)
+            if (company!.LicenseType != LicenseType.Trial)
                 return LicenseStatus.Unlimited();
 
-            var totalReadyToAssign = await investigationService.GetAutoCount(user.Email);
+            var totalReadyToAssign = await investigationService.GetAutoCount(user.Email!);
             var totalClaimsCreated = await context.Investigations
                 .CountAsync(c => !c.Deleted && c.ClientCompanyId == company.ClientCompanyId);
 

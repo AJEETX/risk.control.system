@@ -64,7 +64,7 @@ namespace risk.control.system.Services.Common
             if (admin == null)
                 return Error(result, string.Empty, "Admin configuration missing");
 
-            var changeResult = await userManager.ChangePasswordAsync(user, WebUtility.HtmlEncode(model.CurrentPassword), model.NewPassword);
+            var changeResult = await userManager.ChangePasswordAsync(user, WebUtility.HtmlEncode(model.CurrentPassword!), model.NewPassword);
 
             if (!changeResult.Succeeded)
             {
@@ -97,7 +97,7 @@ namespace risk.control.system.Services.Common
                 $"User {user.Email} {(failed ? "attempted" : "changed")} password.\n" +
                 $"{portal_base_url}";
 
-            await smsService.DoSendSmsAsync(admin.Country.Code, "+" + admin.Country.ISDCode + admin.PhoneNumber, message);
+            await smsService.DoSendSmsAsync(admin.Country!.Code, "+" + admin.Country.ISDCode + admin.PhoneNumber, message);
         }
 
         private async Task NotifyUserAsync(ApplicationUser admin, ApplicationUser user, string newPassword, string portal_base_url)
@@ -108,7 +108,7 @@ namespace risk.control.system.Services.Common
                 $"{portal_base_url}";
 
             await smsService.DoSendSmsAsync(
-                admin.Country.Code,
+                admin.Country!.Code,
                 "+" + admin.Country.ISDCode + user.PhoneNumber,
                 message);
         }
@@ -128,7 +128,7 @@ namespace risk.control.system.Services.Common
             }
             //CHECK AND VALIDATE EMAIL PASSWORD
             var resetPhone = countryCode.TrimStart('+') + mobile.Trim().ToString();
-            var user = await context.ApplicationUser.Include(a => a.Country).FirstOrDefaultAsync(u => !u.Deleted && u.Email == useremail && string.Concat(u.Country.ISDCode.ToString(), u.PhoneNumber) == resetPhone);
+            var user = await context.ApplicationUser.Include(a => a.Country).FirstOrDefaultAsync(u => !u.Deleted && u.Email == useremail && string.Concat(u.Country!.ISDCode.ToString(), u.PhoneNumber) == resetPhone);
             if (user == null)
             {
                 return null!;
@@ -141,8 +141,8 @@ namespace risk.control.system.Services.Common
             string message = $"Dear {useremail}\n";
             message += $"{passwordString}\n";
             message += $"{BaseUrl}";
-            await smsService.DoSendSmsAsync(user.Country.Code, user.Country.ISDCode + user.PhoneNumber, message);
-            var profileImageByte = await File.ReadAllBytesAsync(Path.Combine(webHostEnvironment.ContentRootPath, user.ProfilePictureUrl));
+            await smsService.DoSendSmsAsync(user.Country!.Code, user.Country.ISDCode + user.PhoneNumber, message);
+            var profileImageByte = await File.ReadAllBytesAsync(Path.Combine(webHostEnvironment.ContentRootPath, user.ProfilePictureUrl!));
 
             return new ForgotPasswordResult
             {

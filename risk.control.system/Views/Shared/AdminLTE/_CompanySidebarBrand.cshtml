@@ -14,7 +14,7 @@
         @if (Model?.Name is not null)
         {
             var truncatedName = Model?.Name.Length > 15 ? Model?.Name.Substring(0, 15) + "..." : Model?.Name;
-            <span class="brand-text font-weight-bold" title="@Model.Name" data-bs-toggle="tooltip">@truncatedName </span>
+            <span class="brand-text font-weight-bold" title="@Model!.Name" data-bs-toggle="tooltip">@truncatedName </span>
         }
         else
         {

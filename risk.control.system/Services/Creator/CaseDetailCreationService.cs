@@ -59,7 +59,7 @@ namespace risk.control.system.Services.Creator
                 if (policy?.InsuranceType == null)
                     throw new Exception("Policy or Insurance Type missing.");
 
-                var template = await cloneService.DeepCloneReportTemplate(user.ClientCompanyId.Value, policy.InsuranceType.Value);
+                var template = await cloneService.DeepCloneReportTemplate(user.ClientCompanyId!.Value, policy.InsuranceType.Value);
 
                 var task = new InvestigationTask
                 {

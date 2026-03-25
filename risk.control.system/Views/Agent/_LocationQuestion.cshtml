@@ -48,7 +48,7 @@
 									}
 									else if (question.QuestionType == "radio")
 									{
-										foreach (var option in question.Options.Split(','))
+										foreach (var option in question.Options!.Split(','))
 										{
 											var trimmedOption = option.Trim();
 											var isChecked = question.AnswerText == trimmedOption ? "checked" : "";
@@ -69,7 +69,7 @@
 									{
 										var selectedOptions = question.AnswerText?.Split(',') ?? new string[] { };
 
-										@foreach (var option in question.Options.Split(','))
+										@foreach (var option in question.Options!.Split(','))
 										{
 											var trimmedOption = option.Trim();
 											var isChecked = selectedOptions.Contains(trimmedOption) ? "checked" : "";

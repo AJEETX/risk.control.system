@@ -22,17 +22,17 @@ namespace risk.control.system.Services.Creator
         public void ValidateRequiredFields(UploadCase uc, List<UploadError> errs, List<string> sums)
         {
             if (string.IsNullOrWhiteSpace(uc.CaseId)) AddError("CaseId", "Empty", errs, sums);
-            if (string.IsNullOrWhiteSpace(uc.CustomerName) || uc.CustomerName.Length < 2) AddError("CustomerName", uc.CustomerName, errs, sums);
+            if (string.IsNullOrWhiteSpace(uc.CustomerName) || uc.CustomerName.Length < 2) AddError("CustomerName", uc.CustomerName!, errs, sums);
             if (string.IsNullOrWhiteSpace(uc.CustomerAddressLine)) AddError("AddressLine", "Empty", errs, sums);
         }
 
         public (DateTime Dob, Gender Gen, Education Edu, Occupation Occ, Income Inc) ValidateDetails(UploadCase uc, List<UploadError> errs, List<string> sums)
         {
-            var dob = dateParserService.ParseDate(uc.CustomerDob, errs, sums, "Customer");
-            var gender = ParseEnum<Gender>(uc.Gender.Trim(), "Gender", errs, sums);
-            var edu = ParseEnum<Education>(uc.Education.Trim(), "Education", errs, sums);
-            var occ = ParseEnum<Occupation>(uc.Occupation.Trim(), "Occupation", errs, sums);
-            var inc = ParseEnum<Income>(uc.Income.Trim(), "Income", errs, sums);
+            var dob = dateParserService.ParseDate(uc.CustomerDob!, errs, sums, "Customer");
+            var gender = ParseEnum<Gender>(uc.Gender!.Trim(), "Gender", errs, sums);
+            var edu = ParseEnum<Education>(uc.Education!.Trim(), "Education", errs, sums);
+            var occ = ParseEnum<Occupation>(uc.Occupation!.Trim(), "Occupation", errs, sums);
+            var inc = ParseEnum<Income>(uc.Income!.Trim(), "Income", errs, sums);
 
             return (dob, gender, edu, occ, inc);
         }

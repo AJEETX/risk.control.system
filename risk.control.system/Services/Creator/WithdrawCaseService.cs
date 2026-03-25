@@ -32,28 +32,28 @@ namespace risk.control.system.Services.Creator
                 var caseTask = await context.Investigations
                     .Include(t => t.PolicyDetail)
                     .FirstOrDefaultAsync(c => c.Id == caseId);
-                var vendorId = caseTask.VendorId;
+                var vendorId = caseTask!.VendorId;
                 var company = await context.ClientCompany.FirstOrDefaultAsync(c => c.ClientCompanyId == caseTask.ClientCompanyId);
 
                 caseTask.IsNew = true;
                 caseTask.Updated = DateTime.UtcNow;
-                caseTask.UpdatedBy = currentUser.Email;
+                caseTask.UpdatedBy = currentUser!.Email;
                 caseTask.AssignedToAgency = false;
-                caseTask.CaseOwner = company.Email;
+                caseTask.CaseOwner = company!.Email;
                 caseTask.VendorId = null;
                 caseTask.Vendor = null;
                 caseTask.SubStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY;
                 context.Investigations.Update(caseTask);
                 var rows = await context.SaveChangesAsync(null, false) > 0;
 
-                await timelineService.UpdateTaskStatus(caseTask.Id, currentUser.Email);
+                await timelineService.UpdateTaskStatus(caseTask.Id, currentUser.Email!);
 
-                return rows ? (caseTask.PolicyDetail.ContractNumber, vendorId.GetValueOrDefault()) : (null, 0);
+                return rows ? (caseTask.PolicyDetail!.ContractNumber!, vendorId.GetValueOrDefault()!) : (null!, 0);
             }
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error occurred withdraw case {Id}. {UserEmail}", caseId, userEmail);
-                return (null, 0);
+                return (null!, 0);
             }
         }
     }

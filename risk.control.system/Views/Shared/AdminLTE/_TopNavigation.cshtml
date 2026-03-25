@@ -100,10 +100,10 @@
             <div class="dropdown-menu dropdown-menu-right shadow-lg rounded-lg border-0 settings-dropdown">
                 <!-- Profile Section -->
                 <div class="text-center profile-section">
-                    <img src="/Document/GetUserProfileImage/@Model.UserId"
+                    <img src="/Document/GetUserProfileImage/@Model?.UserId"
                          class="rounded-circle shadow-sm border sidebar-profile"
-                         alt="User Profile" title="@Model.Email" data-bs-toggle="tooltip" />
-                    <p class="text-muted user-email">@Model.Email</p>
+                         alt="User Profile" title="@Model?.Email" data-bs-toggle="tooltip" />
+                    <p class="text-muted user-email">@Model?.Email</p>
 
                 <!-- Logout Link -->
                 <div class="text-center profile-inner-section">

@@ -58,11 +58,11 @@ namespace risk.control.system.Services.Creator
             {
                 var currentUser = await context.ApplicationUser.AsNoTracking().Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == userEmail);
 
-                var reportTemplate = await cloneService.DeepCloneReportTemplate(currentUser.ClientCompanyId.Value, model.PolicyDetailDto.InsuranceType.GetValueOrDefault());
+                var reportTemplate = await cloneService.DeepCloneReportTemplate(currentUser!.ClientCompanyId!.Value, model.PolicyDetailDto.InsuranceType.GetValueOrDefault());
                 context.ReportTemplates.Add(reportTemplate);
                 await context.SaveChangesAsync();
 
-                var (fileName, relativePath) = await fileStorageService.SaveAsync(model.Document, "Case", model.PolicyDetailDto.ContractNumber);
+                var (fileName, relativePath) = await fileStorageService.SaveAsync(model.Document!, "Case", model.PolicyDetailDto.ContractNumber);
 
                 var caseTask = new InvestigationTask
                 {
@@ -73,8 +73,8 @@ namespace risk.control.system.Services.Creator
                         InvestigationServiceTypeId = model.PolicyDetailDto.InvestigationServiceTypeId,
                         CaseEnablerId = model.PolicyDetailDto.CaseEnablerId,
                         SumAssuredValue = model.PolicyDetailDto.SumAssuredValue,
-                        ContractIssueDate = model.PolicyDetailDto.ContractIssueDate.Value,
-                        DateOfIncident = model.PolicyDetailDto.DateOfIncident.Value,
+                        ContractIssueDate = model.PolicyDetailDto.ContractIssueDate!.Value,
+                        DateOfIncident = model.PolicyDetailDto.DateOfIncident!.Value,
                         CauseOfLoss = model.PolicyDetailDto.CauseOfLoss,
                         CostCentreId = model.PolicyDetailDto.CostCentreId,
                         DocumentPath = relativePath,
@@ -88,7 +88,7 @@ namespace risk.control.system.Services.Creator
                     UpdatedBy = userEmail,
                     Status = CONSTANTS.CASE_STATUS.INITIATED,
                     SubStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.DRAFTED_BY_CREATOR,
-                    CreatorSla = currentUser.ClientCompany.CreatorSla,
+                    CreatorSla = currentUser.ClientCompany!.CreatorSla,
                     ClientCompanyId = currentUser.ClientCompanyId,
                     ReportTemplateId = reportTemplate.Id
                 };
@@ -99,7 +99,7 @@ namespace risk.control.system.Services.Creator
 
                 await timelineService.UpdateTaskStatus(caseTask.Id, userEmail);
 
-                return saved ? caseTask : null;
+                return saved ? caseTask : null!;
             }
             catch (Exception ex)
             {
@@ -114,7 +114,7 @@ namespace risk.control.system.Services.Creator
             {
                 var existingPolicy = await context.Investigations.Include(c => c.PolicyDetail).FirstOrDefaultAsync(c => c.Id == model.Id);
 
-                var reportTemplate = await cloneService.DeepCloneReportTemplate(existingPolicy.ClientCompanyId.Value, model.PolicyDetailDto.InsuranceType.GetValueOrDefault());
+                var reportTemplate = await cloneService.DeepCloneReportTemplate(existingPolicy!.ClientCompanyId!.Value, model.PolicyDetailDto.InsuranceType.GetValueOrDefault());
                 context.ReportTemplates.Add(reportTemplate);
                 await context.SaveChangesAsync();
 
@@ -122,17 +122,17 @@ namespace risk.control.system.Services.Creator
                 {
                     var (fileName, relativePath) = await fileStorageService.SaveAsync(model.Document, "Case", model.PolicyDetailDto.ContractNumber);
 
-                    existingPolicy.PolicyDetail.DocumentPath = relativePath;
+                    existingPolicy.PolicyDetail!.DocumentPath = relativePath;
                     existingPolicy.PolicyDetail.DocumentImageExtension = Path.GetExtension(fileName);
                 }
 
-                existingPolicy.PolicyDetail.ContractNumber = WebUtility.HtmlEncode(model.PolicyDetailDto.ContractNumber.ToUpper());
+                existingPolicy.PolicyDetail!.ContractNumber = WebUtility.HtmlEncode(model.PolicyDetailDto.ContractNumber.ToUpper());
                 existingPolicy.PolicyDetail.InsuranceType = model.PolicyDetailDto.InsuranceType;
                 existingPolicy.PolicyDetail.InvestigationServiceTypeId = model.PolicyDetailDto.InvestigationServiceTypeId;
                 existingPolicy.PolicyDetail.CaseEnablerId = model.PolicyDetailDto.CaseEnablerId;
                 existingPolicy.PolicyDetail.SumAssuredValue = model.PolicyDetailDto.SumAssuredValue;
-                existingPolicy.PolicyDetail.ContractIssueDate = model.PolicyDetailDto.ContractIssueDate.Value;
-                existingPolicy.PolicyDetail.DateOfIncident = model.PolicyDetailDto.DateOfIncident.Value;
+                existingPolicy.PolicyDetail.ContractIssueDate = model.PolicyDetailDto.ContractIssueDate!.Value;
+                existingPolicy.PolicyDetail.DateOfIncident = model.PolicyDetailDto.DateOfIncident!.Value;
                 existingPolicy.PolicyDetail.CauseOfLoss = model.PolicyDetailDto.CauseOfLoss;
                 existingPolicy.PolicyDetail.CostCentreId = model.PolicyDetailDto.CostCentreId;
                 existingPolicy.Updated = DateTime.UtcNow;
@@ -142,7 +142,7 @@ namespace risk.control.system.Services.Creator
                 context.Investigations.Update(existingPolicy);
                 var saved = await context.SaveChangesAsync() > 0;
 
-                return saved ? existingPolicy : null;
+                return saved ? existingPolicy : null!;
             }
             catch (Exception ex)
             {
@@ -160,15 +160,15 @@ namespace risk.control.system.Services.Creator
 
                 if (customerDetail?.ProfileImage is not null)
                 {
-                    var (fileName, relativePath) = await fileStorageService.SaveAsync(customerDetail?.ProfileImage, "Case", caseTask.PolicyDetail.ContractNumber);
-                    customerDetail.ProfilePictureExtension = Path.GetExtension(fileName);
+                    var (fileName, relativePath) = await fileStorageService.SaveAsync(customerDetail?.ProfileImage!, "Case", caseTask!.PolicyDetail!.ContractNumber);
+                    customerDetail!.ProfilePictureExtension = Path.GetExtension(fileName);
                     customerDetail.ImagePath = relativePath;
                 }
-                caseTask.UpdatedBy = userEmail;
+                caseTask!.UpdatedBy = userEmail;
                 caseTask.Updated = DateTime.UtcNow;
 
                 var textInfo = CultureInfo.CurrentCulture.TextInfo;
-                customerDetail.Name = WebUtility.HtmlEncode(textInfo.ToTitleCase(customerDetail.Name.ToLower()));
+                customerDetail!.Name = WebUtility.HtmlEncode(textInfo.ToTitleCase(customerDetail.Name.ToLower()));
 
                 customerDetail.PhoneNumber = customerDetail.PhoneNumber.TrimStart('0');
                 customerDetail.CountryId = customerDetail.SelectedCountryId;
@@ -182,7 +182,7 @@ namespace risk.control.system.Services.Creator
                     .Include(p => p.Country)
                     .FirstOrDefaultAsync(p => p.PinCodeId == customerDetail.PinCodeId);
 
-                var address = customerDetail.Addressline + ", " + pincode.District.Name + ", " + pincode.State.Name + ", " + pincode.Country.Code;
+                var address = customerDetail.Addressline + ", " + pincode!.District!.Name + ", " + pincode.State!.Name + ", " + pincode.Country!.Code;
                 var latLong = await customApiCLient.GetCoordinatesFromAddressAsync(address);
                 var customerLatLong = latLong.Latitude + "," + latLong.Longitude;
                 customerDetail.Latitude = latLong.Latitude;
@@ -213,16 +213,16 @@ namespace risk.control.system.Services.Creator
 
                 if (customerDetail?.ProfileImage is not null)
                 {
-                    var (fileName, relativePath) = await fileStorageService.SaveAsync(customerDetail?.ProfileImage, "Case", caseTask.PolicyDetail.ContractNumber);
+                    var (fileName, relativePath) = await fileStorageService.SaveAsync(customerDetail.ProfileImage, "Case", caseTask!.PolicyDetail!.ContractNumber);
                     customerDetail.ProfilePictureExtension = Path.GetExtension(fileName);
                     customerDetail.ImagePath = relativePath;
                 }
                 else
                 {
-                    var existingCustomer = await context.CustomerDetail.AsNoTracking().FirstOrDefaultAsync(c => c.InvestigationTaskId == customerDetail.InvestigationTaskId);
-                    customerDetail.ImagePath = existingCustomer.ImagePath;
+                    var existingCustomer = await context.CustomerDetail.AsNoTracking().FirstOrDefaultAsync(c => c.InvestigationTaskId == customerDetail!.InvestigationTaskId);
+                    customerDetail!.ImagePath = existingCustomer!.ImagePath;
                 }
-                caseTask.UpdatedBy = userEmail;
+                caseTask!.UpdatedBy = userEmail;
                 caseTask.Updated = DateTime.UtcNow;
                 customerDetail.PhoneNumber = customerDetail.PhoneNumber.TrimStart('0');
 
@@ -240,7 +240,7 @@ namespace risk.control.system.Services.Creator
                         .Include(p => p.Country)
                         .FirstOrDefaultAsync(p => p.PinCodeId == customerDetail.PinCodeId);
 
-                var address = customerDetail.Addressline + ", " + pincode.District.Name + ", " + pincode.State.Name + ", " + pincode.Country.Code;
+                var address = customerDetail.Addressline + ", " + pincode!.District!.Name + ", " + pincode.State!.Name + ", " + pincode.Country!.Code;
                 var latLong = await customApiCLient.GetCoordinatesFromAddressAsync(address);
                 var customerLatLong = latLong.Latitude + "," + latLong.Longitude;
                 customerDetail.Latitude = latLong.Latitude;
@@ -269,16 +269,16 @@ namespace risk.control.system.Services.Creator
                     .FirstOrDefaultAsync(m => m.Id == beneficiary.InvestigationTaskId);
                 if (beneficiary?.ProfileImage != null)
                 {
-                    var (fileName, relativePath) = await fileStorageService.SaveAsync(beneficiary?.ProfileImage, "Case", caseTask.PolicyDetail.ContractNumber);
+                    var (fileName, relativePath) = await fileStorageService.SaveAsync(beneficiary.ProfileImage!, "Case", caseTask!.PolicyDetail!.ContractNumber);
                     beneficiary.ProfilePictureExtension = Path.GetExtension(fileName);
                     beneficiary.ImagePath = relativePath;
                 }
                 var textInfo = CultureInfo.CurrentCulture.TextInfo;
-                beneficiary.Name = WebUtility.HtmlEncode(textInfo.ToTitleCase(beneficiary.Name.ToLower()));
+                beneficiary!.Name = WebUtility.HtmlEncode(textInfo.ToTitleCase(beneficiary.Name.ToLower()));
 
                 beneficiary.Updated = DateTime.UtcNow;
                 beneficiary.UpdatedBy = userEmail;
-                caseTask.UpdatedBy = userEmail;
+                caseTask!.UpdatedBy = userEmail;
                 caseTask.Updated = DateTime.UtcNow;
                 caseTask.IsReady2Assign = true;
                 beneficiary.PhoneNumber = beneficiary.PhoneNumber.TrimStart('0');
@@ -294,7 +294,7 @@ namespace risk.control.system.Services.Creator
                         .Include(p => p.Country)
                     .FirstOrDefaultAsync(p => p.PinCodeId == beneficiary.PinCodeId);
 
-                var address = beneficiary.Addressline + ", " + pincode.District.Name + ", " + pincode.State.Name + ", " + pincode.Country.Code;
+                var address = beneficiary.Addressline + ", " + pincode!.District!.Name + ", " + pincode.State!.Name + ", " + pincode.Country!.Code;
                 var latlong = await customApiCLient.GetCoordinatesFromAddressAsync(address);
                 var customerLatLong = latlong.Latitude + "," + latlong.Longitude;
                 var url = string.Format("https://maps.googleapis.com/maps/api/staticmap?center={0}&zoom=14&size={{0}}x{{1}}&maptype=roadmap&markers=color:red%7Clabel:A%7C{0}&key={1}",
@@ -323,24 +323,24 @@ namespace risk.control.system.Services.Creator
 
                 if (beneficiary?.ProfileImage != null)
                 {
-                    var (fileName, relativePath) = await fileStorageService.SaveAsync(beneficiary?.ProfileImage, "Case", caseTask.PolicyDetail.ContractNumber);
+                    var (fileName, relativePath) = await fileStorageService.SaveAsync(beneficiary.ProfileImage!, "Case", caseTask!.PolicyDetail!.ContractNumber);
                     beneficiary.ProfilePictureExtension = Path.GetExtension(fileName);
                     beneficiary.ImagePath = relativePath;
                 }
                 else
                 {
-                    var existingBeneficiary = await context.BeneficiaryDetail.AsNoTracking().Where(c => c.BeneficiaryDetailId == beneficiary.BeneficiaryDetailId).FirstOrDefaultAsync();
-                    if (existingBeneficiary.ImagePath != null)
+                    var existingBeneficiary = await context.BeneficiaryDetail.AsNoTracking().Where(c => c.BeneficiaryDetailId == beneficiary!.BeneficiaryDetailId).FirstOrDefaultAsync();
+                    if (existingBeneficiary!.ImagePath != null)
                     {
-                        beneficiary.ImagePath = existingBeneficiary.ImagePath;
+                        beneficiary!.ImagePath = existingBeneficiary.ImagePath;
                     }
                 }
 
-                caseTask.UpdatedBy = userEmail;
+                caseTask!.UpdatedBy = userEmail;
                 caseTask.Updated = DateTime.UtcNow;
                 caseTask.SubStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR;
                 caseTask.IsReady2Assign = true;
-                beneficiary.PhoneNumber = beneficiary.PhoneNumber.TrimStart('0');
+                beneficiary!.PhoneNumber = beneficiary.PhoneNumber.TrimStart('0');
 
                 var textInfo = CultureInfo.CurrentCulture.TextInfo;
                 beneficiary.Name = WebUtility.HtmlEncode(textInfo.ToTitleCase(beneficiary.Name.ToLower()));
@@ -356,7 +356,7 @@ namespace risk.control.system.Services.Creator
                         .Include(p => p.Country)
                     .FirstOrDefaultAsync(p => p.PinCodeId == beneficiary.PinCodeId);
 
-                var address = beneficiary.Addressline + ", " + pincode.District.Name + ", " + pincode.State.Name + ", " + pincode.Country.Code;
+                var address = beneficiary.Addressline + ", " + pincode!.District!.Name + ", " + pincode.State!.Name + ", " + pincode.Country!.Code;
                 var latlong = await customApiCLient.GetCoordinatesFromAddressAsync(address);
                 var customerLatLong = latlong.Latitude + "," + latlong.Longitude;
                 beneficiary.Latitude = latlong.Latitude;

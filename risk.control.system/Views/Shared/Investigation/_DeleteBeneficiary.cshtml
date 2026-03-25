@@ -9,7 +9,7 @@
     var country = string.Empty;
     var phone = string.Empty;
     var map = string.Empty;
-    if (Model.ClaimsInvestigation.CustomerDetail != null)
+    if (Model.ClaimsInvestigation?.CustomerDetail != null)
     {
         customerExist = true;
     }
@@ -17,12 +17,12 @@
     {
         beneficiaryExist = true;
         baddress = @Model.Beneficiary?.Addressline + " " + @Model.Beneficiary?.District?.Name + " " + @Model.Beneficiary?.State?.Name + " " + @Model.Beneficiary?.PinCode?.Code;
-        var age = DateTime.UtcNow.Subtract(Model.Beneficiary.DateOfBirth.GetValueOrDefault()).TotalDays;
+        var age = DateTime.UtcNow.Subtract(Model.Beneficiary!.DateOfBirth.GetValueOrDefault()).TotalDays;
         currentBAgeinYrs =$"{(int)(age/ 365 )} years";
         country = @Model.Beneficiary?.Country?.Name;
-        phone = +@Model.Beneficiary?.Country.ISDCode +" (0) "+ @Model.Beneficiary?.PhoneNumber;
-        imgPath = "/flags/" + @Model.Beneficiary.Country.Code.ToLower() + ".png";
-        map = string.Format(Model.Beneficiary.BeneficiaryLocationMap, "200", "200");
+        phone = +@Model.Beneficiary?.Country?.ISDCode +" (0) "+ @Model.Beneficiary?.PhoneNumber;
+        imgPath = "/flags/" + @Model.Beneficiary?.Country?.Code.ToLower() + ".png";
+        map = string.Format(Model.Beneficiary?.BeneficiaryLocationMap!, "200", "200");
     }
     string benficiaryProgressClass = "progress-bar-lightgrey"; // Default class
 
@@ -34,7 +34,7 @@
     {
         benficiaryProgressClass = "progress-bar-grey";
     }
-	var beneficiarySMSCount = Model.ClaimsInvestigation.CaseMessages.Where(x => !x.IsCustomer).Count();
+	var beneficiarySMSCount = Model.ClaimsInvestigation?.CaseMessages?.Where(x => !x.IsCustomer).Count();
 
 }
 <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
@@ -60,7 +60,7 @@
                             <span class="fa-li">
                                 <i class="fa fa-money"></i>
                             </span>
-                            Annual Income: (@Model.Currency) <b> @Model.Beneficiary?.Income.GetEnumDisplayName()</b>
+                            Annual Income: (@Model.Currency) <b> @Model.Beneficiary?.Income?.GetEnumDisplayName()</b>
                         </li>
                         <li class="small">
                             <span class="fa-li">
@@ -101,7 +101,7 @@
                     <p class="text-muted text-sm">
                         @if (Model?.Beneficiary?.ImagePath is not null)
                         {
-                            <img id="bImage" class="img-fluid block-data" src="/Document/GetBeneficiaryDocument/@Model?.Beneficiary.BeneficiaryDetailId" title="@Model.Beneficiary?.Name Photo" data-bs-toggle="tooltip" />
+                            <img id="bImage" class="img-fluid block-data" src="/Document/GetBeneficiaryDocument/@Model?.Beneficiary.BeneficiaryDetailId" title="@Model?.Beneficiary?.Name Photo" data-bs-toggle="tooltip" />
                         }
                         else
                         {

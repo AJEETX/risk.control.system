@@ -10,10 +10,10 @@ namespace risk.control.system.Models
         public long AgencyRatingId { get; set; }
 
         public int Rate { get; set; }
-        public string IpAddress { get; set; }
+        public string IpAddress { get; set; } = default!;
         public long VendorId { get; set; }
 
-        public string UserEmail { get; set; }
+        public string UserEmail { get; set; } = default!;
 
         public override string ToString()
         {

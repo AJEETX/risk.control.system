@@ -22,7 +22,7 @@ namespace risk.control.system.Services.Api
 
         public UserService(IConfiguration config, ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, UserManager<ApplicationUser> userManager, IFeatureManager featureManager)
         {
-            cutoffTime = DateTime.UtcNow.AddSeconds(-double.Parse(config["SESSION_TIMEOUT_SEC"]));
+            cutoffTime = DateTime.UtcNow.AddSeconds(-double.Parse(config["SESSION_TIMEOUT_SEC"]!));
             this.context = context;
             this.webHostEnvironment = webHostEnvironment;
             this.userManager = userManager;
@@ -31,18 +31,14 @@ namespace risk.control.system.Services.Api
 
         public async Task<List<UserDetailResponse>> GetUsers(string userEmail)
         {
-            // Fetch user session data from the database
-            var userSessions = await context.UserSessionAlive
-                .Where(u => u.Updated >= cutoffTime) // Filter sessions within the last 15 minutes
-                .Include(u => u.ActiveUser)? // Include ActiveUser to access email
-                .ToListAsync(); // Materialize data into memory
-
-            var activeUsers = userSessions
-                    .GroupBy(u => u.ActiveUser.Email)? // Group by email
-                    .Select(g => g.OrderByDescending(u => u.Updated).FirstOrDefault())? // Get the latest session
-                    .Where(u => u != null && !u.LoggedOut)?
-                     .Select(u => u.ActiveUser.Email)? // Select the user email
-                     .ToList(); // Exclude users who have logged out
+            var activeUsers = await context.UserSessionAlive
+                .AsNoTracking()
+                .Where(u => u.Updated >= cutoffTime && !u.LoggedOut)
+                .GroupBy(u => u.ActiveUser.Email)
+                .Select(g => g.OrderByDescending(u => u.Updated).FirstOrDefault())
+                .Where(u => u != null)
+                .Select(u => u!.ActiveUser.Email)
+                .ToListAsync(); // Only materialize the final, filtered list of emails
 
             var users = context.ApplicationUser
                 .Include(a => a.District)
@@ -51,7 +47,7 @@ namespace risk.control.system.Services.Api
                 .Include(a => a.PinCode)
                     .Where(u => !u.Deleted && u.Email != userEmail);
 
-            var allUsers = users?.OrderBy(u => u.FirstName)
+            var allUsers = users.OrderBy(u => u.FirstName)
             .ThenBy(u => u.LastName);
 
             var activeUsersDetails = new List<UserDetailResponse>();
@@ -106,15 +102,15 @@ namespace risk.control.system.Services.Api
                     State = user?.State?.Code ?? "--",
                     Country = user?.Country?.Code ?? "--",
                     Flag = flag,
-                    Roles = string.Join(",", GetUserRoles(user).Result),
+                    Roles = string.Join(",", GetUserRoles(user!).Result),
                     Pincode = user?.PinCode?.Code ?? 0,
                     OnlineStatus = status,
-                    Updated = user.Updated.HasValue ? user.Updated.Value.ToString("dd-MM-yyyy") : user.Created.ToString("dd-MM-yyyy"),
+                    Updated = user!.Updated ?? user.Created,
                     UpdatedBy = user.UpdatedBy,
                     OnlineStatusName = statusName,
                     OnlineStatusIcon = statusIcon,
                     IsUpdated = user.IsUpdated,
-                    LastModified = user.Updated ??= DateTime.UtcNow,
+                    LastModified = user.Updated ?? DateTime.UtcNow,
                     LoginVerified = logVerified
                 };
                 activeUsersDetails.Add(activeUser);

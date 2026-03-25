@@ -23,7 +23,7 @@
 		<tr>
 			<td>
 				<small>
-				@if (agent.ValidationExecuted)
+				@if (agent!.ValidationExecuted)
 				{
 					@location.AgentEmail
 				}
@@ -53,7 +53,7 @@
 
 			</td>
 			<td>
-				@if (agent.ValidationExecuted && agent.LocationMapUrl != null)
+				@if (agent!.ValidationExecuted && agent.LocationMapUrl != null)
 				{
 					<img src="@string.Format(@agent.LocationMapUrl, "500","500")"
 						 class="thumbnail profile-image doc-profile-image map-image"

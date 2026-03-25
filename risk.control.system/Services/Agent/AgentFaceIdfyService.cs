@@ -49,28 +49,28 @@ internal class AgentFaceIdfyService : IAgentFaceIdfyService
     public async Task<AppiCheckifyResponse> CaptureAgentId(FaceData data)
     {
         InvestigationTask claim = await caseService.GetCaseById(data.CaseId);
-        if (claim?.InvestigationReport == null) return null;
+        if (claim?.InvestigationReport == null) return null!;
 
         var agent = await context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == data.Email);
-        var locationRecord = claim.InvestigationReport.ReportTemplate.LocationReport
+        var locationRecord = claim.InvestigationReport.ReportTemplate!.LocationReport
             .FirstOrDefault(l => l.LocationName == data.LocationName);
 
-        var locationTemplate = await context.LocationReport.Include(l => l.AgentIdReport).FirstOrDefaultAsync(l => l.Id == locationRecord.Id);
+        var locationTemplate = await context.LocationReport.Include(l => l.AgentIdReport).FirstOrDefaultAsync(l => l.Id == locationRecord!.Id);
 
-        var agentIdReport = locationTemplate.AgentIdReport;
+        var agentIdReport = locationTemplate!.AgentIdReport;
 
         try
         {
             // 1. Prepare Data & Save Physical File
-            var faceBytes = await VerificationHelper.GetBytesFromIFormFile(data.Image);
-            var (faceImageFileName, relativePath) = await fileStorageService.SaveAsync(data.Image, "Case", claim.PolicyDetail.ContractNumber, "report");
+            var faceBytes = await VerificationHelper.GetBytesFromIFormFile(data.Image!);
+            var (faceImageFileName, relativePath) = await fileStorageService.SaveAsync(data.Image!, "Case", claim.PolicyDetail!.ContractNumber, "report");
 
             // 2. Extract Coordinates
-            var (lat, lon) = VerificationHelper.ParseCoordinates(data.LocationLatLong);
+            var (lat, lon) = VerificationHelper.ParseCoordinates(data.LocationLatLong!);
             var expectedCoords = VerificationHelper.GetExpectedCoordinates(claim);
 
             // 3. Parallel Service Calls (Orchestration)
-            var registeredImage = await File.ReadAllBytesAsync(Path.Combine(webHostEnvironment.ContentRootPath, agent.ProfilePictureUrl));
+            var registeredImage = await File.ReadAllBytesAsync(Path.Combine(webHostEnvironment.ContentRootPath, agent!.ProfilePictureUrl!));
 
             var faceTask = faceMatchService.GetFaceMatchAsync(registeredImage, faceBytes, Path.GetExtension(faceImageFileName));
             var weatherTask = weatherInfoService.GetWeatherAsync(lat, lon);
@@ -80,12 +80,12 @@ internal class AgentFaceIdfyService : IAgentFaceIdfyService
             await Task.WhenAll(faceTask, weatherTask, addressTask, mapTask);
 
             // 4. Update Entities
-            AgentFaceIdfyHelper.MapMetadataToReport(agentIdReport, locationTemplate, data, relativePath, faceImageFileName, lat, lon);
+            AgentFaceIdfyHelper.MapMetadataToReport(agentIdReport!, locationTemplate, data, relativePath, faceImageFileName, lat, lon);
 
             var (conf, compImage, sim) = await faceTask;
             var (dist, distM, dur, durS, mapUrl) = await mapTask;
 
-            agentIdReport.LocationMapUrl = mapUrl;
+            agentIdReport!.LocationMapUrl = mapUrl;
             agentIdReport.Duration = dur;
             agentIdReport.Distance = dist;
             agentIdReport.DistanceInMetres = distM;
@@ -96,7 +96,7 @@ internal class AgentFaceIdfyService : IAgentFaceIdfyService
             agentIdReport.Similarity = sim;
             agentIdReport.ImageValid = sim > 70;
 
-            await File.WriteAllBytesAsync(agentIdReport.FilePath, compImage);
+            await File.WriteAllBytesAsync(agentIdReport.FilePath!, compImage);
 
             await context.SaveChangesAsync();
 
@@ -106,7 +106,7 @@ internal class AgentFaceIdfyService : IAgentFaceIdfyService
         {
             var sanitizedEmail = data.Email?.Replace("\n", "").Replace("\r", "").Trim();
             logger.LogError(ex, "Failed Agent face Id match for CaseId {Id}. {AgentEmail}", data.CaseId, sanitizedEmail);
-            return await HandleError(claim, agentIdReport);
+            return await HandleError(claim, agentIdReport!);
         }
     }
 
@@ -116,7 +116,7 @@ internal class AgentFaceIdfyService : IAgentFaceIdfyService
         agentIdReport.ValidationExecuted = true;
         agentIdReport.ImageValid = false;
         await context.SaveChangesAsync();
-        byte[] fallback = File.Exists(agentIdReport.FilePath) ? await File.ReadAllBytesAsync(agentIdReport.FilePath) : null;
+        byte[] fallback = File.Exists(agentIdReport.FilePath) ? await File.ReadAllBytesAsync(agentIdReport.FilePath) : null!;
         return AgentFaceIdfyHelper.CreateResponse(claim, agentIdReport, fallback);
     }
 }

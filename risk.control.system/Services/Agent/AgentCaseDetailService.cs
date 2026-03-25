@@ -43,31 +43,31 @@ namespace risk.control.system.Services.Agent
                 .Include(c => c.CaseMessages)
                 .Include(c => c.CaseNotes)
                 .Include(c => c.ClientCompany)
-                    .ThenInclude(c => c.Country)
+                    .ThenInclude(c => c!.Country)
                 .Include(c => c.PolicyDetail)
-                    .ThenInclude(p => p.InvestigationServiceType)
+                    .ThenInclude(p => p!.InvestigationServiceType)
                 .Include(c => c.PolicyDetail)
-                    .ThenInclude(p => p.CostCentre)
+                    .ThenInclude(p => p!.CostCentre)
                 .Include(c => c.PolicyDetail)
-                    .ThenInclude(p => p.CaseEnabler)
+                    .ThenInclude(p => p!.CaseEnabler)
                 .Include(c => c.CustomerDetail)
-                    .ThenInclude(c => c.PinCode)
+                    .ThenInclude(c => c!.PinCode)
                 .Include(c => c.CustomerDetail)
-                    .ThenInclude(c => c.District)
+                    .ThenInclude(c => c!.District)
                 .Include(c => c.CustomerDetail)
-                    .ThenInclude(c => c.State)
+                    .ThenInclude(c => c!.State)
                 .Include(c => c.CustomerDetail)
-                    .ThenInclude(c => c.Country)
+                    .ThenInclude(c => c!.Country)
                 .Include(c => c.BeneficiaryDetail)
-                    .ThenInclude(b => b.PinCode)
+                    .ThenInclude(b => b!.PinCode)
                 .Include(c => c.BeneficiaryDetail)
-                    .ThenInclude(b => b.District)
+                    .ThenInclude(b => b!.District)
                 .Include(c => c.BeneficiaryDetail)
-                    .ThenInclude(b => b.State)
+                    .ThenInclude(b => b!.State)
                 .Include(c => c.BeneficiaryDetail)
-                    .ThenInclude(b => b.Country)
+                    .ThenInclude(b => b!.Country)
                 .Include(c => c.BeneficiaryDetail)
-                    .ThenInclude(b => b.BeneficiaryRelation)
+                    .ThenInclude(b => b!.BeneficiaryRelation)
                 .Include(c => c.CaseNotes)
                 .Include(c => c.InvestigationReport)
                 .FirstOrDefaultAsync(c => c.Id == selectedCaseId);
@@ -79,12 +79,12 @@ namespace risk.control.system.Services.Agent
             }
 
             // Mask sensitive phone numbers
-            caseTask.CustomerDetail.PhoneNumber = MaskPhoneNumber(caseTask.CustomerDetail?.PhoneNumber!);
-            caseTask.BeneficiaryDetail.PhoneNumber = MaskPhoneNumber(caseTask.BeneficiaryDetail?.PhoneNumber!);
+            caseTask.CustomerDetail!.PhoneNumber = MaskPhoneNumber(caseTask.CustomerDetail?.PhoneNumber!);
+            caseTask.BeneficiaryDetail!.PhoneNumber = MaskPhoneNumber(caseTask.BeneficiaryDetail?.PhoneNumber!);
             _logger.LogInformation("Masked phone numbers for case {CaseId}", selectedCaseId);
 
             // Assign agent email
-            caseTask.InvestigationReport.AgentEmail = userEmail;
+            caseTask.InvestigationReport!.AgentEmail = userEmail;
 
             // Load report templates
             var templates = await _context.ReportTemplates.AsNoTracking()
@@ -119,7 +119,7 @@ namespace risk.control.system.Services.Agent
                 InvestigationReport = caseTask.InvestigationReport,
                 Beneficiary = caseTask.BeneficiaryDetail,
                 CaseTask = caseTask,
-                Currency = CustomExtensions.GetCultureByCountry(caseTask.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol
+                Currency = CustomExtensions.GetCultureByCountry(caseTask.ClientCompany!.Country!.Code.ToUpper()).NumberFormat.CurrencySymbol
             };
 
             _logger.LogInformation("Returning investigation model for case {CaseId}", selectedCaseId);
@@ -137,31 +137,31 @@ namespace risk.control.system.Services.Agent
                 .Include(c => c.InvestigationReport)
                 .Include(c => c.InvestigationTimeline)
                 .Include(c => c.PolicyDetail)
-                    .ThenInclude(p => p.CaseEnabler)
+                    .ThenInclude(p => p!.CaseEnabler)
                 .Include(c => c.PolicyDetail)
-                    .ThenInclude(p => p.InvestigationServiceType)
+                    .ThenInclude(p => p!.InvestigationServiceType)
                 .Include(c => c.PolicyDetail)
-                    .ThenInclude(p => p.CostCentre)
+                    .ThenInclude(p => p!.CostCentre)
                 .Include(c => c.ClientCompany)
                 .Include(c => c.Vendor)
                 .Include(c => c.BeneficiaryDetail)
-                    .ThenInclude(b => b.PinCode)
+                    .ThenInclude(b => b!.PinCode)
                 .Include(c => c.BeneficiaryDetail)
-                    .ThenInclude(b => b.District)
+                    .ThenInclude(b => b!.District)
                 .Include(c => c.BeneficiaryDetail)
-                    .ThenInclude(b => b.State)
+                    .ThenInclude(b => b!.State)
                 .Include(c => c.BeneficiaryDetail)
-                    .ThenInclude(b => b.Country)
+                    .ThenInclude(b => b!.Country)
                 .Include(c => c.BeneficiaryDetail)
-                    .ThenInclude(b => b.BeneficiaryRelation)
+                    .ThenInclude(b => b!.BeneficiaryRelation)
                 .Include(c => c.CustomerDetail)
-                    .ThenInclude(c => c.Country)
+                    .ThenInclude(c => c!.Country)
                 .Include(c => c.CustomerDetail)
-                    .ThenInclude(c => c.State)
+                    .ThenInclude(c => c!.State)
                 .Include(c => c.CustomerDetail)
-                    .ThenInclude(c => c.District)
+                    .ThenInclude(c => c!.District)
                 .Include(c => c.CustomerDetail)
-                    .ThenInclude(c => c.PinCode)
+                    .ThenInclude(c => c!.PinCode)
                 .FirstOrDefaultAsync(m => m.Id == id);
 
             if (caseTask == null)
@@ -194,7 +194,7 @@ namespace risk.control.system.Services.Agent
 
             if (templates != null)
             {
-                caseTask.InvestigationReport.ReportTemplate = templates;
+                caseTask.InvestigationReport!.ReportTemplate = templates;
                 _logger.LogInformation("Loaded report template {TemplateId} for case {CaseId}", templates.Id, id);
             }
             else
@@ -209,7 +209,7 @@ namespace risk.control.system.Services.Agent
                 Beneficiary = caseTask.BeneficiaryDetail,
                 Assigned = caseTask.Status == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER,
                 Withdrawable = caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR,
-                Currency = CustomExtensions.GetCultureByCountry(company.Country.Code.ToUpper()).NumberFormat.CurrencySymbol
+                Currency = CustomExtensions.GetCultureByCountry(company!.Country!.Code.ToUpper()).NumberFormat.CurrencySymbol
             };
 
             _logger.LogInformation("Returning CaseTransactionModel for case {CaseId}", id);
@@ -220,25 +220,25 @@ namespace risk.control.system.Services.Agent
         {
             var caseDetail = await _context.Investigations
                 .Include(c => c.InvestigationReport)
-                .ThenInclude(c => c.ReportTemplate)
-                .ThenInclude(c => c.LocationReport)
+                .ThenInclude(c => c!.ReportTemplate)
+                .ThenInclude(c => c!.LocationReport)
                 .Include(c => c.PolicyDetail)
                 .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.PinCode)
+                .ThenInclude(c => c!.PinCode)
                 .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.District)
+                .ThenInclude(c => c!.District)
                 .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.State)
+                .ThenInclude(c => c!.State)
                 .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.Country)
+                .ThenInclude(c => c!.Country)
                 .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.PinCode)
+                .ThenInclude(c => c!.PinCode)
                 .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.District)
+                .ThenInclude(c => c!.District)
                 .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.State)
+                .ThenInclude(c => c!.State)
                 .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.Country)
+                .ThenInclude(c => c!.Country)
                 .Include(c => c.CaseNotes)
                 .FirstOrDefaultAsync(c => c.Id == id);
             return caseDetail!;
@@ -251,8 +251,8 @@ namespace risk.control.system.Services.Agent
                  .Include(c => c.CustomerDetail)
                  .Include(c => c.BeneficiaryDetail)
                  .Include(c => c.InvestigationReport)
-                .ThenInclude(c => c.ReportTemplate)
-                .ThenInclude(c => c.LocationReport)
+                .ThenInclude(c => c!.ReportTemplate)
+                .ThenInclude(c => c!.LocationReport)
                 .FirstOrDefaultAsync(c => c.Id == id);
             return caseDetail!;
         }
@@ -261,8 +261,8 @@ namespace risk.control.system.Services.Agent
         {
             var caseDetail = await _context.Investigations
                     .Include(c => c.InvestigationReport)
-                    .ThenInclude(c => c.ReportTemplate)
-                    .ThenInclude(c => c.LocationReport)
+                    .ThenInclude(c => c!.ReportTemplate)
+                    .ThenInclude(c => c!.LocationReport)
                     .FirstOrDefaultAsync(c => c.Id == id);
             return caseDetail!;
         }
