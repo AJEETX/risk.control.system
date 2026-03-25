@@ -37,9 +37,9 @@ namespace risk.control.system.Services.Creator
             decimal.TryParse(uc.Amount, out var amount);
 
             // 3. Lookups (Service Type, Enabler, Cost Centre)
-            var serviceTypeTask = GetServiceType(uc.ServiceType.Trim(), insuranceType);
-            var enablerTask = GetCaseEnabler(uc.Reason.Trim());
-            var costCentreTask = GetCostCentre(uc.Department.Trim());
+            var serviceTypeTask = GetServiceType(uc.ServiceType!.Trim(), insuranceType);
+            var enablerTask = GetCaseEnabler(uc.Reason!.Trim());
+            var costCentreTask = GetCostCentre(uc.Department!.Trim());
             await Task.WhenAll(serviceTypeTask, enablerTask, costCentreTask);
 
             var serviceType = await serviceTypeTask;
@@ -50,7 +50,7 @@ namespace risk.control.system.Services.Creator
 
             var policy = new PolicyDetail
             {
-                ContractNumber = uc.CaseId?.ToUpper(),
+                ContractNumber = uc.CaseId?.ToUpper()!,
                 SumAssuredValue = amount,
                 ContractIssueDate = issueDate,
                 DateOfIncident = incidentDate,
@@ -58,7 +58,7 @@ namespace risk.control.system.Services.Creator
                 CaseEnablerId = enabler.CaseEnablerId,
                 CostCentreId = costCentre.CostCentreId,
                 InsuranceType = insuranceType,
-                CauseOfLoss = uc.Cause.Trim() ?? "UNKNOWN",
+                CauseOfLoss = uc.Cause!.Trim() ?? "UNKNOWN",
                 DocumentPath = imgPath,
                 DocumentImageExtension = ext,
                 Updated = DateTime.UtcNow,
@@ -70,14 +70,14 @@ namespace risk.control.system.Services.Creator
 
         private async Task<InvestigationServiceType> GetServiceType(string code, InsuranceType type)
         {
-            using var context = await _contextFactory.CreateDbContextAsync();
+            await using var context = await _contextFactory.CreateDbContextAsync();
 
             // 1. Prepare the search term to ensure the query is "SARGable" (index-friendly)
             var normalizedCode = code?.Trim().ToLower();
             var hasCode = !string.IsNullOrWhiteSpace(normalizedCode);
 
             // 2. Try the most specific match first
-            InvestigationServiceType service = null!;
+            InvestigationServiceType? service = null!;
 
             if (hasCode)
             {
@@ -95,27 +95,27 @@ namespace risk.control.system.Services.Creator
             }
 
             // 4. Fallback 2: Get the absolute default (first record)
-            return service ?? await context.InvestigationServiceType.AsNoTracking().FirstOrDefaultAsync();
+            return service ?? (await context.InvestigationServiceType.AsNoTracking().FirstOrDefaultAsync())!;
         }
 
         private async Task<CaseEnabler> GetCaseEnabler(string reason)
         {
-            using var context = await _contextFactory.CreateDbContextAsync();
+            await using var context = await _contextFactory.CreateDbContextAsync();
             if (string.IsNullOrWhiteSpace(reason))
-                return await context.CaseEnabler.AsNoTracking().FirstOrDefaultAsync();
-
-            return await context.CaseEnabler.AsNoTracking().FirstOrDefaultAsync(c => c.Code.ToLower() == reason.Trim().ToLower())
-                ?? await context.CaseEnabler.AsNoTracking().FirstOrDefaultAsync();
+                return (await context.CaseEnabler.AsNoTracking().FirstOrDefaultAsync())!;
+            reason = reason.Trim().ToLower();
+            return await context.CaseEnabler.AsNoTracking().FirstOrDefaultAsync(c => c.Code == reason)
+                ?? (await context.CaseEnabler.AsNoTracking().FirstOrDefaultAsync())!;
         }
 
         private async Task<CostCentre> GetCostCentre(string department)
         {
-            using var context = await _contextFactory.CreateDbContextAsync();
+            await using var context = await _contextFactory.CreateDbContextAsync();
             if (string.IsNullOrWhiteSpace(department))
-                return await context.CostCentre.AsNoTracking().FirstOrDefaultAsync();
-
-            return await context.CostCentre.AsNoTracking().FirstOrDefaultAsync(c => c.Code.ToLower() == department.Trim().ToLower())
-                ?? await context.CostCentre.AsNoTracking().FirstOrDefaultAsync();
+                return (await context.CostCentre.AsNoTracking().FirstOrDefaultAsync())!;
+            department = department.Trim().ToLower();
+            return await context.CostCentre.AsNoTracking().FirstOrDefaultAsync(c => c.Code == department)
+                ?? (await context.CostCentre.AsNoTracking().FirstOrDefaultAsync())!;
         }
     }
 }

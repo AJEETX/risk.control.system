@@ -24,9 +24,9 @@ namespace risk.control.system.Services.Agent
                .FirstOrDefaultAsync(l => l.Id == locationId);
 
             // Save to DB
-            var media = locationTemplate.MediaReports.FirstOrDefault(c => c.ReportName == reportName);
+            var media = locationTemplate!.MediaReports!.FirstOrDefault(c => c.ReportName == reportName);
 
-            media.Transcript = transcript;
+            media!.Transcript = transcript;
 
             await context.SaveChangesAsync();
         }

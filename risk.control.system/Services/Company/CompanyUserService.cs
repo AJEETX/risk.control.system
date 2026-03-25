@@ -61,10 +61,10 @@ namespace risk.control.system.Services.Company
                     return result;
                 }
 
-                if (!ValidateProfileImage(model.ProfileImage, result))
+                if (!ValidateProfileImage(model.ProfileImage!, result))
                     return result;
 
-                var fullEmail = $"{model.Email.Trim().ToLower(CultureInfo.InvariantCulture)}@{emailSuffix.Trim().ToLower(CultureInfo.InvariantCulture)}";
+                var fullEmail = $"{model.Email!.Trim().ToLower(CultureInfo.InvariantCulture)}@{emailSuffix.Trim().ToLower(CultureInfo.InvariantCulture)}";
 
                 var userCount = await _userManager.Users.AsNoTracking().CountAsync(u => u.Email == fullEmail.ToLower());
                 if (userCount > 0)
@@ -73,7 +73,7 @@ namespace risk.control.system.Services.Company
                 if (await _userManager.Users.AnyAsync(u => u.Email == fullEmail && !u.Deleted))
                     return Fail($"User <b>{fullEmail}</b> already exists.");
 
-                await SetProfileImageAsync(model, model.ProfileImage, emailSuffix);
+                await SetProfileImageAsync(model, model.ProfileImage!, emailSuffix);
 
                 var textInfo = CultureInfo.CurrentCulture.TextInfo;
                 model.FirstName = WebUtility.HtmlEncode(textInfo.ToTitleCase(model.FirstName.Trim().ToLower()));
@@ -84,7 +84,7 @@ namespace risk.control.system.Services.Company
                 model.Active = true;
                 model.EmailConfirmed = true;
 
-                model.PhoneNumber = model.PhoneNumber.TrimStart('0').Trim();
+                model.PhoneNumber = model.PhoneNumber!.TrimStart('0').Trim();
                 model.IsClientAdmin = model.Role == AppRoles.COMPANY_ADMIN;
                 model.Updated = DateTime.UtcNow;
                 model.UpdatedBy = performedBy;
@@ -96,10 +96,10 @@ namespace risk.control.system.Services.Company
                 if (!createResult.Succeeded)
                     return Fail($"Failed to create user <b>{fullEmail}</b>.");
 
-                await _userManager.AddToRoleAsync(model, model.Role.ToString());
+                await _userManager.AddToRoleAsync(model, model.Role.ToString()!);
 
                 var country = await _context.Country.FindAsync(model.CountryId);
-                await _sms.DoSendSmsAsync(country.Code, country.ISDCode + model.PhoneNumber, $"User created\nEmail: {model.Email} \n {portal_base_url}");
+                await _sms.DoSendSmsAsync(country!.Code, country.ISDCode + model.PhoneNumber, $"User created\nEmail: {model.Email} \n {portal_base_url}");
 
                 return Success($"User <b>{model.Email} </b>created successfully.");
             }
@@ -123,7 +123,7 @@ namespace risk.control.system.Services.Company
                 {
                     if (!ValidateProfileImage(model.ProfileImage, result))
                         return result;
-                    var domain = user.Email.Split('@')[1];
+                    var domain = user.Email!.Split('@')[1];
                     await SetProfileImageAsync(user, model.ProfileImage, domain);
                 }
                 var textInfo = CultureInfo.CurrentCulture.TextInfo;
@@ -135,7 +135,7 @@ namespace risk.control.system.Services.Company
                 user.DistrictId = model.SelectedDistrictId;
                 user.PinCodeId = model.SelectedPincodeId;
                 user.Addressline = model.Addressline;
-                user.PhoneNumber = model.PhoneNumber.TrimStart('0').Trim();
+                user.PhoneNumber = model.PhoneNumber!.TrimStart('0').Trim();
 
                 user.Role = model.Role;
                 user.IsClientAdmin = user.Role == AppRoles.COMPANY_ADMIN;
@@ -150,7 +150,7 @@ namespace risk.control.system.Services.Company
 
                 var roles = await _userManager.GetRolesAsync(user);
                 await _userManager.RemoveFromRolesAsync(user, roles);
-                await _userManager.AddToRoleAsync(user, user.Role.ToString());
+                await _userManager.AddToRoleAsync(user, user.Role.ToString()!);
                 if (user.Email != performedBy)
                 {
                     user.Active = model.Active;
@@ -166,7 +166,7 @@ namespace risk.control.system.Services.Company
                     }
                 }
                 var country = await _context.Country.FindAsync(user.CountryId);
-                await _sms.DoSendSmsAsync(country.Code, country.ISDCode + model.PhoneNumber, $"User edited\nEmail: {model.Email} \n \r {portal_base_url}");
+                await _sms.DoSendSmsAsync(country!.Code, country.ISDCode + model.PhoneNumber, $"User edited\nEmail: {model.Email} \n \r {portal_base_url}");
 
                 return Success($"User <b>{user.Email}</b> updated successfully.");
             }
@@ -180,9 +180,9 @@ namespace risk.control.system.Services.Company
         public async Task LoadModel(ApplicationUser model, string currentUserEmail)
         {
             var companyUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == currentUserEmail);
-            var company = await _context.ClientCompany.AsNoTracking().Include(c => c.Country).FirstOrDefaultAsync(v => v.ClientCompanyId == companyUser.ClientCompanyId);
+            var company = await _context.ClientCompany.AsNoTracking().Include(c => c.Country).FirstOrDefaultAsync(v => v.ClientCompanyId == companyUser!.ClientCompanyId);
             model.ClientCompany = company;
-            model.Country = company.Country;
+            model.Country = company!.Country;
             model.CountryId = company.CountryId;
 
             model.StateId = model.SelectedStateId;
@@ -245,13 +245,13 @@ namespace risk.control.system.Services.Company
         public async Task<ApplicationUser> GetUserAsync(long id)
         {
             var companyUser = await _context.ApplicationUser.AsNoTracking().Include(u => u.ClientCompany).Include(c => c.Country).FirstOrDefaultAsync(u => u.Id == id);
-            return companyUser;
+            return companyUser!;
         }
 
         public async Task<ApplicationUser> GetChangePasswordUserAsync(string userEmail)
         {
             var companyUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(u => u.Email == userEmail);
-            return companyUser;
+            return companyUser!;
         }
     }
 }

@@ -117,6 +117,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                     p.Code,
                     p.Name,
                     p.Updated,
+                    p.Created,
                     State = p.State!.Name,
                     Country = p.Country!.Name
                 })
@@ -127,7 +128,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 p.DistrictId,
                 p.Code,
                 p.Name,
-                Updated = p.Updated?.ToString("dd-MMM-yyyy HH:mm"),
+                Updated = p.Updated ?? p.Created,
                 State = p.State,
                 Country = p.Country
             }).ToList();

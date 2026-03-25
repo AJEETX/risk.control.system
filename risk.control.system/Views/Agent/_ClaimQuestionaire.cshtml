@@ -2,10 +2,10 @@
 @model CaseAgencyModel
 
 @{
-	var questionTime = @Model.InvestigationReport.AgentRemarksUpdated != null ? @Model.InvestigationReport.AgentRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt") : null;
+	var questionTime = @Model.InvestigationReport?.AgentRemarksUpdated != null ? @Model.InvestigationReport.AgentRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt") : null;
 
 	string questionaire = "progress-bar-grey";
-	if (Model.InvestigationReport.AgentRemarks != null)
+	if (Model.InvestigationReport?.AgentRemarks != null)
 	{
 		questionaire = "progress-bar-green";
 	}
@@ -14,12 +14,12 @@
 			<div class="card-header text-muted border-bottom-0">
 
 				<h3 class="card-title">
-					<i class="far fa-comment"></i> Remarks (@Model.CaseTask?.PolicyDetail.InsuranceType.GetEnumDisplayName())
+					<i class="far fa-comment"></i> Remarks (@Model.CaseTask?.PolicyDetail?.InsuranceType?.GetEnumDisplayName())
 					<span class="hover-text">
 						<i class="fas fa-info-circle"></i>
 						<span class="tooltip-text" id="information">
 							<span>
-								<i class="fas fa-comment"></i> Fill-up Questionnaire (@Model.CaseTask?.PolicyDetail.InsuranceType.GetEnumDisplayName())
+								<i class="fas fa-comment"></i> Fill-up Questionnaire (@Model.CaseTask?.PolicyDetail?.InsuranceType?.GetEnumDisplayName())
 							</span>
 						</span>
 					</span>
@@ -29,7 +29,7 @@
 				</div>
 			</div>
 			<div class="card-footer text-muted border-bottom-0">
-				<i class="fas fa-user-shield"></i>  Agent :<span class="badge badge-light">  @Model.InvestigationReport.AgentEmail </span>
+				<i class="fas fa-user-shield"></i>  Agent :<span class="badge badge-light">  @Model.InvestigationReport?.AgentEmail </span>
 			</div>
 			<div class="progress">
 				<i class="far fa-bookmark bookmark-green"></i>
@@ -38,7 +38,7 @@
 				</div>
 			</div>
 			<form id="create-form" asp-controller="AgencyReport" asp-action="SubmitReport" method="post">
-				<input type="hidden" name="caseId" value="@Model.CaseTask.Id" />
+				<input type="hidden" name="caseId" value="@Model.CaseTask?.Id" />
 				@Html.AntiForgeryToken()
 				<div class="card-body">
 					<div class="row">

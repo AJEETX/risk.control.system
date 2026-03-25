@@ -114,6 +114,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 s.Name,
                 s.Code,
                 s.Updated,
+                s.Created,
                 CountryName = s.Country!.Name
             })
             .ToListAsync();
@@ -124,7 +125,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 s.StateId,
                 s.Name,
                 s.Code,
-                Updated = s.Updated?.ToString("dd-MMM-yyyy HH:mm"),
+                Updated = s.Updated ?? s.Created,
                 s.CountryName
             });
 

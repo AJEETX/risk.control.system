@@ -73,7 +73,7 @@ namespace risk.control.system.Services.Common
             if (await _featureManager.IsEnabledAsync(FeatureFlags.ENABLE_AGENCY_USER_FACE_MATCH))
             {
                 var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == userEmail);
-                byte[] imageBytes = await base64FileService.GetByteFileAsync(user.ProfilePictureUrl);
+                byte[] imageBytes = await base64FileService.GetByteFileAsync(user!.ProfilePictureUrl!);
 
                 var indexRequest = new IndexFacesRequest
                 {

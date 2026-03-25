@@ -2,14 +2,14 @@
 
 @{
 	ViewData["Title"] = "Report ";
-	var locations = Model.InvestigationReport.ReportTemplate.LocationReport;
+	var locations = Model.InvestigationReport?.ReportTemplate?.LocationReport!;
 }
 
 <section class="content">
 	<form id="create-form" method="post" asp-controller="CaseAction" asp-action="ProcessCaseReport">
-		<input type="hidden" id="claimId" name="claimId" value="@Model.CaseTask.Id" />
-		<input type="hidden" id="policyDetailId" value="@Model.CaseTask?.PolicyDetail.PolicyDetailId" />
-		<input type="hidden" id="customerDetailId" value="@Model.CaseTask?.CustomerDetail.CustomerDetailId" />
+		<input type="hidden" id="claimId" name="claimId" value="@Model.CaseTask?.Id" />
+		<input type="hidden" id="policyDetailId" value="@Model.CaseTask?.PolicyDetail?.PolicyDetailId" />
+		<input type="hidden" id="customerDetailId" value="@Model.CaseTask?.CustomerDetail?.CustomerDetailId" />
 		<input type="hidden" id="beneficiaryId" value="@Model.Beneficiary?.BeneficiaryDetailId" />
 		<input type="hidden" id="reportAiSummary" value="@Model.ReportAiSummary" />
 		<input type="hidden" id="assessorRemarkType" name="assessorRemarkType" value="OK" />
@@ -58,7 +58,7 @@
 		</div>
 		<partial name="_AgencyReport" model="@Model" />
 
-		@if (@Model.CaseTask.IsQueryCase && @Model.CaseTask.InvestigationReport.EnquiryRequest != null)
+		@if (@Model.CaseTask!.IsQueryCase && @Model.CaseTask.InvestigationReport?.EnquiryRequest != null)
 		{
 			var data = new CaseTransactionModel
 			{
@@ -113,7 +113,7 @@
 									<tbody>
 										@foreach (var location in locations)
 										{
-											var duration = location.Updated.GetValueOrDefault().Subtract(location.AgentIdReport.Updated.GetValueOrDefault());
+											var duration = location.Updated.GetValueOrDefault().Subtract(location.AgentIdReport!.Updated.GetValueOrDefault());
 											var durationText = (duration.Hours > 0 ? $"{duration.Hours}h " : "") +
 											(duration.Minutes > 0 ? $"{duration.Minutes}m" : "less than a min");
 
@@ -152,7 +152,7 @@
 													}
 												</td>
 												<td>
-													@foreach (var face in location.FaceIds.Where(f => f.Selected))
+													@foreach (var face in location.FaceIds!.Where(f => f.Selected))
 													{
 														<div>
 															@if (face.ValidationExecuted)
@@ -175,7 +175,7 @@
 													}
 												</td>
 												<td>
-													@foreach (var doc in location.DocumentIds.Where(d => d.Selected))
+													@foreach (var doc in location.DocumentIds!.Where(d => d.Selected))
 													{
 														<div>
 															@if (doc.ValidationExecuted)
@@ -284,7 +284,7 @@
 
 							<i class="fas fa-arrow-left" aria-hidden="true"></i> <span class="badge badge-light"> <i class="fas fa-glasses"></i> </span> Back
 						</a>
-						@if (Model.InvestigationReport.EnquiryRequest == null)
+						@if (Model.InvestigationReport?.EnquiryRequest == null)
 						{
 							<a id="enquire-case" asp-controller="Assessor" asp-action="SendEnquiry"
 								   asp-route-id="@Model.CaseTask.Id" class="btn btn-sm btn-warning">

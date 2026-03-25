@@ -49,7 +49,7 @@ namespace risk.control.system.Services.Agent
                     response.EnsureSuccessStatusCode();
                     var body = await response.Content.ReadAsStringAsync();
                     var addressData = JsonConvert.DeserializeObject<MapAddress>(body);
-                    return (addressData.features.FirstOrDefault().properties.formatted);
+                    return addressData!.features!.FirstOrDefault()!.properties!.formatted!;
                 }
             }
             catch (Exception)
@@ -161,7 +161,7 @@ namespace risk.control.system.Services.Agent
                     var body = await response.Content.ReadAsStringAsync();
                     var passportOcrData = JsonConvert.DeserializeObject<PassportOcrData>(body);
                     Console.WriteLine(body);
-                    return passportOcrData;
+                    return passportOcrData!;
                 }
             }
             catch (Exception ex)
@@ -207,8 +207,8 @@ namespace risk.control.system.Services.Agent
                 response.EnsureSuccessStatusCode();
                 var body = await response.Content.ReadAsStringAsync();
                 Console.WriteLine(body);
-                var requestId = JsonConvert.DeserializeObject<List<PassportResult>>(body).FirstOrDefault()?.request_id;
-                return requestId;
+                var requestId = JsonConvert.DeserializeObject<List<PassportResult>>(body)!.FirstOrDefault()?.request_id;
+                return requestId!;
             }
         }
     }

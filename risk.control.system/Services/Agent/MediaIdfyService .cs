@@ -41,25 +41,25 @@ internal class MediaIdfyService : IMediaIdfyService
     public async Task<AppiCheckifyResponse> CaptureMedia(DocumentData data)
     {
         InvestigationTask claim = await caseService.GetCaseByIdForMedia(data.CaseId);
-        if (claim?.InvestigationReport == null) return null;
+        if (claim?.InvestigationReport == null) return null!;
 
-        var location = claim.InvestigationReport.ReportTemplate.LocationReport.FirstOrDefault(l => l.LocationName == data.LocationName);
+        var location = claim.InvestigationReport.ReportTemplate!.LocationReport.FirstOrDefault(l => l.LocationName == data.LocationName);
 
-        var locationTemplate = await context.LocationReport.Include(l => l.MediaReports).FirstOrDefaultAsync(l => l.Id == location.Id);
+        var locationTemplate = await context.LocationReport.Include(l => l.MediaReports).FirstOrDefaultAsync(l => l.Id == location!.Id);
 
-        var media = locationTemplate.MediaReports.FirstOrDefault(c => c.ReportName == data.ReportName);
+        var media = locationTemplate!.MediaReports!.FirstOrDefault(c => c.ReportName == data.ReportName);
 
         try
         {
             // 1. Prepare Data & Coordinates
             var (lat, lon) = VerificationHelper.ParseCoordinates(data.LocationLatLong);
             var expected = VerificationHelper.GetExpectedCoordinates(claim);
-            byte[] fileBytes = await VerificationHelper.GetBytesFromIFormFile(data.Image);
+            byte[] fileBytes = await VerificationHelper.GetBytesFromIFormFile(data.Image!);
 
             // 2. Storage & Metadata
-            var (fileName, relativePath) = await fileStorageService.SaveMediaAsync(data.Image, "Case", claim.PolicyDetail.ContractNumber, "report");
-            MediaIdfyHelper.UpdateMediaMetadata(media, relativePath, fileName, lat, lon);
-            MediaIdfyHelper.DetermineMediaType(media, data.Image.ContentType);
+            var (fileName, relativePath) = await fileStorageService.SaveMediaAsync(data.Image!, "Case", claim.PolicyDetail!.ContractNumber, "report");
+            MediaIdfyHelper.UpdateMediaMetadata(media!, relativePath, fileName, lat, lon);
+            MediaIdfyHelper.DetermineMediaType(media!, data.Image!.ContentType);
 
             // 3. Parallel Service Orchestration
             var weatherTask = weatherInfoService.GetWeatherAsync(lat, lon);
@@ -70,7 +70,7 @@ internal class MediaIdfyService : IMediaIdfyService
 
             // 4. Update Results
             var (dist, distM, dur, durS, mapUrl) = await mapTask;
-            media.LocationMapUrl = mapUrl;
+            media!.LocationMapUrl = mapUrl;
             media.Duration = dur;
             media.Distance = dist;
             media.DistanceInMetres = distM;
@@ -89,7 +89,7 @@ internal class MediaIdfyService : IMediaIdfyService
         {
             var sanitizedEmail = data.Email?.Replace("\n", "").Replace("\r", "").Trim();
             logger.LogError(ex, "Failed media file capture for Case {CaseId}. {AgentEmail}", data.CaseId, sanitizedEmail);
-            return await HandleMediaError(claim, media);
+            return await HandleMediaError(claim, media!);
         }
     }
 

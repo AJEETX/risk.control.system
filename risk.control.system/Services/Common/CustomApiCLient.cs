@@ -46,12 +46,12 @@ namespace risk.control.system.Services.Common
                 JObject jsonResponse = JObject.Parse(content);
 
                 // Check if the status is OK
-                if (jsonResponse["status"].ToString() == "OK")
+                if (jsonResponse["status"]!.ToString() == "OK")
                 {
                     // Extract latitude and longitude
-                    var location = jsonResponse["results"][0]["geometry"]["location"];
-                    string latitude = location["lat"].ToObject<string>();
-                    string longitude = location["lng"].ToObject<string>();
+                    var location = jsonResponse["results"]![0]!["geometry"]!["location"]!;
+                    string latitude = location["lat"]!.ToObject<string>()!;
+                    string longitude = location["lng"]!.ToObject<string>()!;
 
                     return (latitude.ToString(), longitude.ToString());
                 }
@@ -86,10 +86,10 @@ namespace risk.control.system.Services.Common
                 var jsonResponse = JObject.Parse(response);
 
                 // Check if the response contains results
-                if (jsonResponse["status"].ToString() == "OK")
+                if (jsonResponse["status"]!.ToString() == "OK")
                 {
                     // Get the formatted address from the response
-                    var address = jsonResponse["results"][0]["formatted_address"].ToString();
+                    var address = jsonResponse["results"]![0]!["formatted_address"]!.ToString();
                     return address;
                 }
                 else
@@ -135,7 +135,7 @@ namespace risk.control.system.Services.Common
             catch (Exception ex)
             {
                 logger.LogError($"{ex.Message}");
-                return (null, 0, null, 0, null);
+                return (null!, 0, null!, 0, null!);
             }
         }
 
@@ -154,7 +154,7 @@ namespace risk.control.system.Services.Common
                     if (firstRoute.TryGetProperty("overview_polyline", out var overviewPolyline) &&
                         overviewPolyline.TryGetProperty("points", out var points))
                     {
-                        return points.GetString();
+                        return points.GetString()!;
                     }
                     else
                     {
@@ -169,7 +169,7 @@ namespace risk.control.system.Services.Common
             catch (Exception ex)
             {
                 Console.WriteLine($"Error parsing route: {ex.Message}");
-                return null; // Return null to indicate failure
+                return null!; // Return null to indicate failure
             }
         }
 
@@ -196,7 +196,7 @@ namespace risk.control.system.Services.Common
                         var distanceInMetre = float.Parse(firstElement.GetProperty("distance").GetProperty("value").ToString());
                         var duration = firstElement.GetProperty("duration").GetProperty("text").GetString();
                         var durationInSeconds = int.Parse(firstElement.GetProperty("duration").GetProperty("value").ToString());
-                        return (distance, distanceInMetre, duration, durationInSeconds);
+                        return (distance!, distanceInMetre!, duration!, durationInSeconds);
                     }
                 }
             }

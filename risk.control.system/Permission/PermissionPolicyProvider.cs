@@ -18,8 +18,7 @@ namespace risk.control.system.Permission
         public Task<AuthorizationPolicy> GetDefaultPolicyAsync() =>
             _fallbackPolicyProvider.GetDefaultPolicyAsync();
 
-        public Task<AuthorizationPolicy> GetFallbackPolicyAsync() =>
-            _fallbackPolicyProvider.GetFallbackPolicyAsync();
+        public Task<AuthorizationPolicy> GetFallbackPolicyAsync() => _fallbackPolicyProvider.GetFallbackPolicyAsync();
 
         public Task<AuthorizationPolicy?> GetPolicyAsync(string policyName)
         {

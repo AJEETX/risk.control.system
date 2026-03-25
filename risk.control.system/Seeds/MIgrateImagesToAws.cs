@@ -24,7 +24,7 @@ namespace risk.control.system.Seeds
                 try
                 {
                     // Read the existing image from your storage (Disk/S3)
-                    byte[] imageBytes = await base64FileService.GetByteFileAsync(user.ProfilePictureUrl);
+                    byte[] imageBytes = await base64FileService.GetByteFileAsync(user.ProfilePictureUrl!);
 
                     var indexRequest = new IndexFacesRequest
                     {

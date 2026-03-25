@@ -100,7 +100,7 @@ namespace risk.control.system.Services.Api
                         PinCode = $"{u.PinCode!.Name} - {u.PinCode.Code}",
                         Country = u.Country!.Code,
                         Flag = "/flags/" + u.Country.Code.ToLower() + ".png",
-                        Updated = u.Updated.HasValue ? u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy"),
+                        Updated = u.Updated.HasValue ? u.Updated.Value : u.Created,
                         UpdateBy = u.UpdatedBy,
                         Status = u.Status == VendorStatus.ACTIVE,
                         CanOnboard = u.VendorInvestigationServiceTypes != null &&
@@ -113,7 +113,7 @@ namespace risk.control.system.Services.Api
                         Deletable = u.CreatedUser == userEmail
                     };
                 });
-            var awaitedResult = await Task.WhenAll(result);
+            var awaitedResult = await Task.WhenAll(result!);
             availableVendors?.ToList().ForEach(u => u.IsUpdated = false);
             await _context.SaveChangesAsync(null, false);
             return awaitedResult;
@@ -164,7 +164,7 @@ namespace risk.control.system.Services.Api
                         CountryCode = u.Country.Code,
                         PinCode = $"{u.PinCode!.Name} - {u.PinCode.Code}",
                         Flag = $"/flags/{u.Country.Code.ToLower()}.png",
-                        Updated = u.Updated?.ToString("dd-MM-yyyy") ?? u.Created.ToString("dd-MM-yyyy"),
+                        Updated = u.Updated.HasValue ? u.Updated.Value : u.Created,
                         UpdateBy = u.UpdatedBy,
                         CaseCount = claimsCases.Count(c => c.VendorId == u.VendorId),
                         RateCount = u.RateCount,
@@ -175,7 +175,7 @@ namespace risk.control.system.Services.Api
                         HasService = await hasService
                     };
                 });
-            var awaitedResults = await Task.WhenAll(result);
+            var awaitedResults = await Task.WhenAll(result!);
             company.EmpanelledVendors?.ToList().ForEach(u => u.IsUpdated = false);
             await _context.SaveChangesAsync(null, false);
             return awaitedResults;
@@ -198,7 +198,7 @@ namespace risk.control.system.Services.Api
                 .Include(p => p.BeneficiaryDetail)
                 .FirstOrDefaultAsync(c => c.Id == caseId);
 
-            var serviceType = selectedCase.PolicyDetail.InvestigationServiceTypeId;
+            var serviceType = selectedCase!.PolicyDetail!.InvestigationServiceTypeId;
 
             long? countryId;
             long? stateId;
@@ -206,13 +206,13 @@ namespace risk.control.system.Services.Api
 
             if (selectedCase.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING)
             {
-                countryId = selectedCase.CustomerDetail.CountryId;
+                countryId = selectedCase.CustomerDetail!.CountryId;
                 stateId = selectedCase.CustomerDetail.StateId;
                 districtId = selectedCase.CustomerDetail.DistrictId;
             }
             else
             {
-                countryId = selectedCase.BeneficiaryDetail.CountryId;
+                countryId = selectedCase.BeneficiaryDetail!.CountryId;
                 stateId = selectedCase.BeneficiaryDetail.StateId;
                 districtId = selectedCase.BeneficiaryDetail.DistrictId;
             }
@@ -221,7 +221,7 @@ namespace risk.control.system.Services.Api
                 .Include(v => v.VendorInvestigationServiceTypes)
                 .FirstOrDefaultAsync(v => v.VendorId == vendorId);
 
-            var hasService = vendor?.VendorInvestigationServiceTypes
+            var hasService = vendor!.VendorInvestigationServiceTypes!
                 .Any(v => v.InvestigationServiceTypeId == serviceType &&
                     v.InsuranceType == selectedCase.PolicyDetail.InsuranceType &&
                             (
@@ -232,7 +232,7 @@ namespace risk.control.system.Services.Api
                             v.StateId == stateId &&
                             v.CountryId == countryId
                             );
-            return hasService ?? false;
+            return hasService;
         }
 
         private async Task<object> MapVendor(Vendor u, ApplicationUser companyUser, List<InvestigationTask> caseTasks)
@@ -253,7 +253,7 @@ namespace risk.control.system.Services.Api
                 PinCode = $"{u.PinCode!.Name} - {u.PinCode.Code}",
                 Country = u.Country.Name,
                 Flag = $"/flags/{u.Country.Code.ToLower()}.png",
-                Updated = (u.Updated ?? u.Created).ToString("dd-MM-yyyy"),
+                Updated = (u.Updated ?? u.Created),
                 UpdateBy = u.UpdatedBy,
                 CaseCount = caseTasks.Count(c => c.VendorId == u.VendorId),
                 RateCount = u.RateCount,

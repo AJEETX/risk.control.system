@@ -11,8 +11,9 @@ namespace risk.control.system.Seeds
         public static async Task<int> Seed(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, UserManager<ApplicationUser> userManager,
             ICustomApiClient customApiCLient, List<Country> countries, List<InvestigationServiceType> servicesTypes, IFileStorageService fileStorageService)
         {
-            string COUNTRY_CODE = "AU";
-            int PINCODE = 3131;
+            const string DOMAIN_SUFFIX = ".com";
+            const string COUNTRY_CODE = "AU";
+            const int PINCODE = 3131;
             var au = countries.FirstOrDefault(c => c.Code == COUNTRY_CODE);
             var auPincodes = await PinCodeStateSeed.CsvRead_Au(0);
             var auStates = auPincodes.Where(s =>
@@ -22,14 +23,14 @@ namespace risk.control.system.Seeds
                 ||
                 string.Equals(s.StateCode, "nsw", StringComparison.OrdinalIgnoreCase)
                 ).Select(g => g.StateCode).Distinct()?.ToList();
-            var filteredAuPincodes = auPincodes.Where(g => auStates.Contains(g.StateCode))?.ToList();
-            await PinCodeStateSeed.SeedPincode(context, filteredAuPincodes, au);
+            var filteredAuPincodes = auPincodes.Where(g => auStates!.Contains(g.StateCode))?.ToList();
+            await PinCodeStateSeed.SeedPincode(context, filteredAuPincodes!, au!);
             await context.SaveChangesAsync(null, false);
             var checker = new SeedInput
             {
                 COUNTRY = COUNTRY_CODE,
                 PINCODE = PINCODE,
-                DOMAIN = "checker.com",
+                DOMAIN = "checker" + DOMAIN_SUFFIX,
                 NAME = "Checker Inc Australia",
                 PHOTO = "/img/checker.png",
                 ADDRESSLINE = "57 Mahoneys Road",
@@ -42,7 +43,7 @@ namespace risk.control.system.Seeds
             {
                 COUNTRY = COUNTRY_CODE,
                 PINCODE = PINCODE,
-                DOMAIN = "crucible.com",
+                DOMAIN = "crucible" + DOMAIN_SUFFIX,
                 NAME = "Crucible Inc Australia",
                 PHOTO = "/img/crucible.jpg",
                 ADDRESSLINE = "12 faulkner Street",
@@ -55,7 +56,7 @@ namespace risk.control.system.Seeds
             {
                 COUNTRY = COUNTRY_CODE,
                 PINCODE = PINCODE,
-                DOMAIN = "cyber.com",
+                DOMAIN = "cyber" + DOMAIN_SUFFIX,
                 NAME = "Cyber Inc Australia",
                 PHOTO = "/img/cyber.png",
                 ADDRESSLINE = "94 Mahoneys Road",
@@ -68,7 +69,7 @@ namespace risk.control.system.Seeds
             {
                 COUNTRY = COUNTRY_CODE,
                 PINCODE = PINCODE,
-                DOMAIN = "honest.com",
+                DOMAIN = "honest" + DOMAIN_SUFFIX,
                 NAME = "Honest Inc Australia",
                 PHOTO = "/img/honest.png",
                 ADDRESSLINE = "117 Mahoneys Road",
@@ -81,7 +82,7 @@ namespace risk.control.system.Seeds
             {
                 COUNTRY = COUNTRY_CODE,
                 PINCODE = PINCODE,
-                DOMAIN = "hubris.com",
+                DOMAIN = "hubris" + DOMAIN_SUFFIX,
                 NAME = "Hubris Inc Australia",
                 PHOTO = "/img/hubris.jpg",
                 ADDRESSLINE = "12 faulkner Street",
@@ -94,7 +95,7 @@ namespace risk.control.system.Seeds
             {
                 COUNTRY = COUNTRY_CODE,
                 PINCODE = PINCODE,
-                DOMAIN = "investigate.com",
+                DOMAIN = "investigate" + DOMAIN_SUFFIX,
                 NAME = "Investigate Inc Australia",
                 PHOTO = "/img/investigate.png",
                 ADDRESSLINE = "11 Barter Crescent",
@@ -107,7 +108,7 @@ namespace risk.control.system.Seeds
             {
                 COUNTRY = COUNTRY_CODE,
                 PINCODE = PINCODE,
-                DOMAIN = "investigation.com",
+                DOMAIN = "investigation" + DOMAIN_SUFFIX,
                 NAME = "Investigation Inc Australia",
                 PHOTO = "/img/investigation.png",
                 ADDRESSLINE = "11 Jacana Road",
@@ -120,7 +121,7 @@ namespace risk.control.system.Seeds
             {
                 COUNTRY = COUNTRY_CODE,
                 PINCODE = PINCODE,
-                DOMAIN = "nicer.com",
+                DOMAIN = "nicer" + DOMAIN_SUFFIX,
                 NAME = "Nicer Inc Australia",
                 PHOTO = "/img/nicer.png",
                 ADDRESSLINE = "45 Mahoneys Road",
@@ -133,7 +134,7 @@ namespace risk.control.system.Seeds
             {
                 COUNTRY = COUNTRY_CODE,
                 PINCODE = PINCODE,
-                DOMAIN = "proper.com",
+                DOMAIN = "proper" + DOMAIN_SUFFIX,
                 NAME = "Proper Inc Australia",
                 PHOTO = "/img/proper.png",
                 ADDRESSLINE = "11 Jacana Road",
@@ -146,7 +147,7 @@ namespace risk.control.system.Seeds
             {
                 COUNTRY = COUNTRY_CODE,
                 PINCODE = PINCODE,
-                DOMAIN = "sample.com",
+                DOMAIN = "sample" + DOMAIN_SUFFIX,
                 NAME = "Sample Inc Australia",
                 PHOTO = "/img/sample.png",
                 ADDRESSLINE = "33 Mahoneys Road",
@@ -159,7 +160,7 @@ namespace risk.control.system.Seeds
             {
                 COUNTRY = COUNTRY_CODE,
                 PINCODE = PINCODE,
-                DOMAIN = "verify.com",
+                DOMAIN = "verify" + DOMAIN_SUFFIX,
                 NAME = "Verify Inc Australia",
                 PHOTO = "/img/verify.png",
                 ADDRESSLINE = "67 Mahoneys Road",
@@ -172,7 +173,7 @@ namespace risk.control.system.Seeds
             {
                 COUNTRY = COUNTRY_CODE,
                 PINCODE = PINCODE,
-                DOMAIN = "zoom.com",
+                DOMAIN = "zoom" + DOMAIN_SUFFIX,
                 NAME = "Zoom Inc Australia",
                 PHOTO = "/img/zoom.png",
                 ADDRESSLINE = "12 Jackson Road",
@@ -182,7 +183,10 @@ namespace risk.control.system.Seeds
                 PHONE = "432854196"
             };
 
-            var agencies = new List<SeedInput> { checker, crucible, cyber
+            var agencies = new List<SeedInput> {
+                checker,
+                crucible,
+                cyber
                 ,honest, hubris, investigate, investigation, nicer, proper, sample, verify,  zoom
             };
             var vendors = new List<Vendor> { };
@@ -194,8 +198,8 @@ namespace risk.control.system.Seeds
             var insurer = new SeedInput
             {
                 COUNTRY = COUNTRY_CODE,
-                DOMAIN = "insurer.com",
-                NAME = "Insurer",
+                DOMAIN = "insurer" + DOMAIN_SUFFIX,
+                NAME = "Insurer Company Austalia",
                 PHOTO = "/img/insurer.jpg",
                 ADDRESSLINE = "109 Mahoneys Road",
                 BRANCH = "Forest Hill",
@@ -214,7 +218,7 @@ namespace risk.control.system.Seeds
             var pincode = auPincodes.FirstOrDefault(p => p.Code == PINCODE);
             if (pincode == null)
             {
-                return auPincodes.FirstOrDefault().Code;
+                return auPincodes.FirstOrDefault()!.Code;
             }
             return pincode.Code;
         }

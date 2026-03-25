@@ -30,7 +30,7 @@ namespace risk.control.system.Models
 
         private async Task OnBeforeSaveChanges(string? userId)
         {
-            var userEmail = userId ?? httpContext?.HttpContext?.User?.Identity.Name;
+            var userEmail = userId ?? httpContext?.HttpContext?.User?.Identity!.Name;
             await using var _context = await _contextFactory.CreateDbContextAsync();
             var companyUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(u => u.Email == userEmail);
             ChangeTracker.DetectChanges();
@@ -41,7 +41,7 @@ namespace risk.control.system.Models
                     continue;
                 var auditEntry = new AuditEntry(entry);
                 auditEntry.TableName = entry.Entity.GetType().Name;
-                auditEntry.UserId = userEmail;
+                auditEntry.UserId = userEmail!;
                 auditEntry.CompanyId = companyUser?.ClientCompanyId;
                 auditEntries.Add(auditEntry);
                 foreach (var property in entry.Properties)
@@ -49,7 +49,7 @@ namespace risk.control.system.Models
                     string propertyName = property.Metadata.Name;
                     if (property.Metadata.IsPrimaryKey())
                     {
-                        auditEntry.KeyValues[propertyName] = property.CurrentValue;
+                        auditEntry.KeyValues[propertyName] = property.CurrentValue ?? "";
                         continue;
                     }
 
@@ -57,12 +57,12 @@ namespace risk.control.system.Models
                     {
                         case EntityState.Added:
                             auditEntry.AuditType = AuditType.Create;
-                            auditEntry.NewValues[propertyName] = property.CurrentValue;
+                            auditEntry.NewValues[propertyName] = property.CurrentValue ?? "";
                             break;
 
                         case EntityState.Deleted:
                             auditEntry.AuditType = AuditType.Delete;
-                            auditEntry.OldValues[propertyName] = property.OriginalValue;
+                            auditEntry.OldValues[propertyName] = property.OriginalValue ?? "";
                             break;
 
                         case EntityState.Modified:
@@ -70,8 +70,8 @@ namespace risk.control.system.Models
                             {
                                 auditEntry.ChangedColumns.Add(propertyName);
                                 auditEntry.AuditType = AuditType.Update;
-                                auditEntry.OldValues[propertyName] = property.OriginalValue;
-                                auditEntry.NewValues[propertyName] = property.CurrentValue;
+                                auditEntry.OldValues[propertyName] = property.OriginalValue ?? "";
+                                auditEntry.NewValues[propertyName] = property.CurrentValue ?? "";
                             }
                             break;
 

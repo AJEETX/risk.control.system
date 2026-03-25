@@ -13,7 +13,7 @@ namespace risk.control.system.Models
         [Display(Name = "Beneficiary Name")]
         [Required]
         [StringLength(50, MinimumLength = 3, ErrorMessage = "Name must be between 3 and 50 characters.")]
-        public string Name { get; set; }
+        public string Name { get; set; } = default!;
 
         [Display(Name = "Relation")]
         public long BeneficiaryRelationId { get; set; }
@@ -25,7 +25,7 @@ namespace risk.control.system.Models
         [Display(Name = "Contact number")]
         [Required]
         [StringLength(10, MinimumLength = 9, ErrorMessage = "PhoneNumber must be between 9 and 10 characters.")]
-        public string PhoneNumber { get; set; }
+        public string PhoneNumber { get; set; } = default!;
 
         [Display(Name = "Annual Income")]
         public Income? Income { get; set; }
@@ -62,7 +62,7 @@ namespace risk.control.system.Models
         [Display(Name = "Address")]
         [Required]
         [StringLength(70, MinimumLength = 3, ErrorMessage = "Addressline must be between 3 and 70 characters.")]
-        public string Addressline { get; set; }
+        public string Addressline { get; set; } = default!;
 
         public string? BeneficiaryLocationMap { get; set; }
         public string? Latitude { get; set; }

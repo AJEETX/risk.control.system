@@ -32,7 +32,7 @@ namespace risk.control.system.Services.Common
 
                 var weatherData = await response.Content.ReadFromJsonAsync<Weather>();
 
-                return $"Temperature: {weatherData.current.temperature_2m} {weatherData.current_units.temperature_2m}. " +
+                return $"Temperature: {weatherData!.current!.temperature_2m} {weatherData.current_units!.temperature_2m}. " +
                        $"\nWindspeed: {weatherData.current.windspeed_10m} {weatherData.current_units.windspeed_10m}" +
                                       $"\r\nElevation(sea level): {weatherData.elevation} metres";
             }

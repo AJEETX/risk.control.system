@@ -3,19 +3,19 @@
 <div class="card shadow-lg border-1 rounded-lg">
     <div class="card-header bg-light text-white">
         <h3 class="card-title">
-            <i class="fas fa-user-shield"></i> Report (@Model.CaseTask?.PolicyDetail.InsuranceType.GetEnumDisplayName()): <span class="badge badge-light"> @Model.InvestigationReport.AgentEmail </span>
+            <i class="fas fa-user-shield"></i> Report (@Model.CaseTask?.PolicyDetail?.InsuranceType?.GetEnumDisplayName()): <span class="badge badge-light"> @Model.InvestigationReport?.AgentEmail </span>
             <span class="hover-text">
                 <i class="fas fa-info-circle"></i>
                 <span class="tooltip-text" id="information">
                     <span>
 
-                        <i class="fas fa-user-shield"></i><b> @Model.InvestigationReport.AgentEmail </b> report
+                        <i class="fas fa-user-shield"></i><b> @Model.InvestigationReport?.AgentEmail </b> report
                     </span>
                 </span>
             </span>
         </h3>
         <div class="card-tools">
-            <span data-toggle="tooltip" title="Agent (@Model.CaseTask?.PolicyDetail.InsuranceType.GetEnumDisplayName() ) report: @Model.InvestigationReport.AgentEmail" class="badge badge-light"><i class="fas fa-user-shield"></i></span>
+            <span data-toggle="tooltip" title="Agent (@Model.CaseTask?.PolicyDetail?.InsuranceType?.GetEnumDisplayName() ) report: @Model.InvestigationReport?.AgentEmail" class="badge badge-light"><i class="fas fa-user-shield"></i></span>
         </div>
     </div>
 
@@ -25,8 +25,8 @@
         </div>
         <div class="row">
             @{
-                var template = Model.CaseTask.InvestigationReport.ReportTemplate;
-                template.CaseId = Model.CaseTask.Id;
+                var template = Model.CaseTask?.InvestigationReport?.ReportTemplate;
+                template!.CaseId = Model.CaseTask!.Id;
             }
             <input type="hidden" id="caseId" value="@Model.CaseTask.Id" />
             <partial name="_Location" model="@template" />

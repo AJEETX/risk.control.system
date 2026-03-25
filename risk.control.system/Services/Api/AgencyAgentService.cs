@@ -95,7 +95,7 @@ namespace risk.control.system.Services.Api
                 // 5. Parallel Processing
                 var mapTasks = vendorAgents.Select(async (agent) =>
                 {
-                    int claimCount = agentCaseCounts.GetValueOrDefault(agent.Email, 0);
+                    int claimCount = agentCaseCounts!.GetValueOrDefault(agent.Email, 0);
 
                     // API calls are safe to parallelize as they don't use DbContext
                     var (distance, distanceInMetre, duration, durationInSec, map) =
@@ -105,7 +105,7 @@ namespace risk.control.system.Services.Api
                             double.Parse(locationLat),
                             double.Parse(locationLng));
 
-                    var photo = await base64FileService.GetBase64FileAsync(agent.ProfilePictureUrl, Applicationsettings.NO_IMAGE);
+                    var photo = await base64FileService.GetBase64FileAsync(agent.ProfilePictureUrl!, Applicationsettings.NO_IMAGE);
                     var mapDetails = $"Driving distance: {distance}; Duration: {duration}";
 
                     agentList.Add(new AgentData

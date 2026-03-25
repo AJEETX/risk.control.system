@@ -47,6 +47,10 @@
                 targets: 11                      // Index of the column to style
             },
             {
+                className: 'max-width-column-number', // Apply the CSS class,
+                targets: 12                      // Index of the column to style
+            },
+            {
                 'targets': 17, // Index for the "Case Type" column
                 'name': 'policy' // Name for the "Case Type" column
             }],
@@ -78,7 +82,7 @@
                 "data": "agency",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    return '<span class="badge badge-light" title="' + data + '" data-bs-toggle="tooltip">' + data + '</span>';
+                    return '<span title="' + data + '" data-bs-toggle="tooltip">' + data + '</span>';
                 }
                 ///<button type="button" class="btn btn-lg btn-danger" data-bs-toggle="popover" title="Popover title" data-content="And here's some amazing content. It's very engaging. Right?">Click to toggle popover</button>
             },
@@ -165,8 +169,19 @@
             },
             {
                 "data": "created",
-                "mRender": function (data, type, row) {
-                    return '<span title="' + row.created + '" data-bs-toggle="tooltip">' + data + '</span>'
+                "render": function (data, type, row) {
+                    if (!data) return "";
+
+                    // 1. Parse UTC string (Assuming format: "2023-10-27T10:00:00Z")
+                    var date = new Date(data);
+
+                    // 2. Convert to Local String
+                    // You can customize the format: { dateStyle: 'medium', timeStyle: 'short' }
+                    var localDate = date.toLocaleString();
+
+                    return `<i title="${localDate}" data-bs-toggle="tooltip">
+                    <small><strong>${localDate}</strong></small>
+                </i>`;
                 }
             },
             {

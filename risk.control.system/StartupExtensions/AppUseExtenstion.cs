@@ -68,7 +68,7 @@ public static class AppUseExtenstion
             await next();
 
             if (context.Response.StatusCode == 401 &&
-                !context.User.Identity.IsAuthenticated &&
+                !context.User.Identity!.IsAuthenticated &&
             !context.Request.Path.StartsWithSegments("/api") &&
             !context.Request.Headers.ContainsKey("Authorization"))
             {

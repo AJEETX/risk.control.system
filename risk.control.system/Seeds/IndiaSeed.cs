@@ -11,8 +11,9 @@ namespace risk.control.system.Seeds
         public static async Task<int> Seed(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, UserManager<ApplicationUser> userManager,
             ICustomApiClient customApiCLient, List<Country> countries, List<InvestigationServiceType> servicesTypes, IFileStorageService fileStorageService)
         {
-            string COUNTRY_CODE = "IN";
-            var PINCODE = 122003;
+            const string DOMAIN_SUFFIX = ".in";
+            const string COUNTRY_CODE = "IN";
+            const int PINCODE = 122003;
             var india = countries.FirstOrDefault(c => c.Code == COUNTRY_CODE);
             var indiaPincodes = await PinCodeStateSeed.CsvRead_IndiaAsync();
             var indianStates = indiaPincodes
@@ -21,18 +22,18 @@ namespace risk.control.system.Seeds
                 ||
                 string.Equals(s.StateName, "delhi", StringComparison.OrdinalIgnoreCase)
                 ||
-                s.StateCode.Equals("up", StringComparison.CurrentCultureIgnoreCase)
+                s.StateCode!.Equals("up", StringComparison.CurrentCultureIgnoreCase)
                 )
                 .Select(g => g.StateCode).Distinct()?.ToList();
-            var filteredInPincodes = indiaPincodes.Where(g => indianStates.Contains(g.StateCode))?.ToList();
-            await PinCodeStateSeed.SeedPincode(context, filteredInPincodes, india);
+            var filteredInPincodes = indiaPincodes.Where(g => indianStates!.Contains(g.StateCode))?.ToList();
+            await PinCodeStateSeed.SeedPincode(context, filteredInPincodes!, india!);
             await context.SaveChangesAsync(null, false);
 
             var checker = new SeedInput
             {
                 COUNTRY = COUNTRY_CODE,
                 PINCODE = PINCODE,
-                DOMAIN = "checker.in",
+                DOMAIN = "checker" + DOMAIN_SUFFIX,
                 NAME = "Checker Inc India",
                 PHOTO = "/img/checker.png",
                 ADDRESSLINE = "12 MG Road",
@@ -45,7 +46,7 @@ namespace risk.control.system.Seeds
             {
                 COUNTRY = COUNTRY_CODE,
                 PINCODE = PINCODE,
-                DOMAIN = "crucible.in",
+                DOMAIN = "crucible" + DOMAIN_SUFFIX,
                 NAME = "Crucible Inc India",
                 PHOTO = "/img/crucible.jpg",
                 ADDRESSLINE = "67 Mehrauli Road",
@@ -58,7 +59,7 @@ namespace risk.control.system.Seeds
             {
                 COUNTRY = COUNTRY_CODE,
                 PINCODE = PINCODE,
-                DOMAIN = "cyber.com",
+                DOMAIN = "cyber" + DOMAIN_SUFFIX,
                 NAME = "Cyber Inc India",
                 PHOTO = "/img/cyber.png",
                 ADDRESSLINE = "67 Mehrauli Road",
@@ -71,7 +72,7 @@ namespace risk.control.system.Seeds
             {
                 COUNTRY = COUNTRY_CODE,
                 PINCODE = PINCODE,
-                DOMAIN = "honest.in",
+                DOMAIN = "honest" + DOMAIN_SUFFIX,
                 PHOTO = "/img/honest.png",
                 NAME = "Honest Inc India",
                 ADDRESSLINE = "67 Mehrauli Road",
@@ -84,7 +85,7 @@ namespace risk.control.system.Seeds
             {
                 COUNTRY = COUNTRY_CODE,
                 PINCODE = PINCODE,
-                DOMAIN = "hubris.in",
+                DOMAIN = "hubris" + DOMAIN_SUFFIX,
                 NAME = "Hubris Inc India",
                 PHOTO = "/img/hubris.jpg",
                 ADDRESSLINE = "67 Mehrauli Road",
@@ -97,7 +98,7 @@ namespace risk.control.system.Seeds
             {
                 COUNTRY = COUNTRY_CODE,
                 PINCODE = PINCODE,
-                DOMAIN = "investigate.in",
+                DOMAIN = "investigate" + DOMAIN_SUFFIX,
                 NAME = "Investigate Inc India",
                 PHOTO = "/img/investigate.png",
                 ADDRESSLINE = "67 Mehrauli Road",
@@ -110,7 +111,7 @@ namespace risk.control.system.Seeds
             {
                 COUNTRY = COUNTRY_CODE,
                 PINCODE = PINCODE,
-                DOMAIN = "investigation.in",
+                DOMAIN = "investigation" + DOMAIN_SUFFIX,
                 NAME = "Investigation Inc India",
                 PHOTO = "/img/investigation.png",
                 ADDRESSLINE = "67 Mehrauli Road",
@@ -123,7 +124,7 @@ namespace risk.control.system.Seeds
             {
                 COUNTRY = COUNTRY_CODE,
                 PINCODE = PINCODE,
-                DOMAIN = "nicer.in",
+                DOMAIN = "nicer" + DOMAIN_SUFFIX,
                 NAME = "Nicer Inc India",
                 PHOTO = "/img/nicer.png",
                 ADDRESSLINE = "67 Mehrauli Road",
@@ -136,7 +137,7 @@ namespace risk.control.system.Seeds
             {
                 COUNTRY = COUNTRY_CODE,
                 PINCODE = PINCODE,
-                DOMAIN = "proper.in",
+                DOMAIN = "proper" + DOMAIN_SUFFIX,
                 PHOTO = "/img/proper.png",
                 NAME = "Proper Inc India",
                 ADDRESSLINE = "12 MG Road",
@@ -149,7 +150,7 @@ namespace risk.control.system.Seeds
             {
                 COUNTRY = COUNTRY_CODE,
                 PINCODE = PINCODE,
-                DOMAIN = "sample.in",
+                DOMAIN = "sample" + DOMAIN_SUFFIX,
                 NAME = "Sample Inc India",
                 PHOTO = "/img/sample.png",
                 ADDRESSLINE = "67 Mehrauli Road",
@@ -162,7 +163,7 @@ namespace risk.control.system.Seeds
             {
                 COUNTRY = COUNTRY_CODE,
                 PINCODE = PINCODE,
-                DOMAIN = "verify.in",
+                DOMAIN = "verify" + DOMAIN_SUFFIX,
                 NAME = "Verify Inc India",
                 PHOTO = "/img/verify.png",
                 ADDRESSLINE = "12 MG Road",
@@ -175,7 +176,7 @@ namespace risk.control.system.Seeds
             {
                 COUNTRY = COUNTRY_CODE,
                 PINCODE = PINCODE,
-                DOMAIN = "zoom.in",
+                DOMAIN = "zoom" + DOMAIN_SUFFIX,
                 NAME = "Zoom Inc India",
                 PHOTO = "/img/zoom.png",
                 ADDRESSLINE = "67 Mehrauli Road",
@@ -197,8 +198,8 @@ namespace risk.control.system.Seeds
             var insurer = new SeedInput
             {
                 COUNTRY = COUNTRY_CODE,
-                DOMAIN = "insurer.in",
-                NAME = "Insurance Inc India",
+                DOMAIN = "insurer" + DOMAIN_SUFFIX,
+                NAME = "Insurance Company India",
                 PHOTO = "/img/insurer.jpg",
                 ADDRESSLINE = "139 Sector 44",
                 BRANCH = "Head Office",
@@ -217,7 +218,7 @@ namespace risk.control.system.Seeds
             var pincode = indiaPincodes.FirstOrDefault(p => p.Code == PINCODE);
             if (pincode == null)
             {
-                return indiaPincodes.FirstOrDefault().Code;
+                return indiaPincodes.FirstOrDefault()!.Code;
             }
             return pincode.Code;
         }

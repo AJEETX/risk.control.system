@@ -6,7 +6,7 @@
         public int RecordsTotal { get; set; }
         public int RecordsFiltered { get; set; }
         public bool MaxAssignReadyAllowed { get; set; }
-        public object Data { get; set; }
+        public object Data { get; set; } = default!;
     }
 
 }

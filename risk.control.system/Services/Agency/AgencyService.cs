@@ -64,8 +64,8 @@ namespace risk.control.system.Services.Agency
             vendor.AgreementDate = DateTime.UtcNow;
             vendor.ActivatedDate = DateTime.UtcNow;
             vendor.DomainName = domainData;
-            vendor.BankName = WebUtility.HtmlEncode(vendor.BankName.ToUpper());
-            vendor.IFSCCode = WebUtility.HtmlEncode(vendor.IFSCCode.ToUpper());
+            vendor.BankName = WebUtility.HtmlEncode(vendor.BankName!.ToUpper());
+            vendor.IFSCCode = WebUtility.HtmlEncode(vendor.IFSCCode!.ToUpper());
             vendor.Updated = DateTime.UtcNow;
             vendor.UpdatedBy = userEmail;
             vendor.CreatedUser = userEmail;
@@ -83,8 +83,8 @@ namespace risk.control.system.Services.Agency
 
             var notification = new StatusNotification
             {
-                RoleId = managerRole.Id,
-                ClientCompanyId = companyUser.ClientCompanyId,
+                RoleId = managerRole!.Id,
+                ClientCompanyId = companyUser!.ClientCompanyId,
                 Symbol = "far fa-hand-point-right i-green",
                 Message = $"Agency {vendor.Email}",
                 Status = "Created",
@@ -112,7 +112,7 @@ namespace risk.control.system.Services.Agency
             else
             {
                 var existingVendor = await _context.Vendor.AsNoTracking().FirstOrDefaultAsync(c => c.VendorId == vendor.VendorId);
-                if (existingVendor.DocumentUrl != null)
+                if (existingVendor != null && existingVendor!.DocumentUrl != null)
                 {
                     vendor.DocumentImageExtension = existingVendor.DocumentImageExtension;
                     vendor.DocumentUrl = existingVendor.DocumentUrl;
@@ -125,8 +125,8 @@ namespace risk.control.system.Services.Agency
             vendor.DistrictId = vendor.SelectedDistrictId;
             vendor.StateId = vendor.SelectedStateId;
             vendor.CountryId = vendor.SelectedCountryId;
-            vendor.BankName = WebUtility.HtmlEncode(vendor.BankName.ToUpper());
-            vendor.IFSCCode = WebUtility.HtmlEncode(vendor.IFSCCode.ToUpper());
+            vendor.BankName = WebUtility.HtmlEncode(vendor.BankName!.ToUpper());
+            vendor.IFSCCode = WebUtility.HtmlEncode(vendor.IFSCCode!.ToUpper());
             var pinCode = await _context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).FirstOrDefaultAsync(s => s.PinCodeId == vendor.SelectedPincodeId);
             vendor.IsUpdated = true;
             vendor.Updated = DateTime.UtcNow;

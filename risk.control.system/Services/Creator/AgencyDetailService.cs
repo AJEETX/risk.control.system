@@ -35,7 +35,7 @@ namespace risk.control.system.Services
                 .FirstOrDefaultAsync(v => v.VendorId == vendorId);
 
             if (vendor == null)
-                return null;
+                return null!;
 
             var approved = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR;
             var rejected = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR;

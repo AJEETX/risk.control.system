@@ -2,6 +2,6 @@
 {
     public class DeleteRequestModel
     {
-        public List<long> claims { get; set; }
+        public List<long> claims { get; set; } = default!;
     }
 }

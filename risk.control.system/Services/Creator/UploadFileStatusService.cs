@@ -24,12 +24,12 @@ namespace risk.control.system.Services.Creator
 
         public async Task SetUploadAssignSuccess(FileOnFileSystemModel fileData, List<InvestigationTask> claims, List<long> autoAllocated)
         {
-            var uploadedClaimCount = claims.Count(c => c.PolicyDetail.InsuranceType == InsuranceType.CLAIM);
+            var uploadedClaimCount = claims.Count(c => c.PolicyDetail!.InsuranceType == InsuranceType.CLAIM);
 
-            var assignedClaimCount = claims.Count(c => autoAllocated.Contains(c.Id) && c.PolicyDetail.InsuranceType == InsuranceType.CLAIM);
+            var assignedClaimCount = claims.Count(c => autoAllocated.Contains(c.Id) && c.PolicyDetail!.InsuranceType == InsuranceType.CLAIM);
 
-            var uploadedUnderWritingCount = claims.Count(c => c.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING);
-            var assignedUnderWritingCount = claims.Count(c => autoAllocated.Contains(c.Id) && c.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING);
+            var uploadedUnderWritingCount = claims.Count(c => c.PolicyDetail!.InsuranceType == InsuranceType.UNDERWRITING);
+            var assignedUnderWritingCount = claims.Count(c => autoAllocated.Contains(c.Id) && c.PolicyDetail!.InsuranceType == InsuranceType.UNDERWRITING);
 
             string message = $"Claims (Uploaded/Assigned) = ({uploadedClaimCount}/{assignedClaimCount}): Underwritings (Uploaded/Assigned) = ({uploadedUnderWritingCount}/{assignedUnderWritingCount})";
             fileData.Completed = true;
@@ -49,8 +49,8 @@ namespace risk.control.system.Services.Creator
 
         public async Task SetUploadSuccess(FileOnFileSystemModel fileData, List<InvestigationTask> claims)
         {
-            var claimCount = claims.Count(c => c.PolicyDetail.InsuranceType == InsuranceType.CLAIM);
-            var underWritingCount = claims.Count(c => c.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING);
+            var claimCount = claims.Count(c => c.PolicyDetail!.InsuranceType == InsuranceType.CLAIM);
+            var underWritingCount = claims.Count(c => c.PolicyDetail!.InsuranceType == InsuranceType.UNDERWRITING);
 
             string message = $"Uploaded Claims: {claimCount} & Underwritings: {underWritingCount}";
             fileData.Completed = true;

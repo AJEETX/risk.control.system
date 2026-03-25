@@ -67,7 +67,7 @@ namespace risk.control.system.Services.Report
 
             try
             {
-                var pngBytes = ImageConverterToPng.ConvertToPngFromPath(env, investigation.Vendor.DocumentImageExtension);
+                var pngBytes = ImageConverterToPng.ConvertToPngFromPath(env, investigation.Vendor!.DocumentImageExtension!);
 
                 paragraph.AddInlineImage(pngBytes)
                      .SetWidth(150); // optional small space between image and text
@@ -78,7 +78,7 @@ namespace risk.control.system.Services.Report
                 Console.WriteLine("Image conversion error: " + ex.Message);
             }
 
-            paragraph.AddText($" {investigation.Vendor.Email} : Investigation detail")
+            paragraph.AddText($" {investigation.Vendor!.Email} : Investigation detail")
                      .SetFontSize(18)
                      .SetBold()
                      .SetUnderline();
@@ -122,7 +122,7 @@ namespace risk.control.system.Services.Report
             section.AddParagraph().AddText("");
 
             // Add Enquiry Report
-            if (investigation.InvestigationReport.EnquiryRequests != null && investigation.InvestigationReport.EnquiryRequests.Any())
+            if (investigation.InvestigationReport!.EnquiryRequests != null && investigation.InvestigationReport.EnquiryRequests.Any())
             {
                 section.AddParagraph()
                        .SetLineSpacing(1)
@@ -194,9 +194,9 @@ namespace risk.control.system.Services.Report
 
             section.AddParagraph().AddText("");
 
-            section = AddRemarks(section, "Agent Remarks", investigation.InvestigationReport.AgentRemarks);
-            section = AddRemarks(section, "Agent Edited Remarks", investigation.InvestigationReport.AgentRemarksEdit);
-            section = AddRemarks(section, "Agency Remarks", investigation.InvestigationReport.SupervisorRemarks);
+            section = AddRemarks(section, "Agent Remarks", investigation.InvestigationReport.AgentRemarks!);
+            section = AddRemarks(section, "Agent Edited Remarks", investigation.InvestigationReport.AgentRemarksEdit!);
+            section = AddRemarks(section, "Agency Remarks", investigation.InvestigationReport.SupervisorRemarks!);
             return section;
         }
 

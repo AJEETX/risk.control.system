@@ -94,7 +94,7 @@ namespace risk.control.system.Services.Common
                 await SendNotificationInternal(
                     caseId: 0, // No specific case ID yet for a bulk upload
                     senderUserEmail: senderUserEmail,
-                    targetRoleId: creatorRole.Id,
+                    targetRoleId: creatorRole!.Id,
                     clientCompanyId: applicationUser.ClientCompanyId,
                     vendorId: null,
                     symbol: isCompleted ? BlueSymbol : WarningSymbol,
@@ -136,7 +136,7 @@ namespace risk.control.system.Services.Common
                 var vendorRecipients = await GetUsersByRoleAsync(
                     companyId: null,
                     vendorId: vendorId,
-                    roleIds: new[] { agencyAdminRole.Id, supervisorRole.Id }
+                    roleIds: new[] { agencyAdminRole!.Id, supervisorRole!.Id }
                 );
 
                 // 4. Trigger Internal Engine for Vendor Notification
@@ -147,7 +147,7 @@ namespace risk.control.system.Services.Common
                     targetRoleId: supervisorRole.Id,
                     clientCompanyId: null,
                     vendorId: vendorId,
-                    symbol: null, // Uses default BlueSymbol inside engine
+                    symbol: null!, // Uses default BlueSymbol inside engine
                     status: caseTask.SubStatus,
                     message: $"Case #{caseTask.PolicyDetail?.ContractNumber}",
                     url: url,
@@ -159,14 +159,14 @@ namespace risk.control.system.Services.Common
                 await SendNotificationInternal(
                     caseId: caseId,
                     senderUserEmail: userEmail,
-                    targetRoleId: managerRole.Id,
+                    targetRoleId: managerRole!.Id,
                     clientCompanyId: applicationUser.ClientCompanyId,
                     vendorId: null,
                     symbol: BlueSymbol,
                     status: caseTask.SubStatus,
                     message: $"Case #{caseTask.PolicyDetail?.ContractNumber}",
                     url: url,
-                    smsRecipients: null // Managers don't get SMS in this specific workflow
+                    smsRecipients: null! // Managers don't get SMS in this specific workflow
                 );
             }
             catch (Exception ex)
@@ -200,7 +200,7 @@ namespace risk.control.system.Services.Common
                 var recipients = await GetUsersByRoleAsync(
                     companyId: null,
                     vendorId: vendorId,
-                    roleIds: new[] { agencyAdminRole.Id, supervisorRole.Id }
+                    roleIds: new[] { agencyAdminRole!.Id, supervisorRole!.Id }
                 );
 
                 // 4. Fire the Internal Engine
@@ -324,12 +324,12 @@ namespace risk.control.system.Services.Common
             var creatorRole = await roleManager.FindByNameAsync(CREATOR.DISPLAY_NAME);
 
             var recipients = await _context.ApplicationUser.AsNoTracking().Include(u => u.Country)
-                .Where(u => u.ClientCompanyId == caseTask.ClientCompanyId)
-                .Where(u => _context.UserRoles.Any(ur => ur.UserId == u.Id && ur.RoleId == creatorRole.Id))
+                .Where(u => u.ClientCompanyId == caseTask!.ClientCompanyId)
+                .Where(u => _context.UserRoles.Any(ur => ur.UserId == u.Id && ur.RoleId == creatorRole!.Id))
                 .ToListAsync();
 
             senderUserEmail = senderUserEmail.Replace("\n", "").Replace("\r", "").Trim();
-            await SendNotificationInternal(caseId, senderUserEmail, creatorRole.Id, caseTask.ClientCompanyId, null,
+            await SendNotificationInternal(caseId, senderUserEmail, creatorRole!.Id, caseTask!.ClientCompanyId, null,
                 WarningSymbol, caseTask.SubStatus, $"Case #{caseId} Withdrawn", url, recipients);
         }
 
@@ -410,7 +410,7 @@ namespace risk.control.system.Services.Common
                 var recipients = await GetUsersByRoleAsync(
                     companyId: caseTask.ClientCompanyId,
                     vendorId: caseTask.VendorId,
-                    roleIds: new[] { managerRole.Id, agencyAdminRole.Id }
+                    roleIds: new[] { managerRole!.Id, agencyAdminRole!.Id }
                 );
 
                 // 5. Trigger Engine for Agency Admin
@@ -468,7 +468,7 @@ namespace risk.control.system.Services.Common
                 var recipients = await GetUsersByRoleAsync(
                     companyId: caseTask.ClientCompanyId,
                     vendorId: null,
-                    roleIds: new[] { assessorRole.Id }
+                    roleIds: new[] { assessorRole!.Id }
                 );
 
                 // 4. Trigger the Internal Engine
@@ -520,7 +520,7 @@ namespace risk.control.system.Services.Common
                 var recipients = await GetUsersByRoleAsync(
                     companyId: null,
                     vendorId: senderUser.VendorId,
-                    roleIds: new[] { supervisorRole.Id, agencyAdminRole.Id }
+                    roleIds: new[] { supervisorRole!.Id, agencyAdminRole!.Id }
                 );
 
                 // 4. Trigger the Internal Engine
@@ -568,7 +568,7 @@ namespace risk.control.system.Services.Common
                 var recipients = await GetUsersByRoleAsync(
                     companyId: null,
                     vendorId: caseTask.VendorId,
-                    roleIds: new[] { supervisorRole.Id, agencyAdminRole.Id }
+                    roleIds: new[] { supervisorRole!.Id, agencyAdminRole!.Id }
                 );
 
                 // 4. Fire the Internal Engine
@@ -598,12 +598,12 @@ namespace risk.control.system.Services.Common
             var assessorRole = await roleManager.FindByNameAsync(ASSESSOR.DISPLAY_NAME);
 
             var recipients = await _context.ApplicationUser.AsNoTracking().Include(u => u.Country)
-                .Where(u => u.ClientCompanyId == caseTask.ClientCompanyId)
-                .Where(u => _context.UserRoles.Any(ur => ur.UserId == u.Id && ur.RoleId == assessorRole.Id))
+                .Where(u => u.ClientCompanyId == caseTask!.ClientCompanyId)
+                .Where(u => _context.UserRoles.Any(ur => ur.UserId == u.Id && ur.RoleId == assessorRole!.Id))
                 .ToListAsync();
 
             senderUserEmail = senderUserEmail.Replace("\n", "").Replace("\r", "").Trim();
-            await SendNotificationInternal(caseId, senderUserEmail, assessorRole.Id, caseTask.ClientCompanyId, null,
+            await SendNotificationInternal(caseId, senderUserEmail, assessorRole!.Id, caseTask!.ClientCompanyId, null,
                 BlueSymbol, caseTask.SubStatus, $"Reply Submitted for Case #{caseId}", url, recipients);
         }
 
@@ -624,7 +624,7 @@ namespace risk.control.system.Services.Common
                 var agencyAdminRole = await roleManager.FindByNameAsync(AGENCY_ADMIN.DISPLAY_NAME);
 
                 // 3. Get recipients using helper
-                var recipients = await GetUsersByRoleAsync(null, vendorId, supervisorRole.Id, agencyAdminRole.Id);
+                var recipients = await GetUsersByRoleAsync(null, vendorId, supervisorRole!.Id, agencyAdminRole!.Id);
 
                 // 4. Fire the internal engine
                 senderUserEmail = senderUserEmail.Replace("\n", "").Replace("\r", "").Trim();
@@ -697,7 +697,7 @@ namespace risk.control.system.Services.Common
                     try
                     {
                         string smsBody = $"Dear {user.Email},\n{message} : {status}.\nThanks\n{senderUserEmail},\n{url}";
-                        await smsService.DoSendSmsAsync(user.Country.Code, user.Country.ISDCode + user.PhoneNumber, smsBody);
+                        await smsService.DoSendSmsAsync(user.Country!.Code, user.Country.ISDCode + user.PhoneNumber, smsBody);
                     }
                     catch (Exception ex)
                     {

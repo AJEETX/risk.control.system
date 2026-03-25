@@ -76,7 +76,7 @@ namespace risk.control.system.Services.Report
                 foreach (var face in loc.DocumentIds.Where(f => f.Selected && f.ValidationExecuted))
                 {
                     var rowBuilder = tableBuilder.AddRow();
-                    rowBuilder.AddCell().AddParagraph().AddText(face.ReportName).SetFont(FNT9);
+                    rowBuilder.AddCell().AddParagraph().AddText(face.ReportName!).SetFont(FNT9);
 
                     if (face.FilePath != null)
                     {

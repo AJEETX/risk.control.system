@@ -46,28 +46,28 @@ internal class FaceIdfyService : IFaceIdfyService
 
     public async Task<AppiCheckifyResponse> CaptureFaceId(FaceData data)
     {
-        var claim = await caseService.GetCaseById(data.CaseId);
-        if (claim?.InvestigationReport == null) return null;
+        var caseDetail = await caseService.GetCaseById(data.CaseId);
+        if (caseDetail?.InvestigationReport == null) return null!;
 
         // 1. Resolve Entities
         var agent = await context.ApplicationUser.FirstAsync(u => u.Email == data.Email);
-        var location = claim.InvestigationReport.ReportTemplate.LocationReport.First(l => l.LocationName == data.LocationName);
+        var location = caseDetail.InvestigationReport.ReportTemplate!.LocationReport.First(l => l.LocationName == data.LocationName);
 
         var locationTemplate = await context.LocationReport.Include(l => l.FaceIds).FirstAsync(l => l.Id == location.Id);
 
-        var faceIdReport = locationTemplate.FaceIds.First(c => c.ReportName == data.ReportName);
+        var faceIdReport = locationTemplate.FaceIds!.First(c => c.ReportName == data.ReportName);
 
         try
         {
             // 2. Data Preparation
             bool isCustomer = faceIdReport.ReportName == DigitalIdReportType.CUSTOMER_FACE.GetEnumDisplayName();
-            var (lat, lon) = VerificationHelper.ParseCoordinates(data.LocationLatLong);
-            var expected = VerificationHelper.GetExpectedCoordinates(claim);
+            var (lat, lon) = VerificationHelper.ParseCoordinates(data.LocationLatLong!);
+            var expected = VerificationHelper.GetExpectedCoordinates(caseDetail);
 
-            var (fileName, relativePath) = await fileStorageService.SaveAsync(data.Image, "Case", claim.PolicyDetail.ContractNumber, "report");
-            var faceBytes = await VerificationHelper.GetBytesFromIFormFile(data.Image);
+            var (fileName, relativePath) = await fileStorageService.SaveAsync(data.Image!, "Case", caseDetail.PolicyDetail!.ContractNumber, "report");
+            var faceBytes = await VerificationHelper.GetBytesFromIFormFile(data.Image!);
 
-            var regPath = Path.Combine(webHostEnvironment.ContentRootPath, FaceIdfyHelper.GetRegisteredImagePath(claim, isCustomer));
+            var regPath = Path.Combine(webHostEnvironment.ContentRootPath, FaceIdfyHelper.GetRegisteredImagePath(caseDetail, isCustomer));
             var registeredImage = await File.ReadAllBytesAsync(regPath);
 
             // 3. Parallel Execution (External APIs)
@@ -93,16 +93,16 @@ internal class FaceIdfyService : IFaceIdfyService
             faceIdReport.Similarity = sim;
             faceIdReport.ImageValid = sim > 70;
 
-            await File.WriteAllBytesAsync(faceIdReport.FilePath, compImg);
+            await File.WriteAllBytesAsync(faceIdReport.FilePath!, compImg);
             await context.SaveChangesAsync();
 
-            return FaceIdfyHelper.BuildResponse(claim, faceIdReport, compImg);
+            return FaceIdfyHelper.BuildResponse(caseDetail, faceIdReport, compImg);
         }
         catch (Exception ex)
         {
             var sanitizedEmail = data.Email?.Replace("\n", "").Replace("\r", "").Trim();
             logger.LogError(ex, "Failed Face Id processing for {CaseId}. {AgentEmail}", data.CaseId, sanitizedEmail);
-            return await HandleError(claim, faceIdReport);
+            return await HandleError(caseDetail, faceIdReport);
         }
     }
 
@@ -113,6 +113,6 @@ internal class FaceIdfyService : IFaceIdfyService
         faceIdReport.ImageValid = false;
         await context.SaveChangesAsync();
         var img = File.Exists(faceIdReport.FilePath) ? await File.ReadAllBytesAsync(faceIdReport.FilePath) : null;
-        return FaceIdfyHelper.BuildResponse(claim, faceIdReport, img);
+        return FaceIdfyHelper.BuildResponse(claim, faceIdReport, img!);
     }
 }

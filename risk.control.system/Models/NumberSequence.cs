@@ -10,13 +10,13 @@ namespace risk.control.system.Models
         public int NumberSequenceId { get; set; }
 
         [Required]
-        public string NumberSequenceName { get; set; }
+        public string NumberSequenceName { get; set; } = default!;
 
         [Required]
-        public string Module { get; set; }
+        public string Module { get; set; } = default!;
 
         [Required]
-        public string Prefix { get; set; }
+        public string Prefix { get; set; } = default!;
 
         public int LastNumber { get; set; }
     }

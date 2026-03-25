@@ -57,7 +57,7 @@ namespace risk.control.system.Services.Manager
                 .Include(v => v.Country)
                 .FirstOrDefaultAsync(v => v.VendorId == vendorId);
 
-            if (vendor == null) return null;
+            if (vendor == null) return null!;
 
             return new ApplicationUser
             {
@@ -75,7 +75,7 @@ namespace risk.control.system.Services.Manager
                 .Include(v => v.Country)
                 .FirstOrDefaultAsync(v => v.VendorId == vendorId);
 
-            if (vendor == null) return null;
+            if (vendor == null) return null!;
             var (roles, role, status) = await GetNewAgencyUserRoles(vendorId);
             return new ApplicationUser
             {
@@ -123,7 +123,7 @@ namespace risk.control.system.Services.Manager
 
         public async Task LoadEditModelAsync(ApplicationUser model)
         {
-            List<SelectListItem> allRoles = null;
+            List<SelectListItem> allRoles = null!;
             AppRoles? role = null;
             var vendor = await _context.Vendor.Include(v => v.Country).FirstOrDefaultAsync(v => v.VendorId == model.VendorId);
 
@@ -161,7 +161,7 @@ namespace risk.control.system.Services.Manager
             }
             model.Active = status;
             model.Vendor = vendor;
-            model.Country = vendor.Country;
+            model.Country = vendor!.Country;
             model.CountryId = vendor.CountryId;
             model.StateId = model.SelectedStateId;
             model.DistrictId = model.SelectedDistrictId;
@@ -177,7 +177,7 @@ namespace risk.control.system.Services.Manager
                 .Include(v => v.Country)
                 .FirstOrDefaultAsync(v => v.Id == id);
 
-            if (agencyUser == null) return null;
+            if (agencyUser == null) return null!;
 
             // Apply business logic for password change requirements
             bool isFirstLoginEnabled = await _featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION);
@@ -211,7 +211,7 @@ namespace risk.control.system.Services.Manager
                 .Include(v => v.PinCode)
                 .FirstOrDefaultAsync(c => c.Id == id);
 
-            if (model == null) return null;
+            if (model == null) return null!;
 
             // Business Rule: Check for active sub-statuses before allowing deletion
             var agencySubStatuses = new[] {
@@ -256,7 +256,7 @@ namespace risk.control.system.Services.Manager
         {
             var currentVendorUserCount = await _context.ApplicationUser.CountAsync(v => v.VendorId == id);
             bool status = false;
-            List<SelectListItem> allRoles = null;
+            List<SelectListItem> allRoles = null!;
             AppRoles? role = null;
             if (currentVendorUserCount == 0)
             {
