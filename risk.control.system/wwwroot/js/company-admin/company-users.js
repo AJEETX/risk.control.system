@@ -136,8 +136,19 @@
             },
             {
                 "data": "updated",
-                "mRender": function (data, type, row) {
-                    return '<span title="' + data + '" data-bs-toggle="tooltip">' + data + '</span>'
+                "render": function (data, type, row) {
+                    if (!data) return "";
+
+                    // 1. Parse UTC string (Assuming format: "2023-10-27T10:00:00Z")
+                    var date = new Date(data);
+
+                    // 2. Convert to Local String
+                    // You can customize the format: { dateStyle: 'medium', timeStyle: 'short' }
+                    var localDate = date.toLocaleString();
+
+                    return `<i title="${localDate}" data-bs-toggle="tooltip">
+                    <small><strong>${localDate}</strong></small>
+                </i>`;
                 }
             },
             {

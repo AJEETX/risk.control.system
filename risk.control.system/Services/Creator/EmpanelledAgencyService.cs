@@ -27,19 +27,19 @@ namespace risk.control.system.Services.Creator
                 .Include(c => c.PolicyDetail)
                 .Include(c => c.ClientCompany)
                 .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.CaseEnabler)
+                .ThenInclude(c => c!.CaseEnabler)
                 .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.CostCentre)
+                .ThenInclude(c => c!.CostCentre)
                 .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.Country)
+                .ThenInclude(c => c!.Country)
                 .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.District)
+                .ThenInclude(c => c!.District)
                 .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.InvestigationServiceType)
+                .ThenInclude(c => c!.InvestigationServiceType)
                 .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.PinCode)
+                .ThenInclude(c => c!.PinCode)
                 .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.State)
+                .ThenInclude(c => c!.State)
                 .FirstOrDefaultAsync(m => m.Id == selectedcase);
 
             var beneficiary = await _context.BeneficiaryDetail
@@ -50,7 +50,7 @@ namespace risk.control.system.Services.Creator
                .Include(c => c.Country)
                .FirstOrDefaultAsync(c => c.InvestigationTaskId == selectedcase);
 
-            var currentUser = await _context.ApplicationUser.AsNoTracking().Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == userEmail);
+            var currentUser = await _context.ApplicationUser.AsNoTracking().Include(c => c.ClientCompany).ThenInclude(c => c!.Country).FirstOrDefaultAsync(c => c.Email == userEmail);
 
             return new CaseTransactionModel
             {
@@ -58,7 +58,8 @@ namespace risk.control.system.Services.Creator
                 Beneficiary = beneficiary,
                 FromEditPage = fromEditPage,
                 vendorId = vendorId,
-                Currency = CustomExtensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol,
+                Currency = CustomExtensions.GetCultureByCountry(currentUser!.ClientCompany!.Country!.Code.ToUpper()).NumberFormat.CurrencySymbol,
+                Culture = CustomExtensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper())
             };
         }
     }

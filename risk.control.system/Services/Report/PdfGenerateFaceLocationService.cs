@@ -78,7 +78,7 @@ namespace risk.control.system.Services.Report
                 {
 
                     var rowBuilder = tableBuilder.AddRow();
-                    rowBuilder.AddCell().AddParagraph().AddText(face.ReportName).SetFont(FNT9);
+                    rowBuilder.AddCell().AddParagraph().AddText(face.ReportName!).SetFont(FNT9);
 
                     if (face.FilePath != null)
                     {

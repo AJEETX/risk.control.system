@@ -43,13 +43,13 @@ namespace risk.control.system.Services.AgencyAdmin
             var vendorUser = await _context.ApplicationUser.AsNoTracking()
                 .FirstOrDefaultAsync(c => c.Email == currentUserEmail);
 
-            if (vendorUser == null) return null;
+            if (vendorUser == null) return null!;
 
             var vendor = await _context.Vendor.AsNoTracking()
                 .Include(v => v.Country)
                 .FirstOrDefaultAsync(v => v.VendorId == vendorUser.VendorId);
 
-            if (vendor == null) return null;
+            if (vendor == null) return null!;
 
             var model = new ApplicationUser
             {
@@ -70,7 +70,7 @@ namespace risk.control.system.Services.AgencyAdmin
                 .Include(u => u.Vendor)
                 .FirstOrDefaultAsync(c => c.Id == id);
 
-            if (user == null) return null;
+            if (user == null) return null!;
 
             // Apply Feature Flag Logic
             bool forceChange = await _featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION);
@@ -118,7 +118,7 @@ namespace risk.control.system.Services.AgencyAdmin
                 .Include(v => v.District).Include(v => v.PinCode)
                 .FirstOrDefaultAsync(c => c.Id == id);
 
-            if (model == null) return null;
+            if (model == null) return null!;
 
             var agencySubStatuses = new[] {
             CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR,

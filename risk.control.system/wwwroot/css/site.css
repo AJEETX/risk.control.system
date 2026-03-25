@@ -2187,6 +2187,11 @@ select#PinCodeId {
     background-color: #004788;
     cursor: default;
 }
+.btn-info.enabled-btn:focus {
+    color: white;
+    background-color: #004788 !important;
+    cursor: default;
+}
 
 /* Styles for the disabled state of the button */
 .disabled-btn {
@@ -4502,4 +4507,11 @@ div.form-group.text-center.image-logo-container {
     border-top: 1px solid #dee2e6;
     text-align: right;
     padding: 1rem 1.5rem;
+}
+.pascalCase {
+    text-transform: capitalize;
+}
+.btn-info.btn.validate-user.disabled, .btn-info.btn.validate-user:disabled {
+    background-color: gray !important;
+    border-color: gray !important;
 }

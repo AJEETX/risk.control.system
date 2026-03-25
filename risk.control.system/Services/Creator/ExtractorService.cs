@@ -29,7 +29,7 @@ namespace risk.control.system.Services.Creator
                 var pincodeDetils = await _context.PinCode.AsNoTracking()
                 .Include(p => p.District).Include(p => p.State).Include(p => p.Country)
                 .FirstOrDefaultAsync(p => p.Code == code &&
-                    p.District.Name.ToLower().Contains(district.ToLower()) &&
+                    p.District!.Name.ToLower().Contains(district.ToLower()!) &&
                     p.CountryId == countryId);
                 return pincodeDetils;
             }
@@ -49,12 +49,12 @@ namespace risk.control.system.Services.Creator
                 var allRelations = await _context.BeneficiaryRelation.AsNoTracking().ToListAsync();
                 var relations = allRelations.FirstOrDefault(b => b.Code.Equals(code, StringComparison.OrdinalIgnoreCase))
                        ?? allRelations.FirstOrDefault();
-                return relations;
+                return relations!;
             }
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error fetching BeneficiaryRelation for Code: {Code}", code);
-                return null;
+                return null!;
             }
         }
     }

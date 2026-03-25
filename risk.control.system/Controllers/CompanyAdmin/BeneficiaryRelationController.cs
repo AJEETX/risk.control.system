@@ -47,7 +47,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                     c.BeneficiaryRelationId,
                     c.Name,
                     c.Code,
-                    Updated = c.Updated.GetValueOrDefault().ToString("dd-MMM-yyyy HH:mm"),
+                    Updated = c.Updated ?? c.Created,
                     UpdateBy = c.UpdatedBy
                 }).ToList();
 

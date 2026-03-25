@@ -191,6 +191,8 @@ namespace risk.control.system.Services.Api
             // -----------------------------
             var finalDataTasks = pagedRawData.Select(async a =>
             {
+                var time = a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR ? a.AllocatedToAgencyTime :
+                    a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR ? a.EnquiredByAssessorTime : a.Created;
                 var isUW = a.InsuranceType == InsuranceType.UNDERWRITING;
                 var culture = CustomExtensions.GetCultureByCountry(vendorUser.Country!.Code);
                 var pincode = isUW ? a.customerPincode : a.beneficiaryPincode;
@@ -240,7 +242,7 @@ namespace risk.control.system.Services.Api
                     ServiceType = serviceType,
                     Service = service,
                     Location = a.SubStatus,
-                    Created = a.Created.ToString("dd-MM-yyyy"),
+                    Created = time!.Value,
                     timePending = timePending,
                     BeneficiaryPhoto = await beneficiaryPhotoTask,
                     BeneficiaryName = beneficiaryName,
@@ -399,6 +401,9 @@ namespace risk.control.system.Services.Api
                     a.Created,
                     a.Updated,
                     a.ORIGIN,
+                    a.TaskToAgentTime,
+                    a.SubmittedToAssessorTime,
+                    a.EnquiryReplyByAgencyTime,
                     a.IsNewAssignedToAgency,
                     a.IsNewSubmittedToAgent,
                     a.AssignedToAgency,
@@ -435,6 +440,9 @@ namespace risk.control.system.Services.Api
             // -------------------------
             var finalDataTasks = pagedRawData.Select(async a =>
             {
+                var time = a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT ? a.TaskToAgentTime :
+                    a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR ? a.SubmittedToAssessorTime :
+                    a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR ? a.EnquiryReplyByAgencyTime : a.Created;
                 var isUW = a.InsuranceType == InsuranceType.UNDERWRITING;
                 var culture = CustomExtensions.GetCultureByCountry(vendorUser.Country!.Code);
                 var pincode = isUW ? a.customerPincode : a.beneficiaryPincode;
@@ -473,7 +481,7 @@ namespace risk.control.system.Services.Api
                     ServiceType = a.InsuranceType!.GetEnumDisplayName(),
                     Service = a.ServiceTypeName,
                     Location = a.SubStatus,
-                    Created = a.Created.ToString("dd-MM-yyyy"),
+                    Created = time!.Value,
                     timePending = GetSupervisorOpenTimePending(a.investigation),
                     TimeElapsed = GetTimeElapsed(a.investigation),
                     BeneficiaryPhoto = await beneficiaryPhotoTask,
@@ -701,7 +709,7 @@ namespace risk.control.system.Services.Api
                     ServiceType = serviceType,
                     Service = service,
                     Location = a.SubStatus,
-                    Created = a.Created.ToString("dd-MM-yyyy"),
+                    Created = a.ProcessedByAssessorTime!.Value,
                     timePending = timePending,
                     PolicyNum = policyNum,
                     BeneficiaryPhoto = await beneficiaryPhotoTask,
@@ -908,7 +916,7 @@ namespace risk.control.system.Services.Api
                     ServiceType = serviceType,
                     Service = service,
                     Location = a.SubStatus,
-                    Created = a.Created.ToString("dd-MM-yyyy"),
+                    Created = a.SubmittedToSupervisorTime!.Value,
                     timePending = timePending,
                     PolicyNum = policyNum,
                     BeneficiaryPhoto = await beneficiaryPhotoTask,

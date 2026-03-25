@@ -11,7 +11,7 @@ namespace risk.control.system.Models
 
         [Required]
         [StringLength(300, MinimumLength = 3, ErrorMessage = "Question must be between 3 and 300 characters.")]
-        public string QuestionText { get; set; }
+        public string QuestionText { get; set; } = default!;
 
         public string? AnswerText { get; set; }
         public string? QuestionType { get; set; } // Stores type: "text", "dropdown", "checkbox", "date", "file", "radio"

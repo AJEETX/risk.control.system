@@ -25,9 +25,9 @@
 		</h3>
 	</div>
 	<input type="hidden" id="customerDetailId" value="@Model.ClaimsInvestigation?.CustomerDetail?.CustomerDetailId" />
-	<input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.Id" />
+	<input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation?.Id" />
 	<input type="hidden" id="beneficiaryId" value="@Model.Beneficiary?.BeneficiaryDetailId" />
-	<input type="hidden" id="policyDetailId" value="@Model.ClaimsInvestigation?.PolicyDetail.PolicyDetailId" />
+	<input type="hidden" id="policyDetailId" value="@Model.ClaimsInvestigation?.PolicyDetail?.PolicyDetailId" />
 </div>
 
 <div class="card shadow-lg border-1 rounded-lg">
@@ -38,9 +38,9 @@
 			</span>
 			<b> <i class='far fa-hand-point-right'></i> </b>
 			<span class="badge badge-info" data-bs-toggle="tooltip"
-				  title="Owner : @Model.ClaimsInvestigation.CaseOwner">
+				  title="Owner : @Model.ClaimsInvestigation?.CaseOwner">
 				<b>
-					@Model.ClaimsInvestigation.CaseOwner
+					@Model.ClaimsInvestigation?.CaseOwner
 				</b>
 			</span>
 			<span class="hover-text">
@@ -80,7 +80,7 @@
 			</div>
 		</div>
 
-		<input type="hidden" id="caseIdHidden" value="@Model.ClaimsInvestigation.Id" />
+		<input type="hidden" id="caseIdHidden" value="@Model.ClaimsInvestigation?.Id" />
 		<partial name="Investigation/_TimelineReport" model="@Model" />
 	</div>
 	<div class="card-footer">

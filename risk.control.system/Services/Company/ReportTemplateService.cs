@@ -19,7 +19,7 @@ namespace risk.control.system.Services.Creator
 
         public async Task<ReportTemplate> GetReportTemplate(long caseId)
         {
-            var claimsInvestigation = await _context.Investigations
+            var investigation = await _context.Investigations
                 .AsNoTracking()
                 .FirstOrDefaultAsync(c => c.Id == caseId);
 
@@ -34,9 +34,9 @@ namespace risk.control.system.Services.Creator
                     .ThenInclude(l => l.DocumentIds)
                 .Include(r => r.LocationReport)
                     .ThenInclude(l => l.Questions)
-                .FirstOrDefaultAsync(r => r.Id == claimsInvestigation.ReportTemplateId);
+                .FirstOrDefaultAsync(r => r.Id == investigation!.ReportTemplateId);
 
-            return template;
+            return template!;
         }
     }
 }

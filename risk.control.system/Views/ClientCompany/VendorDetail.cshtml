@@ -63,7 +63,7 @@
 						<dd class="col-sm-8">
 							@foreach (var service in Model.VendorInvestigationServiceTypes)
 							{
-								<span class="badge badge-light">@service.InvestigationServiceType.Name</span>
+								<span class="badge badge-light">@service.InvestigationServiceType?.Name</span>
 							}
 						</dd>
 					</dl>

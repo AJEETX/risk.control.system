@@ -22,30 +22,30 @@
                 {
                     var locations = template.LocationReport.Count;
                     var faceCount = template.LocationReport
-                    .SelectMany(l => l.FaceIds)
+                    .SelectMany(l => l.FaceIds!)
                     .Count(i => i.Selected);
 
                     var docCount = template.LocationReport
-                    .SelectMany(l => l.DocumentIds)
+                    .SelectMany(l => l.DocumentIds!)
                     .Count(i => i.Selected);
 
                     var mediaCount = template.LocationReport
-                    .SelectMany(l => l.MediaReports)
+                    .SelectMany(l => l.MediaReports!)
                     .Count(i => i.Selected);
 
                     var questionCount = template.LocationReport
-                    .SelectMany(l => l.Questions)
+                    .SelectMany(l => l.Questions!)
                     .Count(); // all questions, no "Selected" property
 
                     <tr>
                         <td title="@(template.Name)">
-                            @if (template.Name.Length <= 50)
+                            @if (template.Name?.Length <= 50)
                             {
                                <small> @template.Name</small>
                             }
                             else
                             {
-                                <small> @template.Name.Substring(0, 50) <span>...</span></small>
+                                <small> @template.Name?.Substring(0, 50) <span>...</span></small>
                              }
                         </td>
 

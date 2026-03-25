@@ -64,7 +64,7 @@ namespace risk.control.system.Services.Report
                 {
                     var rowBuilder = tableBuilder.AddRow();
                     rowBuilder.AddCell().AddParagraph().AddText(question.QuestionText);
-                    rowBuilder.AddCell().AddParagraph().AddText(question.AnswerText);
+                    rowBuilder.AddCell().AddParagraph().AddText(question.AnswerText!);
                 }
             }
             return section;

@@ -15,10 +15,10 @@
 		beneficiaryProgressColor = beneficiaryExists ? "progress-bar-green" : "progress-bar-grey";
 	}
 
-	var beneficiaryAddress = $"{Model.Beneficiary.Addressline} {Model.Beneficiary.District?.Name} {Model.Beneficiary.State?.Name} {Model.Beneficiary.Country?.Name} {Model.Beneficiary.PinCode?.Code}";
-	var beneficiaryAgeInYears = $"{(int)(DateTime.UtcNow.Subtract(Model.Beneficiary.DateOfBirth.GetValueOrDefault()).TotalDays / 365)} years";
-	var imgPath = "/flags/" + @Model.Beneficiary.Country.Code.ToLower() + ".png";
-	var map = string.Format(Model.Beneficiary?.BeneficiaryLocationMap, "200", "200");
+	var beneficiaryAddress = $"{Model.Beneficiary?.Addressline} {Model.Beneficiary?.District?.Name} {Model.Beneficiary?.State?.Name} {Model.Beneficiary?.Country?.Name} {Model.Beneficiary?.PinCode?.Code}";
+	var beneficiaryAgeInYears = $"{(int)(DateTime.UtcNow.Subtract(Model.Beneficiary!.DateOfBirth.GetValueOrDefault()).TotalDays / 365)} years";
+	var imgPath = "/flags/" + @Model.Beneficiary.Country?.Code.ToLower() + ".png";
+	var map = string.Format(Model.Beneficiary?.BeneficiaryLocationMap!, "200", "200");
 
 }
 
@@ -55,7 +55,7 @@
 					<ul class="ml-4 mb-0 fa-ul text-muted">
 						<li class="small">
 							<span class="fa-li"><i class="fa fa-money"></i></span>
-							Annual Income: (@Model.Currency)<b> @Model.Beneficiary?.Income.GetEnumDisplayName()</b>
+							Annual Income: (@Model.Currency)<b> @Model.Beneficiary?.Income?.GetEnumDisplayName()</b>
 						</li>
 						<li class="small">
 							<span class="fa-li"><i class="fas fa-user-alt"></i></span>
@@ -67,11 +67,11 @@
 						</li>
 						<li class="small">
 							<span class="fa-li"><i class="fas fa-lg fa-globe"></i></span>
-							Country:<img src="@imgPath" class="flag-icon" data-bs-toggle="tooltip" /> @Model.Beneficiary?.Country.Name
+							Country:<img src="@imgPath" class="flag-icon" data-bs-toggle="tooltip" /> @Model.Beneficiary?.Country?.Name
 						</li>
 						<li class="small">
 							<span class="fa-li"><i class="fas fa-lg fa-phone"></i></span>
-							Mobile #: (+@Model.Beneficiary?.Country.ISDCode)<b> @Model.Beneficiary?.PhoneNumber</b>
+							Mobile #: (+@Model.Beneficiary?.Country?.ISDCode)<b> @Model.Beneficiary?.PhoneNumber</b>
 						</li>
 					</ul>
 				</div>
@@ -79,7 +79,7 @@
 				<!-- Beneficiary Image and Map -->
 				<div class="col-5 text-center">
 					<p class="text-muted text-sm">
-						<img id="bImage" class="img-fluid block-data" src="/Document/GetBeneficiaryDocument/@Model.Beneficiary.BeneficiaryDetailId" data-bs-toggle="tooltip" title="@Model.Beneficiary?.Name Photo" alt="@Model.Beneficiary?.Name" />
+						<img id="bImage" class="img-fluid block-data" src="/Document/GetBeneficiaryDocument/@Model.Beneficiary?.BeneficiaryDetailId" data-bs-toggle="tooltip" title="@Model.Beneficiary?.Name Photo" alt="@Model.Beneficiary?.Name" />
 					</p>
 					<p class="text-muted text-sm">
 						<img id="beneficiaryGoogleMap" class="img-fluid block-data" src="@map" title="Display Beneficiary Address on Map" data-bs-toggle="tooltip" alt="Beneficiary Address " />
@@ -96,13 +96,13 @@
 					if (beneficiaryExists)
 					{
 						<input type="hidden" asp-for="ClaimsInvestigation.Id" />
-						<a id="edit-beneficiary" class="btn btn-warning" asp-controller="Beneficiary" asp-action="Edit" asp-route-id="@Model.ClaimsInvestigation.Id">
+						<a id="edit-beneficiary" class="btn btn-warning" asp-controller="Beneficiary" asp-action="Edit" asp-route-id="@Model.ClaimsInvestigation?.Id">
 							<i class="fas fa-user-tie"></i> Edit Beneficiary
 						</a>
 					}
 					else
 					{
-						<a id="add-beneficiary" class="btn btn-success" asp-controller="Beneficiary" asp-action="Create" asp-route-id="@Model.ClaimsInvestigation.Id">
+						<a id="add-beneficiary" class="btn btn-success" asp-controller="Beneficiary" asp-action="Create" asp-route-id="@Model.ClaimsInvestigation?.Id">
 							<i class="fas fa-user-tie"></i> Add Beneficiary
 						</a>
 					}

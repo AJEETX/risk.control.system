@@ -14,7 +14,7 @@ namespace risk.control.system.Models
         [Required]
         [Display(Name = "Name")]
         [StringLength(50, MinimumLength = 3, ErrorMessage = "Name must be between 3 and 50 characters.")]
-        public string Name { get; set; }
+        public string Name { get; set; } = default!;
 
         [Required]
         [Display(Name = "Date of birth")]
@@ -28,12 +28,12 @@ namespace risk.control.system.Models
         [Display(Name = "Contact number")]
         [DataType(DataType.PhoneNumber)]
         [StringLength(10, MinimumLength = 9, ErrorMessage = "PhoneNumber must be between 9 and 10 characters.")]
-        public string PhoneNumber { get; set; }
+        public string PhoneNumber { get; set; } = default!;
 
         [Required]
         [Display(Name = "Address line")]
         [StringLength(70, MinimumLength = 3, ErrorMessage = "Addressline must be between 3 and 70 characters.")]
-        public string Addressline { get; set; }
+        public string Addressline { get; set; } = default!;
 
         [Display(Name = "PinCode")]
         public long? PinCodeId { get; set; }
@@ -122,15 +122,15 @@ namespace risk.control.system.Models
             return $"Customer Information:\n" +
            $"- Name: {Name}\n" +
            $"- Date of birth: {DateOfBirth}\n" +
-           $"- Gender: ${Gender.GetEnumDisplayName()}\n" +
+           $"- Gender: ${Gender!.GetEnumDisplayName()}\n" +
            $"- Address line: {Addressline}\n" +
            $"- City: {District}\n" +
            $"- State: {State}\n" +
            $"- Country: {Country}\n" +
            $"- Contact Number: {PhoneNumber}\n" +
-           $"- Income: {Income.GetEnumDisplayName()}\n" +
-           $"- Occupation: {Occupation.GetEnumDisplayName()}\n" +
-           $"- Education: {Education.GetEnumDisplayName()}\n";
+           $"- Income: {Income!.GetEnumDisplayName()}\n" +
+           $"- Occupation: {Occupation!.GetEnumDisplayName()}\n" +
+           $"- Education: {Education!.GetEnumDisplayName()}\n";
         }
     }
 }

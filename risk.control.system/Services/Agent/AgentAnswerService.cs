@@ -32,7 +32,7 @@ internal class AgentAnswerService : IAgentAnswerService
             var caseTask = await caseService.GetCaseByIdForQuestions(caseId);
             if (caseTask == null)
                 return false;
-            var location = caseTask.InvestigationReport.ReportTemplate.LocationReport.FirstOrDefault(l => l.LocationName == locationName);
+            var location = caseTask.InvestigationReport!.ReportTemplate!.LocationReport.FirstOrDefault(l => l.LocationName == locationName);
             if (location == null)
                 return false;
             var locationTemplate = await context.LocationReport
@@ -40,12 +40,12 @@ internal class AgentAnswerService : IAgentAnswerService
                 .FirstOrDefaultAsync(l => l.Id == location.Id);
             if (locationTemplate == null)
                 return false;
-            locationTemplate.Questions.RemoveAll(q => true);
+            locationTemplate.Questions!.RemoveAll(q => true);
             foreach (var q in Questions)
             {
                 locationTemplate.Questions.Add(new Question
                 {
-                    QuestionText = q.QuestionText,
+                    QuestionText = q.QuestionText!,
                     QuestionType = q.QuestionType,
                     IsRequired = q.IsRequired,
                     Options = q.Options?.Trim(),

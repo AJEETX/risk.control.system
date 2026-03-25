@@ -8,11 +8,11 @@ namespace risk.control.system.Models.ViewModel
         [Required]
         [EmailAddress]
         [DisplayName("Email")]
-        public string Email { get; set; }
+        public string Email { get; set; } = default!;
 
         [DataType(DataType.Password)]
         [DisplayName("Password")]
-        public string Password { get; set; }
+        public string Password { get; set; } = default!;
 
         [Display(Name = "Remember me?")]
         public bool RememberMe { get; set; }

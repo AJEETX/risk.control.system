@@ -25,19 +25,19 @@ namespace risk.control.system.Seeds
             var states = pincodes.GroupBy(g => new { g.StateName, g.StateCode });
             foreach (var state in states)
             {
-                var dbState = new State { Code = state.Key.StateCode, Name = state.Key.StateName, Country = country, Updated = DateTime.UtcNow };
+                var dbState = new State { Code = state.Key.StateCode!, Name = state.Key.StateName!, Country = country, Updated = DateTime.UtcNow };
                 var stateAdded = await context.State.AddAsync(dbState);
                 var districts = state.GroupBy(g => g.District);
                 var pinCodeList = new List<PinCode> { };
                 foreach (var district in districts)
                 {
-                    var districtDetail = new District { Code = district.Key, Name = district.Key, State = stateAdded.Entity, Country = country, Updated = DateTime.UtcNow };
+                    var districtDetail = new District { Code = district.Key!, Name = district.Key!, State = stateAdded.Entity, Country = country, Updated = DateTime.UtcNow };
                     var districtAdded = await context.District.AddAsync(districtDetail);
                     foreach (var pinCode in district)
                     {
                         var pincodeState = new PinCode
                         {
-                            Name = pinCode.Name,
+                            Name = pinCode.Name!,
                             Code = pinCode.Code,
                             Longitude = pinCode.Longitude,
                             Latitude = pinCode.Latitude,
@@ -75,9 +75,9 @@ namespace risk.control.system.Seeds
                             var output = regex.Replace(row, m => m.Value.Replace(',', '@'));
                             var rowData = output.Split(',').ToList();
                             var countryCode = rowData[1].Trim().ToLower();
-                            var currency = currencies.FirstOrDefault(c => c.CountryCode.Trim().ToLower() == countryCode);
+                            var currency = currencies.FirstOrDefault(c => c.CountryCode!.Trim().ToLower() == countryCode);
 
-                            var currencyName = currenciesName.FirstOrDefault(c => c.CountryCode.Trim().ToLower() == countryCode);
+                            var currencyName = currenciesName.FirstOrDefault(c => c.CountryCode!.Trim().ToLower() == countryCode);
 
                             var country = new Country
                             {
@@ -86,7 +86,7 @@ namespace risk.control.system.Seeds
                                 ISDCode = int.Parse(rowData[2].Trim()),
                                 CurrencyCode = currency?.CurrencyCode ?? currencyName?.CurrencyCode,
                                 CurrencyName = currencyName?.CurrencyName,
-                                Language = currency?.Language.ToUpper(),
+                                Language = currency?.Language!.ToUpper(),
                                 Updated = DateTime.UtcNow,
                             };
 
@@ -189,7 +189,7 @@ namespace risk.control.system.Seeds
 
                             var pincodeWithState = new PinCodeState
                             {
-                                Code =int.Parse(pinCode),
+                                Code = int.Parse(pinCode),
                                 Name = rowData[1]?.Trim() ?? NO_DATA,
                                 District = rowData[1]?.Trim() ?? NO_DATA,
                                 StateName = rowData[2]?.Trim() ?? NO_DATA,
@@ -249,7 +249,7 @@ namespace risk.control.system.Seeds
                 {
                     var officeName = officeSuffixRegex.Replace(parts[0].Trim(), "").Trim('"');
 
-                    var pincode =int.Parse( parts[1].Trim());
+                    var pincode = int.Parse(parts[1].Trim());
                     var district = parts[2].Trim().ToUpper();
                     var stateName = parts[3].Trim().ToUpper();
                     var stateCode = states.FirstOrDefault(s => string.Equals(s.StateName, stateName, StringComparison.OrdinalIgnoreCase))?.StateCode;
@@ -271,7 +271,7 @@ namespace risk.control.system.Seeds
     }
     public class StateModel
     {
-        public string StateName { get; set; }
-        public string StateCode { get; set; }
+        public string StateName { get; set; } = default!;
+        public string StateCode { get; set; } = default!;
     }
 }

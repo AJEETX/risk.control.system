@@ -47,23 +47,23 @@ namespace risk.control.system.Services.Creator
                 if (uploadedCaseResult == null || uploadedCaseResult.Count == 0)
                 {
                     await uploadFileStatusService.SetFileUploadFailure(uploadFileData, "Error uploading the file", uploadAndAssign);
-                    await mailService.NotifyFileUpload(companyUser.Email, uploadFileData, url);
+                    await mailService.NotifyFileUpload(companyUser.Email!, uploadFileData, url);
                 }
 
-                var uploadedCases = uploadedCaseResult.Where(c => c.InvestigationTask != null).Select(c => c.InvestigationTask).ToList();
+                var uploadedCases = uploadedCaseResult!.Where(c => c.InvestigationTask != null).Select(c => c.InvestigationTask).ToList();
                 if (uploadedCases == null || uploadedCases.Count == 0)
                 {
                     var errorString = "No valid records to upload.";
                     uploadFileData.ErrorByteData = Encoding.UTF8.GetBytes(errorString);
                     await uploadFileStatusService.SetFileUploadFailure(uploadFileData, errorString, uploadAndAssign);
-                    await mailService.NotifyFileUpload(companyUser.Email, uploadFileData, url);
+                    await mailService.NotifyFileUpload(companyUser.Email!, uploadFileData, url);
                 }
 
-                var totalAddedAndExistingCount = uploadedCaseResult.Count + totalClaimsCreated;
-                if (companyUser.ClientCompany.LicenseType == LicenseType.Trial && totalAddedAndExistingCount > companyUser.ClientCompany.TotalCreatedClaimAllowed)
+                var totalAddedAndExistingCount = uploadedCaseResult!.Count + totalClaimsCreated;
+                if (companyUser.ClientCompany!.LicenseType == LicenseType.Trial && totalAddedAndExistingCount > companyUser.ClientCompany.TotalCreatedClaimAllowed)
                 {
                     await uploadFileStatusService.SetFileUploadFailure(uploadFileData, $"Case limit exceeded of {companyUser.ClientCompany.TotalCreatedClaimAllowed} case(s).", uploadAndAssign);
-                    await mailService.NotifyFileUpload(companyUser.Email, uploadFileData, url);
+                    await mailService.NotifyFileUpload(companyUser.Email!, uploadFileData, url);
                     return;
                 }
                 var sb = new StringBuilder();
@@ -74,19 +74,19 @@ namespace risk.control.system.Services.Creator
                     sb.AppendLine("Row #, [FieldName = Error detail]"); // CSV header
                     var filteredErrors = uploadedCaseResult
                         .Select(r => r.Errors)
-                        .Where(e => e.Count > 0);
+                        .Where(e => e!.Count > 0);
 
                     foreach (var caseErrors in filteredErrors)
                     {
                         ++rowNum;
-                        sb.AppendLine($"\"{rowNum}\", {string.Join(",", caseErrors)}");
+                        sb.AppendLine($"\"{rowNum}\", {string.Join(",", caseErrors!)}");
                     }
 
                     if (rowNum > 0)
                     {
                         uploadFileData.ErrorByteData = Encoding.UTF8.GetBytes(sb.ToString());
                         await uploadFileStatusService.SetFileUploadFailure(uploadFileData, "Error uploading the file", uploadAndAssign);
-                        await mailService.NotifyFileUpload(companyUser.Email, uploadFileData, url);
+                        await mailService.NotifyFileUpload(companyUser.Email!, uploadFileData, url);
                         return;
                     }
                 }
@@ -94,30 +94,30 @@ namespace risk.control.system.Services.Creator
                 if (uploadedCases == null || uploadedCases.Count == 0)
                 {
                     await uploadFileStatusService.SetFileUploadFailure(uploadFileData, "Error uploading the file", uploadAndAssign);
-                    await mailService.NotifyFileUpload(companyUser.Email, uploadFileData, url);
+                    await mailService.NotifyFileUpload(companyUser.Email!, uploadFileData, url);
                     return;
                 }
 
-                var totalReadyToAssign = await investigationService.GetAutoCount(companyUser.Email);
+                var totalReadyToAssign = await investigationService.GetAutoCount(companyUser.Email!);
                 if (uploadedCases.Count + totalReadyToAssign > companyUser.ClientCompany.TotalToAssignMaxAllowed)
                 {
-                    await uploadFileStatusService.SetFileUploadFailure(uploadFileData, $"Max count of {companyUser.ClientCompany.TotalToAssignMaxAllowed} Assign-Ready Case(s) limit reached.", uploadAndAssign, uploadedCases.Select(c => c.Id).ToList());
-                    await mailService.NotifyFileUpload(companyUser.Email, uploadFileData, url);
+                    await uploadFileStatusService.SetFileUploadFailure(uploadFileData, $"Max count of {companyUser.ClientCompany.TotalToAssignMaxAllowed} Assign-Ready Case(s) limit reached.", uploadAndAssign, uploadedCases.Select(c => c!.Id).ToList());
+                    await mailService.NotifyFileUpload(companyUser.Email!, uploadFileData, url);
                     return;
                 }
 
                 await using var _context = await _contextFactory.CreateDbContextAsync();
-                _context.Investigations.AddRange(uploadedCases);
+                _context.Investigations.AddRange(uploadedCases!);
 
                 await _context.SaveChangesAsync();
 
-                await processor.ProcessloadFile(companyUser.Email, uploadedCases, uploadFileData, url, uploadAndAssign);
+                await processor.ProcessloadFile(companyUser.Email!, uploadedCases!, uploadFileData, url, uploadAndAssign);
             }
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error occurred for {UserEmail}", companyUser.Email);
                 await uploadFileStatusService.SetFileUploadFailure(uploadFileData, "Error uploading the file", uploadAndAssign);
-                await mailService.NotifyFileUpload(companyUser.Email, uploadFileData, url);
+                await mailService.NotifyFileUpload(companyUser.Email!, uploadFileData, url);
             }
         }
     }

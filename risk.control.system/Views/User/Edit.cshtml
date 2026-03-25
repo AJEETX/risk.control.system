@@ -6,8 +6,8 @@
 }
 <section class="content">
     <form id="edit-form" asp-action="Edit" enctype="multipart/form-data">
-        <input type="hidden" id="Isd" value="@Model?.Country.ISDCode" />
-		<input type="hidden" id="countryCode" value="@Model?.Country.Code" />
+        <input type="hidden" id="Isd" value="@Model?.Country?.ISDCode" />
+		<input type="hidden" id="countryCode" value="@Model?.Country?.Code" />
 		<input type="hidden" asp-for="Id" />
         <div class="card shadow-lg border-1 rounded-lg">
             <div class="card-header bg-secondary text-white text-center">
@@ -31,7 +31,7 @@
                         <div class="form-group">
                             <label class="input-group-label" for="Email">
                                 Email:
-                                @if (@Model.IsPasswordChangeRequired)
+                                @if (@Model!.IsPasswordChangeRequired)
                                 {
                                     <i class="fa fa-check-circle text-light-green" title="User Login verified" data-bs-toggle="tooltip"></i>
                                 }
@@ -73,10 +73,10 @@
 
                                 <div class="input-group-prepend">
                                     @{
-                                        var imgPath = "/flags/" + @Model.Country.Code.ToLower() + ".png";
+                                        var imgPath = "/flags/" + @Model.Country?.Code.ToLower() + ".png";
                                     }
-                                    <span class="input-group-text country-code-text" data-bs-toggle="tooltip" title="Country Code :+@Model?.Country.ISDCode">
-                                        <img src="@imgPath" class="flag-icon" data-bs-toggle="tooltip" alt="flag" />  +@Model?.Country.ISDCode<i class="fa fa-asterisk asterik-style"></i>
+                                    <span class="input-group-text country-code-text" data-bs-toggle="tooltip" title="Country Code :+@Model?.Country?.ISDCode">
+                                        <img src="@imgPath" class="flag-icon" data-bs-toggle="tooltip" alt="flag" />  +@Model?.Country?.ISDCode<i class="fa fa-asterisk asterik-style"></i>
                                     </span>
                                 </div>
                                 <input disabled id="PhoneNumber" type="text" asp-for="PhoneNumber" class="form-control remarks" required maxlength="10" placeholder="Enter mobile # without country-code" data-bs-toggle="tooltip" />
@@ -99,7 +99,7 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text" asp-for="Role"><i class="nav-icon fas fa-file-invoice"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
-                                <select disabled required asp-for="@Model.Role" class="form-control remarks" asp-items="Html.GetEnumSelectList<AppRoles>()">
+                                <select disabled required asp-for="@Model!.Role" class="form-control remarks" asp-items="Html.GetEnumSelectList<AppRoles>()">
                                     <option value="">--- SELECT ---</option>
                                 </select>
                             </div>
@@ -149,12 +149,12 @@
                             <label class="input-group-label" for="StateText"> State:</label>
                             <div class="input-group mb-3 autocomplete-wrapper">
                                 @{
-                                    var img = "/flags/" + @Model.Country.Code.ToLower() + ".png";
+                                    var img = "/flags/" + @Model?.Country?.Code.ToLower() + ".png";
                                 }
                                 <div class="input-group-prepend">
 
-                                    <span class="input-group-text country-code-text" data-bs-toggle="tooltip" title="Registered Country: @Model?.Country.Name">
-                                        <img src="@img" class="flag-icon" data-bs-toggle="tooltip" alt="flag" /> @Model?.Country.Code<i class="fa fa-asterisk asterik-style-info"></i>
+                                    <span class="input-group-text country-code-text" data-bs-toggle="tooltip" title="Registered Country: @Model?.Country?.Name">
+                                        <img src="@img" class="flag-icon" data-bs-toggle="tooltip" alt="flag" /> @Model?.Country?.Code<i class="fa fa-asterisk asterik-style-info"></i>
                                     </span>
                                 </div>
                                 <input readonly type="text" id="StateText" class="form-control remarks" data-placeholder="state" data-bs-toggle="tooltip" placeholder="..." tabindex="-1" />
@@ -176,7 +176,7 @@
                                 <input disabled type="text" id="Addressline" asp-for="Addressline" class="form-control remarks" required placeholder="Street Address..." maxlength="70" />
                             </div>
                         </div>
-                        @if (Model.Role == AppRoles.PORTAL_ADMIN || Model.Role == AppRoles.COMPANY_ADMIN || Model.Role == AppRoles.AGENCY_ADMIN)
+                        @if (Model!.Role == AppRoles.PORTAL_ADMIN || Model.Role == AppRoles.COMPANY_ADMIN || Model.Role == AppRoles.AGENCY_ADMIN)
                         {
                             <input asp-for="Active" type="hidden" value="true">
                         }

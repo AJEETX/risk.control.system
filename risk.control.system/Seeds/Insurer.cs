@@ -20,15 +20,15 @@ namespace risk.control.system.Seeds
 
             var globalSettings = await context.GlobalSettings.FirstOrDefaultAsync();
 
-            var companyPinCode = await context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).FirstOrDefaultAsync(s => s.Country.Code == input.COUNTRY && s.Code == input.PINCODE);
+            var companyPinCode = await context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).FirstOrDefaultAsync(s => s.Country!.Code == input.COUNTRY && s.Code == input.PINCODE);
 
-            var companyAddress = input.ADDRESSLINE + ", " + companyPinCode.District.Name + ", " + companyPinCode.State.Name + ", " + companyPinCode.Country.Code;
+            var companyAddress = input.ADDRESSLINE + ", " + companyPinCode!.District!.Name + ", " + companyPinCode.State!.Name + ", " + companyPinCode.Country!.Code;
             var companyAddressCoordinates = await customApiCLient.GetCoordinatesFromAddressAsync(companyAddress);
             var companyAddressCoordinatesLatLong = companyAddressCoordinates.Latitude + "," + companyAddressCoordinates.Longitude;
             var companyAddressUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={companyAddressCoordinatesLatLong}&zoom=14&size={companyMapSize}&maptype=roadmap&markers=color:red%7Clabel:S%7C{companyAddressCoordinatesLatLong}&key={EnvHelper.Get("GOOGLE_MAP_KEY")}";
 
             //CREATE COMPANY1
-            string insurerImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", Path.GetFileName(input.PHOTO));
+            string insurerImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", Path.GetFileName(input.PHOTO)!);
             var insurerImage = File.ReadAllBytes(insurerImagePath);
 
             if (insurerImage == null)
@@ -36,13 +36,13 @@ namespace risk.control.system.Seeds
                 insurerImage = File.ReadAllBytes(noCompanyImagePath);
             }
             var extension = Path.GetExtension(insurerImagePath);
-            var (fileName, relativePath) = await fileStorageService.SaveAsync(insurerImage, extension, input.DOMAIN);
+            var (fileName, relativePath) = await fileStorageService.SaveAsync(insurerImage, extension, input.DOMAIN!);
             vendors = vendors.Where(v => v.CountryId == companyPinCode.CountryId).ToList();
 
             var insurer = new ClientCompany
             {
-                Name = input.NAME,
-                Addressline = input.ADDRESSLINE,
+                Name = input.NAME!,
+                Addressline = input.ADDRESSLINE!,
                 Branch = input.BRANCH,
                 ActivatedDate = DateTime.UtcNow,
                 AgreementDate = DateTime.UtcNow,
@@ -55,15 +55,15 @@ namespace risk.control.system.Seeds
                 StateId = companyPinCode.StateId,
                 DistrictId = companyPinCode.DistrictId,
                 PinCodeId = companyPinCode.PinCodeId,
-                Email = input.DOMAIN,
+                Email = input.DOMAIN!,
                 DocumentUrl = relativePath,
-                PhoneNumber = input.PHONE,
+                PhoneNumber = input.PHONE!,
                 ExpiryDate = DateTime.UtcNow.AddDays(10),
                 EmpanelledVendors = vendors,
                 Status = CompanyStatus.ACTIVE,
                 Updated = DateTime.UtcNow,
                 Deleted = false,
-                VerifyPan = globalSettings.VerifyPan,
+                VerifyPan = globalSettings!.VerifyPan,
                 VerifyPassport = globalSettings.VerifyPassport,
                 EnableMedia = globalSettings.EnableMedia,
                 PanIdfyUrl = globalSettings.PanIdfyUrl,
