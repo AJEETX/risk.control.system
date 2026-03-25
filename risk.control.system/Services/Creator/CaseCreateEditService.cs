@@ -52,9 +52,9 @@ namespace risk.control.system.Services.Creator
 
         public async Task LoadDropDowns(PolicyDetailDto model, string userEmail)
         {
-            var currentUser = await _context.ApplicationUser.AsNoTracking().Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == userEmail);
+            var currentUser = await _context.ApplicationUser.AsNoTracking().Include(c => c.ClientCompany).ThenInclude(c => c!.Country).FirstOrDefaultAsync(c => c.Email == userEmail);
 
-            model.CurrencySymbol = CustomExtensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
+            model.CurrencySymbol = CustomExtensions.GetCultureByCountry(currentUser!.ClientCompany!.Country!.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
             model.CaseEnablers = new SelectList(_context.CaseEnabler.AsNoTracking().OrderBy(s => s.Code), "CaseEnablerId", "Name", model.CaseEnablerId);
 
@@ -78,8 +78,8 @@ namespace risk.control.system.Services.Creator
             {
                 UserCanCreate = true,
                 HasClaims = true,
-                FileSampleIdentifier = user.Country.Code.ToLower(),
-                IsTrial = user.ClientCompany.LicenseType == LicenseType.Trial
+                FileSampleIdentifier = user.Country!.Code.ToLower(),
+                IsTrial = user.ClientCompany!.LicenseType == LicenseType.Trial
             };
 
             if (state.IsTrial)
@@ -104,16 +104,16 @@ namespace risk.control.system.Services.Creator
             var companyUser = await _context.ApplicationUser.Include(c => c.ClientCompany).FirstOrDefaultAsync(c => c.Email == userEmail);
             var caseTask = new InvestigationTask
             {
-                ClientCompany = companyUser.ClientCompany
+                ClientCompany = companyUser!.ClientCompany
             };
             bool userCanCreate = true;
             int availableCount = 0;
-            var trial = companyUser.ClientCompany.LicenseType == LicenseType.Trial;
+            var trial = companyUser.ClientCompany!.LicenseType == LicenseType.Trial;
             if (trial)
             {
                 var totalClaimsCreated = _context.Investigations.Include(c => c.PolicyDetail).Where(c => !c.Deleted &&
                     c.ClientCompanyId == companyUser.ClientCompanyId)?.ToList();
-                availableCount = companyUser.ClientCompany.TotalCreatedClaimAllowed - totalClaimsCreated.Count;
+                availableCount = companyUser.ClientCompany.TotalCreatedClaimAllowed - totalClaimsCreated!.Count;
 
                 if (totalClaimsCreated?.Count >= companyUser.ClientCompany.TotalCreatedClaimAllowed)
                 {
@@ -142,13 +142,13 @@ namespace risk.control.system.Services.Creator
             {
                 ContractNumber = contractNumber,
                 InsuranceType = InsuranceType.CLAIM,
-                InvestigationServiceTypeId = service.InvestigationServiceTypeId,
-                CaseEnablerId = caseEnabler.CaseEnablerId,
+                InvestigationServiceTypeId = service!.InvestigationServiceTypeId,
+                CaseEnablerId = caseEnabler!.CaseEnablerId,
                 SumAssuredValue = 99999,
                 ContractIssueDate = DateTime.UtcNow.AddDays(-10),
                 DateOfIncident = DateTime.UtcNow.AddDays(-3),
                 CauseOfLoss = "LOST IN ACCIDENT",
-                CostCentreId = costCentre.CostCentreId
+                CostCentreId = costCentre!.CostCentreId
             };
             return new CreateCaseViewModel
             {
@@ -183,7 +183,7 @@ namespace risk.control.system.Services.Creator
             var caseDetail = await _addInvestigationService.CreateCase(userEmail, model);
             return caseDetail == null
                 ? (false, null, null, errors)
-                : (true, caseDetail.Id, caseDetail.PolicyDetail.ContractNumber, errors);
+                : (true, caseDetail.Id, caseDetail.PolicyDetail!.ContractNumber, errors);
         }
 
         private static void ValidateDates(PolicyDetailDto policy, Dictionary<string, string> errors)
@@ -223,7 +223,7 @@ namespace risk.control.system.Services.Creator
             var caseDetail = await _addInvestigationService.EditCase(userEmail, model);
             return caseDetail == null
                 ? (false, null, errors)
-                : (true, caseDetail.PolicyDetail.ContractNumber, errors);
+                : (true, caseDetail.PolicyDetail!.ContractNumber, errors);
         }
 
         public async Task<EditPolicyDto> GetEditPolicyDetail(long id)
@@ -234,15 +234,15 @@ namespace risk.control.system.Services.Creator
 
             if (caseTask == null)
             {
-                return null;
+                return null!;
             }
             var model = new EditPolicyDto
             {
                 Id = caseTask.Id,
                 PolicyDetailDto = new PolicyDetailDto
                 {
-                    ContractNumber = caseTask.PolicyDetail.ContractNumber,
-                    InsuranceType = caseTask.PolicyDetail.InsuranceType.Value,
+                    ContractNumber = caseTask.PolicyDetail!.ContractNumber,
+                    InsuranceType = caseTask.PolicyDetail.InsuranceType!.Value,
                     InvestigationServiceTypeId = caseTask.PolicyDetail.InvestigationServiceTypeId,
                     CaseEnablerId = caseTask.PolicyDetail.CaseEnablerId,
                     SumAssuredValue = caseTask.PolicyDetail.SumAssuredValue,
@@ -261,13 +261,13 @@ namespace risk.control.system.Services.Creator
             var user = await _context.ApplicationUser
                 .AsNoTracking()
                 .Include(c => c.ClientCompany)
-                .ThenInclude(c => c.Country)
+                .ThenInclude(c => c!.Country)
                 .FirstOrDefaultAsync(c => c.Email == userEmail)
                 ?? throw new KeyNotFoundException("User not found");
 
             CreateCaseViewModel model;
 
-            if (user.ClientCompany.HasSampleData)
+            if (user.ClientCompany!.HasSampleData)
             {
                 model = await AddCaseDetail(userEmail);
                 // We reuse the mapping logic here
@@ -286,7 +286,7 @@ namespace risk.control.system.Services.Creator
         {
             // Set Currency
             dto.CurrencySymbol = CustomExtensions
-                .GetCultureByCountry(user.ClientCompany.Country.Code.ToUpper())
+                .GetCultureByCountry(user.ClientCompany!.Country!.Code.ToUpper())
                 .NumberFormat.CurrencySymbol;
 
             // Fetch Dropdowns (Parallelized for performance)

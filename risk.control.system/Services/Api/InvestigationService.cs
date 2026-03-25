@@ -46,7 +46,7 @@ namespace risk.control.system.Services.Api
                 .Where(c => c.Email == currentUserEmail)
                 .FirstOrDefaultAsync();
 
-            var query = context.Investigations.AsNoTracking().Where(a => !a.Deleted && a.ClientCompanyId == companyUser.ClientCompanyId && a.CreatedUser == currentUserEmail);
+            var query = context.Investigations.AsNoTracking().Where(a => !a.Deleted && a.ClientCompanyId == companyUser!.ClientCompanyId && a.CreatedUser == currentUserEmail);
 
             query = query.Where(a => CONSTANTS.CreatedAndDraftStatuses.Contains(a.SubStatus));
 
@@ -59,7 +59,7 @@ namespace risk.control.system.Services.Api
                     a.PolicyDetail!.ContractNumber.ToLower().Contains(search) ||
                     a.PolicyDetail.CauseOfLoss.ToLower().Contains(search) ||
                     a.PolicyDetail.InvestigationServiceType!.Name.ToLower().Contains(search) ||
-                    a.CustomerDetail.DateOfBirth.ToString().ToLower().Contains(search) ||
+                    a.CustomerDetail!.DateOfBirth.ToString()!.ToLower().Contains(search) ||
                     a.CustomerDetail.Name.ToLower().Contains(search) ||
                     a.CustomerDetail.PhoneNumber.ToLower().Contains(search) ||
                     a.CustomerDetail.PinCode!.Code.ToString().Contains(search) ||
@@ -84,16 +84,16 @@ namespace risk.control.system.Services.Api
                 3 => isAsc
                     ? query.OrderBy(a =>
                         a.PolicyDetail!.InsuranceType == InsuranceType.UNDERWRITING
-                            ? a.CustomerDetail.PinCode.Code
-                            : a.BeneficiaryDetail.PinCode.Code)
+                            ? a.CustomerDetail!.PinCode!.Code
+                            : a.BeneficiaryDetail!.PinCode!.Code)
                     : query.OrderByDescending(a =>
-                        a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING
-                            ? a.CustomerDetail.PinCode.Code
-                            : a.BeneficiaryDetail.PinCode.Code),
+                        a.PolicyDetail!.InsuranceType == InsuranceType.UNDERWRITING
+                            ? a.CustomerDetail!.PinCode!.Code
+                            : a.BeneficiaryDetail!.PinCode!.Code),
 
-                6 => isAsc ? query.OrderBy(a => a.CustomerDetail.Name) : query.OrderByDescending(a => a.CustomerDetail.Name),
-                8 => isAsc ? query.OrderBy(a => a.BeneficiaryDetail.Name) : query.OrderByDescending(a => a.BeneficiaryDetail.Name),
-                9 => isAsc ? query.OrderBy(a => a.PolicyDetail!.InvestigationServiceType!.Name) : query.OrderByDescending(a => a.PolicyDetail!.InvestigationServiceType!.Name),
+                6 => isAsc ? query.OrderBy(a => a.CustomerDetail!.Name) : query.OrderByDescending(a => a.CustomerDetail!.Name),
+                8 => isAsc ? query.OrderBy(a => a.BeneficiaryDetail!.Name) : query.OrderByDescending(a => a.BeneficiaryDetail!.Name),
+                9 => isAsc ? query.OrderBy(a => a.PolicyDetail!.InsuranceType) : query.OrderByDescending(a => a.PolicyDetail!.InsuranceType),
                 10 => isAsc ? query.OrderBy(a => a.ORIGIN) : query.OrderByDescending(a => a.ORIGIN),
                 11 => isAsc ? query.OrderBy(a => a.Created) : query.OrderByDescending(a => a.Created),
                 12 => isAsc ? query.OrderBy(a => a.Updated) : query.OrderByDescending(a => a.Updated),
@@ -124,14 +124,14 @@ namespace risk.control.system.Services.Api
                     a.ORIGIN,
                     CustomerName = a.CustomerDetail != null ? a.CustomerDetail.Name : null,
                     customerImagePath = a.CustomerDetail != null ? a.CustomerDetail.ImagePath : Applicationsettings.NO_USER,
-                    CustomerLocationMap = a.CustomerDetail.CustomerLocationMap,
+                    CustomerLocationMap = a.CustomerDetail!.CustomerLocationMap,
                     customerAddressline = a.CustomerDetail != null ? a.CustomerDetail.Addressline : string.Empty,
                     customerDistrict = a.CustomerDetail != null ? a.CustomerDetail.District!.Name : string.Empty,
                     customerState = a.CustomerDetail != null ? a.CustomerDetail.State!.Name : string.Empty,
                     customerPincode = a.CustomerDetail != null ? a.CustomerDetail.PinCode!.Code : 0,
                     BeneficiaryName = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.Name : null,
                     beneficiaryImagePath = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.ImagePath : Applicationsettings.NO_USER,
-                    BeneficiaryLocationMap = a.BeneficiaryDetail.BeneficiaryLocationMap,
+                    BeneficiaryLocationMap = a.BeneficiaryDetail!.BeneficiaryLocationMap,
                     beneficiaryAddressline = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.Addressline : string.Empty,
                     beneficiaryDistrict = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.District!.Name : string.Empty,
                     beneficiaryState = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.State!.Name : string.Empty,
@@ -166,8 +166,8 @@ namespace risk.control.system.Services.Api
 
                 // Run file operations in parallel for this specific row
                 var documentTask = base64FileService.GetBase64FileAsync(i.PolicyDocumentPath!, Applicationsettings.NO_POLICY_IMAGE);
-                var customerTask = base64FileService.GetBase64FileAsync(i.customerImagePath, Applicationsettings.NO_USER);
-                var beneficiaryTask = base64FileService.GetBase64FileAsync(i.beneficiaryImagePath, Applicationsettings.NO_USER);
+                var customerTask = base64FileService.GetBase64FileAsync(i.customerImagePath!, Applicationsettings.NO_USER);
+                var beneficiaryTask = base64FileService.GetBase64FileAsync(i.beneficiaryImagePath!, Applicationsettings.NO_USER);
 
                 await Task.WhenAll(documentTask, customerTask, beneficiaryTask);
                 return new CaseAutoAllocationResponse
@@ -179,7 +179,7 @@ namespace risk.control.system.Services.Api
                     PolicyNum = i.PolicyNum,
                     AssignedToAgency = i.IsNew,
                     PincodeCode = pincodeCode,
-                    PincodeAddress = pincodeName,
+                    PincodeAddress = pincodeName!,
                     Document = await documentTask,
                     Customer = await customerTask,
                     Name = customerName,
@@ -188,7 +188,7 @@ namespace risk.control.system.Services.Api
                     SubStatus = i.SubStatus,
                     Ready2Assign = ready2Assign,
                     Service = investigationService,
-                    Created = i.Created.ToString("dd-MM-yyyy"),
+                    Created = i.Updated ?? i.Created,
                     ServiceType = serviceType,
                     TimePending = timePending,
                     BeneficiaryPhoto = await beneficiaryTask,
@@ -243,7 +243,7 @@ namespace risk.control.system.Services.Api
                     a.PolicyDetail!.ContractNumber.ToLower().Contains(search) ||
                      a.PolicyDetail.CauseOfLoss.ToLower().Contains(search) ||
                     a.PolicyDetail.InvestigationServiceType!.Name.ToLower().Contains(search) ||
-                    a.CustomerDetail.DateOfBirth.ToString().ToLower().Contains(search) ||
+                    a.CustomerDetail!.DateOfBirth.ToString()!.ToLower().Contains(search) ||
                     a.CustomerDetail.Name.ToLower().Contains(search) ||
                     a.CustomerDetail.PhoneNumber.ToLower().Contains(search) ||
                     a.CustomerDetail.PinCode!.Code.ToString().Contains(search) ||
@@ -367,7 +367,7 @@ namespace risk.control.system.Services.Api
                     CaseWithPerson = a.CaseOwner,
                     BeneficiaryPhoto = await beneTask,
                     SubStatus = a.SubStatus,
-                    Created = a.Created.ToString("dd-MM-yyyy"),
+                    Created = a.Updated ?? a.Created,
                     TimePending = GetCreatorTimePending(a.AllocatedToAgencyTime!.Value, a.CreatorSla),
                     TimeElapsed = DateTime.UtcNow.Subtract(a.Updated.GetValueOrDefault()).TotalSeconds,
                     Service = investigationService,
@@ -524,7 +524,7 @@ namespace risk.control.system.Services.Api
                 file.Name,
                 file.Description,
                 file.FileType,
-                CreatedOn = file.CreatedOn.ToString("dd-MMM-yyyy HH:mm:ss"),
+                CreatedOn = file.CreatedOn,
                 file.UploadedBy,
                 Status = file.Status,
                 file.Message,
@@ -552,7 +552,7 @@ namespace risk.control.system.Services.Api
         public async Task<(object, bool)> GetFileById(string userEmail, bool isManager, int uploadId)
         {
             var companyUser = await context.ApplicationUser.AsNoTracking().Include(c => c.ClientCompany).FirstOrDefaultAsync(u => u.Email == userEmail);
-            var file = await context.FilesOnFileSystem.AsNoTracking().Include(c => c.CaseIds).FirstOrDefaultAsync(f => f.Id == uploadId && f.CompanyId == companyUser.ClientCompanyId && f.UploadedBy == userEmail && !f.Deleted);
+            var file = await context.FilesOnFileSystem.AsNoTracking().Include(c => c.CaseIds).FirstOrDefaultAsync(f => f.Id == uploadId && f.CompanyId == companyUser!.ClientCompanyId && f.UploadedBy == userEmail && !f.Deleted);
             if (file == null)
             {
                 return (null!, false);

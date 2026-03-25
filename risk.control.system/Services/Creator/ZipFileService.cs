@@ -47,9 +47,9 @@ namespace risk.control.system.Services.Creator
             var extension = Path.GetExtension(file.FileName);
             await using var _context = _contextFactory.CreateDbContext();
             var company = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == uploadedBy);
-            int lastCompanySequence = await _context.FilesOnFileSystem.Where(f => f.CompanyId == company.ClientCompanyId).MaxAsync(f => (int?)f.CompanySequenceNumber) ?? 0;
+            int lastCompanySequence = await _context.FilesOnFileSystem.Where(f => f.CompanyId == company!.ClientCompanyId).MaxAsync(f => (int?)f.CompanySequenceNumber) ?? 0;
 
-            int lastUserSequence = await _context.FilesOnFileSystem.Where(f => f.CompanyId == company.ClientCompanyId && f.UploadedBy == uploadedBy).MaxAsync(f => (int?)f.UserSequenceNumber) ?? 0;
+            int lastUserSequence = await _context.FilesOnFileSystem.Where(f => f.CompanyId == company!.ClientCompanyId && f.UploadedBy == uploadedBy).MaxAsync(f => (int?)f.UserSequenceNumber) ?? 0;
             var fileModel = new FileOnFileSystemModel
             {
                 CompanySequenceNumber = lastCompanySequence + 1,
@@ -61,7 +61,7 @@ namespace risk.control.system.Services.Creator
                 Description = description,
                 FilePath = filePath,
                 UploadedBy = uploadedBy,
-                CompanyId = company.ClientCompanyId,
+                CompanyId = company!.ClientCompanyId,
                 AutoOrManual = autoOrManual,
                 Message = uploadAndAssign ? "Assign In progress" : "Upload In progress",
                 FileOrFtp = fileOrFtp,

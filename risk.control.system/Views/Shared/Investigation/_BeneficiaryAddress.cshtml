@@ -45,12 +45,12 @@
     <label class="input-group-label" for="StateText"> State:</label>
     <div class="input-group mb-3 autocomplete-wrapper">
         @{
-            var img = "/flags/" + @Model.Country.Code.ToLower() + ".png";
+            var img = "/flags/" + @Model?.Country?.Code.ToLower() + ".png";
         }
         <div class="input-group-prepend">
 
-            <span class="input-group-text country-code-text" data-bs-toggle="tooltip" title="Registered Country: @Model?.Country.Name">
-                <img src="@img" class="flag-icon" data-bs-toggle="tooltip" alt="title=" Auto-selected based on Pincode"" /> @Model?.Country.Code<i class="fa fa-asterisk asterik-style-info"></i>
+            <span class="input-group-text country-code-text" data-bs-toggle="tooltip" title="Registered Country: @Model?.Country?.Name">
+                <img src="@img" class="flag-icon" data-bs-toggle="tooltip" alt="title=" Auto-selected based on Pincode"" /> @Model?.Country?.Code<i class="fa fa-asterisk asterik-style-info"></i>
             </span>
         </div>
         <input readonly type="text" id="StateText" class="form-control remarks" data-placeholder="state" data-bs-toggle="tooltip" placeholder="..." tabindex="-1" title="Auto-selected based on Pincode" />

@@ -34,8 +34,8 @@ namespace risk.control.system.Services.Agency
                 var caseTask = await context.Investigations.AsNoTracking()
                     .FirstOrDefaultAsync(c => c.Id == caseId);
 
-                caseTask.IsNewAssignedToAgency = true;
-                caseTask.CaseOwner = currentUser.Vendor.Email;
+                caseTask!.IsNewAssignedToAgency = true;
+                caseTask.CaseOwner = currentUser!.Vendor!.Email;
                 caseTask.TaskedAgentEmail = null;
                 caseTask.Updated = DateTime.UtcNow;
                 caseTask.UpdatedBy = currentUser.Email;
@@ -43,7 +43,7 @@ namespace risk.control.system.Services.Agency
                 context.Investigations.Update(caseTask);
                 var rows = await context.SaveChangesAsync(null, false);
 
-                await timelineService.UpdateTaskStatus(caseTask.Id, currentUser.Email);
+                await timelineService.UpdateTaskStatus(caseTask.Id, currentUser.Email!);
 
                 return currentUser.Vendor;
             }
@@ -61,22 +61,22 @@ namespace risk.control.system.Services.Agency
                 var currentUser = await context.ApplicationUser.AsNoTracking().Include(u => u.Vendor).FirstOrDefaultAsync(u => u.Email == userEmail);
                 var caseTask = await context.Investigations.AsNoTracking()
                     .FirstOrDefaultAsync(c => c.Id == caseId);
-                var company = await context.ClientCompany.AsNoTracking().FirstOrDefaultAsync(c => c.ClientCompanyId == caseTask.ClientCompanyId);
-                caseTask.CaseOwner = company.Email;
+                var company = await context.ClientCompany.AsNoTracking().FirstOrDefaultAsync(c => c.ClientCompanyId == caseTask!.ClientCompanyId);
+                caseTask!.CaseOwner = company!.Email;
                 caseTask.IsAutoAllocated = false;
                 caseTask.IsNew = true;
                 caseTask.IsNewAssignedToAgency = true;
                 caseTask.IsNewSubmittedToAgent = true;
                 caseTask.Updated = DateTime.UtcNow;
-                caseTask.UpdatedBy = currentUser.Email;
+                caseTask.UpdatedBy = currentUser!.Email;
                 caseTask.AssignedToAgency = false;
                 caseTask.VendorId = null;
                 caseTask.Vendor = null;
                 caseTask.SubStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY;
                 context.Investigations.Update(caseTask);
                 var rows = await context.SaveChangesAsync(null, false);
-                await timelineService.UpdateTaskStatus(caseTask.Id, currentUser.Email);
-                return currentUser.Vendor;
+                await timelineService.UpdateTaskStatus(caseTask.Id, currentUser.Email!);
+                return currentUser.Vendor!;
             }
             catch (Exception ex)
             {

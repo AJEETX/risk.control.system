@@ -118,6 +118,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                     State = p.State!.Name,
                     Country = p.Country!.Name,
                     p.Updated,
+                    p.Created,
                     p.PinCodeId
                 })
                 .ToListAsync();
@@ -130,7 +131,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 State = s.State,
                 Country = s.Country,
                 s.PinCodeId,
-                Updated = s.Updated?.ToString("dd-MMM-yyyy HH:mm"),
+                Updated = s.Updated ?? s.Created,
             });
             // Prepare the DataTables response
             var response = new

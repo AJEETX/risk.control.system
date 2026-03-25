@@ -114,7 +114,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 p.UserId,
                 p.TableName,
                 p.Type,
-                DateTime = p.DateTime.ToString("dd-MMM-yyyy HH:mm"),
+                DateTime = p.DateTime,
                 OldValues = p.OldValues ?? "",
                 p.NewValues
             }).ToList();

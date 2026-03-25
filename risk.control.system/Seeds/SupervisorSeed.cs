@@ -39,7 +39,7 @@ namespace risk.control.system.Seeds
                 PhoneNumberConfirmed = true,
                 Password = TestingData,
                 PhoneNumber = string.Equals(pinCode.Country!.Code, "au", StringComparison.OrdinalIgnoreCase) ? SAMPLE_MOBILE_AUSTRALIA : SAMPLE_MOBILE_INDIA,
-                Vendor = vendor,
+                VendorId = vendor.VendorId,
                 IsSuperAdmin = false,
                 IsClientAdmin = false,
                 Addressline = vendor.Addressline,

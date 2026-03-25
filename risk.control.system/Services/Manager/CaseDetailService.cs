@@ -27,37 +27,37 @@ namespace risk.control.system.Services.Manager
                 .Include(c => c.CaseNotes)
                 .Include(c => c.InvestigationReport)
                 .Include(c => c.InvestigationTimeline)
-                .Include(c => c.InvestigationReport.EnquiryRequest)
-                .Include(c => c.InvestigationReport.EnquiryRequests)
+                .Include(c => c.InvestigationReport!.EnquiryRequest)
+                .Include(c => c.InvestigationReport!.EnquiryRequests)
                 .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.CaseEnabler)
+                .ThenInclude(c => c!.CaseEnabler)
                  .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.InvestigationServiceType)
+                .ThenInclude(c => c!.InvestigationServiceType)
                  .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.CostCentre)
+                .ThenInclude(c => c!.CostCentre)
                 .Include(c => c.ClientCompany)
                 .Include(c => c.Vendor)
                 .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.PinCode)
+                .ThenInclude(c => c!.PinCode)
                 .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.District)
+                .ThenInclude(c => c!.District)
                 .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.State)
+                .ThenInclude(c => c!.State)
                 .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.Country)
+                .ThenInclude(c => c!.Country)
                 .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.BeneficiaryRelation)
+                .ThenInclude(c => c!.BeneficiaryRelation)
                 .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.Country)
+                .ThenInclude(c => c!.Country)
                 .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.State)
+                .ThenInclude(c => c!.State)
                 .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.District)
+                .ThenInclude(c => c!.District)
                 .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.PinCode)
+                .ThenInclude(c => c!.PinCode)
                 .FirstOrDefaultAsync(m => m.Id == id);
 
-            if (caseTask.CustomerDetail != null)
+            if (caseTask!.CustomerDetail != null)
             {
                 var maskedCustomerContact = new string('*', caseTask.CustomerDetail.PhoneNumber.ToString().Length - 4) + caseTask.CustomerDetail.PhoneNumber.ToString().Substring(caseTask.CustomerDetail.PhoneNumber.ToString().Length - 4);
                 caseTask.CustomerDetail.PhoneNumber = maskedCustomerContact;
@@ -67,7 +67,7 @@ namespace risk.control.system.Services.Manager
                 var maskedBeneficiaryContact = new string('*', caseTask.BeneficiaryDetail.PhoneNumber.ToString().Length - 4) + caseTask.BeneficiaryDetail.PhoneNumber.ToString().Substring(caseTask.BeneficiaryDetail.PhoneNumber.ToString().Length - 4);
                 caseTask.BeneficiaryDetail.PhoneNumber = maskedBeneficiaryContact;
             }
-            var companyUser = await _context.ApplicationUser.AsNoTracking().Include(u => u.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(u => u.Email == currentUserEmail);
+            var companyUser = await _context.ApplicationUser.AsNoTracking().Include(u => u.ClientCompany).ThenInclude(c => c!.Country).FirstOrDefaultAsync(u => u.Email == currentUserEmail);
             var lastHistory = caseTask.InvestigationTimeline.OrderByDescending(h => h.StatusChangedAt).FirstOrDefault();
             var endTIme = caseTask.Status == CONSTANTS.CASE_STATUS.FINISHED ? caseTask.ProcessedByAssessorTime.GetValueOrDefault() : DateTime.UtcNow;
             var timeTaken = endTIme - caseTask.Created;
@@ -92,7 +92,7 @@ namespace risk.control.system.Services.Manager
                   .ThenInclude(l => l.Questions)
                   .FirstOrDefaultAsync(q => q.Id == caseTask.ReportTemplateId);
 
-            caseTask.InvestigationReport.ReportTemplate = templates;
+            caseTask.InvestigationReport!.ReportTemplate = templates;
 
             var tracker = await _context.PdfDownloadTracker.AsNoTracking()
                           .FirstOrDefaultAsync(t => t.ReportId == id && t.UserEmail == currentUserEmail);
@@ -112,7 +112,7 @@ namespace risk.control.system.Services.Manager
                 VendorInvoice = invoice,
                 CanDownload = canDownload,
                 Withdrawable = (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR),
-                Currency = CustomExtensions.GetCultureByCountry(companyUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol
+                Currency = CustomExtensions.GetCultureByCountry(companyUser!.ClientCompany!.Country!.Code.ToUpper()).NumberFormat.CurrencySymbol
             };
 
             return model;

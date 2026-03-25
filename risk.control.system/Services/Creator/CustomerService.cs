@@ -53,10 +53,10 @@ namespace risk.control.system.Services.Creator
             var user = await GetUserWithCompanyAsync(userEmail);
             CustomerDetail model;
 
-            if (user.ClientCompany.HasSampleData)
+            if (user.ClientCompany!.HasSampleData)
             {
                 // Assuming this method exists or you are moving it here
-                model = await GetCustomerDetailAsync(investigationId, user.ClientCompany.CountryId.Value);
+                model = await GetCustomerDetailAsync(investigationId, user.ClientCompany.CountryId!.Value);
             }
             else
             {
@@ -93,7 +93,7 @@ namespace risk.control.system.Services.Creator
             model.PinCodeId = model.SelectedPincodeId > 0 ? model.SelectedPincodeId : model.PinCodeId;
 
             // Set Currency
-            var countryCode = user.ClientCompany.Country.Code.ToUpper();
+            var countryCode = user.ClientCompany!.Country!.Code.ToUpper();
             model.CurrencySymbol = CustomExtensions.GetCultureByCountry(countryCode).NumberFormat.CurrencySymbol;
 
             // Populate Enum Dropdowns
@@ -106,7 +106,7 @@ namespace risk.control.system.Services.Creator
         private async Task<ApplicationUser> GetUserWithCompanyAsync(string email)
         {
             return await _context.ApplicationUser.AsNoTracking()
-                .Include(c => c.ClientCompany).ThenInclude(c => c.Country)
+                .Include(c => c.ClientCompany).ThenInclude(c => c!.Country)
                 .FirstOrDefaultAsync(c => c.Email == email)
                 ?? throw new KeyNotFoundException("User not found");
         }
@@ -155,12 +155,12 @@ namespace risk.control.system.Services.Creator
 
         public async Task<CustomerDetail> GetCustomerDetailAsync(long id, long countryId)
         {
-            var pinCode = await _context.PinCode.Include(s => s.Country).FirstOrDefaultAsync(s => s.Country.CountryId == countryId);
+            var pinCode = await _context.PinCode.Include(s => s.Country).FirstOrDefaultAsync(s => s.Country!.CountryId == countryId);
             var customerDetail = new CustomerDetail
             {
                 InvestigationTaskId = id,
                 Addressline = "12 Main Road",
-                PhoneNumber = pinCode.Country.Code.Equals("au", StringComparison.CurrentCultureIgnoreCase) ? Applicationsettings.SAMPLE_MOBILE_AUSTRALIA : Applicationsettings.SAMPLE_MOBILE_INDIA,
+                PhoneNumber = pinCode!.Country!.Code.Equals("au", StringComparison.CurrentCultureIgnoreCase) ? Applicationsettings.SAMPLE_MOBILE_AUSTRALIA : Applicationsettings.SAMPLE_MOBILE_INDIA,
                 DateOfBirth = DateTime.UtcNow.AddYears(-30).AddDays(20),
                 Education = Education.PROFESSIONAL,
                 Income = Income.UPPER_INCOME,

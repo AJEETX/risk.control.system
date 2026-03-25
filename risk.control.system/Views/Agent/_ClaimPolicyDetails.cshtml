@@ -36,46 +36,46 @@
 			<div class="card-body">
 				<div class="row">
 					<div class="col-7">
-						<h2 class="lead"><b>@Model.CaseTask?.PolicyDetail.ContractNumber</b></h2>
+						<h2 class="lead"><b>@Model.CaseTask?.PolicyDetail?.ContractNumber</b></h2>
 						<p class="text-muted text-sm">
-							<b>Case Type: </b>@Model.CaseTask?.PolicyDetail.InsuranceType.GetEnumDisplayName()
+							<b>Case Type: </b>@Model.CaseTask?.PolicyDetail?.InsuranceType!.GetEnumDisplayName()
 						</p>
 						<ul class="ml-4 mb-0 fa-ul text-muted">
 							<li class="small">
 								<span class="fa-li">
 									<i class="fas fa-money-bill-wave"></i>
 								</span>
-								Amount: (@Model.Currency)@Model.CaseTask?.PolicyDetail.SumAssuredValue
+								Amount: (@Model.Currency)@Model.CaseTask?.PolicyDetail?.SumAssuredValue
 							</li>
 							<li class="small">
 								<span class="fa-li">
 									<i class="fas fa-tools"></i>
 								</span>
-								Service: @Model.CaseTask?.PolicyDetail.InvestigationServiceType.Name
+								Service: @Model.CaseTask?.PolicyDetail?.InvestigationServiceType?.Name
 							</li>
 							<li class="small">
 								<span class="fa-li">
 									<i class="fas fa-building"></i>
 								</span>
-								Budget center: @Model.CaseTask?.PolicyDetail.CostCentre.Name
+								Budget center: @Model.CaseTask?.PolicyDetail?.CostCentre?.Name
 							</li>
 							<li class="small">
 								<span class="fa-li">
 									<i class="fas fa-sun"></i>
 								</span>
-								Reason: @Model.CaseTask?.PolicyDetail.CaseEnabler.Name;
+								Reason: @Model.CaseTask?.PolicyDetail?.CaseEnabler?.Name;
 							</li>
 							<li class="small">
 								<span class="fa-li">
 									<i class="far fa-clock"></i>
 								</span>
-								Issue Date: @Model.CaseTask?.PolicyDetail.ContractIssueDate.ToString("dd-MMM-yyyy")
+								Issue Date: @Model.CaseTask?.PolicyDetail?.ContractIssueDate.ToString("dd-MMM-yyyy")
 							</li>
 						</ul>
 					</div>
 					<div class="col-5 text-center">
 						<p class="text-muted text-sm">
-							@if (Model?.CaseTask?.PolicyDetail.DocumentPath is not null)
+							@if (Model?.CaseTask?.PolicyDetail?.DocumentPath is not null)
 							{
 								<img id="documentImage" class="img-fluid" src="/Document/GetPolicyDocument/@Model?.CaseTask?.PolicyDetail.PolicyDetailId" data-bs-toggle="tooltip" title="@Model?.CaseTask?.PolicyDetail.ContractNumber Document">
 							}
@@ -88,14 +88,14 @@
 						<p class="text-muted text-sm">
 							<div id="notesContainer" class="position-relative d-inline-block">
 								<img id="notesDetail"
-									 class="img-fluid form-Image @(Model.CaseTask.CaseNotes.Count > 0 ? "notes-active" : "")"
+									 class="img-fluid form-Image @(Model?.CaseTask?.CaseNotes?.Count > 0 ? "notes-active" : "")"
 									 src="/img/blank-document.png"
 									 data-bs-toggle="tooltip"
-									 title="@(Model.CaseTask.CaseNotes.Count > 0 ? "Display notes" : "No notes")" />
+									 title="@(Model?.CaseTask?.CaseNotes?.Count > 0 ? "Display notes" : "No notes")" />
 
 								<span id="notesBadge"
-									  class="position-absolute top-0 start-100 translate-middle badge rounded-pill @(Model.CaseTask.CaseNotes.Count > 0 ? "bg-danger" : "bg-secondary")">
-									@Model.CaseTask.CaseNotes.Count
+									  class="position-absolute top-0 start-100 translate-middle badge rounded-pill @(Model?.CaseTask?.CaseNotes?.Count > 0 ? "bg-danger" : "bg-secondary")">
+									@Model?.CaseTask?.CaseNotes?.Count
 								</span>
 							</div>
 						</p>

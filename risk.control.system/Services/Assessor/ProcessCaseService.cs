@@ -64,7 +64,7 @@ namespace risk.control.system.Services.Assessor
                 .Include(r => r.InvestigationReport)
                 .FirstOrDefaultAsync(c => c.Id == caseId);
 
-                caseTask.InvestigationReport.AiSummary = reportAiSummary;
+                caseTask!.InvestigationReport!.AiSummary = reportAiSummary;
                 caseTask.InvestigationReport.AssessorRemarkType = assessorRemarkType;
                 caseTask.InvestigationReport.AssessorRemarks = assessorRemarks;
                 caseTask.InvestigationReport.AssessorRemarksUpdated = DateTime.UtcNow;
@@ -76,7 +76,7 @@ namespace risk.control.system.Services.Assessor
                 caseTask.UpdatedBy = userEmail;
                 caseTask.ProcessedByAssessorTime = DateTime.UtcNow;
                 caseTask.SubmittedAssessordEmail = userEmail;
-                caseTask.CaseOwner = caseTask.ClientCompany.Email;
+                caseTask.CaseOwner = caseTask.ClientCompany!.Email;
                 context.Investigations.Update(caseTask);
 
                 var saveCount = await context.SaveChangesAsync(null, false);
@@ -86,7 +86,7 @@ namespace risk.control.system.Services.Assessor
                 backgroundJobClient.Enqueue(() => pdfGenerativeService.Generate(caseId, userEmail));
 
                 var currentUser = await context.ApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == userEmail);
-                return saveCount > 0 ? (currentUser.ClientCompany, caseTask.PolicyDetail.ContractNumber) : (null!, string.Empty);
+                return saveCount > 0 ? (currentUser!.ClientCompany!, caseTask.PolicyDetail!.ContractNumber) : (null!, string.Empty);
             }
             catch (Exception ex)
             {
@@ -108,7 +108,7 @@ namespace risk.control.system.Services.Assessor
                 .Include(r => r.InvestigationReport)
                 .FirstOrDefaultAsync(c => c.Id == caseId);
 
-                caseTask.InvestigationReport.AiSummary = reportAiSummary;
+                caseTask!.InvestigationReport!.AiSummary = reportAiSummary;
                 caseTask.InvestigationReport.AssessorRemarkType = assessorRemarkType;
                 caseTask.InvestigationReport.AssessorRemarks = assessorRemarks;
                 caseTask.InvestigationReport.AssessorRemarksUpdated = DateTime.UtcNow;
@@ -118,7 +118,7 @@ namespace risk.control.system.Services.Assessor
                 caseTask.SubStatus = approved;
                 caseTask.Updated = DateTime.UtcNow;
                 caseTask.UpdatedBy = userEmail;
-                caseTask.CaseOwner = caseTask.ClientCompany.Email;
+                caseTask.CaseOwner = caseTask.ClientCompany!.Email;
                 caseTask.ProcessedByAssessorTime = DateTime.UtcNow;
                 caseTask.SubmittedAssessordEmail = userEmail;
                 context.Investigations.Update(caseTask);
@@ -129,7 +129,7 @@ namespace risk.control.system.Services.Assessor
 
                 backgroundJobClient.Enqueue(() => pdfGenerativeService.Generate(caseId, userEmail));
 
-                return saveCount > 0 ? (caseTask.ClientCompany, caseTask.PolicyDetail.ContractNumber) : (null!, string.Empty);
+                return saveCount > 0 ? (caseTask.ClientCompany, caseTask.PolicyDetail!.ContractNumber) : (null!, string.Empty);
             }
             catch (Exception ex)
             {

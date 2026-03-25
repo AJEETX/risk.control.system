@@ -25,9 +25,9 @@
 								 alt="User Profile" />
 						</div>
 
-						<h4 class="font-weight-bold">@Model.Name</h4>
+						<h4 class="font-weight-bold">@Model?.Name</h4>
 
-						@if (Model.Status.ToString().Equals("ACTIVE", StringComparison.OrdinalIgnoreCase))
+						@if (Model!.Status.ToString()!.Equals("ACTIVE", StringComparison.OrdinalIgnoreCase))
 						{
 							<div class="alert alert-success py-1 px-3 d-inline-block shadow-sm">
 								<i class="fas fa-check-circle"></i> <strong>ACTIVE</strong>
@@ -56,7 +56,7 @@
 										<span class="badge badge-light">(@Model.RateCount)</span>
 										@if (Model.RateCount != null && Model.RateCount > 0)
 										{
-											decimal a = @Model.RateTotal.Value / @Model.RateCount.Value;
+											decimal a = @Model.RateTotal!.Value / @Model.RateCount.Value;
 											<sup class="avr"> @a</sup>
 										}
 									</span>

@@ -9,7 +9,7 @@
 	{
 		location.SetStatus();
 		var agent = location.AgentIdReport;
-		var duration = location.Updated.GetValueOrDefault().Subtract(agent.Updated.GetValueOrDefault());
+		var duration = location.Updated.GetValueOrDefault().Subtract(agent!.Updated.GetValueOrDefault());
 		location.Address = Model.InsuranceType == InsuranceType.CLAIM ? "Beneficiary" : location.Address;
 		<div class="col-12 mb-4 location-container">
 			<div class="card mb-2 border @location.StatusClass @location.LocationStatus">

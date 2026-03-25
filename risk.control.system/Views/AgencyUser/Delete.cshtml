@@ -82,7 +82,7 @@
 									<i class="fas fa-toggle-on text-muted me-2"></i> Active
 								</div>
 								<div class="col-sm-8">
-									@if (Model.Active)
+									@if (Model!.Active)
 									{
 										<span class="badge bg-success">
 											<i class="fas fa-check-circle me-1"></i> Yes
@@ -118,7 +118,7 @@
 									<i class="fas fa-city text-muted me-2"></i> District
 								</div>
 								<div class="col-sm-8">
-									@Html.DisplayFor(m => m.District.Name)
+									@Html.DisplayFor(m => m.District!.Name)
 								</div>
 							</div>
 
@@ -127,7 +127,7 @@
 									<i class="fas fa-map text-muted me-2"></i> State
 								</div>
 								<div class="col-sm-8">
-									@Html.DisplayFor(m => m.State.Name)
+									@Html.DisplayFor(m => m.State!.Name)
 								</div>
 							</div>
 
@@ -136,7 +136,7 @@
 									<i class="fas fa-flag text-muted me-2"></i> Country
 								</div>
 								<div class="col-sm-8">
-									@Html.DisplayFor(m => m.Country.Name)
+									@Html.DisplayFor(m => m.Country!.Name)
 								</div>
 							</div>
 
@@ -145,7 +145,7 @@
 									<i class="fas fa-mail-bulk text-muted me-2"></i> Pin Code
 								</div>
 								<div class="col-sm-8">
-									@Html.DisplayFor(m => m.PinCode.Code)
+									@Html.DisplayFor(m => m.PinCode!.Code)
 								</div>
 							</div>
 						</div>

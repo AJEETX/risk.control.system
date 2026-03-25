@@ -5,7 +5,7 @@ namespace risk.control.system.Helpers
     public static class NameGenerator
     {
         private static readonly string[] firstNames = { "John", "Paul", "Ringo", "George", "Laura", "Stephaney" };
-        private static readonly string[] lastNames = { "Lennon", "McCartney", "Starr", "Harrison", "Blanc" };
+        private static readonly string[] lastNames = { "Lennon", "McCartney", "Starr", "Harrison", "Blanc", "Keir" };
 
         public static string GenerateName()
         {

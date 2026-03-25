@@ -103,7 +103,23 @@ $(document).ready(function () {
             { data: "stateCode", mRender: (data, type, row) => `<span title="${row.state}" data-bs-toggle="tooltip">${data}</span>` },
             { data: "countryCode", mRender: (data, type, row) => `<span title="${row.country}" data-bs-toggle="tooltip"> <img alt="${data}" title="${data}" src="${row.flag}" class="flag-icon" />(${data})</span>` },
             { data: "updatedBy", mRender: (data, type, row) => `<span title="${row.updatedBy}" data-bs-toggle="tooltip">${data}</span>` },
-            { data: "updated", mRender: (data, type, row) => `<span title="${row.updated}" data-bs-toggle="tooltip">${data}</span>` },
+            {
+                "data": "updated",
+                "render": function (data, type, row) {
+                    if (!data) return "";
+
+                    // 1. Parse UTC string (Assuming format: "2023-10-27T10:00:00Z")
+                    var date = new Date(data);
+
+                    // 2. Convert to Local String
+                    // You can customize the format: { dateStyle: 'medium', timeStyle: 'short' }
+                    var localDate = date.toLocaleString();
+
+                    return `<i title="${localDate}" data-bs-toggle="tooltip">
+                    <small><strong>${localDate}</strong></small>
+                </i>`;
+                }
+            },
             {
                 sDefaultContent: "",
                 bSortable: false,

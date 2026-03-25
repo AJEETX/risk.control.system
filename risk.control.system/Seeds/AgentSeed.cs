@@ -21,7 +21,7 @@ namespace risk.control.system.Seeds
             var extension = Path.GetExtension(agentImagePath);
             var (fileName, relativePath) = await fileStorageService.SaveAsync(agentImage, extension, vendor.Email, "user");
 
-            var address = addressLine + ", " + pincode.District.Name + ", " + pincode.State.Name + ", " + pincode.Country.Code;
+            var address = addressLine + ", " + pincode.District!.Name + ", " + pincode.State!.Name + ", " + pincode.Country!.Code;
             var coordinates = await customApiCLient.GetCoordinatesFromAddressAsync(address);
             var customerLatLong = coordinates.Latitude + "," + coordinates.Longitude;
             var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{customerLatLong}&key={EnvHelper.Get("GOOGLE_MAP_KEY")}";
@@ -36,7 +36,7 @@ namespace risk.control.system.Seeds
                 Active = true,
                 PhoneNumberConfirmed = true,
                 Password = TestingData,
-                Vendor = vendor,
+                VendorId = vendor.VendorId,
                 PhoneNumber = AGENT_MOBILE,
                 IsSuperAdmin = false,
                 IsClientAdmin = false,

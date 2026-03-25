@@ -47,7 +47,7 @@ namespace risk.control.system.Services.Common
                 Status = task.Status,
                 SubStatus = task.SubStatus,
                 UpdatedBy = updatedBy,
-                AssigedTo = task.CaseOwner,
+                AssigedTo = task.CaseOwner!,
                 StatusChangedAt = DateTime.UtcNow,
                 Duration = duration
             };

@@ -52,7 +52,7 @@ namespace risk.control.system.Services.Creator
         {
             var user = await _context.ApplicationUser
                 .AsNoTracking()
-                .Include(c => c.ClientCompany).ThenInclude(c => c.Country)
+                .Include(c => c.ClientCompany).ThenInclude(c => c!.Country)
                 .FirstOrDefaultAsync(c => c.Email == userEmail)
                 ?? throw new KeyNotFoundException("User not found");
 
@@ -100,7 +100,7 @@ namespace risk.control.system.Services.Creator
         public async Task<BeneficiaryDetail> GetBeneficiaryDetailAsync(long id, long countryId)
         {
             var beneRelation = await _context.BeneficiaryRelation.FirstOrDefaultAsync();
-            var pinCode = await _context.PinCode.Include(s => s.Country).OrderBy(p => p.StateId).LastOrDefaultAsync(s => s.Country.CountryId == countryId);
+            var pinCode = await _context.PinCode.Include(s => s.Country).OrderBy(p => p.StateId).LastOrDefaultAsync(s => s.Country!.CountryId == countryId);
 
             var model = new BeneficiaryDetail
             {

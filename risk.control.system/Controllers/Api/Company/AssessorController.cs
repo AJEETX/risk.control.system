@@ -23,8 +23,8 @@ namespace risk.control.system.Controllers.Api.Company
             this.logger = logger;
         }
 
-        [HttpGet("GetInvestigations")]
-        public async Task<IActionResult> GetInvestigations(int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc")
+        [HttpGet("GetInvestigationReports")]
+        public async Task<IActionResult> GetInvestigationReports(int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc")
         {
             var userEmail = HttpContext.User?.Identity?.Name!;
 

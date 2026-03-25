@@ -14,8 +14,8 @@
 
 	if (customerExist)
 	{
-		address = $"{customerDetail.Addressline} {customerDetail.District?.Name} {customerDetail.State?.Name} {customerDetail.PinCode?.Code}";
-		currentAgeInYrs = $"{(int)(DateTime.UtcNow.Subtract(customerDetail.DateOfBirth.GetValueOrDefault()).TotalDays / 365)} years";
+		address = $"{customerDetail?.Addressline} {customerDetail?.District?.Name} {customerDetail?.State?.Name} {customerDetail?.PinCode?.Code}";
+		currentAgeInYrs = $"{(int)(DateTime.UtcNow.Subtract(customerDetail!.DateOfBirth.GetValueOrDefault()).TotalDays / 365)} years";
 	}
 
 	// Progress bar and message setup
@@ -24,8 +24,8 @@
 	string customerProgressbarMessage = customerExist ? "customer" : "add customer";
 
 	string beneficiaryProgressbarMessage = beneficiaryExist ? "edit beneficiary" : "beneficiary";
-	var imgPath = "/flags/" + @customerDetail.Country.Code.ToLower() + ".png";
-	var map = string.Format(@customerDetail?.CustomerLocationMap, "200", "200");
+	var imgPath = "/flags/" + @customerDetail?.Country?.Code.ToLower() + ".png";
+	var map = string.Format(@customerDetail?.CustomerLocationMap!, "200", "200");
 }
 
 <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
@@ -56,16 +56,16 @@
 						<li class="small"><span class="fa-li"><i class="fas fa-restroom"></i></span>Gender:<b> @customerDetail?.Gender </b></li>
 						<li class="small"><span class="fa-li"><i class="fas fa-graduation-cap"></i></span>Education:<b> @customerDetail?.Education </b></li>
 						<li class="small"><span class="fa-li"><i class="fas fa-user-alt"></i></span>Age:<b> @currentAgeInYrs </b></li>
-						<li class="small"><span class="fa-li"><i class="fa fa-money"></i></span>Annual Income:(@Model.Currency)<b> @customerDetail?.Income.GetEnumDisplayName() </b></li>
+						<li class="small"><span class="fa-li"><i class="fa fa-money"></i></span>Annual Income:(@Model.Currency)<b> @customerDetail?.Income?.GetEnumDisplayName() </b></li>
 						<li class="small"><span class="fa-li"><i class="fas fa-lg fa-building"></i></span>Address:<b> @address</b></li>
-						<li class="small"><span class="fa-li"><i class="fas fa-lg fa-globe"></i></span>Country:  <img src="@imgPath" class="flag-icon" data-bs-toggle="tooltip" />@customerDetail.Country.Name</li>
-						<li class="small"><span class="fa-li"><i class="fas fa-lg fa-phone"></i></span>Mobile #: (+@customerDetail?.Country.ISDCode)<b> @customerDetail?.PhoneNumber</b></li>
+						<li class="small"><span class="fa-li"><i class="fas fa-lg fa-globe"></i></span>Country:  <img src="@imgPath" class="flag-icon" data-bs-toggle="tooltip" />@customerDetail?.Country?.Name</li>
+						<li class="small"><span class="fa-li"><i class="fas fa-lg fa-phone"></i></span>Mobile #: (+@customerDetail?.Country?.ISDCode)<b> @customerDetail?.PhoneNumber</b></li>
 					</ul>
 				</div>
 
 				<div class="col-5 text-center">
 					<p class="text-muted text-sm">
-						<img id="profileImage" class="img-fluid block-data" src="/Document/GetCustomerDocument/@customerDetail.CustomerDetailId" data-bs-toggle="tooltip" title="@customerDetail?.Name Photo" alt="@customerDetail?.Name" />
+						<img id="profileImage" class="img-fluid block-data" src="/Document/GetCustomerDocument/@customerDetail?.CustomerDetailId" data-bs-toggle="tooltip" title="@customerDetail?.Name Photo" alt="@customerDetail?.Name" />
 					</p>
 					<p class="text-muted text-sm">
 						<img id="customerGoogleMap" class="img-fluid block-data" src="@map" title="Display Customer Address in map" data-bs-toggle="tooltip" alt="Customer Address Map" />
@@ -79,11 +79,11 @@
 				@if (customerExist)
 				{
 					<input type="hidden" asp-for="ClaimsInvestigation.Id" />
-					<a id="edit-customer" class="btn btn-warning" asp-controller="Customer" asp-action="Edit" asp-route-id="@Model.ClaimsInvestigation.Id"><i class="fa fa-user-plus"></i> Edit Customer</a>
+					<a id="edit-customer" class="btn btn-warning" asp-controller="Customer" asp-action="Edit" asp-route-id="@Model.ClaimsInvestigation?.Id"><i class="fa fa-user-plus"></i> Edit Customer</a>
 				}
 				else
 				{
-					<a id="add-customer" class="btn btn-success" asp-controller="Customer" asp-action="Create" asp-route-id="@Model.ClaimsInvestigation.Id"><i class="fa fa-user-plus"></i> Add Customer</a>
+					<a id="add-customer" class="btn btn-success" asp-controller="Customer" asp-action="Create" asp-route-id="@Model.ClaimsInvestigation?.Id"><i class="fa fa-user-plus"></i> Add Customer</a>
 				}
 			</div>
 		</div>

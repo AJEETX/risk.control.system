@@ -42,14 +42,14 @@ namespace risk.control.system.Services.Agency
                 var caseTask = await GetCases().Include(c => c.InvestigationReport)
                     .FirstOrDefaultAsync(c => c.Id == caseId);
 
-                caseTask.Updated = DateTime.UtcNow;
+                caseTask!.Updated = DateTime.UtcNow;
                 caseTask.UpdatedBy = agent!.Email;
                 caseTask.SubStatus = submitted2Supervisor;
                 caseTask.SubmittedToSupervisorTime = DateTime.UtcNow;
                 caseTask.CaseOwner = agent.Vendor!.Email;
                 var claimReport = caseTask.InvestigationReport;
 
-                claimReport.AgentRemarks = remarks;
+                claimReport!.AgentRemarks = remarks;
                 claimReport.AgentRemarksUpdated = DateTime.UtcNow;
                 claimReport.AgentEmail = userEmail;
 
@@ -82,7 +82,7 @@ namespace risk.control.system.Services.Agency
                 .FirstOrDefaultAsync(c => c.Id == caseId);
 
                 var submitted2Assessor = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR;
-                caseTask.SubmittingSupervisordEmail = userEmail;
+                caseTask!.SubmittingSupervisordEmail = userEmail;
                 caseTask.SubmittedToAssessorTime = DateTime.UtcNow;
                 caseTask.AssignedToAgency = false;
                 caseTask.Updated = DateTime.UtcNow;
@@ -91,7 +91,7 @@ namespace risk.control.system.Services.Agency
                 caseTask.CaseOwner = caseTask.ClientCompany!.Email;
                 caseTask.SubmittedToAssessorTime = DateTime.UtcNow;
                 var report = caseTask.InvestigationReport;
-                var edited = report.AgentRemarks.Trim() != editRemarks.Trim();
+                var edited = report!.AgentRemarks!.Trim() != editRemarks.Trim();
                 if (edited)
                 {
                     report.AgentRemarksEdit = editRemarks;
@@ -127,69 +127,37 @@ namespace risk.control.system.Services.Agency
             }
         }
 
-        private async Task<InvestigationTask> ReAllocateToVendorAgent(string userEmail, long caseId, string supervisorRemarks, SupervisorRemarkType reportUpdateStatus)
-        {
-            try
-            {
-                var agencyUser = await context.ApplicationUser.Include(u => u.Vendor).FirstOrDefaultAsync(s => s.Email == userEmail);
-
-                var assignedToAgentSubStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT;
-                var caseToAllocateToVendor = await context.Investigations
-                    .Include(c => c.InvestigationReport)
-                    .Include(c => c.PolicyDetail)
-                    .Include(p => p.ClientCompany)
-                    .FirstOrDefaultAsync(v => v.Id == caseId);
-                caseToAllocateToVendor.CaseOwner = agencyUser.Email;
-                caseToAllocateToVendor.TaskedAgentEmail = agencyUser.Email;
-                caseToAllocateToVendor.Updated = DateTime.UtcNow;
-                caseToAllocateToVendor.UpdatedBy = userEmail;
-                caseToAllocateToVendor.SubStatus = assignedToAgentSubStatus;
-                caseToAllocateToVendor.TaskToAgentTime = DateTime.UtcNow;
-                context.Investigations.Update(caseToAllocateToVendor);
-
-                var rowsAffected = await context.SaveChangesAsync(null, false) > 0;
-
-                await timelineService.UpdateTaskStatus(caseToAllocateToVendor.Id, userEmail);
-                return rowsAffected ? caseToAllocateToVendor : null!;
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Error occurred Re-Allocate case {Id}. {UserEmail}", caseId, userEmail);
-                return null!;
-            }
-        }
-
         private IQueryable<InvestigationTask> GetCases()
         {
             var caseTasks = context.Investigations
                 .Include(c => c.PolicyDetail)
                 .Include(c => c.InvestigationTimeline)
                 .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.CaseEnabler)
+                .ThenInclude(c => c!.CaseEnabler)
                  .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.InvestigationServiceType)
+                .ThenInclude(c => c!.InvestigationServiceType)
                  .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.CostCentre)
+                .ThenInclude(c => c!.CostCentre)
                 .Include(c => c.ClientCompany)
                 .Include(c => c.Vendor)
                 .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.PinCode)
+                .ThenInclude(c => c!.PinCode)
                 .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.District)
+                .ThenInclude(c => c!.District)
                 .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.State)
+                .ThenInclude(c => c!.State)
                 .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.Country)
+                .ThenInclude(c => c!.Country)
                 .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.BeneficiaryRelation)
+                .ThenInclude(c => c!.BeneficiaryRelation)
                 .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.Country)
+                .ThenInclude(c => c!.Country)
                 .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.State)
+                .ThenInclude(c => c!.State)
                 .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.District)
+                .ThenInclude(c => c!.District)
                 .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.PinCode);
+                .ThenInclude(c => c!.PinCode);
             return caseTasks;
         }
     }

@@ -104,7 +104,7 @@ namespace risk.control.system.Models
         public string StatusClass = "bg-light i-red";
 
         [NotMapped]
-        public bool AllQuestionsAnswered => Questions.Where(q => q.IsRequired).All(q => !string.IsNullOrWhiteSpace(q.AnswerText));
+        public bool AllQuestionsAnswered => Questions!.Where(q => q.IsRequired).All(q => !string.IsNullOrWhiteSpace(q.AnswerText));
 
         [NotMapped]
         public bool DocumentsValidated => DocumentIds?.Where(d => d.Selected && d.IsRequired).All(d => d.ImageValid.GetValueOrDefault() && d.IsRequired) ?? false;

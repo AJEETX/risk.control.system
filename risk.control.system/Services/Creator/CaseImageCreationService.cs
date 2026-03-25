@@ -59,14 +59,14 @@ namespace risk.control.system.Services
             {
                 return image.ImageData;
             }
-            return null;
+            return null!;
         }
 
         private static bool IsImageFile(string filePath)
         {
             // Check if the file is an image based on file extension
             string[] imageExtensions = { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tiff", ".webp" };
-            string extension = Path.GetExtension(filePath)?.ToLower();
+            string extension = Path.GetExtension(filePath)?.ToLower()!;
             return imageExtensions.Contains(extension);
         }
     }

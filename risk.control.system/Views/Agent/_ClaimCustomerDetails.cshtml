@@ -5,7 +5,7 @@
 	int currentAgeinYrs = 0;
 	if (Model.CaseTask != null && Model.CaseTask.CustomerDetail != null)
 	{
-		address = @Model.CaseTask?.CustomerDetail.Addressline + " " + @Model.CaseTask?.CustomerDetail.District.Name + " " + @Model.CaseTask?.CustomerDetail.State.Name + " " + @Model.CaseTask?.CustomerDetail.Country.Name + " " + @Model.CaseTask?.CustomerDetail.PinCode.Code;
+		address = @Model.CaseTask?.CustomerDetail.Addressline + " " + @Model.CaseTask?.CustomerDetail.District?.Name + " " + @Model.CaseTask?.CustomerDetail.State?.Name + " " + @Model.CaseTask?.CustomerDetail.Country?.Name + " " + @Model.CaseTask?.CustomerDetail.PinCode?.Code;
 
 		if (Model.CaseTask?.CustomerDetail.DateOfBirth != null)
 		{
@@ -13,8 +13,8 @@
 			currentAgeinYrs = (int)age / 365;
 		}
 	}
-	var map = string.Format(Model.CaseTask.CustomerDetail.CustomerLocationMap, "400", "400");
-	var customerSMSCount = Model.CaseTask.CaseMessages.Where(x => x.IsCustomer).Count();
+	var map = string.Format(Model.CaseTask?.CustomerDetail?.CustomerLocationMap!, "400", "400");
+	var customerSMSCount = Model.CaseTask?.CaseMessages!.Where(x => x.IsCustomer).Count();
 
 	<div class="col-12 col-sm-6 d-flex align-items-stretch flex-column">
 		<div class="card bg-light d-flex flex-fill">
@@ -51,16 +51,16 @@
 			<div class="card-body">
 				<div class="row">
 					<div class="col-7">
-						<h2 class="lead"><b>@Model.CaseTask.CustomerDetail.Name</b></h2>
+						<h2 class="lead"><b>@Model.CaseTask?.CustomerDetail?.Name</b></h2>
 						<p class="text-muted text-sm">
-							<b>Occupation: </b> @Model.CaseTask.CustomerDetail.Occupation
+							<b>Occupation: </b> @Model.CaseTask?.CustomerDetail?.Occupation
 						</p>
 						<ul class="ml-4 mb-0 fa-ul text-muted">
 							<li class="small">
 								<span class="fa-li">
 									<i class="fa fa-money"></i>
 								</span>
-								Annual Income: (@Model.Currency) @Model.CaseTask.CustomerDetail.Income
+								Annual Income: (@Model.Currency) @Model.CaseTask?.CustomerDetail?.Income
 							</li>
 							<li class="small">
 								<span class="fa-li">
@@ -79,7 +79,7 @@
 								<span class="fa-li">
 									<i class="fas fa-lg fa-phone"></i>
 								</span>
-								Mobile #: + @Model.CaseTask.CustomerDetail.PhoneNumber
+								Mobile #: + @Model.CaseTask?.CustomerDetail?.PhoneNumber
 							</li>
 						</ul>
 					</div>

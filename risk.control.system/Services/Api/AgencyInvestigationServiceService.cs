@@ -32,7 +32,7 @@ namespace risk.control.system.Services.Api
                 .Include(s => s.State)
                 .Include(s => s.Country)
                 .Where(s => s.VendorId == vendorId)
-                .OrderBy(s => s.InvestigationServiceType.Name)
+                .OrderBy(s => s.InvestigationServiceType!.Name)
                 .ToListAsync();
 
             // Pre-fetch districts for N+1 optimization
@@ -57,23 +57,23 @@ namespace risk.control.system.Services.Api
                         .Select(id => districtDict.TryGetValue(id, out var name) ? name : null)
                         .Where(n => n != null) ?? Enumerable.Empty<string>());
 
-                var culture = CustomExtensions.GetCultureByCountry(service.Country.Code.ToUpper());
+                var culture = CustomExtensions.GetCultureByCountry(service.Country!.Code.ToUpper());
 
                 return new AgencyServiceResponse
                 {
                     VendorId = service.VendorId,
                     Id = service.VendorInvestigationServiceTypeId,
-                    CaseType = service.InsuranceType.GetEnumDisplayName(),
-                    ServiceType = service.InvestigationServiceType.Name,
+                    CaseType = service.InsuranceType!.GetEnumDisplayName(),
+                    ServiceType = service.InvestigationServiceType!.Name,
                     District = districtNames,
-                    StateCode = service.State.Code,
+                    StateCode = service.State!.Code,
                     State = service.State.Name,
                     CountryCode = service.Country.Code,
                     Country = service.Country.Name,
                     Flag = $"/flags/{service.Country.Code.ToLower()}.png",
                     Rate = string.Format(culture, "{0:c}", service.Price),
-                    UpdatedBy = service.UpdatedBy,
-                    Updated = (service.Updated ?? service.Created).ToString("dd-MM-yyyy"),
+                    UpdatedBy = service.UpdatedBy!,
+                    Updated = service.Updated ?? service.Created,
                     IsUpdated = service.IsUpdated,
                     LastModified = service.Updated
                 };
@@ -81,8 +81,8 @@ namespace risk.control.system.Services.Api
 
             // Batch reset IsUpdated
             await _context.VendorInvestigationServiceType.AsNoTracking()
-                .Where(s => s.VendorId == vendorId)
-                .ExecuteUpdateAsync(setters => setters.SetProperty(s => s.IsUpdated, false));
+                        .Where(s => s.VendorId == vendorId)
+                        .ExecuteUpdateAsync(setters => setters.SetProperty(s => s.IsUpdated, false));
 
             return serviceResponse;
         }
@@ -103,8 +103,8 @@ namespace risk.control.system.Services.Api
             // 2. Fetch ONLY required fields (no Include, no tracking)
             var servicesData = await _context.VendorInvestigationServiceType
                 .AsNoTracking()
-                .Where(s => s.VendorId == vendorId && !s.Vendor.Deleted)
-                .OrderBy(s => s.InvestigationServiceType.Name)
+                .Where(s => s.VendorId == vendorId && !s.Vendor!.Deleted)
+                .OrderBy(s => s.InvestigationServiceType!.Name)
                 .Select(s => new
                 {
                     s.VendorId,
@@ -116,10 +116,10 @@ namespace risk.control.system.Services.Api
                     s.IsUpdated,
                     s.UpdatedBy,
                     InsuranceType = s.InsuranceType,
-                    ServiceTypeName = s.InvestigationServiceType.Name,
-                    StateCode = s.State.Code,
+                    ServiceTypeName = s.InvestigationServiceType!.Name,
+                    StateCode = s.State!.Code,
                     StateName = s.State.Name,
-                    CountryCode = s.Country.Code,
+                    CountryCode = s.Country!.Code,
                     CountryName = s.Country.Name
                 })
                 .ToListAsync();
@@ -158,7 +158,7 @@ namespace risk.control.system.Services.Api
                 {
                     VendorId = service.VendorId,
                     Id = service.VendorInvestigationServiceTypeId,
-                    CaseType = service.InsuranceType.GetEnumDisplayName(),
+                    CaseType = service.InsuranceType!.GetEnumDisplayName(),
                     ServiceType = service.ServiceTypeName,
                     District = districtNames,
                     StateCode = service.StateCode,
@@ -167,8 +167,8 @@ namespace risk.control.system.Services.Api
                     Country = service.CountryName,
                     Flag = $"/flags/{service.CountryCode.ToLower()}.png",
                     Rate = string.Format(culture, "{0:c}", service.Price),
-                    UpdatedBy = service.UpdatedBy,
-                    Updated = (service.Updated ?? service.Created).ToString("dd-MM-yyyy"),
+                    UpdatedBy = service.UpdatedBy!,
+                    Updated = service.Updated ?? service.Created,
                     IsUpdated = service.IsUpdated,
                     LastModified = service.Updated
                 };

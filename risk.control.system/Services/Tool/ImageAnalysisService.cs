@@ -103,7 +103,7 @@ namespace risk.control.system.Services.Tool
             var directories = ImageMetadataReader.ReadMetadata(path);
             return directories.Any(d => d.Tags.Any(t =>
                 t.Name.Contains("Software") &&
-                (t.Description.Contains("Adobe") || t.Description.Contains("GIMP"))));
+                (t.Description!.Contains("Adobe") || t.Description.Contains("GIMP"))));
         }
     }
 }

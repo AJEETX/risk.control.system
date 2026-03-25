@@ -48,6 +48,10 @@
                 targets: 9                      // Index of the column to style
             },
             {
+                className: 'max-width-column-name', // Apply the CSS class,
+                targets: 11                      // Index of the column to style
+            },
+            {
                 'targets': 15, // Index for the "Case Type" column
                 'name': 'policy' // Name for the "Case Type" column
             }],
@@ -168,11 +172,21 @@
             },
             {
                 "data": "created",
-                "mRender": function (data, type, row) {
-                    return '<span title="' + row.created + '" data-bs-toggle="tooltip">' + data + '</span>'
+                "render": function (data, type, row) {
+                    if (!data) return "";
+
+                    // 1. Parse UTC string (Assuming format: "2023-10-27T10:00:00Z")
+                    var date = new Date(data);
+
+                    // 2. Convert to Local String
+                    // You can customize the format: { dateStyle: 'medium', timeStyle: 'short' }
+                    var localDate = date.toLocaleString();
+
+                    return `<i title="${localDate}" data-bs-toggle="tooltip">
+                    <small><strong>${localDate}</strong></small>
+                </i>`;
                 }
             },
-
             {
                 "sDefaultContent": "",
                 "bSortable": false,

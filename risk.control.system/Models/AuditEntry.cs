@@ -11,9 +11,9 @@ namespace risk.control.system.Models
             Entry = entry;
         }
         public EntityEntry Entry { get; }
-        public string UserId { get; set; }
+        public string? UserId { get; set; }
         public long? CompanyId { get; set; }
-        public string TableName { get; set; }
+        public string? TableName { get; set; }
         public Dictionary<string, object> KeyValues { get; } = new Dictionary<string, object>();
         public Dictionary<string, object> OldValues { get; } = new Dictionary<string, object>();
         public Dictionary<string, object> NewValues { get; } = new Dictionary<string, object>();

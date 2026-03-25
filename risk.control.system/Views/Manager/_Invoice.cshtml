@@ -9,21 +9,21 @@
                     <i class="fas fa-info-circle"></i>
                     <span class="tooltip-text" id="information">
                         <span>
-                            <i class="fas fa-user-check"></i><b> Billing Info: @Model.ClaimsInvestigation.Vendor.Email</b>.
+                            <i class="fas fa-user-check"></i><b> Billing Info: @Model.ClaimsInvestigation?.Vendor?.Email</b>.
                         </span>
                     </span>
                 </span>
             </h3>
             <div class="card-tools">
                 <span data-bs-toggle="tooltip" title="Billing time" class="badge badge-light">
-                    <i class="nav-icon fas fa-clock"></i> @Model.ClaimsInvestigation.InvestigationReport?.AssessorRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt")
+                    <i class="nav-icon fas fa-clock"></i> @Model.ClaimsInvestigation?.InvestigationReport?.AssessorRemarksUpdated!.Value.ToString("dd-MMM-yy hh:mm tt")
                 </span>
             </div>
         </div>
         <div class="card-body pt-0">
             <div class="row">
                 <div class="col-7">
-                    <h2 class="lead"><b>Case Type: </b>@Model.ClaimsInvestigation?.PolicyDetail.InsuranceType.GetEnumDisplayName()</h2>
+                    <h2 class="lead"><b>Case Type: </b>@Model.ClaimsInvestigation?.PolicyDetail?.InsuranceType?.GetEnumDisplayName()</h2>
                     @* <p class="text-muted text-sm">
                         <b>Claim Type: </b>@Model.ClaimsInvestigation?.PolicyDetail.InsuranceType.GetEnumDisplayName()
                     </p> *@
@@ -32,26 +32,26 @@
                             <span class="fa-li">
                                 <i class="fas fa-tools"></i>
                             </span>
-                            Service: @Model.ClaimsInvestigation?.PolicyDetail.InvestigationServiceType.Name
+                            Service: @Model.ClaimsInvestigation?.PolicyDetail?.InvestigationServiceType?.Name
                         </li>
 
                         <li class="small">
                             <span class="fa-li">
                                 <i class="fas fa-sun"></i>
                             </span>
-                            Reason: @Model.ClaimsInvestigation?.PolicyDetail.CaseEnabler.Name;
+                            Reason: @Model.ClaimsInvestigation?.PolicyDetail?.CaseEnabler?.Name;
                         </li>
                         <li class="small">
                             <span class="fa-li">
                                 <i class="fas fa-money"></i>
                             </span>
-                            Tax Amount (@Model.Currency): @Model.VendorInvoice.TaxAmount
+                            Tax Amount (@Model.Currency): @Model.VendorInvoice?.TaxAmount
                         </li>
                         <li class="small">
                             <span class="fa-li">
                                 <i class="fas fa-money"></i>
                             </span>
-                            Total Amount (@Model.Currency): @(Model.VendorInvoice.GrandTotal + Model.VendorInvoice.TaxAmount)
+                            Total Amount (@Model.Currency): @(Model.VendorInvoice?.GrandTotal + Model.VendorInvoice?.TaxAmount)
                         </li>
                     </ul>
                 </div>
@@ -67,7 +67,7 @@
                 @* <a href="/Report/PrintPdfReport?Id=@Model.ClaimsInvestigation.Id" class="btn btn-xs btn-danger"><i class="far fa-file-pdf"></i> PDF</a> *@
                 <a id="printInvoiceButton" class="btn btn-sm btn-danger text-white"><i class="far fa-file-pdf"></i> PDF</a>
 
-                <a class="btn btn-sm bg-teal" asp-controller="Manager" asp-action="ShowInvoice" asp-route-id="@Model.VendorInvoice.VendorInvoiceId">
+                <a class="btn btn-sm bg-teal" asp-controller="Manager" asp-action="ShowInvoice" asp-route-id="@Model.VendorInvoice?.VendorInvoiceId">
                     <i class="fa fa-print"> Invoice</i>
                 </a>
             </div>

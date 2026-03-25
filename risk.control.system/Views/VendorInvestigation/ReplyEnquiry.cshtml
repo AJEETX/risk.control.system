@@ -5,7 +5,7 @@
 }
 <section class="content">
 	<form id="query-form" method="post" asp-controller="AgencyQuery" asp-action="ReplyQuery" enctype="multipart/form-data" autocomplete="off">
-		<input type="hidden" id="claimId" name="claimId" value="@Model.CaseTask.Id" />
+		<input type="hidden" id="claimId" name="claimId" value="@Model.CaseTask?.Id" />
 		<div id="article" class="shadow-lg border-1 rounded-lg">
 			<div class="card-header bg-secondary text-white text-center">
 				<h3 class="card-title">
@@ -75,7 +75,7 @@
 												<div class="input-group">
 													<div class="row">
 														<div class="col-md-12">
-															<b>  <i class="fa fa-comment"></i> Descriptive Question </b>:  @Model.InvestigationReport.EnquiryRequest.DescriptiveQuestion
+															<b>  <i class="fa fa-comment"></i> Descriptive Question </b>:  @Model.InvestigationReport?.EnquiryRequest?.DescriptiveQuestion
 														</div>
 													</div>
 												</div>
@@ -85,7 +85,7 @@
 									<div class="col-md-1">
 										<div class="btn btn-default btn-file">
 											<small>File Sent</small>
-											@if (Model.InvestigationReport.EnquiryRequest.QuestionImageAttachment is not null)
+											@if (Model.InvestigationReport?.EnquiryRequest?.QuestionImageAttachment is not null)
 											{
 												<img id="profileImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model.InvestigationReport.EnquiryRequest.QuestionImageAttachment))">
 												<a asp-controller="Download" asp-action="EnquiryFileAttachment" asp-route-id="InvestigationReport.EnquiryRequest.QueryRequestId" class="mailbox-attachment-name"><i class="fas fa-paperclip"></i></a>
@@ -118,7 +118,7 @@
 							</div>
 						</div>
 					</div>
-					@if (Model.InvestigationReport.EnquiryRequests.Count > 0)
+					@if (Model.InvestigationReport?.EnquiryRequests.Count > 0)
 					{
 						<div class="col-sm-12 d-flex align-items-stretch flex-column">
 

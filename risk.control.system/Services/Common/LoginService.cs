@@ -143,11 +143,11 @@ namespace risk.control.system.Services.Common
 
         public async Task<(bool Success, string Message)> VerifyAndLoginAsync(OtpLoginModel request)
         {
-            string cleanIsd = request.CountryIsd.TrimStart('+');
-            string cleanMobile = request.MobileNumber.TrimStart('0');
+            string cleanIsd = request.CountryIsd!.TrimStart('+');
+            string cleanMobile = request.MobileNumber!.TrimStart('0');
             string cacheKey = $"{cleanIsd}{cleanMobile}";
 
-            if (!cache.TryGetValue(cacheKey, out string correctOtp) || correctOtp != request.UserEnteredOtp?.Trim())
+            if (!cache.TryGetValue(cacheKey, out string? correctOtp) || correctOtp != request.UserEnteredOtp?.Trim())
             {
                 return (false, "The OTP entered is invalid or has expired.");
             }

@@ -65,23 +65,23 @@ namespace risk.control.system.Services.Company
                     Domain = $"<a href='/ClientCompany/Details?Id={u.ClientCompanyId}'>" + u.Email + "</a>",
                     Name = u.Name,
                     //Code = u.Code,
-                    Phone = "(+" + u.Country.ISDCode + ") " + u.PhoneNumber,
+                    Phone = "(+" + u.Country!.ISDCode + ") " + u.PhoneNumber,
                     Address = u.Addressline,
-                    District = u.District.Name,
-                    State = u.State.Code,
+                    District = u.District!.Name,
+                    State = u.State!.Code,
                     CountryCode = u.Country.Code,
                     Country = u.Country.Name,
-                    PinCode = $"{u.PinCode.Name} - {u.PinCode.Code}",
+                    PinCode = $"{u.PinCode!.Name} - {u.PinCode.Code}",
                     Flag = "/flags/" + u.Country.Code.ToLower() + ".png",
                     Updated = u.Updated.HasValue ? u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy"),
-                    Active = u.Status.GetEnumDisplayName(),
+                    Active = u.Status!.GetEnumDisplayName(),
                     UpdatedBy = u.UpdatedBy,
                     IsUpdated = u.IsUpdated,
                     LastModified = u.Updated
                 })?.ToArray();
             companies.ToList().ForEach(u => u.IsUpdated = false);
             await context.SaveChangesAsync(null, false);
-            return result;
+            return result!;
         }
 
         public async Task<(bool Success, Dictionary<string, string> Errors)> EditAsync(string userEmail, ClientCompany model, string portal_base_url)
@@ -123,7 +123,7 @@ namespace risk.control.system.Services.Company
 
             await SendNotificationAsync(company, model.Email, portal_base_url);
 
-            return (true, null);
+            return (true, null!);
         }
 
         private async Task ValidatePhoneAsync(ClientCompany model, Dictionary<string, string> errors)
@@ -143,7 +143,7 @@ namespace risk.control.system.Services.Company
 
         private async Task UpdateDocumentAsync(ClientCompany company, ClientCompany model)
         {
-            var (fileName, relativePath) = await fileStorageService.SaveAsync(model.Document, model.Email, "user");
+            var (fileName, relativePath) = await fileStorageService.SaveAsync(model.Document!, model.Email, "user");
 
             company.DocumentUrl = relativePath;
             company.DocumentImageExtension = Path.GetExtension(fileName);
@@ -163,7 +163,7 @@ namespace risk.control.system.Services.Company
             company.Branch = WebUtility.HtmlEncode(model.Branch);
             company.BankName = WebUtility.HtmlEncode(model.BankName);
             company.BankAccountNumber = WebUtility.HtmlEncode(model.BankAccountNumber);
-            company.IFSCCode = WebUtility.HtmlEncode(model.IFSCCode.ToUpper());
+            company.IFSCCode = WebUtility.HtmlEncode(model.IFSCCode!.ToUpper());
             company.Addressline = WebUtility.HtmlEncode(model.Addressline);
 
             company.Updated = DateTime.UtcNow;
@@ -174,7 +174,7 @@ namespace risk.control.system.Services.Company
         {
             string message = $"Company edited.\nDomain : {email}\n{portal_base_url}";
 
-            await smsService.DoSendSmsAsync(company.Country.Code, company.Country.ISDCode + company.PhoneNumber, message);
+            await smsService.DoSendSmsAsync(company.Country!.Code, company.Country.ISDCode + company.PhoneNumber, message);
         }
     }
 }

@@ -46,7 +46,7 @@ namespace risk.control.system.Services.Creator
                 .Include(u => u.Country)
                 .FirstOrDefaultAsync(u => u.Email == userEmail);
 
-            if (companyUser == null) return null;
+            if (companyUser == null) return null!;
 
             var licenseStatus = await _licenseService.GetUploadPermissionsAsync(companyUser);
             var isManager = await _userManager.IsInRoleAsync(companyUser, MANAGER.DISPLAY_NAME);
@@ -59,7 +59,7 @@ namespace risk.control.system.Services.Creator
                 FileSampleIdentifier = companyUser.Country?.Code?.ToLower() ?? "default",
                 LicenseStatus = licenseStatus,
                 // Logic for notification trigger
-                ShouldSendTrialNotification = uploadId == 0 && companyUser.ClientCompany.LicenseType == LicenseType.Trial
+                ShouldSendTrialNotification = uploadId == 0 && companyUser.ClientCompany!.LicenseType == LicenseType.Trial
             };
         }
 

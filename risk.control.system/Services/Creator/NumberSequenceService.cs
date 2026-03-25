@@ -25,7 +25,7 @@ namespace risk.control.system.Services.Creator
             {
                 int counter = 0;
 
-                NumberSequence numberSequence = await context.NumberSequence.FirstOrDefaultAsync(x => x.Module.Equals(module));
+                NumberSequence? numberSequence = await context.NumberSequence.FirstOrDefaultAsync(x => x.Module.Equals(module));
 
                 if (numberSequence is null)
                 {
@@ -55,7 +55,7 @@ namespace risk.control.system.Services.Creator
 
         public async Task SaveNumberSequence(string module)
         {
-            NumberSequence numberSequence = await context.NumberSequence.FirstOrDefaultAsync(x => x.Module.Equals(module));
+            NumberSequence? numberSequence = await context.NumberSequence.FirstOrDefaultAsync(x => x.Module.Equals(module));
             int counter = 0;
 
             if (numberSequence is null)

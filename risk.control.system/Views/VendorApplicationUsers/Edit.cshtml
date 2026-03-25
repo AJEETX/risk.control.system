@@ -2,7 +2,7 @@
 
 @{
 	ViewData["Title"] = @Applicationsettings.EDIT;
-	var email = Model.Vendor.Email;
+	var email = Model.Vendor?.Email;
 }
 <section class="content">
 	<form id="edit-form" asp-action="Edit" enctype="multipart/form-data">
@@ -16,7 +16,7 @@
 					<input type="hidden" asp-for="Id" />
 					<div class="col-md-6">
 						<div class="form-group hide-id">
-							<input asp-for="VendorId" class="form-control remarks" value="@Model.Vendor.VendorId" />
+							<input asp-for="VendorId" class="form-control remarks" value="@Model.Vendor?.VendorId" />
 							<span asp-validation-for="VendorId" class="text-danger"></span>
 						</div>
 						<div class="form-group">
@@ -75,13 +75,13 @@
 							<div class="input-group">
 								<!-- Display Country Code -->
 								<div class="input-group-prepend">
-									<span class="input-group-text" data-toggle="tooltip" title="Country Code :+@Model?.Country.ISDCode">
+									<span class="input-group-text" data-toggle="tooltip" title="Country Code :+@Model?.Country?.ISDCode">
 										<i class="fas fa-phone"></i><i class="fa fa-asterisk asterik-style"> </i>
 									</span>
 								</div>
 								<div class="input-group-prepend">
-									<span class="input-group-text" data-toggle="tooltip" title="Country Code :+@Model?.Country.ISDCode">
-										(+@Model?.Country.ISDCode)
+									<span class="input-group-text" data-toggle="tooltip" title="Country Code :+@Model?.Country?.ISDCode">
+										(+@Model?.Country?.ISDCode)
 									</span>
 								</div>
 								<input id="PhoneNumber" type="text" asp-for="PhoneNumber" class="form-control remarks" required maxlength="10" placeholder="Mobile # only (e.g., 9876543210)" data-bs-toggle="tooltip" />
@@ -122,7 +122,7 @@
 					<div class="row">
 						<div class="col-md-12">
 							<div class="form-group text-right">
-								<a id="cancel" asp-controller="VendorUser" asp-action="Index" asp-route-id="@Model.VendorId" class="btn btn-secondary">
+								<a id="cancel" asp-controller="VendorUser" asp-action="Index" asp-route-id="@Model?.VendorId" class="btn btn-secondary">
 									<i class="fa fa-window-close"></i>
 									Cancel
 								</a>

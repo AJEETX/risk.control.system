@@ -14,7 +14,7 @@
 						<li>
 							<i class='far fa-file-powerpoint'></i> Policy details.
 						</li>
-						@if (Model.ClaimsInvestigation.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING)
+						@if (Model.ClaimsInvestigation?.PolicyDetail?.InsuranceType == InsuranceType.UNDERWRITING)
 						{
 							<li>
 								<i class='fa fa-user-plus'></i> Customer details
@@ -41,9 +41,10 @@
 @{
 	var data = new CaseAgencyAgentModel
 	{
-		Beneficiary = Model.Beneficiary,
-		ClaimsInvestigation = Model.ClaimsInvestigation,
-		Currency = Model.Currency
+		Beneficiary = Model.Beneficiary!,
+		ClaimsInvestigation = Model.ClaimsInvestigation!,
+		Currency = Model.Currency!,
+		Culture = Model.Culture!
 	};
 }
 <div class="card shadow-lg border-1 rounded-lg">
@@ -58,8 +59,8 @@
 			<div class="col-md-12">
 		
 				<form id="create-form" method="post" asp-action="Decline" asp-controller="DeclineCase">
-					<input type="hidden" name="claimId" asp-for="@Model.ClaimsInvestigation.Id" />
-					<input type="hidden" name="policyNumber" asp-for="@Model.ClaimsInvestigation.PolicyDetail.ContractNumber" />
+					<input type="hidden" name="claimId" asp-for="@Model.ClaimsInvestigation!.Id" />
+					<input type="hidden" name="policyNumber" asp-for="@Model.ClaimsInvestigation!.PolicyDetail!.ContractNumber" />
 			
 					<a id="back" asp-action="Allocate" class="btn btn-sm btn-outline-secondary" data-bs-toggle="tooltip" title="Back to Allocate cases">
 						<i class="fas fa-arrow-left"></i> 

@@ -47,7 +47,7 @@ namespace risk.control.system.Services
             var companyUser = await context.ApplicationUser
                 .AsNoTracking()
                 .Where(u => u.Email == userEmail)
-                .Select(u => new { u.ClientCompanyId, CountryCode = u.Country.Code.ToUpper() })
+                .Select(u => new { u.ClientCompanyId, CountryCode = u.Country!.Code.ToUpper() })
                 .FirstOrDefaultAsync();
 
             // 2. Base Query (IQueryable - Not executed yet)
@@ -86,9 +86,9 @@ namespace risk.control.system.Services
                 3 => isAsc ? query.OrderBy(i => i.Vendor!.Name) : query.OrderByDescending(i => i.Vendor!.Name),
                 4 => isAsc ? query.OrderBy(i => i.Created) : query.OrderByDescending(i => i.Created),
                 5 => isAsc ? query.OrderBy(i => i.SelectedAgentDrivingDistance) : query.OrderByDescending(i => i.SelectedAgentDrivingDistance),
-                9 => isAsc ? query.OrderBy(i => i.CustomerDetail.Name) : query.OrderByDescending(i => i.CustomerDetail.Name),
-                11 => isAsc ? query.OrderBy(i => i.BeneficiaryDetail.Name) : query.OrderByDescending(i => i.BeneficiaryDetail.Name),
-                12 => isAsc ? query.OrderBy(i => i.PolicyDetail.InsuranceType) : query.OrderByDescending(i => i.PolicyDetail.InsuranceType),
+                9 => isAsc ? query.OrderBy(i => i.CustomerDetail!.Name) : query.OrderByDescending(i => i.CustomerDetail!.Name),
+                11 => isAsc ? query.OrderBy(i => i.BeneficiaryDetail!.Name) : query.OrderByDescending(i => i.BeneficiaryDetail!.Name),
+                12 => isAsc ? query.OrderBy(i => i.PolicyDetail!.InsuranceType) : query.OrderByDescending(i => i.PolicyDetail!.InsuranceType),
                 13 => isAsc ? query.OrderBy(i => i.Created) : query.OrderByDescending(i => i.Created),
                 15 => isAsc ? query.OrderBy(i => i.SubmittedToAssessorTime != null ? i.SubmittedToAssessorTime : i.Created) :
                 query.OrderByDescending(i => i.SubmittedToAssessorTime != null ? i.SubmittedToAssessorTime : i.Created),
@@ -142,6 +142,7 @@ namespace risk.control.system.Services
 
             var finalDataTasks = pagedRawData.Select(async a =>
             {
+                var time = a.SubmittedToAssessorTime;
                 var culture = CustomExtensions.GetCultureByCountry(companyUser!.CountryCode.ToUpper());
                 var isUW = a.InsuranceType == InsuranceType.UNDERWRITING;
                 var pincode = ClaimsInvestigationExtension.GetPincodeOfInterest(isUW, a.customerPincode, a.beneficiaryPincode);
@@ -182,7 +183,7 @@ namespace risk.control.system.Services
                     ServiceType = $"{a.InsuranceType!.GetEnumDisplayName()} ({a.ServiceTypeName})",
                     Service = a.ServiceTypeName,
                     Location = a.SubStatus,
-                    Created = a.Created.ToString("dd-MM-yyyy"),
+                    Created = a.SubmittedToAssessorTime,
                     timePending = GetAssessorSubmittedTimeReport(a.SubmittedToAssessorTime, a.AssessorSla),
                     BeneficiaryName = a.BeneficiaryName,
                     PersonMapAddressUrl = string.Format(a.SelectedAgentDrivingMap!, "300", "300"),
@@ -279,9 +280,9 @@ namespace risk.control.system.Services
                 1 => isAsc ? query.OrderBy(i => i.PolicyDetail!.SumAssuredValue) : query.OrderByDescending(i => i.PolicyDetail!.SumAssuredValue),
                 3 => isAsc ? query.OrderBy(i => i.Vendor!.Name) : query.OrderByDescending(i => i.Vendor!.Name),
                 4 => isAsc ? query.OrderBy(i => i.SelectedAgentDrivingDistance) : query.OrderByDescending(i => i.SelectedAgentDrivingDistance),
-                8 => isAsc ? query.OrderBy(i => i.CustomerDetail.Name) : query.OrderByDescending(i => i.CustomerDetail.Name),
-                10 => isAsc ? query.OrderBy(i => i.BeneficiaryDetail.Name) : query.OrderByDescending(i => i.BeneficiaryDetail.Name),
-                11 => isAsc ? query.OrderBy(i => i.PolicyDetail.InsuranceType) : query.OrderByDescending(i => i.PolicyDetail.InsuranceType),
+                8 => isAsc ? query.OrderBy(i => i.CustomerDetail!.Name) : query.OrderByDescending(i => i.CustomerDetail!.Name),
+                10 => isAsc ? query.OrderBy(i => i.BeneficiaryDetail!.Name) : query.OrderByDescending(i => i.BeneficiaryDetail!.Name),
+                11 => isAsc ? query.OrderBy(i => i.PolicyDetail!.InsuranceType) : query.OrderByDescending(i => i.PolicyDetail!.InsuranceType),
                 12 => isAsc ? query.OrderBy(i => i.Created) : query.OrderByDescending(i => i.Created),
                 14 => isAsc ? query.OrderBy(i => i.EnquiredByAssessorTime != null ? i.EnquiredByAssessorTime : i.Created) :
                 query.OrderByDescending(i => i.EnquiredByAssessorTime != null ? i.EnquiredByAssessorTime : i.Created),
@@ -374,7 +375,7 @@ namespace risk.control.system.Services
                         ServiceType = $"{a.InsuranceType!.GetEnumDisplayName()} ({a.ServiceTypeName})",
                         Service = a.ServiceTypeName,
                         Location = a.SubStatus,
-                        Created = a.Created.ToString("dd-MM-yyyy"),
+                        Created = a.EnquiredByAssessorTime!.Value,
                         timePending = GetAssessorReviewTime(a.EnquiredByAssessorTime!.Value, a.AssessorSla),
                         Withdrawable = false,
                         PolicyNum = a.PolicyNum,
@@ -562,7 +563,7 @@ namespace risk.control.system.Services
                     ServiceType = $"{a.InsuranceType!.GetEnumDisplayName()} ({a.ServiceTypeName})",
                     Service = a.ServiceTypeName,
                     Location = a.SubStatus,
-                    Created = a.Created.ToString("dd-MM-yyyy"),
+                    Created = a.ProcessedByAssessorTime!.Value,
                     timePending = GetAssessorCompletedTime(a.ProcessedByAssessorTime!.Value),
                     BeneficiaryName = a.BeneficiaryName,
                     PersonMapAddressUrl = string.Format(a.SelectedAgentDrivingMap!, "300", "300"),

@@ -1,4 +1,6 @@
-﻿namespace risk.control.system.Models.ViewModel
+﻿using System.Globalization;
+
+namespace risk.control.system.Models.ViewModel
 {
     public class CaseAgencyModel
     {
@@ -8,5 +10,6 @@
         public string? Address { get; set; }
         public string? ReportAiSummary { get; set; }
         public string? Currency { get; set; }
+        public CultureInfo? Culture { get; set; }
     }
 }

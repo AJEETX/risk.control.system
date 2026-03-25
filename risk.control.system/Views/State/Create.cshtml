@@ -24,7 +24,7 @@
 						</div>
 						@if (Model != null && Model.CountryId > 0)
 						{
-							<input readonly type="text" id="CountryText" class="form-control remarks" data-placeholder="country" asp-for="CountryId" value="@Model.Country.Name" />
+							<input readonly type="text" id="CountryText" class="form-control remarks" data-placeholder="country" asp-for="CountryId" value="@Model.Country?.Name" />
 						}
 						else
 						{

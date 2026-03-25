@@ -38,7 +38,7 @@ namespace risk.control.system.Services.Common
                     ValidateIssuerSigningKey = true,
                     ValidIssuer = config["Jwt:Issuer"],
                     ValidAudience = config["Jwt:Audience"],
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Jwt:Data"])),
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Jwt:Data"]!)),
                     ClockSkew = TimeSpan.Zero
                 };
 
@@ -50,8 +50,8 @@ namespace risk.control.system.Services.Common
                 var userSessionAlive = new UserSessionAlive
                 {
                     Updated = DateTime.UtcNow,
-                    ActiveUser = user,
-                    CurrentPage = httpContext.Request.Path.Value
+                    ActiveUser = user!,
+                    CurrentPage = httpContext.Request.Path.Value!
                 };
                 context.UserSessionAlive.Add(userSessionAlive);
                 await context.SaveChangesAsync(null, false);

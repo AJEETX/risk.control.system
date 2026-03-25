@@ -30,7 +30,7 @@ namespace risk.control.system.Services.AgencyAdmin
             var vendorUser = await _context.ApplicationUser.AsNoTracking()
                 .FirstOrDefaultAsync(c => c.Email == userEmail);
 
-            if (vendorUser == null) return null;
+            if (vendorUser == null) return null!;
 
             var vendor = await _context.Vendor
                 .Include(v => v.Ratings)
@@ -43,16 +43,16 @@ namespace risk.control.system.Services.AgencyAdmin
             var approvedStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR;
             var rejectedStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR;
 
-            var vendorAllCasesCount = await _context.Investigations.CountAsync(c => c.VendorId == vendor.VendorId && !c.Deleted &&
+            var vendorAllCasesCount = await _context.Investigations.CountAsync(c => c.VendorId == vendor!.VendorId && !c.Deleted &&
                       (c.SubStatus == approvedStatus ||
                       c.SubStatus == rejectedStatus));
 
-            var vendorUserCount = await _context.ApplicationUser.CountAsync(c => c.VendorId == vendor.VendorId && !c.Deleted);
+            var vendorUserCount = await _context.ApplicationUser.CountAsync(c => c.VendorId == vendor!.VendorId && !c.Deleted);
 
             // HACKY
-            var currentCases = await _agencyCaseLoadService.GetAgencyIdsLoad(new List<long> { vendor.VendorId });
+            var currentCases = await _agencyCaseLoadService.GetAgencyIdsLoad(new List<long> { vendor!.VendorId });
             vendor.SelectedCountryId = vendorUserCount;
-            vendor.SelectedStateId = currentCases.FirstOrDefault().CaseCount;
+            vendor.SelectedStateId = currentCases.FirstOrDefault()!.CaseCount;
             vendor.SelectedDistrictId = vendorAllCasesCount;
             return vendor;
         }
@@ -62,7 +62,7 @@ namespace risk.control.system.Services.AgencyAdmin
             var vendorUser = await _context.ApplicationUser
                 .FirstOrDefaultAsync(c => c.Email == userEmail);
 
-            if (vendorUser == null) return null;
+            if (vendorUser == null) return null!;
 
             var vendor = await _context.Vendor
                 .Include(v => v.Country)
@@ -73,7 +73,7 @@ namespace risk.control.system.Services.AgencyAdmin
                 vendor.SelectedByCompany = true;
             }
 
-            return vendor;
+            return vendor!;
         }
 
         public async Task LoadAgencyMetadataAsync(Vendor model, string userEmail)

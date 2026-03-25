@@ -9,7 +9,7 @@ $.validator.setDefaults({
             closeIcon: true,
             buttons: {
                 confirm: {
-                    text: "Save",
+                    text: "Save Agency",
                     btnClass: 'btn-warning',
                     action: function () {
                         askConfirmation = false;
