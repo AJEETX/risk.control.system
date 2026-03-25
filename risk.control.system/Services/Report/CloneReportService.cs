@@ -70,7 +70,7 @@ namespace risk.control.system.Services.Report
                     .ThenInclude(l => l.Questions)
                 .FirstOrDefaultAsync(r => r.Id == templateId);
 
-            string baseName = Regex.Replace(originalTemplate.Name, @"_\d{8}_\d{6,9}$", "");
+            string baseName = Regex.Replace(originalTemplate!.Name!, @"_\d{8}_\d{6,9}$", "");
             string newName = $"{baseName}_{DateTime.UtcNow:yyyyMMdd_HHmmss}";
 
             var clone = new ReportTemplate
@@ -88,7 +88,7 @@ namespace risk.control.system.Services.Report
                     IsRequired = loc.IsRequired,
                     AgentIdReport = new AgentIdReport
                     {
-                        Selected = loc.AgentIdReport.Selected,
+                        Selected = loc.AgentIdReport!.Selected,
                         IsRequired = loc.AgentIdReport.IsRequired,
                         ReportType = loc.AgentIdReport.ReportType,
                         ReportName = loc.AgentIdReport.ReportName,
@@ -150,7 +150,7 @@ namespace risk.control.system.Services.Report
 
             var clone = new ReportTemplate
             {
-                Name = originalTemplate.Name,
+                Name = originalTemplate!.Name,
                 ClientCompanyId = originalTemplate.ClientCompanyId,
                 InsuranceType = originalTemplate.InsuranceType,
                 Basetemplate = false, // Set to false for the cloned template
@@ -163,7 +163,7 @@ namespace risk.control.system.Services.Report
                     IsRequired = loc.IsRequired,
                     AgentIdReport = new AgentIdReport
                     {
-                        Selected = loc.AgentIdReport.Selected,
+                        Selected = loc.AgentIdReport!.Selected,
                         IsRequired = loc.AgentIdReport.IsRequired,
                         ReportType = loc.AgentIdReport.ReportType,
                         ReportName = loc.AgentIdReport.ReportName,
@@ -220,15 +220,15 @@ namespace risk.control.system.Services.Report
                    .ThenInclude(l => l.DocumentIds)
                .Include(r => r.LocationReport)
                    .ThenInclude(l => l.Questions)
-            .FirstOrDefaultAsync(r => r.Id == investigation.ReportTemplateId);
+            .FirstOrDefaultAsync(r => r.Id == investigation!.ReportTemplateId);
 
-            var locationTemplate = originalTemplate.LocationReport.Select(loc => new
+            var locationTemplate = originalTemplate!.LocationReport.Select(loc => new
             {
                 LocationName = loc.LocationName,
                 IsRequired = loc.IsRequired,
                 Agent = new
                 {
-                    IsRequired = loc.AgentIdReport.IsRequired,
+                    IsRequired = loc.AgentIdReport!.IsRequired,
                     ReportType = loc.AgentIdReport.ReportType.GetEnumDisplayName(),
                     ReportName = loc.AgentIdReport.ReportName
                 },
@@ -240,7 +240,7 @@ namespace risk.control.system.Services.Report
                     Selected = m.Selected,
                     MediaExtension = m.MediaExtension
                 }).ToList(),
-                FaceIds = loc.FaceIds.Where(face => face.Selected)?.Select(face => new
+                FaceIds = loc.FaceIds!.Where(face => face.Selected)?.Select(face => new
                 {
                     IsRequired = face.IsRequired,
                     ReportType = face.ReportType.GetEnumDisplayName(),
@@ -248,7 +248,7 @@ namespace risk.control.system.Services.Report
                     ReportName = face.ReportName
                 }).ToList(),
 
-                DocumentIds = loc.DocumentIds.Where(face => face.Selected)?.Select(doc => new
+                DocumentIds = loc.DocumentIds!.Where(face => face.Selected)?.Select(doc => new
                 {
                     IsRequired = doc.IsRequired,
                     ReportType = doc.ReportType.GetEnumDisplayName(),

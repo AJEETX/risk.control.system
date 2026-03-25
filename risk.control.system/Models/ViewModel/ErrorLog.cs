@@ -2,18 +2,9 @@
 {
     public class LogFileViewModel
     {
-        public string FileName { get; set; }
-        public string FullPath { get; set; }
+        public string FileName { get; set; } = default!;
+        public string FullPath { get; set; } = default!;
         public DateTime Date { get; set; }
         public long SizeKB { get; set; }
-    }
-
-    public class LogEntry
-    {
-        public DateTime Timestamp { get; set; }
-        public string Level { get; set; }
-        public string MessageTemplate { get; set; }
-        public Exception Exception { get; set; }
-        public string RenderedMessage { get; set; }
     }
 }

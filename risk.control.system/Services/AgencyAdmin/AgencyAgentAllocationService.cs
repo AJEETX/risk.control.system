@@ -49,7 +49,7 @@ namespace risk.control.system.Services.AgencyAdmin
                     };
                 }
 
-                var claim = await _vendorInvestigationDetailService.AssignToVendorAgent(vendorAgent.Email, allocatedByEmail, vendorAgent.VendorId.Value, caseId);
+                var claim = await _vendorInvestigationDetailService.AssignToVendorAgent(vendorAgent.Email!, allocatedByEmail!, vendorAgent.VendorId.Value, caseId);
 
                 if (claim == null)
                 {
@@ -65,7 +65,7 @@ namespace risk.control.system.Services.AgencyAdmin
                     Success = true,
                     VendorAgentEmail = vendorAgent.Email,
                     VendorId = vendorAgent.VendorId.Value,
-                    ContractNumber = claim.PolicyDetail.ContractNumber
+                    ContractNumber = claim.PolicyDetail!.ContractNumber
                 };
             }
             catch (Exception ex)

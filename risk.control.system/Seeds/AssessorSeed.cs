@@ -15,7 +15,7 @@ namespace risk.control.system.Seeds
             ClientCompany clientCompany, PinCode pinCode, string assessorEmailwithSuffix, string photo, string firstName, string lastName, IFileStorageService fileStorageService)
         {
             //Seed client creator
-            string noUserImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", @Applicationsettings.NO_USER);
+            string noUserImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", NO_USER);
 
             string assessorImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", Path.GetFileName(photo));
             var assessorImage = File.ReadAllBytes(assessorImagePath);
@@ -36,13 +36,13 @@ namespace risk.control.system.Seeds
                 PhoneNumberConfirmed = true,
                 Password = TestingData,
                 Active = true,
-                ClientCompany = clientCompany,
+                ClientCompanyId = clientCompany.ClientCompanyId,
                 IsSuperAdmin = false,
                 IsClientAdmin = false,
                 IsVendorAdmin = false,
                 IsClientManager = true,
                 Addressline = clientCompany.Addressline,
-                PhoneNumber = string.Equals(pinCode.Country.Code, "au", StringComparison.OrdinalIgnoreCase) ? Applicationsettings.SAMPLE_MOBILE_AUSTRALIA : Applicationsettings.SAMPLE_MOBILE_INDIA,
+                PhoneNumber = string.Equals(pinCode.Country!.Code, "au", StringComparison.OrdinalIgnoreCase) ? SAMPLE_MOBILE_AUSTRALIA : SAMPLE_MOBILE_INDIA,
                 PinCode = pinCode,
                 Country = pinCode.Country,
                 CountryId = pinCode.CountryId,

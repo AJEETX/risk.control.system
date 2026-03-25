@@ -8,20 +8,20 @@ namespace risk.control.system.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long Id { get; set; }
-        public string BSB { get; set; } = "";
-        public string Bank { get; set; } = "";
-        public string BankCode { get; set; } = "";
-        public string Branch { get; set; } = "";
-        public string Address { get; set; } = "";
-        public string City { get; set; } = "";
-        public string State { get; set; } = "";
-        public string Postcode { get; set; } = "";
+        public string BSB { get; set; } = default!;
+        public string Bank { get; set; } = default!;
+        public string BankCode { get; set; } = default!;
+        public string Branch { get; set; } = default!;
+        public string Address { get; set; } = default!;
+        public string City { get; set; } = default!;
+        public string State { get; set; } = default!;
+        public string Postcode { get; set; } = default!;
     }
 
     public class BsbLookUp
     {
-        public string BSBOwner { get; set; }
-        public string OwnerName { get; set; }
-        public string BSBPrefix { get; set; }
+        public string BSBOwner { get; set; } = default!;
+        public string OwnerName { get; set; } = default!;
+        public string BSBPrefix { get; set; } = default!;
     }
 }

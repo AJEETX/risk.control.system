@@ -4,16 +4,16 @@
 	int currentAgeinYrs = 0;
 	if (Model.ClaimsInvestigation != null)
 	{
-		address = @Model.ClaimsInvestigation?.CustomerDetail.Addressline + " " + @Model.ClaimsInvestigation?.CustomerDetail.District.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.State.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.Country.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.PinCode.Code;
+		address = @Model.ClaimsInvestigation?.CustomerDetail?.Addressline + " " + @Model.ClaimsInvestigation?.CustomerDetail?.District?.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail?.State?.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail?.Country?.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail?.PinCode?.Code;
 
-		if (Model.ClaimsInvestigation?.CustomerDetail.DateOfBirth != null)
+		if (Model.ClaimsInvestigation?.CustomerDetail?.DateOfBirth != null)
 		{
 			var age = DateTime.UtcNow.Subtract(Model.ClaimsInvestigation.CustomerDetail.DateOfBirth.GetValueOrDefault()).TotalDays;
 			currentAgeinYrs = (int)age / 365;
 		}
 	}
-	var map = string.Format(Model.ClaimsInvestigation.CustomerDetail.CustomerLocationMap, "400", "400");
-	var customerSMSCount = Model.ClaimsInvestigation.CaseMessages.Where(x => x.IsCustomer).Count();
+	var map = string.Format(Model.ClaimsInvestigation?.CustomerDetail?.CustomerLocationMap!, "400", "400");
+	var customerSMSCount = Model.ClaimsInvestigation?.CaseMessages!.Where(x => x.IsCustomer).Count();
 }
 <div class="col-12 col-sm-6 d-flex align-items-stretch flex-column">
 	<div class="card bg-light d-flex flex-fill">

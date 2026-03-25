@@ -9,7 +9,7 @@ namespace risk.control.system.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long Id { get; set; }
         public long ReportId { get; set; }
-        public string UserEmail { get; set; }
+        public string UserEmail { get; set; } = string.Empty;
         public int DownloadCount { get; set; } = 0;
         public DateTime LastDownloaded { get; set; }
     }

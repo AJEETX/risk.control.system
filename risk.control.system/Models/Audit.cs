@@ -8,13 +8,9 @@ namespace risk.control.system.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long Id { get; set; }
-        public Audit()
-        {
-            //Id = new Random().Next();
-        }
         public string? UserId { get; set; }
         public long? CompanyId { get; set; }
-        public string Type { get; set; }
+        public string Type { get; set; } = default!;
         public string? TableName { get; set; }
         public DateTime DateTime { get; set; } = DateTime.UtcNow;
         public string? OldValues { get; set; }

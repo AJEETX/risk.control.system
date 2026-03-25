@@ -12,7 +12,7 @@
         public Vendor? Vendor { get; set; }
         public string? NotifierUserEmail { get; set; }
         public string? AgenctUserEmail { get; set; }
-        public string Message { get; set; }
+        public string Message { get; set; } = default!;
         public bool IsReadByCreator { get; set; } = false;
         public bool IsReadByVendor { get; set; } = false;
         public bool IsReadByAssessor { get; set; } = false;

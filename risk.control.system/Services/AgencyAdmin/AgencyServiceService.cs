@@ -30,20 +30,20 @@ namespace risk.control.system.Services.AgencyAdmin
             var vendorUser = await _context.ApplicationUser.AsNoTracking()
                 .FirstOrDefaultAsync(c => c.Email == userEmail);
 
-            if (vendorUser == null) return null;
+            if (vendorUser == null) return null!;
 
             var vendor = await _context.Vendor
                 .Include(v => v.Country)
                 .FirstOrDefaultAsync(v => v.VendorId == vendorUser.VendorId);
 
-            if (vendor == null) return null;
+            if (vendor == null) return null!;
 
             return new VendorInvestigationServiceType
             {
                 Country = vendor.Country,
                 CountryId = vendor.CountryId,
                 Vendor = vendor,
-                Currency = CustomExtensions.GetCultureByCountry(vendor.Country.Code.ToUpper()).NumberFormat.CurrencySymbol
+                Currency = CustomExtensions.GetCultureByCountry(vendor.Country!.Code.ToUpper()).NumberFormat.CurrencySymbol
             };
         }
 
@@ -56,9 +56,9 @@ namespace risk.control.system.Services.AgencyAdmin
                 .Include(v => v.Vendor)
                 .FirstOrDefaultAsync(v => v.VendorInvestigationServiceTypeId == id);
 
-            if (serviceType == null) return null;
+            if (serviceType == null) return null!;
 
-            serviceType.Currency = CustomExtensions.GetCultureByCountry(serviceType.Country.Code.ToUpper())
+            serviceType.Currency = CustomExtensions.GetCultureByCountry(serviceType.Country!.Code.ToUpper())
                                    .NumberFormat.CurrencySymbol;
 
             serviceType.InvestigationServiceTypeList = await _context.InvestigationServiceType
@@ -91,10 +91,10 @@ namespace risk.control.system.Services.AgencyAdmin
 
             var model = new VendorInvestigationServiceType
             {
-                Country = vendor.Country,
+                Country = vendor!.Country,
                 CountryId = vendor.CountryId,
                 Vendor = vendor,
-                Currency = CustomExtensions.GetCultureByCountry(vendor.Country.Code.ToUpper()).NumberFormat.CurrencySymbol
+                Currency = CustomExtensions.GetCultureByCountry(vendor.Country!.Code.ToUpper()).NumberFormat.CurrencySymbol
             };
             return model;
         }

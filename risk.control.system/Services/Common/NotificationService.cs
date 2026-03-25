@@ -38,19 +38,19 @@ namespace risk.control.system.Services.Common
 
         public async Task<string> SendSms2Customer(string currentUser, long claimId, string sms)
         {
-            var claim = await context.Investigations
+            var caseDetail = await context.Investigations
             .Include(c => c.CaseMessages)
             .Include(c => c.PolicyDetail)
             .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.PinCode)
+               .ThenInclude(c => c!.PinCode)
                 .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.Country)
+               .ThenInclude(c => c!.Country)
             .FirstOrDefaultAsync(c => c.Id == claimId);
 
-            var mobile = claim.CustomerDetail.PhoneNumber.ToString();
+            var mobile = caseDetail!.CustomerDetail!.PhoneNumber.ToString();
             var user = await context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(u => u.Email == currentUser);
-            var isdCode = claim.CustomerDetail.Country.ISDCode;
-            var isInsurerUser = user.ClientCompanyId > 0;
+            var isdCode = caseDetail.CustomerDetail.Country!.ISDCode;
+            var isInsurerUser = user!.ClientCompanyId > 0;
             var isVendorUser = user.VendorId > 0;
 
             string entityName = string.Empty;
@@ -72,11 +72,11 @@ namespace risk.control.system.Services.Common
             {
                 return string.Empty;
             }
-            var message = $"Dear {claim.CustomerDetail.Name}\n\n";
+            var message = $"Dear {caseDetail.CustomerDetail.Name}\n\n";
             message += $"{sms}\n\n";
             message += $"Thanks\n\n";
             message += $"{user.FirstName} {user.LastName}\n\n";
-            message += $"Policy #:{claim.PolicyDetail.ContractNumber}\n\n";
+            message += $"Policy #:{caseDetail.PolicyDetail!.ContractNumber}\n\n";
             message += $"{entityName}\n\n";
             message += $"{logo}";
 
@@ -85,15 +85,15 @@ namespace risk.control.system.Services.Common
                 Message = sms,
                 IsCustomer = true,
                 InvestigationTaskId = claimId,
-                RecepicientEmail = claim.CustomerDetail.Name,
+                RecepicientEmail = caseDetail.CustomerDetail.Name,
                 SenderEmail = user.Email,
                 UpdatedBy = user.Email,
                 Updated = DateTime.UtcNow
             };
-            claim.CaseMessages.Add(scheduleMessage);
+            caseDetail.CaseMessages!.Add(scheduleMessage);
             await context.SaveChangesAsync(null, false);
-            await smsService.DoSendSmsAsync(claim.CustomerDetail.Country.Code, "+" + isdCode + mobile, message);
-            return claim.CustomerDetail.Name;
+            await smsService.DoSendSmsAsync(caseDetail.CustomerDetail.Country.Code, "+" + isdCode + mobile, message);
+            return caseDetail.CustomerDetail.Name;
         }
 
         public async Task<string> SendSms2Beneficiary(string currentUser, long claimId, string sms)
@@ -102,11 +102,11 @@ namespace risk.control.system.Services.Common
                 .Include(b => b.Country)
                .FirstOrDefaultAsync(c => c.InvestigationTaskId == claimId);
 
-            var mobile = beneficiary.PhoneNumber.ToString();
+            var mobile = beneficiary!.PhoneNumber.ToString();
             var user = await context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(u => u.Email == currentUser);
-            var isdCode = beneficiary.Country.ISDCode;
+            var isdCode = beneficiary.Country!.ISDCode;
 
-            var isInsurerUser = user.ClientCompanyId > 0;
+            var isInsurerUser = user!.ClientCompanyId > 0;
             var isVendorUser = user.VendorId > 0;
 
             string entityName = string.Empty;
@@ -116,13 +116,13 @@ namespace risk.control.system.Services.Common
             {
                 insurerUser = user;
                 var entity = await context.ClientCompany.AsNoTracking().FirstOrDefaultAsync(c => c.ClientCompanyId == insurerUser.ClientCompanyId);
-                entityName = entity.Name;
+                entityName = entity!.Name;
             }
             else if (isVendorUser)
             {
                 agencyUser = user;
                 var entity = await context.Vendor.AsNoTracking().FirstOrDefaultAsync(v => v.VendorId == agencyUser.VendorId);
-                entityName = entity.Name;
+                entityName = entity!.Name;
             }
             if (!isInsurerUser && !isVendorUser)
             {
@@ -137,7 +137,7 @@ namespace risk.control.system.Services.Common
             message += $"{sms}\n\n";
             message += $"Thanks\n\n";
             message += $"{user.FirstName} {user.LastName}\n\n";
-            message += $"Policy #:{caseTask.PolicyDetail.ContractNumber}\n\n";
+            message += $"Policy #:{caseTask!.PolicyDetail!.ContractNumber}\n\n";
             message += $"{entityName}\n\n";
             message += $"{logo}";
 
@@ -151,7 +151,7 @@ namespace risk.control.system.Services.Common
                 Updated = DateTime.UtcNow
             };
 
-            caseTask.CaseMessages.Add(scheduleMessage);
+            caseTask.CaseMessages!.Add(scheduleMessage);
             await context.SaveChangesAsync(null, false);
             await smsService.DoSendSmsAsync(beneficiary.Country.Code, "+" + isdCode + mobile, message);
             return beneficiary.Name;
@@ -162,25 +162,25 @@ namespace risk.control.system.Services.Common
             var companyUser = await context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == userEmail && c.ClientCompanyId > 0);
             var vendorUser = await context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == userEmail && c.VendorId > 0);
 
-            ApplicationRole role = null!;
-            ClientCompany company = null!;
-            Vendor agency = null!;
+            ApplicationRole? role = null!;
+            ClientCompany? company = null!;
+            Vendor? agency = null!;
             if (companyUser != null)
             {
-                role = await roleManager.FindByNameAsync(companyUser.Role.ToString());
+                role = await roleManager.FindByNameAsync(companyUser.Role.ToString()!);
 
                 company = await context.ClientCompany.AsNoTracking().FirstOrDefaultAsync(c => c.ClientCompanyId == companyUser.ClientCompanyId);
 
-                var notifications = context.Notifications.AsNoTracking().Where(n => n.ClientCompanyId == company.ClientCompanyId && (!n.IsReadByCreator || !n.IsReadByManager || !n.IsReadByAssessor));
-                if (role.Name == ASSESSOR.DISPLAY_NAME)
+                var notifications = context.Notifications.AsNoTracking().Where(n => n.ClientCompanyId == company!.ClientCompanyId && (!n.IsReadByCreator || !n.IsReadByManager || !n.IsReadByAssessor));
+                if (role?.Name == ASSESSOR.DISPLAY_NAME)
                 {
                     notifications = notifications.Where(n => n.RoleId == role.Id && !n.IsReadByAssessor);
                 }
-                else if (role.Name == MANAGER.DISPLAY_NAME)
+                else if (role?.Name == MANAGER.DISPLAY_NAME)
                 {
                     notifications = notifications.Where(n => !n.IsReadByManager);
                 }
-                else if (role.Name == CREATOR.DISPLAY_NAME)
+                else if (role?.Name == CREATOR.DISPLAY_NAME)
                 {
                     notifications = notifications.Where(n => (n.RoleId == role.Id && n.NotifierUserEmail == userEmail) && !n.IsReadByCreator);
                 }
@@ -191,19 +191,19 @@ namespace risk.control.system.Services.Common
             }
             else if (vendorUser != null)
             {
-                role = await roleManager.FindByNameAsync(vendorUser.Role.ToString());
+                role = await roleManager.FindByNameAsync(vendorUser.Role.ToString()!);
                 agency = await context.Vendor.AsNoTracking().FirstOrDefaultAsync(c => c.VendorId == vendorUser.VendorId);
 
                 var notifications = context.Notifications.AsNoTracking().Where(n => n.VendorId == vendorUser.VendorId && (!n.IsReadByVendor || !n.IsReadByVendorAgent));
 
-                if (role.Name == AGENT.DISPLAY_NAME)
+                if (role?.Name == AGENT.DISPLAY_NAME)
                 {
                     notifications = notifications.Where(n => n.AgenctUserEmail == userEmail);
                 }
                 else
                 {
                     var superRole = await roleManager.FindByNameAsync(SUPERVISOR.DISPLAY_NAME);
-                    if (role.Name == SUPERVISOR.DISPLAY_NAME)
+                    if (role?.Name == SUPERVISOR.DISPLAY_NAME)
                     {
                         notifications = notifications.Where(n =>
                         (!n.IsReadByVendor && n.NotifierUserEmail == userEmail &&
@@ -230,30 +230,30 @@ namespace risk.control.system.Services.Common
 
         public async Task MarkAsRead(long id, string userEmail)
         {
-            var companyUser = await context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == userEmail);
-            var vendorUser = await context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == userEmail);
+            var companyUser = await context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == userEmail && c.ClientCompanyId > 0);
+            var vendorUser = await context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == userEmail && c.VendorId > 0);
 
-            ApplicationRole role = null!;
-            ClientCompany company = null!;
-            Vendor agency = null!;
+            ApplicationRole? role = null!;
+            ClientCompany? company = null!;
+            Vendor? agency = null!;
             if (companyUser != null)
             {
-                role = await roleManager.FindByNameAsync(companyUser.Role.ToString());
+                role = await roleManager.FindByNameAsync(companyUser.Role.ToString()!);
                 company = await context.ClientCompany.AsNoTracking().FirstOrDefaultAsync(c => c.ClientCompanyId == companyUser.ClientCompanyId);
                 var notification = await context.Notifications.FirstOrDefaultAsync(s => s.StatusNotificationId == id);
                 if (notification == null)
                 {
                     return;
                 }
-                if (role.Name == ASSESSOR.DISPLAY_NAME)
+                if (role?.Name == ASSESSOR.DISPLAY_NAME)
                 {
                     notification.IsReadByAssessor = true;
                 }
-                else if (role.Name == MANAGER.DISPLAY_NAME)
+                else if (role?.Name == MANAGER.DISPLAY_NAME)
                 {
                     notification.IsReadByManager = true;
                 }
-                else if (role.Name == CREATOR.DISPLAY_NAME)
+                else if (role?.Name == CREATOR.DISPLAY_NAME)
                 {
                     notification.IsReadByCreator = true;
                 }
@@ -262,18 +262,18 @@ namespace risk.control.system.Services.Common
             }
             else if (vendorUser != null)
             {
-                role = await roleManager.FindByNameAsync(vendorUser.Role.ToString());
+                role = await roleManager.FindByNameAsync(vendorUser.Role.ToString()!);
                 agency = await context.Vendor.AsNoTracking().FirstOrDefaultAsync(c => c.VendorId == vendorUser.VendorId);
                 var notification = await context.Notifications.FirstOrDefaultAsync(s => s.VendorId == vendorUser.VendorId && s.StatusNotificationId == id);
                 if (notification == null)
                 {
                     return;
                 }
-                if (role.Name == AGENCY_ADMIN.DISPLAY_NAME || role.Name == SUPERVISOR.DISPLAY_NAME)
+                if (role?.Name == AGENCY_ADMIN.DISPLAY_NAME || role?.Name == SUPERVISOR.DISPLAY_NAME)
                 {
                     notification.IsReadByVendor = true;
                 }
-                else if (role.Name == AGENT.DISPLAY_NAME)
+                else if (role?.Name == AGENT.DISPLAY_NAME)
                 {
                     notification.IsReadByVendorAgent = true;
                 }

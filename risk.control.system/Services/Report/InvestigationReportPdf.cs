@@ -37,35 +37,35 @@ namespace risk.control.system.Services.Report
                 .Include(c => c.InvestigationReport)
                 .Include(c => c.InvestigationTimeline)
                 .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.CaseEnabler)
+                .ThenInclude(c => c!.CaseEnabler)
                  .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.InvestigationServiceType)
+                .ThenInclude(c => c!.InvestigationServiceType)
                  .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.CostCentre)
+                .ThenInclude(c => c!.CostCentre)
                 .Include(c => c.ClientCompany)
                 .Include(c => c.Vendor)
                 .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.PinCode)
+                .ThenInclude(c => c!.PinCode)
                 .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.District)
+                .ThenInclude(c => c!.District)
                 .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.State)
+                .ThenInclude(c => c!.State)
                 .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.Country)
+                .ThenInclude(c => c!.Country)
                 .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.BeneficiaryRelation)
+                .ThenInclude(c => c!.BeneficiaryRelation)
                 .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.Country)
+                .ThenInclude(c => c!.Country)
                 .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.State)
+                .ThenInclude(c => c!.State)
                 .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.District)
+                .ThenInclude(c => c!.District)
                 .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.PinCode)
+                .ThenInclude(c => c!.PinCode)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            var maskedCustomerContact = new string('*', caseTask.CustomerDetail.PhoneNumber.ToString().Length - 4) + caseTask.CustomerDetail.PhoneNumber.ToString().Substring(caseTask.CustomerDetail.PhoneNumber.ToString().Length - 4);
+            var maskedCustomerContact = new string('*', caseTask!.CustomerDetail!.PhoneNumber.ToString().Length - 4) + caseTask.CustomerDetail.PhoneNumber.ToString().Substring(caseTask.CustomerDetail.PhoneNumber.ToString().Length - 4);
             caseTask.CustomerDetail.PhoneNumber = maskedCustomerContact;
-            var maskedBeneficiaryContact = new string('*', caseTask.BeneficiaryDetail.PhoneNumber.ToString().Length - 4) + caseTask.BeneficiaryDetail.PhoneNumber.ToString().Substring(caseTask.BeneficiaryDetail.PhoneNumber.ToString().Length - 4);
+            var maskedBeneficiaryContact = new string('*', caseTask.BeneficiaryDetail!.PhoneNumber.ToString().Length - 4) + caseTask.BeneficiaryDetail.PhoneNumber.ToString().Substring(caseTask.BeneficiaryDetail.PhoneNumber.ToString().Length - 4);
             caseTask.BeneficiaryDetail.PhoneNumber = maskedBeneficiaryContact;
             var companyUser = await _context.ApplicationUser.AsNoTracking().Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == currentUserEmail);
             var lastHistory = caseTask.InvestigationTimeline.OrderByDescending(h => h.StatusChangedAt).FirstOrDefault();
@@ -92,7 +92,7 @@ namespace risk.control.system.Services.Report
                   .ThenInclude(l => l.Questions)
                   .FirstOrDefaultAsync(q => q.Id == caseTask.ReportTemplateId);
 
-            caseTask.InvestigationReport.ReportTemplate = templates;
+            caseTask.InvestigationReport!.ReportTemplate = templates;
 
             var tracker = await _context.PdfDownloadTracker.AsNoTracking()
                           .FirstOrDefaultAsync(t => t.ReportId == id && t.UserEmail == currentUserEmail);

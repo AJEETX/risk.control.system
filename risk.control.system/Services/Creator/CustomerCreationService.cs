@@ -45,10 +45,10 @@ namespace risk.control.system.Services.Creator
                 var (dob, gender, edu, occ, income) = customerValidator.ValidateDetails(uploadCase, errors, summaries);
 
                 // 2. Data Lookups
-                var pinCodeTask = customerExtractorService.GetPinCodeAsync(uploadCase.CustomerPincode, uploadCase.CustomerDistrictName.Trim(), companyUser.ClientCompany.CountryId.Value);
+                var pinCodeTask = customerExtractorService.GetPinCodeAsync(uploadCase.CustomerPincode, uploadCase.CustomerDistrictName!.Trim(), companyUser.ClientCompany!.CountryId!.Value);
 
                 // 3. IO & External Logic
-                var phoneTask = verifierProcessor.ValidatePhone(companyUser, uploadCase.CustomerContact.Trim(), errors, summaries);
+                var phoneTask = verifierProcessor.ValidatePhone(companyUser, uploadCase.CustomerContact!.Trim(), errors, summaries);
                 var imageTask = verifierProcessor.ProcessImage(uploadCase, data, errors, summaries, CUSTOMER_IMAGE, "Customer");
 
                 await Task.WhenAll(pinCodeTask, imageTask, phoneTask);
@@ -60,14 +60,14 @@ namespace risk.control.system.Services.Creator
                 // 4. Mapping
                 var customer = new CustomerDetail
                 {
-                    Name = WebUtility.HtmlEncode(textInfo.ToTitleCase(uploadCase.CustomerName.ToLower())),
+                    Name = WebUtility.HtmlEncode(textInfo.ToTitleCase(uploadCase.CustomerName!.ToLower())),
                     Gender = gender,
                     DateOfBirth = dob,
                     PhoneNumber = uploadCase.CustomerContact.Trim(),
                     Education = edu,
                     Occupation = occ,
                     Income = income,
-                    Addressline = uploadCase.CustomerAddressLine.Trim(),
+                    Addressline = uploadCase.CustomerAddressLine!.Trim(),
                     CountryId = pinCode?.CountryId,
                     PinCodeId = pinCode?.PinCodeId,
                     StateId = pinCode?.StateId,
@@ -84,14 +84,14 @@ namespace risk.control.system.Services.Creator
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error uploading customer detail for case {CaseId}", uploadCase.CaseId.Trim());
+                logger.LogError(ex, "Error uploading customer detail for case {CaseId}", uploadCase.CaseId!.Trim());
                 return (null, errors, summaries);
             }
         }
 
         private async Task EnrichLocation(CustomerDetail c, PinCode p)
         {
-            var addr = $"{c.Addressline.Trim()}, {p.District.Name}, {p.State.Name}, {p.Country.Code}, {p.Code}";
+            var addr = $"{c.Addressline.Trim()}, {p.District!.Name}, {p.State!.Name}, {p.Country!.Code}, {p.Code}";
             var (lat, lon) = await customApiClient.GetCoordinatesFromAddressAsync(addr);
             c.Latitude = lat; c.Longitude = lon;
             var latLong = lat + "," + lon;

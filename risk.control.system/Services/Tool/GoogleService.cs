@@ -22,10 +22,10 @@ namespace risk.control.system.Services.Tool
         {
             try
             {
-                string credentialJson = EnvHelper.Get("GOOGLE_APPLICATION_CREDENTIALS_JSON"); // "{ \"type\": \"service_account\", ... }";
+                string credentialJson = EnvHelper.Get("GOOGLE_APPLICATION_CREDENTIALS_JSON")!; // "{ \"type\": \"service_account\", ... }";
 
                 // Create Google Credential from JSON string
-                GoogleCredential googleCredential = GoogleCredential.FromJson(credentialJson);
+                GoogleCredential googleCredential = GoogleCredential.FromJson(credentialJson)!;
 
                 var client = new ImageAnnotatorClientBuilder
                 {

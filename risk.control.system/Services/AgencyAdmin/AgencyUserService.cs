@@ -87,9 +87,9 @@ namespace risk.control.system.Services.AgencyAdmin
         public async Task LoadModel(ApplicationUser model, string currentUserEmail)
         {
             var vendorUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == currentUserEmail);
-            var vendor = await _context.Vendor.AsNoTracking().Include(c => c.Country).FirstOrDefaultAsync(v => v.VendorId == vendorUser.VendorId);
+            var vendor = await _context.Vendor.AsNoTracking().Include(c => c.Country).FirstOrDefaultAsync(v => v.VendorId == vendorUser!.VendorId);
             model.Vendor = vendor;
-            model.Country = vendor.Country;
+            model.Country = vendor!.Country;
             model.CountryId = vendor.CountryId;
 
             model.StateId = model.SelectedStateId;
@@ -100,13 +100,13 @@ namespace risk.control.system.Services.AgencyAdmin
         public async Task<ApplicationUser> GetUserAsync(long id)
         {
             var agencyUser = await _context.ApplicationUser.AsNoTracking().Include(u => u.Vendor).Include(c => c.Country).FirstOrDefaultAsync(u => u.Id == id);
-            return agencyUser;
+            return agencyUser!;
         }
 
         public async Task<ApplicationUser> GetChangePasswordUserAsync(string userEmail)
         {
             var agencyUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(u => u.Email == userEmail);
-            return agencyUser;
+            return agencyUser!;
         }
 
         private static ServiceResult ValidateProfileImage(IFormFile file)
@@ -133,8 +133,8 @@ namespace risk.control.system.Services.AgencyAdmin
 
         private async Task ProcessProfileImageAsync(ApplicationUser model)
         {
-            var domain = WebUtility.HtmlEncode(model.Email.Split('@')[1]);
-            var (fileName, relativePath) = await _fileStorageService.SaveAsync(model.ProfileImage, domain, "user");
+            var domain = WebUtility.HtmlEncode(model.Email!.Split('@')[1]);
+            var (fileName, relativePath) = await _fileStorageService.SaveAsync(model.ProfileImage!, domain, "user");
 
             model.ProfilePictureUrl = relativePath;
             model.ProfilePictureExtension = Path.GetExtension(fileName);
@@ -142,7 +142,7 @@ namespace risk.control.system.Services.AgencyAdmin
 
         private static void MapUserFields(ApplicationUser user, ApplicationUser model, string updatedBy)
         {
-            user.Addressline = WebUtility.HtmlEncode(model.Addressline.Trim());
+            user.Addressline = WebUtility.HtmlEncode(model.Addressline!.Trim());
 
             var textInfo = CultureInfo.CurrentCulture.TextInfo;
             user.FirstName = WebUtility.HtmlEncode(textInfo.ToTitleCase(model.FirstName.Trim().ToLower()));
@@ -158,7 +158,7 @@ namespace risk.control.system.Services.AgencyAdmin
             user.DistrictId = model.SelectedDistrictId;
             user.IsUpdated = true;
             user.Updated = DateTime.UtcNow;
-            user.PhoneNumber = WebUtility.HtmlEncode(model.PhoneNumber.TrimStart('0').Trim());
+            user.PhoneNumber = WebUtility.HtmlEncode(model.PhoneNumber!.TrimStart('0').Trim());
             user.UpdatedBy = updatedBy;
             user.SecurityStamp = DateTime.UtcNow.ToString();
 

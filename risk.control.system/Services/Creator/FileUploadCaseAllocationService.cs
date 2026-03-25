@@ -40,7 +40,7 @@ namespace risk.control.system.Services.Creator
 
             var caseIds = caseTasks.Select(c => c.Id).ToList();
 
-            var notAutoAllocated = caseIds.Except(autoAllocatedCases)?.ToList();
+            var notAutoAllocated = caseIds.Except(autoAllocatedCases).ToList();
 
             if (caseIds.Count > autoAllocatedCases.Count)
             {
@@ -59,12 +59,12 @@ namespace risk.control.system.Services.Creator
             var company = await initialContext.ClientCompany.AsNoTracking()
                     .Include(c => c.EmpanelledVendors.Where(v => v.Status == VendorStatus.ACTIVE && !v.Deleted))
                     .ThenInclude(e => e.VendorInvestigationServiceTypes)
-                    .FirstOrDefaultAsync(c => c.ClientCompanyId == companyUser.ClientCompanyId);
+                    .FirstOrDefaultAsync(c => c.ClientCompanyId == companyUser!.ClientCompanyId);
 
             // 1. Get initial DB load for ALL potential vendors once
-            var allVendorIds = company.EmpanelledVendors.Select(v => v.VendorId)?.ToList();
+            var allVendorIds = company!.EmpanelledVendors.Select(v => v.VendorId)?.ToList();
 
-            if (!allVendorIds.Any()) return new List<long>(); // No vendors, no allocations
+            if (allVendorIds == null || !allVendorIds.Any()) return new List<long>(); // No vendors, no allocations
 
             var vendorLoadList = await GetAgencyIdsLoad(allVendorIds);
 
@@ -81,8 +81,8 @@ namespace risk.control.system.Services.Creator
 
                 // Find eligible vendors for THIS specific case
                 var eligibleVendorIds = company.EmpanelledVendors
-                    .Where(vendor => vendor.VendorInvestigationServiceTypes.Any(st =>
-                        st.InvestigationServiceTypeId == caseTask.PolicyDetail.InvestigationServiceTypeId &&
+                    .Where(vendor => vendor.VendorInvestigationServiceTypes!.Any(st =>
+                        st.InvestigationServiceTypeId == caseTask.PolicyDetail!.InvestigationServiceTypeId &&
                         st.InsuranceType == caseTask.PolicyDetail.InsuranceType
                     // ... add your State/District logic here ...
                     ))
@@ -129,31 +129,31 @@ namespace risk.control.system.Services.Creator
                 var caseTask = await context.Investigations
                     .Include(c => c.PolicyDetail)
                     .Include(c => c.ReportTemplate)
-                    .ThenInclude(c => c.LocationReport)
+                    .ThenInclude(c => c!.LocationReport)
                     .ThenInclude(c => c.FaceIds)
                     .Include(c => c.ReportTemplate)
-                    .ThenInclude(c => c.LocationReport)
+                    .ThenInclude(c => c!.LocationReport)
                     .ThenInclude(c => c.DocumentIds)
                     .Include(c => c.ReportTemplate)
-                    .ThenInclude(c => c.LocationReport)
+                    .ThenInclude(c => c!.LocationReport)
                     .ThenInclude(c => c.Questions)
                     .FirstOrDefaultAsync(v => v.Id == caseId);
 
                 var vendor = await context.Vendor.FindAsync(vendorId);
 
                 // Update case details
-                caseTask.IsAutoAllocated = autoAllocated;
+                caseTask!.IsAutoAllocated = autoAllocated;
                 caseTask.IsNew = true;
                 caseTask.IsNewAssignedToAgency = true;
                 caseTask.AssignedToAgency = true;
                 caseTask.Updated = DateTime.UtcNow;
                 caseTask.AllocatedToAgencyTime = DateTime.UtcNow;
-                caseTask.UpdatedBy = currentUser.Email;
-                caseTask.AiEnabled = currentUser.ClientCompany.AiEnabled;
+                caseTask.UpdatedBy = currentUser!.Email;
+                caseTask.AiEnabled = currentUser.ClientCompany!.AiEnabled;
                 caseTask.SubStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR;
                 caseTask.Status = CONSTANTS.CASE_STATUS.INPROGRESS;
                 caseTask.VendorId = vendorId;
-                caseTask.CaseOwner = vendor.Email;
+                caseTask.CaseOwner = vendor!.Email;
                 caseTask.CreatorSla = currentUser.ClientCompany.CreatorSla;
                 caseTask.AssessorSla = currentUser.ClientCompany.AssessorSla;
                 caseTask.SupervisorSla = currentUser.ClientCompany.SupervisorSla;
@@ -178,9 +178,9 @@ namespace risk.control.system.Services.Creator
                 // Save changes
                 await context.SaveChangesAsync(null, false);
 
-                await timelineService.UpdateTaskStatus(caseTask.Id, currentUser.Email);
+                await timelineService.UpdateTaskStatus(caseTask.Id, currentUser.Email!);
 
-                return (caseTask.PolicyDetail.ContractNumber, caseTask.SubStatus);
+                return (caseTask.PolicyDetail!.ContractNumber, caseTask.SubStatus);
             }
             catch (Exception ex)
             {
@@ -209,7 +209,7 @@ namespace risk.control.system.Services.Creator
                                 c.VendorId.HasValue &&
                                 c.AssignedToAgency &&
                                 relevantStatuses.Contains(c.SubStatus))
-                    .GroupBy(c => c.VendorId.Value)
+                    .GroupBy(c => c.VendorId!.Value)
                     .ToDictionary(g => g.Key, g => g.Count());
 
                 // Create the list of VendorIdWithCases
@@ -248,7 +248,7 @@ namespace risk.control.system.Services.Creator
 
                 foreach (var case2Assign in cases2Assign)
                 {
-                    case2Assign.CaseOwner = currentUser.Email;
+                    case2Assign.CaseOwner = currentUser!.Email;
                     case2Assign.IsNew = true;
                     case2Assign.Updated = DateTime.UtcNow;
                     case2Assign.UpdatedBy = currentUser.Email;

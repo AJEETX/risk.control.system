@@ -36,9 +36,9 @@ namespace risk.control.system.Services.Agent
             string panNumber = string.Empty;
             string docyTypePan = string.Empty;
             byte[]? ocrImaged = null;
-            var filePath = Path.Combine(env.ContentRootPath, doc.FilePath);
+            var filePath = Path.Combine(env.ContentRootPath, doc.FilePath!);
 
-            var allPanText = imageReadOnly.FirstOrDefault().Description;
+            var allPanText = imageReadOnly.FirstOrDefault()!.Description;
             var panTextPre = allPanText.IndexOf(panNumber2Find);
             if (panTextPre > 0)
             {

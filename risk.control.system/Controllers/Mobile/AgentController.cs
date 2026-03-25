@@ -170,10 +170,10 @@ namespace risk.control.system.Controllers.Mobile
                     }
 
                     var agentRole = await _roleManager.FindByNameAsync(AppRoles.AGENT.ToString());
-                    var matchingUsers = await _context.ApplicationUser.Include(u => u.Country).Where(u => (u.Country.ISDCode + u.PhoneNumber) == normalizedMobile).ToListAsync();
+                    var matchingUsers = await _context.ApplicationUser.Include(u => u.Country).Where(u => (u.Country!.ISDCode + u.PhoneNumber) == normalizedMobile).ToListAsync();
                     foreach (var user in matchingUsers)
                     {
-                        var isAgent = await _userManager.IsInRoleAsync(user, agentRole.Name);
+                        var isAgent = await _userManager.IsInRoleAsync(user, agentRole!.Name!);
                         if (isAgent && string.IsNullOrWhiteSpace(user.MobileUId) && user.Active)
                         {
                             user.MobileUId = request.Uid;
@@ -181,14 +181,14 @@ namespace risk.control.system.Controllers.Mobile
                             user.SecretPin = pin.ToString("D4");
                             _context.ApplicationUser.Update(user);
                             await _context.SaveChangesAsync();
-                            await SendVerificationSmsAsync(user.Country.Code, user.Email, request.Mobile, user.SecretPin);
+                            await SendVerificationSmsAsync(user.Country!.Code, user.Email!, request.Mobile, user.SecretPin);
                             return Ok(new { user.Email, Pin = user.SecretPin });
                         }
                     }
                 }
                 else if (request.SendSMSForRetry && userWithUid != null)
                 {
-                    await SendVerificationSmsAsync(userWithUid.Country.Code, userWithUid.Email, request.Mobile, userWithUid.SecretPin);
+                    await SendVerificationSmsAsync(userWithUid.Country!.Code, userWithUid.Email!, request.Mobile, userWithUid.SecretPin!);
                     return Ok(new { userWithUid.Email, Pin = userWithUid.SecretPin });
                 }
 
@@ -335,21 +335,21 @@ namespace risk.control.system.Controllers.Mobile
                 var claims = await _context.Investigations
                 .Include(c => c.PolicyDetail)
                .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.Country)
+                .ThenInclude(c => c!.Country)
                 .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.State)
+                .ThenInclude(c => c!.State)
                 .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.District)
+                .ThenInclude(c => c!.District)
                 .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.PinCode)
+                .ThenInclude(c => c!.PinCode)
                 .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.PinCode)
+                .ThenInclude(c => c!.PinCode)
                 .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.State)
+                .ThenInclude(c => c!.State)
                 .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.Country)
+                .ThenInclude(c => c!.Country)
                 .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.District)
+                .ThenInclude(c => c!.District)
                 .Where(i => i.VendorId == vendorUser.VendorId &&
                 i.SubStatus == assignedToAgentStatus &&
                 i.TaskedAgentEmail == vendorUser.Email).ToListAsync();
@@ -360,34 +360,34 @@ namespace risk.control.system.Controllers.Mobile
                     {
                         claimId = c.Id,
                         Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId),
-                        claimType = c.PolicyDetail.InsuranceType == InsuranceType.CLAIM ? ClaimType.DEATH.GetEnumDisplayName() : ClaimType.HEALTH.GetEnumDisplayName(),
+                        claimType = c.PolicyDetail!.InsuranceType == InsuranceType.CLAIM ? ClaimType.DEATH.GetEnumDisplayName() : ClaimType.HEALTH.GetEnumDisplayName(),
                         DocumentPhoto = c.PolicyDetail.DocumentPath != null ?
                         Convert.ToBase64String(System.IO.File.ReadAllBytes(Path.Combine(_env.ContentRootPath, c.PolicyDetail.DocumentPath))) :
                         Applicationsettings.NO_POLICY_IMAGE,
-                        CustomerName = c.CustomerDetail.Name,
+                        CustomerName = c.CustomerDetail!.Name,
                         CustomerEmail = email,
                         PolicyNumber = c.PolicyDetail.ContractNumber,
-                        Gender = c.CustomerDetail.Gender.GetEnumDisplayName(),
+                        Gender = c.CustomerDetail.Gender!.GetEnumDisplayName(),
                         c.CustomerDetail.Addressline,
-                        c.CustomerDetail.PinCode.Code,
+                        c.CustomerDetail.PinCode!.Code,
                         CustomerPhoto = c?.CustomerDetail.ImagePath != null ?
-                        Convert.ToBase64String(System.IO.File.ReadAllBytes(Path.Combine(_env.ContentRootPath, c?.CustomerDetail.ImagePath))) :
+                        Convert.ToBase64String(System.IO.File.ReadAllBytes(Path.Combine(_env.ContentRootPath, c?.CustomerDetail.ImagePath!))) :
                         Applicationsettings.USER_PHOTO,
-                        Country = c.CustomerDetail.Country.Name,
-                        State = c.CustomerDetail.State.Name,
-                        District = c.CustomerDetail.District.Name,
+                        Country = c!.CustomerDetail.Country!.Name,
+                        State = c.CustomerDetail.State!.Name,
+                        District = c.CustomerDetail.District!.Name,
                         Locations = new
                         {
-                            c.BeneficiaryDetail.BeneficiaryDetailId,
+                            c.BeneficiaryDetail!.BeneficiaryDetailId,
                             Photo = c.BeneficiaryDetail?.ImagePath != null ?
                             Convert.ToBase64String(System.IO.File.ReadAllBytes(Path.Combine(_env.ContentRootPath, c.BeneficiaryDetail.ImagePath))) :
                             Applicationsettings.USER_PHOTO,
-                            c.BeneficiaryDetail.Country.Name,
+                            c.BeneficiaryDetail!.Country!.Name,
                             BeneficiaryName = c.BeneficiaryDetail.Name,
                             c.BeneficiaryDetail.Addressline,
-                            c.BeneficiaryDetail.PinCode.Code,
-                            District = c.BeneficiaryDetail.District.Name,
-                            State = c.BeneficiaryDetail.State.Name
+                            c.BeneficiaryDetail.PinCode!.Code,
+                            District = c.BeneficiaryDetail.District!.Name,
+                            State = c.BeneficiaryDetail.State!.Name
                         }
                     })?.ToList();
                 return Ok(claim2Agent);
@@ -430,21 +430,21 @@ namespace risk.control.system.Controllers.Mobile
                 var claims = await _context.Investigations
                     .Include(c => c.PolicyDetail)
                     .Include(c => c.BeneficiaryDetail)
-                    .ThenInclude(c => c.PinCode)
+                    .ThenInclude(c => c!.PinCode)
                     .Include(c => c.BeneficiaryDetail)
-                    .ThenInclude(c => c.District)
+                    .ThenInclude(c => c!.District)
                     .Include(c => c.BeneficiaryDetail)
-                    .ThenInclude(c => c.State)
+                    .ThenInclude(c => c!.State)
                     .Include(c => c.BeneficiaryDetail)
-                    .ThenInclude(c => c.Country)
+                    .ThenInclude(c => c!.Country)
                     .Include(c => c.CustomerDetail)
-                    .ThenInclude(c => c.Country)
+                    .ThenInclude(c => c!.Country)
                     .Include(c => c.CustomerDetail)
-                    .ThenInclude(c => c.District)
+                    .ThenInclude(c => c!.District)
                     .Include(c => c.CustomerDetail)
-                    .ThenInclude(c => c.PinCode)
+                    .ThenInclude(c => c!.PinCode)
                     .Include(c => c.CustomerDetail)
-                    .ThenInclude(c => c.State)
+                    .ThenInclude(c => c!.State)
                     .Where(i => i.VendorId == vendorUser.VendorId &&
                     i.TaskedAgentEmail == vendorUser.Email &&
                     i.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT).ToListAsync();
@@ -457,12 +457,12 @@ namespace risk.control.system.Controllers.Mobile
                     Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId),
                     Coordinate = new
                     {
-                        Lat = c.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING ?
-                            decimal.Parse(c.CustomerDetail.Latitude) : decimal.Parse(c.BeneficiaryDetail.Latitude),
+                        Lat = c.PolicyDetail!.InsuranceType == InsuranceType.UNDERWRITING ?
+                            decimal.Parse(c.CustomerDetail!.Latitude!) : decimal.Parse(c.BeneficiaryDetail!.Latitude!),
                         Lng = c.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING ?
-                             decimal.Parse(c.CustomerDetail.Longitude) : decimal.Parse(c.BeneficiaryDetail.Longitude)
+                             decimal.Parse(c.CustomerDetail!.Longitude!) : decimal.Parse(c.BeneficiaryDetail!.Longitude!)
                     },
-                    Address = LocationDetail.GetAddress(c.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING, c.CustomerDetail, c.BeneficiaryDetail),
+                    Address = LocationDetail.GetAddress(c.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING, c.CustomerDetail!, c.BeneficiaryDetail!),
                     PolicyNumber = c.PolicyDetail.ContractNumber,
                 });
                 return Ok(claim2Agent);
@@ -497,19 +497,19 @@ namespace risk.control.system.Controllers.Mobile
                         return StatusCode(401, new { message = "Offboarded Agent." });
                     }
                 }
-                var claim = await _context.Investigations
+                var caseDetail = await _context.Investigations
                     .Include(c => c.PolicyDetail)
-                    .ThenInclude(c => c.CostCentre)
+                    .ThenInclude(c => c!.CostCentre)
                     .Include(c => c.PolicyDetail)
-                    .ThenInclude(c => c.CaseEnabler)
+                    .ThenInclude(c => c!.CaseEnabler)
                     .Include(c => c.CustomerDetail)
-                    .ThenInclude(c => c.District)
+                    .ThenInclude(c => c!.District)
                     .Include(c => c.CustomerDetail)
-                    .ThenInclude(c => c.State)
+                    .ThenInclude(c => c!.State)
                     .Include(c => c.CustomerDetail)
-                    .ThenInclude(c => c.Country)
+                    .ThenInclude(c => c!.Country)
                     .Include(c => c.CustomerDetail)
-                    .ThenInclude(c => c.PinCode)
+                    .ThenInclude(c => c!.PinCode)
                     .FirstOrDefaultAsync(c => c.Id == caseId);
 
                 var beneficiary = await _context.BeneficiaryDetail
@@ -522,61 +522,61 @@ namespace risk.control.system.Controllers.Mobile
 
                 var vendorUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == email && c.Role == AppRoles.AGENT);
 
-                object locations = null;
+                object locations = null!;
                 if (await _featureManager.IsEnabledAsync(FeatureFlags.ENABLE_REAL_TIME_REPORT_TEMPlATE))
                 {
-                    locations = await _cloneReportService.GetReportTemplate(caseId, agent.Email);
+                    locations = await _cloneReportService.GetReportTemplate(caseId, agent.Email!);
                 }
-                var docPath = Path.Combine(_env.ContentRootPath, claim.PolicyDetail.DocumentPath);
+                var docPath = Path.Combine(_env.ContentRootPath, caseDetail!.PolicyDetail!.DocumentPath!);
                 var docByte = System.IO.File.ReadAllBytes(docPath);
                 var docBase64 = Convert.ToBase64String(docByte);
-                var documentPhoto = claim.PolicyDetail.DocumentPath != null ? docBase64 : Applicationsettings.NO_POLICY_IMAGE;
-                var customerPhoto = claim.CustomerDetail.ImagePath != null ?
-                            Convert.ToBase64String(System.IO.File.ReadAllBytes(Path.Combine(_env.ContentRootPath, claim.CustomerDetail.ImagePath))) : Applicationsettings.USER_PHOTO;
-                var beneficiaryPhoto = beneficiary.ImagePath != null ?
+                var documentPhoto = caseDetail.PolicyDetail.DocumentPath != null ? docBase64 : Applicationsettings.NO_POLICY_IMAGE;
+                var customerPhoto = caseDetail.CustomerDetail!.ImagePath != null ?
+                            Convert.ToBase64String(System.IO.File.ReadAllBytes(Path.Combine(_env.ContentRootPath, caseDetail.CustomerDetail.ImagePath))) : Applicationsettings.USER_PHOTO;
+                var beneficiaryPhoto = beneficiary!.ImagePath != null ?
                             Convert.ToBase64String(System.IO.File.ReadAllBytes(Path.Combine(_env.ContentRootPath, beneficiary.ImagePath))) : Applicationsettings.USER_PHOTO;
                 return Ok(
                     new
                     {
                         Policy = new
                         {
-                            ClaimId = claim.Id,
-                            PolicyNumber = claim.PolicyDetail.ContractNumber,
-                            ClaimType = claim.PolicyDetail.InsuranceType == InsuranceType.CLAIM ? ClaimType.DEATH.GetEnumDisplayName() : ClaimType.HEALTH.GetEnumDisplayName(),
+                            ClaimId = caseDetail.Id,
+                            PolicyNumber = caseDetail.PolicyDetail.ContractNumber,
+                            ClaimType = caseDetail.PolicyDetail.InsuranceType == InsuranceType.CLAIM ? ClaimType.DEATH.GetEnumDisplayName() : ClaimType.HEALTH.GetEnumDisplayName(),
                             Document = documentPhoto,
-                            IssueDate = claim.PolicyDetail.ContractIssueDate.ToString("dd-MMM-yyyy"),
-                            IncidentDate = claim.PolicyDetail.DateOfIncident.ToString("dd-MMM-yyyy"),
-                            Amount = claim.PolicyDetail.SumAssuredValue,
-                            BudgetCentre = claim.PolicyDetail.CostCentre.Name,
-                            Reason = claim.PolicyDetail.CaseEnabler.Name
+                            IssueDate = caseDetail.PolicyDetail.ContractIssueDate.ToString("dd-MMM-yyyy"),
+                            IncidentDate = caseDetail.PolicyDetail.DateOfIncident.ToString("dd-MMM-yyyy"),
+                            Amount = caseDetail.PolicyDetail.SumAssuredValue,
+                            BudgetCentre = caseDetail.PolicyDetail.CostCentre!.Name,
+                            Reason = caseDetail.PolicyDetail.CaseEnabler!.Name
                         },
                         beneficiary = new
                         {
                             BeneficiaryId = beneficiary.BeneficiaryDetailId,
                             Name = beneficiary.Name,
                             Photo = beneficiaryPhoto,
-                            Relation = beneficiary.BeneficiaryRelation.Name,
-                            Income = beneficiary.Income.GetEnumDisplayName(),
+                            Relation = beneficiary.BeneficiaryRelation!.Name,
+                            Income = beneficiary.Income!.GetEnumDisplayName(),
                             Phone = beneficiary.PhoneNumber,
                             DateOfBirth = beneficiary.DateOfBirth.GetValueOrDefault().ToString("dd-MMM-yyyy"),
-                            Address = beneficiary.Addressline + " " + beneficiary.District.Name + " " + beneficiary.State.Name + " " + beneficiary.Country.Name + " " + beneficiary.PinCode.Code
+                            Address = beneficiary.Addressline + " " + beneficiary.District!.Name + " " + beneficiary.State!.Name + " " + beneficiary.Country!.Name + " " + beneficiary.PinCode!.Code
                         },
                         Customer = new
                         {
-                            Name = claim.CustomerDetail.Name,
-                            Occupation = claim.CustomerDetail.Occupation.GetEnumDisplayName(),
+                            Name = caseDetail.CustomerDetail.Name,
+                            Occupation = caseDetail.CustomerDetail.Occupation!.GetEnumDisplayName(),
                             Photo = customerPhoto,
-                            Income = claim.CustomerDetail.Income.GetEnumDisplayName(),
-                            Phone = claim.CustomerDetail.PhoneNumber,
-                            DateOfBirth = claim.CustomerDetail.DateOfBirth.GetValueOrDefault().ToString("dd-MMM-yyyy"),
-                            Address = claim.CustomerDetail.Addressline + " " + claim.CustomerDetail.District.Name + " " + claim.CustomerDetail.State.Name + " " + claim.CustomerDetail.Country.Name + " " + claim.CustomerDetail.PinCode.Code
+                            Income = caseDetail.CustomerDetail.Income!.GetEnumDisplayName(),
+                            Phone = caseDetail.CustomerDetail.PhoneNumber,
+                            DateOfBirth = caseDetail.CustomerDetail.DateOfBirth.GetValueOrDefault().ToString("dd-MMM-yyyy"),
+                            Address = caseDetail.CustomerDetail.Addressline + " " + caseDetail.CustomerDetail.District!.Name + " " + caseDetail.CustomerDetail.State!.Name + " " + caseDetail.CustomerDetail.Country!.Name + " " + caseDetail.CustomerDetail.PinCode!.Code
                         },
                         InvestigationData = new
                         {
                             locations
                         },
-                        Remarks = claim?.InvestigationReport?.AgentRemarks,
-                        Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId)
+                        Remarks = caseDetail?.InvestigationReport?.AgentRemarks,
+                        Registered = vendorUser!.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId)
                     });
             }
             catch (Exception ex)
@@ -602,7 +602,7 @@ namespace risk.control.system.Controllers.Mobile
                 {
                     return Unauthorized("Invalid User !!!");
                 }
-                var locations = await _cloneReportService.GetReportTemplate(caseId, agent.Email);
+                var locations = await _cloneReportService.GetReportTemplate(caseId, agent.Email!);
                 return Ok(locations);
             }
             catch (Exception ex)

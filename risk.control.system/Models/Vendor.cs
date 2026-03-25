@@ -141,8 +141,7 @@ namespace risk.control.system.Models
            $"- Bank Account Number: {BankAccountNumber}\n" +
            $"- IFSC Code: {IFSCCode}\n" +
            $"- Agreement Date: {AgreementDate}\n" +
-           $"- Activated Date: {ActivatedDate}\n" +
-           $"- Status: {Status.GetEnumDisplayName()}";
+           $"- Activated Date: {ActivatedDate}";
         }
     }
 

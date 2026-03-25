@@ -69,7 +69,7 @@ namespace risk.control.system.Services.AgencyAdmin
 
             var model = request.User;
 
-            var email = $"{model.Email.Trim().ToLowerInvariant()}@{request.EmailSuffix.Trim().ToLowerInvariant()}";
+            var email = $"{model.Email!.Trim().ToLowerInvariant()}@{request.EmailSuffix.Trim().ToLowerInvariant()}";
 
             if (await _userManager.Users.AnyAsync(u => u.Email == email && !u.Deleted))
             {
@@ -82,7 +82,7 @@ namespace risk.control.system.Services.AgencyAdmin
             {
                 return (false, "Invalid profile image.", errors);
             }
-            var matchedFace = await _faceImageCheckService.CheckFaceImageAsync(model.ProfileImage);
+            var matchedFace = await _faceImageCheckService.CheckFaceImageAsync(model.ProfileImage!);
             if (matchedFace)
             {
                 modelState.AddModelError("ProfileImage", "Profile image matches with existing user. Please use a different image.");
@@ -107,7 +107,7 @@ namespace risk.control.system.Services.AgencyAdmin
                 }
                 return (false, "Error creating user.", errors);
             }
-            await _userManager.AddToRoleAsync(model, model.Role.ToString());
+            await _userManager.AddToRoleAsync(model, model.Role.ToString()!);
 
             await HandleLockAndNotificationsAsync(model, portal_base_url);
 
@@ -141,7 +141,7 @@ namespace risk.control.system.Services.AgencyAdmin
             }
             if (input.ProfileImage != null && input.ProfileImage.Length > 0)
             {
-                var suffix = user.Email.Split('@').Last();
+                var suffix = user.Email!.Split('@').Last();
                 await SaveProfileImageAsync(input, suffix);
             }
             if (input.ProfileImage != null && input.ProfileImage.Length > 0)
@@ -177,7 +177,7 @@ namespace risk.control.system.Services.AgencyAdmin
 
             var userEdited = (true, $"User <b> {user.Email} </b> updated successfully", errors);
 
-            await _faceImageCheckService.SetImageToAws(user.Email);
+            await _faceImageCheckService.SetImageToAws(user.Email!);
 
             return userEdited;
         }
@@ -186,7 +186,7 @@ namespace risk.control.system.Services.AgencyAdmin
         {
             var safeFolder = Regex.Replace(suffix, @"[^a-zA-Z0-9\-\.]", "");
 
-            var (fileName, path) = await _fileStorage.SaveAsync(model.ProfileImage, safeFolder, "user");
+            var (fileName, path) = await _fileStorage.SaveAsync(model.ProfileImage!, safeFolder, "user");
 
             model.ProfilePictureUrl = path;
             model.ProfilePictureExtension = Path.GetExtension(fileName);
@@ -206,7 +206,7 @@ namespace risk.control.system.Services.AgencyAdmin
             model.LastName = WebUtility.HtmlEncode(textInfo.ToTitleCase(model.LastName.Trim().ToLower()));
 
             model.PhoneNumber = WebUtility.HtmlEncode(model.PhoneNumber?.TrimStart('0').Trim());
-            model.Addressline = WebUtility.HtmlEncode(model.Addressline.Trim());
+            model.Addressline = WebUtility.HtmlEncode(model.Addressline!.Trim());
             model.PinCodeId = model.SelectedPincodeId;
             model.DistrictId = model.SelectedDistrictId;
             model.StateId = model.SelectedStateId;
@@ -238,21 +238,21 @@ namespace risk.control.system.Services.AgencyAdmin
                 if (onboardAgent)
                 {
                     var vendor = await _context.Vendor.FirstOrDefaultAsync(v => v.VendorId == user.VendorId);
-                    string tinyUrl = await _urlService.ShortenUrlAsync(vendor.MobileAppUrl);
+                    string tinyUrl = await _urlService.ShortenUrlAsync(vendor!.MobileAppUrl!);
 
                     var message = $"Dear {user.FirstName},\n" +
                     $"Click on link below to install the mobile app\n\n" +
                     $"{tinyUrl}\n\n" +
                     $"Thanks\n\n" +
                     $"{portal_base_url}";
-                    await _sms.DoSendSmsAsync(pincode.Country.Code, pincode.Country.ISDCode + user.PhoneNumber, message, true);
+                    await _sms.DoSendSmsAsync(pincode!.Country!.Code, pincode.Country.ISDCode + user.PhoneNumber, message, true);
                     _notify.Custom($"Agent {user.Email} onboarding initiated.", 3, "green", "fas fa-user-check");
                 }
                 else
                 {
                     try
                     {
-                        await _sms.DoSendSmsAsync(pincode.Country.Code, pincode.Country.ISDCode + user.PhoneNumber, "User created. \nEmail : " + user.Email + "\n" + portal_base_url);
+                        await _sms.DoSendSmsAsync(pincode!.Country!.Code, pincode.Country.ISDCode + user.PhoneNumber, "User created. \nEmail : " + user.Email + "\n" + portal_base_url);
                     }
                     catch (Exception)
                     {
@@ -285,7 +285,7 @@ namespace risk.control.system.Services.AgencyAdmin
             if (user.Role == AppRoles.AGENT)
             {
                 var address =
-                $"{user.Addressline}, {pincode.Name}, {pincode.District.Name}, {pincode.State.Name}, {pincode.Country.Name}";
+                $"{user.Addressline}, {pincode.Name}, {pincode.District!.Name}, {pincode.State!.Name}, {pincode.Country!.Name}";
 
                 var coordinates = await _geoClient.GetCoordinatesFromAddressAsync(address);
 
@@ -306,7 +306,7 @@ namespace risk.control.system.Services.AgencyAdmin
             if (existingRoles.Any())
                 await _userManager.RemoveFromRolesAsync(user, existingRoles);
 
-            await _userManager.AddToRoleAsync(user, user.Role.ToString());
+            await _userManager.AddToRoleAsync(user, user.Role.ToString()!);
         }
 
         private static void UpdateUserFields(ApplicationUser input, ApplicationUser user, string updatedBy)
@@ -318,7 +318,7 @@ namespace risk.control.system.Services.AgencyAdmin
             user.FirstName = WebUtility.HtmlEncode(textInfo.ToTitleCase(input.FirstName.Trim().ToLower()));
             user.LastName = WebUtility.HtmlEncode(textInfo.ToTitleCase(input.LastName.Trim().ToLower()));
 
-            user.Addressline = WebUtility.HtmlEncode(input.Addressline.Trim());
+            user.Addressline = WebUtility.HtmlEncode(input.Addressline!.Trim());
             user.PhoneNumber = input.PhoneNumber?.TrimStart('0').Trim();
             user.Active = input.Active;
 

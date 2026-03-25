@@ -8,8 +8,8 @@ namespace risk.control.system.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long UserSessionAliveId { get; set; }
-        public ApplicationUser ActiveUser { get; set; }
-        public string CurrentPage { get; set; }
+        public ApplicationUser ActiveUser { get; set; } = default!;
+        public string CurrentPage { get; set; } = default!;
         public bool LoggedOut { get; set; }
     }
 }

@@ -29,17 +29,17 @@ namespace risk.control.system.Services.Api
         public string GenerateJwtToken(ApplicationUser model)
         {
             // Fetch the signing key from configuration
-            var key = config["Jwt:Data"];
+            var key = config["Jwt:Data"]!;
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
             // Define claims
             var claims = new[]
             {
-                new Claim(JwtRegisteredClaimNames.Sub, model.Email),
+                new Claim(JwtRegisteredClaimNames.Sub, model.Email!),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(ClaimTypes.Name, model.Email),
-                new Claim(ClaimTypes.Role, model.Role.ToString())
+                new Claim(ClaimTypes.Name, model.Email!),
+                new Claim(ClaimTypes.Role, model.Role.ToString()!)
             };
 
             // Generate the token

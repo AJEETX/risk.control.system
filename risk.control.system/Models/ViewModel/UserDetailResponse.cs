@@ -20,7 +20,7 @@
         public string? Role { get; set; }
         public int? Pincode { get; set; }
         public string? PincodeName { get; set; }
-        public string? Updated { get; set; }
+        public DateTime? Updated { get; set; }
         public string? UpdatedBy { get; set; }
         public string? OnlineStatus { get; set; }
         public string? OnlineStatusName { get; set; }

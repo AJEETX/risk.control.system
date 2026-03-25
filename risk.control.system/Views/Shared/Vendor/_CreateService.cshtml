@@ -1,7 +1,7 @@
 ﻿@model risk.control.system.Models.VendorInvestigationServiceType
 <input type="hidden" id="CountryId" asp-for="CountryId" />
 <input asp-for="SelectedCountryId" type="hidden" id="SelectedCountryId" name="SelectedCountryId" value="@Model?.CountryId" />
-<input id="vendorId" type="hidden" asp-for="VendorId" value="@Model.Vendor.VendorId" />
+<input id="vendorId" type="hidden" asp-for="VendorId" value="@Model?.Vendor?.VendorId" />
 <div class="row">
     <div class="col-md-6">
 
@@ -34,12 +34,12 @@
         </div>
 
         <div class="form-group">
-            <label class="input-group-label" for="Price"> Service Price in @Model.Country.CurrencyCode (@Model.Currency):</label>
+            <label class="input-group-label" for="Price"> Service Price in @Model?.Country?.CurrencyCode (@Model?.Currency):</label>
             <div class="input-group mb-3">
                 <div class="input-group-prepend">
                     <span class="input-group-text" for="Price"> <i class="fas fa-money-bill-wave"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                 </div>
-                <input id="Price" asp-for="Price" class="form-control remarks" type="text" placeholder="Service Price in @Model.Country.CurrencyCode (@Model.Currency)"  required maxlength="10" autocomplete="off" />
+                <input id="Price" asp-for="Price" class="form-control remarks" type="text" placeholder="Service Price in @Model?.Country?.CurrencyCode (@Model?.Currency)"  required maxlength="10" autocomplete="off" />
                 <span asp-validation-for="Price" class="text-danger"></span>
             </div>
         </div>
@@ -48,10 +48,10 @@
             <div class="input-group mb-3 autocomplete-wrapper">
                 <div class="input-group-prepend">
                     @{
-                        var imgPath = "/flags/" + @Model.Country.Code.ToLower() + ".png";
+                        var imgPath = "/flags/" + @Model?.Country?.Code.ToLower() + ".png";
                     }
-                    <span class="input-group-text country-code-text" data-bs-toggle="tooltip" title="Registered Country : @Model?.Country.Name">
-                        <img src="@imgPath" class="flag-icon" data-bs-toggle="tooltip" />  @Model?.Country.Code
+                    <span class="input-group-text country-code-text" data-bs-toggle="tooltip" title="Registered Country : @Model?.Country?.Name">
+                        <img src="@imgPath" class="flag-icon" data-bs-toggle="tooltip" />  @Model?.Country?.Code
                     </span>
                 </div>
                 <input type="text" id="StateId" class="form-control remarks auto-dropdown" data-placeholder="state" placeholder="Search state ..." asp-for="StateId" required />
@@ -73,7 +73,7 @@
                        class="form-check-input"
                        id="allDistrictsCheckbox"
                        value="-1"
-                       @(Model.SelectedDistrictIds?.Contains(-1) == true ? "checked" : "") disabled />
+                       @(Model?.SelectedDistrictIds?.Contains(-1) == true ? "checked" : "") disabled />
                 <label class="form-check-label" for="allDistrictsCheckbox">
                     All Districts
                 </label>
@@ -93,7 +93,7 @@
                         class="form-control remarks"
                         multiple
                         required
-                        data-selected="@string.Join(",", Model.SelectedDistrictIds ?? new List<long>())">
+                        data-selected="@string.Join(",", Model?.SelectedDistrictIds ?? new List<long>())">
                 </select>
                 <div id="districtLoadingSpinner" class="spinner-border text-primary d-none district-spinner" role="status">
                     <span class="visually-hidden"></span>

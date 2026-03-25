@@ -53,27 +53,27 @@ internal class DocumentIdfyService : IDocumentIdfyService
     public async Task<AppiCheckifyResponse> CaptureDocumentId(DocumentData data)
     {
         var claim = await caseService.GetCaseById(data.CaseId);
-        if (claim?.InvestigationReport == null) return null;
+        if (claim?.InvestigationReport == null) return null!;
 
-        var location = claim.InvestigationReport.ReportTemplate.LocationReport
+        var location = claim.InvestigationReport.ReportTemplate!.LocationReport
             .FirstOrDefault(l => l.LocationName == data.LocationName);
 
         var locationTemplate = await context.LocationReport
             .Include(l => l.DocumentIds)
-            .FirstOrDefaultAsync(l => l.Id == location.Id);
+            .FirstOrDefaultAsync(l => l.Id == location!.Id);
 
-        var documentReport = locationTemplate.DocumentIds.FirstOrDefault(c => c.ReportName == data.ReportName);
+        var documentReport = locationTemplate!.DocumentIds!.FirstOrDefault(c => c.ReportName == data.ReportName);
 
         try
         {
             // 1. Data Preparation
             var (lat, lon) = VerificationHelper.ParseCoordinates(data.LocationLatLong);
             var expected = VerificationHelper.GetExpectedCoordinates(claim);
-            var (fileName, relativePath) = await fileStorageService.SaveAsync(data.Image, "Case", claim.PolicyDetail.ContractNumber, "report");
+            var (fileName, relativePath) = await fileStorageService.SaveAsync(data.Image!, "Case", claim.PolicyDetail!.ContractNumber, "report");
 
-            documentReport.FilePath = relativePath;
+            documentReport!.FilePath = relativePath;
             documentReport.ImageExtension = Path.GetExtension(fileName);
-            byte[] docImage = await VerificationHelper.GetBytesFromIFormFile(data.Image);
+            byte[] docImage = await VerificationHelper.GetBytesFromIFormFile(data.Image!);
 
             // 2. Parallel Service Calls (OCR, Address, and Mapping)
             //var ocrTask = ocrService.ExtractTextDataAsync(documentReport, docImage);
@@ -117,7 +117,7 @@ internal class DocumentIdfyService : IDocumentIdfyService
         {
             var sanitizedEmail = data.Email?.Replace("\n", "").Replace("\r", "").Trim();
             logger.LogError(ex, "Failed Document file capture/processing for Case {CaseId}. {AgentEmail}", data.CaseId, sanitizedEmail);
-            return await HandleError(claim, documentReport);
+            return await HandleError(claim, documentReport!);
         }
     }
 
@@ -129,12 +129,12 @@ internal class DocumentIdfyService : IDocumentIdfyService
 
             if (doc.ReportName == DocumentIdReportType.PAN.GetEnumDisplayName())
             {
-                await panCardService.Process(docImage, ocrResult, company, doc, doc.ImageExtension);
+                await panCardService.Process(docImage, ocrResult, company!, doc, doc.ImageExtension!);
             }
             else
             {
                 var compressed = processImageService.CompressImage(docImage);
-                await File.WriteAllBytesAsync(doc.FilePath, compressed);
+                await File.WriteAllBytesAsync(doc.FilePath!, compressed);
                 doc.ImageValid = true;
                 doc.LocationInfo = ocrResult.FirstOrDefault()?.Description;
             }
@@ -143,7 +143,7 @@ internal class DocumentIdfyService : IDocumentIdfyService
         {
             doc.ImageValid = false;
             doc.LocationInfo = "No OCR data detected";
-            await File.WriteAllBytesAsync(doc.FilePath, processImageService.CompressImage(docImage));
+            await File.WriteAllBytesAsync(doc.FilePath!, processImageService.CompressImage(docImage));
         }
         doc.ValidationExecuted = true;
     }
@@ -152,7 +152,7 @@ internal class DocumentIdfyService : IDocumentIdfyService
     {
         return new AppiCheckifyResponse
         {
-            BeneficiaryId = claim.BeneficiaryDetail.BeneficiaryDetailId,
+            BeneficiaryId = claim.BeneficiaryDetail!.BeneficiaryDetailId,
             Image = image,
             OcrImage = doc.FilePath,
             OcrLongLat = doc.LongLat,
@@ -169,6 +169,6 @@ internal class DocumentIdfyService : IDocumentIdfyService
         await context.SaveChangesAsync();
 
         var img = File.Exists(doc.FilePath) ? await File.ReadAllBytesAsync(doc.FilePath) : null;
-        return MapResponse(claim, doc, img);
+        return MapResponse(claim, doc, img!);
     }
 }

@@ -2,7 +2,6 @@
 
 @{
 	var cardView = "expanding-card";
-	var cardViewIcon = "fas fa-minus";
 }
 <div class="card shadow-lg border-1 rounded-lg direct-chat-warning  @cardView">
 	<div class="card-header bg-light text-white text-center">
@@ -13,9 +12,9 @@
 			<b><i class='far fa-hand-point-right'></i></b>
 
 			<span class="badge badge-info" data-bs-toggle="tooltip"
-				  title="Owner : @Model.ClaimsInvestigation.CaseOwner">
+				  title="Owner : @Model.ClaimsInvestigation?.CaseOwner">
 				<b>
-					@Model.ClaimsInvestigation.CaseOwner
+					@Model.ClaimsInvestigation?.CaseOwner
 				</b>
 			</span>
 
@@ -25,7 +24,7 @@
 					<li>
 						<i class='far fa-file-powerpoint'></i> Policy details.
 					</li>
-					@if (Model.ClaimsInvestigation.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING)
+					@if (Model.ClaimsInvestigation?.PolicyDetail!.InsuranceType == InsuranceType.UNDERWRITING)
 					{
 						<li>
 							<i class='fa fa-user-plus'></i> Customer details
@@ -46,7 +45,7 @@
 		<div class="row">
 			@{
 				<partial name="_ClaimPolicyDetails" model="@Model" />
-				@if (Model.ClaimsInvestigation.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING)
+				@if (Model.ClaimsInvestigation?.PolicyDetail!.InsuranceType == InsuranceType.UNDERWRITING)
 				{
 					<partial name="_ClaimCustomerDetails" model="@Model" />
 				}
@@ -59,8 +58,8 @@
 	</div>
 	<div class="card-footer">
 		<form id="withdraw-form" method="post" asp-action="WithdrawCaseFromAgent" asp-controller="DeclineCase">
-			<input type="hidden" name="claimId" asp-for="@Model.ClaimsInvestigation.Id" />
-			<input type="hidden" name="policyNumber" asp-for="@Model.ClaimsInvestigation.PolicyDetail.ContractNumber" />
+			<input type="hidden" name="claimId" asp-for="@Model.ClaimsInvestigation!.Id" />
+			<input type="hidden" name="policyNumber" asp-for="@Model.ClaimsInvestigation!.PolicyDetail!.ContractNumber" />
 			<div class="row float-right">
 				<div class="col-md-12">
 					<a id="back" asp-action="Open" class="btn btn-outline-secondary" data-bs-toggle="tooltip" title="Back to Active cases">

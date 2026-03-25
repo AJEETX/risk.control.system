@@ -34,8 +34,8 @@ namespace risk.control.system.Services.Creator
 
         public (DateTime IssueDate, DateTime IncidentDate) ValidateDates(UploadCase uc, List<UploadError> errs, List<string> sums)
         {
-            bool isIssueValid = DateTime.TryParseExact(uc.IssueDate.Trim(), formats, CultureInfo.InvariantCulture, DateTimeStyles.None, out var issueDate);
-            bool isIncidentValid = DateTime.TryParseExact(uc.IncidentDate.Trim(), formats, CultureInfo.InvariantCulture, DateTimeStyles.None, out var incidentDate);
+            bool isIssueValid = DateTime.TryParseExact(uc.IssueDate!.Trim(), formats, CultureInfo.InvariantCulture, DateTimeStyles.None, out var issueDate);
+            bool isIncidentValid = DateTime.TryParseExact(uc.IncidentDate!.Trim(), formats, CultureInfo.InvariantCulture, DateTimeStyles.None, out var incidentDate);
 
             if (!isIssueValid || issueDate > DateTime.Today)
             {

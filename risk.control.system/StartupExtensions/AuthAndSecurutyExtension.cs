@@ -127,7 +127,7 @@ public static class AuthAndSecurutyExtension
                 ValidAudience = configuration["Jwt:Audience"],
                 IssuerSigningKey =
                     new SymmetricSecurityKey(
-                        Encoding.UTF8.GetBytes(configuration["Jwt:Data"])),
+                        Encoding.UTF8.GetBytes(configuration["Jwt:Data"]!)),
                 ClockSkew = TimeSpan.Zero
             };
         });
@@ -191,7 +191,7 @@ public static class AuthAndSecurutyExtension
                 },
                 OnSignedIn = context =>
                 {
-                    var userName = context.Principal.Identity.Name;
+                    var userName = context.Principal!.Identity!.Name;
                     var cookie = context.HttpContext.User.Claims;
                     Console.WriteLine($"Identity {userName} cookie issued");
                     return Task.CompletedTask;

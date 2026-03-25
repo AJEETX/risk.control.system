@@ -53,7 +53,7 @@ public class OcrService : IOcrService
                 if (panBlock == null)
                 {
                     var compressedDocumentImage = processImageService.CompressImage(bytes);
-                    await File.WriteAllBytesAsync(doc.FilePath, compressedDocumentImage);
+                    await File.WriteAllBytesAsync(doc.FilePath!, compressedDocumentImage);
                     doc.ImageValid = true;
                     doc.LocationInfo = ocrText;
                     return (ocrText, panNumber, bytes);
@@ -64,7 +64,7 @@ public class OcrService : IOcrService
                 var maskedImageBytes = await MaskPanNumber(bytes, boundingBox);
 
                 var compressedPanImage = processImageService.CompressImage(maskedImageBytes);
-                await File.WriteAllBytesAsync(doc.FilePath, compressedPanImage);
+                await File.WriteAllBytesAsync(doc.FilePath!, compressedPanImage);
                 doc.ImageValid = true;
 
                 doc.LocationInfo = ocrText.Replace(panNumber, "XXXXXXXXXXX");
@@ -73,7 +73,7 @@ public class OcrService : IOcrService
             else
             {
                 var compressed = processImageService.CompressImage(bytes);
-                await File.WriteAllBytesAsync(doc.FilePath, compressed);
+                await File.WriteAllBytesAsync(doc.FilePath!, compressed);
                 doc.ImageValid = false;
                 doc.LocationInfo = ocrText;
                 return (ocrText, "...", bytes);
@@ -100,7 +100,7 @@ public class OcrService : IOcrService
             var rectY = box.Top * height;
 
             // Draw a black box over the PAN number
-            image.Mutate(ctx => ctx.Fill(Color.Black, new RectangleF(rectX.Value, rectY.Value, rectWidth.Value, rectHeight.Value)));
+            image.Mutate(ctx => ctx.Fill(Color.Black, new RectangleF(rectX!.Value, rectY!.Value, rectWidth!.Value, rectHeight!.Value)));
 
             using (var ms = new MemoryStream())
             {

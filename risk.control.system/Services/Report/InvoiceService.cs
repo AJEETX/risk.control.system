@@ -22,23 +22,23 @@ namespace risk.control.system.Services.Report
             var invoice = await context.VendorInvoice
               .Where(x => x.VendorInvoiceId.Equals(id))
               .Include(x => x.ClientCompany)
-              .ThenInclude(c => c.District)
+              .ThenInclude(c => c!.District)
               .Include(c => c.ClientCompany)
-              .ThenInclude(c => c.State)
+              .ThenInclude(c => c!.State)
               .Include(c => c.ClientCompany)
-              .ThenInclude(c => c.Country)
+              .ThenInclude(c => c!.Country)
               .Include(c => c.ClientCompany)
-              .ThenInclude(c => c.PinCode)
+              .ThenInclude(c => c!.PinCode)
               .Include(x => x.Vendor)
-              .ThenInclude(v => v.State)
+              .ThenInclude(v => v!.State)
               .Include(v => v.Vendor)
-              .ThenInclude(v => v.District)
+              .ThenInclude(v => v!.District)
               .Include(v => v.Vendor)
-              .ThenInclude(v => v.Country)
+              .ThenInclude(v => v!.Country)
               .Include(i => i.InvestigationServiceType)
               .FirstOrDefaultAsync();
 
-            return invoice;
+            return invoice!;
         }
     }
 }

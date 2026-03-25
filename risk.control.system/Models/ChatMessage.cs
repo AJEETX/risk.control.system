@@ -9,7 +9,7 @@ namespace risk.control.system.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long ChatMessageId { get; set; }
         [EmailAddress]
-        public string FromUserEmail { get; set; }
+        public string FromUserEmail { get; set; } = default!;
         public ApplicationUser? FromUser { get; set; }
         public ApplicationUser? ToUser { get; set; }
         public List<string>? ActiveUsers { get; set; }

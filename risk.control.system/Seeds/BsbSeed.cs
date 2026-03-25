@@ -24,7 +24,7 @@ namespace risk.control.system.Seeds
                 {
                     BSB = parts[0].Trim().Replace("-", ""),
                     BankCode = parts[1].Trim().ToUpper(),
-                    Bank = bankName,
+                    Bank = bankName!,
                     Branch = parts[2].Trim(),
                     Address = parts[3].Trim(),
                     City = parts[4].Trim(),

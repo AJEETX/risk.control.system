@@ -27,11 +27,11 @@
             <label class="input-group-label" for="StateText">State:</label>
             <div class="input-group autocomplete-wrapper">
                 @{
-                    var img = "/flags/" + @Model.Country.Code.ToLower() + ".png";
+                    var img = "/flags/" + @Model?.Country?.Code.ToLower() + ".png";
                 }
                 <div class="input-group-prepend">
-                    <span class="input-group-text country-code-text" title="Country: @Model?.Country.Name">
-                        <img src="@img" class="flag-icon" alt="flag" /> @Model?.Country.Code
+                    <span class="input-group-text country-code-text" title="Country: @Model?.Country?.Name">
+                        <img src="@img" class="flag-icon" alt="flag" /> @Model?.Country?.Code
                     </span>
                 </div>
                 <input readonly type="text" id="StateText" class="form-control bg-light-gray remarks" placeholder="..." tabindex="-1" />

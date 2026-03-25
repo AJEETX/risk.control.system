@@ -9,12 +9,12 @@ namespace risk.control.system.Models
         public int Id { get; set; }
 
         public long InvestigationTaskId { get; set; }
-        public InvestigationTask InvestigationTask { get; set; }
+        public InvestigationTask InvestigationTask { get; set; } = default!;
 
-        public string SubStatus { get; set; }
-        public string Status { get; set; }
+        public string SubStatus { get; set; } = default!;
+        public string Status { get; set; } = default!;
 
-        public string AssigedTo { get; set; } // UserName or Id
+        public string AssigedTo { get; set; } = default!;// UserName or Id
 
         public DateTime StatusChangedAt { get; set; }
 

@@ -53,14 +53,14 @@
                             <div class="form-group">
                                 <label>Face IDs</label>
                                 <div id="faceIdsContainer">
-                                    @for (int i = 0; i < faceIds.Count; i++)
+                                    @for (int i = 0; i < faceIds!.Count; i++)
                                     {
                                         <div class="faceId-entry d-flex justify-content-between align-items-center">
                                             <div class="d-flex w-100">
                                             <input name="FaceIds[@i].FaceIdName" class="form-control mt-2" value="@faceIds[i].FaceIdName" placeholder="Face ID Name" />
                                             <select name="FaceIds[@i].DigitalIdReportType" class="form-control mt-2">
                                                 <option value="">-- Select Digital ID Type --</option>
-                                                @foreach (var item in Model.DigitalIdReportItems)
+                                                @foreach (var item in Model.DigitalIdReportItems!)
                                                 {
                                                     <option value="@item.Value">@item.Text</option>
                                                 }
@@ -86,14 +86,14 @@
                             <div class="form-group">
                                 <label>Document IDs</label>
                                 <div id="documentIdsContainer">
-                                    @for (int i = 0; i < documentIds.Count; i++)
+                                    @for (int i = 0; i < documentIds!.Count; i++)
                                     {
                                         <div class="documentId-entry d-flex justify-content-between align-items-center">
                                             <div class="d-flex w-100">
                                                 <input name="DocumentIds[@i].DocumentIdName" class="form-control mt-2" value="@documentIds[i].DocumentIdName" placeholder="Document ID Name" />
                                                 <select name="DocumentIds[@i].DocumentIdReportType" class="form-control mt-2">
                                                     <option value="">-- Select Document ID Type --</option>
-                                                    @foreach (var item in Model.DocumentIdReportItems)
+                                                    @foreach (var item in Model.DocumentIdReportItems!)
                                                     {
                                                         <option value="@item.Value">@item.Text</option>
                                                     }
@@ -117,7 +117,7 @@
                     <form id="answers" method="post" asp-controller="Question" asp-action="SubmitAnswers" enctype="multipart/form-data" class="p-4 bg-white border rounded shadow-sm questionnaire-form">
                         <input type="hidden" name="InsuranceType" value="@Model.InsuranceType" />
 
-                        @if (Model != null && Model.Questions.Questions.Count > 0)
+                        @if (Model != null && Model.Questions!.Questions!.Count > 0)
                         {
                             @for (int i = 0; i < Model.Questions.Questions.Count; i++)
                             {

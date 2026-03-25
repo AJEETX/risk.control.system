@@ -10,7 +10,7 @@
     var truncatedName = firstName.Length > 15 ? firstName.Substring(0, 15) + "..." : firstName;
     <div class="user-panel mt-3 pb-3 mb-3 d-flex">
         <div class="image" data-bs-toggle="tooltip" title="@firstName">
-            <img class="elevation-2 sidebar-profile img-circle" src="/Document/GetUserProfileImage/@user.Id" alt="profile">
+            <img class="elevation-2 sidebar-profile img-circle" src="/Document/GetUserProfileImage/@user!.Id" alt="profile">
         </div>
         <a class="d-block">
             <div data-bs-toggle="tooltip" title="Firstname: @firstName" id="user-firstname">@truncatedName</div>

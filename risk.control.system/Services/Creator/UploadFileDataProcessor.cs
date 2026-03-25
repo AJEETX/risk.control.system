@@ -32,12 +32,12 @@ namespace risk.control.system.Services.Creator
         {
             try
             {
-                if (companyUser.ClientCompany.LicenseType == LicenseType.Trial && totalClaimsCreated > companyUser.ClientCompany.TotalCreatedClaimAllowed)
+                if (companyUser.ClientCompany!.LicenseType == LicenseType.Trial && totalClaimsCreated > companyUser.ClientCompany.TotalCreatedClaimAllowed)
                 {
                     string errorString = $"Case limit reached of {companyUser.ClientCompany.TotalCreatedClaimAllowed} case(s)."; // or use "," or "\n"
                     await uploadFileStatusService.SetFileUploadFailure(uploadFileData, errorString, uploadAndAssign);
                     await context.SaveChangesAsync();
-                    await mailService.NotifyFileUpload(companyUser.Email, uploadFileData, url);
+                    await mailService.NotifyFileUpload(companyUser.Email!, uploadFileData, url);
                     return;
                 }
 
@@ -47,7 +47,7 @@ namespace risk.control.system.Services.Creator
                     uploadFileData.ErrorByteData = Encoding.UTF8.GetBytes(errorString);
                     await uploadFileStatusService.SetFileUploadFailure(uploadFileData, $"{errorString}", uploadAndAssign);
                     await context.SaveChangesAsync();
-                    await mailService.NotifyFileUpload(companyUser.Email, uploadFileData, url);
+                    await mailService.NotifyFileUpload(companyUser.Email!, uploadFileData, url);
                     return;
                 }
 
@@ -57,7 +57,7 @@ namespace risk.control.system.Services.Creator
                     uploadFileData.ErrorByteData = Encoding.UTF8.GetBytes(errorString);
                     await uploadFileStatusService.SetFileUploadFailure(uploadFileData, $"{errorString}", uploadAndAssign);
                     await context.SaveChangesAsync();
-                    await mailService.NotifyFileUpload(companyUser.Email, uploadFileData, url);
+                    await mailService.NotifyFileUpload(companyUser.Email!, uploadFileData, url);
                     return;
                 }
             }

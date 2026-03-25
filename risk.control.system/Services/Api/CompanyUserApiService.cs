@@ -32,9 +32,9 @@ namespace risk.control.system.Services.Api
             IBase64FileService base64FileService,
             IFeatureManager featureManager)
         {
-            awayThresholdInMinutes = int.Parse(config["LOGIN_SESSION_INACTIVE_MIN"]);
-            onlineThresholdInMinutes = int.Parse(config["LOGIN_SESSION_ACTIVE_MIN"]);
-            sessionTimeoutInSeconds = int.Parse(config["SESSION_TIMEOUT_SEC"]);
+            awayThresholdInMinutes = int.Parse(config["LOGIN_SESSION_INACTIVE_MIN"]!);
+            onlineThresholdInMinutes = int.Parse(config["LOGIN_SESSION_ACTIVE_MIN"]!);
+            sessionTimeoutInSeconds = int.Parse(config["SESSION_TIMEOUT_SEC"]!);
             sessionTimeoutinMinutes = sessionTimeoutInSeconds / 60;
             cutoffTime = DateTime.UtcNow.AddSeconds(-sessionTimeoutInSeconds);
             this.context = context;
@@ -99,7 +99,7 @@ namespace risk.control.system.Services.Api
                         _ => ("#DED5D5", "Offline", "fa fa-circle-o")
                     };
                 }
-                var photo = await base64FileService.GetBase64FileAsync(user.ProfilePictureUrl, Applicationsettings.NO_USER);
+                var photo = await base64FileService.GetBase64FileAsync(user.ProfilePictureUrl!, Applicationsettings.NO_USER);
                 activeUsersDetails.Add(new UserDetailResponse
                 {
                     Id = user.Id,
@@ -123,7 +123,7 @@ namespace risk.control.system.Services.Api
                     OnlineStatusIcon = icon,
                     IsUpdated = user.IsUpdated,
                     LastModified = user.Updated ?? user.Created,
-                    Updated = (user.Updated ?? user.Created).ToString("dd-MM-yyyy"),
+                    Updated = (user.Updated ?? user.Created),
                     UpdatedBy = user.UpdatedBy,
                     LoginVerified = await featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION)
                         ? !user.IsPasswordChangeRequired
@@ -188,7 +188,7 @@ namespace risk.control.system.Services.Api
                 };
 
                 // Convert photo to base64 (optional: cache this for performance)
-                var photo = await base64FileService.GetBase64FileAsync(user.ProfilePictureUrl, Applicationsettings.NO_USER);
+                var photo = await base64FileService.GetBase64FileAsync(user.ProfilePictureUrl!, Applicationsettings.NO_USER);
 
                 activeUsersDetails.Add(new UserDetailResponse
                 {
@@ -213,7 +213,7 @@ namespace risk.control.system.Services.Api
                     OnlineStatusIcon = icon,
                     IsUpdated = user.IsUpdated,
                     LastModified = user.Updated ?? user.Created,
-                    Updated = (user.Updated ?? user.Created).ToString("dd-MM-yyyy"),
+                    Updated = (user.Updated ?? user.Created),
                     UpdatedBy = user.UpdatedBy,
                     LoginVerified = loginVerificationEnabled ? !user.IsPasswordChangeRequired : true
                 });

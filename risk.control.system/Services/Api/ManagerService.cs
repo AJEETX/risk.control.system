@@ -54,7 +54,7 @@ namespace risk.control.system.Services.Api
                     a.PolicyDetail!.ContractNumber.ToLower().Contains(search) ||
                     a.PolicyDetail!.CauseOfLoss!.ToLower().Contains(search) ||
                     a.PolicyDetail.InvestigationServiceType!.Name.ToLower().Contains(search) ||
-                    a.CustomerDetail.DateOfBirth!.ToString().ToLower().Contains(search) ||
+                    a.CustomerDetail!.DateOfBirth!.ToString()!.ToLower().Contains(search) ||
                     a.CustomerDetail!.Name!.ToLower().Contains(search) ||
                     a.CustomerDetail!.PhoneNumber!.ToLower().Contains(search) ||
                     a.CustomerDetail.PinCode!.Code.ToString().Contains(search) ||
@@ -185,7 +185,7 @@ namespace risk.control.system.Services.Api
                     ServiceType = a.ServiceType,
                     Service = a.ServiceTypeName,
                     Location = a.SubStatus,
-                    Created = a.Created.ToString("dd-MM-yyyy"),
+                    Created = a.Created,
                     timePending = GetManagerActiveTimePending(a.investigation),
                     PolicyNum = a.PolicyNum,
                     BeneficiaryPhoto = await beneTask,
@@ -376,7 +376,7 @@ namespace risk.control.system.Services.Api
                     ServiceType = $"{a.InsuranceType!.GetEnumDisplayName()} ({a.ServiceTypeName})",
                     Service = a.ServiceTypeName,
                     Location = a.SubStatus,
-                    Created = a.Created.ToString("dd-MM-yyyy"),
+                    Created = a.ProcessedByAssessorTime!.Value,
                     timePending = GetAssessorCompletedTime(a.ProcessedByAssessorTime!.Value),
                     BeneficiaryName = a.BeneficiaryName,
                     PersonMapAddressUrl = string.Format(a.SelectedAgentDrivingMap!, "300", "300"),

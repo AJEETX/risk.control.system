@@ -31,14 +31,14 @@ namespace risk.control.system.Services.AgencyAdmin
                 .Include(c => c.PolicyDetail)
                 .Include(p => p.ClientCompany)
                 .Include(c => c.InvestigationReport)
-                .ThenInclude(c => c.EnquiryRequest)
+                .ThenInclude(c => c!.EnquiryRequest)
                 .Include(c => c.InvestigationReport)
-                .ThenInclude(c => c.EnquiryRequests)
+                .ThenInclude(c => c!.EnquiryRequests)
                 .Include(c => c.Vendor)
                 .FirstOrDefaultAsync(c => c.Id == caseId);
 
                 var replyByAgency = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR;
-                caseTask.CaseOwner = caseTask.ClientCompany!.Email;
+                caseTask!.CaseOwner = caseTask.ClientCompany!.Email;
                 caseTask.SubStatus = replyByAgency;
                 caseTask.UpdatedBy = userEmail;
                 caseTask.AssignedToAgency = false;

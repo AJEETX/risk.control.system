@@ -53,7 +53,7 @@
 							<li>
 								<i class='far fa-file-powerpoint'></i> Case details.
 							</li>
-							@if (Model.ClaimsInvestigation.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING)
+							@if (Model.ClaimsInvestigation?.PolicyDetail!.InsuranceType == InsuranceType.UNDERWRITING)
 							{
 								<li>
 									<i class='fa fa-user-plus'></i> Customer details
@@ -80,7 +80,7 @@
 
 				<div class="row">
 					<partial name="_ClaimPolicyDetails" model="@Model" />
-					@if (Model.ClaimsInvestigation.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING)
+					@if (Model.ClaimsInvestigation?.PolicyDetail?.InsuranceType == InsuranceType.UNDERWRITING)
 					{
 						<partial name="_ClaimCustomerDetails" model="@Model" />
 					}

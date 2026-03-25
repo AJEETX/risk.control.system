@@ -51,9 +51,9 @@ namespace risk.control.system.Services.Agent
 
             var user2Onboard = await context.ApplicationUser.FirstOrDefaultAsync(u => u.PhoneNumber == mobile && !string.IsNullOrWhiteSpace(u.MobileUId));
 
-            var isAgent = await userVendorManager.IsInRoleAsync(user2Onboard, agentRole?.Name);
+            var isAgent = await userVendorManager.IsInRoleAsync(user2Onboard!, agentRole?.Name!);
             if (isAgent)
-                return user2Onboard;
+                return user2Onboard!;
             return null!;
         }
 
@@ -62,7 +62,7 @@ namespace risk.control.system.Services.Agent
             var vendorUser = await context.ApplicationUser.Include(v => v.Country).FirstOrDefaultAsync(c => c.Email == userEmail);
             var assignedToAgentStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT;
             var claims = await GetClaims()
-                    .Where(i => i.VendorId == vendorUser.VendorId &&
+                    .Where(i => i.VendorId == vendorUser!.VendorId &&
                     i.TaskedAgentEmail == userEmail &&
                     !i.Deleted &&
                     i.SubStatus == assignedToAgentStatus).ToListAsync();
@@ -71,40 +71,40 @@ namespace risk.control.system.Services.Agent
                    .Select(a => new CaseInvestigationAgencyResponse
                    {
                        Id = a.Id,
-                       PolicyId = a.PolicyDetail.ContractNumber,
-                       Amount = string.Format(CustomExtensions.GetCultureByCountry(vendorUser.Country.Code.ToUpper()), "{0:C}", a.PolicyDetail.SumAssuredValue),
-                       Company = a.ClientCompany.Name,
-                       Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING, a.CustomerDetail, a.BeneficiaryDetail),
-                       PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING, a.CustomerDetail, a.BeneficiaryDetail),
+                       PolicyId = a.PolicyDetail!.ContractNumber,
+                       Amount = string.Format(CustomExtensions.GetCultureByCountry(vendorUser!.Country!.Code.ToUpper()), "{0:C}", a.PolicyDetail.SumAssuredValue),
+                       Company = a.ClientCompany!.Name,
+                       Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING, a.CustomerDetail!, a.BeneficiaryDetail!),
+                       PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING, a.CustomerDetail!, a.BeneficiaryDetail!),
                        AssignedToAgency = a.AssignedToAgency,
-                       Document = a.PolicyDetail.DocumentPath != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(System.IO.File.ReadAllBytes(
+                       Document = a.PolicyDetail.DocumentPath != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(File.ReadAllBytes(
                     Path.Combine(env.ContentRootPath, a.PolicyDetail.DocumentPath)))) : Applicationsettings.NO_POLICY_IMAGE,
                        Customer =
-                string.Format("data:image/*;base64,{0}", Convert.ToBase64String(System.IO.File.ReadAllBytes(
-                    Path.Combine(env.ContentRootPath, ClaimsInvestigationExtension.GetPersonPhoto(a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING, a.CustomerDetail, a.BeneficiaryDetail))))),
-                       Name = a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING ? a.CustomerDetail.Name : a.BeneficiaryDetail.Name,
-                       Policy = a.PolicyDetail.InsuranceType.GetEnumDisplayName(),
+                string.Format("data:image/*;base64,{0}", Convert.ToBase64String(File.ReadAllBytes(
+                    Path.Combine(env.ContentRootPath, ClaimsInvestigationExtension.GetPersonPhoto(a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING, a.CustomerDetail!, a.BeneficiaryDetail!))))),
+                       Name = a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING ? a.CustomerDetail!.Name : a.BeneficiaryDetail!.Name,
+                       Policy = a.PolicyDetail.InsuranceType!.GetEnumDisplayName(),
                        Status = a.SubStatus,
-                       ServiceType = a.PolicyDetail.InsuranceType.GetEnumDisplayName(),
-                       Service = a.PolicyDetail.InvestigationServiceType.Name,
+                       ServiceType = a.PolicyDetail.InsuranceType!.GetEnumDisplayName(),
+                       Service = a.PolicyDetail.InvestigationServiceType!.Name,
                        Location = a.SubStatus,
-                       Created = a.Created.ToString("dd-MM-yyyy"),
+                       Created = a.Created,
                        timePending = a.GetAgentTimePending(),
                        PolicyNum = a.GetPolicyNumForAgency(CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR),
-                       BeneficiaryPhoto = a.BeneficiaryDetail.ImagePath != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(System.IO.File.ReadAllBytes(
-                    Path.Combine(env.ContentRootPath, a.BeneficiaryDetail?.ImagePath)))) : Applicationsettings.NO_USER,
-                       BeneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail.Name) ?
+                       BeneficiaryPhoto = a.BeneficiaryDetail!.ImagePath != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(File.ReadAllBytes(
+                    Path.Combine(env.ContentRootPath, a.BeneficiaryDetail?.ImagePath!)))) : Applicationsettings.NO_USER,
+                       BeneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail!.Name) ?
                         "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>" :
                         a.BeneficiaryDetail.Name,
-                       TimeElapsed = DateTime.UtcNow.Subtract(a.TaskToAgentTime.Value).TotalSeconds,
+                       TimeElapsed = DateTime.UtcNow.Subtract(a.TaskToAgentTime!.Value).TotalSeconds,
                        IsNewAssigned = a.IsNewSubmittedToAgent,
                        IsQueryCase = a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR,
-                       PersonMapAddressUrl = string.Format(a.SelectedAgentDrivingMap, "300", "300"),
+                       PersonMapAddressUrl = string.Format(a.SelectedAgentDrivingMap!, "300", "300"),
                        Distance = a.SelectedAgentDrivingDistance,
                        Duration = a.SelectedAgentDrivingDuration
                    })
                     ?.ToList();
-            return response;
+            return response!;
         }
 
         public async Task<ApplicationUser> GetPin(string agentEmail, string portal_base_url)
@@ -113,9 +113,9 @@ namespace risk.control.system.Services.Agent
 
             var user2Onboard = await context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == agentEmail);
 
-            var isAgent = await userVendorManager.IsInRoleAsync(user2Onboard, agentRole?.Name);
+            var isAgent = await userVendorManager.IsInRoleAsync(user2Onboard!, agentRole?.Name!);
             if (isAgent)
-                return user2Onboard;
+                return user2Onboard!;
             return null!;
         }
 
@@ -123,7 +123,7 @@ namespace risk.control.system.Services.Agent
         {
             var agentUser = await context.ApplicationUser.AsNoTracking().Include(v => v.Country).Include(u => u.Vendor).FirstOrDefaultAsync(c => c.Email == userEmail);
             var claims = await GetClaims()
-                    .Where(i => i.VendorId == agentUser.VendorId &&
+                    .Where(i => i.VendorId == agentUser!.VendorId &&
                     i.TaskedAgentEmail == userEmail &&
                     !i.Deleted &&
                     i.SubStatus != CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT).ToListAsync();
@@ -131,12 +131,12 @@ namespace risk.control.system.Services.Agent
             var finalDataTasks = claims
                    .Select(async a =>
                    {
-                       var culture = CustomExtensions.GetCultureByCountry(agentUser.Country.Code.ToUpper());
-                       var isUW = a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING;
+                       var culture = CustomExtensions.GetCultureByCountry(agentUser!.Country!.Code.ToUpper());
+                       var isUW = a.PolicyDetail!.InsuranceType == InsuranceType.UNDERWRITING;
 
-                       var documentTask = base64FileService.GetBase64FileAsync(a.PolicyDetail.DocumentPath, Applicationsettings.NO_POLICY_IMAGE);
-                       var customerPhotoTask = base64FileService.GetBase64FileAsync(isUW ? a.CustomerDetail.ImagePath : a.BeneficiaryDetail.ImagePath);
-                       var beneficiaryPhotoTask = base64FileService.GetBase64FileAsync(a.BeneficiaryDetail.ImagePath, Applicationsettings.NO_USER);
+                       var documentTask = base64FileService.GetBase64FileAsync(a.PolicyDetail.DocumentPath!, Applicationsettings.NO_POLICY_IMAGE);
+                       var customerPhotoTask = base64FileService.GetBase64FileAsync(isUW ? a.CustomerDetail!.ImagePath! : a.BeneficiaryDetail!.ImagePath!);
+                       var beneficiaryPhotoTask = base64FileService.GetBase64FileAsync(a.BeneficiaryDetail!.ImagePath!, Applicationsettings.NO_USER);
                        await Task.WhenAll(documentTask, customerPhotoTask, beneficiaryPhotoTask);
 
                        return new CaseInvestigationAgencyResponse
@@ -145,24 +145,24 @@ namespace risk.control.system.Services.Agent
                            PolicyId = a.PolicyDetail.ContractNumber,
                            Amount = string.Format(culture, "{0:C}", a.PolicyDetail.SumAssuredValue),
                            AssignedToAgency = a.AssignedToAgency,
-                           Pincode = ClaimsInvestigationExtension.GetPincode(isUW, a.CustomerDetail, a.BeneficiaryDetail),
-                           PincodeName = ClaimsInvestigationExtension.GetPincodeName(isUW, a.CustomerDetail, a.BeneficiaryDetail),
-                           Company = a.ClientCompany.Name,
+                           Pincode = ClaimsInvestigationExtension.GetPincode(isUW, a.CustomerDetail!, a.BeneficiaryDetail),
+                           PincodeName = ClaimsInvestigationExtension.GetPincodeName(isUW, a.CustomerDetail!, a.BeneficiaryDetail),
+                           Company = a.ClientCompany!.Name,
                            Document = await documentTask,
                            Customer = await customerPhotoTask,
-                           Name = a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING ? a.CustomerDetail.Name : a.BeneficiaryDetail.Name,
-                           Policy = a.PolicyDetail?.InsuranceType.GetEnumDisplayName(),
+                           Name = a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING ? a.CustomerDetail!.Name : a.BeneficiaryDetail.Name,
+                           Policy = a.PolicyDetail.InsuranceType!.GetEnumDisplayName(),
                            Status = a.SubStatus,
-                           ServiceType = a.PolicyDetail?.InsuranceType.GetEnumDisplayName(),
-                           Service = a.PolicyDetail.InvestigationServiceType.Name,
+                           ServiceType = a.PolicyDetail.InsuranceType!.GetEnumDisplayName(),
+                           Service = a.PolicyDetail.InvestigationServiceType!.Name,
                            Location = a.SubStatus,
-                           Created = a.Created.ToString("dd-MM-yyyy"),
+                           Created = a.Created,
                            timePending = a.GetAgentTimePending(true),
                            PolicyNum = a.PolicyDetail.ContractNumber,
                            BeneficiaryPhoto = await beneficiaryPhotoTask,
                            BeneficiaryName = a.BeneficiaryDetail.Name,
-                           TimeElapsed = DateTime.UtcNow.Subtract(a.SubmittedToSupervisorTime.Value).TotalSeconds,
-                           PersonMapAddressUrl = string.Format(a.SelectedAgentDrivingMap, "300", "300"),
+                           TimeElapsed = DateTime.UtcNow.Subtract(a.SubmittedToSupervisorTime!.Value).TotalSeconds,
+                           PersonMapAddressUrl = string.Format(a.SelectedAgentDrivingMap!, "300", "300"),
                            Distance = a.SelectedAgentDrivingDistance,
                            Duration = a.SelectedAgentDrivingDuration
                        };
@@ -209,27 +209,27 @@ namespace risk.control.system.Services.Agent
                .Include(c => c.PolicyDetail)
                .Include(c => c.ClientCompany)
                .Include(c => c.BeneficiaryDetail)
-               .ThenInclude(b => b.BeneficiaryRelation)
+               .ThenInclude(b => b!.BeneficiaryRelation)
                .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.CaseEnabler)
+               .ThenInclude(c => c!.CaseEnabler)
                .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.CostCentre)
+               .ThenInclude(c => c!.CostCentre)
                .Include(c => c.BeneficiaryDetail)
-               .ThenInclude(c => c.PinCode)
+               .ThenInclude(c => c!.PinCode)
                .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.District)
+                .ThenInclude(c => c!.District)
                 .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.State)
+                .ThenInclude(c => c!.State)
                .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.Country)
+               .ThenInclude(c => c!.Country)
                .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.District)
+               .ThenInclude(c => c!.District)
                .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.InvestigationServiceType)
+               .ThenInclude(c => c!.InvestigationServiceType)
                .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.PinCode)
+               .ThenInclude(c => c!.PinCode)
                .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.State)
+               .ThenInclude(c => c!.State)
                .Include(c => c.Vendor)
                 .Where(c => !c.Deleted);
             return applicationDbContext.OrderByDescending(o => o.Created);

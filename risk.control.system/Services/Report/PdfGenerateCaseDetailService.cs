@@ -47,15 +47,15 @@ namespace risk.control.system.Services.Report
         {
             // Title
             section.AddParagraph().SetAlignment(HorizontalAlignment.Center)
-                .AddText($"{policy?.InsuranceType.GetEnumDisplayName()} Investigation Report").SetFontSize(20).SetBold();
+                .AddText($"{policy?.InsuranceType!.GetEnumDisplayName()} Investigation Report").SetFontSize(20).SetBold();
 
             // Investigation Section
-            section.AddParagraph().AddText($" Investigator : {investigation.Vendor.Email}").SetFontSize(16).SetBold().SetUnderline();
-            section.AddParagraph().AddText($"Proposal #: {investigation?.PolicyDetail.ContractNumber}");
+            section.AddParagraph().AddText($" Investigator : {investigation.Vendor!.Email}").SetFontSize(16).SetBold().SetUnderline();
+            section.AddParagraph().AddText($"Proposal #: {investigation?.PolicyDetail!.ContractNumber}");
             section.AddParagraph().AddText($"Insurer: {investigation?.ClientCompany?.Name}");
 
             // Policy Section
-            section.AddParagraph().AddText($"Policy Type: {policy?.InsuranceType.GetEnumDisplayName()}").SetFontSize(16).SetBold().SetUnderline();
+            section.AddParagraph().AddText($"Policy Type: {policy?.InsuranceType!.GetEnumDisplayName()}").SetFontSize(16).SetBold().SetUnderline();
             section.AddParagraph().AddText(" Proposal Info").SetFontSize(16).SetBold().SetUnderline();
 
             section.AddParagraph().AddText($"Verification Type: {policy?.InvestigationServiceType?.Name}");
@@ -64,17 +64,17 @@ namespace risk.control.system.Services.Report
             // Customer Section
             section.AddParagraph().AddText(" Life Assured  Details").SetFontSize(16).SetBold().SetUnderline();
             section.AddParagraph().AddText($"Life Assured Name: {customer?.Name}");
-            section.AddParagraph().AddText($"Date Of birth: {customer?.DateOfBirth.Value.ToString("dd-MMM-yyyy")}");
-            section.AddParagraph().AddText($"Occupation : {customer?.Occupation.GetEnumDisplayName()}");
-            section.AddParagraph().AddText($"Income : {customer?.Income.GetEnumDisplayName()}");
+            section.AddParagraph().AddText($"Date Of birth: {customer?.DateOfBirth!.Value.ToString("dd-MMM-yyyy")}");
+            section.AddParagraph().AddText($"Occupation : {customer?.Occupation!.GetEnumDisplayName()}");
+            section.AddParagraph().AddText($"Income : {customer?.Income!.GetEnumDisplayName()}");
             section.AddParagraph().AddText($"Address: {customer?.Addressline},{customer?.District?.Name}, {customer?.State?.Name}, {customer?.Country?.Name}");
 
             // Beneficiary Section
             section.AddParagraph().AddText(" Beneficiary Details").SetFontSize(16).SetBold().SetUnderline();
             section.AddParagraph().AddText($"Name: {beneficiary?.Name}");
             section.AddParagraph().AddText($"Relation: {beneficiary?.BeneficiaryRelation?.Name}");
-            section.AddParagraph().AddText($"Date Of birth: {beneficiary?.DateOfBirth.Value.ToString("dd-MMM-yyyy")}");
-            section.AddParagraph().AddText($"Income : {beneficiary?.Income.GetEnumDisplayName()}");
+            section.AddParagraph().AddText($"Date Of birth: {beneficiary?.DateOfBirth!.Value.ToString("dd-MMM-yyyy")}");
+            section.AddParagraph().AddText($"Income : {beneficiary?.Income!.GetEnumDisplayName()}");
             section.AddParagraph().AddText($"Address: {beneficiary?.Addressline},{beneficiary?.District?.Name}, {beneficiary?.State?.Name}, {beneficiary?.Country?.Name}");
             return section;
         }
@@ -82,23 +82,23 @@ namespace risk.control.system.Services.Report
         public SectionBuilder BuildClaim(SectionBuilder section, InvestigationTask investigation, PolicyDetail policy, CustomerDetail customer, BeneficiaryDetail beneficiary)
         {
             // Title
-            section.AddParagraph().SetAlignment(HorizontalAlignment.Center).AddText($"{policy?.InsuranceType.GetEnumDisplayName()} Investigation Report").SetFontSize(20).SetBold();
+            section.AddParagraph().SetAlignment(HorizontalAlignment.Center).AddText($"{policy?.InsuranceType!.GetEnumDisplayName()} Investigation Report").SetFontSize(20).SetBold();
 
             section.AddParagraph().AddText($"Company: {investigation?.ClientCompany?.Name}");
-            section.AddParagraph().AddText($"Policy #: {investigation?.PolicyDetail.ContractNumber}");
+            section.AddParagraph().AddText($"Policy #: {investigation?.PolicyDetail!.ContractNumber}");
 
             section.AddParagraph().AddText($"Case received: {policy?.DateOfIncident.ToString("dd-MMM-yyyy")}");
 
             // Investigation Section
-            section.AddParagraph().AddText($" Investigator : {investigation.Vendor.Email}").SetFontSize(16).SetBold().SetUnderline();
-            section.AddParagraph().AddText($" Report Date : {investigation.InvestigationReport.AssessorRemarksUpdated.GetValueOrDefault()}");
+            section.AddParagraph().AddText($" Investigator : {investigation!.Vendor!.Email}").SetFontSize(16).SetBold().SetUnderline();
+            section.AddParagraph().AddText($" Report Date : {investigation.InvestigationReport!.AssessorRemarksUpdated.GetValueOrDefault()}");
 
             // Customer Section
             section.AddParagraph().AddText(" Life Assured  Details").SetFontSize(16).SetBold().SetUnderline();
             section.AddParagraph().AddText($"Life Assured Name: {customer?.Name}");
-            section.AddParagraph().AddText($"Date Of birth: {customer?.DateOfBirth.Value.ToString("dd-MMM-yyyy")}");
-            section.AddParagraph().AddText($"Occupation : {customer?.Occupation.GetEnumDisplayName()}");
-            section.AddParagraph().AddText($"Income : {customer?.Income.GetEnumDisplayName()}");
+            section.AddParagraph().AddText($"Date Of birth: {customer?.DateOfBirth!.Value.ToString("dd-MMM-yyyy")}");
+            section.AddParagraph().AddText($"Occupation : {customer?.Occupation!.GetEnumDisplayName()}");
+            section.AddParagraph().AddText($"Income : {customer?.Income!.GetEnumDisplayName()}");
             section.AddParagraph().AddText($"Address: {customer?.Addressline},{customer?.District?.Name}, {customer?.State?.Name}, {customer?.Country?.Name}");
 
             section.AddParagraph().AddText($"Verification Type: {policy?.InvestigationServiceType?.Name}");
@@ -110,8 +110,8 @@ namespace risk.control.system.Services.Report
             section.AddParagraph().AddText(" Claimant Details").SetFontSize(16).SetBold().SetUnderline();
             section.AddParagraph().AddText($"Name: {beneficiary?.Name}");
             section.AddParagraph().AddText($"Relation: {beneficiary?.BeneficiaryRelation?.Name}");
-            section.AddParagraph().AddText($"Date Of birth: {beneficiary?.DateOfBirth.Value.ToString("dd-MMM-yyyy")}");
-            section.AddParagraph().AddText($"Income : {beneficiary?.Income.GetEnumDisplayName()}");
+            section.AddParagraph().AddText($"Date Of birth: {beneficiary?.DateOfBirth!.Value.ToString("dd-MMM-yyyy")}");
+            section.AddParagraph().AddText($"Income : {beneficiary?.Income!.GetEnumDisplayName()}");
             section.AddParagraph().AddText($"Address: {beneficiary?.Addressline},{beneficiary?.District?.Name}, {beneficiary?.State?.Name}, {beneficiary?.Country?.Name}");
             return section;
         }

@@ -1,4 +1,6 @@
-﻿namespace risk.control.system.Models.ViewModel
+﻿using System.Globalization;
+
+namespace risk.control.system.Models.ViewModel
 {
     public class CaseTransactionModel
     {
@@ -13,6 +15,7 @@
         public string? ReportAiSummary { get; set; }
         public bool CaseIsValidToAssign { get; set; } = false;
         public string? Currency { get; set; }
+        public CultureInfo? Culture { get; set; }
         public long vendorId { get; set; } = 0;
     }
 }
