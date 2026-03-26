@@ -25,7 +25,7 @@ namespace risk.control.system.Services.Tool
                 string credentialJson = EnvHelper.Get("GOOGLE_APPLICATION_CREDENTIALS_JSON")!; // "{ \"type\": \"service_account\", ... }";
 
                 // Create Google Credential from JSON string
-                GoogleCredential googleCredential = GoogleCredential.FromJson(credentialJson)!;
+                var googleCredential = CredentialFactory.FromJson<ServiceAccountCredential>(credentialJson).ToGoogleCredential();
 
                 var client = new ImageAnnotatorClientBuilder
                 {
