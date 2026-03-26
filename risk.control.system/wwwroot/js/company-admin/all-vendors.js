@@ -17,8 +17,12 @@
             {
                 className: 'max-width-column-name', // Apply the CSS class,
                 targets: 7                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column-name', // Apply the CSS class,
+                targets: 8                      // Index of the column to style
             }],
-        order: [[9, 'desc'], [10, 'desc']], // Sort by `isUpdated` and `lastModified`,
+        order: [[10, 'desc'], [11, 'desc']], // Sort by `isUpdated` and `lastModified`,
         fixedHeader: true,
         processing: true,
         paging: true,
@@ -82,15 +86,26 @@
                 }
             },
             {
-                "data": "updated",
+                "data": "updatedBy",
                 "mRender": function (data, type, row) {
                     return '<span title="' + data + '" data-toggle="tooltip">' + data + '</span>'
                 }
             },
             {
-                "data": "updatedBy",
-                "mRender": function (data, type, row) {
-                    return '<span title="' + data + '" data-toggle="tooltip">' + data + '</span>'
+                "data": "updated",
+                "render": function (data, type, row) {
+                    if (!data) return "";
+
+                    // 1. Parse UTC string (Assuming format: "2023-10-27T10:00:00Z")
+                    var date = new Date(data);
+
+                    // 2. Convert to Local String
+                    // You can customize the format: { dateStyle: 'medium', timeStyle: 'short' }
+                    var localDate = date.toLocaleString();
+
+                    return `<i title="${localDate}" data-bs-toggle="tooltip">
+                    <small><strong>${localDate}</strong></small>
+                </i>`;
                 }
             },
             {
@@ -98,7 +113,7 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    buttons += '<a id=details' + row.id + ' href="/ClientCompany/AgencyDetails/' + row.id + '" class="btn btn-xs btn-info"><i class="fa fa-search"></i> Details</a>&nbsp;'
+                    buttons += '<button data-id=' + row.id + '" class="btn btn-xs btn-info"><i class="fa fa-search"></i> Detail</button>'
                     return buttons;
                 }
             },
@@ -110,17 +125,29 @@
                 "data": "lastModified",
                 bVisible: false
             }
-        ],
-        "drawCallback": function (settings, start, end, max, total, pre) {
-            $('#dataTable tbody').on('click', '.btn-info', function (e) {
-                e.preventDefault(); // Prevent the default anchor behavior
-                var id = $(this).attr('id').replace('details', ''); // Extract the ID from the button's ID attribute
-                showdetails(id); // Call the getdetails function with the ID
-                window.location.href = $(this).attr('href'); // Navigate to the edit page
-            });
-        }
+        ]
     });
+    $('body').on('click', 'button.btn-xs.btn-info', function (e) {
+        e.preventDefault();
+        const id = $(this).data('id');
+        showedetail(id, this);
+    });
+    function showedetail(id, element) {
+        id = String(id).replace(/[^a-zA-Z0-9_-]/g, "");
+        $("body").addClass("submit-progress-bg");
+        setTimeout(() => $(".submit-progress").removeClass("hidden"), 1);
 
+        showSpinnerOnButton(element, "Detail");
+
+        const url = `/ClientCompany/AgencyDetails/${encodeURIComponent(id)}`;
+
+        setTimeout(() => {
+            window.location.href = url;
+        }, 1000);
+    }
+    function showSpinnerOnButton(selector, spinnerText) {
+        $(selector).html(`<i class='fas fa-sync fa-spin'></i> ${spinnerText}`);
+    }
     table.on('draw', function () {
         table.rows().every(function () {
             var data = this.data(); // Get row data
@@ -173,54 +200,3 @@
         }
     });
 });
-function getdetails(id) {
-    $("body").addClass("submit-progress-bg");
-    // Wrap in setTimeout so the UI
-    // can update the spinners
-    setTimeout(function () {
-        $(".submit-progress").removeClass("hidden");
-    }, 1);
-    // Disable all buttons, submit inputs, and anchors
-    $('button, input[type="submit"], a').prop('disabled', true);
-
-    // Add a class to visually indicate disabled state for anchors
-    $('a').addClass('disabled-anchor').on('click', function (e) {
-        e.preventDefault(); // Prevent default action for anchor clicks
-    });
-
-    $('a#delete' + id + '.btn.btn-xs.btn-danger').html("<i class='fas fa-sync fa-spin'></i> Delete");
-    var article = document.getElementById("article");
-    if (article) {
-        var nodes = article.getElementsByTagName('*');
-        for (var i = 0; i < nodes.length; i++) {
-            nodes[i].disabled = true;
-        }
-    }
-}
-
-function showdetails(id) {
-    $("body").addClass("submit-progress-bg");
-    // Wrap in setTimeout so the UI
-    // can update the spinners
-    setTimeout(function () {
-        $(".submit-progress").removeClass("hidden");
-    }, 1);
-    // Disable all buttons, submit inputs, and anchors
-    $('button, input[type="submit"], a').prop('disabled', true);
-
-    // Add a class to visually indicate disabled state for anchors
-    $('a').addClass('disabled-anchor').on('click', function (e) {
-        e.preventDefault(); // Prevent default action for anchor clicks
-    });
-
-    var detailbtn = $('a#details' + id + '.btn.btn-xs.btn-info')
-    detailbtn.html("<i class='fas fa-sync fa-spin'></i> Details");
-
-    var article = document.getElementById("article");
-    if (article) {
-        var nodes = article.getElementsByTagName('*');
-        for (var i = 0; i < nodes.length; i++) {
-            nodes[i].disabled = true;
-        }
-    }
-}

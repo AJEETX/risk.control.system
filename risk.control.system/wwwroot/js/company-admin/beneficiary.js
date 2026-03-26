@@ -99,9 +99,10 @@
             },
             {
                 data: 'beneficiaryRelationId',
+                bSortable: false,
                 render: function (data) {
                     return `
-                        <a id="edit${data}" class="btn btn-xs btn-warning" href="/BeneficiaryRelation/Edit/${data}">
+                        <a data-id="${data}" class="btn btn-xs btn-warning">
                             <i class="fas fa-user-tie"></i> Edit
                         </a>
                         <button type="button" class="btn btn-xs btn-danger delete-item" data-id="${data}">
@@ -109,17 +110,29 @@
                         </button>`;
                 }
             }
-        ],
-        "drawCallback": function (setting) {
-            $('#dataTable tbody').on('click', '.btn-warning', function (e) {
-                e.preventDefault(); // Prevent the default anchor behavior
-                var id = $(this).attr('id').replace('edit', ''); // Extract the ID from the button's ID attribute
-                showedit(id); // Call the getdetails function with the ID
-                window.location.href = $(this).attr('href'); // Navigate to the delete page
-            });
-        }
+        ]
     });
+    $('body').on('click', 'a.btn-xs.btn-warning', function (e) {
+        e.preventDefault();
+        const id = $(this).data('id');
+        showdetail(id, this);
+    });
+    function showdetail(id, element) {
+        id = String(id).replace(/[^a-zA-Z0-9_-]/g, "");
+        $("body").addClass("submit-progress-bg");
+        setTimeout(() => $(".submit-progress").removeClass("hidden"), 1);
 
+        showSpinnerOnButton(element, "Edit");
+
+        const url = `/BeneficiaryRelation/Edit/${encodeURIComponent(id)}`;
+
+        setTimeout(() => {
+            window.location.href = url;
+        }, 1000);
+    }
+    function showSpinnerOnButton(selector, spinnerText) {
+        $(selector).html(`<i class='fas fa-sync fa-spin'></i> ${spinnerText}`);
+    }
     var askConfirmation = true;
     $('#create-form').submit(function (e) {
         if (askConfirmation) {
