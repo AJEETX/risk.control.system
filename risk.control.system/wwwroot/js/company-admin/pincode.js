@@ -96,6 +96,7 @@
             { data: 'district' },
             { data: 'state' },
             { data: 'country' },
+            { data: 'updatedBy' },
             {
                 "data": "updated",
                 "render": function (data, type, row) {

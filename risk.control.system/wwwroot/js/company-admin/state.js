@@ -137,6 +137,7 @@
             { data: 'code', orderable: true }, // Make sortable
             { data: 'name', orderable: true }, // Make sortable
             { data: 'countryName', orderable: true },
+            { data: 'updatedBy' },
             {
                 "data": "updated",
                 "render": function (data, type, row) {

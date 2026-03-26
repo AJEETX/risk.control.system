@@ -116,6 +116,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                     p.DistrictId,
                     p.Code,
                     p.Name,
+                    p.UpdatedBy,
                     p.Updated,
                     p.Created,
                     State = p.State!.Name,
@@ -128,6 +129,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 p.DistrictId,
                 p.Code,
                 p.Name,
+                p.UpdatedBy,
                 Updated = p.Updated ?? p.Created,
                 State = p.State,
                 Country = p.Country

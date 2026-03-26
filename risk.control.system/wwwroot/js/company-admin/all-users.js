@@ -130,7 +130,7 @@
                         buttons += '<button id="details' + row.id + '" class="btn btn-xs btn-danger"><i class="fa fa-trash "></i> Delete </button>';
                     }
                     else {
-                        buttons += '<a id=edit' + row.id + ' href="/User/Edit/' + row.id + '" class="btn btn-xs btn-info"><i class="fas fa-search"></i> Detail</a>'
+                        buttons += `<a data-id="${row.id}" class="active-claims btn btn-xs btn-info"><i class="fas fa-search"></i> Detail</a>`
                     }
                     return buttons;
                 }
@@ -143,18 +143,29 @@
                 "data": "lastModified",
                 bVisible: false
             }
-        ],
-        "drawCallback": function (settings, start, end, max, total, pre) {
-            // Event delegation for .btn-danger elements
-
-            $('#dataTable tbody').on('click', '.btn-warning', function (e) {
-                e.preventDefault(); // Prevent the default anchor behavior
-                var id = $(this).attr('id').replace('edit', ''); // Extract the ID from the button's ID attribute
-                showedit(id); // Call the getdetails function with the ID
-                window.location.href = $(this).attr('href'); // Navigate to the edit page
-            });
-        }
+        ]
     });
+    $('body').on('click', 'a.btn-info', function (e) {
+        e.preventDefault();
+        const id = $(this).data('id');
+        showdetail(id, this);
+    });
+    function showdetail(id, element) {
+        id = String(id).replace(/[^a-zA-Z0-9_-]/g, "");
+        $("body").addClass("submit-progress-bg");
+        setTimeout(() => $(".submit-progress").removeClass("hidden"), 1);
+
+        showSpinnerOnButton(element, "Detail");
+
+        const url = `/User/Edit/${encodeURIComponent(id)}`;
+
+        setTimeout(() => {
+            window.location.href = url;
+        }, 1000);
+    }
+    function showSpinnerOnButton(selector, spinnerText) {
+        $(selector).html(`<i class='fas fa-sync fa-spin'></i> ${spinnerText}`);
+    }
     table.on('draw', function () {
         table.rows().every(function () {
             var data = this.data(); // Get row data
@@ -261,30 +272,5 @@ function getColorClass(color) {
             return "online-status-orange";
         default:
             return "online-icon-default"; // Fallback class
-    }
-}
-function showedit(id) {
-    $("body").addClass("submit-progress-bg");
-    // Wrap in setTimeout so the UI
-    // can update the spinners
-    setTimeout(function () {
-        $(".submit-progress").removeClass("hidden");
-    }, 1);
-    var editbtn = $('a#edit' + id + '.btn.btn-xs.btn-info')
-    // Disable all buttons, submit inputs, and anchors
-    $('button, input[type="submit"], a').prop('disabled', true);
-
-    // Add a class to visually indicate disabled state for anchors
-    $('a').addClass('disabled-anchor').on('click', function (e) {
-        e.preventDefault(); // Prevent default action for anchor clicks
-    });
-    editbtn.html("<i class='fas fa-sync fa-spin'></i> Detail");
-
-    var article = document.getElementById("article");
-    if (article) {
-        var nodes = article.getElementsByTagName('*');
-        for (var i = 0; i < nodes.length; i++) {
-            nodes[i].disabled = true;
-        }
     }
 }
