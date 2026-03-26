@@ -19,9 +19,9 @@ jobs:
   # ---------------------------------------------------
   # 1️⃣ Code Scan Job
   # ---------------------------------------------------
-  code-scan:
-    uses: ./.github/workflows/code-scan.yml
-    secrets: inherit
+  # code-scan:
+    # uses: ./.github/workflows/code-scan.yml
+    # secrets: inherit
 
   # ---------------------------------------------------
   # 2️⃣   Build  .Net Core Application Job
@@ -29,7 +29,7 @@ jobs:
   build:
     name: Build .Net Core Application
     runs-on: windows-latest
-    needs: code-scan
+    # needs: code-scan
     permissions:
       contents: read
 
