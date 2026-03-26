@@ -23,9 +23,13 @@
             },
             {
                 className: 'max-width-column-name', // Apply the CSS class,
+                targets: 9                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column-name', // Apply the CSS class,
                 targets: 10                      // Index of the column to style
             }],
-        order: [[9, 'desc']],
+        order: [[10, 'desc']],
         fixedHeader: true,
         processing: true,
         paging: true,
@@ -104,6 +108,12 @@
                 }
             },
             {
+                "data": "updateBy",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.updateBy + '" data-bs-toggle="tooltip">' + data + '</span>'
+                }
+            },
+            {
                 "data": "updated",
                 "render": function (data, type, row) {
                     if (!data) return "";
@@ -118,12 +128,6 @@
                     return `<i title="${localDate}" data-bs-toggle="tooltip">
                     <small><strong>${localDate}</strong></small>
                 </i>`;
-                }
-            },
-            {
-                "data": "updateBy",
-                "mRender": function (data, type, row) {
-                    return '<span title="' + row.updateBy + '" data-bs-toggle="tooltip">' + data + '</span>'
                 }
             },
             {

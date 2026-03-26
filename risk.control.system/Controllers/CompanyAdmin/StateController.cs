@@ -113,6 +113,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 s.StateId,
                 s.Name,
                 s.Code,
+                s.UpdatedBy,
                 s.Updated,
                 s.Created,
                 CountryName = s.Country!.Name
@@ -125,6 +126,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 s.StateId,
                 s.Name,
                 s.Code,
+                s.UpdatedBy,
                 Updated = s.Updated ?? s.Created,
                 s.CountryName
             });

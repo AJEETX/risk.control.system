@@ -79,6 +79,7 @@
         columns: [
             { data: 'name' },
             { data: 'code' },
+            { data: 'updateBy' },
             {
                 "data": "updated",
                 "render": function (data, type, row) {
@@ -96,7 +97,6 @@
                 </i>`;
                 }
             },
-            { data: 'updateBy' },
             {
                 data: 'beneficiaryRelationId',
                 render: function (data) {

@@ -34,11 +34,11 @@ namespace risk.control.system.Services.Api
             var activeUsers = await context.UserSessionAlive
                 .AsNoTracking()
                 .Where(u => u.Updated >= cutoffTime && !u.LoggedOut)
+                // Grouping by the email directly
                 .GroupBy(u => u.ActiveUser.Email)
-                .Select(g => g.OrderByDescending(u => u.Updated).FirstOrDefault())
-                .Where(u => u != null)
-                .Select(u => u!.ActiveUser.Email)
-                .ToListAsync(); // Only materialize the final, filtered list of emails
+                // We only need the email (the key), so we select it here
+                .Select(g => g.Key)
+                .ToListAsync();
 
             var users = context.ApplicationUser
                 .Include(a => a.District)
