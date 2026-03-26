@@ -12,6 +12,10 @@
             },
             {
                 className: 'max-width-column-name', // Apply the CSS class,
+                targets: 9                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column-name', // Apply the CSS class,
                 targets: 10                      // Index of the column to style
             }],
         order: [[11, 'desc']], // Sort by `isUpdated` and `lastModified`,
@@ -100,6 +104,12 @@
                 }
             },
             {
+                "data": "updateBy",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.updateBy + '" data-bs-toggle="tooltip">' + data + '</span>'
+                }
+            },
+            {
                 "data": "updated",
                 "render": function (data, type, row) {
                     if (!data) return "";
@@ -116,12 +126,7 @@
                 </i>`;
                 }
             },
-            {
-                "data": "updateBy",
-                "mRender": function (data, type, row) {
-                    return '<span title="' + row.updateBy + '" data-bs-toggle="tooltip">' + data + '</span>'
-                }
-            },
+            
             {
                 "data": "isUpdated",
                 "bVisible": false
