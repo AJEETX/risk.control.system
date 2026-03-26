@@ -117,6 +117,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                     District = p.District!.Name,
                     State = p.State!.Name,
                     Country = p.Country!.Name,
+                    p.UpdatedBy,
                     p.Updated,
                     p.Created,
                     p.PinCodeId
@@ -131,6 +132,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 State = s.State,
                 Country = s.Country,
                 s.PinCodeId,
+                s.UpdatedBy,
                 Updated = s.Updated ?? s.Created,
             });
             // Prepare the DataTables response
