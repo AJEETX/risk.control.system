@@ -93,7 +93,7 @@ namespace risk.control.system.Services.Api
                     Flag = $"/flags/{u.CountryCode.ToLower()}.png",
                     Pincode = u.PinCodeValue,
                     Status = $"<span class='badge badge-light'>{u.Status!.GetEnumDisplayName()}</span>",
-                    Updated = (u.Updated ?? u.Created).ToString("dd-MM-yyyy"),
+                    Updated = (u.Updated ?? u.Created),
                     u.UpdatedBy,
                     VendorName = u.Email,
                     RawStatus = u.Status!.GetEnumDisplayName(),
