@@ -30,7 +30,7 @@
             dataSrc: '',
             error: DataTableErrorHandler
         },
-        order: [[11, 'desc'], [12, 'desc']], // Sort by `isUpdated` and `lastModified`,
+        order: [[12, 'desc'], [10, 'desc']], // Sort by `isUpdated` and `lastModified`,
         columnDefs: [
             {
                 className: 'max-width-column-name', // Apply the CSS class,
@@ -43,6 +43,10 @@
             {
                 className: 'max-width-column-name', // Apply the CSS class,
                 targets: 9                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column-name', // Apply the CSS class,
+                targets: 10                      // Index of the column to style
             }],
         fixedHeader: true,
         processing: true,
@@ -142,7 +146,24 @@
             {
                 "data": "updatedBy",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.updatedBy + '" data-bs-toggle="tooltip">' + data + '</span>'
+                    return '<span title="' + data + '" data-bs-toggle="tooltip">' + data + '</span>'
+                }
+            },
+            {
+                "data": "lastModified",
+                "render": function (data, type, row) {
+                    if (!data) return "";
+
+                    // 1. Parse UTC string (Assuming format: "2023-10-27T10:00:00Z")
+                    var date = new Date(data);
+
+                    // 2. Convert to Local String
+                    // You can customize the format: { dateStyle: 'medium', timeStyle: 'short' }
+                    var localDate = date.toLocaleString();
+
+                    return `<i title="${localDate}" data-bs-toggle="tooltip">
+                    <small><strong>${localDate}</strong></small>
+                </i>`;
                 }
             },
             {
@@ -152,9 +173,9 @@
                     var buttons = "";
                     buttons += `<a data-id="${row.id}" class="btn btn-xs btn-warning"><i class="fas fa-edit"></i> Edit</a> &nbsp;`;
                     if (row.role != "AGENCY_ADMIN") {
-                        buttons += `<a data-id="${row.id}" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i> Delete</a>`;
+                        buttons += `<button data-id="${row.id}" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i> Delete</button>`;
                     } else {
-                        buttons += '<button disabled class="btn btn-xs btn-danger"><i class="fa fa-trash"></i> Delete </a>'
+                        buttons += '<button disabled class="btn btn-xs btn-danger"><i class="fa fa-trash"></i> Delete </button>'
                     }
 
                     return buttons;
@@ -162,10 +183,6 @@
             },
             {
                 "data": "isUpdated",
-                bVisible: false
-            },
-            {
-                "data": "lastModified",
                 bVisible: false
             }
         ],
@@ -194,7 +211,7 @@
         const id = $(this).data('id');
         showedit(id, this);
     });
-    $('body').on('click', 'a.btn-danger', function (e) {
+    $('body').on('click', 'button.btn-danger', function (e) {
         e.preventDefault();
         const id = $(this).data('id');
         showdetail(id, this);

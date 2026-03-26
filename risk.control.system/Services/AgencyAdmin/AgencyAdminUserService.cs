@@ -129,7 +129,7 @@ namespace risk.control.system.Services.AgencyAdmin
         };
 
             model.HasClaims = await _context.Investigations.AsNoTracking()
-                .AnyAsync(c => agencySubStatuses.Contains(c.SubStatus) && c.VendorId == model.VendorId);
+                .AnyAsync(c => agencySubStatuses.Contains(c.SubStatus) && c.VendorId == model.VendorId && c.CaseOwner == model.Email);
 
             return model;
         }
