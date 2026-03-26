@@ -20,12 +20,16 @@
             targets: 2                      // Index of the column to style
         },
         {
-            className: 'max-width-column-name', // Apply the CSS class,
+            className: 'max-width-column', // Apply the CSS class,
             targets: 4                      // Index of the column to style
         },
         {
             className: 'max-width-column-name', // Apply the CSS class,
             targets: 8                      // Index of the column to style
+        },
+        {
+            className: 'max-width-column-name', // Apply the CSS class,
+            targets: 9                      // Index of the column to style
         },
         {
             className: 'max-width-column-name', // Apply the CSS class,
