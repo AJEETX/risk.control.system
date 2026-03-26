@@ -8,6 +8,6 @@ namespace risk.control.system.Models.ViewModel
         public BeneficiaryDetail Beneficiary { get; set; } = default!;
         public bool ReSelect { get; set; }
         public string Currency { get; set; } = default!;
-        public CultureInfo Culture { get; set; }
+        public CultureInfo? Culture { get; set; }
     }
 }
