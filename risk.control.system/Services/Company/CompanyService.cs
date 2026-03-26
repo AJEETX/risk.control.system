@@ -62,7 +62,7 @@ namespace risk.control.system.Services.Company
                     Id = u.ClientCompanyId,
                     Document = string.IsNullOrWhiteSpace(u.DocumentUrl) ? Applicationsettings.NO_IMAGE : string.Format("data:image/*;base64,{0}", Convert.ToBase64String(System.IO.File.ReadAllBytes(
                     Path.Combine(env.ContentRootPath, u.DocumentUrl)))),
-                    Domain = $"<a href='/ClientCompany/Details?Id={u.ClientCompanyId}'>" + u.Email + "</a>",
+                    Domain = u.Email,
                     Name = u.Name,
                     //Code = u.Code,
                     Phone = "(+" + u.Country!.ISDCode + ") " + u.PhoneNumber,
@@ -73,7 +73,7 @@ namespace risk.control.system.Services.Company
                     Country = u.Country.Name,
                     PinCode = $"{u.PinCode!.Name} - {u.PinCode.Code}",
                     Flag = "/flags/" + u.Country.Code.ToLower() + ".png",
-                    Updated = u.Updated.HasValue ? u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy"),
+                    Updated = u.Updated ?? u.Created,
                     Active = u.Status!.GetEnumDisplayName(),
                     UpdatedBy = u.UpdatedBy,
                     IsUpdated = u.IsUpdated,

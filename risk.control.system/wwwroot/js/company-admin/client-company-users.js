@@ -37,11 +37,19 @@
         columnDefs: [
             {
                 className: 'max-width-column-name', // Apply the CSS class,
+                targets: 2                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column-name', // Apply the CSS class,
                 targets: 3                      // Index of the column to style
             },
             {
                 className: 'max-width-column', // Apply the CSS class,
                 targets: 4                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column-name', // Apply the CSS class,
+                targets: 9                      // Index of the column to style
             },
             {
                 className: 'max-width-column-name', // Apply the CSS class,
@@ -83,7 +91,7 @@
             {
                 "data": "email",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.rawEmail + '" data-toggle="tooltip">' + data + '</span>'
+                    return '<span class="blue" title="' + data + '" data-toggle="tooltip">' + data + '</span>'
                 }
             },
             {
@@ -132,15 +140,26 @@
                 }
             },
             {
-                "data": "updated",
+                "data": "updatedBy",
                 "mRender": function (data, type, row) {
                     return '<span title="' + data + '" data-toggle="tooltip">' + data + '</span>'
                 }
             },
             {
-                "data": "updatedBy",
-                "mRender": function (data, type, row) {
-                    return '<span title="' + data + '" data-toggle="tooltip">' + data + '</span>'
+                "data": "updated",
+                "render": function (data, type, row) {
+                    if (!data) return "";
+
+                    // 1. Parse UTC string (Assuming format: "2023-10-27T10:00:00Z")
+                    var date = new Date(data);
+
+                    // 2. Convert to Local String
+                    // You can customize the format: { dateStyle: 'medium', timeStyle: 'short' }
+                    var localDate = date.toLocaleString();
+
+                    return `<i title="${localDate}" data-bs-toggle="tooltip">
+                    <small><strong>${localDate}</strong></small>
+                </i>`;
                 }
             },
             {
@@ -148,7 +167,7 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    buttons += '<button id=' + row.id + ' href="/CompanyUser/Edit/' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-pen"></i> Edit</button>&nbsp;'
+                    buttons += '<button data-id=' + row.id + ' class="btn btn-xs btn-warning"><i class="fas fa-edit"></i> Edit</button>'
                     //buttons += '<a href="/CompanyUserRoles/Index?userId=' + row.id + '"  class="btn btn-xs btn-info"><i class="fas fa-pen"></i> Roles</a>'
                     return buttons;
                 }
@@ -160,16 +179,29 @@
             } else {
                 $('td', row).removeClass('lightgrey');
             }
-        },
-        "drawCallback": function (settings, start, end, max, total, pre) {
-            $('#dataTable tbody').on('click', '.btn-warning', function (e) {
-                e.preventDefault(); // Prevent the default anchor behavior
-                var id = $(this).attr('id'); // Extract the ID from the button's ID attribute
-                showedit(id); // Call the getdetails function with the ID
-                window.location.href = $(this).attr('href'); // Navigate to the edit page
-            });
         }
     });
+    $('body').on('click', 'button.btn-xs.btn-warning', function (e) {
+        e.preventDefault();
+        const id = $(this).data('id');
+        showedit(id, this);
+    });
+    function showedit(id, element) {
+        id = String(id).replace(/[^a-zA-Z0-9_-]/g, "");
+        $("body").addClass("submit-progress-bg");
+        setTimeout(() => $(".submit-progress").removeClass("hidden"), 1);
+
+        showSpinnerOnButton(element, "Edit");
+
+        const url = `/CompanyUser/Edit/${encodeURIComponent(id)}`;
+
+        setTimeout(() => {
+            window.location.href = url;
+        }, 1000);
+    }
+    function showSpinnerOnButton(selector, spinnerText) {
+        $(selector).html(`<i class='fas fa-sync fa-spin'></i> ${spinnerText}`);
+    }
     $('#dataTable').on('draw.dt', function () {
         $('[data-toggle="tooltip"]').tooltip({
             animated: 'fade',

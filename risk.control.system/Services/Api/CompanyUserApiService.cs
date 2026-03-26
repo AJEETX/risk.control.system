@@ -194,8 +194,7 @@ namespace risk.control.system.Services.Api
                 {
                     Id = user.Id,
                     Name = $"{user.FirstName} {user.LastName}",
-                    Email = $"<a href='/CompanyUser/Edit?userId={user.Id}'>{user.Email}</a>",
-                    RawEmail = user.Email,
+                    Email = $"{user.Email}",
                     Phone = $"(+{user.Country!.ISDCode}) {user.PhoneNumber}",
                     Photo = photo,
                     Active = user.Active,

@@ -25,7 +25,7 @@
                 className: 'max-width-column-name', // Apply the CSS class,
                 targets: 10                      // Index of the column to style
             }],
-        order: [[11, 'desc'], [12, 'desc']], // Sort by `isUpdated` and `lastModified`,
+        order: [[12, 'desc'], [13, 'desc']], // Sort by `isUpdated` and `lastModified`,
         columns: [
             /* Name of the keys from
             data file source */
@@ -127,7 +127,7 @@
                 "mRender": function (data, type, row) {
                     var buttons = "";
                     if (row.roles == "GUEST" || row.roles == undefined || row.roles == '' || row.roles == null) {
-                        buttons += '<button id="details' + row.id + '" class="btn btn-xs btn-danger"><i class="fa fa-trash "></i> Delete </button>';
+                        buttons += '<button id="' + row.id + '" class="btn btn-xs btn-danger"><i class="fa fa-trash "></i> Delete </button>';
                     }
                     else {
                         buttons += `<a data-id="${row.id}" class="active-claims btn btn-xs btn-info"><i class="fas fa-search"></i> Detail</a>`
@@ -197,7 +197,7 @@
         var $btn = $(this);
         var $spinner = $(".submit-progress"); // global spinner (you already have this)
 
-        var id = $(this).attr('id').replace('details', '');
+        var id = $(this).attr('id');
         var url = '/User/Delete/' + id; // Replace with your actual API URL
 
         $.confirm({

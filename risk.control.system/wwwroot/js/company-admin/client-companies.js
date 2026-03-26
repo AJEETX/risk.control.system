@@ -16,6 +16,10 @@
             },
             {
                 className: 'max-width-column-name', // Apply the CSS class,
+                targets: 10                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column-name', // Apply the CSS class,
                 targets: 11                      // Index of the column to style
             }],
         order: [[13, 'desc'], [14, 'desc']], // Sort by `isUpdated` and `lastModified`,
@@ -44,7 +48,7 @@
                 "data": "domain",
                 bSortable: false,
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.name + '" data-toggle="tooltip">' + data + '</span>'
+                    return '<span class="blue" title="' + row.name + '" data-toggle="tooltip">' + data + '</span>'
                 }
             },
             {
@@ -100,16 +104,27 @@
                 }
             },
             {
-                "data": "updated",
-                "mRender": function (data, type, row) {
-                    return '<span title="' + data + '" data-toggle="tooltip">' + data + '</span>'
-                }
-            },
-            {
                 "data": "updatedBy",
                 bSortable: false,
                 "mRender": function (data, type, row) {
                     return '<span title="' + row.updatedBy + '" data-toggle="tooltip">' + data + '</span>'
+                }
+            },
+            {
+                "data": "updated",
+                "render": function (data, type, row) {
+                    if (!data) return "";
+
+                    // 1. Parse UTC string (Assuming format: "2023-10-27T10:00:00Z")
+                    var date = new Date(data);
+
+                    // 2. Convert to Local String
+                    // You can customize the format: { dateStyle: 'medium', timeStyle: 'short' }
+                    var localDate = date.toLocaleString();
+
+                    return `<i title="${localDate}" data-bs-toggle="tooltip">
+                    <small><strong>${localDate}</strong></small>
+                </i>`;
                 }
             },
             {
