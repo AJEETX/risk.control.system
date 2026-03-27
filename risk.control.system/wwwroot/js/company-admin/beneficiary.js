@@ -147,7 +147,7 @@
                     closeIcon: true,
                     buttons: {
                         confirm: {
-                            text: "Add ",
+                            text: "Add New",
                             btnClass: 'btn-success',
                             action: function () {
                                 askConfirmation = false;
