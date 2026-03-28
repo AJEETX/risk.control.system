@@ -408,7 +408,8 @@
 });
 function giveRating(img, image) {
     img.attr("src", "/img/" + image).prevAll("img.rating").attr("src", "/img/" + image);
-} function refilRating(img1) {
+}
+function refilRating(img1) {
     var rt = $(img1).closest('tr').find("span.avr").text();
     var img = $(img1).closest('tr').find("img[id='" + parseInt(rt) + "']");
     img.attr("src", "/img/FilledStar.jpeg").prevAll("img.rating").attr("src", "/img/FilledStar.jpeg");
