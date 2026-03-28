@@ -12,15 +12,15 @@ namespace risk.control.system.Controllers.Creator
 {
     [Breadcrumb("Cases")]
     [Authorize(Roles = CREATOR.DISPLAY_NAME)]
-    public class CaseCreateEditController : Controller
+    public class CaseDetailController : Controller
     {
-        private readonly ILogger<CaseCreateEditController> _logger;
+        private readonly ILogger<CaseDetailController> _logger;
         private readonly IErrorNotifyService _errorNotifyService;
         private readonly ICaseCreateEditService _caseCreateEditService;
         private readonly INavigationService _navigationService;
         private readonly INotyfService _notifyService;
 
-        public CaseCreateEditController(ILogger<CaseCreateEditController> logger,
+        public CaseDetailController(ILogger<CaseDetailController> logger,
             IErrorNotifyService errorNotifyService,
             ICaseCreateEditService createCreateEditService,
             INavigationService navigationService,
@@ -165,7 +165,7 @@ namespace risk.control.system.Controllers.Creator
                 if (!ModelState.IsValid || id < 0)
                 {
                     _notifyService.Error("OOPS!!!.Case Not Found.Try Again");
-                    return RedirectToAction(nameof(New), "CaseCreateEdit");
+                    return RedirectToAction(nameof(New));
                 }
 
                 var model = await _caseCreateEditService.GetEditPolicyDetail(id);

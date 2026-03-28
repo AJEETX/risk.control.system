@@ -153,7 +153,7 @@
 		<div class="row float-right">
 			<div class="col-md-12">
 				<a id="back"
-					   asp-controller="@(Model!.FromEditPage ? "Creator" : "CaseCreateEdit")"
+					   asp-controller="@(Model!.FromEditPage ? "Creator" : "CaseDetail")"
 					   asp-action="@(Model.FromEditPage ? "Details" : "New")"
 					   asp-route-id="@(Model.FromEditPage ? Model?.ClaimsInvestigation!.Id : null)"
 					   class="btn btn-sm btn-outline-secondary"
