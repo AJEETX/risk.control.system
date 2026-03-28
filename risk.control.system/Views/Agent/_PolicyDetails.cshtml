@@ -42,14 +42,14 @@
 		<div class="card-body pb-0">
 
 			<div class="row">
-				<partial name="_ClaimPolicyDetails" model="@Model" />
+				<partial name="_CaseDetails" model="@Model" />
 				@if (Model.CaseTask?.PolicyDetail?.InsuranceType == InsuranceType.UNDERWRITING)
 				{
-					<partial name="_ClaimCustomerDetails" model="@Model" />
+					<partial name="_CustomerDetails" model="@Model" />
 				}
 				else
 				{
-					<partial name="_ClaimBeneficiaryDetails" model="@Model" />
+					<partial name="_BeneficiaryDetails" model="@Model" />
 				}
 			</div>
 		</div>

@@ -62,9 +62,8 @@ namespace risk.control.system.Helpers
         }
     }
 
-    public static class ControllerName<T> where T : Microsoft.AspNetCore.Mvc.Controller
+    public static class ControllerName<T> where T : Controller
     {
-        // Returns "CaseCreateEdit" instead of "CaseCreateEditController"
         public static string Name => typeof(T).Name.Replace("Controller", "");
     }
 }

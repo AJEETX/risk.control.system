@@ -33,9 +33,9 @@ namespace risk.control.system.Services.Common
     {
         private MvcBreadcrumbNode GetCaseBasePath(long id)
         {
-            var cases = new MvcBreadcrumbNode(nameof(CaseCreateEditController.New), ControllerName<CaseCreateEditController>.Name, "Cases");
+            var cases = new MvcBreadcrumbNode(nameof(CaseDetailController.New), ControllerName<CaseDetailController>.Name, "Cases");
 
-            return new MvcBreadcrumbNode(nameof(CaseCreateEditController.New), ControllerName<CaseCreateEditController>.Name, "Add/Assign") { Parent = cases };
+            return new MvcBreadcrumbNode(nameof(CaseDetailController.New), ControllerName<CaseDetailController>.Name, "Add/Assign") { Parent = cases };
         }
 
         private MvcBreadcrumbNode GetCaseDetailsBase(long id)
@@ -63,8 +63,8 @@ namespace risk.control.system.Services.Common
 
         public MvcBreadcrumbNode GetEditCasePath(long id)
         {
-            return new MvcBreadcrumbNode(nameof(CaseCreateEditController.Edit),
-                ControllerName<CaseCreateEditController>.Name, "Edit Case")
+            return new MvcBreadcrumbNode(nameof(CaseDetailController.Edit),
+                ControllerName<CaseDetailController>.Name, "Edit Case")
             {
                 Parent = GetCaseDetailsBase(id),
                 RouteValues = new { id }
@@ -73,7 +73,7 @@ namespace risk.control.system.Services.Common
 
         public MvcBreadcrumbNode GetEmpanelledVendorsPath(long id, long vendorId, bool fromEditPage = false)
         {
-            return new MvcBreadcrumbNode(nameof(CreatorController.EmpanelledVendors), ControllerName<CreatorController>.Name, "Empanelled Agencies")
+            return new MvcBreadcrumbNode(nameof(CreatorController.EmpanelledAgencies), ControllerName<CreatorController>.Name, "Empanelled Agencies")
             {
                 Parent = fromEditPage ? GetCaseDetailsBase(id) : GetCaseBasePath(id),
                 RouteValues = new { id, vendorId }
