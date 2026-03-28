@@ -48,14 +48,14 @@
 		</div>
 		<div class="row">
 			@{
-				<partial name="_ClaimPolicyDetails" model="@data" />
+				<partial name="_CaseDetails" model="@data" />
 				@if (Model.ClaimsInvestigation?.PolicyDetail!.InsuranceType == InsuranceType.UNDERWRITING)
 				{
-					<partial name="_ClaimCustomerDetails" model="@data" />
+					<partial name="_CustomerDetails" model="@data" />
 				}
 				else
 				{
-					<partial name="_ClaimBeneficairyDetails" model="@data" />
+					<partial name="_BeneficiaryDetails" model="@data" />
 				}
 			}
 		</div>

@@ -6,14 +6,14 @@
 
 <div class="row">
 	@{
-		<partial name="_ClaimPolicyDetails" model="@Model" />
+		<partial name="_CaseDetails" model="@Model" />
 		@if (Model.ClaimsInvestigation?.PolicyDetail?.InsuranceType == InsuranceType.UNDERWRITING)
 		{
-			<partial name="_ClaimCustomerDetails" model="@Model" />
+			<partial name="_CustomerDetails" model="@Model" />
 		}
 		else
 		{
-			<partial name="_ClaimBeneficairyDetails" model="@Model" />
+			<partial name="_BeneficiaryDetails" model="@Model" />
 		}
 	}
 </div>

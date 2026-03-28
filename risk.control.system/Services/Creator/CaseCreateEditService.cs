@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using risk.control.system.AppConstant;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
@@ -84,7 +85,11 @@ namespace risk.control.system.Services.Creator
 
             if (state.IsTrial)
             {
-                var totalReadyToAssign = await _investigationService.GetAutoCount(userEmail);
+                var query = _context.Investigations.AsNoTracking().Where(a => !a.Deleted && a.ClientCompanyId == user!.ClientCompanyId && a.CreatedUser == userEmail);
+
+                query = query.Where(a => CONSTANTS.CreatedAndDraftStatuses.Contains(a.SubStatus));
+
+                int totalReadyToAssign = await query.CountAsync();
                 var totalClaimsCreated = await _context.Investigations.AsNoTracking()
                     .CountAsync(c => !c.Deleted && c.ClientCompanyId == user.ClientCompanyId);
 

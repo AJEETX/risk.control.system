@@ -96,7 +96,7 @@
 						<span asp-validation-for="DateOfBirth" class="text-danger"></span>
 					</div>
 				</div>
-				<partial name="Investigation/_CustomerPhoneNumber" model="@Model" />
+				<partial name="_CustomerPhoneNumber" model="@Model" />
 
 				<div class="form-group">
 					<label class="input-group-label" for="Gender"> Gender:</label>
@@ -161,7 +161,7 @@
 						<span asp-validation-for="Education" class="text-danger"></span>
 					</div>
 				</div>
-				<partial name="Investigation/_CustomerAddress" model="@Model" />
+				<partial name="_CustomerAddress" model="@Model" />
 
 				<div class="form-group">
 					<label class="input-group-label" for="Addressline">Street Address:</label>

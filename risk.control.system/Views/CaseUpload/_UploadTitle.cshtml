@@ -8,10 +8,20 @@
             <span class="tooltip-text" id="information">
                     <li>
                     <i class='far fa-hand-point-right'></i>
-                    <button class='btn btn-info  btn-xs'><i class='fa fa-upload'></i> Upload File </button>
+                    <button class='btn btn-info  btn-xs'><i class='fa fa-upload'></i> Upload </button> | <button class='btn btn-danger  btn-xs'><i class='fa fa-random'></i> Assign </button>
                 </li>
                 @if (Model.HasFileUploads)
                 {
+                    <li>
+                        <i class='far fa-hand-point-down'></i>
+                        <button class='badge xs i-green upload-success'>
+                            <span class="badge badge-outline-success"><i class='fa fa-check'></i> </span> Success
+                        </button>
+                        |
+                        <button class='badge xs badge-danger xs'>
+                            <span class="badge badge-danger"><i class='fa fa-download'></i> </span> Error File
+                        </button>
+                    </li>
                     <li>
                         <i class='far fa-hand-point-down'></i>  <button class='badge badge-primary xs'>
                             <span class="badge badge-primary"><i class='fa fa-download'></i> </span> Download
@@ -30,7 +40,7 @@
     <div class="card-tools">
         <span data-bs-toggle="tooltip" title="Click to download sample File"><span class="download-file">
                 <a class="ziplink text-white" href="@Url.Content($"~/headers/{Model.FileSampleIdentifier}.zip")">
-                    <i class="nav-icon fa fa-download"></i>  sample file
+                    <img src="~/headers/download.gif" alt="download" />  sample file
                 </a>
             </span>
         </span>
