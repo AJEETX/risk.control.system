@@ -55,9 +55,9 @@ namespace risk.control.system.Services
                 .FirstOrDefault();
 
             // ⚠️ Legacy hack preserved
-            vendor.SelectedCountryId = agentCount;
-            vendor.SelectedStateId = currentCases?.CaseCount ?? 0;
-            vendor.SelectedDistrictId = totalCases;
+            vendor.UserCount = agentCount;
+            vendor.CurrentCasesCount = currentCases?.CaseCount ?? 0;
+            vendor.CompletedCasesCount = totalCases;
             vendor.SelectedPincodeId = selectedCaseId;
 
             return vendor;

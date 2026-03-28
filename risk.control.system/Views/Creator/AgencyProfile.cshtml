@@ -1,7 +1,7 @@
 ﻿@model risk.control.system.Models.Vendor
 
 @{
-	ViewData["Title"] = @Applicationsettings.DETAILS;
+	ViewData["Title"] = "Agency Detail";
 }
 
 <section class="content">
@@ -71,7 +71,7 @@
 							<div class="row">
 								<div class="col-md-12">
 									<div class="form-group">
-										<label class="card-header shadow-lg rounded-lg text-sm bg-light" title="Agents (@Model.SelectedCountryId)" data-bs-toggle="tooltip"><i class="fa fa-user-secret"></i>  Agents (@Model.SelectedCountryId)</label>
+										<label class="card-header shadow-lg rounded-lg text-sm bg-light" title="Agents (@Model.UserCount)" data-bs-toggle="tooltip"><i class="fa fa-user-secret"></i>  Agents (@Model.UserCount)</label>
 										<label class="card-header shadow-lg rounded-lg text-sm bg-light" title="Service (@Model.VendorInvestigationServiceTypes!.Count)" data-bs-toggle="tooltip"><i class="fas fa-cogs"></i>  Service (@Model.VendorInvestigationServiceTypes.Count)</label>
 									</div>
 								</div>
@@ -84,14 +84,14 @@
 						<div class="col-md-6">
 							<div class="small-box bg-light border">
 								<div class="inner">
-									<h3>@Model.SelectedDistrictId</h3>
+									<h3>@Model.CompletedCasesCount</h3>
 									<p>Cases Completed</p>
 								</div>
 								<div class="icon"><i class="fas fa-check-double text-success"></i></div>
 							</div>
 							<div class="small-box bg-light border">
 								<div class="inner">
-									<h3>@Model.SelectedStateId</h3>
+									<h3>@Model.CurrentCasesCount</h3>
 									<p>Current Cases</p>
 								</div>
 								<div class="icon"><i class="fas fa-hourglass-half text-info"></i></div>
@@ -182,7 +182,7 @@
 			<div class="row float-right">
 				<div class="col-md-12">
 					<div class="form-group">
-						<a id="back" asp-controller="Creator" asp-action="EmpanelledVendors"
+						<a id="back" asp-controller="Creator" asp-action="EmpanelledAgencies"
 							   asp-route-id="@Model.SelectedPincodeId" asp-route-vendorId="@Model.VendorId"
 							   class="btn btn-outline-secondary" data-bs-toggle="tooltip" title="Back to Empanelled Agencies">
 							<i class="fas fa-arrow-left"></i>

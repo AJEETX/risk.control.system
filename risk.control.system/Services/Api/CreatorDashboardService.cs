@@ -105,7 +105,7 @@ namespace risk.control.system.Services.Api
             return new DashboardData
             {
                 FirstBlockName = "ADD/ASSIGN",
-                FirstBlockUrl = "/CaseCreateEdit/New",
+                FirstBlockUrl = "/CaseDetail/New",
                 FirstBlockCount = claimAssign,
                 SecondBlockCount = underwritingAssign,
                 BulkUploadBlockName = "UPLOAD",
