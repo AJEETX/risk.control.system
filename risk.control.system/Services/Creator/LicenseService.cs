@@ -7,7 +7,7 @@ namespace risk.control.system.Services.Creator
 {
     public interface ILicenseService
     {
-        Task<LicenseStatus> GetUploadPermissionsAsync(ApplicationUser user);
+        Task<LicenseStatus> GetUploadPermissionsAsync(ApplicationUser user, bool isManager = false);
     }
 
     public class LicenseService : ILicenseService
@@ -21,13 +21,23 @@ namespace risk.control.system.Services.Creator
             this.investigationService = investigationService;
         }
 
-        public async Task<LicenseStatus> GetUploadPermissionsAsync(ApplicationUser user)
+        public async Task<LicenseStatus> GetUploadPermissionsAsync(ApplicationUser user, bool isManager = false)
         {
             var company = user.ClientCompany;
             if (company!.LicenseType != LicenseType.Trial)
                 return LicenseStatus.Unlimited();
 
             var totalReadyToAssign = await investigationService.GetAutoCount(user.Email!);
+            bool hasUploadFiles = false;
+            if (!isManager)
+            {
+                hasUploadFiles = await context.FilesOnFileSystem.AsNoTracking().AnyAsync(f => f.UploadedBy == user.Email && !f.Deleted);
+            }
+            else
+            {
+                hasUploadFiles = await context.FilesOnFileSystem.AsNoTracking().AnyAsync(f => f.CompanyId == user.ClientCompanyId && !f.Deleted);
+            }
+
             var totalClaimsCreated = await context.Investigations
                 .CountAsync(c => !c.Deleted && c.ClientCompanyId == company.ClientCompanyId);
 
@@ -36,7 +46,7 @@ namespace risk.control.system.Services.Creator
             return new LicenseStatus
             {
                 CanCreate = (available > 0) && (company.TotalToAssignMaxAllowed > totalReadyToAssign),
-                HasClaimsPending = totalReadyToAssign > 0,
+                HasClaimsPending = hasUploadFiles,
                 AvailableCount = available,
                 MaxAllowed = company.TotalCreatedClaimAllowed
             };

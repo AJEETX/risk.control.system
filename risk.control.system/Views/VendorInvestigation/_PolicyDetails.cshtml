@@ -51,14 +51,14 @@
 					Beneficiary = Model.Beneficiary!
 				};
 
-				<partial name="_ClaimPolicyDetails" model="@pmodel" />
+				<partial name="_CaseDetails" model="@pmodel" />
 				@if (Model.CaseTask!.PolicyDetail!.InsuranceType == InsuranceType.UNDERWRITING)
 				{
-					<partial name="_ClaimCustomerDetails" model="@pmodel" />
+					<partial name="_CustomerDetails" model="@pmodel" />
 				}
 				else
 				{
-					<partial name="_ClaimBeneficairyDetails" model="@pmodel" />
+					<partial name="_BeneficiaryDetails" model="@pmodel" />
 				}
 			}
 		</div>
