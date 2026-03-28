@@ -140,7 +140,7 @@
 								<span class="detail-wizard"> <i class="far fa-hand-point-up"></i>  Complete  details to <b> Assign </b> <i class="far fa-hand-point-down"></i></span>
 							</div>
 							<div class="d-flex justify-content-center align-items-center">
-								<a id="back" asp-controller="CaseCreateEdit" asp-action="New" class="btn btn-outline-secondary btn-sm"><span class="badge badge-light"> <i class="fas fa-arrow-left"></i> <i class="fa fa-random"></i></span> Back </a>
+								<a id="back" asp-controller="CaseDetail" asp-action="New" class="btn btn-outline-secondary btn-sm"><span class="badge badge-light"> <i class="fas fa-arrow-left"></i> <i class="fa fa-random"></i></span> Back </a>
 								<button disabled class="btn btn-warning disabled btn-sm">
 									<span class="badge badge-warning"> <i class="fas fa-random"></i></span><b> Assign </b> <i class="small-suffix"> auto</i>
 								</button>
@@ -155,13 +155,13 @@
 								<span class="detail-wizard-complete"> <i class="far fa-thumbs-up"></i> Detail completed. <b> Assign </b> <i class="far fa-hand-point-down"></i></span>
 							</div>
 							<div class="d-flex justify-content-center align-items-center">
-								<a id="back" asp-controller="CaseCreateEdit" asp-action="New" class="btn btn-outline-secondary btn-sm" title="Back to Add/Assign cases" data-bs-toggle="tooltip"> <i class="fas fa-arrow-left"></i> <span class="badge badge-light"><i class="fa fa-random"></i></span> Back </a>
+								<a id="back" asp-controller="CaseDetail" asp-action="New" class="btn btn-outline-secondary btn-sm" title="Back to Add/Assign cases" data-bs-toggle="tooltip"> <i class="fas fa-arrow-left"></i> <span class="badge badge-light"><i class="fa fa-random"></i></span> Back </a>
 								@if (customerExist && beneficiaryExist && Model!.CaseIsValidToAssign)
 								{
 									<button type="submit" id="assign-list" class="btn btn-warning btn-sm">
 										<span class="badge badge-warning"> <i class="fas fa-random"></i></span><b> Assign</b><sub> auto </sub>
 									</button>
-									<a id="assign-manual" href="/Creator/EmpanelledVendors/@Model?.ClaimsInvestigation!.Id?fromEditPage=true" class="btn btn-info btn-sm">
+									<a id="assign-manual" href="/Creator/EmpanelledAgencies/@Model?.ClaimsInvestigation!.Id?fromEditPage=true" class="btn btn-info btn-sm">
 										<span class="badge badge-info"> <i class="fas fa-external-link-alt"></i></span><b> Assign</b><sub> manual </sub>
 									</a>
 								}

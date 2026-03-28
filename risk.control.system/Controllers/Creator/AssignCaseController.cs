@@ -47,7 +47,7 @@ namespace risk.control.system.Controllers.Creator
                 if (!ModelState.IsValid || claims == null || claims.Count == 0)
                 {
                     _notifyService.Custom($"No Case selected!!!. Please select Case to be assigned.", 3, "red", "far fa-file-powerpoint");
-                    return RedirectToAction(nameof(CaseCreateEditController.New), ControllerName<CaseCreateEditController>.Name);
+                    return RedirectToAction(nameof(CaseDetailController.New), ControllerName<CaseDetailController>.Name);
                 }
 
                 // AUTO ALLOCATION COUNT
@@ -56,7 +56,7 @@ namespace risk.control.system.Controllers.Creator
                 if (affectedRows < distinctClaims.Count)
                 {
                     _notifyService.Custom($"Case(s) assignment error", 3, "orange", "far fa-file-powerpoint");
-                    return RedirectToAction(nameof(CaseCreateEditController.New), ControllerName<CaseCreateEditController>.Name);
+                    return RedirectToAction(nameof(CaseDetailController.New), ControllerName<CaseDetailController>.Name);
                 }
                 var jobId = _backgroundJobClient.Enqueue(() => _assignCaseService.BackgroundAutoAllocation(distinctClaims, userEmail, _baseUrl));
                 _notifyService.Custom($"Assignment of <b> {distinctClaims.Count}</b> Case(s) started", 3, "orange", "far fa-file-powerpoint");
@@ -67,7 +67,7 @@ namespace risk.control.system.Controllers.Creator
                 _logger.LogError(ex, "Error deleting case(s). {UserEmail}", userEmail);
                 _notifyService.Error("Error assigning case. Try again.");
             }
-            return RedirectToAction(nameof(CaseCreateEditController.New), ControllerName<CaseCreateEditController>.Name);
+            return RedirectToAction(nameof(CaseDetailController.New), ControllerName<CaseDetailController>.Name);
         }
 
         [ValidateAntiForgeryToken]
@@ -80,7 +80,7 @@ namespace risk.control.system.Controllers.Creator
                 if (!ModelState.IsValid || selectedcase < 1 || caseId < 1)
                 {
                     _notifyService.Custom($"Error!!! Try again", 3, "red", "far fa-file-powerpoint");
-                    return RedirectToAction(nameof(CaseCreateEditController.New), ControllerName<CaseCreateEditController>.Name);
+                    return RedirectToAction(nameof(CaseDetailController.New), ControllerName<CaseDetailController>.Name);
                 }
 
                 var (policy, status, agencyName) = await _assignCaseService.AllocateToVendor(userEmail, caseId, selectedcase, false);
@@ -88,7 +88,7 @@ namespace risk.control.system.Controllers.Creator
                 if (string.IsNullOrEmpty(policy) || string.IsNullOrEmpty(status))
                 {
                     _notifyService.Custom($"Error!!! Try again", 3, "red", "far fa-file-powerpoint");
-                    return RedirectToAction(nameof(CaseCreateEditController.New), ControllerName<CaseCreateEditController>.Name);
+                    return RedirectToAction(nameof(CaseDetailController.New), ControllerName<CaseDetailController>.Name);
                 }
 
                 var jobId = _backgroundJobClient.Enqueue(() => _mailService.NotifyCaseAllocationToVendorAndManager(userEmail, policy, caseId, selectedcase, _baseUrl));
@@ -101,7 +101,7 @@ namespace risk.control.system.Controllers.Creator
             {
                 _logger.LogError(ex, "Error assigning case {Id} to {Agency}. {UserEmail}", caseId, selectedcase, userEmail);
                 _notifyService.Error("Error assigning case. Try again.");
-                return RedirectToAction(nameof(CaseCreateEditController.New), ControllerName<CaseCreateEditController>.Name);
+                return RedirectToAction(nameof(CaseDetailController.New), ControllerName<CaseDetailController>.Name);
             }
         }
 
@@ -115,14 +115,14 @@ namespace risk.control.system.Controllers.Creator
                 if (!ModelState.IsValid || claims < 1)
                 {
                     _notifyService.Custom($"No case selected!!!. Please select case to be assigned.", 3, "red", "far fa-file-powerpoint");
-                    return RedirectToAction(nameof(CaseCreateEditController.New), ControllerName<CaseCreateEditController>.Name);
+                    return RedirectToAction(nameof(CaseDetailController.New), ControllerName<CaseDetailController>.Name);
                 }
 
                 var allocatedCaseNumber = await _assignCaseService.ProcessAutoSingleAllocation(claims, userEmail, _baseUrl);
                 if (string.IsNullOrWhiteSpace(allocatedCaseNumber))
                 {
                     _notifyService.Custom($"Case #:{allocatedCaseNumber} Not Assigned", 3, "orange", "far fa-file-powerpoint");
-                    return RedirectToAction(nameof(CaseCreateEditController.New), ControllerName<CaseCreateEditController>.Name);
+                    return RedirectToAction(nameof(CaseDetailController.New), ControllerName<CaseDetailController>.Name);
                 }
                 _notifyService.Custom($"Case <b>#:{allocatedCaseNumber}</b> Assigned<sub>auto</b>", 3, "green", "far fa-file-powerpoint");
             }
@@ -130,7 +130,7 @@ namespace risk.control.system.Controllers.Creator
             {
                 _logger.LogError(ex, "Error assigning case {Id}. {UserEmail}", claims, userEmail);
                 _notifyService.Error("Error assigning case. Try again.");
-                return RedirectToAction(nameof(CaseCreateEditController.New), ControllerName<CaseCreateEditController>.Name);
+                return RedirectToAction(nameof(CaseDetailController.New), ControllerName<CaseDetailController>.Name);
             }
             return RedirectToAction(nameof(CaseActiveController.Active), ControllerName<CaseActiveController>.Name);
         }

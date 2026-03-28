@@ -327,7 +327,7 @@
 
         showSpinnerOnButton(element, "Assign");
 
-        const editUrl = `/Creator/EmpanelledVendors/${encodeURIComponent(id)}`;
+        const editUrl = `/Creator/EmpanelledAgencies/${encodeURIComponent(id)}`;
 
         setTimeout(() => {
             window.location.href = editUrl;
