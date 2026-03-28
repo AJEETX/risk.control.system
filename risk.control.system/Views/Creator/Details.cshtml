@@ -121,9 +121,25 @@
 				<i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
 			</div>
 			<div class="row">
+				<partial name="_FilledCase" model="@Model" />
+				@if (@customerExist)
+				{
+					<partial name="_FilledCustomerDetail" model="@Model" />
+				}
+				else
+				{
+					<partial name="_BlankCustomerDetail" model="@Model" />
 
-				<partial name="Investigation/_FilledCase" model="@Model" />
-				<partial name="Investigation/_CustomerAndBeneficiary" model="@Model" />
+				}
+
+				@if (@beneficiaryExist)
+				{
+				<partial name="_FilledBeneficiaryDetail" model="@Model" />
+				}
+				else
+				{
+				<partial name="_BlankBeneficiaryDetail" model="@Model" />
+				}
 			</div>
 		</div>
 		<form id="create-form" method="post" asp-controller="AssignCase" asp-action="AssignAutoSingle">
