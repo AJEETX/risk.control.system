@@ -42,6 +42,8 @@ namespace risk.control.system.Controllers.Creator
             }
             try
             {
+                var isManager = HttpContext?.User?.IsInRole(MANAGER.DISPLAY_NAME) ?? false;
+
                 var result = await _caseUploadService.GetUploadViewDataAsync(userEmail, uploadId);
 
                 if (result == null) return RedirectToDashboard("File Upload failed.");
