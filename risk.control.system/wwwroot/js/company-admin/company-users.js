@@ -94,7 +94,7 @@
             {
                 "data": "phone",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + data + '" data-bs-toggle="tooltip"> <img alt="' + data + '" title="' + data + '" src="' + row.flag + '" class="flag-icon" data-bs-toggle="tooltip"/>' + data + '</span>'
+                    return '<span title="' + data + '" data-bs-toggle="tooltip"> <img alt="' + data + '" src="' + row.flag + '" class="flag-icon" data-bs-toggle="tooltip"/>' + data + '</span>'
                 }
             },
             {
