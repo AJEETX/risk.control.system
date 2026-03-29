@@ -28,7 +28,7 @@ namespace risk.control.system.Controllers.Common
         [Breadcrumb("Error Logs")]
         public IActionResult ErrorLog()
         {
-            var logPath = Path.Combine(_env.ContentRootPath, "Logs");
+            var logPath = Path.Combine(_env.ContentRootPath, CONSTANTS.LogsDirectory);
             if (!Directory.Exists(logPath)) Directory.CreateDirectory(logPath);
 
             var files = Directory.GetFiles(logPath, "*.json")
@@ -51,12 +51,12 @@ namespace risk.control.system.Controllers.Common
         {
             var safeFileName = Path.GetFileName(fileName);
 
-            string logsDirectory = Path.GetFullPath(Path.Combine(_env.ContentRootPath, "Logs"));
+            string logsDirectoryPath = Path.GetFullPath(Path.Combine(_env.ContentRootPath, CONSTANTS.LogsDirectory));
 
-            var relativePath = Path.Combine("Logs", safeFileName);
+            var relativePath = Path.Combine(logsDirectoryPath, safeFileName);
             var fullPath = Path.GetFullPath(Path.Combine(_env.ContentRootPath, relativePath));
 
-            if (!fullPath.StartsWith(logsDirectory, StringComparison.OrdinalIgnoreCase))
+            if (!fullPath.StartsWith(logsDirectoryPath, StringComparison.OrdinalIgnoreCase))
             {
                 _logger.LogWarning("Malicious path detected: {FileName}", safeFileName);
                 return BadRequest("Invalid file name.");
