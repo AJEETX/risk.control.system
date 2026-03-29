@@ -8,6 +8,7 @@
         public const string NullInvalid = "null/invalid";
         public const string ValidDateFormat = "dd-MM-yyyy";
         public const string AgencyUsersImageCollection = "AgencyUsersImageCollection";
+        public const string LogsDirectory = "Logs";
 
         public static class CASE_STATUS
         {
