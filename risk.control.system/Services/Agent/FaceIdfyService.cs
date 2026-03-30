@@ -48,42 +48,28 @@ internal class FaceIdfyService : IFaceIdfyService
     {
         var caseDetail = await caseService.GetCaseById(data.CaseId);
         if (caseDetail?.InvestigationReport == null) return null!;
-
-        // 1. Resolve Entities
         var agent = await context.ApplicationUser.FirstAsync(u => u.Email == data.Email);
         var location = caseDetail.InvestigationReport.ReportTemplate!.LocationReport.First(l => l.LocationName == data.LocationName);
-
         var locationTemplate = await context.LocationReport.Include(l => l.FaceIds).FirstAsync(l => l.Id == location.Id);
-
         var faceIdReport = locationTemplate.FaceIds!.First(c => c.ReportName == data.ReportName);
 
         try
         {
-            // 2. Data Preparation
             bool isCustomer = faceIdReport.ReportName == DigitalIdReportType.CUSTOMER_FACE.GetEnumDisplayName();
             var (lat, lon) = VerificationHelper.ParseCoordinates(data.LocationLatLong!);
             var expected = VerificationHelper.GetExpectedCoordinates(caseDetail);
-
             var (fileName, relativePath) = await fileStorageService.SaveAsync(data.Image!, "Case", caseDetail.PolicyDetail!.ContractNumber, "report");
             var faceBytes = await VerificationHelper.GetBytesFromIFormFile(data.Image!);
-
             var regPath = Path.Combine(webHostEnvironment.ContentRootPath, FaceIdfyHelper.GetRegisteredImagePath(caseDetail, isCustomer));
             var registeredImage = await File.ReadAllBytesAsync(regPath);
-
-            // 3. Parallel Execution (External APIs)
             var faceTask = faceMatchService.GetFaceMatchAsync(registeredImage, faceBytes, Path.GetExtension(fileName));
             var weatherTask = weatherInfoService.GetWeatherAsync(lat, lon);
             var addressTask = httpClientService.GetRawAddress(lat, lon);
-            var mapTask = customApiCLient.GetMap(expected.lat, expected.lon, double.Parse(lat), double.Parse(lon), "S", "E", "300", "300", "green", "red");
-
+            var mapTask = customApiCLient.GetMap(expected.lat, expected.lon, double.Parse(lat), double.Parse(lon));
             await Task.WhenAll(faceTask, weatherTask, addressTask, mapTask);
-
-            // 4. Update and Save
             FaceIdfyHelper.MapMetadataToReport(faceIdReport, locationTemplate, data, relativePath, Path.GetExtension(fileName), lat, lon);
-
             var (conf, compImg, sim) = await faceTask;
             var (dist, distM, dur, durS, mapUrl) = await mapTask;
-
             faceIdReport.LocationMapUrl = mapUrl;
             faceIdReport.Distance = dist;
             faceIdReport.Duration = dur;
@@ -92,10 +78,8 @@ internal class FaceIdfyService : IFaceIdfyService
             faceIdReport.MatchConfidence = conf;
             faceIdReport.Similarity = sim;
             faceIdReport.ImageValid = sim > 70;
-
             await File.WriteAllBytesAsync(faceIdReport.FilePath!, compImg);
             await context.SaveChangesAsync();
-
             return FaceIdfyHelper.BuildResponse(caseDetail, faceIdReport, compImg);
         }
         catch (Exception ex)

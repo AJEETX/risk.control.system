@@ -41,7 +41,6 @@ namespace risk.control.system.Controllers.CompanyAdmin
         [HttpGet]
         public async Task<IActionResult> GetStates(int draw, int start, int length, string search, int? orderColumn, string orderDirection)
         {
-            // Determine column to sort by
             string sortColumn = orderColumn switch
             {
                 0 => "Code",   // First column (index 0)
@@ -49,42 +48,25 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 2 => "Country.Name",   // Third column (index 2)
                 _ => "Code"    // Default to "Code" if no column is specified
             };
-
-            // Determine sort direction
             bool isAscending = orderDirection?.ToLower() == "asc";
-            var query = _context.State
-                .Include(s => s.Country)
-                .AsQueryable();
+            var query = _context.State.Include(s => s.Country).AsQueryable();
             var userEmail = HttpContext.User.Identity?.Name;
-
             var user = await _context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == userEmail);
             if (!user!.IsSuperAdmin)
             {
                 query = query.Where(s => s.CountryId == user.CountryId);
             }
-            // Apply search filter
             if (!string.IsNullOrEmpty(search) && Regex.IsMatch(search, @"^[a-zA-Z0-9\s]*$"))
             {
                 var lowerSearch = search.ToLower();
-                query = query.Where(p =>
-                    p.Code.ToLower().Contains(lowerSearch) ||
-                    p.Name.ToLower().Contains(lowerSearch) ||
-                    p.Country!.Name.ToLower().Contains(lowerSearch));
+                query = query.Where(p => p.Code.ToLower().Contains(lowerSearch) || p.Name.ToLower().Contains(lowerSearch) || p.Country!.Name.ToLower().Contains(lowerSearch));
             }
-
-            // Dynamically apply sorting using reflection
             var parameter = Expression.Parameter(typeof(State), "p");
-
-            // Helper method to handle nested properties (e.g., "Country.Name")
             Expression GetPropertyExpression(Expression parentExpression, string propertyName)
             {
-                var property = Expression.Property(parentExpression, propertyName);
-                return property;
+                return Expression.Property(parentExpression, propertyName);
             }
-
-            // Handle sorting by related entity (e.g., Country.Name)
             Expression propertyExpression = parameter;
-
             if (sortColumn.Contains('.'))
             {
                 var parts = sortColumn.Split('.');
@@ -97,50 +79,12 @@ namespace risk.control.system.Controllers.CompanyAdmin
             {
                 propertyExpression = GetPropertyExpression(propertyExpression, sortColumn); // Simple property (e.g., Code or Name)
             }
-
             var lambda = Expression.Lambda<Func<State, object>>(Expression.Convert(propertyExpression, typeof(object)), parameter);
-
-            // Apply sorting
             query = isAscending ? query.OrderBy(lambda) : query.OrderByDescending(lambda);
-
-            // Get total records before filtering
             var totalRecords = await query.CountAsync();
-            var rawData = await query
-            .Skip(start)
-            .Take(length)
-            .Select(s => new
-            {
-                s.StateId,
-                s.Name,
-                s.Code,
-                s.UpdatedBy,
-                s.Updated,
-                s.Created,
-                CountryName = s.Country!.Name
-            })
-            .ToListAsync();
-            // Apply paging
-            // Now format the datetime in memory
-            var data = rawData.Select(s => new
-            {
-                s.StateId,
-                s.Name,
-                s.Code,
-                s.UpdatedBy,
-                Updated = s.Updated ?? s.Created,
-                s.CountryName
-            });
-
-            // Prepare DataTables response
-            var response = new
-            {
-                draw = draw,
-                recordsTotal = totalRecords,
-                recordsFiltered = totalRecords,
-                data = data
-            };
-
-            return Json(response);
+            var rawData = await query.Skip(start).Take(length).Select(s => new { s.StateId, s.Name, s.Code, s.UpdatedBy, s.Updated, s.Created, CountryName = s.Country!.Name }).ToListAsync();
+            var data = rawData.Select(s => new { s.StateId, s.Name, s.Code, s.UpdatedBy, Updated = s.Updated ?? s.Created, s.CountryName });
+            return Json(new { draw = draw, recordsTotal = totalRecords, recordsFiltered = totalRecords, data = data });
         }
 
         [HttpPost]

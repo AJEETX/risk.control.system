@@ -42,105 +42,105 @@ namespace risk.control.system.Services.Api
         {
             try
             {
-                // 1. Get initial data (Vendor info & Feature flag)
-                ApplicationUser? vendorUser;
-                bool onboardingEnabled;
-                using (var context = await _contextFactory.CreateDbContextAsync())
-                {
-                    vendorUser = await context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == userEmail);
-                    onboardingEnabled = await featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED);
-                }
+                // 1. Fetch all necessary data in one or two context uses
+                var (vendorAgents, caseTask) = await FetchRequiredData(userEmail, caseId);
 
-                if (vendorUser == null) return new ConcurrentBag<AgentData>();
+                if (caseTask == null || !vendorAgents.Any())
+                    return new ConcurrentBag<AgentData>();
 
-                // 2. Fetch Agents (Dispose context immediately after ToListAsync)
-                List<ApplicationUser> vendorAgents;
-                using (var context = await _contextFactory.CreateDbContextAsync())
-                {
-                    var query = context.ApplicationUser.AsNoTracking()
-                        .Where(u => u.VendorId == vendorUser.VendorId && !u.Deleted && u.Active && u.Role == AppRoles.AGENT);
-
-                    if (onboardingEnabled)
-                        query = query.Where(u => !string.IsNullOrWhiteSpace(u.MobileUId));
-
-                    vendorAgents = await query
-                        .Include(u => u.Country).Include(u => u.State)
-                        .Include(u => u.District).Include(u => u.PinCode)
-                        .OrderBy(u => u.FirstName).ThenBy(u => u.LastName)
-                        .ToListAsync();
-                }
-
-                // 3. Fetch Case Task
-                InvestigationTask? caseTask;
-                using (var context = await _contextFactory.CreateDbContextAsync())
-                {
-                    caseTask = await context.Investigations.AsNoTracking()
-                        .Include(c => c.PolicyDetail)
-                        .Include(c => c.CustomerDetail)
-                        .Include(c => c.BeneficiaryDetail)
-                        .FirstOrDefaultAsync(c => c.Id == caseId);
-                }
-
-                if (caseTask == null) return new ConcurrentBag<AgentData>();
-
-                // 4. External Service calls (Ensure these don't share the 'main' context)
                 var agentCaseCounts = await dashboardService.CalculateAgentCaseStatus(userEmail);
 
-                var IsUW = caseTask.PolicyDetail!.InsuranceType == InsuranceType.UNDERWRITING;
-                string locationLat = IsUW ? caseTask.CustomerDetail!.Latitude! : caseTask.BeneficiaryDetail!.Latitude!;
-                string locationLng = IsUW ? caseTask.CustomerDetail!.Longitude! : caseTask.BeneficiaryDetail!.Longitude!;
+                // 2. Determine target coordinates once
+                var isUW = caseTask.PolicyDetail!.InsuranceType == InsuranceType.UNDERWRITING;
+                var targetLocationInfo = isUW ? caseTask.CustomerDetail!.AddressLocationInfo : caseTask.BeneficiaryDetail!.AddressLocationInfo;
+                var targetLatitude = isUW ? caseTask.CustomerDetail!.Latitude : caseTask.BeneficiaryDetail!.Latitude;
+                var targetLongitude = isUW ? caseTask.CustomerDetail!.Longitude : caseTask.BeneficiaryDetail!.Longitude;
 
+                var targetLat = double.Parse(targetLatitude!);
+                var targetLng = double.Parse(targetLongitude!);
+
+                // 3. Parallel Processing of external API calls
                 var agentList = new ConcurrentBag<AgentData>();
-
-                // 5. Parallel Processing
-                var mapTasks = vendorAgents.Select(async (agent) =>
+                var tasks = vendorAgents.Select(async agent =>
                 {
-                    int claimCount = agentCaseCounts!.GetValueOrDefault(agent.Email, 0);
 
-                    // API calls are safe to parallelize as they don't use DbContext
-                    var (distance, distanceInMetre, duration, durationInSec, map) =
-                        await customApiClient.GetMap(
-                            double.Parse(agent.AddressLatitude!),
-                            double.Parse(agent.AddressLongitude!),
-                            double.Parse(locationLat),
-                            double.Parse(locationLng));
-
-                    var photo = await base64FileService.GetBase64FileAsync(agent.ProfilePictureUrl!, Applicationsettings.NO_IMAGE);
-                    var mapDetails = $"Driving distance: {distance}; Duration: {duration}";
-
-                    agentList.Add(new AgentData
-                    {
-                        Id = agent.Id,
-                        Photo = photo,
-                        Name = $"{agent.FirstName} {agent.LastName}",
-                        Phone = $"(+{agent.Country!.ISDCode}) {agent.PhoneNumber}",
-                        Addressline = $"{agent.Addressline}, {agent.District!.Name}, {agent.State!.Code}, {agent.Country.Code}",
-                        Country = agent.Country.Code,
-                        Flag = $"/flags/{agent.Country.Code.ToLower()}.png",
-                        Active = agent.Active,
-                        Count = claimCount,
-                        UpdateBy = agent.UpdatedBy ?? "",
-                        AgentOnboarded = agent.Role != AppRoles.AGENT || !string.IsNullOrWhiteSpace(agent.MobileUId),
-                        RawEmail = agent.Email!,
-                        PersonMapAddressUrl = string.Format(map, "300", "300"),
-                        MapDetails = mapDetails,
-                        PinCode = agent.PinCode!.Code,
-                        Distance = distance,
-                        DistanceInMetres = distanceInMetre,
-                        Duration = duration,
-                        DurationInSeconds = durationInSec,
-                        AddressLocationInfo = IsUW ? caseTask.CustomerDetail!.AddressLocationInfo : caseTask.BeneficiaryDetail!.AddressLocationInfo
-                    });
+                    var data = await MapToAgentData(agent, targetLat, targetLng, agentCaseCounts, targetLocationInfo!);
+                    agentList.Add(data);
                 });
 
-                await Task.WhenAll(mapTasks);
-                return agentList;
+                await Task.WhenAll(tasks);
+
+                // Return sorted by distance (usually what users want)
+                return new ConcurrentBag<AgentData>(agentList.OrderBy(a => a.DistanceInMetres));
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error in GetAgentWithCases...{UserEmail}", userEmail);
+                logger.LogError(ex, "Error in GetAgentWithCases for {UserEmail}", userEmail);
                 throw;
             }
+        }
+
+        private async Task<(List<ApplicationUser> Agents, InvestigationTask? Case)> FetchRequiredData(string userEmail, long caseId)
+        {
+            await using var context = await _contextFactory.CreateDbContextAsync();
+
+            var vendorUser = await context.ApplicationUser.AsNoTracking()
+                .FirstOrDefaultAsync(c => c.Email == userEmail);
+
+            if (vendorUser == null) return (new List<ApplicationUser>(), null);
+
+            var onboardingEnabled = await featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED);
+
+            var agentsQuery = context.ApplicationUser.AsNoTracking()
+                .Where(u => u.VendorId == vendorUser.VendorId && !u.Deleted && u.Active && u.Role == AppRoles.AGENT);
+
+            if (onboardingEnabled)
+                agentsQuery = agentsQuery.Where(u => !string.IsNullOrWhiteSpace(u.MobileUId));
+
+            var agents = await agentsQuery
+                .Include(u => u.Country).Include(u => u.State)
+                .Include(u => u.District).Include(u => u.PinCode)
+                .OrderBy(u => u.FirstName).ToListAsync();
+
+            var caseTask = await context.Investigations.AsNoTracking()
+                .Include(c => c.PolicyDetail)
+                .Include(c => c.CustomerDetail)
+                .Include(c => c.BeneficiaryDetail)
+                .FirstOrDefaultAsync(c => c.Id == caseId);
+
+            return (agents, caseTask);
+        }
+
+        private async Task<AgentData> MapToAgentData(ApplicationUser agent, double tLat, double tLng, Dictionary<string, int> counts, string addressInfo)
+        {
+            var claimCount = counts?.GetValueOrDefault(agent.Email!, 0) ?? 0;
+            var mapTask = customApiClient.GetMap(double.Parse(agent.AddressLatitude!), double.Parse(agent.AddressLongitude!), tLat, tLng);
+            var photoTask = base64FileService.GetBase64FileAsync(agent.ProfilePictureUrl!, Applicationsettings.NO_IMAGE);
+            await Task.WhenAll(mapTask, photoTask);
+            var (dist, distMetre, dur, durSec, mapUrl) = await mapTask;
+            return new AgentData
+            {
+                Id = agent.Id,
+                Photo = await photoTask,
+                Name = $"{agent.FirstName} {agent.LastName}",
+                Phone = $"(+{agent.Country!.ISDCode}) {agent.PhoneNumber}",
+                Addressline = $"{agent.Addressline}, {agent.District!.Name}, {agent.State!.Code}, {agent.Country.Code}",
+                Country = agent.Country.Code,
+                Flag = $"/flags/{agent.Country.Code.ToLower()}.png",
+                Active = agent.Active,
+                Count = claimCount,
+                UpdateBy = agent.UpdatedBy ?? "",
+                AgentOnboarded = !string.IsNullOrWhiteSpace(agent.MobileUId),
+                RawEmail = agent.Email!,
+                PersonMapAddressUrl = string.Format(mapUrl, "300", "300"),
+                MapDetails = $"Driving distance: {dist}; Duration: {dur}",
+                PinCode = agent.PinCode!.Code,
+                Distance = dist,
+                DistanceInMetres = distMetre,
+                Duration = dur,
+                DurationInSeconds = durSec,
+                AddressLocationInfo = addressInfo
+            };
         }
     }
 }

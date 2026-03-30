@@ -9,35 +9,24 @@ namespace risk.control.system.Seeds
 {
     public static class CompanyAdminSeed
     {
-        public static async Task Seed(ApplicationDbContext context,
-            IWebHostEnvironment webHostEnvironment,
-            UserManager<ApplicationUser> userManager,
-            ClientCompany clientCompany, string companyDomain, PinCode pinCode, IFileStorageService fileStorageService)
+        public static async Task Seed(ApplicationDbContext context, IWebHostEnvironment env, UserManager<ApplicationUser> userManager, ClientCompany clientCompany, string companyDomain, PinCode pinCode, IFileStorageService fileStorageService)
         {
-            //Seed client creator
             string adminEmailwithSuffix = COMPANY_ADMIN.CODE + "@" + companyDomain;
-
-            string adminImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", Path.GetFileName(COMPANY_ADMIN.PROFILE_IMAGE));
-
-            var adminImage = File.ReadAllBytes(adminImagePath);
-            var extension = Path.GetExtension(adminImagePath);
-            var (fileName, relativePath) = await fileStorageService.SaveAsync(adminImage, extension, companyDomain, "user");
+            var adminImage = await File.ReadAllBytesAsync(Path.Combine(env.WebRootPath, "img", Path.GetFileName(COMPANY_ADMIN.PROFILE_IMAGE)));
+            var (fileName, relativePath) = await fileStorageService.SaveAsync(adminImage, Path.GetExtension(Path.Combine(env.WebRootPath, "img", Path.GetFileName(COMPANY_ADMIN.PROFILE_IMAGE))), companyDomain, "user");
             var admin = new ApplicationUser()
             {
                 UserName = adminEmailwithSuffix,
                 Email = adminEmailwithSuffix,
                 FirstName = COMPANY_ADMIN.FIRST_NAME,
                 LastName = COMPANY_ADMIN.LAST_NAME,
-                Active = true,
                 EmailConfirmed = true,
                 ClientCompanyId = clientCompany.ClientCompanyId,
                 PhoneNumberConfirmed = true,
                 Password = TestingData,
-                IsSuperAdmin = false,
-                IsClientAdmin = false,
+                IsCompanyAdmin = true,
                 Addressline = clientCompany.Addressline,
                 PhoneNumber = string.Equals(pinCode.Country!.Code, "au", StringComparison.OrdinalIgnoreCase) ? SAMPLE_MOBILE_AUSTRALIA : SAMPLE_MOBILE_INDIA,
-                IsVendorAdmin = false,
                 Country = pinCode.Country,
                 CountryId = pinCode.CountryId,
                 DistrictId = pinCode?.DistrictId ?? default!,

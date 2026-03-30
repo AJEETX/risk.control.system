@@ -152,11 +152,7 @@ namespace risk.control.system.Services.Agency
                     LocationLatitude = caseTask.BeneficiaryDetail?.Latitude!;
                     LocationLongitude = caseTask.BeneficiaryDetail?.Longitude!;
                 }
-                (drivingDistance, distanceInMeters, drivingDuration, durationInSeconds, drivingMap) = await customApiCLient.GetMap(
-                  double.Parse(agentUser!.AddressLatitude!),
-                  double.Parse(agentUser.AddressLongitude!),
-                   double.Parse(LocationLatitude),
-                    double.Parse(LocationLongitude));
+                (drivingDistance, distanceInMeters, drivingDuration, durationInSeconds, drivingMap) = await customApiCLient.GetMap(double.Parse(agentUser!.AddressLatitude!), double.Parse(agentUser.AddressLongitude!), double.Parse(LocationLatitude), double.Parse(LocationLongitude));
                 caseTask.AllocatingSupervisordEmail = currentUser;
                 caseTask.CaseOwner = vendorAgentEmail;
                 caseTask.TaskedAgentEmail = vendorAgentEmail;

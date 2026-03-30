@@ -50,59 +50,61 @@ namespace risk.control.system.Controllers.AgencyAdmin
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ReplyQuery(long claimId, CaseAgencyModel request, IFormFile? document)
         {
-            var userEmail = HttpContext.User?.Identity?.Name!;
+            var userEmail = User.Identity?.Name ?? "Anonymous";
+            var redirectOnSuccess = RedirectToAction(nameof(VendorInvestigationController.Allocate),
+                                                   ControllerName<VendorInvestigationController>.Name);
             if (!ModelState.IsValid)
             {
                 _notifyService.Error("NOT FOUND !!!..");
-                return RedirectToAction(nameof(VendorInvestigationController.Allocate), ControllerName<VendorInvestigationController>.Name);
+                return redirectOnSuccess;
             }
             try
             {
                 if (document != null && document.Length > 0)
                 {
-                    if (document.Length > MAX_FILE_SIZE)
+                    var (isValid, errorMessage) = ValidateDocument(document);
+                    if (!isValid)
                     {
-                        _notifyService.Error($"Document image Size exceeds the max size: 5MB");
-                        return RedirectToAction("ReplyEnquiry", ControllerName<VendorInvestigationController>.Name, new { id = claimId });
-                    }
-                    var ext = Path.GetExtension(document.FileName).ToLowerInvariant();
-                    if (!AllowedExt.Contains(ext))
-                    {
-                        _notifyService.Error($"Invalid Document image type");
-                        return RedirectToAction("ReplyEnquiry", ControllerName<VendorInvestigationController>.Name, new { id = claimId });
-                    }
-                    if (!AllowedMime.Contains(document.ContentType))
-                    {
-                        _notifyService.Error($"Invalid Document Image content type");
-                        return RedirectToAction("ReplyEnquiry", ControllerName<VendorInvestigationController>.Name, new { id = claimId });
-                    }
-                    if (!ImageSignatureValidator.HasValidSignature(document))
-                    {
-                        _notifyService.Error($"Invalid or corrupted Document Image ");
+                        _notifyService.Error(errorMessage!);
                         return RedirectToAction("ReplyEnquiry", ControllerName<VendorInvestigationController>.Name, new { id = claimId });
                     }
                 }
-
-                request.InvestigationReport!.EnquiryRequest!.DescriptiveAnswer = HttpUtility.HtmlEncode(request.InvestigationReport.EnquiryRequest.DescriptiveAnswer);
-
-                var claim = await _agencyQueryReplyService.SubmitQueryReplyToCompany(userEmail, claimId, request.InvestigationReport.EnquiryRequest, request.InvestigationReport.EnquiryRequests, document);
-
-                if (claim != null)
+                var enquiry = request.InvestigationReport!.EnquiryRequest!;
+                enquiry.DescriptiveAnswer = HttpUtility.HtmlEncode(enquiry.DescriptiveAnswer);
+                var replySubmitted = await _agencyQueryReplyService.SubmitQueryReplyToCompany(userEmail, claimId, enquiry, request.InvestigationReport.EnquiryRequests, document);
+                if (replySubmitted)
                 {
                     _backgroundJobClient.Enqueue(() => _mailService.NotifySubmitReplyToCompany(userEmail, claimId, _baseUrl));
-
                     _notifyService.Success("Enquiry Reply Sent to Company");
-                    return RedirectToAction(nameof(VendorInvestigationController.Allocate), ControllerName<VendorInvestigationController>.Name);
+                    return redirectOnSuccess;
                 }
                 _notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(VendorInvestigationController.Allocate), ControllerName<VendorInvestigationController>.Name);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred for Case {Id}. {UserEmail}.", claimId, userEmail ?? "Anonymous");
-                _notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(VendorInvestigationController.Allocate), ControllerName<VendorInvestigationController>.Name);
+                _logger.LogError(ex, "Error occurred for Case {Id}. {UserEmail}.", claimId, userEmail);
+                _notifyService.Error("An internal error occurred.");
             }
+
+            return redirectOnSuccess;
+        }
+
+        private (bool IsValid, string? Error) ValidateDocument(IFormFile document)
+        {
+            if (document.Length > MAX_FILE_SIZE)
+                return (false, "Document image Size exceeds the max size: 5MB");
+
+            var ext = Path.GetExtension(document.FileName).ToLowerInvariant();
+            if (!AllowedExt.Contains(ext))
+                return (false, "Invalid Document image type");
+
+            if (!AllowedMime.Contains(document.ContentType))
+                return (false, "Invalid Document Image content type");
+
+            if (!ImageSignatureValidator.HasValidSignature(document))
+                return (false, "Invalid or corrupted Document Image");
+
+            return (true, null);
         }
     }
 }

@@ -121,47 +121,27 @@ namespace risk.control.system.Services.Common
 
         private string GetOrCreateFolder(string category, string? subFolder, string? subSubFolder)
         {
-            // 1. Establish the absolute root
             string rootPath = Path.GetFullPath(Path.Combine(env.ContentRootPath, Applicationsettings.DOCUMENT));
-
-            // 2. Helper to sanitize segments
-            string Sanitize(string? input)
-            {
-                if (string.IsNullOrWhiteSpace(input) || input == ".") return string.Empty;
-
-                // Block ".." specifically to prevent traversal
-                if (input.Contains(".."))
-                    throw new ArgumentException("Invalid path segment: Parent directory traversal is forbidden.");
-
-                // Strip drive roots or absolute indicators (e.g., "C:\")
-                return Path.GetFileName(input);
-            }
-
-            // 3. Combine safely
             string combined = Path.Combine(rootPath, Sanitize(category), Sanitize(subFolder), Sanitize(subSubFolder));
-
-            // 4. Final Canonicalization
             string finalPath = Path.GetFullPath(combined);
-
-            // 5. Boundary Check
-            string rootWithSeparator = rootPath.EndsWith(Path.DirectorySeparatorChar.ToString())
-                ? rootPath
-                : rootPath + Path.DirectorySeparatorChar;
-
-            if (!finalPath.StartsWith(rootWithSeparator, System.StringComparison.OrdinalIgnoreCase) && finalPath != rootPath)
+            string rootWithSeparator = rootPath.EndsWith(Path.DirectorySeparatorChar.ToString()) ? rootPath : rootPath + Path.DirectorySeparatorChar;
+            if (!finalPath.StartsWith(rootWithSeparator, StringComparison.OrdinalIgnoreCase) && finalPath != rootPath)
             {
                 throw new System.UnauthorizedAccessException("Path security violation: Attempted to escape root directory.");
             }
-
-            // 6. Create (Handles nested creation automatically)
             if (!Directory.Exists(finalPath))
             {
                 Directory.CreateDirectory(finalPath);
             }
-
             return finalPath;
         }
-
+        private string Sanitize(string? input)
+        {
+            if (string.IsNullOrWhiteSpace(input) || input == ".") return string.Empty;
+            if (input.Contains(".."))
+                throw new ArgumentException("Invalid path segment: Parent directory traversal is forbidden.");
+            return Path.GetFileName(input);
+        }
         private static string BuildRelativePath(string category, string? subFolder, string? subSubFolder, string fileName)
         {
             var path = Path.Combine(Applicationsettings.DOCUMENT, category, subFolder ?? "", subSubFolder ?? "", fileName).Replace("\\", "/").Replace("\n", "").Replace("\r", "");

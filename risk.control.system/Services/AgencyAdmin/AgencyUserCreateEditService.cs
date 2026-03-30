@@ -66,11 +66,8 @@ namespace risk.control.system.Services.AgencyAdmin
                 errors.Add("Email", "Invalid email address.");
                 return (false, "Invalid email address.", errors);
             }
-
             var model = request.User;
-
             var email = $"{model.Email!.Trim().ToLowerInvariant()}@{request.EmailSuffix.Trim().ToLowerInvariant()}";
-
             if (await _userManager.Users.AnyAsync(u => u.Email == email && !u.Deleted))
             {
                 modelState.AddModelError("Email", $"User with email {email} already exists.");
@@ -90,15 +87,11 @@ namespace risk.control.system.Services.AgencyAdmin
                 return (false, "Profile image matches with existing users. Please use a different image.", errors);
             }
             await SaveProfileImageAsync(model, request.EmailSuffix);
-
             PopulateUserEntity(model, email, request.CreatedBy);
             await UpdateGeoLocationAsync(model);
-
             using var tx = await _context.Database.BeginTransactionAsync();
-
             var tempPassword = Applicationsettings.TestingData;
             var result = await _userManager.CreateAsync(model, tempPassword);
-
             if (!result.Succeeded)
             {
                 foreach (var error in result.Errors)
@@ -123,28 +116,26 @@ namespace risk.control.system.Services.AgencyAdmin
         {
             var input = request.Model;
             var errors = new Dictionary<string, string>();
-
             var user = await _userManager.FindByIdAsync(request.UserId);
             if (user == null)
             {
                 errors.Add("Email", "User not found");
                 return (false, "User not found", errors);
             }
-
-            if (input.ProfileImage != null && input.ProfileImage.Length > 0)
+            if (input.ProfileImage?.Length > 0)
             {
                 _validateImageService.ValidateImage(input.ProfileImage, errors);
             }
-            if (errors.Any())
+            if (errors.Count != 0)
             {
                 return (false, "Invalid profile image.", errors);
             }
-            if (input.ProfileImage != null && input.ProfileImage.Length > 0)
+            if (input.ProfileImage?.Length > 0)
             {
                 var suffix = user.Email!.Split('@').Last();
                 await SaveProfileImageAsync(input, suffix);
             }
-            if (input.ProfileImage != null && input.ProfileImage.Length > 0)
+            if (input.ProfileImage?.Length > 0)
             {
                 var matchedFace = await _faceImageCheckService.CheckFaceImageAsync(input.ProfileImage);
                 if (matchedFace)
@@ -155,11 +146,8 @@ namespace risk.control.system.Services.AgencyAdmin
                 }
             }
             UpdateUserFields(input, user, request.UpdatedBy);
-
             await UpdateGeoLocationAsync(user);
-
             using var tx = await _context.Database.BeginTransactionAsync();
-
             var updateResult = await _userManager.UpdateAsync(user);
             if (!updateResult.Succeeded)
             {
@@ -170,15 +158,10 @@ namespace risk.control.system.Services.AgencyAdmin
                 return (false, "Error updating user", errors);
             }
             await UpdateUserRolesAsync(user);
-
             await HandleLockAndNotificationsAsync(user, portal_base_url, false);
-
             await tx.CommitAsync();
-
             var userEdited = (true, $"User <b> {user.Email} </b> updated successfully", errors);
-
             await _faceImageCheckService.SetImageToAws(user.Email!);
-
             return userEdited;
         }
 
@@ -217,7 +200,6 @@ namespace risk.control.system.Services.AgencyAdmin
         private async Task HandleLockAndNotificationsAsync(ApplicationUser user, string portal_base_url, bool created = true)
         {
             await _userManager.SetLockoutEnabledAsync(user, !user.Active);
-
             if (!user.Active)
             {
                 await _userManager.SetLockoutEndDateAsync(user, DateTimeOffset.MaxValue);
@@ -239,12 +221,7 @@ namespace risk.control.system.Services.AgencyAdmin
                 {
                     var vendor = await _context.Vendor.FirstOrDefaultAsync(v => v.VendorId == user.VendorId);
                     string tinyUrl = await _urlService.ShortenUrlAsync(vendor!.MobileAppUrl!);
-
-                    var message = $"Dear {user.FirstName},\n" +
-                    $"Click on link below to install the mobile app\n\n" +
-                    $"{tinyUrl}\n\n" +
-                    $"Thanks\n\n" +
-                    $"{portal_base_url}";
+                    var message = $"Dear {user.FirstName},\n" + $"Click on link below to install the mobile app\n\n" + $"{tinyUrl}\n\n" + $"Thanks\n\n" + $"{portal_base_url}";
                     await _sms.DoSendSmsAsync(pincode!.Country!.Code, pincode.Country.ISDCode + user.PhoneNumber, message, true);
                     _notify.Custom($"Agent {user.Email} onboarding initiated.", 3, "green", "fas fa-user-check");
                 }

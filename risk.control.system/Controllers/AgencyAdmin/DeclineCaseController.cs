@@ -18,7 +18,6 @@ namespace risk.control.system.Controllers.AgencyAdmin
         private static readonly string[] AllowedExt = new[] { ".jpg", ".jpeg", ".png" };
         private static readonly string[] AllowedMime = new[] { "image/jpeg", "image/png" };
         private IDeclineCaseService _declineCaseService;
-        private readonly IAgencyInvestigationDetailService _agencyInvestigationDetailService;
         private readonly INotyfService _notifyService;
         private readonly IMailService _mailService;
         private readonly ILogger<DeclineCaseController> _logger;
@@ -26,7 +25,6 @@ namespace risk.control.system.Controllers.AgencyAdmin
 
         public DeclineCaseController(
             IDeclineCaseService declineCaseService,
-            IAgencyInvestigationDetailService agencyInvestigationDetailService,
             INotyfService notifyService,
             IBackgroundJobClient backgroundJobClient,
             IHttpContextAccessor httpContextAccessor,
@@ -34,7 +32,6 @@ namespace risk.control.system.Controllers.AgencyAdmin
             ILogger<DeclineCaseController> logger)
         {
             _declineCaseService = declineCaseService;
-            _agencyInvestigationDetailService = agencyInvestigationDetailService;
             _notifyService = notifyService;
             _mailService = mailService;
             _logger = logger;
@@ -49,7 +46,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
         public async Task<IActionResult> Decline(CaseTransactionModel model, long claimId, string policyNumber)
         {
             string userEmail = HttpContext?.User?.Identity?.Name!;
-            if (!ModelState.IsValid || model == null || claimId < 1)
+            if (!ModelState.IsValid)
             {
                 _notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(VendorInvestigationController.Allocate), ControllerName<VendorInvestigationController>.Name);
@@ -77,7 +74,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
         public async Task<IActionResult> WithdrawCaseFromAgent(CaseTransactionModel model, long claimId, string policyNumber)
         {
             string userEmail = HttpContext?.User?.Identity?.Name!;
-            if (!ModelState.IsValid || claimId < 1)
+            if (!ModelState.IsValid)
             {
                 _notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(VendorInvestigationController.Allocate), ControllerName<VendorInvestigationController>.Name);

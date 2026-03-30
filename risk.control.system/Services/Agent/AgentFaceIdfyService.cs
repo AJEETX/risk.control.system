@@ -75,7 +75,7 @@ internal class AgentFaceIdfyService : IAgentFaceIdfyService
             var faceTask = faceMatchService.GetFaceMatchAsync(registeredImage, faceBytes, Path.GetExtension(faceImageFileName));
             var weatherTask = weatherInfoService.GetWeatherAsync(lat, lon);
             var addressTask = httpClientService.GetRawAddress(lat, lon);
-            var mapTask = customApiClient.GetMap(expectedCoords.lat, expectedCoords.lon, double.Parse(lat), double.Parse(lon), "S", "E", "300", "300", "green", "red");
+            var mapTask = customApiClient.GetMap(expectedCoords.lat, expectedCoords.lon, double.Parse(lat), double.Parse(lon));
 
             await Task.WhenAll(faceTask, weatherTask, addressTask, mapTask);
 

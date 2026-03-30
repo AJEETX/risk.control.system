@@ -51,13 +51,7 @@ namespace risk.control.system.Services.Api
         public async Task<object[]> AllAgencies()
         {
             await using var _context = await _contextFactory.CreateDbContextAsync();
-            var agencyData = await _context.Vendor.AsNoTracking()
-             .Include(v => v.Country)
-             .Include(v => v.District)
-             .Include(v => v.State)
-             .Include(v => v.PinCode)
-             .Where(v => !v.Deleted)
-             .OrderBy(a => a.Name)
+            var agencyData = await _context.Vendor.AsNoTracking().Include(v => v.Country).Include(v => v.District).Include(v => v.State).Include(v => v.PinCode).Where(v => !v.Deleted).OrderBy(a => a.Name)
              .Select(u => new
              {
                  u.VendorId,
@@ -75,13 +69,11 @@ namespace risk.control.system.Services.Api
                  u.Created,
                  u.UpdatedBy,
                  u.IsUpdated
-             })
-             .ToListAsync();
+             }).ToListAsync();
 
             var result = agencyData.Select(async u =>
             {
                 var documentImage = await base64FileService.GetBase64FileAsync(u.DocumentUrl!, Applicationsettings.NO_IMAGE);
-
                 return new
                 {
                     Id = u.VendorId,
@@ -102,12 +94,7 @@ namespace risk.control.system.Services.Api
                 };
             });
             var awaitedResults = await Task.WhenAll(result);
-
-            // 3. Batch Update (EF Core 7+) - This is much faster than loading all into memory
-            await _context.Vendor.AsNoTracking()
-                .Where(v => !v.Deleted)
-                .ExecuteUpdateAsync(setters => setters.SetProperty(v => v.IsUpdated, false));
-
+            await _context.Vendor.AsNoTracking().Where(v => !v.Deleted).ExecuteUpdateAsync(setters => setters.SetProperty(v => v.IsUpdated, false));
             return awaitedResults;
         }
 

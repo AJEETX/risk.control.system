@@ -55,51 +55,48 @@ namespace risk.control.system.Seeds
 
         public static async Task<List<Country>> Countries(ApplicationDbContext context)
         {
-            //GET ALL COUNTRIES FROM CSV
             string countries_csv = await File.ReadAllTextAsync(countriesFilePath);
             var countries = new List<Country>();
-
             bool firstRow = true;
             foreach (string row in countries_csv.Split('\n'))
             {
-                if (!string.IsNullOrEmpty(row))
+                if (string.IsNullOrEmpty(row))
                 {
-                    if (!string.IsNullOrEmpty(row))
+                    return countries;
+                }
+                if (string.IsNullOrEmpty(row))
+                {
+                    return countries;
+                }
+                if (firstRow)
+                {
+                    firstRow = false;
+                }
+                else
+                {
+                    var output = regex.Replace(row, m => m.Value.Replace(',', '@'));
+                    var rowData = output.Split(',').ToList();
+                    var countryCode = rowData[1].Trim().ToLower();
+                    var currency = currencies.FirstOrDefault(c => c.CountryCode!.Trim().ToLower() == countryCode);
+                    var currencyName = currenciesName.FirstOrDefault(c => c.CountryCode!.Trim().ToLower() == countryCode);
+                    var country = new Country
                     {
-                        if (firstRow)
-                        {
-                            firstRow = false;
-                        }
-                        else
-                        {
-                            var output = regex.Replace(row, m => m.Value.Replace(',', '@'));
-                            var rowData = output.Split(',').ToList();
-                            var countryCode = rowData[1].Trim().ToLower();
-                            var currency = currencies.FirstOrDefault(c => c.CountryCode!.Trim().ToLower() == countryCode);
+                        Name = rowData[0] ?? NO_DATA,
+                        Code = rowData[1] ?? NO_DATA,
+                        ISDCode = int.Parse(rowData[2].Trim()),
+                        CurrencyCode = currency?.CurrencyCode ?? currencyName?.CurrencyCode,
+                        CurrencyName = currencyName?.CurrencyName,
+                        Language = currency?.Language!.ToUpper(),
+                        Updated = DateTime.UtcNow,
+                    };
 
-                            var currencyName = currenciesName.FirstOrDefault(c => c.CountryCode!.Trim().ToLower() == countryCode);
-
-                            var country = new Country
-                            {
-                                Name = rowData[0] ?? NO_DATA,
-                                Code = rowData[1] ?? NO_DATA,
-                                ISDCode = int.Parse(rowData[2].Trim()),
-                                CurrencyCode = currency?.CurrencyCode ?? currencyName?.CurrencyCode,
-                                CurrencyName = currencyName?.CurrencyName,
-                                Language = currency?.Language!.ToUpper(),
-                                Updated = DateTime.UtcNow,
-                            };
-
-                            countries.Add(country);
-                        }
-                    }
+                    countries.Add(country);
                 }
             }
             context.Country.AddRange(countries);
             await context.SaveChangesAsync(null, false);
             return countries;
         }
-
         public static async Task CurrenciesCode(ApplicationDbContext context)
         {
             //GET ALL CURRENCIES FROM CSV
@@ -173,38 +170,40 @@ namespace risk.control.system.Seeds
             bool firstRow = true;
             foreach (string row in csvData.Split('\n'))
             {
-                if (!string.IsNullOrEmpty(row))
+                if (string.IsNullOrEmpty(row))
                 {
-                    if (!string.IsNullOrEmpty(row))
-                    {
-                        if (firstRow)
-                        {
-                            firstRow = false;
-                        }
-                        else
-                        {
-                            var output = regex.Replace(row, m => m.Value.Replace(',', '@'));
-                            var rowData = output.Split(',').ToList();
-                            var pinCode = rowData[0].Trim();
+                    return pincodes;
+                }
+                if (string.IsNullOrEmpty(row))
+                {
+                    return pincodes;
+                }
+                if (firstRow)
+                {
+                    firstRow = false;
+                }
+                else
+                {
+                    var output = regex.Replace(row, m => m.Value.Replace(',', '@'));
+                    var rowData = output.Split(',').ToList();
+                    var pinCode = rowData[0].Trim();
 
-                            var pincodeWithState = new PinCodeState
-                            {
-                                Code = int.Parse(pinCode),
-                                Name = rowData[1]?.Trim() ?? NO_DATA,
-                                District = rowData[1]?.Trim() ?? NO_DATA,
-                                StateName = rowData[2]?.Trim() ?? NO_DATA,
-                                StateCode = rowData[3]?.Trim() ?? NO_DATA,
-                                Latitude = rowData[4]?.Trim() ?? NO_DATA,
-                                Longitude = rowData[5]?.Trim() ?? NO_DATA,
-                            };
-                            var isDupicate = pincodes.FirstOrDefault(p => p.Code == pincodeWithState.Code);
-                            pincodes.Add(pincodeWithState);
-                            rowCount++;
-                            if (maxCount > 0 && rowCount >= maxCount)
-                            {
-                                break;
-                            }
-                        }
+                    var pincodeWithState = new PinCodeState
+                    {
+                        Code = int.Parse(pinCode),
+                        Name = rowData[1]?.Trim() ?? NO_DATA,
+                        District = rowData[1]?.Trim() ?? NO_DATA,
+                        StateName = rowData[2]?.Trim() ?? NO_DATA,
+                        StateCode = rowData[3]?.Trim() ?? NO_DATA,
+                        Latitude = rowData[4]?.Trim() ?? NO_DATA,
+                        Longitude = rowData[5]?.Trim() ?? NO_DATA,
+                    };
+                    var isDupicate = pincodes.FirstOrDefault(p => p.Code == pincodeWithState.Code);
+                    pincodes.Add(pincodeWithState);
+                    rowCount++;
+                    if (maxCount > 0 && rowCount >= maxCount)
+                    {
+                        break;
                     }
                 }
             }

@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-
-using risk.control.system.AppConstant;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
@@ -16,31 +14,48 @@ namespace risk.control.system.Seeds
         public static async Task<Vendor> Seed(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, ICustomApiClient customApiCLient,
             UserManager<ApplicationUser> vendorUserManager, SeedInput input, List<InvestigationServiceType> servicesTypes, IFileStorageService fileStorageService)
         {
-            string noCompanyImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", @Applicationsettings.NO_IMAGE);
-
-            var globalSettings = await context.GlobalSettings.FirstOrDefaultAsync();
-
-            //CREATE VENDOR COMPANY
-
-            var pinCode = await context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).OrderBy(o => o.State!.Code).LastOrDefaultAsync(s => s.Country!.Code == input.COUNTRY && s.Code == input.PINCODE);
-
             var states = await context.State.Include(s => s.Country).Where(s => s.Country!.Code == input.COUNTRY).ToListAsync();
-
+            string agencyImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", Path.GetFileName(input.PHOTO)!);
+            var agencyImage = await File.ReadAllBytesAsync(agencyImagePath);
+            var (fileName, relativePath) = await fileStorageService.SaveAsync(agencyImage, Path.GetExtension(agencyImagePath), input.DOMAIN!);
+            var agency = await GetAgency(context, input, customApiCLient, relativePath);
+            var addedAgency = await context.Vendor.AddAsync(agency);
+            await context.SaveChangesAsync(null, false);
+            var agencyServices = new List<VendorInvestigationServiceType>();
+            foreach (var state in states)
+            {
+                foreach (var service in servicesTypes)
+                {
+                    var vendorService = new VendorInvestigationServiceType
+                    {
+                        VendorId = addedAgency.Entity.VendorId,
+                        InvestigationServiceTypeId = service.InvestigationServiceTypeId,
+                        Price = 399,
+                        InsuranceType = service.InsuranceType,
+                        AllDistrictsCheckbox = true,
+                        SelectedDistrictIds = { -1 },
+                        StateId = state.StateId,
+                        CountryId = state.CountryId,
+                        Updated = DateTime.UtcNow,
+                    };
+                    agencyServices.Add(vendorService);
+                }
+            }
+            agency.VendorInvestigationServiceTypes = agencyServices;
+            await context.SaveChangesAsync(null, false);
+            await AgencyUserSeed.Seed(context, webHostEnvironment, vendorUserManager, addedAgency.Entity, customApiCLient, fileStorageService);
+            return addedAgency.Entity;
+        }
+        private static async Task<Vendor> GetAgency(ApplicationDbContext context, SeedInput input, ICustomApiClient customApiCLient, string relativePath)
+        {
+            var globalSettings = await context.GlobalSettings.FirstOrDefaultAsync();
+            var pinCode = await context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).OrderBy(o => o.State!.Code).LastOrDefaultAsync(s => s.Country!.Code == input.COUNTRY && s.Code == input.PINCODE);
             var address = input.ADDRESSLINE + ", " + pinCode!.District!.Name + ", " + pinCode.State!.Name + ", " + pinCode.Country!.Code;
             var addressCoordinates = await customApiCLient.GetCoordinatesFromAddressAsync(address);
             var latLong = addressCoordinates.Latitude + "," + addressCoordinates.Longitude;
             var addressUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={latLong}&zoom=14&size={vendorMapSize}&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLong}&key={EnvHelper.Get("GOOGLE_MAP_KEY")}";
 
-            string agencyImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", Path.GetFileName(input.PHOTO)!);
-            var agencyImage = await File.ReadAllBytesAsync(agencyImagePath);
-
-            if (agencyImage == null)
-            {
-                agencyImage = await File.ReadAllBytesAsync(noCompanyImagePath);
-            }
-            var extension = Path.GetExtension(agencyImagePath);
-            var (fileName, relativePath) = await fileStorageService.SaveAsync(agencyImage, extension, input.DOMAIN!);
-            var agency = new Vendor
+            return new Vendor
             {
                 Name = input.NAME!,
                 Addressline = input.ADDRESSLINE!,
@@ -64,36 +79,6 @@ namespace risk.control.system.Seeds
                 AddressLatitude = addressCoordinates.Latitude,
                 AddressLongitude = addressCoordinates.Longitude
             };
-
-            var addedAgency = await context.Vendor.AddAsync(agency);
-            await context.SaveChangesAsync(null, false);
-            var agencyServices = new List<VendorInvestigationServiceType>();
-            foreach (var state in states)
-            {
-                foreach (var service in servicesTypes)
-                {
-                    var vendorService = new VendorInvestigationServiceType
-                    {
-                        VendorId = addedAgency.Entity.VendorId,
-                        InvestigationServiceTypeId = service.InvestigationServiceTypeId,
-                        Price = 399,
-                        InsuranceType = service.InsuranceType,
-                        AllDistrictsCheckbox = true,
-                        SelectedDistrictIds = { -1 },
-                        StateId = state.StateId,
-                        CountryId = state.CountryId,
-                        Updated = DateTime.UtcNow,
-                    };
-                    agencyServices.Add(vendorService);
-                }
-            }
-
-            agency.VendorInvestigationServiceTypes = agencyServices;
-
-            await context.SaveChangesAsync(null, false);
-            await AgencyUserSeed.Seed(context, webHostEnvironment, vendorUserManager, addedAgency.Entity, customApiCLient, fileStorageService);
-
-            return addedAgency.Entity;
         }
     }
 }

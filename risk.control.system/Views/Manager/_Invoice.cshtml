@@ -67,7 +67,7 @@
                 @* <a href="/Report/PrintPdfReport?Id=@Model.ClaimsInvestigation.Id" class="btn btn-xs btn-danger"><i class="far fa-file-pdf"></i> PDF</a> *@
                 <a id="printInvoiceButton" class="btn btn-sm btn-danger text-white"><i class="far fa-file-pdf"></i> PDF</a>
 
-                <a class="btn btn-sm bg-teal" asp-controller="Manager" asp-action="ShowInvoice" asp-route-id="@Model.VendorInvoice?.VendorInvoiceId">
+                <a class="btn btn-sm btn-primary" asp-controller="Manager" asp-action="ShowInvoice" asp-route-id="@Model.VendorInvoice?.VendorInvoiceId">
                     <i class="fa fa-print"> Invoice</i>
                 </a>
             </div>

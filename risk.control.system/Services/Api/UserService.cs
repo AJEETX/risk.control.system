@@ -14,6 +14,7 @@ namespace risk.control.system.Services.Api
 
     internal class UserService : IUserService
     {
+        private string status = "#DED5D5", statusIcon = "fa fa-circle-o", statusName = "Offline";
         private readonly ApplicationDbContext context;
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly UserManager<ApplicationUser> userManager;
@@ -31,63 +32,25 @@ namespace risk.control.system.Services.Api
 
         public async Task<List<UserDetailResponse>> GetUsers(string userEmail)
         {
-            var activeUsers = await context.UserSessionAlive
-                .AsNoTracking()
-                .Where(u => u.Updated >= cutoffTime && !u.LoggedOut)
-                // Grouping by the email directly
-                .GroupBy(u => u.ActiveUser.Email)
-                // We only need the email (the key), so we select it here
-                .Select(g => g.Key)
-                .ToListAsync();
-
-            var users = context.ApplicationUser
-                .Include(a => a.District)
-                .Include(a => a.State)
-                .Include(a => a.Country)
-                .Include(a => a.PinCode)
-                    .Where(u => !u.Deleted && u.Email != userEmail);
-
-            var allUsers = users.OrderBy(u => u.FirstName)
-            .ThenBy(u => u.LastName);
-
+            var activeUsers = await context.UserSessionAlive.AsNoTracking().Where(u => u.Updated >= cutoffTime && !u.LoggedOut).GroupBy(u => u.ActiveUser.Email).Select(g => g.Key).ToListAsync();
+            var users = context.ApplicationUser.Include(a => a.District).Include(a => a.State).Include(a => a.Country).Include(a => a.PinCode).Where(u => !u.Deleted && u.Email != userEmail);
+            var allUsers = users.OrderBy(u => u.FirstName).ThenBy(u => u.LastName);
             var activeUsersDetails = new List<UserDetailResponse>();
             foreach (var user in allUsers)
             {
-                var currentOnlineTime = context.UserSessionAlive
-                    .Where(a => a.ActiveUser.Email == user.Email && activeUsers.Contains(a.ActiveUser.Email))?
-                    .AsEnumerable()? // Brings the data into memory
-                    .Select(d => (DateTime?)d.Created) // Use nullable DateTime
-                    .DefaultIfEmpty(null) // Provide a default value if no records exist
-                    .Max();
-
-                string status = "#DED5D5";
-                string statusIcon = "fa fa-circle-o";
-                string statusName = "Offline";
-                if (currentOnlineTime == null)
+                var currentOnlineTime = context.UserSessionAlive.Where(a => a.ActiveUser.Email == user.Email && activeUsers.Contains(a.ActiveUser.Email))?.AsEnumerable()?.Select(d => (DateTime?)d.Created).DefaultIfEmpty(null).Max();
+                if (currentOnlineTime != null && DateTime.UtcNow.Subtract(currentOnlineTime.GetValueOrDefault()).Minutes >= 5 && DateTime.UtcNow.Subtract(currentOnlineTime.GetValueOrDefault()).Minutes < 15)
                 {
-                }
-                else if (currentOnlineTime != null && DateTime.UtcNow.Subtract(currentOnlineTime.GetValueOrDefault()).Minutes >= 5 && DateTime.UtcNow.Subtract(currentOnlineTime.GetValueOrDefault()).Minutes < 15)
-                {
-                    status = "orange";
-                    statusName = $"Away for {DateTime.UtcNow.Subtract(currentOnlineTime.GetValueOrDefault()).Minutes} minutes";
-                    statusIcon = "far fa-clock";
+                    status = "orange"; statusIcon = "far fa-clock"; statusName = $"Away for {DateTime.UtcNow.Subtract(currentOnlineTime.GetValueOrDefault()).Minutes} minutes";
                 }
                 else if (DateTime.UtcNow.Subtract(currentOnlineTime.GetValueOrDefault()).Minutes >= 1 && DateTime.UtcNow.Subtract(currentOnlineTime.GetValueOrDefault()).Minutes < 5)
                 {
-                    status = "orange";
-                    statusName = $"Inactive for {DateTime.UtcNow.Subtract(currentOnlineTime.GetValueOrDefault()).Minutes} minutes";
-                    statusIcon = "fas fa-clock";
+                    status = "orange"; statusIcon = "fas fa-clock"; statusName = $"Inactive for {DateTime.UtcNow.Subtract(currentOnlineTime.GetValueOrDefault()).Minutes} minutes";
                 }
                 else if (DateTime.UtcNow.Subtract(currentOnlineTime.GetValueOrDefault()).Minutes >= 0 && DateTime.UtcNow.Subtract(currentOnlineTime.GetValueOrDefault()).Minutes < 1)
                 {
-                    status = "green";
-                    statusName = $"Online now";
-                    statusIcon = "fas fa-circle";
+                    status = "green"; statusName = $"Online now"; statusIcon = "fas fa-circle";
                 }
-                var flag = user.Country == null ? "/flags/in.png" : "/flags/" + user.Country?.Code.ToLower() + ".png";
-                var photo = user.ProfilePictureUrl == null ? Applicationsettings.NO_USER : string.Format("data:image/*;base64,{0}", Convert.ToBase64String(await File.ReadAllBytesAsync(
-                    Path.Combine(webHostEnvironment.ContentRootPath, user.ProfilePictureUrl))));
-                var logVerified = !await featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION) || !user.IsPasswordChangeRequired;
                 var activeUser = new UserDetailResponse
                 {
                     Id = user.Id,
@@ -95,13 +58,13 @@ namespace risk.control.system.Services.Api
                     Email = "<a>" + user.Email + "</a>",
                     RawEmail = user.Email,
                     Phone = "(+" + user.Country?.ISDCode + ") " + user.PhoneNumber,
-                    Photo = photo,
+                    Photo = user.ProfilePictureUrl == null ? Applicationsettings.NO_USER : string.Format("data:image/*;base64,{0}", Convert.ToBase64String(await File.ReadAllBytesAsync(Path.Combine(webHostEnvironment.ContentRootPath, user.ProfilePictureUrl)))),
                     Active = user.Active,
                     Addressline = user?.Addressline ?? "--",
                     District = user?.District?.Name ?? "--",
                     State = user?.State?.Code ?? "--",
                     Country = user?.Country?.Code ?? "--",
-                    Flag = flag,
+                    Flag = user!.Country == null ? "/flags/in.png" : "/flags/" + user.Country?.Code.ToLower() + ".png",
                     Roles = string.Join(",", GetUserRoles(user!).Result),
                     Pincode = user?.PinCode?.Code ?? 0,
                     OnlineStatus = status,
@@ -111,7 +74,7 @@ namespace risk.control.system.Services.Api
                     OnlineStatusIcon = statusIcon,
                     IsUpdated = user.IsUpdated,
                     LastModified = user.Updated ?? DateTime.UtcNow,
-                    LoginVerified = logVerified
+                    LoginVerified = (!await featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION) || !user.IsPasswordChangeRequired)
                 };
                 activeUsersDetails.Add(activeUser);
             }
