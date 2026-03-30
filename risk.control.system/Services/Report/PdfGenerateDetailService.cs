@@ -68,15 +68,11 @@ namespace risk.control.system.Services.Report
                 Directory.CreateDirectory(folder);
             }
             var reportFilename = "report" + investigation.Id + ".pdf";
-
             var ReportFilePath = Path.Combine(webHostEnvironment.WebRootPath, "report", reportFilename);
-            // Create document
             DocumentBuilder builder = DocumentBuilder.New();
-
             SectionBuilder section = builder.AddSection();
             section.SetOrientation(PageOrientation.Landscape);
             bool isClaim = true;
-            //CASE DETAIL
             if (policy.InsuranceType == InsuranceType.UNDERWRITING)
             {
                 isClaim = false;
@@ -86,31 +82,17 @@ namespace risk.control.system.Services.Report
             {
                 section = detailService.BuildClaim(section, investigation, policy, customer, beneficiary);
             }
-
-            //CASE DETAIL   Investigation Report Section
             section = await detailReportService.Build(section, investigation, investigationReport, isClaim);
-
             section.AddParagraph().AddText("");
-
-            //add assessor remarks
-
             section = AddRemarks(section, "Assessor remarks", investigation.InvestigationReport!.AssessorRemarks!);
-
             section.AddParagraph().AddText("");
-
-            //add status
             section = AddRemarks(section, "Report Status", investigation.SubStatus);
-
             section.AddParagraph().AddText("");
             section.AddParagraph().AddText("");
             section.AddParagraph().AddText("");
-
-            // Footer
             section.AddParagraph().AddText($"Generated on: {DateTime.UtcNow:yyyy-MM-dd HH:mm}").SetItalic().SetFontSize(10);
-
             builder.Build(ReportFilePath);
             investigation.InvestigationReport.PdfReportFilePath = ReportFilePath;
-
             context.Investigations.Update(investigation);
             await context.SaveChangesAsync(null, false);
             return reportFilename;

@@ -162,9 +162,6 @@ namespace risk.control.system.Controllers.PortalAdmin
             return View(user);
         }
 
-        // POST: ClientCompanyApplicationUser/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(long id, ApplicationUser applicationUser)
@@ -172,51 +169,41 @@ namespace risk.control.system.Controllers.PortalAdmin
             try
             {
                 var user = await userManager.FindByIdAsync(id.ToString());
+                if (user == null) { notifyService.Custom("User not found.", 3, "red", "fas fa-user-slash"); return RedirectToAction(nameof(Index), "Dashboard"); }
                 if (applicationUser?.ProfileImage != null && applicationUser.ProfileImage.Length > 0)
                 {
                     var emailSuffix = user!.Email!.Split('@').LastOrDefault();
                     var (fileName, relativePath) = await fileStorageService.SaveAsync(user.ProfileImage!, emailSuffix!, "user");
                     user.ProfilePictureUrl = relativePath;
                 }
-
-                if (user != null)
+                user.ProfilePictureUrl = applicationUser?.ProfilePictureUrl ?? user.ProfilePictureUrl;
+                user.ProfilePictureUrl = applicationUser?.ProfilePictureUrl ?? user.ProfilePictureUrl;
+                user.ProfilePictureExtension = applicationUser?.ProfilePictureExtension ?? user.ProfilePictureExtension;
+                user.PhoneNumber = applicationUser?.PhoneNumber ?? user.PhoneNumber;
+                user.FirstName = applicationUser?.FirstName!;
+                user.LastName = applicationUser?.LastName!;
+                user.Addressline = applicationUser!.Addressline;
+                user.Active = applicationUser.Active;
+                user.PhoneNumber = user.PhoneNumber!.TrimStart('0');
+                user.CountryId = applicationUser.SelectedCountryId;
+                user.StateId = applicationUser.SelectedStateId;
+                user.DistrictId = applicationUser.SelectedDistrictId;
+                user.PinCodeId = applicationUser.SelectedPincodeId;
+                user.Updated = DateTime.Now;
+                user.Role = applicationUser.Role;
+                user.PhoneNumber = applicationUser.PhoneNumber;
+                user.UpdatedBy = HttpContext.User?.Identity?.Name;
+                user.SecurityStamp = DateTime.Now.ToString();
+                var result = await userManager.UpdateAsync(user);
+                if (result.Succeeded)
                 {
-                    user.ProfilePictureUrl = applicationUser?.ProfilePictureUrl ?? user.ProfilePictureUrl;
-                    user.ProfilePictureUrl = applicationUser?.ProfilePictureUrl ?? user.ProfilePictureUrl;
-                    user.ProfilePictureExtension = applicationUser?.ProfilePictureExtension ?? user.ProfilePictureExtension;
-                    user.PhoneNumber = applicationUser?.PhoneNumber ?? user.PhoneNumber;
-                    user.FirstName = applicationUser?.FirstName!;
-                    user.LastName = applicationUser?.LastName!;
-                    if (!string.IsNullOrWhiteSpace(applicationUser?.Password))
-                    {
-                        user.Password = applicationUser.Password;
-                    }
-                    user.Addressline = applicationUser!.Addressline;
-                    user.Active = applicationUser.Active;
-                    user.PhoneNumber = user.PhoneNumber!.TrimStart('0');
-                    user.CountryId = applicationUser.SelectedCountryId;
-                    user.StateId = applicationUser.SelectedStateId;
-                    user.DistrictId = applicationUser.SelectedDistrictId;
-                    user.PinCodeId = applicationUser.SelectedPincodeId;
-
-                    user.Updated = DateTime.Now;
-                    user.Role = applicationUser.Role;
-                    user.Role = (AppRoles)Enum.Parse(typeof(AppRoles), user.Role.ToString()!);
-                    user.PhoneNumber = applicationUser.PhoneNumber;
-                    user.UpdatedBy = HttpContext.User?.Identity?.Name;
-                    user.SecurityStamp = DateTime.Now.ToString();
-                    var result = await userManager.UpdateAsync(user);
-                    if (result.Succeeded)
-                    {
-                        var roles = await userManager.GetRolesAsync(user);
-                        var roleResult = await userManager.RemoveFromRolesAsync(user, roles);
-                        await userManager.AddToRoleAsync(user, user.Role.ToString()!);
-                        notifyService.Custom($"Company user edited successfully.", 3, "orange", "fas fa-user-check");
-                        var country = await _context.Country.FirstOrDefaultAsync(c => c.CountryId == user.CountryId);
-                        await smsService.DoSendSmsAsync(country!.Code, country.ISDCode + user.PhoneNumber, "Company account edited. \nDomain : " + user.Email + "\n" + portal_base_url);
-
-                        return RedirectToAction(nameof(CompanyUserController.Index), "CompanyUser", new { id = applicationUser.ClientCompanyId });
-                    }
+                    var roles = await userManager.GetRolesAsync(user);
+                    var roleResult = await userManager.RemoveFromRolesAsync(user, roles);
+                    await userManager.AddToRoleAsync(user, user.Role.ToString()!);
+                    notifyService.Custom($"Company user edited successfully.", 3, "orange", "fas fa-user-check");
+                    var country = await _context.Country.FirstOrDefaultAsync(c => c.CountryId == user.CountryId);
+                    await smsService.DoSendSmsAsync(country!.Code, country.ISDCode + user.PhoneNumber, "Company account edited. \nDomain : " + user.Email + "\n" + portal_base_url);
+                    return RedirectToAction(nameof(CompanyUserController.Index), "CompanyUser", new { id = applicationUser.ClientCompanyId });
                 }
             }
             catch (Exception ex)

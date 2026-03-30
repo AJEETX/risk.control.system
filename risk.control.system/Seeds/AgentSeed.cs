@@ -10,22 +10,16 @@ namespace risk.control.system.Seeds
 {
     public static class AgentSeed
     {
-        public static async Task Seed(ApplicationDbContext context, string agentEmailwithSuffix,
-            IWebHostEnvironment webHostEnvironment, ICustomApiClient customApiCLient,
-            UserManager<ApplicationUser> userManager,
+        public static async Task Seed(ApplicationDbContext context, string agentEmailwithSuffix, IWebHostEnvironment env, ICustomApiClient customApiCLient, UserManager<ApplicationUser> userManager,
             Vendor vendor, PinCode pincode, string photo, string firstName, string lastName, IFileStorageService fileStorageService, string addressLine)
         {
-            string agentImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", Path.GetFileName(photo));
-            var agentImage = File.ReadAllBytes(agentImagePath);
-
-            var extension = Path.GetExtension(agentImagePath);
-            var (fileName, relativePath) = await fileStorageService.SaveAsync(agentImage, extension, vendor.Email, "user");
-
+            string agentImagePath = Path.Combine(env.WebRootPath, "img", Path.GetFileName(photo));
+            var agentImage = await File.ReadAllBytesAsync(agentImagePath);
+            var (fileName, relativePath) = await fileStorageService.SaveAsync(agentImage, Path.GetExtension(agentImagePath), vendor.Email, "user");
             var address = addressLine + ", " + pincode.District!.Name + ", " + pincode.State!.Name + ", " + pincode.Country!.Code;
             var coordinates = await customApiCLient.GetCoordinatesFromAddressAsync(address);
             var customerLatLong = coordinates.Latitude + "," + coordinates.Longitude;
             var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{customerLatLong}&key={EnvHelper.Get("GOOGLE_MAP_KEY")}";
-
             var vendorAgent = new ApplicationUser()
             {
                 UserName = agentEmailwithSuffix,
@@ -38,9 +32,6 @@ namespace risk.control.system.Seeds
                 Password = TestingData,
                 VendorId = vendor.VendorId,
                 PhoneNumber = AGENT_MOBILE,
-                IsSuperAdmin = false,
-                IsClientAdmin = false,
-                IsVendorAdmin = false,
                 Addressline = addressLine,
                 Country = pincode?.Country,
                 PinCode = pincode,

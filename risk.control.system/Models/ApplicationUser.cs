@@ -23,7 +23,7 @@ namespace risk.control.system.Models
         public int Speech2TextCount { get; set; } = 0;
         public bool IsSuperAdmin { get; set; } = false;
         public bool IsClientManager { get; set; } = false;
-        public bool IsClientAdmin { get; set; } = false;
+        public bool IsCompanyAdmin { get; set; } = false;
         public bool IsVendorAdmin { get; set; } = false;
         public string? ProfilePictureExtension { get; set; }
 
@@ -63,7 +63,7 @@ namespace risk.control.system.Models
 
         public string? Password { get; set; }
 
-        public bool Active { get; set; } = false;
+        public bool Active { get; set; } = true;
 
         public bool Deleted { get; set; } = false;
 

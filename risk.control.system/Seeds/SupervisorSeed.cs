@@ -9,23 +9,13 @@ namespace risk.control.system.Seeds
 {
     public static class SupervisorSeed
     {
-        public static async Task Seed(ApplicationDbContext context, string emailSuffix,
-            IWebHostEnvironment webHostEnvironment,
-            UserManager<ApplicationUser> userManager,
+        public static async Task Seed(ApplicationDbContext context, string emailSuffix, IWebHostEnvironment env, UserManager<ApplicationUser> userManager,
             Vendor vendor, PinCode pinCode, string photo, string firstName, string lastName, IFileStorageService fileStorageService)
         {
-            //Seed client creator
-            string noUserImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", NO_USER);
-
+            string noUserImagePath = Path.Combine(env.WebRootPath, "img", NO_USER);
             string supervisorEmailwithSuffix = emailSuffix + "@" + vendor.Email;
-
-            string supervisorImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", Path.GetFileName(photo));
-            var supervisorImage = File.ReadAllBytes(supervisorImagePath);
-
-            if (supervisorImage == null)
-            {
-                supervisorImage = File.ReadAllBytes(noUserImagePath);
-            }
+            string supervisorImagePath = Path.Combine(env.WebRootPath, "img", Path.GetFileName(photo));
+            var supervisorImage = await File.ReadAllBytesAsync(supervisorImagePath);
             var extension = Path.GetExtension(supervisorImagePath);
             var (fileName, relativePath) = await fileStorageService.SaveAsync(supervisorImage, extension, vendor.Email, "user");
             var vendorSupervisor = new ApplicationUser()
@@ -40,10 +30,7 @@ namespace risk.control.system.Seeds
                 Password = TestingData,
                 PhoneNumber = string.Equals(pinCode.Country!.Code, "au", StringComparison.OrdinalIgnoreCase) ? SAMPLE_MOBILE_AUSTRALIA : SAMPLE_MOBILE_INDIA,
                 VendorId = vendor.VendorId,
-                IsSuperAdmin = false,
-                IsClientAdmin = false,
                 Addressline = vendor.Addressline,
-                IsVendorAdmin = false,
                 CountryId = pinCode.CountryId,
                 DistrictId = pinCode?.DistrictId ?? default!,
                 StateId = pinCode?.StateId ?? default!,

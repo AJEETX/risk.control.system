@@ -31,17 +31,8 @@ namespace risk.control.system.Services.Api
         {
             var statuses = GetValidStatuses();
             await using var _context = _contextFactory.CreateDbContext();
-
-            var claimsCases = await _context.Investigations.AsNoTracking()
-                .Where(c => c.AssignedToAgency &&
-                            !c.Deleted &&
-                            c.VendorId.HasValue &&
-                            statuses.Contains(c.SubStatus))
-                .ToListAsync(); ;
-
-            var companyUser = await _context.ApplicationUser.AsNoTracking()
-                    .FirstOrDefaultAsync(c => c.Email == userEmail);
-
+            var claimsCases = await _context.Investigations.AsNoTracking().Where(c => c.AssignedToAgency && !c.Deleted && c.VendorId.HasValue && statuses.Contains(c.SubStatus)).ToListAsync(); ;
+            var companyUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == userEmail);
             var company = await _context.ClientCompany
                 .Include(c => c.EmpanelledVendors).ThenInclude(v => v.State)
                 .Include(c => c.EmpanelledVendors).ThenInclude(v => v.District)
@@ -50,17 +41,10 @@ namespace risk.control.system.Services.Api
                 .Include(c => c.EmpanelledVendors).ThenInclude(v => v.Ratings)
                 .FirstOrDefaultAsync(c => c.ClientCompanyId == companyUser!.ClientCompanyId!.Value);
             if (company == null) return Array.Empty<object>();
-
-            var vendorTasks = company.EmpanelledVendors
-                .Where(v => !v.Deleted)
-                .OrderBy(v => v.Name)
-                .Select(v => MapVendor(v, companyUser!, claimsCases));
-
+            var vendorTasks = company.EmpanelledVendors.Where(v => !v.Deleted).OrderBy(v => v.Name).Select(v => MapVendor(v, companyUser!, claimsCases));
             var result = await Task.WhenAll(vendorTasks);
-
             ResetVendorUpdateFlags(company.EmpanelledVendors);
             await _context.SaveChangesAsync(null, false);
-
             return result;
         }
 
@@ -68,22 +52,12 @@ namespace risk.control.system.Services.Api
         {
             await using var _context = await _contextFactory.CreateDbContextAsync();
             var companyUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == userEmail);
-            var company = await _context.ClientCompany.AsNoTracking()
-                .Include(c => c.EmpanelledVendors)
-                .FirstOrDefaultAsync(c => c.ClientCompanyId == companyUser!.ClientCompanyId);
+            var company = await _context.ClientCompany.AsNoTracking().Include(c => c.EmpanelledVendors).FirstOrDefaultAsync(c => c.ClientCompanyId == companyUser!.ClientCompanyId);
 
             var availableVendors = await _context.Vendor
                 .Where(v => !company!.EmpanelledVendors.Contains(v) && !v.Deleted && v.CountryId == company.CountryId)
-                .Include(v => v.ApplicationUser)
-                .Include(v => v.Country)
-                .Include(v => v.PinCode)
-                .Include(v => v.District)
-                .Include(v => v.State)
-                .Include(v => v.VendorInvestigationServiceTypes)
-                .OrderByDescending(u => u.Updated)
-                .ThenBy(u => u.Name)
-                .ToListAsync();
-
+                .Include(v => v.ApplicationUser).Include(v => v.Country).Include(v => v.PinCode).Include(v => v.District).Include(v => v.State).Include(v => v.VendorInvestigationServiceTypes)
+                .OrderByDescending(u => u.Updated).ThenBy(u => u.Name).ToListAsync();
             var result =
                 availableVendors?.Select(async u =>
                 {
@@ -123,22 +97,13 @@ namespace risk.control.system.Services.Api
         {
             await using var _context = await _contextFactory.CreateDbContextAsync();
             var claimsCases = await _context.Investigations.AsNoTracking().Where(c => c.AssignedToAgency && !c.Deleted && c.VendorId.HasValue && GetValidStatuses().Contains(c.SubStatus)).ToListAsync();
-            var companyUser = await _context.ApplicationUser.AsNoTracking()
-                    .FirstOrDefaultAsync(c => c.Email == userEmail);
-
-            var company = await _context.ClientCompany.AsNoTracking()
-                .Include(c => c.EmpanelledVendors)
-                    .ThenInclude(v => v.State)
-                .Include(c => c.EmpanelledVendors)
-                    .ThenInclude(v => v.District)
-                .Include(c => c.EmpanelledVendors)
-                    .ThenInclude(v => v.Country)
-                .Include(c => c.EmpanelledVendors)
-                    .ThenInclude(v => v.PinCode)
-                .Include(c => c.EmpanelledVendors)
-                    .ThenInclude(v => v.Ratings)
+            var companyUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == userEmail);
+            var company = await _context.ClientCompany.AsNoTracking().Include(c => c.EmpanelledVendors).ThenInclude(v => v.State)
+                .Include(c => c.EmpanelledVendors).ThenInclude(v => v.District)
+                .Include(c => c.EmpanelledVendors).ThenInclude(v => v.Country)
+                .Include(c => c.EmpanelledVendors).ThenInclude(v => v.PinCode)
+                .Include(c => c.EmpanelledVendors).ThenInclude(v => v.Ratings)
                 .FirstOrDefaultAsync(c => c.ClientCompanyId == companyUser!.ClientCompanyId);
-
             if (company == null)
             {
                 return null!;

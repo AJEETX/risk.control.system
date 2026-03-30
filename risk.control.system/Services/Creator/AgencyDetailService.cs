@@ -12,54 +12,30 @@ namespace risk.control.system.Services
 
     internal class AgencyDetailService : IAgencyDetailService
     {
-        private readonly ApplicationDbContext context;
+        private readonly ApplicationDbContext _context;
         private readonly IAgencyCaseLoadService _agencyCaseLoadService;
 
         public AgencyDetailService(
             ApplicationDbContext context,
             IAgencyCaseLoadService agencyCaseLoadService)
         {
-            this.context = context;
-            this._agencyCaseLoadService = agencyCaseLoadService;
+            _context = context;
+            _agencyCaseLoadService = agencyCaseLoadService;
         }
 
         public async Task<Vendor> GetVendorDetailAsync(long vendorId, long selectedCaseId)
         {
-            var vendor = await context.Vendor
-                .Include(v => v.Ratings)
-                .Include(v => v.Country)
-                .Include(v => v.PinCode)
-                .Include(v => v.State)
-                .Include(v => v.District)
-                .Include(v => v.VendorInvestigationServiceTypes)
-                .FirstOrDefaultAsync(v => v.VendorId == vendorId);
-
-            if (vendor == null)
-                return null!;
-
-            var approved = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR;
-            var rejected = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR;
-
-            var totalCases = await context.Investigations.CountAsync(c =>
-                c.VendorId == vendor.VendorId &&
-                !c.Deleted &&
-                (c.SubStatus == approved || c.SubStatus == rejected));
-
-            var agentCount = await context.ApplicationUser.CountAsync(u =>
-                u.VendorId == vendor.VendorId &&
-                !u.Deleted &&
-                u.Role == AppRoles.AGENT);
-
-            var currentCases = (await _agencyCaseLoadService
-                .GetAgencyIdsLoad(new List<long> { vendor.VendorId }))
-                .FirstOrDefault();
-
-            // ⚠️ Legacy hack preserved
+            var vendor = await _context.Vendor.Include(v => v.Ratings).Include(v => v.Country).Include(v => v.PinCode).Include(v => v.State).Include(v => v.District).Include(v => v.VendorInvestigationServiceTypes).FirstOrDefaultAsync(v => v.VendorId == vendorId);
+            if (vendor == null) return null!;
+            var totalCases = await _context.Investigations.CountAsync(c =>
+                c.VendorId == vendor.VendorId && !c.Deleted &&
+                (c.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR || c.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR));
+            var agentCount = await _context.ApplicationUser.CountAsync(u => u.VendorId == vendor.VendorId && !u.Deleted && u.Role == AppRoles.AGENT);
+            var currentCases = (await _agencyCaseLoadService.GetAgencyIdsLoad(new List<long> { vendor.VendorId })).FirstOrDefault();
             vendor.UserCount = agentCount;
             vendor.CurrentCasesCount = currentCases?.CaseCount ?? 0;
             vendor.CompletedCasesCount = totalCases;
             vendor.SelectedPincodeId = selectedCaseId;
-
             return vendor;
         }
     }

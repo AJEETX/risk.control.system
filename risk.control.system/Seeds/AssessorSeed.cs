@@ -9,21 +9,12 @@ namespace risk.control.system.Seeds
 {
     public static class AssessorSeed
     {
-        public static async Task Seed(ApplicationDbContext context,
-            IWebHostEnvironment webHostEnvironment,
-            UserManager<ApplicationUser> userManager,
+        public static async Task Seed(ApplicationDbContext context, IWebHostEnvironment env, UserManager<ApplicationUser> userManager,
             ClientCompany clientCompany, PinCode pinCode, string assessorEmailwithSuffix, string photo, string firstName, string lastName, IFileStorageService fileStorageService)
         {
-            //Seed client creator
-            string noUserImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", NO_USER);
-
-            string assessorImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", Path.GetFileName(photo));
-            var assessorImage = File.ReadAllBytes(assessorImagePath);
-
-            if (assessorImage == null)
-            {
-                assessorImage = File.ReadAllBytes(noUserImagePath);
-            }
+            string noUserImagePath = Path.Combine(env.WebRootPath, "img", NO_USER);
+            string assessorImagePath = Path.Combine(env.WebRootPath, "img", Path.GetFileName(photo));
+            var assessorImage = await File.ReadAllBytesAsync(assessorImagePath);
             var extension = Path.GetExtension(assessorImagePath);
             var (fileName, relativePath) = await fileStorageService.SaveAsync(assessorImage, extension, clientCompany.Email, "user");
             var clientAssessor = new ApplicationUser()
@@ -37,10 +28,6 @@ namespace risk.control.system.Seeds
                 Password = TestingData,
                 Active = true,
                 ClientCompanyId = clientCompany.ClientCompanyId,
-                IsSuperAdmin = false,
-                IsClientAdmin = false,
-                IsVendorAdmin = false,
-                IsClientManager = true,
                 Addressline = clientCompany.Addressline,
                 PhoneNumber = string.Equals(pinCode.Country!.Code, "au", StringComparison.OrdinalIgnoreCase) ? SAMPLE_MOBILE_AUSTRALIA : SAMPLE_MOBILE_INDIA,
                 PinCode = pinCode,

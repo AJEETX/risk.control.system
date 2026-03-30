@@ -85,7 +85,7 @@ namespace risk.control.system.Services.Company
                 model.EmailConfirmed = true;
 
                 model.PhoneNumber = model.PhoneNumber!.TrimStart('0').Trim();
-                model.IsClientAdmin = model.Role == AppRoles.COMPANY_ADMIN;
+                model.IsCompanyAdmin = model.Role == AppRoles.COMPANY_ADMIN;
                 model.Updated = DateTime.UtcNow;
                 model.UpdatedBy = performedBy;
                 model.CountryId = model.SelectedCountryId;
@@ -115,59 +115,45 @@ namespace risk.control.system.Services.Company
             try
             {
                 var user = await _userManager.FindByIdAsync(id);
-                if (user == null)
-                    return Fail("User not found.");
+                if (user == null) return Fail("User not found.");
                 var result = new ServiceResult();
-
                 if (model.ProfileImage != null)
                 {
-                    if (!ValidateProfileImage(model.ProfileImage, result))
-                        return result;
-                    var domain = user.Email!.Split('@')[1];
-                    await SetProfileImageAsync(user, model.ProfileImage, domain);
+                    if (!ValidateProfileImage(model.ProfileImage, result)) return result;
+                    await SetProfileImageAsync(user, model.ProfileImage, user.Email!.Split('@')[1]);
                 }
                 var textInfo = CultureInfo.CurrentCulture.TextInfo;
                 user.FirstName = WebUtility.HtmlEncode(textInfo.ToTitleCase(model.FirstName.Trim().ToLower()));
                 user.LastName = WebUtility.HtmlEncode(textInfo.ToTitleCase(model.LastName.Trim().ToLower()));
-
                 user.CountryId = model.SelectedCountryId;
                 user.StateId = model.SelectedStateId;
                 user.DistrictId = model.SelectedDistrictId;
                 user.PinCodeId = model.SelectedPincodeId;
                 user.Addressline = model.Addressline;
                 user.PhoneNumber = model.PhoneNumber!.TrimStart('0').Trim();
-
                 user.Role = model.Role;
-                user.IsClientAdmin = user.Role == AppRoles.COMPANY_ADMIN;
-
+                user.IsCompanyAdmin = user.Role == AppRoles.COMPANY_ADMIN;
                 user.Updated = DateTime.UtcNow;
                 user.UpdatedBy = performedBy;
                 user.SecurityStamp = Guid.NewGuid().ToString();
-
+                user.Active = model.Active;
                 var updateResult = await _userManager.UpdateAsync(user);
-                if (!updateResult.Succeeded)
-                    return Fail($"Failed to update user <b>{user.Email}</b>.");
-
+                if (!updateResult.Succeeded) return Fail($"Failed to update user <b>{user.Email}</b>.");
                 var roles = await _userManager.GetRolesAsync(user);
                 await _userManager.RemoveFromRolesAsync(user, roles);
                 await _userManager.AddToRoleAsync(user, user.Role.ToString()!);
                 if (user.Email != performedBy)
                 {
-                    user.Active = model.Active;
-
-                    if (!user.Active)
+                    if (user.Active)
+                        await _userManager.SetLockoutEndDateAsync(user, DateTime.UtcNow);
+                    else
                     {
                         await _userManager.SetLockoutEnabledAsync(user, true);
                         await _userManager.SetLockoutEndDateAsync(user, DateTime.MaxValue);
                     }
-                    else
-                    {
-                        await _userManager.SetLockoutEndDateAsync(user, DateTime.UtcNow);
-                    }
                 }
                 var country = await _context.Country.FindAsync(user.CountryId);
                 await _sms.DoSendSmsAsync(country!.Code, country.ISDCode + model.PhoneNumber, $"User edited\nEmail: {model.Email} \n \r {portal_base_url}");
-
                 return Success($"User <b>{user.Email}</b> updated successfully.");
             }
             catch (Exception ex)

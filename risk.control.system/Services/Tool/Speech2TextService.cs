@@ -15,6 +15,7 @@ namespace risk.control.system.Services.Tool
 
     internal class Speech2TextService : ISpeech2TextService
     {
+        private string bucketName = "icheckify-bucket";
         private readonly IAmazonS3 s3Client;
         private readonly IAmazonTranscribeService transcribeClient;
         private readonly IHttpClientFactory clientFactory;
@@ -28,49 +29,24 @@ namespace risk.control.system.Services.Tool
 
         public async Task<string> ConvertSpeech(Speech2TextData input)
         {
-            string bucketName = "icheckify-bucket";
             string fileName = $"{Guid.NewGuid()}_{input.SpeechInputData!.FileName}";
             string transcribedText = "";
-
             try
             {
-                // Check if bucket exists, if not, create it
                 if (!(await Amazon.S3.Util.AmazonS3Util.DoesS3BucketExistV2Async(s3Client, bucketName)))
                 {
-                    var putBucketRequest = new PutBucketRequest
-                    {
-                        BucketName = bucketName,
-                        UseClientRegion = true
-                    };
+                    var putBucketRequest = new PutBucketRequest { BucketName = bucketName, UseClientRegion = true };
                     await s3Client.PutBucketAsync(putBucketRequest);
                 }
-                // 2. Upload file to S3
                 using (var stream = input.SpeechInputData.OpenReadStream())
                 {
-                    var uploadRequest = new TransferUtilityUploadRequest
-                    {
-                        InputStream = stream,
-                        Key = fileName,
-                        BucketName = bucketName
-                    };
+                    var uploadRequest = new TransferUtilityUploadRequest { InputStream = stream, Key = fileName, BucketName = bucketName };
                     var fileTransferUtility = new TransferUtility(s3Client);
                     await fileTransferUtility.UploadAsync(uploadRequest);
                 }
-
-                // 3. Start Transcription Job
                 var jobName = $"Job_{Guid.NewGuid()}";
-                var startRequest = new StartTranscriptionJobRequest
-                {
-                    TranscriptionJobName = jobName,
-                    LanguageCode = LanguageCode.EnUS,
-                    MediaSampleRateHertz = 44100,
-                    MediaFormat = MediaFormat.Mp3, // or Wav depending on input
-                    Media = new Media { MediaFileUri = $"s3://{bucketName}/{fileName}" }
-                };
-
+                var startRequest = CreateRequest(jobName, fileName);
                 await transcribeClient.StartTranscriptionJobAsync(startRequest);
-
-                // 4. Poll for completion (Simple loop for demo purposes)
                 TranscriptionJob status;
                 do
                 {
@@ -82,22 +58,14 @@ namespace risk.control.system.Services.Tool
 
                 if (status.TranscriptionJobStatus == TranscriptionJobStatus.COMPLETED)
                 {
-
                     var httpClient = clientFactory.CreateClient();
                     try
                     {
-                        // Use the optimized GetFromJsonAsync to skip the manual string-to-json step
                         var result = await httpClient.GetFromJsonAsync<JsonElement>(status.Transcript.TranscriptFileUri);
-
-                        // Access the data using System.Text.Json's property navigation
-                        transcribedText = result.GetProperty("results")
-                                                .GetProperty("transcripts")[0]
-                                                .GetProperty("transcript")
-                                                .GetString()!;
+                        transcribedText = result.GetProperty("results").GetProperty("transcripts")[0].GetProperty("transcript").GetString()!;
                     }
                     catch (HttpRequestException e)
                     {
-                        // Handle potential connection issues (like the one in your earlier logs!)
                         Console.WriteLine($"Request error: {e.Message}");
                     }
                 }
@@ -107,6 +75,18 @@ namespace risk.control.system.Services.Tool
                 transcribedText = "Error during transcription: " + ex.Message;
             }
             return transcribedText;
+        }
+        private StartTranscriptionJobRequest CreateRequest(string jobName, string fileName)
+        {
+            var startRequest = new StartTranscriptionJobRequest
+            {
+                TranscriptionJobName = jobName,
+                LanguageCode = LanguageCode.EnUS,
+                MediaSampleRateHertz = 44100,
+                MediaFormat = MediaFormat.Mp3,
+                Media = new Media { MediaFileUri = $"s3://{bucketName}/{fileName}" }
+            };
+            return startRequest;
         }
     }
 }

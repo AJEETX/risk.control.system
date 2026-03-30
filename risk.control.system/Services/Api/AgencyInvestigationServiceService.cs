@@ -26,39 +26,16 @@ namespace risk.control.system.Services.Api
         public async Task<List<AgencyServiceResponse>> GetAgencyService(long vendorId)
         {
             await using var _context = await _contextFactory.CreateDbContextAsync();
-            // Fetch all services for the vendor with related data
-            var services = await _context.VendorInvestigationServiceType.AsNoTracking()
-                .Include(s => s.InvestigationServiceType)
-                .Include(s => s.State)
-                .Include(s => s.Country)
-                .Where(s => s.VendorId == vendorId)
-                .OrderBy(s => s.InvestigationServiceType!.Name)
+            var services = await _context.VendorInvestigationServiceType.AsNoTracking().Include(s => s.InvestigationServiceType).Include(s => s.State).Include(s => s.Country).Where(s => s.VendorId == vendorId).OrderBy(s => s.InvestigationServiceType!.Name)
                 .ToListAsync();
-
-            // Pre-fetch districts for N+1 optimization
-            var allDistrictIds = services
-                .Where(s => s.SelectedDistrictIds != null && !s.SelectedDistrictIds.Contains(-1))
-                .SelectMany(s => s.SelectedDistrictIds)
-                .Distinct()
-                .ToList();
-
-            var districtDict = await _context.District.AsNoTracking()
-                .Where(d => allDistrictIds.Contains(d.DistrictId))
-                .ToDictionaryAsync(d => d.DistrictId, d => d.Name);
-
-            // Map to response
+            var allDistrictIds = services.Where(s => s.SelectedDistrictIds != null && !s.SelectedDistrictIds.Contains(-1)).SelectMany(s => s.SelectedDistrictIds).Distinct().ToList();
+            var districtDict = await _context.District.AsNoTracking().Where(d => allDistrictIds.Contains(d.DistrictId)).ToDictionaryAsync(d => d.DistrictId, d => d.Name);
             var serviceResponse = services.Select(service =>
             {
                 bool isAllDistrict = service.SelectedDistrictIds?.Contains(-1) == true;
-
-                var districtNames = isAllDistrict
-                    ? ALL_DISTRICT
-                    : string.Join(", ", service.SelectedDistrictIds?
-                        .Select(id => districtDict.TryGetValue(id, out var name) ? name : null)
+                var districtNames = isAllDistrict ? ALL_DISTRICT : string.Join(", ", service.SelectedDistrictIds?.Select(id => districtDict.TryGetValue(id, out var name) ? name : null)
                         .Where(n => n != null) ?? Enumerable.Empty<string>());
-
                 var culture = CustomExtensions.GetCultureByCountry(service.Country!.Code.ToUpper());
-
                 return new AgencyServiceResponse
                 {
                     VendorId = service.VendorId,
@@ -78,33 +55,16 @@ namespace risk.control.system.Services.Api
                     LastModified = service.Updated
                 };
             }).ToList();
-
-            // Batch reset IsUpdated
-            await _context.VendorInvestigationServiceType.AsNoTracking()
-                        .Where(s => s.VendorId == vendorId)
-                        .ExecuteUpdateAsync(setters => setters.SetProperty(s => s.IsUpdated, false));
-
+            await _context.VendorInvestigationServiceType.AsNoTracking().Where(s => s.VendorId == vendorId).ExecuteUpdateAsync(setters => setters.SetProperty(s => s.IsUpdated, false));
             return serviceResponse;
         }
 
         public async Task<List<AgencyServiceResponse>> AllServices(string userEmail)
         {
             await using var _context = await _contextFactory.CreateDbContextAsync();
-            // 1. Get VendorId (no tracking, minimal projection)
-            var vendorId = await _context.ApplicationUser
-                .AsNoTracking()
-                .Where(u => u.Email == userEmail)
-                .Select(u => u.VendorId)
-                .SingleOrDefaultAsync();
-
-            if (vendorId == null)
-                return new List<AgencyServiceResponse>();
-
-            // 2. Fetch ONLY required fields (no Include, no tracking)
-            var servicesData = await _context.VendorInvestigationServiceType
-                .AsNoTracking()
-                .Where(s => s.VendorId == vendorId && !s.Vendor!.Deleted)
-                .OrderBy(s => s.InvestigationServiceType!.Name)
+            var vendorId = await _context.ApplicationUser.AsNoTracking().Where(u => u.Email == userEmail).Select(u => u.VendorId).SingleOrDefaultAsync();
+            if (vendorId == null) return new List<AgencyServiceResponse>();
+            var servicesData = await _context.VendorInvestigationServiceType.AsNoTracking().Where(s => s.VendorId == vendorId && !s.Vendor!.Deleted).OrderBy(s => s.InvestigationServiceType!.Name)
                 .Select(s => new
                 {
                     s.VendorId,
@@ -121,39 +81,12 @@ namespace risk.control.system.Services.Api
                     StateName = s.State.Name,
                     CountryCode = s.Country!.Code,
                     CountryName = s.Country.Name
-                })
-                .ToListAsync();
-
-            // 3. Collect district IDs efficiently
-            var districtIds = servicesData
-                .Where(s => s.SelectedDistrictIds != null && !s.SelectedDistrictIds.Contains(-1))
-                .SelectMany(s => s.SelectedDistrictIds)
-                .Distinct()
-                .ToHashSet();
-
-            var districtDict = districtIds.Count == 0
-                ? new Dictionary<long, string>()
-                : await _context.District
-                    .AsNoTracking()
-                    .Where(d => districtIds.Contains(d.DistrictId))
-                    .Select(d => new { d.DistrictId, d.Name })
-                    .ToDictionaryAsync(d => d.DistrictId, d => d.Name);
-
-            // 4. Map to response (pure in-memory work)
+                }).ToListAsync();
+            var districtIds = servicesData.Where(s => s.SelectedDistrictIds != null && !s.SelectedDistrictIds.Contains(-1)).SelectMany(s => s.SelectedDistrictIds).Distinct().ToHashSet();
+            var districtDict = districtIds.Count == 0 ? new Dictionary<long, string>() : await _context.District.AsNoTracking().Where(d => districtIds.Contains(d.DistrictId)).Select(d => new { d.DistrictId, d.Name }).ToDictionaryAsync(d => d.DistrictId, d => d.Name);
             var response = servicesData.Select(service =>
             {
-                bool isAllDistrict = service.SelectedDistrictIds?.Contains(-1) == true;
-
-                var districtNames = isAllDistrict
-                    ? ALL_DISTRICT
-                    : string.Join(", ",
-                        service.SelectedDistrictIds?
-                            .Select(id => districtDict.GetValueOrDefault(id))
-                            .Where(name => name != null)
-                        ?? Enumerable.Empty<string>());
-
-                var culture = CustomExtensions.GetCultureByCountry(service.CountryCode.ToUpper());
-
+                var districtNames = (service.SelectedDistrictIds?.Contains(-1) == true) ? ALL_DISTRICT : string.Join(", ", service.SelectedDistrictIds?.Select(id => districtDict.GetValueOrDefault(id)).Where(name => name != null) ?? Enumerable.Empty<string>());
                 return new AgencyServiceResponse
                 {
                     VendorId = service.VendorId,
@@ -166,20 +99,14 @@ namespace risk.control.system.Services.Api
                     CountryCode = service.CountryCode,
                     Country = service.CountryName,
                     Flag = $"/flags/{service.CountryCode.ToLower()}.png",
-                    Rate = string.Format(culture, "{0:c}", service.Price),
+                    Rate = string.Format(CustomExtensions.GetCultureByCountry(service.CountryCode.ToUpper()), "{0:c}", service.Price),
                     UpdatedBy = service.UpdatedBy!,
                     Updated = service.Updated ?? service.Created,
                     IsUpdated = service.IsUpdated,
                     LastModified = service.Updated
                 };
             }).ToList();
-
-            // 5. Batch update (already optimal 👍)
-            await _context.VendorInvestigationServiceType.AsNoTracking()
-                .Where(s => s.VendorId == vendorId)
-                .ExecuteUpdateAsync(setters =>
-                    setters.SetProperty(s => s.IsUpdated, false));
-
+            await _context.VendorInvestigationServiceType.AsNoTracking().Where(s => s.VendorId == vendorId).ExecuteUpdateAsync(setters => setters.SetProperty(s => s.IsUpdated, false));
             return response;
         }
     }

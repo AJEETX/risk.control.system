@@ -37,9 +37,52 @@ namespace risk.control.system.Services.Agent
 
         public async Task<CaseAgencyModel> GetInvestigate(string userEmail, long selectedCaseId, bool uploaded = false)
         {
-            _logger.LogInformation("Fetching investigation case {CaseId} for user {UserEmail}", selectedCaseId, userEmail);
+            var caseTask = await GetInvestigateTask(selectedCaseId);
 
-            var caseTask = await _context.Investigations
+            if (caseTask == null)
+            {
+                _logger.LogWarning("Investigation case {CaseId} not found", selectedCaseId);
+                return null!;
+            }
+            caseTask.CustomerDetail!.PhoneNumber = MaskPhoneNumber(caseTask.CustomerDetail?.PhoneNumber!);
+            caseTask.BeneficiaryDetail!.PhoneNumber = MaskPhoneNumber(caseTask.BeneficiaryDetail?.PhoneNumber!);
+            caseTask.InvestigationReport!.AgentEmail = userEmail;
+            var templates = await _context.ReportTemplates.AsNoTracking()
+                .Include(r => r.LocationReport)
+                    .ThenInclude(l => l.AgentIdReport)
+                .Include(r => r.LocationReport)
+                    .ThenInclude(l => l.FaceIds)
+                .Include(r => r.LocationReport)
+                    .ThenInclude(l => l.MediaReports)
+                .Include(r => r.LocationReport)
+                    .ThenInclude(l => l.DocumentIds)
+                .Include(r => r.LocationReport)
+                    .ThenInclude(l => l.Questions)
+                .FirstOrDefaultAsync(r => r.Id == caseTask.ReportTemplateId);
+
+            if (templates == null)
+            {
+                _logger.LogWarning("Report template {TemplateId} not found for case {CaseId}", caseTask.ReportTemplateId, selectedCaseId);
+            }
+            else
+            {
+                caseTask.InvestigationReport.ReportTemplate = templates;
+                _logger.LogInformation("Loaded report template {TemplateId} for case {CaseId}", templates.Id, selectedCaseId);
+            }
+            _context.Investigations.Update(caseTask);
+            var rowsAffected = await _context.SaveChangesAsync();
+            var model = new CaseAgencyModel
+            {
+                InvestigationReport = caseTask.InvestigationReport,
+                Beneficiary = caseTask.BeneficiaryDetail,
+                CaseTask = caseTask,
+                Currency = CustomExtensions.GetCultureByCountry(caseTask.ClientCompany!.Country!.Code.ToUpper()).NumberFormat.CurrencySymbol
+            };
+            return model;
+        }
+        private async Task<InvestigationTask?> GetInvestigateTask(long selectedCaseId)
+        {
+            return await _context.Investigations
                 .Include(c => c.CaseMessages)
                 .Include(c => c.CaseNotes)
                 .Include(c => c.ClientCompany)
@@ -71,67 +114,49 @@ namespace risk.control.system.Services.Agent
                 .Include(c => c.CaseNotes)
                 .Include(c => c.InvestigationReport)
                 .FirstOrDefaultAsync(c => c.Id == selectedCaseId);
-
+        }
+        public async Task<CaseTransactionModel> GetInvestigatedForAgent(string currentUserEmail, long id)
+        {
+            var caseTask = await GetInvestigateTaskForAgent(id);
             if (caseTask == null)
             {
-                _logger.LogWarning("Investigation case {CaseId} not found", selectedCaseId);
                 return null!;
             }
-
-            // Mask sensitive phone numbers
-            caseTask.CustomerDetail!.PhoneNumber = MaskPhoneNumber(caseTask.CustomerDetail?.PhoneNumber!);
-            caseTask.BeneficiaryDetail!.PhoneNumber = MaskPhoneNumber(caseTask.BeneficiaryDetail?.PhoneNumber!);
-            _logger.LogInformation("Masked phone numbers for case {CaseId}", selectedCaseId);
-
-            // Assign agent email
-            caseTask.InvestigationReport!.AgentEmail = userEmail;
-
-            // Load report templates
+            var company = await _context.ClientCompany.AsNoTracking().Include(c => c.Country).FirstOrDefaultAsync(c => c.ClientCompanyId == caseTask.ClientCompanyId);
+            if (company == null)
+            {
+                return null!;
+            }
             var templates = await _context.ReportTemplates.AsNoTracking()
                 .Include(r => r.LocationReport)
                     .ThenInclude(l => l.AgentIdReport)
                 .Include(r => r.LocationReport)
-                    .ThenInclude(l => l.FaceIds)
-                .Include(r => r.LocationReport)
                     .ThenInclude(l => l.MediaReports)
+                .Include(r => r.LocationReport)
+                    .ThenInclude(l => l.FaceIds)
                 .Include(r => r.LocationReport)
                     .ThenInclude(l => l.DocumentIds)
                 .Include(r => r.LocationReport)
                     .ThenInclude(l => l.Questions)
-                .FirstOrDefaultAsync(r => r.Id == caseTask.ReportTemplateId);
-
+                .FirstOrDefaultAsync(q => q.Id == caseTask.ReportTemplateId);
             if (templates == null)
             {
-                _logger.LogWarning("Report template {TemplateId} not found for case {CaseId}", caseTask.ReportTemplateId, selectedCaseId);
+                return null!;
             }
-            else
+            caseTask.InvestigationReport!.ReportTemplate = templates;
+            return new CaseTransactionModel
             {
-                caseTask.InvestigationReport.ReportTemplate = templates;
-                _logger.LogInformation("Loaded report template {TemplateId} for case {CaseId}", templates.Id, selectedCaseId);
-            }
-
-            _context.Investigations.Update(caseTask);
-            var rowsAffected = await _context.SaveChangesAsync();
-            _logger.LogInformation("{RowsAffected} rows updated for case {CaseId}", rowsAffected, selectedCaseId);
-
-            var model = new CaseAgencyModel
-            {
-                InvestigationReport = caseTask.InvestigationReport,
+                ClaimsInvestigation = caseTask,
+                CaseIsValidToAssign = caseTask.IsValidCaseData(),
                 Beneficiary = caseTask.BeneficiaryDetail,
-                CaseTask = caseTask,
-                Currency = CustomExtensions.GetCultureByCountry(caseTask.ClientCompany!.Country!.Code.ToUpper()).NumberFormat.CurrencySymbol
+                Assigned = caseTask.Status == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER,
+                Withdrawable = caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR,
+                Currency = CustomExtensions.GetCultureByCountry(company!.Country!.Code.ToUpper()).NumberFormat.CurrencySymbol
             };
-
-            _logger.LogInformation("Returning investigation model for case {CaseId}", selectedCaseId);
-            return model;
         }
-
-        public async Task<CaseTransactionModel> GetInvestigatedForAgent(string currentUserEmail, long id)
+        private async Task<InvestigationTask?> GetInvestigateTaskForAgent(long id)
         {
-            _logger.LogInformation("Fetching investigation case {CaseId} for agent {UserEmail}", id, currentUserEmail);
-
-            // Fetch case with related entities
-            var caseTask = await _context.Investigations.AsNoTracking()
+            return await _context.Investigations.AsNoTracking()
                 .Include(c => c.CaseMessages)
                 .Include(c => c.CaseNotes)
                 .Include(c => c.InvestigationReport)
@@ -163,59 +188,7 @@ namespace risk.control.system.Services.Agent
                 .Include(c => c.CustomerDetail)
                     .ThenInclude(c => c!.PinCode)
                 .FirstOrDefaultAsync(m => m.Id == id);
-
-            if (caseTask == null)
-            {
-                _logger.LogWarning("Investigation case {CaseId} not found for agent {UserEmail}", id, currentUserEmail);
-                return null!;
-            }
-
-            _logger.LogInformation("Investigation case {CaseId} found. Fetching related data...", id);
-
-            // Fetch company
-            var company = await _context.ClientCompany.AsNoTracking().Include(c => c.Country).FirstOrDefaultAsync(c => c.ClientCompanyId == caseTask.ClientCompanyId);
-            if (company == null)
-            {
-                _logger.LogWarning("ClientCompany {CompanyId} not found for case {CaseId}", caseTask.ClientCompanyId, id);
-            }
-            // Fetch report templates
-            var templates = await _context.ReportTemplates.AsNoTracking()
-                .Include(r => r.LocationReport)
-                    .ThenInclude(l => l.AgentIdReport)
-                .Include(r => r.LocationReport)
-                    .ThenInclude(l => l.MediaReports)
-                .Include(r => r.LocationReport)
-                    .ThenInclude(l => l.FaceIds)
-                .Include(r => r.LocationReport)
-                    .ThenInclude(l => l.DocumentIds)
-                .Include(r => r.LocationReport)
-                    .ThenInclude(l => l.Questions)
-                .FirstOrDefaultAsync(q => q.Id == caseTask.ReportTemplateId);
-
-            if (templates != null)
-            {
-                caseTask.InvestigationReport!.ReportTemplate = templates;
-                _logger.LogInformation("Loaded report template {TemplateId} for case {CaseId}", templates.Id, id);
-            }
-            else
-            {
-                _logger.LogWarning("Report template {TemplateId} not found for case {CaseId}", caseTask.ReportTemplateId, id);
-            }
-
-            var model = new CaseTransactionModel
-            {
-                ClaimsInvestigation = caseTask,
-                CaseIsValidToAssign = caseTask.IsValidCaseData(),
-                Beneficiary = caseTask.BeneficiaryDetail,
-                Assigned = caseTask.Status == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER,
-                Withdrawable = caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR,
-                Currency = CustomExtensions.GetCultureByCountry(company!.Country!.Code.ToUpper()).NumberFormat.CurrencySymbol
-            };
-
-            _logger.LogInformation("Returning CaseTransactionModel for case {CaseId}", id);
-            return model;
         }
-
         public async Task<InvestigationTask> GetCaseById(long id)
         {
             var caseDetail = await _context.Investigations
@@ -287,17 +260,6 @@ namespace risk.control.system.Services.Agent
             return caseInvestigation!;
         }
 
-        private static string FormatTime(TimeSpan time)
-        {
-            if (time == TimeSpan.Zero) return "-";
-
-            return $"{(time.Days > 0 ? $"{time.Days}d " : "")}" +
-                   $"{(time.Hours > 0 ? $"{time.Hours}h " : "")}" +
-                   $"{(time.Minutes > 0 ? $"{time.Minutes}m " : "")}" +
-                   $"{(time.Seconds > 0 ? $"{time.Seconds}s" : "less than a sec")}";
-        }
-
-        // Helper to check PDF download eligibility
         private async Task<bool> CanDownloadPdf(string userEmail, long reportId)
         {
             var tracker = await _context.PdfDownloadTracker.AsNoTracking()
