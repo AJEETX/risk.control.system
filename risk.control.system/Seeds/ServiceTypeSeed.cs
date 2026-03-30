@@ -6,9 +6,6 @@ namespace risk.control.system.Seeds
     {
         public static async Task<List<InvestigationServiceType>> Seed(ApplicationDbContext context)
         {
-
-            #region INVESTIGATION SERVICE TYPES
-
             var claimComprehensive = new InvestigationServiceType
             {
                 Name = "COMPREHENSIVE",
@@ -17,9 +14,7 @@ namespace risk.control.system.Seeds
                 Updated = DateTime.UtcNow,
                 InsuranceType = InsuranceType.CLAIM
             };
-
             var claimComprehensiveService = await context.InvestigationServiceType.AddAsync(claimComprehensive);
-
             var claimNonComprehensive = new InvestigationServiceType
             {
                 Name = "STANDARD",
@@ -28,9 +23,7 @@ namespace risk.control.system.Seeds
                 MasterData = true,
                 Updated = DateTime.UtcNow
             };
-
             var claimNonComprehensiveService = await context.InvestigationServiceType.AddAsync(claimNonComprehensive);
-
             var underWritingPreVerification = new InvestigationServiceType
             {
                 Name = "PRE-BOARD",
@@ -39,9 +32,7 @@ namespace risk.control.system.Seeds
                 MasterData = true,
                 Updated = DateTime.UtcNow
             };
-
             var underWritingPreVerificationService = await context.InvestigationServiceType.AddAsync(underWritingPreVerification);
-
             var underWritingPostVerification = new InvestigationServiceType
             {
                 Name = "POST-BOARD",
@@ -49,13 +40,8 @@ namespace risk.control.system.Seeds
                 InsuranceType = InsuranceType.UNDERWRITING,
                 MasterData = true
             };
-
             var underWritingPostVerificationService = await context.InvestigationServiceType.AddAsync(underWritingPostVerification);
-
-            #endregion INVESTIGATION SERVICE TYPES
-
             await context.SaveChangesAsync(null, false);
-
             var investigationServiceTypes = new List<InvestigationServiceType>
             {
                 claimComprehensiveService.Entity,

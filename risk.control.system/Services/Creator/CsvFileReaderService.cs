@@ -21,97 +21,67 @@ namespace risk.control.system.Services.Creator
             _environment = environment;
         }
 
-        public async Task<(byte[] ZipFileData, List<UploadCase> ValidRecords, List<string> Errors)>
-            ReadPipeDelimitedCsvFromZip(FileOnFileSystemModel uploadFileData)
+        public async Task<(byte[] ZipFileData, List<UploadCase> ValidRecords, List<string> Errors)> ReadPipeDelimitedCsvFromZip(FileOnFileSystemModel uploadFileData)
         {
             var validRecords = new List<UploadCase>();
             var errors = new List<string>();
-
-            var filePath = Path.Combine(_environment.ContentRootPath, uploadFileData.FilePath!);
-
+            var filePath = Path.Combine(_environment.ContentRootPath, uploadFileData.FilePath ?? string.Empty);
             if (!File.Exists(filePath))
             {
                 errors.Add("Uploaded ZIP file not found.");
                 return (Array.Empty<byte>(), validRecords, errors);
             }
-
             var zipFileData = await File.ReadAllBytesAsync(filePath);
-
-            using var zipStream = new MemoryStream(zipFileData);
-            using var archive = new ZipArchive(zipStream, ZipArchiveMode.Read);
-
-            var csvEntry = archive.Entries
-                .FirstOrDefault(e => e.FullName.EndsWith(".csv", StringComparison.OrdinalIgnoreCase));
-
+            using var archive = new ZipArchive(new MemoryStream(zipFileData), ZipArchiveMode.Read);
+            var csvEntry = archive.Entries.FirstOrDefault(e => e.FullName.EndsWith(".csv", StringComparison.OrdinalIgnoreCase));
             if (csvEntry == null)
             {
                 errors.Add("No CSV file found in ZIP.");
                 return (zipFileData, validRecords, errors);
             }
-
-            // -----------------------------
-            // 1️⃣ Header validation
-            // -----------------------------
-            using (var headerStream = csvEntry.Open())
-            using (var headerReader = new StreamReader(headerStream))
+            using var reader = new StreamReader(csvEntry.Open());
+            var config = GetCsvConfiguration(errors);
+            using var csv = new CsvReader(reader, config);
+            try
             {
-                var headerLine = await headerReader.ReadLineAsync();
-
-                if (string.IsNullOrWhiteSpace(headerLine))
+                if (!await csv.ReadAsync() || !csv.ReadHeader())
                 {
                     errors.Add("CSV file is empty or has no header.");
                     return (zipFileData, validRecords, errors);
                 }
 
-                if (headerLine.Count(c => c == '|') < 26)
+                if (csv.HeaderRecord?.Length < 27) // 26 pipes = 27 columns
                 {
                     errors.Add("The CSV file has fewer columns than expected.");
                     return (zipFileData, validRecords, errors);
                 }
-            }
-
-            // -----------------------------
-            // 2️⃣ CSV parsing
-            // -----------------------------
-            using (var dataStream = csvEntry.Open())
-            using (var reader = new StreamReader(dataStream))
-            using (var csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture)
-            {
-                Delimiter = "|",
-                TrimOptions = TrimOptions.Trim,
-                HeaderValidated = null,
-                MissingFieldFound = null,
-                BadDataFound = ctx =>
+                while (await csv.ReadAsync())
                 {
-                    errors.Add($"Bad data at row {ctx.Field}: {ctx.RawRecord}");
-                }
-            }))
-            {
-                try
-                {
-                    await csv.ReadAsync();
-                    csv.ReadHeader();
-
-                    while (await csv.ReadAsync())
+                    try
                     {
-                        try
-                        {
-                            var record = csv.GetRecord<UploadCase>();
-                            validRecords.Add(record);
-                        }
-                        catch (Exception ex)
-                        {
-                            errors.Add($"Row {csv.Context.Reader}: {ex.Message}");
-                        }
+                        var record = csv.GetRecord<UploadCase>();
+                        if (record != null) validRecords.Add(record);
+                    }
+                    catch (Exception ex)
+                    {
+                        errors.Add($"Row {csv.Context.Parser!.Row!}: {ex.Message}");
                     }
                 }
-                catch (Exception ex)
-                {
-                    errors.Add($"Error reading CSV: {ex.Message}");
-                }
             }
-
+            catch (Exception ex)
+            {
+                errors.Add($"Critical error reading CSV: {ex.Message}");
+            }
             return (zipFileData, validRecords, errors);
         }
+
+        private CsvConfiguration GetCsvConfiguration(List<string> errors) => new(CultureInfo.InvariantCulture)
+        {
+            Delimiter = "|",
+            TrimOptions = TrimOptions.Trim,
+            HeaderValidated = null,
+            MissingFieldFound = null,
+            BadDataFound = ctx => errors.Add($"Bad data at row {ctx.Field}: {ctx.RawRecord}")
+        };
     }
 }

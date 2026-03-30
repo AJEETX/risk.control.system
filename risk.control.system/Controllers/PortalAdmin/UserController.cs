@@ -150,7 +150,6 @@ namespace risk.control.system.Controllers.PortalAdmin
                     user.ProfilePictureUrl = relativePath;
                     user.ProfilePictureExtension = Path.GetExtension(fileName);
                 }
-
                 user.PhoneNumber = applicationUser?.PhoneNumber ?? user.PhoneNumber;
                 user.PhoneNumber = user.PhoneNumber!.TrimStart('0');
                 user.FirstName = applicationUser?.FirstName!;
@@ -162,12 +161,10 @@ namespace risk.control.system.Controllers.PortalAdmin
                 user.Country = applicationUser!.Country;
                 user.Active = applicationUser.Active;
                 user.Addressline = applicationUser.Addressline;
-
                 user.CountryId = applicationUser.SelectedCountryId;
                 user.StateId = applicationUser.SelectedStateId;
                 user.DistrictId = applicationUser.SelectedDistrictId;
                 user.PinCodeId = applicationUser.SelectedPincodeId;
-
                 user.IsUpdated = true;
                 user.Updated = DateTime.UtcNow;
                 user.PhoneNumber = applicationUser.PhoneNumber;

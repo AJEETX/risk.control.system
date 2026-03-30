@@ -1,6 +1,7 @@
 ﻿using Google.Cloud.Vision.V1;
 
 using Microsoft.EntityFrameworkCore;
+using risk.control.system.AppConstant;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
@@ -54,41 +55,21 @@ internal class DocumentIdfyService : IDocumentIdfyService
     {
         var claim = await caseService.GetCaseById(data.CaseId);
         if (claim?.InvestigationReport == null) return null!;
-
-        var location = claim.InvestigationReport.ReportTemplate!.LocationReport
-            .FirstOrDefault(l => l.LocationName == data.LocationName);
-
-        var locationTemplate = await context.LocationReport
-            .Include(l => l.DocumentIds)
-            .FirstOrDefaultAsync(l => l.Id == location!.Id);
-
+        var location = claim.InvestigationReport.ReportTemplate!.LocationReport.FirstOrDefault(l => l.LocationName == data.LocationName);
+        var locationTemplate = await context.LocationReport.Include(l => l.DocumentIds).FirstOrDefaultAsync(l => l.Id == location!.Id);
         var documentReport = locationTemplate!.DocumentIds!.FirstOrDefault(c => c.ReportName == data.ReportName);
-
         try
         {
-            // 1. Data Preparation
             var (lat, lon) = VerificationHelper.ParseCoordinates(data.LocationLatLong);
             var expected = VerificationHelper.GetExpectedCoordinates(claim);
-            var (fileName, relativePath) = await fileStorageService.SaveAsync(data.Image!, "Case", claim.PolicyDetail!.ContractNumber, "report");
-
+            var (fileName, relativePath) = await fileStorageService.SaveAsync(data.Image!, CONSTANTS.CASE, claim.PolicyDetail!.ContractNumber, "report");
             documentReport!.FilePath = relativePath;
             documentReport.ImageExtension = Path.GetExtension(fileName);
             byte[] docImage = await VerificationHelper.GetBytesFromIFormFile(data.Image!);
-
-            // 2. Parallel Service Calls (OCR, Address, and Mapping)
-            //var ocrTask = ocrService.ExtractTextDataAsync(documentReport, docImage);
             var googleTask = googleApi.DetectTextAsync(documentReport.FilePath);
             var addressTask = httpClientService.GetRawAddress(lat, lon);
-            var mapTask = customApiCLient.GetMap(expected.lat, expected.lon, double.Parse(lat), double.Parse(lon), "S", "E", "300", "300", "green", "red");
-
-            await Task.WhenAll(
-                googleTask,
-                addressTask, mapTask
-                //, ocrTask
-                );
-
-            // 3. Process Results
-            //var (ocrText, Pan, maskedImage) = await ocrTask;
+            var mapTask = customApiCLient.GetMap(expected.lat, expected.lon, double.Parse(lat), double.Parse(lon));
+            await Task.WhenAll(googleTask, addressTask, mapTask /*, ocrTask*/);
             var (dist, distM, dur, durS, mapUrl) = await mapTask;
             documentReport.LocationMapUrl = mapUrl;
             documentReport.Distance = dist;
@@ -98,25 +79,19 @@ internal class DocumentIdfyService : IDocumentIdfyService
             documentReport.LocationAddress = await addressTask;
             documentReport.LongLat = $"Latitude = {lat}, Longitude = {lon}";
             documentReport.LongLatTime = DateTime.UtcNow;
-
             var detectedText = await googleTask;
             await ProcessOcrResults(documentReport, docImage, detectedText, claim);
-
-            // 4. Persistence
             locationTemplate.ValidationExecuted = true;
             locationTemplate.Updated = DateTime.UtcNow;
             locationTemplate.UpdatedBy = data.Email;
-
             context.DocumentIdReport.Update(documentReport);
             context.Investigations.Update(claim);
             await context.SaveChangesAsync();
-
             return MapResponse(claim, documentReport, docImage);
         }
         catch (Exception ex)
         {
-            var sanitizedEmail = data.Email?.Replace("\n", "").Replace("\r", "").Trim();
-            logger.LogError(ex, "Failed Document file capture/processing for Case {CaseId}. {AgentEmail}", data.CaseId, sanitizedEmail);
+            logger.LogError(ex, "Failed Document file capture/processing for Case {CaseId}. {AgentEmail}", data.CaseId, data.Email?.Replace("\n", "").Replace("\r", "").Trim());
             return await HandleError(claim, documentReport!);
         }
     }

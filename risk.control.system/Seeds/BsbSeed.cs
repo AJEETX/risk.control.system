@@ -39,7 +39,6 @@ namespace risk.control.system.Seeds
         public static List<BsbLookUp> LoadBsb2Name()
         {
             var list = new List<BsbLookUp>();
-
             var lines = File.ReadAllLines(lookupFilePath, Encoding.UTF8).Skip(1); // skip header
             foreach (var line in lines) // skip header
             {

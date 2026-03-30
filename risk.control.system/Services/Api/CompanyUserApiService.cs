@@ -45,48 +45,26 @@ namespace risk.control.system.Services.Api
         public async Task<List<UserDetailResponse>> GetCompanyUsers(string userEmail)
         {
             var now = DateTime.UtcNow;
-            // 1️⃣ Get the current company user
-            var companyUser = await context.ApplicationUser.AsNoTracking()
-                .FirstOrDefaultAsync(c => c.Email == userEmail);
-
+            var companyUser = await context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == userEmail);
             if (companyUser == null) return new List<UserDetailResponse>();
-
-            // 2️⃣ Pre-fetch latest sessions per user (active in last 15 min)
-            var latestSessions = await context.UserSessionAlive
-                .Where(s => s.Updated >= cutoffTime || s.Created >= cutoffTime)
-                .Include(s => s.ActiveUser)
-                .GroupBy(s => s.ActiveUser.Email)
+            var latestSessions = await context.UserSessionAlive.Where(s => s.Updated >= cutoffTime || s.Created >= cutoffTime).Include(s => s.ActiveUser).GroupBy(s => s.ActiveUser.Email)
                 .Select(g => new
                 {
                     Email = g.Key!,
                     LastSeen = g.Max(x => x.Updated ?? x.Created),
                     LoggedOut = g.All(x => x.LoggedOut)
-                })
-                .ToDictionaryAsync(x => x.Email, x => new { x.LastSeen, x.LoggedOut });
-
-            // 3️⃣ Fetch company users
-            var companyUsers = await context.ApplicationUser.AsNoTracking()
-                .Where(u => u.ClientCompanyId == companyUser.ClientCompanyId && !u.Deleted && u.Email != userEmail)
-                .Include(u => u.PinCode)
-                .Include(u => u.District)
-                .Include(u => u.State)
-                .Include(u => u.Country)
-                .OrderBy(u => u.FirstName)
-                .ThenBy(u => u.LastName)
-                .ToListAsync();
-
+                }).ToDictionaryAsync(x => x.Email, x => new { x.LastSeen, x.LoggedOut });
+            var companyUsers = await context.ApplicationUser.AsNoTracking().Where(u => u.ClientCompanyId == companyUser.ClientCompanyId && !u.Deleted && u.Email != userEmail)
+                .Include(u => u.PinCode).Include(u => u.District).Include(u => u.State).Include(u => u.Country).OrderBy(u => u.FirstName).ThenBy(u => u.LastName).ToListAsync();
             var activeUsersDetails = new List<UserDetailResponse>();
             for (int i = 0; i < companyUsers.Count; i++)
             {
                 var user = companyUsers[i];
                 latestSessions.TryGetValue(user.Email!, out var session);
-
                 string status, statusName, icon;
-                if (session == null || session.LoggedOut)
+                if (session?.LoggedOut != false)
                 {
-                    status = "#DED5D5";
-                    statusName = "Offline";
-                    icon = "fa fa-circle-o";
+                    status = "#DED5D5"; statusName = "Offline"; icon = "fa fa-circle-o";
                 }
                 else
                 {
@@ -130,55 +108,26 @@ namespace risk.control.system.Services.Api
                         : true
                 });
             }
-
-            // 5️⃣ Bulk reset IsUpdated
-            await context.ApplicationUser.AsNoTracking()
-                .Where(u => u.ClientCompanyId == companyUser.ClientCompanyId)
-                .ExecuteUpdateAsync(u => u.SetProperty(x => x.IsUpdated, false));
-
+            await context.ApplicationUser.AsNoTracking().Where(u => u.ClientCompanyId == companyUser.ClientCompanyId).ExecuteUpdateAsync(u => u.SetProperty(x => x.IsUpdated, false));
             return activeUsersDetails;
         }
 
         public async Task<List<UserDetailResponse>> GetCompanyUsers(string userEmail, long companyId)
         {
-            // Get the company user
-            var companyUser = await context.ApplicationUser.AsNoTracking()
-                .FirstOrDefaultAsync(c => c.Email == userEmail);
+            var companyUser = await context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == userEmail);
             if (companyUser == null) return new List<UserDetailResponse>();
-
-            // Get all active sessions in one query
-            var sessionLookup = await context.UserSessionAlive
-                .Where(s => s.Updated >= cutoffTime && !s.LoggedOut)
-                .Include(s => s.ActiveUser)
-                .ToListAsync();
-
-            // Dictionary of last seen per email
-            var lastSeenDict = sessionLookup
-                .GroupBy(s => s.ActiveUser.Email)
-                .ToDictionary(g => g.Key!, g => g.Max(s => s.Updated));
-
-            // Fetch all users for the company (excluding deleted and current user)
-            var users = await context.ApplicationUser.AsNoTracking()
-                .Include(u => u.PinCode)
-                .Include(u => u.District)
-                .Include(u => u.State)
-                .Include(u => u.Country)
-                .Where(u => u.ClientCompanyId == companyId && !u.Deleted && u.Email != userEmail)
-                .OrderBy(u => u.FirstName)
-                .ThenBy(u => u.LastName)
-                .ToListAsync();
-
+            var sessionLookup = await context.UserSessionAlive.Where(s => s.Updated >= cutoffTime && !s.LoggedOut).Include(s => s.ActiveUser).ToListAsync();
+            var lastSeenDict = sessionLookup.GroupBy(s => s.ActiveUser.Email).ToDictionary(g => g.Key!, g => g.Max(s => s.Updated));
+            var users = await context.ApplicationUser.AsNoTracking().Include(u => u.PinCode)
+                .Include(u => u.District).Include(u => u.State).Include(u => u.Country).Where(u => u.ClientCompanyId == companyId && !u.Deleted && u.Email != userEmail)
+                .OrderBy(u => u.FirstName).ThenBy(u => u.LastName).ToListAsync();
             var loginVerificationEnabled = await featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION);
-
             var now = DateTime.UtcNow;
             var activeUsersDetails = new List<UserDetailResponse>();
-
             foreach (var user in users)
             {
-                // Compute online status
                 lastSeenDict.TryGetValue(user.Email!, out var lastSeen);
                 var minutesAway = lastSeen.HasValue ? (int)(now - lastSeen.Value).TotalMinutes : int.MaxValue;
-
                 var (status, statusName, icon) = minutesAway switch
                 {
                     var m when m < onlineThresholdInMinutes => ("green", "Online now", "fas fa-circle"),
@@ -186,10 +135,7 @@ namespace risk.control.system.Services.Api
                     var m when m < sessionTimeoutinMinutes => ("orange", $"Away for {m} minutes", "far fa-clock"),
                     _ => ("#DED5D5", "Offline", "fa fa-circle-o")
                 };
-
-                // Convert photo to base64 (optional: cache this for performance)
                 var photo = await base64FileService.GetBase64FileAsync(user.ProfilePictureUrl!, Applicationsettings.NO_USER);
-
                 activeUsersDetails.Add(new UserDetailResponse
                 {
                     Id = user.Id,
@@ -217,11 +163,8 @@ namespace risk.control.system.Services.Api
                     LoginVerified = loginVerificationEnabled ? !user.IsPasswordChangeRequired : true
                 });
             }
-
-            // Batch update IsUpdated flag
             users.ForEach(u => u.IsUpdated = false);
             await context.SaveChangesAsync(false);
-
             return activeUsersDetails;
         }
     }

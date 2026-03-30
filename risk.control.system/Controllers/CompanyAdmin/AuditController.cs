@@ -37,24 +37,12 @@ namespace risk.control.system.Controllers.CompanyAdmin
         {
             var userEmail = HttpContext.User.Identity?.Name!;
             var companyUser = await _context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == userEmail);
-            var query = _context.AuditLogs.Where(a => !string.IsNullOrWhiteSpace(a.NewValues) &&
-            !string.IsNullOrWhiteSpace(a.UserId) &&
-            a.CompanyId == companyUser!.ClientCompanyId &&
-            a.TableName != "StatusNotification").AsQueryable();
-
+            var query = _context.AuditLogs.Where(a => !string.IsNullOrWhiteSpace(a.NewValues) && !string.IsNullOrWhiteSpace(a.UserId) && a.CompanyId == companyUser!.ClientCompanyId && a.TableName != "StatusNotification").AsQueryable();
             int recordsTotal = await query.CountAsync();
-
             if (!string.IsNullOrEmpty(search) && Regex.IsMatch(search, @"^[a-zA-Z0-9\s]*$"))
             {
-                search = search.Trim().Replace("%", "[%]")
-                   .Replace("_", "[_]")
-                   .Replace("[", "[[]");
-                query = query.Where(p =>
-                    EF.Functions.Like(p.UserId, $"%{search}%") ||
-                    EF.Functions.Like(p.TableName, $"%{search}%") ||
-                    EF.Functions.Like(p.Type, $"%{search}%") ||
-                    EF.Functions.Like(p.OldValues, $"%{search}%") ||
-                    EF.Functions.Like(p.NewValues, $"%{search}%"));
+                search = search.Trim().Replace("%", "[%]").Replace("_", "[_]").Replace("[", "[[]");
+                query = query.Where(p => EF.Functions.Like(p.UserId, $"%{search}%") || EF.Functions.Like(p.TableName, $"%{search}%") || EF.Functions.Like(p.Type, $"%{search}%") || EF.Functions.Like(p.OldValues, $"%{search}%") || EF.Functions.Like(p.NewValues, $"%{search}%"));
             }
             string sortColumn = orderColumn switch
             {
@@ -66,14 +54,9 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 5 => "NewValues",  // Fourth column (index 3) - Country
                 _ => "DateTime"           // Default to "Code" if no column is specified
             };
-
-            // Determine sort direction
             bool isAscending = orderDirection?.ToLower() == "asc";
-
-            // Dynamically apply sorting using reflection
             var parameter = Expression.Parameter(typeof(Audit), "p");
             Expression propertyExpression = parameter;
-
             if (sortColumn.Contains('.'))
             {
                 var parts = sortColumn.Split('.');
@@ -86,48 +69,12 @@ namespace risk.control.system.Controllers.CompanyAdmin
             {
                 propertyExpression = Expression.Property(parameter, sortColumn);
             }
-
             var lambda = Expression.Lambda<Func<Audit, object>>(Expression.Convert(propertyExpression, typeof(object)), parameter);
-
-            // Apply sorting
             query = isAscending ? query.OrderBy(lambda) : query.OrderByDescending(lambda);
             int totalRecords = await query.CountAsync();
-
-            var rawData = await query
-                .Skip(start)
-                .Take(length)
-                .Select(p => new
-                {
-                    p.Id,
-                    p.UserId,
-                    p.TableName,
-                    p.Type,
-                    p.DateTime,
-                    p.OldValues,
-                    p.NewValues
-                })
-                .ToListAsync();
-
-            var data = rawData.Select(p => new
-            {
-                p.Id,
-                p.UserId,
-                p.TableName,
-                p.Type,
-                DateTime = p.DateTime,
-                OldValues = p.OldValues ?? "",
-                p.NewValues
-            }).ToList();
-
-            var response = new
-            {
-                draw = draw,
-                recordsTotal = totalRecords,
-                recordsFiltered = totalRecords,
-                data = data
-            };
-
-            return Json(response);
+            var rawData = await query.Skip(start).Take(length).Select(p => new { p.Id, p.UserId, p.TableName, p.Type, p.DateTime, p.OldValues, p.NewValues }).ToListAsync();
+            var data = rawData.Select(p => new { p.Id, p.UserId, p.TableName, p.Type, DateTime = p.DateTime, OldValues = p.OldValues ?? "", p.NewValues }).ToList();
+            return Json(new { draw = draw, recordsTotal = totalRecords, recordsFiltered = totalRecords, data = data });
         }
 
         // GET: Audit/Details/5

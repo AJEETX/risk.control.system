@@ -116,19 +116,14 @@ namespace risk.control.system.Services.Agent
 
         public async Task<PassportOcrData> GetPassportOcrResult(byte[] imageBytes, string url, string key, string host)
         {
-            var extension = risk.control.system.Helpers.CustomExtensions.GetImageExtension(imageBytes);
-            // Convert the byte array to a Base64 string
-
-            string filePath = $"{Guid.NewGuid()}.{extension}";
+            string filePath = $"{Guid.NewGuid()}.{Helpers.CustomExtensions.GetImageExtension(imageBytes)}";
             string path = Path.Combine(env.WebRootPath, "passport");
             if (!Directory.Exists(path))
             {
                 Directory.CreateDirectory(path);
             }
             var imagefilePath = Path.Combine(env.WebRootPath, "passport", filePath);
-            // Write the byte array to a file
-            File.WriteAllBytes(imagefilePath, imageBytes);
-
+            await File.WriteAllBytesAsync(imagefilePath, imageBytes);
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Post,
@@ -155,14 +150,12 @@ namespace risk.control.system.Services.Agent
             try
             {
                 var httpClient = httpClientFactory.CreateClient();
-                using (var response = await httpClient.SendAsync(request))
-                {
-                    response.EnsureSuccessStatusCode();
-                    var body = await response.Content.ReadAsStringAsync();
-                    var passportOcrData = JsonConvert.DeserializeObject<PassportOcrData>(body);
-                    Console.WriteLine(body);
-                    return passportOcrData!;
-                }
+                using var response = await httpClient.SendAsync(request);
+                response.EnsureSuccessStatusCode();
+                var body = await response.Content.ReadAsStringAsync();
+                var passportOcrData = JsonConvert.DeserializeObject<PassportOcrData>(body);
+                Console.WriteLine(body);
+                return passportOcrData!;
             }
             catch (Exception ex)
             {

@@ -52,12 +52,8 @@ namespace risk.control.system.Controllers.CompanyAdmin
         [HttpGet]
         public async Task<IActionResult> GetDistricts(int draw, int start, int length, string search, int? orderColumn, string orderDirection)
         {
-            var query = _context.District
-                .Include(p => p.Country)
-                .Include(p => p.State)
-                .AsQueryable();
+            var query = _context.District.Include(p => p.Country).Include(p => p.State).AsQueryable();
             var userEmail = HttpContext.User.Identity?.Name!;
-
             var user = await _context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == userEmail);
             if (!user!.IsSuperAdmin)
             {
@@ -66,13 +62,8 @@ namespace risk.control.system.Controllers.CompanyAdmin
             if (!string.IsNullOrEmpty(search) && Regex.IsMatch(search, @"^[a-zA-Z0-9\s]*$"))
             {
                 var lowerSearch = search.ToLower();
-                query = query.Where(p =>
-                    p.Code.ToLower().Contains(lowerSearch) ||
-                    p.Name.ToLower().Contains(lowerSearch) ||
-                    p.State!.Name.ToLower().Contains(lowerSearch) ||
-                    p.Country!.Name.ToLower().Contains(lowerSearch));
+                query = query.Where(p => p.Code.ToLower().Contains(lowerSearch) || p.Name.ToLower().Contains(lowerSearch) || p.State!.Name.ToLower().Contains(lowerSearch) || p.Country!.Name.ToLower().Contains(lowerSearch));
             }
-            // Determine column to sort by
             string sortColumn = orderColumn switch
             {
                 0 => "Code",          // First column (index 0) - Code
@@ -81,14 +72,9 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 3 => "Country.Name",  // Fourth column (index 3) - Country
                 _ => "Code"           // Default to "Code" if no column is specified
             };
-
-            // Determine sort direction
             bool isAscending = orderDirection?.ToLower() == "asc";
-
-            // Dynamically apply sorting using reflection
             var parameter = Expression.Parameter(typeof(District), "p");
             Expression propertyExpression = parameter;
-
             if (sortColumn.Contains('.'))
             {
                 var parts = sortColumn.Split('.');
@@ -101,16 +87,10 @@ namespace risk.control.system.Controllers.CompanyAdmin
             {
                 propertyExpression = Expression.Property(parameter, sortColumn);
             }
-
             var lambda = Expression.Lambda<Func<District, object>>(Expression.Convert(propertyExpression, typeof(object)), parameter);
-
-            // Apply sorting
             query = isAscending ? query.OrderBy(lambda) : query.OrderByDescending(lambda);
-
             var totalRecords = await query.CountAsync();
-            var rawData = await query
-                .Skip(start)
-                .Take(length)
+            var rawData = await query.Skip(start).Take(length)
                 .Select(p => new
                 {
                     p.DistrictId,
@@ -134,14 +114,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 State = p.State,
                 Country = p.Country
             }).ToList();
-            var response = new
-            {
-                draw = draw,
-                recordsTotal = totalRecords,
-                recordsFiltered = totalRecords,
-                data = data
-            };
-
+            var response = new { draw = draw, recordsTotal = totalRecords, recordsFiltered = totalRecords, data = data };
             return Json(response);
         }
 
@@ -182,16 +155,8 @@ namespace risk.control.system.Controllers.CompanyAdmin
             {
                 notifyService.Custom($"Invalid District data!", 3, "red", "fas fa-city");
                 var userEmail = HttpContext.User.Identity?.Name;
-
                 var user = await _context.ApplicationUser.Include(a => a.Country).FirstOrDefaultAsync(u => u.Email == userEmail);
-
-                return View(new District
-                {
-                    IsUpdated = !user!.IsSuperAdmin,
-                    Country = user.Country,
-                    CountryId = user.CountryId.GetValueOrDefault(),
-                    SelectedCountryId = user.CountryId.GetValueOrDefault()
-                });
+                return View(new District { IsUpdated = !user!.IsSuperAdmin, Country = user.Country, CountryId = user.CountryId.GetValueOrDefault(), SelectedCountryId = user.CountryId.GetValueOrDefault() });
             }
             try
             {
@@ -200,11 +165,8 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 {
                     notifyService.Custom($"Disitrict Code <b>{district.Code}</b> already exists!", 3, "red", "fas fa-city");
                     ModelState.Clear();
-
                     var userEmail = HttpContext.User.Identity?.Name;
                     var user = await _context.ApplicationUser.Include(a => a.Country).FirstOrDefaultAsync(u => u.Email == userEmail);
-
-                    // 2. Return the fresh object. Name and Code will now be empty in the browser.
                     return View(new District
                     {
                         IsUpdated = !user!.IsSuperAdmin,

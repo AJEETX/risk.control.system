@@ -64,7 +64,7 @@ internal class MediaIdfyService : IMediaIdfyService
             // 3. Parallel Service Orchestration
             var weatherTask = weatherInfoService.GetWeatherAsync(lat, lon);
             var addressTask = httpClientService.GetRawAddress(lat, lon);
-            var mapTask = customApiCLient.GetMap(expected.lat, expected.lon, double.Parse(lat), double.Parse(lon), "S", "E", "300", "300", "green", "red");
+            var mapTask = customApiCLient.GetMap(expected.lat, expected.lon, double.Parse(lat), double.Parse(lon));
 
             await Task.WhenAll(weatherTask, addressTask, mapTask);
 

@@ -161,7 +161,7 @@ namespace risk.control.system.Services.Common
                 var tdetail = _context.Investigations.AsNoTracking()
                     .Include(i => i.PolicyDetail)
                     .Where(d =>
-                        (companyUser.Role == AppRoles.ASSESSOR || companyUser.IsClientAdmin || d.UpdatedBy == userEmail) &&
+                        (companyUser.Role == AppRoles.ASSESSOR || companyUser.IsCompanyAdmin || d.UpdatedBy == userEmail) &&
                      d.ClientCompanyId == companyUser.ClientCompanyId && !d.Deleted);
 
                 var userSubStatuses = tdetail.Select(s => s.SubStatus).Distinct()?.ToList();
@@ -244,7 +244,7 @@ namespace risk.control.system.Services.Common
             {
                 var tdetail = _context.Investigations.AsNoTracking()
                     .Include(i => i.PolicyDetail).Where(d =>
-                        (companyUser.Role == AppRoles.ASSESSOR || companyUser.IsClientAdmin || d.UpdatedBy == userEmail) &&
+                        (companyUser.Role == AppRoles.ASSESSOR || companyUser.IsCompanyAdmin || d.UpdatedBy == userEmail) &&
                        d.ClientCompanyId == companyUser.ClientCompanyId &&
                        d.Created > DateTime.UtcNow.AddMonths(-7) && !d.Deleted);
                 var userSubStatuses = tdetail.Select(s => s.SubStatus).Distinct().ToList();
@@ -322,7 +322,7 @@ namespace risk.control.system.Services.Common
                     .Include(i => i.PolicyDetail)
                     .Where(d =>
                     d.ClientCompanyId == companyUser.ClientCompanyId &&
-                    (companyUser.Role == AppRoles.ASSESSOR || companyUser.IsClientAdmin || d.UpdatedBy == userEmail) &&
+                    (companyUser.Role == AppRoles.ASSESSOR || companyUser.IsCompanyAdmin || d.UpdatedBy == userEmail) &&
                     d.Created > DateTime.UtcNow.AddDays(-28) && !d.Deleted);
 
                 var userSubStatuses = tdetail.Select(s => s.SubStatus).Distinct().ToList();
@@ -412,7 +412,7 @@ namespace risk.control.system.Services.Common
             if (companyUser != null)
             {
                 var tdetail = tdetailDays.Where(d =>
-                    (companyUser.Role == AppRoles.ASSESSOR || companyUser.IsClientAdmin || d.UpdatedBy == userEmail) &&
+                    (companyUser.Role == AppRoles.ASSESSOR || companyUser.IsCompanyAdmin || d.UpdatedBy == userEmail) &&
                     d.ClientCompanyId == companyUser.ClientCompanyId);
 
                 var userSubStatuses = tdetail.Select(s => s.SubStatus).Distinct().ToList();
@@ -504,7 +504,7 @@ namespace risk.control.system.Services.Common
                     (
                     companyUser.Role == AppRoles.ASSESSOR ||
                     companyUser.Role == AppRoles.MANAGER ||
-                    companyUser.IsClientAdmin ||
+                    companyUser.IsCompanyAdmin ||
                     d.UpdatedBy == userEmail ||
                     (companyUser.Role == AppRoles.CREATOR && d.CreatedUser == companyUser.Email)
                     ) &&

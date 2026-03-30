@@ -17,6 +17,7 @@ namespace risk.control.system.Services.Api
 
     internal class AgencyUserApiService : IAgencyUserApiService
     {
+        private string status = "#DED5D5", statusName = "Offline", icon = "fa fa-circle-o";
         private readonly IDbContextFactory<ApplicationDbContext> _contextFactory;
         private readonly IDashboardService dashboardService;
         private readonly IBase64FileService base64FileService;
@@ -49,47 +50,20 @@ namespace risk.control.system.Services.Api
         {
             var now = DateTime.UtcNow;
             await using var context = await _contextFactory.CreateDbContextAsync();
-            // 1. Get vendorId
-            var vendor = await context.ApplicationUser
-                .AsNoTracking()
-                .Where(u => u.Email == userEmail)
-                .Select(u => new { u.VendorId })
-                .SingleOrDefaultAsync();
-
+            var vendor = await context.ApplicationUser.AsNoTracking().Where(u => u.Email == userEmail).Select(u => new { u.VendorId }).SingleOrDefaultAsync();
             if (vendor == null)
                 return new();
-
-            // 2. Active session lookup (ONE query)
-            var sessionLookup = await context.UserSessionAlive
-                .Where(s => s.Updated >= cutoffTime)
-                .GroupBy(s => s.ActiveUser.Email)
+            var sessionLookup = await context.UserSessionAlive.Where(s => s.Updated >= cutoffTime).GroupBy(s => s.ActiveUser.Email)
                 .Select(g => new
                 {
                     Email = g.Key!,
                     LastSeen = g.Max(x => x.Updated),
                     LoggedOut = g.All(x => x.LoggedOut)
-                })
-                .ToDictionaryAsync(
-                    x => x.Email,
-                    x => new { x.LastSeen, x.LoggedOut }
-                );
-
-            // 3. Case counts (already optimized 👍)
+                }).ToDictionaryAsync(x => x.Email, x => new { x.LastSeen, x.LoggedOut });
             var caseCounts = await dashboardService.CalculateAgentCaseStatus(userEmail);
-
-            // 4. Feature flag ONCE
-            var loginVerificationEnabled =
-                await featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION);
-
-            // 5. Fetch agency users (projection only)
-            var users = await context.ApplicationUser
-                .AsNoTracking()
-                .Where(u =>
-                    u.VendorId == vendor.VendorId &&
-                    !u.Deleted &&
-                    u.Email != userEmail)
-                .OrderBy(u => u.IsUpdated)
-                .ThenBy(u => u.Updated)
+            var loginVerificationEnabled = await featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION);
+            var users = await context.ApplicationUser.AsNoTracking().Where(u => u.VendorId == vendor.VendorId && !u.Deleted && u.Email != userEmail)
+                .OrderBy(u => u.IsUpdated).ThenBy(u => u.Updated)
                 .Select(u => new
                 {
                     u.Id,
@@ -113,20 +87,13 @@ namespace risk.control.system.Services.Api
                     PinCode = new { u.PinCode!.Code, u.PinCode.Name }
                 })
                 .ToListAsync();
-
-            // 6. Map to response
             var responseTasks = users.Select(async u =>
             {
                 caseCounts.TryGetValue(u.Email!, out var count);
-
-                string status = "#DED5D5", statusName = "Offline", icon = "fa fa-circle-o";
-
-                // Use the lookup you already fetched in Step 2!
                 if (sessionLookup.TryGetValue(u.Email!, out var session) && !session.LoggedOut)
                 {
                     var lastSeen = session.LastSeen ?? u.Created; // Fallback to created if null
                     var minutesAway = (int)(DateTime.UtcNow - lastSeen).TotalMinutes;
-
                     (status, statusName, icon) = minutesAway switch
                     {
                         var m when m < onlineThresholdInMinutes => ("green", "Online now", "fas fa-circle"),
@@ -135,18 +102,12 @@ namespace risk.control.system.Services.Api
                         _ => ("#DED5D5", "Offline", "fa fa-circle-o")
                     };
                 }
-
                 var photo = await base64FileService.GetBase64FileAsync(u.ProfilePictureUrl!, Applicationsettings.NO_USER);
                 return new UserDetailResponse
                 {
                     Id = u.Id,
                     Photo = photo,
-
-                    Email = $"{u.Email}" +
-                        (u.Role == AppRoles.AGENT && string.IsNullOrWhiteSpace(u.MobileUId)
-                            ? "<span title=\"Onboarding incomplete !!!\"><i class='fa fa-asterisk asterik-style'></i></span>"
-                            : ""),
-
+                    Email = $"{u.Email}" + (u.Role == AppRoles.AGENT && string.IsNullOrWhiteSpace(u.MobileUId) ? "<span title=\"Onboarding incomplete !!!\"><i class='fa fa-asterisk asterik-style'></i></span>" : ""),
                     RawEmail = u.Email,
                     Name = $"{u.FirstName} {u.LastName}",
                     Phone = $"(+{u.Country.ISDCode}) {u.PhoneNumber}",
@@ -174,13 +135,7 @@ namespace risk.control.system.Services.Api
                 };
             });
             var response = (await Task.WhenAll(responseTasks)).ToList();
-
-            // 7. Batch reset IsUpdated (no tracking, no SaveChanges)
-            await context.ApplicationUser
-                .Where(u => u.VendorId == vendor.VendorId)
-                .ExecuteUpdateAsync(setters =>
-                    setters.SetProperty(u => u.IsUpdated, false));
-
+            await context.ApplicationUser.Where(u => u.VendorId == vendor.VendorId).ExecuteUpdateAsync(setters => setters.SetProperty(u => u.IsUpdated, false));
             return response;
         }
 
@@ -188,7 +143,6 @@ namespace risk.control.system.Services.Api
         {
             var now = DateTime.UtcNow;
             await using var context = await _contextFactory.CreateDbContextAsync();
-            // 1️⃣ Pre-fetch active sessions (latest per user) as a dictionary
             var latestSessions = await context.UserSessionAlive
                 .Where(s => s.Updated >= cutoffTime || s.Created >= cutoffTime)
                 .Include(s => s.ActiveUser)
@@ -200,8 +154,6 @@ namespace risk.control.system.Services.Api
                     LoggedOut = g.All(x => x.LoggedOut)
                 })
                 .ToDictionaryAsync(x => x.Email, x => new { x.LastSeen, x.LoggedOut });
-
-            // 2️⃣ Pre-fetch vendor users
             var vendorUsers = await context.ApplicationUser.AsNoTracking()
                 .Where(u => u.VendorId == vendorId && !u.Deleted)
                 .Include(u => u.Country)
@@ -211,19 +163,13 @@ namespace risk.control.system.Services.Api
                 .OrderBy(u => u.IsUpdated)
                 .ThenBy(u => u.Updated)
                 .ToListAsync();
-
             var activeUsersDetails = new List<UserDetailResponse>();
-
-            // 4️⃣ Map users to UserDetailResponse
             for (int i = 0; i < vendorUsers.Count; i++)
             {
                 var user = vendorUsers[i];
-
-                // Lookup last session
                 latestSessions.TryGetValue(user.Email!, out var session);
-
                 string status, statusName, icon;
-                if (session == null || session.LoggedOut)
+                if (session?.LoggedOut != false)
                 {
                     status = "#DED5D5";
                     statusName = "Offline";
@@ -241,7 +187,6 @@ namespace risk.control.system.Services.Api
                     };
                 }
                 var photo = await base64FileService.GetBase64FileAsync(user.ProfilePictureUrl!, Applicationsettings.NO_USER);
-
                 activeUsersDetails.Add(new UserDetailResponse
                 {
                     Id = user.Id,
@@ -275,12 +220,7 @@ namespace risk.control.system.Services.Api
                         : true
                 });
             }
-
-            // 5️⃣ Bulk reset IsUpdated
-            await context.ApplicationUser
-                .Where(u => u.VendorId == vendorId)
-                .ExecuteUpdateAsync(u => u.SetProperty(x => x.IsUpdated, false));
-
+            await context.ApplicationUser.Where(u => u.VendorId == vendorId).ExecuteUpdateAsync(u => u.SetProperty(x => x.IsUpdated, false));
             return activeUsersDetails;
         }
     }

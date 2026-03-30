@@ -9,21 +9,12 @@ namespace risk.control.system.Seeds
 {
     public static class ManagerSeed
     {
-        public static async Task Seed(ApplicationDbContext context,
-            IWebHostEnvironment webHostEnvironment,
-            UserManager<ApplicationUser> userManager,
+        public static async Task Seed(ApplicationDbContext context, IWebHostEnvironment env, UserManager<ApplicationUser> userManager,
             ClientCompany clientCompany, PinCode pinCode, string managorEmailwithSuffix, string photo, string firstName, string lastName, IFileStorageService fileStorageService)
         {
-            //Seed client creator
-            string noUserImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", @Applicationsettings.NO_USER);
-
-            string managerImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", Path.GetFileName(photo));
-            var managerImage = File.ReadAllBytes(managerImagePath);
-
-            if (managerImage == null)
-            {
-                managerImage = File.ReadAllBytes(noUserImagePath);
-            }
+            string noUserImagePath = Path.Combine(env.WebRootPath, "img", @Applicationsettings.NO_USER);
+            string managerImagePath = Path.Combine(env.WebRootPath, "img", Path.GetFileName(photo));
+            var managerImage = await File.ReadAllBytesAsync(managerImagePath);
             var extension = Path.GetExtension(managerImagePath);
             var (fileName, relativePath) = await fileStorageService.SaveAsync(managerImage, extension, clientCompany.Email, "user");
             var manager = new ApplicationUser()
@@ -35,12 +26,10 @@ namespace risk.control.system.Seeds
                 EmailConfirmed = true,
                 PhoneNumberConfirmed = true,
                 Password = TestingData,
-                IsSuperAdmin = false,
-                IsClientAdmin = true,
+                IsClientManager = true,
                 Active = true,
                 PhoneNumber = string.Equals(pinCode.Country!.Code, "au", StringComparison.OrdinalIgnoreCase) ? SAMPLE_MOBILE_AUSTRALIA : SAMPLE_MOBILE_INDIA,
                 Addressline = clientCompany.Addressline,
-                IsVendorAdmin = false,
                 ClientCompanyId = clientCompany.ClientCompanyId,
                 Country = pinCode.Country,
                 CountryId = pinCode.CountryId,

@@ -21,7 +21,9 @@ namespace risk.control.system.Services.Agent
         private readonly IHttpClientService httpClientService;
         private readonly IWebHostEnvironment env;
         private readonly ILogger<PanCardService> logger;
-
+        private string panNumber = string.Empty;
+        private string docyTypePan = string.Empty;
+        private byte[]? ocrImaged = null;
         public PanCardService(IGoogleMaskHelper googleHelper, IProcessImageService processImageService, IHttpClientService httpClientService, IWebHostEnvironment env, ILogger<PanCardService> logger)
         {
             this.googleHelper = googleHelper;
@@ -33,11 +35,7 @@ namespace risk.control.system.Services.Agent
 
         public async Task<DocumentIdReport> Process(byte[] IdImage, IReadOnlyList<EntityAnnotation> imageReadOnly, ClientCompany company, DocumentIdReport doc, string onlyExtension)
         {
-            string panNumber = string.Empty;
-            string docyTypePan = string.Empty;
-            byte[]? ocrImaged = null;
             var filePath = Path.Combine(env.ContentRootPath, doc.FilePath!);
-
             var allPanText = imageReadOnly.FirstOrDefault()!.Description;
             var panTextPre = allPanText.IndexOf(panNumber2Find);
             if (panTextPre > 0)
@@ -57,17 +55,9 @@ namespace risk.control.system.Services.Agent
                     ocrImaged = googleHelper.MaskPanTextInImage(IdImage, imageReadOnly, panNumber2Find);
                 }
             }
-
-            var maskedImage = new FaceImageDetail
-            {
-                DocType = docyTypePan,
-                DocumentId = panNumber,
-                MaskedImage = ocrImaged != null ? Convert.ToBase64String(ocrImaged) : string.Empty,
-                OcrData = allPanText
-            };
+            var maskedImage = new FaceImageDetail { DocType = docyTypePan, DocumentId = panNumber, MaskedImage = ocrImaged != null ? Convert.ToBase64String(ocrImaged) : string.Empty, OcrData = allPanText };
             try
             {
-                #region// PAN VERIFICATION ::: //test PAN FNLPM8635N, BYSPP5796F
                 if (company.VerifyPan)
                 {
                     var panResponse = await httpClientService.VerifyPanNew(maskedImage.DocumentId, company.PanIdfyUrl, company.PanAPIData, company.PanAPIHost);
@@ -82,26 +72,17 @@ namespace risk.control.system.Services.Agent
                     var panMatch = panRegex.Match(maskedImage.DocumentId);
                     doc.ImageValid = panMatch.Success ? true : false;
                 }
-
-                #endregion PAN IMAGE PROCESSING
-
-                var image = Convert.FromBase64String(maskedImage.MaskedImage);
-                var savedMaskedImage = processImageService.CompressImage(image);
-                await File.WriteAllBytesAsync(filePath, savedMaskedImage);
-
+                await File.WriteAllBytesAsync(filePath, processImageService.CompressImage(Convert.FromBase64String(maskedImage.MaskedImage)));
                 doc.LocationInfo = maskedImage.DocType + " data: ";
-
                 if (!string.IsNullOrWhiteSpace(maskedImage.OcrData))
                 {
-                    doc.LocationInfo = maskedImage.DocType + " data:. \r\n " +
-                        "" + maskedImage.OcrData.Replace(maskedImage.DocumentId, "xxxxxxxxxx");
+                    doc.LocationInfo = maskedImage.DocType + " data:. \r\n " + "" + maskedImage.OcrData.Replace(maskedImage.DocumentId, "xxxxxxxxxx");
                 }
             }
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error occurred.");
-                var image = Convert.FromBase64String(maskedImage.MaskedImage);
-                await File.WriteAllBytesAsync(filePath, processImageService.CompressImage(image));
+                await File.WriteAllBytesAsync(filePath, processImageService.CompressImage(Convert.FromBase64String(maskedImage.MaskedImage)));
                 doc.LongLatTime = DateTime.UtcNow;
                 doc.LocationInfo = "no data: ";
             }

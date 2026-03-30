@@ -47,39 +47,17 @@ public class PdfSummaryController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Summarize(IFormFile pdfFile)
     {
-        if (pdfFile == null || pdfFile.Length == 0)
-        {
-            ModelState.AddModelError("pdfFile", "Please upload a PDF file.");
-        }
-        // Check file size (e.g., limit to 10 MB)
-        if (pdfFile!.Length > 10 * 1024 * 1024)
-            return BadRequest("File too large.");
-
-        // Whitelist extensions (but note: extensions can be spoofed)
+        if (pdfFile == null || pdfFile.Length == 0) return BadRequest("Please upload a PDF file.");
+        if (pdfFile!.Length > 10 * 1024 * 1024) return BadRequest("File too large.");
         var extension = Path.GetExtension(pdfFile.FileName).ToLowerInvariant();
-        if (extension != ".pdf")
-            return BadRequest("Only PDF files allowed.");
-
-        // Better: Validate MIME type
-        if (pdfFile.ContentType != "application/pdf")
-            return BadRequest("Invalid file type.");
-
-        if (!ModelState.IsValid)
-        {
-            return BadRequest(ModelState);
-        }
-        // 1. Get current user and verify limit
+        if (extension != ".pdf") return BadRequest("Only PDF files allowed.");
+        if (pdfFile.ContentType != "application/pdf") return BadRequest("Invalid file type.");
         var user = await _userManager.GetUserAsync(User);
-        if (user == null)
-        {
-            return Unauthorized("Unauthorized");
-        }
-
+        if (user == null) return Unauthorized("Unauthorized");
         if (user.PdfCount >= 5)
         {
             return StatusCode(403, new { errorMessage = "PDF Summary limit reached (5/5)." });
         }
-
         try
         {
             string content = "";
@@ -104,29 +82,15 @@ public class PdfSummaryController : Controller
             {
                 return BadRequest(new { errorMessage = "The file content is empty." });
             }
-
-            // 2. Run the AI Service
             var summary = await textAnalyticsService.AbstractiveSummarizeAsync(content);
-
-            // 3. Increment the count in the database
             user.PdfCount++;
             await _userManager.UpdateAsync(user);
-
-            // 4. Return summary and current remaining count
-            return Ok(new
-            {
-                summary = summary,
-                remaining = 5 - user.PdfCount
-            });
+            return Ok(new { summary = summary, remaining = 5 - user.PdfCount });
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "Error processing PDF summary. {UserId}", _userManager.GetUserId(User) ?? "Anonymous");
-            return Ok(new
-            {
-                summary = "Error occurred",
-                remaining = 5 - user.PdfCount
-            });
+            return Ok(new { summary = "Error occurred", remaining = 5 - user.PdfCount });
         }
     }
 }

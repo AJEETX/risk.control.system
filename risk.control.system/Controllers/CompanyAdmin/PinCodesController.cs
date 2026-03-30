@@ -45,28 +45,17 @@ namespace risk.control.system.Controllers.CompanyAdmin
         [HttpGet]
         public async Task<IActionResult> GetPincodes(int draw, int start, int length, string search, int orderColumn, string orderDirection)
         {
-            var query = _context.PinCode
-                .Include(p => p.Country)
-                .Include(p => p.District)
-                .Include(p => p.State)
-                .AsQueryable();
+            var query = _context.PinCode.Include(p => p.Country).Include(p => p.District).Include(p => p.State).AsQueryable();
             var userEmail = HttpContext.User.Identity?.Name!;
-
             var user = await _context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == userEmail);
             if (!user!.IsSuperAdmin)
             {
                 query = query.Where(s => s.CountryId == user.CountryId);
             }
-            // Filter based on the search input (if provided)
             if (!string.IsNullOrEmpty(search) && Regex.IsMatch(search, @"^[a-zA-Z0-9\s]*$"))
             {
                 var lowerSearch = search.ToLower();
-                query = query.Where(p =>
-                    p.Code.ToString().Contains(lowerSearch) ||
-                    p.Name.ToLower().Contains(lowerSearch) ||
-                    p.District!.Name.ToLower().Contains(lowerSearch) ||
-                    p.State!.Name.ToLower().Contains(lowerSearch) ||
-                    p.Country!.Name.ToLower().Contains(lowerSearch));
+                query = query.Where(p => p.Code.ToString().Contains(lowerSearch) || p.Name.ToLower().Contains(lowerSearch) || p.District!.Name.ToLower().Contains(lowerSearch) || p.State!.Name.ToLower().Contains(lowerSearch) || p.Country!.Name.ToLower().Contains(lowerSearch));
             }
             string sortColumn = orderColumn switch
             {
@@ -77,14 +66,9 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 4 => "Country.Name",  // Column index 4 - Country Name
                 _ => "Code"          // Default to Code if index is invalid
             };
-
-            // Determine sort direction
             bool isAscending = orderDirection?.ToLower() == "asc";
-
-            // Dynamically apply sorting using reflection
             var parameter = Expression.Parameter(typeof(PinCode), "p");
             Expression propertyExpression = parameter;
-
             if (sortColumn.Contains('.'))
             {
                 var parts = sortColumn.Split('.');
@@ -97,54 +81,12 @@ namespace risk.control.system.Controllers.CompanyAdmin
             {
                 propertyExpression = Expression.Property(parameter, sortColumn);
             }
-
             var lambda = Expression.Lambda<Func<PinCode, object>>(Expression.Convert(propertyExpression, typeof(object)), parameter);
-
-            // Apply sorting based on direction
             query = isAscending ? query.OrderBy(lambda) : query.OrderByDescending(lambda);
-
-            // Get the total number of records before paging
             var totalRecords = await query.CountAsync();
-
-            // Apply paging
-            var rawData = await query
-                .Skip(start)
-                .Take(length)
-                .Select(p => new
-                {
-                    p.Code,
-                    p.Name,
-                    District = p.District!.Name,
-                    State = p.State!.Name,
-                    Country = p.Country!.Name,
-                    p.UpdatedBy,
-                    p.Updated,
-                    p.Created,
-                    p.PinCodeId
-                })
-                .ToListAsync();
-
-            var data = rawData.Select(s => new
-            {
-                s.Code,
-                s.Name,
-                District = s.District,
-                State = s.State,
-                Country = s.Country,
-                s.PinCodeId,
-                s.UpdatedBy,
-                Updated = s.Updated ?? s.Created,
-            });
-            // Prepare the DataTables response
-            var response = new
-            {
-                draw = draw,
-                recordsTotal = totalRecords,
-                recordsFiltered = totalRecords,
-                data = data
-            };
-
-            return Json(response);
+            var rawData = await query.Skip(start).Take(length).Select(p => new { p.Code, p.Name, District = p.District!.Name, State = p.State!.Name, Country = p.Country!.Name, p.UpdatedBy, p.Updated, p.Created, p.PinCodeId }).ToListAsync();
+            var data = rawData.Select(s => new { s.Code, s.Name, District = s.District, State = s.State, Country = s.Country, s.PinCodeId, s.UpdatedBy, Updated = s.Updated ?? s.Created, });
+            return Json(new { draw = draw, recordsTotal = totalRecords, recordsFiltered = totalRecords, data = data });
         }
 
         [HttpGet]
