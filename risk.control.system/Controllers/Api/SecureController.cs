@@ -24,6 +24,7 @@ namespace risk.control.system.Controllers.Api
     {
         private readonly ITokenService tokenService;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IProcessImageService processImageService;
         private readonly IAmazonApiService _amazonApiService;
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly IPdfGenerativeService pdfGenerativeService;
@@ -35,6 +36,7 @@ namespace risk.control.system.Controllers.Api
         private readonly string baseUrl;
 
         public SecureController(UserManager<ApplicationUser> userManager,
+            IProcessImageService processImageService,
             IAmazonApiService amazonApiService,
             IWebHostEnvironment webHostEnvironment,
             IPdfGenerativeService generateService,
@@ -47,6 +49,7 @@ namespace risk.control.system.Controllers.Api
             ITokenService tokenService)
         {
             _userManager = userManager ?? throw new ArgumentNullException();
+            this.processImageService = processImageService;
             _amazonApiService = amazonApiService;
             this.webHostEnvironment = webHostEnvironment;
             this.pdfGenerativeService = generateService;
@@ -69,7 +72,6 @@ namespace risk.control.system.Controllers.Api
             {
                 return BadRequest("Invalid login attempt.");
             }
-
             var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, false, lockoutOnFailure: false);
             if (!result.Succeeded)
             {
@@ -82,19 +84,16 @@ namespace risk.control.system.Controllers.Api
                     return BadRequest("Invalid login attempt.");
                 }
             }
-
             var user = await _userManager.FindByEmailAsync(model.Email);
             if (user == null)
             {
                 return BadRequest("Invalid login attempt.");
             }
-
             var roles = await _userManager.GetRolesAsync(user);
             if (roles == null || roles.Count == 0)
             {
                 return BadRequest("Invalid login attempt.");
             }
-
             var vendorUser = await _context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == model.Email && !u.Deleted && u.Role == AppRoles.AGENT);
             if (vendorUser == null)
             {
@@ -106,15 +105,12 @@ namespace risk.control.system.Controllers.Api
             {
                 vendorIsActive = !string.IsNullOrWhiteSpace(user.MobileUId);
             }
-
             if (!vendorIsActive || !user.Active)
             {
                 return BadRequest("Invalid login attempt.");
             }
-
             var token = tokenService.GenerateJwtToken(user);
             var refreshToken = await tokenService.GenerateRefreshTokenAsync(user.Email!);
-
             return Ok(new TokenResponse
             {
                 AccessToken = token,
@@ -297,6 +293,27 @@ namespace risk.control.system.Controllers.Api
                 Console.WriteLine($"Collection {collectionId} does not exist. Nothing to delete. {ex.Message}");
             }
             return StatusCode(500, $"Server error deleting Collection {collectionId}");
+        }
+
+        [AllowAnonymous]
+        [HttpPost("watermark-image")]
+        public async Task<IActionResult> WatermarkImage(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                return BadRequest("No file uploaded.");
+            try
+            {
+                await using var memoryStream = new MemoryStream();
+                await file.CopyToAsync(memoryStream);
+                var imageBytes = memoryStream.ToArray();
+                var watermarkedBytes = processImageService.CompressImage(imageBytes, 80, "VERIFIED");
+                return File(watermarkedBytes, "image/*", $"watermarked_{file.FileName}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error watermarking image {FileName}", ex.Message);
+                return StatusCode(500, "An error occurred while processing the image.");
+            }
         }
     }
 }

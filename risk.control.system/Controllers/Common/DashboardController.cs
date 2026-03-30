@@ -46,35 +46,14 @@ namespace risk.control.system.Controllers.Common
             try
             {
                 var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
-                if (string.IsNullOrEmpty(userRole))
-                {
-                    _logger.LogWarning("User {UserEmail} has no role claim.", userEmail);
-                    return new JsonResult(null);
-                }
-
-                if (userRole.Contains(CREATOR.DISPLAY_NAME))
-                {
-                    var model = await _companyDashboardService.GetCreatorCount(userEmail, userRole);
-                    return View(model);
-                }
-                else if (userRole.Contains(PORTAL_ADMIN.DISPLAY_NAME))
+                if (userRole!.Contains(PORTAL_ADMIN.DISPLAY_NAME))
                 {
                     var model = await _adminDashBoardService.GetSuperAdminCount(userEmail, userRole);
                     return View(model);
                 }
-                else if (userRole.Contains(COMPANY_ADMIN.DISPLAY_NAME))
+                else if (userRole.Contains(CREATOR.DISPLAY_NAME) || userRole.Contains(COMPANY_ADMIN.DISPLAY_NAME) || userRole.Contains(ASSESSOR.DISPLAY_NAME) || userRole.Contains(MANAGER.DISPLAY_NAME))
                 {
-                    var model = await _companyDashboardService.GetCompanyAdminCount(userEmail, userRole);
-                    return View(model);
-                }
-                else if (userRole.Contains(ASSESSOR.DISPLAY_NAME))
-                {
-                    var model = await _companyDashboardService.GetAssessorCount(userEmail, userRole);
-                    return View(model);
-                }
-                else if (userRole.Contains(MANAGER.DISPLAY_NAME))
-                {
-                    var model = await _companyDashboardService.GetManagerCount(userEmail, userRole);
+                    var model = await _companyDashboardService.GetCompanyUserCount(userEmail, userRole);
                     return View(model);
                 }
                 else if (userRole.Contains(AGENCY_ADMIN.DISPLAY_NAME) || userRole.Contains(SUPERVISOR.DISPLAY_NAME))
@@ -89,7 +68,8 @@ namespace risk.control.system.Controllers.Common
                 }
                 else
                 {
-                    return View();
+                    _logger.LogWarning("User {UserEmail} has no role claim.", userEmail);
+                    return new JsonResult(null);
                 }
             }
             catch (Exception ex)

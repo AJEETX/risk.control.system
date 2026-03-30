@@ -80,14 +80,11 @@ namespace risk.control.system.Controllers.Assessor
                         return RedirectToAction(nameof(AssessorController.SendEnquiry), ControllerName<AssessorController>.Name, new { id = claimId });
                     }
                 }
-
                 request.InvestigationReport!.EnquiryRequest!.DescriptiveQuestion = HttpUtility.HtmlEncode(request.InvestigationReport.EnquiryRequest.DescriptiveQuestion);
-
                 var model = await _assessorQueryService.SubmitQueryToAgency(userEmail, claimId, request.InvestigationReport.EnquiryRequest, request.InvestigationReport.EnquiryRequests, document);
                 if (model != null)
                 {
                     _backgroundJobClient.Enqueue(() => _mailService.NotifySubmitQueryToAgency(userEmail, claimId, _baseUrl));
-
                     _notifyService.Success("Enquiry Sent to Agency");
                     return RedirectToAction(nameof(AssessorController.Assess), ControllerName<AssessorController>.Name);
                 }

@@ -132,8 +132,6 @@ namespace risk.control.system.Controllers.PortalAdmin
         {
             try
             {
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-
                 if (user == null)
                 {
                     notifyService.Error("OOPs !!!..User not found");
@@ -144,7 +142,7 @@ namespace risk.control.system.Controllers.PortalAdmin
                     notifyService.Error("OOPs !!!..Email suffix not found");
                     return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
                 }
-                if (user.ProfileImage != null && user.ProfileImage.Length > 0)
+                if (user.ProfileImage?.Length > 0)
                 {
                     var (fileName, relativePath) = await fileStorageService.SaveAsync(user.ProfileImage, emailSuffix, "user");
                     user.ProfilePictureUrl = relativePath;
@@ -152,45 +150,39 @@ namespace risk.control.system.Controllers.PortalAdmin
                 }
                 var userFullEmail = user.Email!.Trim().ToLower() + "@" + emailSuffix;
                 user.PhoneNumber = user.PhoneNumber!.TrimStart('0');
-                //DEMO
                 user.Password = Applicationsettings.TestingData;
                 user.Email = userFullEmail;
                 user.EmailConfirmed = true;
-                user.UserName = userFullEmail;
+                user.UserName = HttpContext.User?.Identity?.Name;
                 user.Updated = DateTime.UtcNow;
-                user.UpdatedBy = currentUserEmail;
+                user.UpdatedBy = HttpContext.User?.Identity?.Name;
                 IdentityResult result = await userManager.CreateAsync(user, user.Password);
-
-                if (result.Succeeded)
-                {
-                    var country = await _context.Country.FirstOrDefaultAsync(c => c.CountryId == user.CountryId);
-                    if (!user.Active)
-                    {
-                        var createdUser = await userManager.FindByEmailAsync(user.Email);
-                        var lockUser = await userManager.SetLockoutEnabledAsync(createdUser!, true);
-                        var lockDate = await userManager.SetLockoutEndDateAsync(createdUser!, DateTime.MaxValue);
-
-                        if (lockUser.Succeeded && lockDate.Succeeded)
-                        {
-                            await smsService.DoSendSmsAsync(country!.Code, country.ISDCode + user.PhoneNumber, "Agency user created and locked. \nEmail : " + user.Email + "\n" + portal_base_url);
-                            notifyService.Custom($"User edited and locked.", 3, "orange", "fas fa-user-lock");
-                        }
-                    }
-                    else
-                    {
-                        await smsService.DoSendSmsAsync(country!.Code, country.ISDCode + user.PhoneNumber, "Agency user created. \n\nEmail : " + user.Email);
-                        notifyService.Custom($"User created successfully.", 3, "green", "fas fa-user-plus");
-                    }
-                    return RedirectToAction(nameof(VendorUserController.Index), "VendorUser", new { id = user.VendorId });
-                }
-                else
+                if (!result.Succeeded)
                 {
                     notifyService.Error("Error to create user!");
                     foreach (IdentityError error in result.Errors)
                         ModelState.AddModelError("", error.Description);
+                    return View(user);
                 }
-                notifyService.Custom($"User created successfully.", 3, "green", "fas fa-user-plus");
-                return View(user);
+                var country = await _context.Country.FirstOrDefaultAsync(c => c.CountryId == user.CountryId);
+                if (!user.Active)
+                {
+                    var createdUser = await userManager.FindByEmailAsync(user.Email);
+                    var lockUser = await userManager.SetLockoutEnabledAsync(createdUser!, true);
+                    var lockDate = await userManager.SetLockoutEndDateAsync(createdUser!, DateTime.MaxValue);
+                    if (lockUser.Succeeded && lockDate.Succeeded)
+                    {
+                        await smsService.DoSendSmsAsync(country!.Code, country.ISDCode + user.PhoneNumber, "Agency user created and locked. \nEmail : " + user.Email + "\n" + portal_base_url);
+                        notifyService.Custom($"User edited and locked.", 3, "orange", "fas fa-user-lock");
+                    }
+                }
+                else
+                {
+                    await smsService.DoSendSmsAsync(country!.Code, country.ISDCode + user.PhoneNumber, "Agency user created. \n\nEmail : " + user.Email);
+                    notifyService.Custom($"User created successfully.", 3, "green", "fas fa-user-plus");
+                }
+                return RedirectToAction(nameof(VendorUserController.Index), "VendorUser", new { id = user.VendorId });
+
             }
             catch (Exception ex)
             {
@@ -204,8 +196,6 @@ namespace risk.control.system.Controllers.PortalAdmin
         {
             try
             {
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-
                 if (userId == null || _context.ApplicationUser == null)
                 {
                     notifyService.Error("OOPs !!!..Id Not found");
@@ -242,12 +232,12 @@ namespace risk.control.system.Controllers.PortalAdmin
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(id))
-                {
-                }
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-
                 var user = await userManager.FindByIdAsync(id);
+                if (user == null)
+                {
+                    notifyService.Error("OOPs !!!..User Not found");
+                    return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
+                }
                 if (applicationUser?.ProfileImage != null && applicationUser.ProfileImage.Length > 0)
                 {
                     var domain = user!.Email!.Split('@')[1];
@@ -255,61 +245,57 @@ namespace risk.control.system.Controllers.PortalAdmin
                     user.ProfilePictureUrl = relativePath;
                     user.ProfilePictureExtension = Path.GetExtension(fileName);
                 }
-
-                if (user != null)
+                user.ProfilePictureExtension = applicationUser?.ProfilePictureExtension ?? user.ProfilePictureExtension;
+                user.PhoneNumber = applicationUser?.PhoneNumber ?? user.PhoneNumber;
+                user.FirstName = applicationUser?.FirstName!;
+                user.LastName = applicationUser?.LastName!;
+                user.Addressline = applicationUser!.Addressline;
+                user.Active = applicationUser.Active;
+                user.Country = applicationUser.Country;
+                user.CountryId = applicationUser.CountryId;
+                user.State = applicationUser.State;
+                user.StateId = applicationUser.StateId;
+                user.PinCode = applicationUser.PinCode;
+                user.PinCodeId = applicationUser.PinCodeId;
+                user.Updated = DateTime.UtcNow;
+                user.IsUpdated = true;
+                user.PhoneNumber = applicationUser.PhoneNumber!.TrimStart('0');
+                user.UpdatedBy = HttpContext.User?.Identity?.Name;
+                user.SecurityStamp = DateTime.UtcNow.ToString();
+                var result = await userManager.UpdateAsync(user);
+                if (!result.Succeeded)
                 {
-                    user.ProfilePictureExtension = applicationUser?.ProfilePictureExtension ?? user.ProfilePictureExtension;
-                    user.PhoneNumber = applicationUser?.PhoneNumber ?? user.PhoneNumber;
-                    user.FirstName = applicationUser?.FirstName!;
-                    user.LastName = applicationUser?.LastName!;
-                    if (!string.IsNullOrWhiteSpace(applicationUser?.Password))
-                    {
-                        user.Password = applicationUser.Password;
-                    }
-                    user.Addressline = applicationUser!.Addressline;
-                    user.Active = applicationUser.Active;
-                    user.Country = applicationUser.Country;
-                    user.CountryId = applicationUser.CountryId;
-                    user.State = applicationUser.State;
-                    user.StateId = applicationUser.StateId;
-                    user.PinCode = applicationUser.PinCode;
-                    user.PinCodeId = applicationUser.PinCodeId;
-                    user.Updated = DateTime.UtcNow;
-                    user.IsUpdated = true;
-                    user.PhoneNumber = applicationUser.PhoneNumber!.TrimStart('0');
-                    user.UpdatedBy = currentUserEmail;
-                    user.SecurityStamp = DateTime.UtcNow.ToString();
-                    var result = await userManager.UpdateAsync(user);
-                    if (result.Succeeded)
-                    {
-                        var country = await _context.Country.FirstOrDefaultAsync(c => c.CountryId == user.CountryId);
-                        if (!user.Active)
-                        {
-                            var createdUser = await userManager.FindByEmailAsync(user.Email!);
-                            var lockUser = await userManager.SetLockoutEnabledAsync(createdUser!, true);
-                            var lockDate = await userManager.SetLockoutEndDateAsync(createdUser!, DateTime.MaxValue);
+                    notifyService.Error("Error to edit user!");
+                    foreach (IdentityError error in result.Errors)
+                        ModelState.AddModelError("", error.Description);
+                    return View(applicationUser);
+                }
+                var country = await _context.Country.FirstOrDefaultAsync(c => c.CountryId == user.CountryId);
+                if (!user.Active)
+                {
+                    var createdUser = await userManager.FindByEmailAsync(user.Email!);
+                    var lockUser = await userManager.SetLockoutEnabledAsync(createdUser!, true);
+                    var lockDate = await userManager.SetLockoutEndDateAsync(createdUser!, DateTime.MaxValue);
 
-                            if (lockUser.Succeeded && lockDate.Succeeded)
-                            {
-                                await smsService.DoSendSmsAsync(country!.Code, country.ISDCode + user.PhoneNumber, "Agency user edited and locked. \nEmail : " + user.Email + "\n" + portal_base_url);
-                                notifyService.Custom($"User edited and locked.", 3, "orange", "fas fa-user-lock");
-                            }
-                        }
-                        else
-                        {
-                            var createdUser = await userManager.FindByEmailAsync(user.Email!);
-                            var lockUser = await userManager.SetLockoutEnabledAsync(createdUser!, true);
-                            var lockDate = await userManager.SetLockoutEndDateAsync(createdUser!, DateTime.UtcNow);
-
-                            if (lockUser.Succeeded && lockDate.Succeeded)
-                            {
-                                await smsService.DoSendSmsAsync(country!.Code, country.ISDCode + user.PhoneNumber, "Agency user edited and unlocked. \n\nEmail : " + user.Email);
-                                notifyService.Custom($"User edited.", 3, "green", "fas fa-user-check");
-                            }
-                        }
-                        return RedirectToAction(nameof(VendorUserController.Index), "VendorUser", new { id = applicationUser.VendorId });
+                    if (lockUser.Succeeded && lockDate.Succeeded)
+                    {
+                        await smsService.DoSendSmsAsync(country!.Code, country.ISDCode + user.PhoneNumber, "Agency user edited and locked. \nEmail : " + user.Email + "\n" + portal_base_url);
+                        notifyService.Custom($"User edited and locked.", 3, "orange", "fas fa-user-lock");
                     }
                 }
+                else
+                {
+                    var createdUser = await userManager.FindByEmailAsync(user.Email!);
+                    var lockUser = await userManager.SetLockoutEnabledAsync(createdUser!, true);
+                    var lockDate = await userManager.SetLockoutEndDateAsync(createdUser!, DateTime.UtcNow);
+
+                    if (lockUser.Succeeded && lockDate.Succeeded)
+                    {
+                        await smsService.DoSendSmsAsync(country!.Code, country.ISDCode + user.PhoneNumber, "Agency user edited and unlocked. \n\nEmail : " + user.Email);
+                        notifyService.Custom($"User edited.", 3, "green", "fas fa-user-check");
+                    }
+                }
+                return RedirectToAction(nameof(VendorUserController.Index), "VendorUser", new { id = applicationUser.VendorId });
             }
             catch (Exception ex)
             {
@@ -317,9 +303,6 @@ namespace risk.control.system.Controllers.PortalAdmin
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
             }
-
-            notifyService.Error("Error !!. The user can't be edited!");
-            return RedirectToAction(nameof(VendorUserController.Index), "VendorUser", new { id = applicationUser!.VendorId });
         }
 
         public async Task<IActionResult> Delete(long? id)

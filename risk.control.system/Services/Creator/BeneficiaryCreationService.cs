@@ -38,101 +38,66 @@ namespace risk.control.system.Services.Creator
         {
             var errors = new List<UploadError>();
             var summaries = new List<string>();
-
             try
             {
-                // 1️⃣ Validation first (cheap, fail fast)
                 beneficiaryValidator.ValidateRequiredFields(uploadCase, errors, summaries);
                 var (dob, income) = beneficiaryValidator.ValidateDetails(uploadCase, errors, summaries);
-
-                if (errors.Count > 0)
-                    return (null, errors, summaries);
-
-                // 2️⃣ Run independent async operations in parallel
+                if (errors.Count > 0) return (null, errors, summaries);
                 var relationTask = extractorService.GetRelationAsync(uploadCase.Relation!.Trim());
-                var pinCodeTask = extractorService.GetPinCodeAsync(
-                    uploadCase.BeneficiaryPincode,
-                    uploadCase.BeneficiaryDistrictName!.Trim(),
-                    companyUser.ClientCompany!.CountryId!.Value);
-
-                var imageTask = verifierProcessor.ProcessImage(
-                    uploadCase, data, errors, summaries, BENEFICIARY_IMAGE, "Beneficiary");
-
-                var phoneTask = verifierProcessor.ValidatePhone(
-                    companyUser, uploadCase.BeneficiaryContact!.Trim(), errors, summaries);
-
+                var pinCodeTask = extractorService.GetPinCodeAsync(uploadCase.BeneficiaryPincode, uploadCase.BeneficiaryDistrictName!.Trim(), companyUser.ClientCompany!.CountryId!.Value);
+                var imageTask = verifierProcessor.ProcessImage(uploadCase, data, errors, summaries, BENEFICIARY_IMAGE, "Beneficiary");
+                var phoneTask = verifierProcessor.ValidatePhone(companyUser, uploadCase.BeneficiaryContact!.Trim(), errors, summaries);
                 await Task.WhenAll(relationTask, pinCodeTask, imageTask, phoneTask);
-
                 var relation = await relationTask;
                 var pinCode = await pinCodeTask;
                 var (imagePath, ext) = await imageTask;
-
-                // 3️⃣ Defensive null handling (Docker exposes this)
                 if (relation == null)
                 {
-                    errors.Add(new UploadError
-                    {
-                        UploadData = "Relation",
-                        Error = $"Invalid beneficiary relation: '{uploadCase.Relation.Trim()}'"
-                    });
-
+                    errors.Add(new UploadError { UploadData = "Relation", Error = $"Invalid beneficiary relation: '{uploadCase.Relation.Trim()}'" });
                     return (null, errors, summaries);
                 }
-
                 if (pinCode == null)
                 {
-                    verifierProcessor.AddLocationError(
-                        errors,
-                        summaries,
-                        uploadCase.BeneficiaryPincode,
-                        uploadCase.BeneficiaryDistrictName.Trim());
+                    verifierProcessor.AddLocationError(errors, summaries, uploadCase.BeneficiaryPincode, uploadCase.BeneficiaryDistrictName.Trim());
                 }
-                var textInfo = CultureInfo.CurrentCulture.TextInfo;
-
-                // 4️⃣ Map entity (pure in-memory work)
-                var beneficiary = new BeneficiaryDetail
-                {
-                    Name = WebUtility.HtmlEncode(textInfo.ToTitleCase(uploadCase.BeneficiaryName!.ToLower())),
-                    BeneficiaryRelationId = relation.BeneficiaryRelationId,
-                    DateOfBirth = dob,
-                    Income = income,
-                    PhoneNumber = uploadCase.BeneficiaryContact.Trim(),
-                    Addressline = uploadCase.BeneficiaryAddressLine!.Trim(),
-                    PinCodeId = pinCode?.PinCodeId,
-                    DistrictId = pinCode?.DistrictId,
-                    StateId = pinCode?.StateId,
-                    CountryId = pinCode?.CountryId,
-                    ImagePath = imagePath,
-                    ProfilePictureExtension = ext,
-                    Updated = DateTime.UtcNow,
-                    UpdatedBy = companyUser.Email
-                };
-
-                if (pinCode != null)
-                    await EnrichLocationData(beneficiary, pinCode);
-
+                var beneficiary = CreateBeneficiary(uploadCase, dob, relation, pinCode!, companyUser, income, imagePath, ext);
+                if (pinCode != null) await EnrichLocationData(beneficiary, pinCode);
                 return (beneficiary, errors, summaries);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex,
-                    "AddBeneficiary failed in Docker. CaseId={CaseId}, Relation='{Relation}'",
-                    uploadCase.CaseId!.Trim(),
-                    uploadCase.Relation);
-
+                logger.LogError(ex, "AddBeneficiary failed in Docker. CaseId={CaseId}, Relation='{Relation}'", uploadCase.CaseId!.Trim(), uploadCase.Relation);
                 return (null, errors, summaries);
             }
         }
 
+        private BeneficiaryDetail CreateBeneficiary(UploadCase uploadCase, DateTime dob, BeneficiaryRelation relation, PinCode pinCode, ApplicationUser companyUser, Income income, string imagePath, string ext)
+        {
+            return new BeneficiaryDetail
+            {
+                Name = WebUtility.HtmlEncode(CultureInfo.CurrentCulture.TextInfo.ToTitleCase(uploadCase.BeneficiaryName!.ToLower())),
+                BeneficiaryRelationId = relation.BeneficiaryRelationId,
+                DateOfBirth = dob,
+                Income = income,
+                PhoneNumber = uploadCase.BeneficiaryContact!.Trim(),
+                Addressline = uploadCase.BeneficiaryAddressLine!.Trim(),
+                PinCodeId = pinCode?.PinCodeId,
+                DistrictId = pinCode?.DistrictId,
+                StateId = pinCode?.StateId,
+                CountryId = pinCode?.CountryId,
+                ImagePath = imagePath,
+                ProfilePictureExtension = ext,
+                Updated = DateTime.UtcNow,
+                UpdatedBy = companyUser.Email
+            };
+        }
         private async Task EnrichLocationData(BeneficiaryDetail beneficiary, PinCode pin)
         {
             var fullAddress = $"{beneficiary.Addressline.Trim()}, {pin.District!.Name}, {pin.State!.Name}, {pin.Country!.Code}, {pin.Code}";
             var (lat, lon) = await customApiCLient.GetCoordinatesFromAddressAsync(fullAddress);
-
             beneficiary.Latitude = lat;
             beneficiary.Longitude = lon;
             var latLong = lat + "," + lon;
-
             var url = string.Format("https://maps.googleapis.com/maps/api/staticmap?center={0}&zoom=14&size={{0}}x{{1}}&maptype=roadmap&markers=color:red%7Clabel:A%7C{0}&key={1}",
                     latLong, EnvHelper.Get("GOOGLE_MAP_KEY"));
             beneficiary.BeneficiaryLocationMap = url;

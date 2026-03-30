@@ -32,18 +32,6 @@ namespace risk.control.system.StartupExtensions
                 options.ActiveLiClasses = "breadcrumb-item active";
                 options.DontLookForDefaultNode = false;
             });
-            //services.AddWorkflow();
-            //services.AddTransient<InvestigationTaskWorkflow>();
-            //services.AddTransient<CaseCreateStep>();
-            //services.AddTransient<CaseAssignToAgencyStep>();
-            //services.AddTransient<CaseWithdrawStep>();
-            //services.AddTransient<CaseDeclineStep>();
-            //services.AddTransient<CaseAssignToAgentStep>();
-            //services.AddTransient<CaseAgentReportSubmitted>();
-            //services.AddTransient<CaseReAssignedToAgentStep>();
-            //services.AddTransient<CaseInvestigationReportSubmitted>();
-            //services.AddTransient<CaseApproved>();
-            //services.AddTransient<CaseRejected>();
 
             services.AddNotyf(config =>
             {
@@ -52,9 +40,7 @@ namespace risk.control.system.StartupExtensions
                 config.Position = NotyfPosition.TopCenter;
             });
 
-            var allowedOrigins = configuration
-                .GetSection("Cors:AllowedOrigins")
-                .Get<string[]>();
+            var allowedOrigins = configuration.GetSection("Cors:AllowedOrigins").Get<string[]>();
 
             services.AddCors(options =>
             {

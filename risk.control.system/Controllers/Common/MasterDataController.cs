@@ -26,14 +26,15 @@ namespace risk.control.system.Controllers.Common
         }
 
         [HttpGet("SearchCountry")]
-        public IActionResult SearchCountry(string term = "")
+        public async Task<IActionResult> SearchCountry(string term = "")
         {
             try
             {
-                var allCountries = _context.Country.AsNoTracking().ToList();
+                var allCountries = await _context.Country.AsNoTracking().ToListAsync();
 
                 if (string.IsNullOrEmpty(term))
-                    return Ok(allCountries
+                {
+                    var result = allCountries
                         .OrderBy(x => x.Name)
                      .Take(10)
                      .Select(c => new
@@ -42,7 +43,9 @@ namespace risk.control.system.Controllers.Common
                          Name = c.Name,
                          Label = c.Name
                      })?
-                        .ToList());
+                        .ToList();
+                    return Ok(result);
+                }
 
                 var countries = allCountries
                         .Where(c => c.Name.Contains(term, StringComparison.OrdinalIgnoreCase))
@@ -70,17 +73,12 @@ namespace risk.control.system.Controllers.Common
             try
             {
                 var searchTerm = term?.Trim();
-
-                // 2. Build the query
                 var query = _context.State
                     .AsNoTracking()
                     .Where(x => x.CountryId == countryId);
 
                 if (!string.IsNullOrWhiteSpace(searchTerm))
                 {
-                    // 3. Use ILike (Postgres) or Like (SQLite) safely
-                    // EF.Functions.Like is the most cross-platform compatible way
-                    // to handle "contains" searches without forcing .ToLower() on the column.
                     query = query.Where(x => EF.Functions.Like(x.Name, $"%{searchTerm}%"));
                 }
                 ;
@@ -127,15 +125,10 @@ namespace risk.control.system.Controllers.Common
                     })
                     .ToListAsync();
 
-                // Add the "ALL DISTRICTS" option to the response
                 var result = new List<object>
                 {
                 };
-
-                // Append the queried districts to the result
                 result.AddRange(districts);
-
-                // Return the final response
                 return Ok(result);
             }
             catch (Exception ex)
@@ -160,17 +153,7 @@ namespace risk.control.system.Controllers.Common
                     query = query.Where(x => EF.Functions.Like(x.Name, $"%{searchTerm}%"));
                 }
 
-                var districts = await query
-                    .OrderBy(x => x.Name)
-                    .Take(10)
-                    .Select(x => new
-                    {
-                        DistrictId = x.DistrictId,
-                        DistrictName = x.Name
-                    })
-                    .ToListAsync();
-
-                // Add the "ALL DISTRICTS" option to the response
+                var districts = await query.OrderBy(x => x.Name).Take(10).Select(x => new { DistrictId = x.DistrictId, DistrictName = x.Name }).ToListAsync();
                 var result = new List<object>
                 {
                     new
@@ -179,11 +162,7 @@ namespace risk.control.system.Controllers.Common
                         DistrictName = Applicationsettings.ALL_DISTRICT
                     }
                 };
-
-                // Append the queried districts to the result
                 result.AddRange(districts);
-
-                // Return the final response
                 return Ok(result);
             }
             catch (Exception ex)
@@ -194,12 +173,12 @@ namespace risk.control.system.Controllers.Common
         }
 
         [HttpGet("GetCountryName")]
-        public IActionResult GetCountryName(long id)
+        public async Task<IActionResult> GetCountryName(long id)
         {
             try
             {
-                var country = _context.Country.AsNoTracking().Where(x => x.CountryId == id).OrderBy(x => x.Name).Take(10) // Filter based on user input
-                    .Select(x => new { Id = x.CountryId, Name = $"{x.Name}" }).FirstOrDefault(); // Format for jQuery UI Autocomplete
+                var country = await _context.Country.AsNoTracking().Where(x => x.CountryId == id).OrderBy(x => x.Name).Take(10) // Filter based on user input
+                    .Select(x => new { Id = x.CountryId, Name = $"{x.Name}" }).FirstOrDefaultAsync(); // Format for jQuery UI Autocomplete
 
                 return Ok(country);
             }
@@ -211,12 +190,12 @@ namespace risk.control.system.Controllers.Common
         }
 
         [HttpGet("GetStateName")]
-        public IActionResult GetStateName(long id, long countryId)
+        public async Task<IActionResult> GetStateName(long id, long countryId)
         {
             try
             {
-                var state = _context.State.AsNoTracking().Where(x => x.StateId == id && x.CountryId == countryId).OrderBy(x => x.Name).Take(10) // Filter based on user input
-                    .Select(x => new { StateId = x.StateId, StateName = $"{x.Name}" }).FirstOrDefault(); // Format for jQuery UI Autocomplete
+                var state = await _context.State.AsNoTracking().Where(x => x.StateId == id && x.CountryId == countryId).OrderBy(x => x.Name).Take(10) // Filter based on user input
+                    .Select(x => new { StateId = x.StateId, StateName = $"{x.Name}" }).FirstOrDefaultAsync(); // Format for jQuery UI Autocomplete
 
                 return Ok(state);
             }
@@ -228,19 +207,18 @@ namespace risk.control.system.Controllers.Common
         }
 
         [HttpGet("GetStateNameForCountry")]
-        public IActionResult GetStateNameForCountry(long countryId, long? id = null)
+        public async Task<IActionResult> GetStateNameForCountry(long countryId, long? id = null)
         {
             try
             {
-                var states = _context.State.AsNoTracking()
+                var states = await _context.State.AsNoTracking()
                     .Where(x => x.CountryId == countryId)
                     .OrderBy(x => x.Name)
                     .Select(x => new { StateId = x.StateId, StateName = x.Name })
-                    .ToList();
+                    .ToListAsync();
 
                 if (id.HasValue)
                 {
-                    // Return the state with the specific id if needed for pre-filling
                     var state = states.FirstOrDefault(x => x.StateId == id);
                     return Ok(state);
                 }
@@ -255,7 +233,7 @@ namespace risk.control.system.Controllers.Common
         }
 
         [HttpGet("GetDistrictName")]
-        public IActionResult GetDistrictName(long id, long stateId, long countryId)
+        public async Task<IActionResult> GetDistrictName(long id, long stateId, long countryId)
         {
             try
             {
@@ -268,8 +246,8 @@ namespace risk.control.system.Controllers.Common
                     };
                     return Ok(result);
                 }
-                var pincode = _context.District.AsNoTracking().Where(x => x.DistrictId == id && x.StateId == stateId && x.CountryId == countryId).OrderBy(x => x.Name).Take(10) // Filter based on user input
-                    .Select(x => new { DistrictId = x.DistrictId, DistrictName = $"{x.Name}" }).FirstOrDefault(); // Format for jQuery UI Autocomplete
+                var pincode = await _context.District.AsNoTracking().Where(x => x.DistrictId == id && x.StateId == stateId && x.CountryId == countryId).OrderBy(x => x.Name).Take(10) // Filter based on user input
+                    .Select(x => new { DistrictId = x.DistrictId, DistrictName = $"{x.Name}" }).FirstOrDefaultAsync(); // Format for jQuery UI Autocomplete
 
                 return Ok(pincode);
             }
@@ -281,12 +259,12 @@ namespace risk.control.system.Controllers.Common
         }
 
         [HttpGet("GetDistrictNameForAgency")]
-        public IActionResult GetDistrictNameForAgency(long id, long stateId, long countryId, long lob, long serviceId, long vendorId)
+        public async Task<IActionResult> GetDistrictNameForAgency(long id, long stateId, long countryId, long lob, long serviceId, long vendorId)
         {
             try
             {
-                var districts = _context.District.AsNoTracking().Where(x => x.StateId == stateId && x.CountryId == countryId).OrderBy(x => x.Name)//.Take(10) // Filter based on user input
-                                .Select(x => new { DistrictId = x.DistrictId, DistrictName = $"{x.Name}" }).ToList(); // Format for jQuery UI Autocomplete
+                var districts = await _context.District.AsNoTracking().Where(x => x.StateId == stateId && x.CountryId == countryId).OrderBy(x => x.Name)//.Take(10) // Filter based on user input
+                                .Select(x => new { DistrictId = x.DistrictId, DistrictName = $"{x.Name}" }).ToListAsync(); // Format for jQuery UI Autocomplete
 
                 var result = new List<object>
             {
@@ -308,12 +286,12 @@ namespace risk.control.system.Controllers.Common
         }
 
         [HttpGet("GetPincode")]
-        public IActionResult GetPincode(long id, long countryId)
+        public async Task<IActionResult> GetPincode(long id, long countryId)
         {
             try
             {
                 var userClaim = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
-                var pincode = _context.PinCode.AsNoTracking().FirstOrDefault(x => x.PinCodeId == id && x.CountryId == countryId); // Format for jQuery UI Autocomplete
+                var pincode = await _context.PinCode.AsNoTracking().FirstOrDefaultAsync(x => x.PinCodeId == id && x.CountryId == countryId); // Format for jQuery UI Autocomplete
 
                 var response = new
                 {
@@ -332,86 +310,32 @@ namespace risk.control.system.Controllers.Common
         }
 
         [HttpGet("GetPincodeSuggestions")]
-        public IActionResult GetPincodeSuggestions(long countryId, string term = "")
+        public async Task<IActionResult> GetPincodeSuggestions(long countryId, string term = "")
         {
             try
             {
-                // Check if the term is empty or null
                 if (string.IsNullOrEmpty(term?.Trim()))
                 {
-                    // If no search term, return all pincodes for the given district, state, and country
-                    var allpincodes = _context.PinCode.AsNoTracking()
-                        .Include(x => x.State)
-                        .Include(x => x.District)
-                        .Where(x => x.CountryId == countryId)
-                        .OrderBy(x => x.Name)
-                     .Take(10)
-                        .Select(x => new
-                        {
-                            PincodeId = x.PinCodeId,
-                            Pincode = x.Code,
-                            Name = x.Name,
-                            StateId = x.StateId,
-                            StateName = x.State!.Name,
-                            DistricId = x.DistrictId,
-                            DistrictName = x.District!.Name
-                        })?
-                        .ToList();
+                    var allpincodes = await _context.PinCode.AsNoTracking().Include(x => x.State).Include(x => x.District).Where(x => x.CountryId == countryId).OrderBy(x => x.Name).Take(10)
+                        .Select(x => new { PincodeId = x.PinCodeId, Pincode = x.Code, Name = x.Name, StateId = x.StateId, StateName = x.State!.Name, DistricId = x.DistrictId, DistrictName = x.District!.Name }).ToListAsync();
                     return Ok(allpincodes);
                 }
-
-                // Sanitize the term by trimming spaces
-                // Sanitize the term by trimming spaces
                 var sanitizedTerm = term.Trim();
-
-                // Split the term by hyphen, handle both parts (name and pincode)
                 var termParts = sanitizedTerm.Split('-').Select(part => part.Trim()).ToArray();
-
-                // Name filter: The part before the hyphen (if exists)
                 var nameFilter = termParts.Length > 0 ? termParts[0] : string.Empty;
-
-                // Pincode filter: The part after the hyphen (if exists)
                 var pincodeFilter = termParts.Length > 1 ? termParts[1] : string.Empty;
-
                 var pincodesQuery = _context.PinCode.AsNoTracking().Where(x => x.CountryId == countryId);
-
                 if (!string.IsNullOrWhiteSpace(nameFilter))
                 {
                     var filter = $"%{nameFilter}%";
-                    // Search pincodes that match either name or pincode
-                    pincodesQuery = pincodesQuery.Where(x =>
-                        EF.Functions.Like(x.Name, filter) ||
-                        EF.Functions.Like(x.Code.ToString(), filter) // Still heavy, see note below
-                    );
+                    pincodesQuery = pincodesQuery.Where(x => EF.Functions.Like(x.Name, filter) || EF.Functions.Like(x.Code.ToString(), filter));
                 }
                 else
                 {
-                    // Search pincodes that match either name or pincode
-                    pincodesQuery = _context.PinCode.AsNoTracking()
-                        .Where(x => x.CountryId == countryId &&
-                        x.Code.ToString().Contains(pincodeFilter.ToLower())
-                        );
+                    pincodesQuery = _context.PinCode.AsNoTracking().Where(x => x.CountryId == countryId && x.Code.ToString().Contains(pincodeFilter.ToLower()));
                 }
-
-                // Get the filtered and sorted results
-                var filteredPincodes = pincodesQuery
-                    .Include(x => x.State)
-                    .Include(x => x.District)
-                     .Take(10)
-                    .OrderBy(x => x.Name)
-                        .Select(x => new
-                        {
-                            PincodeId = x.PinCodeId,
-                            Pincode = x.Code,
-                            Name = x.Name,
-                            StateId = x.StateId,
-                            StateName = x.State!.Name,
-                            DistrictId = x.DistrictId,
-                            DistrictName = x.District!.Name
-                        })?
-                    .ToList();
-
-                // Return the filtered pincodes
+                var filteredPincodes = pincodesQuery.Include(x => x.State).Include(x => x.District).Take(10).OrderBy(x => x.Name)
+                        .Select(x => new { PincodeId = x.PinCodeId, Pincode = x.Code, Name = x.Name, StateId = x.StateId, StateName = x.State!.Name, DistrictId = x.DistrictId, DistrictName = x.District!.Name })?.ToList();
                 return Ok(filteredPincodes);
             }
             catch (Exception ex)
@@ -422,35 +346,16 @@ namespace risk.control.system.Controllers.Common
         }
 
         [HttpGet("GetCountrySuggestions")]
-        public IActionResult GetCountrySuggestions(string term = "")
+        public async Task<IActionResult> GetCountrySuggestions(string term = "")
         {
             try
             {
-                var allCountries = _context.Country.AsNoTracking().ToList();
+                var allCountries = await _context.Country.AsNoTracking().ToListAsync();
 
                 if (string.IsNullOrEmpty(term))
-                    return Ok(allCountries
-                        .OrderBy(x => x.Name)
-                     .Take(10)
-                     .Select(c => new
-                     {
-                         Id = c.CountryId,
-                         Name = c.Name,
-                         Label = c.Name
-                     })?
-                        .ToList());
+                    return Ok(allCountries.OrderBy(x => x.Name).Take(10).Select(c => new { Id = c.CountryId, Name = c.Name, Label = c.Name })?.ToList());
 
-                var countries = allCountries
-                        .Where(c => c.Name.Contains(term, StringComparison.OrdinalIgnoreCase))
-                        .OrderBy(x => x.Name)
-                     .Take(10)
-                        .Select(c => new
-                        {
-                            Id = c.CountryId,
-                            Name = c.Name,
-                            Label = c.Name
-                        })?
-                        .ToList();
+                var countries = allCountries.Where(c => c.Name.Contains(term, StringComparison.OrdinalIgnoreCase)).OrderBy(x => x.Name).Take(10).Select(c => new { Id = c.CountryId, Name = c.Name, Label = c.Name })?.ToList();
                 return Ok(countries);
             }
             catch (Exception ex)

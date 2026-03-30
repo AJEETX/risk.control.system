@@ -35,25 +35,15 @@ namespace risk.control.system.Controllers.Company
             {
                 if (!ModelState.IsValid)
                     return BadRequest(new { message = "Invalid request." });
-
                 if (User?.Identity == null || !User.Identity.IsAuthenticated)
                     return Unauthorized(new { message = "User is logged out due to inactivity or authentication failure." });
-
                 var email = User.Identity.Name;
                 var user = await _signInManager.UserManager.Users
                     .FirstOrDefaultAsync(u => u.Email == email);
-
                 if (user == null)
                     return Unauthorized(new { message = "User not found." });
-
                 var now = DateTime.UtcNow;
-
-                // Update or create UserSessionAlive
-                var session = await _context.UserSessionAlive
-                    .Where(s => s.ActiveUser.Id == user.Id && !s.LoggedOut)
-                    .OrderByDescending(s => s.Updated ?? s.Created)
-                    .FirstOrDefaultAsync();
-
+                var session = await _context.UserSessionAlive.Where(s => s.ActiveUser.Id == user.Id && !s.LoggedOut).OrderByDescending(s => s.Updated ?? s.Created).FirstOrDefaultAsync();
                 if (session != null)
                 {
                     session.UpdatedBy = user.Email;
@@ -70,14 +60,8 @@ namespace risk.control.system.Controllers.Company
                         Created = now
                     });
                 }
-
                 await _context.SaveChangesAsync(null, false);
-
-                // Optionally refresh the cookie sign-in
                 await _signInManager.RefreshSignInAsync(user);
-
-                Console.WriteLine($"Session kept alive for {email} at {now}. Current page: {request.CurrentPage}");
-                // Return minimal user info
                 var userDetails = new
                 {
                     name = user.UserName,
@@ -85,7 +69,6 @@ namespace risk.control.system.Controllers.Company
                     lastActivity = now,
                     currentPage = request.CurrentPage
                 };
-
                 return Ok(userDetails);
             }
             catch (Exception ex)

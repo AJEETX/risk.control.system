@@ -48,57 +48,61 @@ namespace risk.control.system.Controllers.Tools
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> OcrDocument(DocumentOcrData data)
         {
-            if (data.DocumentImage == null || data.DocumentImage.Length == 0)
-            {
-                ModelState.AddModelError("DocumentImage", "Please upload a valid image file.");
-            }
-            if (!ModelState.IsValid) return BadRequest(ModelState);
+            var validationError = await ValidateOcrRequest(data);
+            if (validationError != null) return validationError;
 
-            // 1. Get current user and check limit
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
                 return Unauthorized("Unauthorized");
             }
-
-            if (user.OcrCount >= 5)
-            {
-                return StatusCode(403, "OCR usage limit reached (5/5).");
-            }
             try
             {
-                // 2. Perform the OCR Task
-                var (file, path) = await _fileStorageService.SaveAsync(data.DocumentImage!, "tool");
-                var ocrData = await _googleService.DetectTextAsync(path);
+                var result = await ProcessOcrAsync(user, data.DocumentImage!);
 
-                if (ocrData == null || ocrData.Count == 0)
-                {
-                    return BadRequest("Ocr failed to detect text.");
-                }
-
-                // 3. Increment the count and save to Database
-                user.OcrCount++;
-                await _userManager.UpdateAsync(user);
-
-                var ocrDetail = ocrData.FirstOrDefault();
-                var description = ocrDetail != null ? ocrDetail.Description : string.Empty;
-
-                // 4. Return description (and optionally remaining count)
                 return Ok(new
                 {
-                    description = description,
-                    remaining = 5 - user.OcrCount // Send remaining count back to JS
+                    description = result,
+                    remaining = 5 - user.OcrCount
                 });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                _logger.LogError("Error processing OCR document. {UserId}", _userManager.GetUserId(User) ?? "Anonymous");
+                _logger.LogError(ex, "OCR Error for user {UserId}", user.Id);
                 return Ok(new
                 {
-                    description = "Error Face match",
-                    remaining = 5 - user.OcrCount // Send remaining count back to JS
+                    description = "Error processing document",
+                    remaining = 5 - user.OcrCount
                 });
             }
+        }
+
+        private async Task<IActionResult?> ValidateOcrRequest(DocumentOcrData data)
+        {
+            if (data.DocumentImage == null || data.DocumentImage.Length == 0)
+                return BadRequest("Please upload a valid image file.");
+
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Unauthorized();
+
+            if (user.OcrCount >= 5)
+                return StatusCode(403, "OCR usage limit reached (5/5).");
+
+            return null;
+        }
+
+        private async Task<string> ProcessOcrAsync(ApplicationUser user, IFormFile image)
+        {
+            var (file, path) = await _fileStorageService.SaveAsync(image, "tool");
+            var ocrData = await _googleService.DetectTextAsync(path);
+
+            if (ocrData == null || !ocrData.Any())
+                throw new Exception("Ocr failed to detect text.");
+
+            user.OcrCount++;
+            await _userManager.UpdateAsync(user);
+
+            return ocrData.FirstOrDefault()?.Description ?? string.Empty;
         }
     }
 }

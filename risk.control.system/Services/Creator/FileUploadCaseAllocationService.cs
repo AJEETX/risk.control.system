@@ -60,58 +60,29 @@ namespace risk.control.system.Services.Creator
                     .Include(c => c.EmpanelledVendors.Where(v => v.Status == VendorStatus.ACTIVE && !v.Deleted))
                     .ThenInclude(e => e.VendorInvestigationServiceTypes)
                     .FirstOrDefaultAsync(c => c.ClientCompanyId == companyUser!.ClientCompanyId);
-
-            // 1. Get initial DB load for ALL potential vendors once
             var allVendorIds = company!.EmpanelledVendors.Select(v => v.VendorId)?.ToList();
-
             if (allVendorIds == null || !allVendorIds.Any()) return new List<long>(); // No vendors, no allocations
-
             var vendorLoadList = await GetAgencyIdsLoad(allVendorIds);
-
-            // Convert to a Dictionary for fast lookup and local updates
             var localVendorLoad = vendorLoadList.ToDictionary(v => v.VendorId, v => v.CaseCount);
-
             var allocatedCaseIds = new List<long>();
-
-            // 2. Process cases. Note: We use a loop or restricted parallelism to ensure
-            // we aren't over-allocating to the same "least busy" vendor.
             foreach (var caseTask in caseTasks)
             {
                 if (caseTask == null || !caseTask.IsValidCaseData()) continue;
-
-                // Find eligible vendors for THIS specific case
-                var eligibleVendorIds = company.EmpanelledVendors
-                    .Where(vendor => vendor.VendorInvestigationServiceTypes!.Any(st =>
+                var eligibleVendorIds = company.EmpanelledVendors.Where(vendor => vendor.VendorInvestigationServiceTypes!.Any(st =>
                         st.InvestigationServiceTypeId == caseTask.PolicyDetail!.InvestigationServiceTypeId &&
                         st.InsuranceType == caseTask.PolicyDetail.InsuranceType
-                    // ... add your State/District logic here ...
-                    ))
-                    .Select(v => v.VendorId)
+                    )).Select(v => v.VendorId)
                     .ToList();
-
                 if (!eligibleVendorIds.Any()) continue;
-
-                // 3. PICK THE VENDOR with the lowest load from our LOCAL tracker
-                var selectedVendorId = eligibleVendorIds
-                    .OrderBy(id => localVendorLoad[id])
-                    .FirstOrDefault();
-
-                // 4. Perform the assignment
+                var selectedVendorId = eligibleVendorIds.OrderBy(id => localVendorLoad[id]).FirstOrDefault();
                 var (policy, status) = await AllocateToVendor(userEmail, caseTask.Id, selectedVendorId);
-
                 if (!string.IsNullOrEmpty(policy))
                 {
                     allocatedCaseIds.Add(caseTask.Id);
-
-                    // 5. IMPORTANT: Increment local load so the NEXT case in the loop
-                    // sees this vendor is now busier.
                     localVendorLoad[selectedVendorId]++;
-
-                    backgroundJobClient.Enqueue(() =>
-                        mailboxService.NotifyCaseAllocationToVendor(userEmail, policy, caseTask.Id, selectedVendorId, url));
+                    backgroundJobClient.Enqueue(() => mailboxService.NotifyCaseAllocationToVendor(userEmail, policy, caseTask.Id, selectedVendorId, url));
                 }
             }
-
             return allocatedCaseIds;
         }
 
@@ -120,28 +91,12 @@ namespace risk.control.system.Services.Creator
             try
             {
                 await using var context = await _contextFactory.CreateDbContextAsync();
-                // Fetch vendor & user details
-                var currentUser = await context.ApplicationUser.AsNoTracking()
-                    .Include(c => c.ClientCompany)
-                    .FirstOrDefaultAsync(u => u.Email == userEmail);
-
-                // Fetch case
-                var caseTask = await context.Investigations
-                    .Include(c => c.PolicyDetail)
-                    .Include(c => c.ReportTemplate)
-                    .ThenInclude(c => c!.LocationReport)
-                    .ThenInclude(c => c.FaceIds)
-                    .Include(c => c.ReportTemplate)
-                    .ThenInclude(c => c!.LocationReport)
-                    .ThenInclude(c => c.DocumentIds)
-                    .Include(c => c.ReportTemplate)
-                    .ThenInclude(c => c!.LocationReport)
-                    .ThenInclude(c => c.Questions)
-                    .FirstOrDefaultAsync(v => v.Id == caseId);
+                var currentUser = await context.ApplicationUser.AsNoTracking().Include(c => c.ClientCompany).FirstOrDefaultAsync(u => u.Email == userEmail);
+                var caseTask = await context.Investigations.Include(c => c.PolicyDetail).Include(c => c.ReportTemplate).ThenInclude(c => c!.LocationReport).ThenInclude(c => c.FaceIds)
+                    .Include(c => c.ReportTemplate).ThenInclude(c => c!.LocationReport).ThenInclude(c => c.DocumentIds).Include(c => c.ReportTemplate).ThenInclude(c => c!.LocationReport)
+                    .ThenInclude(c => c.Questions).FirstOrDefaultAsync(v => v.Id == caseId);
 
                 var vendor = await context.Vendor.FindAsync(vendorId);
-
-                // Update case details
                 caseTask!.IsAutoAllocated = autoAllocated;
                 caseTask.IsNew = true;
                 caseTask.IsNewAssignedToAgency = true;
@@ -159,27 +114,17 @@ namespace risk.control.system.Services.Creator
                 caseTask.SupervisorSla = currentUser.ClientCompany.SupervisorSla;
                 caseTask.AgentSla = currentUser.ClientCompany.AgentSla;
                 caseTask.UpdateAgentAnswer = currentUser.ClientCompany.UpdateAgentAnswer;
-
-                //REPORT TEMPLATE
                 var investigationReport = new InvestigationReport
                 {
                     ReportTemplateId = caseTask.ReportTemplateId,
                     ReportTemplate = caseTask.ReportTemplate, // Optional
                 };
-
-                // Save InvestigationReport
                 context.InvestigationReport.Add(investigationReport);
-
-                // Link the InvestigationReport back to the InvestigationTask
                 caseTask.InvestigationReportId = investigationReport.Id;
                 caseTask.InvestigationReport = investigationReport;
-
                 context.Investigations.Update(caseTask);
-                // Save changes
                 await context.SaveChangesAsync(null, false);
-
                 await timelineService.UpdateTaskStatus(caseTask.Id, currentUser.Email!);
-
                 return (caseTask.PolicyDetail!.ContractNumber, caseTask.SubStatus);
             }
             catch (Exception ex)
@@ -193,33 +138,10 @@ namespace risk.control.system.Services.Creator
         {
             try
             {
-                // Get relevant status IDs in one query
-                var relevantStatuses = new[]
-                    {
-                    CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR,
-                    CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT,
-                    CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR,
-                    CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR
-                }; // Improves lookup performance
-
+                var relevantStatuses = new[] { CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR, CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT, CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR, CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR }; // Improves lookup performance
                 await using var context = await _contextFactory.CreateDbContextAsync();
-                // Fetch cases that match the criteria
-                var vendorCaseCount = context.Investigations.AsNoTracking()
-                    .Where(c => !c.Deleted &&
-                                c.VendorId.HasValue &&
-                                c.AssignedToAgency &&
-                                relevantStatuses.Contains(c.SubStatus))
-                    .GroupBy(c => c.VendorId!.Value)
-                    .ToDictionary(g => g.Key, g => g.Count());
-
-                // Create the list of VendorIdWithCases
-                return existingVendors
-                    .Select(vendorId => new VendorIdWithCases
-                    {
-                        VendorId = vendorId,
-                        CaseCount = vendorCaseCount.GetValueOrDefault(vendorId, 0)
-                    })
-                    .ToList();
+                var vendorCaseCount = context.Investigations.AsNoTracking().Where(c => !c.Deleted && c.VendorId.HasValue && c.AssignedToAgency && relevantStatuses.Contains(c.SubStatus)).GroupBy(c => c.VendorId!.Value).ToDictionary(g => g.Key, g => g.Count());
+                return existingVendors.Select(vendorId => new VendorIdWithCases { VendorId = vendorId, CaseCount = vendorCaseCount.GetValueOrDefault(vendorId, 0) }).ToList();
             }
             catch (Exception ex)
             {
@@ -237,15 +159,9 @@ namespace risk.control.system.Services.Creator
                     return;
                 }
                 await using var context = await _contextFactory.CreateDbContextAsync();
-                var cases2Assign = context.Investigations
-                    .Include(c => c.PolicyDetail)
-                    .Include(c => c.CustomerDetail)
-                    .Include(c => c.BeneficiaryDetail)
-                    .Include(c => c.InvestigationTimeline)
-                       .Where(v => caseIds.Contains(v.Id));
+                var cases2Assign = context.Investigations.Include(c => c.PolicyDetail).Include(c => c.CustomerDetail).Include(c => c.BeneficiaryDetail).Include(c => c.InvestigationTimeline).Where(v => caseIds.Contains(v.Id));
                 var currentUser = await context.ApplicationUser.AsNoTracking().Include(c => c.ClientCompany).FirstOrDefaultAsync(u => u.Email == userEmail);
                 var assigned = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER;
-
                 foreach (var case2Assign in cases2Assign)
                 {
                     case2Assign.CaseOwner = currentUser!.Email;
@@ -259,9 +175,7 @@ namespace risk.control.system.Services.Creator
                 }
                 context.Investigations.UpdateRange(cases2Assign);
                 await context.SaveChangesAsync(null, false);
-
                 var autoAllocatedTasks = cases2Assign.ToList().Select(u => timelineService.UpdateTaskStatus(u.Id, userEmail));
-
                 await Task.WhenAll(autoAllocatedTasks);
             }
             catch (Exception ex)

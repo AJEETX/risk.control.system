@@ -75,29 +75,7 @@ namespace risk.control.system.Controllers.Creator
 
             try
             {
-                var existingRating = await context.Ratings
-                    .FirstOrDefaultAsync(r => r.VendorId == vendorId && r.UserEmail == currentUserEmail);
-
-                if (existingRating != null)
-                {
-                    existingRating.Rate = rating;
-                    context.Ratings.Update(existingRating);
-                }
-                else
-                {
-                    context.Ratings.Add(new AgencyRating
-                    {
-                        VendorId = vendorId,
-                        Rate = rating,
-                        UserEmail = currentUserEmail,
-                        IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? ""
-                    });
-                }
-
-                await context.SaveChangesAsync();
-
-                var ratings = context.Ratings.Where(r => r.VendorId == vendorId);
-                var avgRating = ratings.Any() ? ratings.Average(r => r.Rate) : 0;
+                double avgRating = await SaveRatingAndGetAverageAsync(rating, vendorId, currentUserEmail);
 
                 return Json(new
                 {
@@ -118,6 +96,34 @@ namespace risk.control.system.Controllers.Creator
                     message = "Unable to save your rating at the moment. Please try again later."
                 });
             }
+        }
+        private async Task<double> SaveRatingAndGetAverageAsync(int rating, long vendorId, string userEmail)
+        {
+            var existingRating = await context.Ratings
+                .FirstOrDefaultAsync(r => r.VendorId == vendorId && r.UserEmail == userEmail);
+
+            if (existingRating != null)
+            {
+                existingRating.Rate = rating;
+            }
+            else
+            {
+                context.Ratings.Add(new AgencyRating
+                {
+                    VendorId = vendorId,
+                    Rate = rating,
+                    UserEmail = userEmail,
+                    IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? ""
+                });
+            }
+
+            await context.SaveChangesAsync();
+
+            // Simplified average calculation
+            return await context.Ratings
+                .Where(r => r.VendorId == vendorId)
+                .Select(r => (double?)r.Rate)
+                .AverageAsync() ?? 0.0;
         }
     }
 }

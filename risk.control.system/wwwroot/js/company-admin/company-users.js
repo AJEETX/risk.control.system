@@ -86,9 +86,9 @@
                 }
             },
             {
-                "data": "email",
+                "data": "rawEmail",
                 "mRender": function (data, type, row) {
-                    return '<span class="blue" title="' + row.rawEmail + '" data-bs-toggle="tooltip">' + row.rawEmail + '</span>'
+                    return '<span class="blue" title="' + data + '" data-bs-toggle="tooltip">' + data + '</span>'
                 }
             },
             {

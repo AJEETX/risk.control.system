@@ -68,22 +68,17 @@ namespace risk.control.system.Services.Common
                     var accessToken = context.TokenEndpointResponse!.AccessToken;
                     var httpClient = httpClientFactory.CreateClient();
                     httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-
                     var response = await httpClient.GetAsync(graphApiEndpointWithParams);
                     response.EnsureSuccessStatusCode();
-
                     var json = await response.Content.ReadAsStringAsync();
                     var azureADUserDetail = JsonConvert.DeserializeObject<AzureADUserDetail>(json);
-
                     user = await CreateOrUpdateExternalUserAsync(context.Principal, azureADUserDetail!);
                     var existing = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
                     if (existing != null)
                     {
                         claimsIdentity.RemoveClaim(existing);
                     }
-
                     claimsIdentity.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
-
                     if (!claimsIdentity.HasClaim(c => c.Type == ClaimTypes.Email))
                     {
                         claimsIdentity.AddClaim(new Claim(ClaimTypes.Email, email));
@@ -94,10 +89,7 @@ namespace risk.control.system.Services.Common
                         var claim = claimsIdentity.FindFirst(claimType);
                         if (claim != null) claimsIdentity.RemoveClaim(claim);
                     }
-                    var identityPrincipal = await signInManager.CreateUserPrincipalAsync(user);
-
-                    context.Principal = identityPrincipal;
-
+                    context.Principal = await signInManager.CreateUserPrincipalAsync(user);
                     await SignInWithTimeoutAsync(user);
                     return email;
                 }
@@ -124,17 +116,14 @@ namespace risk.control.system.Services.Common
         private async Task<ApplicationUser> CreateOrUpdateExternalUserAsync(ClaimsPrincipal principal, AzureADUserDetail azureADUserDetail)
         {
             var email = principal.FindFirstValue(ClaimTypes.Email) ?? principal.FindFirstValue("preferred_username") ?? principal.FindFirstValue(ClaimTypes.Upn);
-
             if (string.IsNullOrEmpty(email)) return null!;
             var azureRole = principal.FindFirstValue(ClaimTypes.Role) ?? principal.FindFirstValue("roles");
-
             var user = await _userManager.FindByEmailAsync(email);
             if (user != null)
             {
                 var currentRoles = await _userManager.GetRolesAsync(user);
                 if (!string.IsNullOrEmpty(azureRole) && !currentRoles.Contains(azureRole))
                 {
-                    // Optional: Remove old roles and add the new one
                     await _userManager.RemoveFromRolesAsync(user, currentRoles);
                     await EnsureRoleExistsAndAssign(user, azureRole);
                 }
@@ -142,22 +131,13 @@ namespace risk.control.system.Services.Common
             }
             var countryName = azureADUserDetail.Country;
             var countryCode = ExtractCountryCode(principal);
-
             var country = await _context.Country.FirstOrDefaultAsync(c => c.Name == countryName);
-
             var pincode = await _context.PinCode.Include(d => d.District).Include(s => s.State).Include(c => c.Country).FirstOrDefaultAsync(p => p.CountryId == country!.CountryId && p.Code == azureADUserDetail.PostalCode);
-
             var district = await _context.District.FirstOrDefaultAsync(d => d.Name == azureADUserDetail.City);
-
             if (pincode == null) throw new Exception($"Location configuration missing for country: {countryCode}");
-
-            // Handle Vendor/Company associations
             ClientCompany? company = RoleGroups.CompanyRoles.Contains(azureRole) ? await _context.ClientCompany.FirstOrDefaultAsync(c => !c.Deleted) : null;
-
             Vendor? vendor = RoleGroups.AgencyRoles.Contains(azureRole) ? await _context.Vendor.FirstOrDefaultAsync(v => !v.Deleted) : null;
-
             var appRole = Enum.TryParse<AppRoles>(azureRole, out var parsedRole) ? parsedRole : AppRoles.GUEST;
-
             user = new ApplicationUser
             {
                 UserName = email,
@@ -184,7 +164,6 @@ namespace risk.control.system.Services.Common
                 var errors = string.Join(", ", createResult.Errors.Select(e => e.Description));
                 throw new Exception($"User creation failed: {errors}");
             }
-
             await EnsureRoleExistsAndAssign(user, azureRole!);
             return user;
         }

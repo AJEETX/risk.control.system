@@ -8,23 +8,14 @@ namespace risk.control.system.Seeds
 {
     public static class AgencyUserSeed
     {
-        public static async Task Seed(ApplicationDbContext context,
-            IWebHostEnvironment webHostEnvironment,
-            UserManager<ApplicationUser> userManager,
+        public static async Task Seed(ApplicationDbContext context, IWebHostEnvironment env, UserManager<ApplicationUser> userManager,
             Vendor vendor, ICustomApiClient customApiCLient, IFileStorageService fileStorageService)
         {
             var pinCode = await context.PinCode.Include(p => p.District).Include(p => p.State).Include(p => p.Country).FirstOrDefaultAsync(p => p.PinCodeId == vendor.PinCodeId);
-
-            //Seed Vendor Admin
-            await AgencyAdmiSeed.Seed(context, webHostEnvironment, userManager, vendor, pinCode!, fileStorageService);
-
-            //Seed Vendor Supervisor
-            await SupervisorSeed.Seed(context, SUPERVISOR.CODE, webHostEnvironment, userManager, vendor, pinCode!, SUPERVISOR.PROFILE_IMAGE, SUPERVISOR.FIRST_NAME, SUPERVISOR.LAST_NAME, fileStorageService);
-
-            //Seed Vendor Agent
+            await AgencyAdminSeed.Seed(context, env, userManager, vendor, pinCode!, fileStorageService);
+            await SupervisorSeed.Seed(context, SUPERVISOR.CODE, env, userManager, vendor, pinCode!, SUPERVISOR.PROFILE_IMAGE, SUPERVISOR.FIRST_NAME, SUPERVISOR.LAST_NAME, fileStorageService);
             string agentEmailwithSuffix = AGENT.CODE + "@" + vendor.Email;
-            await AgentSeed.Seed(context, agentEmailwithSuffix, webHostEnvironment, customApiCLient, userManager, vendor, pinCode!, AGENT.PROFILE_IMAGE, AGENT.FIRST_NAME, AGENT.LAST_NAME,
-                fileStorageService, "110 Mahoneys Road");
+            await AgentSeed.Seed(context, agentEmailwithSuffix, env, customApiCLient, userManager, vendor, pinCode!, AGENT.PROFILE_IMAGE, AGENT.FIRST_NAME, AGENT.LAST_NAME, fileStorageService, "110 Mahoneys Road");
 
             //if (!System.Diagnostics.Debugger.IsAttached)
             //{

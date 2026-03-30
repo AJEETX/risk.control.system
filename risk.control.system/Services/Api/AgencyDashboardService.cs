@@ -41,18 +41,13 @@ namespace risk.control.system.Services.Api
             {
                 await using var _context = contextFactory.CreateDbContext();
                 var vendorUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == userEmail);
-
-                // Execute the first count
                 var taskCount = await GetCases(_context).CountAsync(c =>
                     c.VendorId == vendorUser!.VendorId &&
                     c.SubStatus == assigned2Agent &&
                     c.TaskedAgentEmail == userEmail);
-
-                // Execute the second count
                 var agentSubmittedCount = await GetCases(_context).CountAsync(t =>
                     t.TaskedAgentEmail == userEmail &&
                     t.SubStatus != assigned2Agent);
-
                 return new DashboardData
                 {
                     FirstBlockName = "Tasks",
@@ -74,14 +69,11 @@ namespace risk.control.system.Services.Api
         {
             try
             {
-                // Execute queries in parallel
                 var claimsAllocateTask = GetAgencyAllocateCount(userEmail);
                 var claimsVerifiedTask = GetAgencyVerifiedCount(userEmail);
                 var claimsActiveCountTask = GetSuperVisorActiveCount(userEmail);
                 var claimsCompletedTask = GetAgencyyCompleted(userEmail);
-
                 await Task.WhenAll(claimsAllocateTask, claimsVerifiedTask, claimsActiveCountTask, claimsCompletedTask);
-
                 return new DashboardData
                 {
                     FirstBlockName = "Allocate/Enquiry",
@@ -110,16 +102,11 @@ namespace risk.control.system.Services.Api
             await using var _context = contextFactory.CreateDbContext();
             var vendorUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == userEmail);
             var query = GetAgencyClaims(_context).Where(a => a.VendorId == vendorUser!.VendorId && a.Status != finished);
-
             if (vendorUser!.IsVendorAdmin)
             {
-                return await query.CountAsync(a => a.SubStatus == assigned2Agent ||
-                                                   a.SubStatus == submitted2Assessor ||
-                                                   a.SubStatus == reply2Assessor);
+                return await query.CountAsync(a => a.SubStatus == assigned2Agent || a.SubStatus == submitted2Assessor || a.SubStatus == reply2Assessor);
             }
-
-            return await query.CountAsync(a => (a.SubStatus == assigned2Agent && a.AllocatingSupervisordEmail == userEmail) ||
-                                               (a.SubStatus == submitted2Assessor && a.SubmittingSupervisordEmail == userEmail) ||
+            return await query.CountAsync(a => (a.SubStatus == assigned2Agent && a.AllocatingSupervisordEmail == userEmail) || (a.SubStatus == submitted2Assessor && a.SubmittingSupervisordEmail == userEmail) ||
                                                (a.SubStatus == reply2Assessor && a.SubmittingSupervisordEmail == userEmail));
         }
 
@@ -143,19 +130,16 @@ namespace risk.control.system.Services.Api
             await using var _context = contextFactory.CreateDbContext();
             var agencyUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == userEmail);
             var query = GetAgencyClaims(_context).Where(c => c.VendorId == agencyUser!.VendorId && c.Status == finished);
-
             if (agencyUser!.IsVendorAdmin)
             {
                 return await query.CountAsync(item => item.SubStatus == approved || item.SubStatus == rejectd);
             }
-
             return await query.CountAsync(item => item.SubmittingSupervisordEmail == userEmail &&
                 (item.SubStatus == approved || item.SubStatus == rejectd));
         }
 
         private static IQueryable<InvestigationTask> GetCases(ApplicationDbContext context)
         {
-            // Do NOT use a 'using' block here
             return context.Investigations
                 .AsNoTracking()
                 .Include(c => c.PolicyDetail)

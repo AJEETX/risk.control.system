@@ -6,127 +6,64 @@ namespace risk.control.system.Seeds
     {
         public static async Task Seed(ApplicationDbContext context)
         {
-            #region BENEFICIARY-RELATION
+            await Relation(context);
 
-            var brother = new BeneficiaryRelation
-            {
-                Name = "BROTHER",
-                Code = "BROTHER",
-                Updated = DateTime.UtcNow,
-            };
+            await Casenabler(context);
+
+            await CostCentre(context);
+
+        }
+        private static async Task Relation(ApplicationDbContext context)
+        {
+            var brother = new BeneficiaryRelation { Name = "BROTHER", Code = "BROTHER", Updated = DateTime.UtcNow };
             var brotherEntity = await context.AddAsync(brother);
 
-            var father = new BeneficiaryRelation
-            {
-                Name = "FATHER",
-                Code = "FATHER",
-                Updated = DateTime.UtcNow,
-            };
+            var father = new BeneficiaryRelation { Name = "FATHER", Code = "FATHER", Updated = DateTime.UtcNow };
             var fatherEntity = await context.AddAsync(father);
 
-            var mother = new BeneficiaryRelation
-            {
-                Name = "MOTHER",
-                Code = "MOTHER",
-                Updated = DateTime.UtcNow,
-            };
+            var mother = new BeneficiaryRelation { Name = "MOTHER", Code = "MOTHER", Updated = DateTime.UtcNow };
             var motherEntity = await context.AddAsync(mother);
 
-
-            var sister = new BeneficiaryRelation
-            {
-                Name = "SISTER",
-                Code = "SISTER",
-                Updated = DateTime.UtcNow,
-            };
+            var sister = new BeneficiaryRelation { Name = "SISTER", Code = "SISTER", Updated = DateTime.UtcNow };
             var sisterEntity = await context.AddAsync(sister);
 
-            var uncle = new BeneficiaryRelation
-            {
-                Name = "UNCLE",
-                Code = "UNCLE",
-                Updated = DateTime.UtcNow,
-            };
+            var uncle = new BeneficiaryRelation { Name = "UNCLE", Code = "UNCLE", Updated = DateTime.UtcNow };
             var uncleEntity = await context.AddAsync(uncle);
 
-            var aunty = new BeneficiaryRelation
-            {
-                Name = "AUNTY",
-                Code = "AUNTY",
-                Updated = DateTime.UtcNow,
-            };
+            var aunty = new BeneficiaryRelation { Name = "AUNTY", Code = "AUNTY", Updated = DateTime.UtcNow };
             var auntyEntity = await context.AddAsync(aunty);
 
-            var newphew = new BeneficiaryRelation
-            {
-                Name = "NEWPHEW",
-                Code = "NEWPHEW",
-                Updated = DateTime.UtcNow,
-            };
+            var newphew = new BeneficiaryRelation { Name = "NEWPHEW", Code = "NEWPHEW", Updated = DateTime.UtcNow };
             var newphewEntity = await context.AddAsync(newphew);
 
-            var niece = new BeneficiaryRelation
-            {
-                Name = "NIECE",
-                Code = "NIECE",
-                Updated = DateTime.UtcNow,
-            };
+            var niece = new BeneficiaryRelation { Name = "NIECE", Code = "NIECE", Updated = DateTime.UtcNow };
             var nieceEntity = await context.AddAsync(niece);
 
-            var inlaw = new BeneficiaryRelation
-            {
-                Name = "INLAW",
-                Code = "INLAW",
-                Updated = DateTime.UtcNow,
-            };
+            var inlaw = new BeneficiaryRelation { Name = "INLAW", Code = "INLAW", Updated = DateTime.UtcNow };
             var inlawEntity = await context.AddAsync(inlaw);
 
-            var unknown = new BeneficiaryRelation
-            {
-                Name = "UNKNOWN",
-                Code = "UNKNOWN",
-                Updated = DateTime.UtcNow,
-            };
+            var unknown = new BeneficiaryRelation { Name = "UNKNOWN", Code = "UNKNOWN", Updated = DateTime.UtcNow };
             var unknownEntity = await context.AddAsync(unknown);
+        }
 
-            #endregion
-
+        private static async Task Casenabler(ApplicationDbContext context)
+        {
             #region CASE ENABLER
-            var demoCaseEnabler = new CaseEnabler
-            {
-                Name = "DEMO",
-                Code = "DEMO",
-                Updated = DateTime.UtcNow,
-            };
+            var demoCaseEnabler = new CaseEnabler { Name = "DEMO", Code = "DEMO", Updated = DateTime.UtcNow };
             var demoCaseEnablerEntity = await context.CaseEnabler.AddAsync(demoCaseEnabler);
 
-            var doubtCaseEnabler = new CaseEnabler
-            {
-                Name = "DOUBT-DETAILS",
-                Code = "DOUBT",
-                Updated = DateTime.UtcNow,
-            };
+            var doubtCaseEnabler = new CaseEnabler { Name = "DOUBT-DETAILS", Code = "DOUBT", Updated = DateTime.UtcNow };
             var doubtCaseEnablerEntity = await context.CaseEnabler.AddAsync(doubtCaseEnabler);
 
-            var highAmountCaseEnabler = new CaseEnabler
-            {
-                Name = "HIGH-PREMIUM",
-                Code = "HIGH",
-                Updated = DateTime.UtcNow,
-            };
+            var highAmountCaseEnabler = new CaseEnabler { Name = "HIGH-PREMIUM", Code = "HIGH", Updated = DateTime.UtcNow };
             var highAmountCaseEnablerEntity = await context.CaseEnabler.AddAsync(highAmountCaseEnabler);
 
-            var unknownCaseEnabler = new CaseEnabler
-            {
-                Name = "UNKNOWN",
-                Code = "UNKNOWN",
-                Updated = DateTime.UtcNow,
-            };
+            var unknownCaseEnabler = new CaseEnabler { Name = "UNKNOWN", Code = "UNKNOWN", Updated = DateTime.UtcNow };
             var unknownCaseEnablerCaseEnablerEntity = await context.CaseEnabler.AddAsync(unknownCaseEnabler);
             #endregion
-
-            #region COST CENTRE
-
+        }
+        private static async Task CostCentre(ApplicationDbContext context)
+        {
             var demoCentre = new CostCentre
             {
                 Name = "DEMO",
@@ -162,8 +99,6 @@ namespace risk.control.system.Seeds
             };
 
             var unknownCostCentreEntity = await context.CostCentre.AddAsync(unknownCostCentre);
-            #endregion
-
         }
     }
 }

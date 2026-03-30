@@ -6,23 +6,15 @@ using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Seeds
 {
-    public static class AgencyAdmiSeed
+    public static class AgencyAdminSeed
     {
         public static async Task Seed(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, UserManager<ApplicationUser> userManager, Vendor vendor, PinCode pinCode, IFileStorageService fileStorageService)
         {
-            var noUserImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", NO_USER);
             string adminEmailwithSuffix = AGENCY_ADMIN.CODE + "@" + vendor.Email;
-
             string adminImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", Path.GetFileName(AGENCY_ADMIN.PROFILE_IMAGE));
-            var adminImage = File.ReadAllBytes(adminImagePath);
-
-            if (adminImage == null)
-            {
-                adminImage = File.ReadAllBytes(noUserImagePath);
-            }
+            var adminImage = await File.ReadAllBytesAsync(adminImagePath);
             var extension = Path.GetExtension(adminImagePath);
             var (fileName, relativePath) = await fileStorageService.SaveAsync(adminImage, extension, vendor.Email, "user");
-
             var vendorAdmin = new ApplicationUser()
             {
                 UserName = adminEmailwithSuffix,
@@ -33,8 +25,6 @@ namespace risk.control.system.Seeds
                 PhoneNumberConfirmed = true,
                 Active = true,
                 Password = TestingData,
-                IsSuperAdmin = false,
-                IsClientAdmin = false,
                 IsVendorAdmin = true,
                 Addressline = vendor.Addressline,
                 PhoneNumber = string.Equals(pinCode.Country!.Code, "au", StringComparison.OrdinalIgnoreCase) ? SAMPLE_MOBILE_AUSTRALIA : SAMPLE_MOBILE_INDIA,

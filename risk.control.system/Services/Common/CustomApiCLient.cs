@@ -12,11 +12,12 @@ namespace risk.control.system.Services.Common
 
         Task<string> GetAddressFromLatLong(double latitude, double longitude);
 
-        Task<(string distance, float distanceInMetres, string duration, int durationInSeconds, string map)> GetMap(double startLat, double startLong, double endLat, double endLong, string startLbl = "S", string endLbl = "E", string mapHeight = "300", string mapWidth = "200", string startColor = "red", string endColor = "green");
+        Task<(string distance, float distanceInMetres, string duration, int durationInSeconds, string map)> GetMap(double startLat, double startLong, double endLat, double endLong);
     }
 
     internal class CustomApiClient : ICustomApiClient
     {
+        private string startLbl = "S", endLbl = "E", startColor = "red", endColor = "green";
         private static readonly string geocodeUrl = "https://maps.googleapis.com/maps/api/geocode/json";
         private readonly ILogger<CustomApiClient> logger;
         private readonly IHttpClientFactory httpClientFactory;
@@ -33,26 +34,16 @@ namespace risk.control.system.Services.Common
             {
                 var googleKey = EnvHelper.Get("GOOGLE_MAP_KEY");
                 string url = $"https://maps.googleapis.com/maps/api/geocode/json?address={Uri.EscapeDataString(address)}&key={googleKey}";
-
-                // Send the GET request
                 var httpClient = httpClientFactory.CreateClient();
                 HttpResponseMessage response = await httpClient.GetAsync(url);
                 response.EnsureSuccessStatusCode();
-
-                // Read the response content as a string
                 string content = await response.Content.ReadAsStringAsync();
-
-                // Parse the response JSON
                 JObject jsonResponse = JObject.Parse(content);
-
-                // Check if the status is OK
                 if (jsonResponse["status"]!.ToString() == "OK")
                 {
-                    // Extract latitude and longitude
                     var location = jsonResponse["results"]![0]!["geometry"]!["location"]!;
                     string latitude = location["lat"]!.ToObject<string>()!;
                     string longitude = location["lng"]!.ToObject<string>()!;
-
                     return (latitude.ToString(), longitude.ToString());
                 }
                 else
@@ -74,23 +65,13 @@ namespace risk.control.system.Services.Common
         {
             try
             {
-                // Construct the request URL
                 var requestUrl = $"{geocodeUrl}?latlng={latitude},{longitude}&key={EnvHelper.Get("GOOGLE_MAP_KEY")}";
-
                 var httpClient = httpClientFactory.CreateClient();
-
-                // Make the HTTP GET request to the Google Geocoding API
                 var response = await httpClient.GetStringAsync(requestUrl);
-
-                // Parse the JSON response
                 var jsonResponse = JObject.Parse(response);
-
-                // Check if the response contains results
                 if (jsonResponse["status"]!.ToString() == "OK")
                 {
-                    // Get the formatted address from the response
-                    var address = jsonResponse["results"]![0]!["formatted_address"]!.ToString();
-                    return address;
+                    return jsonResponse["results"]![0]!["formatted_address"]!.ToString();
                 }
                 else
                 {
@@ -105,13 +86,12 @@ namespace risk.control.system.Services.Common
             }
         }
 
-        public async Task<(string distance, float distanceInMetres, string duration, int durationInSeconds, string map)> GetMap(double startLat, double startLong, double endLat, double endLong, string startLbl = "S", string endLbl = "E", string mapHeight = "300", string mapWidth = "200", string startColor = "red", string endColor = "green")
+        public async Task<(string distance, float distanceInMetres, string duration, int durationInSeconds, string map)> GetMap(double startLat, double startLong, double endLat, double endLong)
         {
             try
             {
                 var httpClient = httpClientFactory.CreateClient();
-
-                var driving = await GetDrivingDistance(httpClient, (startLat.ToString() + "," + startLong.ToString()), (endLat.ToString() + "," + endLong.ToString()));
+                var (Distance, DistanceInMetres, Duration, DurationInTime) = await GetDrivingDistance(httpClient, (startLat.ToString() + "," + startLong.ToString()), (endLat.ToString() + "," + endLong.ToString()));
                 string directionsUrl = $"https://maps.googleapis.com/maps/api/directions/json?origin={startLat},{startLong}&destination={endLat},{endLong}&mode=driving&key={EnvHelper.Get("GOOGLE_MAP_KEY")}";
 
                 var response = await httpClient.GetStringAsync(directionsUrl);
@@ -130,7 +110,7 @@ namespace risk.control.system.Services.Common
                     encodedPolyline,
                     EnvHelper.Get("GOOGLE_MAP_KEY")
                     );
-                return (driving.Distance, driving.DistanceInMetres, driving.Duration, driving.DurationInTime, distanceMap);
+                return (Distance, DistanceInMetres, Duration, DurationInTime, distanceMap);
             }
             catch (Exception ex)
             {
