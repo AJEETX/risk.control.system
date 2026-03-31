@@ -51,8 +51,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
         public async Task<IActionResult> ReplyQuery(long claimId, CaseAgencyModel request, IFormFile? document)
         {
             var userEmail = User.Identity?.Name ?? "Anonymous";
-            var redirectOnSuccess = RedirectToAction(nameof(VendorInvestigationController.Allocate),
-                                                   ControllerName<VendorInvestigationController>.Name);
+            var redirectOnSuccess = RedirectToAction(nameof(VendorInvestigationController.Allocate), ControllerName<VendorInvestigationController>.Name);
             if (!ModelState.IsValid)
             {
                 _notifyService.Error("NOT FOUND !!!..");
@@ -60,13 +59,13 @@ namespace risk.control.system.Controllers.AgencyAdmin
             }
             try
             {
-                if (document != null && document.Length > 0)
+                if (document?.Length > 0)
                 {
                     var (isValid, errorMessage) = ValidateDocument(document);
                     if (!isValid)
                     {
                         _notifyService.Error(errorMessage!);
-                        return RedirectToAction("ReplyEnquiry", ControllerName<VendorInvestigationController>.Name, new { id = claimId });
+                        return RedirectToAction(nameof(VendorInvestigationController.ReplyEnquiry), ControllerName<VendorInvestigationController>.Name, new { id = claimId });
                     }
                 }
                 var enquiry = request.InvestigationReport!.EnquiryRequest!;

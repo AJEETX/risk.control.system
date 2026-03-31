@@ -27,10 +27,7 @@ namespace risk.control.system.Services.AgencyAdmin
         {
             try
             {
-                var vendorAgent = await _context.ApplicationUser.AsNoTracking()
-                    .Include(a => a.Vendor)
-                    .FirstOrDefaultAsync(u => u.Id.ToString() == selectedCase);
-
+                var vendorAgent = await _context.ApplicationUser.AsNoTracking().Include(a => a.Vendor).FirstOrDefaultAsync(u => u.Id.ToString() == selectedCase);
                 if (vendorAgent == null)
                 {
                     return new AllocateVendorAgentResult
@@ -39,7 +36,6 @@ namespace risk.control.system.Services.AgencyAdmin
                         ErrorMessage = "User not found"
                     };
                 }
-
                 if (!vendorAgent.VendorId.HasValue)
                 {
                     return new AllocateVendorAgentResult
@@ -48,9 +44,7 @@ namespace risk.control.system.Services.AgencyAdmin
                         ErrorMessage = "Vendor not mapped to agent"
                     };
                 }
-
                 var claim = await _vendorInvestigationDetailService.AssignToVendorAgent(vendorAgent.Email!, allocatedByEmail!, vendorAgent.VendorId.Value, caseId);
-
                 if (claim == null)
                 {
                     return new AllocateVendorAgentResult
@@ -59,7 +53,6 @@ namespace risk.control.system.Services.AgencyAdmin
                         ErrorMessage = $"Error occurred while assigning case {caseId}"
                     };
                 }
-
                 return new AllocateVendorAgentResult
                 {
                     Success = true,
@@ -70,10 +63,7 @@ namespace risk.control.system.Services.AgencyAdmin
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex,
-                    "Allocation failed for Case {ClaimId} by {User}",
-                    caseId,
-                    allocatedByEmail ?? "Anonymous");
+                _logger.LogError(ex, "Allocation failed for Case {ClaimId} by {User}", caseId, allocatedByEmail ?? "Anonymous");
 
                 return new AllocateVendorAgentResult
                 {

@@ -32,7 +32,7 @@ namespace risk.control.system.Services.Creator
                 return (Array.Empty<byte>(), validRecords, errors);
             }
             var zipFileData = await File.ReadAllBytesAsync(filePath);
-            using var archive = new ZipArchive(new MemoryStream(zipFileData), ZipArchiveMode.Read);
+            await using var archive = new ZipArchive(new MemoryStream(zipFileData), ZipArchiveMode.Read);
             var csvEntry = archive.Entries.FirstOrDefault(e => e.FullName.EndsWith(".csv", StringComparison.OrdinalIgnoreCase));
             if (csvEntry == null)
             {
@@ -40,8 +40,7 @@ namespace risk.control.system.Services.Creator
                 return (zipFileData, validRecords, errors);
             }
             using var reader = new StreamReader(csvEntry.Open());
-            var config = GetCsvConfiguration(errors);
-            using var csv = new CsvReader(reader, config);
+            using var csv = new CsvReader(reader, GetCsvConfiguration(errors));
             try
             {
                 if (!await csv.ReadAsync() || !csv.ReadHeader())
@@ -49,7 +48,6 @@ namespace risk.control.system.Services.Creator
                     errors.Add("CSV file is empty or has no header.");
                     return (zipFileData, validRecords, errors);
                 }
-
                 if (csv.HeaderRecord?.Length < 27) // 26 pipes = 27 columns
                 {
                     errors.Add("The CSV file has fewer columns than expected.");

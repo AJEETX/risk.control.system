@@ -57,13 +57,10 @@ namespace risk.control.system.Services.Creator
             try
             {
                 var currentUser = await context.ApplicationUser.AsNoTracking().Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == userEmail);
-
                 var reportTemplate = await cloneService.DeepCloneReportTemplate(currentUser!.ClientCompanyId!.Value, model.PolicyDetailDto.InsuranceType.GetValueOrDefault());
                 context.ReportTemplates.Add(reportTemplate);
                 await context.SaveChangesAsync();
-
                 var (fileName, relativePath) = await fileStorageService.SaveAsync(model.Document!, "Case", model.PolicyDetailDto.ContractNumber);
-
                 var caseTask = new InvestigationTask
                 {
                     PolicyDetail = new PolicyDetail
@@ -92,13 +89,10 @@ namespace risk.control.system.Services.Creator
                     ClientCompanyId = currentUser.ClientCompanyId,
                     ReportTemplateId = reportTemplate.Id
                 };
-
                 context.Investigations.Add(caseTask);
                 await numberService.SaveNumberSequence("PX");
                 var saved = await context.SaveChangesAsync() > 0;
-
                 await timelineService.UpdateTaskStatus(caseTask.Id, userEmail);
-
                 return saved ? caseTask : null!;
             }
             catch (Exception ex)
@@ -113,19 +107,15 @@ namespace risk.control.system.Services.Creator
             try
             {
                 var existingPolicy = await context.Investigations.Include(c => c.PolicyDetail).FirstOrDefaultAsync(c => c.Id == model.Id);
-
                 var reportTemplate = await cloneService.DeepCloneReportTemplate(existingPolicy!.ClientCompanyId!.Value, model.PolicyDetailDto.InsuranceType.GetValueOrDefault());
                 context.ReportTemplates.Add(reportTemplate);
                 await context.SaveChangesAsync();
-
                 if (model.Document is not null)
                 {
                     var (fileName, relativePath) = await fileStorageService.SaveAsync(model.Document, "Case", model.PolicyDetailDto.ContractNumber);
-
                     existingPolicy.PolicyDetail!.DocumentPath = relativePath;
                     existingPolicy.PolicyDetail.DocumentImageExtension = Path.GetExtension(fileName);
                 }
-
                 existingPolicy.PolicyDetail!.ContractNumber = WebUtility.HtmlEncode(model.PolicyDetailDto.ContractNumber.ToUpper());
                 existingPolicy.PolicyDetail.InsuranceType = model.PolicyDetailDto.InsuranceType;
                 existingPolicy.PolicyDetail.InvestigationServiceTypeId = model.PolicyDetailDto.InvestigationServiceTypeId;
@@ -137,11 +127,9 @@ namespace risk.control.system.Services.Creator
                 existingPolicy.PolicyDetail.CostCentreId = model.PolicyDetailDto.CostCentreId;
                 existingPolicy.Updated = DateTime.UtcNow;
                 existingPolicy.UpdatedBy = userEmail;
-
                 existingPolicy.ReportTemplateId = reportTemplate.Id;
                 context.Investigations.Update(existingPolicy);
                 var saved = await context.SaveChangesAsync() > 0;
-
                 return saved ? existingPolicy : null!;
             }
             catch (Exception ex)
@@ -155,9 +143,7 @@ namespace risk.control.system.Services.Creator
         {
             try
             {
-                var caseTask = await context.Investigations.Include(c => c.PolicyDetail)
-                   .FirstOrDefaultAsync(c => c.Id == customerDetail.InvestigationTaskId);
-
+                var caseTask = await context.Investigations.Include(c => c.PolicyDetail).FirstOrDefaultAsync(c => c.Id == customerDetail.InvestigationTaskId);
                 if (customerDetail?.ProfileImage is not null)
                 {
                     var (fileName, relativePath) = await fileStorageService.SaveAsync(customerDetail?.ProfileImage!, "Case", caseTask!.PolicyDetail!.ContractNumber);
@@ -166,34 +152,22 @@ namespace risk.control.system.Services.Creator
                 }
                 caseTask!.UpdatedBy = userEmail;
                 caseTask.Updated = DateTime.UtcNow;
-
                 var textInfo = CultureInfo.CurrentCulture.TextInfo;
                 customerDetail!.Name = WebUtility.HtmlEncode(textInfo.ToTitleCase(customerDetail.Name.ToLower()));
-
                 customerDetail.PhoneNumber = customerDetail.PhoneNumber.TrimStart('0');
                 customerDetail.CountryId = customerDetail.SelectedCountryId;
                 customerDetail.StateId = customerDetail.SelectedStateId;
                 customerDetail.DistrictId = customerDetail.SelectedDistrictId;
                 customerDetail.PinCodeId = customerDetail.SelectedPincodeId;
-
-                var pincode = await context.PinCode.AsNoTracking()
-                    .Include(p => p.District)
-                    .Include(p => p.State)
-                    .Include(p => p.Country)
-                    .FirstOrDefaultAsync(p => p.PinCodeId == customerDetail.PinCodeId);
-
+                var pincode = await context.PinCode.AsNoTracking().Include(p => p.District).Include(p => p.State).Include(p => p.Country).FirstOrDefaultAsync(p => p.PinCodeId == customerDetail.PinCodeId);
                 var address = customerDetail.Addressline + ", " + pincode!.District!.Name + ", " + pincode.State!.Name + ", " + pincode.Country!.Code;
                 var latLong = await customApiCLient.GetCoordinatesFromAddressAsync(address);
                 var customerLatLong = latLong.Latitude + "," + latLong.Longitude;
                 customerDetail.Latitude = latLong.Latitude;
                 customerDetail.Longitude = latLong.Longitude;
-
-                var url = string.Format("https://maps.googleapis.com/maps/api/staticmap?center={0}&zoom=14&size={{0}}x{{1}}&maptype=roadmap&markers=color:red%7Clabel:A%7C{0}&key={1}",
-                    customerLatLong, EnvHelper.Get("GOOGLE_MAP_KEY"));
+                var url = string.Format("https://maps.googleapis.com/maps/api/staticmap?center={0}&zoom=14&size={{0}}x{{1}}&maptype=roadmap&markers=color:red%7Clabel:A%7C{0}&key={1}", customerLatLong, EnvHelper.Get("GOOGLE_MAP_KEY"));
                 customerDetail.CustomerLocationMap = url;
-
                 var addedClaim = context.CustomerDetail.Add(customerDetail);
-
                 context.Investigations.Update(caseTask);
                 return await context.SaveChangesAsync() > 0;
             }
@@ -208,9 +182,7 @@ namespace risk.control.system.Services.Creator
         {
             try
             {
-                var caseTask = await context.Investigations.Include(c => c.PolicyDetail)
-                    .FirstOrDefaultAsync(c => c.Id == customerDetail.InvestigationTaskId);
-
+                var caseTask = await context.Investigations.Include(c => c.PolicyDetail).FirstOrDefaultAsync(c => c.Id == customerDetail.InvestigationTaskId);
                 if (customerDetail?.ProfileImage is not null)
                 {
                     var (fileName, relativePath) = await fileStorageService.SaveAsync(customerDetail.ProfileImage, "Case", caseTask!.PolicyDetail!.ContractNumber);
@@ -225,30 +197,20 @@ namespace risk.control.system.Services.Creator
                 caseTask!.UpdatedBy = userEmail;
                 caseTask.Updated = DateTime.UtcNow;
                 customerDetail.PhoneNumber = customerDetail.PhoneNumber.TrimStart('0');
-
                 var textInfo = CultureInfo.CurrentCulture.TextInfo;
                 customerDetail.Name = WebUtility.HtmlEncode(textInfo.ToTitleCase(customerDetail.Name.ToLower()));
-
                 customerDetail.CountryId = customerDetail.SelectedCountryId;
                 customerDetail.StateId = customerDetail.SelectedStateId;
                 customerDetail.DistrictId = customerDetail.SelectedDistrictId;
                 customerDetail.PinCodeId = customerDetail.SelectedPincodeId;
-
-                var pincode = await context.PinCode.AsNoTracking()
-                        .Include(p => p.District)
-                        .Include(p => p.State)
-                        .Include(p => p.Country)
-                        .FirstOrDefaultAsync(p => p.PinCodeId == customerDetail.PinCodeId);
-
+                var pincode = await context.PinCode.AsNoTracking().Include(p => p.District).Include(p => p.State).Include(p => p.Country).FirstOrDefaultAsync(p => p.PinCodeId == customerDetail.PinCodeId);
                 var address = customerDetail.Addressline + ", " + pincode!.District!.Name + ", " + pincode.State!.Name + ", " + pincode.Country!.Code;
                 var latLong = await customApiCLient.GetCoordinatesFromAddressAsync(address);
                 var customerLatLong = latLong.Latitude + "," + latLong.Longitude;
                 customerDetail.Latitude = latLong.Latitude;
                 customerDetail.Longitude = latLong.Longitude;
-                var url = string.Format("https://maps.googleapis.com/maps/api/staticmap?center={0}&zoom=14&size={{0}}x{{1}}&maptype=roadmap&markers=color:red%7Clabel:A%7C{0}&key={1}",
-                    customerLatLong, EnvHelper.Get("GOOGLE_MAP_KEY"));
+                var url = string.Format("https://maps.googleapis.com/maps/api/staticmap?center={0}&zoom=14&size={{0}}x{{1}}&maptype=roadmap&markers=color:red%7Clabel:A%7C{0}&key={1}", customerLatLong, EnvHelper.Get("GOOGLE_MAP_KEY"));
                 customerDetail.CustomerLocationMap = url;
-
                 context.CustomerDetail.Attach(customerDetail);
                 context.Entry(customerDetail).State = EntityState.Modified;
                 context.Investigations.Update(caseTask);
@@ -265,9 +227,7 @@ namespace risk.control.system.Services.Creator
         {
             try
             {
-                var caseTask = await context.Investigations.Include(c => c.PolicyDetail)
-                    .FirstOrDefaultAsync(m => m.Id == beneficiary.InvestigationTaskId);
-                if (beneficiary?.ProfileImage != null)
+                var caseTask = await context.Investigations.Include(c => c.PolicyDetail).FirstOrDefaultAsync(m => m.Id == beneficiary.InvestigationTaskId); if (beneficiary?.ProfileImage != null)
                 {
                     var (fileName, relativePath) = await fileStorageService.SaveAsync(beneficiary.ProfileImage!, "Case", caseTask!.PolicyDetail!.ContractNumber);
                     beneficiary.ProfilePictureExtension = Path.GetExtension(fileName);
@@ -275,35 +235,25 @@ namespace risk.control.system.Services.Creator
                 }
                 var textInfo = CultureInfo.CurrentCulture.TextInfo;
                 beneficiary!.Name = WebUtility.HtmlEncode(textInfo.ToTitleCase(beneficiary.Name.ToLower()));
-
                 beneficiary.Updated = DateTime.UtcNow;
                 beneficiary.UpdatedBy = userEmail;
                 caseTask!.UpdatedBy = userEmail;
                 caseTask.Updated = DateTime.UtcNow;
                 caseTask.IsReady2Assign = true;
                 beneficiary.PhoneNumber = beneficiary.PhoneNumber.TrimStart('0');
-
                 beneficiary.CountryId = beneficiary.SelectedCountryId;
                 beneficiary.StateId = beneficiary.SelectedStateId;
                 beneficiary.DistrictId = beneficiary.SelectedDistrictId;
                 beneficiary.PinCodeId = beneficiary.SelectedPincodeId;
-
-                var pincode = await context.PinCode.AsNoTracking()
-                    .Include(p => p.District)
-                        .Include(p => p.State)
-                        .Include(p => p.Country)
-                    .FirstOrDefaultAsync(p => p.PinCodeId == beneficiary.PinCodeId);
-
+                var pincode = await context.PinCode.AsNoTracking().Include(p => p.District).Include(p => p.State).Include(p => p.Country).FirstOrDefaultAsync(p => p.PinCodeId == beneficiary.PinCodeId);
                 var address = beneficiary.Addressline + ", " + pincode!.District!.Name + ", " + pincode.State!.Name + ", " + pincode.Country!.Code;
                 var latlong = await customApiCLient.GetCoordinatesFromAddressAsync(address);
                 var customerLatLong = latlong.Latitude + "," + latlong.Longitude;
-                var url = string.Format("https://maps.googleapis.com/maps/api/staticmap?center={0}&zoom=14&size={{0}}x{{1}}&maptype=roadmap&markers=color:red%7Clabel:A%7C{0}&key={1}",
-                    customerLatLong, EnvHelper.Get("GOOGLE_MAP_KEY"));
+                var url = string.Format("https://maps.googleapis.com/maps/api/staticmap?center={0}&zoom=14&size={{0}}x{{1}}&maptype=roadmap&markers=color:red%7Clabel:A%7C{0}&key={1}", customerLatLong, EnvHelper.Get("GOOGLE_MAP_KEY"));
                 beneficiary.BeneficiaryLocationMap = url;
                 beneficiary.Latitude = latlong.Latitude;
                 beneficiary.Longitude = latlong.Longitude;
                 context.BeneficiaryDetail.Add(beneficiary);
-
                 context.Investigations.Update(caseTask);
                 return await context.SaveChangesAsync() > 0;
             }
@@ -318,9 +268,7 @@ namespace risk.control.system.Services.Creator
         {
             try
             {
-                var caseTask = await context.Investigations.Include(c => c.PolicyDetail)
-                    .FirstOrDefaultAsync(m => m.Id == beneficiary.InvestigationTaskId);
-
+                var caseTask = await context.Investigations.Include(c => c.PolicyDetail).FirstOrDefaultAsync(m => m.Id == beneficiary.InvestigationTaskId);
                 if (beneficiary?.ProfileImage != null)
                 {
                     var (fileName, relativePath) = await fileStorageService.SaveAsync(beneficiary.ProfileImage!, "Case", caseTask!.PolicyDetail!.ContractNumber);
@@ -335,36 +283,25 @@ namespace risk.control.system.Services.Creator
                         beneficiary!.ImagePath = existingBeneficiary.ImagePath;
                     }
                 }
-
                 caseTask!.UpdatedBy = userEmail;
                 caseTask.Updated = DateTime.UtcNow;
                 caseTask.SubStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR;
                 caseTask.IsReady2Assign = true;
                 beneficiary!.PhoneNumber = beneficiary.PhoneNumber.TrimStart('0');
-
                 var textInfo = CultureInfo.CurrentCulture.TextInfo;
                 beneficiary.Name = WebUtility.HtmlEncode(textInfo.ToTitleCase(beneficiary.Name.ToLower()));
-
                 beneficiary.CountryId = beneficiary.SelectedCountryId;
                 beneficiary.StateId = beneficiary.SelectedStateId;
                 beneficiary.DistrictId = beneficiary.SelectedDistrictId;
                 beneficiary.PinCodeId = beneficiary.SelectedPincodeId;
-
-                var pincode = await context.PinCode.AsNoTracking()
-                    .Include(p => p.District)
-                        .Include(p => p.State)
-                        .Include(p => p.Country)
-                    .FirstOrDefaultAsync(p => p.PinCodeId == beneficiary.PinCodeId);
-
+                var pincode = await context.PinCode.AsNoTracking().Include(p => p.District).Include(p => p.State).Include(p => p.Country).FirstOrDefaultAsync(p => p.PinCodeId == beneficiary.PinCodeId);
                 var address = beneficiary.Addressline + ", " + pincode!.District!.Name + ", " + pincode.State!.Name + ", " + pincode.Country!.Code;
                 var latlong = await customApiCLient.GetCoordinatesFromAddressAsync(address);
                 var customerLatLong = latlong.Latitude + "," + latlong.Longitude;
                 beneficiary.Latitude = latlong.Latitude;
                 beneficiary.Longitude = latlong.Longitude;
-                var url = string.Format("https://maps.googleapis.com/maps/api/staticmap?center={0}&zoom=14&size={{0}}x{{1}}&maptype=roadmap&markers=color:red%7Clabel:A%7C{0}&key={1}",
-                    customerLatLong, EnvHelper.Get("GOOGLE_MAP_KEY"));
+                var url = string.Format("https://maps.googleapis.com/maps/api/staticmap?center={0}&zoom=14&size={{0}}x{{1}}&maptype=roadmap&markers=color:red%7Clabel:A%7C{0}&key={1}", customerLatLong, EnvHelper.Get("GOOGLE_MAP_KEY"));
                 beneficiary.BeneficiaryLocationMap = url;
-
                 context.BeneficiaryDetail.Attach(beneficiary);
                 context.Entry(beneficiary).State = EntityState.Modified;
                 context.Investigations.Update(caseTask);

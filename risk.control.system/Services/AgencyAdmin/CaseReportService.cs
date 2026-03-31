@@ -22,7 +22,50 @@ namespace risk.control.system.Services.AgencyAdmin
 
         public async Task<CaseAgencyModel> GetInvestigateReport(string userEmail, long selectedcase)
         {
-            var caseTask = await _context.Investigations.AsNoTracking()
+            var caseTask = await GetCaseDetail(selectedcase);
+            if (caseTask is null) return null!;
+
+            var beneficiaryDetails = await _context.BeneficiaryDetail.AsNoTracking().Include(c => c.PinCode).Include(c => c.BeneficiaryRelation).Include(c => c.District)
+                .Include(c => c.Country).Include(c => c.State).FirstOrDefaultAsync(c => c.BeneficiaryDetailId == caseTask.BeneficiaryDetail!.BeneficiaryDetailId);
+
+            var customerContactMasked = new string('*', caseTask.CustomerDetail!.PhoneNumber.ToString().Length - 4) + caseTask.CustomerDetail.PhoneNumber.ToString().Substring(caseTask.CustomerDetail.PhoneNumber.ToString().Length - 4);
+            caseTask.CustomerDetail.PhoneNumber = customerContactMasked;
+
+            var beneficairyContactMasked = new string('*', caseTask.BeneficiaryDetail!.PhoneNumber.ToString().Length - 4) + caseTask.BeneficiaryDetail.PhoneNumber.ToString().Substring(caseTask.BeneficiaryDetail.PhoneNumber.ToString().Length - 4);
+
+            caseTask.BeneficiaryDetail.PhoneNumber = beneficairyContactMasked;
+
+            beneficiaryDetails!.PhoneNumber = beneficairyContactMasked;
+
+            caseTask.InvestigationReport!.ReportTemplate = await GetReportTemplate(caseTask.ReportTemplateId);
+
+            return (new CaseAgencyModel
+            {
+                InvestigationReport = caseTask.InvestigationReport,
+                Beneficiary = beneficiaryDetails,
+                CaseTask = caseTask,
+                Address = caseTask.PolicyDetail!.InsuranceType == Models.InsuranceType.CLAIM ? "Beneficiary" : "Life-Assured",
+                Currency = CustomExtensions.GetCultureByCountry(caseTask.ClientCompany!.Country!.Code.ToUpper()).NumberFormat.CurrencySymbol
+            });
+        }
+        private async Task<ReportTemplate?> GetReportTemplate(long? reportTemplateId)
+        {
+            return await _context.ReportTemplates
+                .Include(r => r.LocationReport)
+                   .ThenInclude(l => l.AgentIdReport)
+               .Include(r => r.LocationReport)
+               .ThenInclude(l => l.MediaReports)
+               .Include(r => r.LocationReport)
+                   .ThenInclude(l => l.FaceIds)
+               .Include(r => r.LocationReport)
+                   .ThenInclude(l => l.DocumentIds)
+               .Include(r => r.LocationReport)
+                   .ThenInclude(l => l.Questions)
+                   .FirstOrDefaultAsync(q => q.Id == reportTemplateId);
+        }
+        private async Task<InvestigationTask?> GetCaseDetail(long caseId)
+        {
+            return await _context.Investigations.AsNoTracking()
                .Include(c => c.InvestigationTimeline)
                .Include(c => c.InvestigationReport)
                .ThenInclude(c => c!.EnquiryRequest)
@@ -57,49 +100,7 @@ namespace risk.control.system.Services.AgencyAdmin
                .ThenInclude(c => c!.BeneficiaryRelation)
                .Include(c => c.CaseNotes)
                .Include(c => c.CaseMessages)
-               .FirstOrDefaultAsync(c => c.Id == selectedcase);
-            if (caseTask is null) return null!;
-
-            var beneficiaryDetails = await _context.BeneficiaryDetail.AsNoTracking()
-                .Include(c => c.PinCode)
-                .Include(c => c.BeneficiaryRelation)
-                .Include(c => c.District)
-                .Include(c => c.Country)
-                .Include(c => c.State)
-                .FirstOrDefaultAsync(c => c.BeneficiaryDetailId == caseTask.BeneficiaryDetail!.BeneficiaryDetailId);
-
-            var customerContactMasked = new string('*', caseTask.CustomerDetail!.PhoneNumber.ToString().Length - 4) + caseTask.CustomerDetail.PhoneNumber.ToString().Substring(caseTask.CustomerDetail.PhoneNumber.ToString().Length - 4);
-            caseTask.CustomerDetail.PhoneNumber = customerContactMasked;
-
-            var beneficairyContactMasked = new string('*', caseTask.BeneficiaryDetail!.PhoneNumber.ToString().Length - 4) + caseTask.BeneficiaryDetail.PhoneNumber.ToString().Substring(caseTask.BeneficiaryDetail.PhoneNumber.ToString().Length - 4);
-
-            caseTask.BeneficiaryDetail.PhoneNumber = beneficairyContactMasked;
-
-            beneficiaryDetails!.PhoneNumber = beneficairyContactMasked;
-
-            var caseReportTemplate = await _context.ReportTemplates
-                .Include(r => r.LocationReport)
-                   .ThenInclude(l => l.AgentIdReport)
-               .Include(r => r.LocationReport)
-               .ThenInclude(l => l.MediaReports)
-               .Include(r => r.LocationReport)
-                   .ThenInclude(l => l.FaceIds)
-               .Include(r => r.LocationReport)
-                   .ThenInclude(l => l.DocumentIds)
-               .Include(r => r.LocationReport)
-                   .ThenInclude(l => l.Questions)
-                   .FirstOrDefaultAsync(q => q.Id == caseTask.ReportTemplateId);
-
-            caseTask.InvestigationReport!.ReportTemplate = caseReportTemplate;
-
-            return (new CaseAgencyModel
-            {
-                InvestigationReport = caseTask.InvestigationReport,
-                Beneficiary = beneficiaryDetails,
-                CaseTask = caseTask,
-                Address = caseTask.PolicyDetail!.InsuranceType == Models.InsuranceType.CLAIM ? "Beneficiary" : "Life-Assured",
-                Currency = CustomExtensions.GetCultureByCountry(caseTask.ClientCompany!.Country!.Code.ToUpper()).NumberFormat.CurrencySymbol
-            });
+               .FirstOrDefaultAsync(c => c.Id == caseId);
         }
     }
 }

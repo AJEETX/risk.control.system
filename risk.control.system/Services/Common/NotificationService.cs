@@ -38,21 +38,13 @@ namespace risk.control.system.Services.Common
 
         public async Task<string> SendSms2Customer(string currentUser, long claimId, string sms)
         {
-            var caseDetail = await context.Investigations
-            .Include(c => c.CaseMessages)
-            .Include(c => c.PolicyDetail)
-            .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c!.PinCode)
-                .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c!.Country)
-            .FirstOrDefaultAsync(c => c.Id == claimId);
-
+            var caseDetail = await context.Investigations.Include(c => c.CaseMessages).Include(c => c.PolicyDetail).Include(c => c.CustomerDetail).ThenInclude(c => c!.PinCode)
+                .Include(c => c.CustomerDetail).ThenInclude(c => c!.Country).FirstOrDefaultAsync(c => c.Id == claimId);
             var mobile = caseDetail!.CustomerDetail!.PhoneNumber.ToString();
             var user = await context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(u => u.Email == currentUser);
             var isdCode = caseDetail.CustomerDetail.Country!.ISDCode;
             var isInsurerUser = user!.ClientCompanyId > 0;
             var isVendorUser = user.VendorId > 0;
-
             string entityName = string.Empty;
             ApplicationUser insurerUser;
             ApplicationUser agencyUser;
@@ -72,12 +64,7 @@ namespace risk.control.system.Services.Common
             {
                 return string.Empty;
             }
-            var message = $"Dear {caseDetail.CustomerDetail.Name}\n\n";
-            message += $"{sms}\n\n";
-            message += $"Thanks\n\n";
-            message += $"{user.FirstName} {user.LastName}\n\n";
-            message += $"Policy #:{caseDetail.PolicyDetail!.ContractNumber}\n\n";
-            message += $"{entityName}\n\n";
+            var message = $"Dear {caseDetail.CustomerDetail.Name}\n\n" + $"{sms}\n\n" + $"Thanks\n\n" + "{user.FirstName} {user.LastName}\n\n" + $"Policy #:{caseDetail.PolicyDetail!.ContractNumber}\n\n" + $"{entityName}\n\n";
             message += $"{logo}";
 
             var scheduleMessage = new CaseMessage
@@ -98,17 +85,12 @@ namespace risk.control.system.Services.Common
 
         public async Task<string> SendSms2Beneficiary(string currentUser, long claimId, string sms)
         {
-            var beneficiary = await context.BeneficiaryDetail.AsNoTracking()
-                .Include(b => b.Country)
-               .FirstOrDefaultAsync(c => c.InvestigationTaskId == claimId);
-
+            var beneficiary = await context.BeneficiaryDetail.AsNoTracking().Include(b => b.Country).FirstOrDefaultAsync(c => c.InvestigationTaskId == claimId);
             var mobile = beneficiary!.PhoneNumber.ToString();
             var user = await context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(u => u.Email == currentUser);
             var isdCode = beneficiary.Country!.ISDCode;
-
             var isInsurerUser = user!.ClientCompanyId > 0;
             var isVendorUser = user.VendorId > 0;
-
             string entityName = string.Empty;
             ApplicationUser insurerUser;
             ApplicationUser agencyUser;
@@ -128,19 +110,10 @@ namespace risk.control.system.Services.Common
             {
                 return string.Empty;
             }
-            var caseTask = await context.Investigations
-            .Include(c => c.CaseMessages)
-            .Include(c => c.PolicyDetail)
-            .FirstOrDefaultAsync(c => c.Id == claimId);
-
-            var message = $"Dear {beneficiary.Name}\n\n";
-            message += $"{sms}\n\n";
-            message += $"Thanks\n\n";
-            message += $"{user.FirstName} {user.LastName}\n\n";
-            message += $"Policy #:{caseTask!.PolicyDetail!.ContractNumber}\n\n";
+            var caseTask = await context.Investigations.Include(c => c.CaseMessages).Include(c => c.PolicyDetail).FirstOrDefaultAsync(c => c.Id == claimId);
+            var message = $"Dear {beneficiary.Name}\n\n" + $"{sms}\n\n" + $"Thanks\n\n" + $"{user.FirstName} {user.LastName}\n\n" + $"Policy #:{caseTask!.PolicyDetail!.ContractNumber}\n\n";
             message += $"{entityName}\n\n";
             message += $"{logo}";
-
             var scheduleMessage = new CaseMessage
             {
                 Message = sms,
@@ -150,7 +123,6 @@ namespace risk.control.system.Services.Common
                 UpdatedBy = user.Email,
                 Updated = DateTime.UtcNow
             };
-
             caseTask.CaseMessages!.Add(scheduleMessage);
             await context.SaveChangesAsync(null, false);
             await smsService.DoSendSmsAsync(beneficiary.Country.Code, "+" + isdCode + mobile, message);
@@ -161,16 +133,13 @@ namespace risk.control.system.Services.Common
         {
             var companyUser = await context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == userEmail && c.ClientCompanyId > 0);
             var vendorUser = await context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == userEmail && c.VendorId > 0);
-
             ApplicationRole? role = null!;
             ClientCompany? company = null!;
             Vendor? agency = null!;
             if (companyUser != null)
             {
                 role = await roleManager.FindByNameAsync(companyUser.Role.ToString()!);
-
                 company = await context.ClientCompany.AsNoTracking().FirstOrDefaultAsync(c => c.ClientCompanyId == companyUser.ClientCompanyId);
-
                 var notifications = context.Notifications.AsNoTracking().Where(n => n.ClientCompanyId == company!.ClientCompanyId && (!n.IsReadByCreator || !n.IsReadByManager || !n.IsReadByAssessor));
                 if (role?.Name == ASSESSOR.DISPLAY_NAME)
                 {
@@ -184,48 +153,31 @@ namespace risk.control.system.Services.Common
                 {
                     notifications = notifications.Where(n => (n.RoleId == role.Id && n.NotifierUserEmail == userEmail) && !n.IsReadByCreator);
                 }
-
-                var activeNotifications = await notifications
-                    .OrderByDescending(n => n.CreatedAt).ToListAsync();
-                return activeNotifications;
+                return await notifications.OrderByDescending(n => n.CreatedAt).ToListAsync();
             }
             else if (vendorUser != null)
             {
                 role = await roleManager.FindByNameAsync(vendorUser.Role.ToString()!);
                 agency = await context.Vendor.AsNoTracking().FirstOrDefaultAsync(c => c.VendorId == vendorUser.VendorId);
-
                 var notifications = context.Notifications.AsNoTracking().Where(n => n.VendorId == vendorUser.VendorId && (!n.IsReadByVendor || !n.IsReadByVendorAgent));
-
                 if (role?.Name == AGENT.DISPLAY_NAME)
                 {
                     notifications = notifications.Where(n => n.AgenctUserEmail == userEmail);
                 }
                 else
                 {
-                    var superRole = await roleManager.FindByNameAsync(SUPERVISOR.DISPLAY_NAME);
                     if (role?.Name == SUPERVISOR.DISPLAY_NAME)
                     {
-                        notifications = notifications.Where(n =>
-                        (!n.IsReadByVendor && n.NotifierUserEmail == userEmail &&
-                        (n.Status == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR || n.Status == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR))
-                        ||
-                        (!n.IsReadByVendor && n.Status == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR)
-                        );
+                        notifications = notifications.Where(n => (!n.IsReadByVendor && n.NotifierUserEmail == userEmail && (n.Status == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR || n.Status == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR)) || (!n.IsReadByVendor && n.Status == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR));
                     }
                     else
                     {
                         notifications = notifications.Where(n => (!n.IsReadByVendor));
                     }
                 }
-
-                var activeNotifications = await notifications
-                     .OrderByDescending(n => n.CreatedAt).ToListAsync();
-                return activeNotifications;
+                return await notifications.OrderByDescending(n => n.CreatedAt).ToListAsync();
             }
-            var allNotifications = await context.Notifications.AsNoTracking()
-                .OrderByDescending(n => n.CreatedAt)
-                .ToListAsync();
-            return allNotifications;
+            return await context.Notifications.AsNoTracking().OrderByDescending(n => n.CreatedAt).ToListAsync();
         }
 
         public async Task MarkAsRead(long id, string userEmail)

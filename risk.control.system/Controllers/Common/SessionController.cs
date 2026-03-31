@@ -33,58 +33,70 @@ namespace risk.control.system.Controllers.Company
         {
             try
             {
-                if (!ModelState.IsValid)
-                    return BadRequest(new { message = "Invalid request." });
-                if (User?.Identity == null || !User.Identity.IsAuthenticated)
-                    return Unauthorized(new { message = "User is logged out due to inactivity or authentication failure." });
-                var email = User.Identity.Name;
-                var user = await _signInManager.UserManager.Users
-                    .FirstOrDefaultAsync(u => u.Email == email);
-                if (user == null)
-                    return Unauthorized(new { message = "User not found." });
+                if (!ModelState.IsValid) return BadRequest(new { message = "Invalid request." });
+
+                var user = await GetAuthenticatedUserAsync();
+                if (user == null) return Unauthorized(new { message = "User session invalid." });
+
                 var now = DateTime.UtcNow;
-                var session = await _context.UserSessionAlive.Where(s => s.ActiveUser.Id == user.Id && !s.LoggedOut).OrderByDescending(s => s.Updated ?? s.Created).FirstOrDefaultAsync();
-                if (session != null)
-                {
-                    session.UpdatedBy = user.Email;
-                    session.Updated = now;
-                    session.CurrentPage = request.CurrentPage!;
-                }
-                else
-                {
-                    _context.UserSessionAlive.Add(new UserSessionAlive
-                    {
-                        ActiveUser = user,
-                        CreatedUser = email,
-                        CurrentPage = request.CurrentPage!,
-                        Created = now
-                    });
-                }
-                await _context.SaveChangesAsync(null, false);
+                await UpdateOrCrateSessionRecord(user, request.CurrentPage!, now);
+
                 await _signInManager.RefreshSignInAsync(user);
-                var userDetails = new
+
+                return Ok(new
                 {
                     name = user.UserName,
                     role = user.Role?.GetEnumDisplayName(),
                     lastActivity = now,
                     currentPage = request.CurrentPage
-                };
-                return Ok(userDetails);
+                });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error in KeepSessionAlive for {UserEmail}", User?.Identity?.Name ?? "Anonymous");
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred." });
+                return StatusCode(500, new { message = "An error occurred." });
             }
+        }
+
+        private async Task<ApplicationUser?> GetAuthenticatedUserAsync()
+        {
+            if (User?.Identity?.IsAuthenticated != true) return null;
+
+            return await _signInManager.UserManager.Users
+                .FirstOrDefaultAsync(u => u.Email == User.Identity.Name);
+        }
+
+        private async Task UpdateOrCrateSessionRecord(ApplicationUser user, string page, DateTime now)
+        {
+            var session = await _context.UserSessionAlive
+                .Where(s => s.ActiveUser.Id == user.Id && !s.LoggedOut)
+                .OrderByDescending(s => s.Updated ?? s.Created)
+                .FirstOrDefaultAsync();
+
+            if (session != null)
+            {
+                session.UpdatedBy = user.Email;
+                session.Updated = now;
+                session.CurrentPage = page;
+            }
+            else
+            {
+                _context.UserSessionAlive.Add(new UserSessionAlive
+                {
+                    ActiveUser = user,
+                    CreatedUser = user.Email,
+                    CurrentPage = page,
+                    Created = now
+                });
+            }
+            await _context.SaveChangesAsync(null, false);
         }
 
         [HttpGet]
         public async Task StreamTypingUpdates(string email, CancellationToken cancellationToken)
         {
             Response.ContentType = "text/event-stream";
-            // Important: Disable buffering so the browser gets data immediately
             Response.Headers.Append("Connection", "keep-alive");
-
             var user = await _userManager.FindByEmailAsync(email);
             if (user == null)
             {
@@ -104,7 +116,6 @@ namespace risk.control.system.Controllers.Company
             {
                 if (cancellationToken.IsCancellationRequested) break;
 
-                // The double \n\n is mandatory for the 'message' event to fire in JS
                 await Response.WriteAsync($"data: {message}\n\n");
                 await Response.Body.FlushAsync(cancellationToken);
 

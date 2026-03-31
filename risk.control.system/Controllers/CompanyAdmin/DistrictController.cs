@@ -90,32 +90,9 @@ namespace risk.control.system.Controllers.CompanyAdmin
             var lambda = Expression.Lambda<Func<District, object>>(Expression.Convert(propertyExpression, typeof(object)), parameter);
             query = isAscending ? query.OrderBy(lambda) : query.OrderByDescending(lambda);
             var totalRecords = await query.CountAsync();
-            var rawData = await query.Skip(start).Take(length)
-                .Select(p => new
-                {
-                    p.DistrictId,
-                    p.Code,
-                    p.Name,
-                    p.UpdatedBy,
-                    p.Updated,
-                    p.Created,
-                    State = p.State!.Name,
-                    Country = p.Country!.Name
-                })
-                .ToListAsync();
-
-            var data = rawData.Select(p => new
-            {
-                p.DistrictId,
-                p.Code,
-                p.Name,
-                p.UpdatedBy,
-                Updated = p.Updated ?? p.Created,
-                State = p.State,
-                Country = p.Country
-            }).ToList();
-            var response = new { draw = draw, recordsTotal = totalRecords, recordsFiltered = totalRecords, data = data };
-            return Json(response);
+            var rawData = await query.Skip(start).Take(length).Select(p => new { p.DistrictId, p.Code, p.Name, p.UpdatedBy, p.Updated, p.Created, State = p.State!.Name, Country = p.Country!.Name }).ToListAsync();
+            var data = rawData.Select(p => new { p.DistrictId, p.Code, p.Name, p.UpdatedBy, Updated = p.Updated ?? p.Created, State = p.State, Country = p.Country }).ToList();
+            return Json(new { draw = draw, recordsTotal = totalRecords, recordsFiltered = totalRecords, data = data });
         }
 
         [HttpPost]

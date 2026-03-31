@@ -51,38 +51,41 @@ namespace risk.control.system.Services.Api
                 {
                     status = "green"; statusName = $"Online now"; statusIcon = "fas fa-circle";
                 }
-                var activeUser = new UserDetailResponse
-                {
-                    Id = user.Id,
-                    Name = user.FirstName + " " + user.LastName,
-                    Email = "<a>" + user.Email + "</a>",
-                    RawEmail = user.Email,
-                    Phone = "(+" + user.Country?.ISDCode + ") " + user.PhoneNumber,
-                    Photo = user.ProfilePictureUrl == null ? Applicationsettings.NO_USER : string.Format("data:image/*;base64,{0}", Convert.ToBase64String(await File.ReadAllBytesAsync(Path.Combine(webHostEnvironment.ContentRootPath, user.ProfilePictureUrl)))),
-                    Active = user.Active,
-                    Addressline = user?.Addressline ?? "--",
-                    District = user?.District?.Name ?? "--",
-                    State = user?.State?.Code ?? "--",
-                    Country = user?.Country?.Code ?? "--",
-                    Flag = user!.Country == null ? "/flags/in.png" : "/flags/" + user.Country?.Code.ToLower() + ".png",
-                    Roles = string.Join(",", GetUserRoles(user!).Result),
-                    Pincode = user?.PinCode?.Code ?? 0,
-                    OnlineStatus = status,
-                    Updated = user!.Updated ?? user.Created,
-                    UpdatedBy = user.UpdatedBy,
-                    OnlineStatusName = statusName,
-                    OnlineStatusIcon = statusIcon,
-                    IsUpdated = user.IsUpdated,
-                    LastModified = user.Updated ?? DateTime.UtcNow,
-                    LoginVerified = (!await featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION) || !user.IsPasswordChangeRequired)
-                };
+                var activeUser = await MapUsers(user);
                 activeUsersDetails.Add(activeUser);
             }
             users?.ToList().ForEach(u => u.IsUpdated = false);
             await context.SaveChangesAsync(null, false);
             return activeUsersDetails;
         }
-
+        private async Task<UserDetailResponse> MapUsers(ApplicationUser user)
+        {
+            return new UserDetailResponse
+            {
+                Id = user.Id,
+                Name = user.FirstName + " " + user.LastName,
+                Email = "<a>" + user.Email + "</a>",
+                RawEmail = user.Email,
+                Phone = "(+" + user.Country?.ISDCode + ") " + user.PhoneNumber,
+                Photo = user.ProfilePictureUrl == null ? Applicationsettings.NO_USER : string.Format("data:image/*;base64,{0}", Convert.ToBase64String(await File.ReadAllBytesAsync(Path.Combine(webHostEnvironment.ContentRootPath, user.ProfilePictureUrl)))),
+                Active = user.Active,
+                Addressline = user?.Addressline ?? "--",
+                District = user?.District?.Name ?? "--",
+                State = user?.State?.Code ?? "--",
+                Country = user?.Country?.Code ?? "--",
+                Flag = user!.Country == null ? "/flags/in.png" : "/flags/" + user.Country?.Code.ToLower() + ".png",
+                Roles = string.Join(",", GetUserRoles(user!).Result),
+                Pincode = user?.PinCode?.Code ?? 0,
+                OnlineStatus = status,
+                Updated = user!.Updated ?? user.Created,
+                UpdatedBy = user.UpdatedBy,
+                OnlineStatusName = statusName,
+                OnlineStatusIcon = statusIcon,
+                IsUpdated = user.IsUpdated,
+                LastModified = user.Updated ?? DateTime.UtcNow,
+                LoginVerified = (!await featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION) || !user.IsPasswordChangeRequired)
+            };
+        }
         private async Task<List<string>> GetUserRoles(ApplicationUser user)
         {
             var roles = await userManager.GetRolesAsync(user);

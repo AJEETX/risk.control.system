@@ -129,16 +129,30 @@ namespace risk.control.system.Services.Common
                 }
                 return user;
             }
+
+            user = await CreateUser(email, principal, azureADUserDetail, azureRole!);
+
+            var createResult = await _userManager.CreateAsync(user);
+            if (!createResult.Succeeded)
+            {
+                var errors = string.Join(", ", createResult.Errors.Select(e => e.Description));
+                throw new Exception($"User creation failed: {errors}");
+            }
+            await EnsureRoleExistsAndAssign(user, azureRole!);
+            return user;
+        }
+        private async Task<ApplicationUser> CreateUser(string email, ClaimsPrincipal principal, AzureADUserDetail azureADUserDetail, string azureRole)
+        {
             var countryName = azureADUserDetail.Country;
             var countryCode = ExtractCountryCode(principal);
             var country = await _context.Country.FirstOrDefaultAsync(c => c.Name == countryName);
             var pincode = await _context.PinCode.Include(d => d.District).Include(s => s.State).Include(c => c.Country).FirstOrDefaultAsync(p => p.CountryId == country!.CountryId && p.Code == azureADUserDetail.PostalCode);
-            var district = await _context.District.FirstOrDefaultAsync(d => d.Name == azureADUserDetail.City);
             if (pincode == null) throw new Exception($"Location configuration missing for country: {countryCode}");
+            var district = await _context.District.FirstOrDefaultAsync(d => d.Name == azureADUserDetail.City);
             ClientCompany? company = RoleGroups.CompanyRoles.Contains(azureRole) ? await _context.ClientCompany.FirstOrDefaultAsync(c => !c.Deleted) : null;
             Vendor? vendor = RoleGroups.AgencyRoles.Contains(azureRole) ? await _context.Vendor.FirstOrDefaultAsync(v => !v.Deleted) : null;
             var appRole = Enum.TryParse<AppRoles>(azureRole, out var parsedRole) ? parsedRole : AppRoles.GUEST;
-            user = new ApplicationUser
+            return new ApplicationUser
             {
                 UserName = email,
                 Email = email,
@@ -157,17 +171,7 @@ namespace risk.control.system.Services.Common
                 Addressline = azureADUserDetail.StreetAddress,
                 Password = Applicationsettings.TestingData
             };
-
-            var createResult = await _userManager.CreateAsync(user);
-            if (!createResult.Succeeded)
-            {
-                var errors = string.Join(", ", createResult.Errors.Select(e => e.Description));
-                throw new Exception($"User creation failed: {errors}");
-            }
-            await EnsureRoleExistsAndAssign(user, azureRole!);
-            return user;
         }
-
         private string ExtractCountryCode(ClaimsPrincipal principal)
         {
             return principal.FindFirstValue("ctry")

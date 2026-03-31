@@ -111,12 +111,7 @@ namespace risk.control.system.Controllers.Api
             }
             var token = tokenService.GenerateJwtToken(user);
             var refreshToken = await tokenService.GenerateRefreshTokenAsync(user.Email!);
-            return Ok(new TokenResponse
-            {
-                AccessToken = token,
-                RefreshToken = refreshToken.Token,
-                ExpiresAt = DateTime.UtcNow.AddMinutes(15) // Matches access token lifetime
-            });
+            return Ok(new TokenResponse { AccessToken = token, RefreshToken = refreshToken.Token, ExpiresAt = DateTime.UtcNow.AddMinutes(15) });
         }
 
         //[AllowAnonymous]
