@@ -119,51 +119,52 @@ namespace risk.control.system.Services.Report
                 OriginalTemplateId = originalTemplate.Id, // Reference to the original template
                 Created = DateTime.UtcNow,
                 UpdatedBy = "system", // Or current user
-                LocationReport = originalTemplate.LocationReport.Select(loc => new LocationReport
-                {
-                    LocationName = loc.LocationName,
-                    IsRequired = loc.IsRequired,
-                    AgentIdReport = new AgentIdReport
-                    {
-                        Selected = loc.AgentIdReport!.Selected,
-                        IsRequired = loc.AgentIdReport.IsRequired,
-                        ReportType = loc.AgentIdReport.ReportType,
-                        ReportName = loc.AgentIdReport.ReportName,
-                    },
-                    MediaReports = loc.MediaReports?.Select(m => new MediaReport
-                    {
-                        IsRequired = m.IsRequired,
-                        ReportName = m.ReportName,
-                        MediaType = m.MediaType,
-                        Selected = m.Selected,
-                    }).ToList(),
-                    FaceIds = loc.FaceIds?.Select(face => new FaceIdReport
-                    {
-                        IsRequired = face.IsRequired,
-                        ReportType = face.ReportType,
-                        Selected = face.Selected,
-                        Has2Face = face.Has2Face,
-                        ReportName = face.ReportName
-                    }).ToList(),
-
-                    DocumentIds = loc.DocumentIds?.Select(doc => new DocumentIdReport
-                    {
-                        IsRequired = doc.IsRequired,
-                        ReportType = doc.ReportType,
-                        ReportName = doc.ReportName,
-                        Selected = doc.Selected,
-                    }).ToList(),
-
-                    Questions = loc.Questions?.Select(q => new Question
-                    {
-                        QuestionText = q.QuestionText,
-                        QuestionType = q.QuestionType,
-                        Options = q.Options,
-                        IsRequired = q.IsRequired,
-                        // Copy other fields
-                    }).ToList()
-                }).ToList()
+                LocationReport = GetLocationreport(originalTemplate)
             };
+        }
+        private List<LocationReport> GetLocationreport(ReportTemplate originalTemplate)
+        {
+            return originalTemplate.LocationReport.Select(loc => new LocationReport
+            {
+                LocationName = loc.LocationName,
+                IsRequired = loc.IsRequired,
+                AgentIdReport = new AgentIdReport
+                {
+                    Selected = loc.AgentIdReport!.Selected,
+                    IsRequired = loc.AgentIdReport.IsRequired,
+                    ReportType = loc.AgentIdReport.ReportType,
+                    ReportName = loc.AgentIdReport.ReportName,
+                },
+                MediaReports = loc.MediaReports?.Select(m => new MediaReport
+                {
+                    IsRequired = m.IsRequired,
+                    ReportName = m.ReportName,
+                    MediaType = m.MediaType,
+                    Selected = m.Selected,
+                }).ToList(),
+                FaceIds = loc.FaceIds?.Select(face => new FaceIdReport
+                {
+                    IsRequired = face.IsRequired,
+                    ReportType = face.ReportType,
+                    Selected = face.Selected,
+                    Has2Face = face.Has2Face,
+                    ReportName = face.ReportName
+                }).ToList(),
+                DocumentIds = loc.DocumentIds?.Select(doc => new DocumentIdReport
+                {
+                    IsRequired = doc.IsRequired,
+                    ReportType = doc.ReportType,
+                    ReportName = doc.ReportName,
+                    Selected = doc.Selected,
+                }).ToList(),
+                Questions = loc.Questions?.Select(q => new Question
+                {
+                    QuestionText = q.QuestionText,
+                    QuestionType = q.QuestionType,
+                    Options = q.Options,
+                    IsRequired = q.IsRequired,
+                }).ToList()
+            }).ToList();
         }
         private ReportTemplate CloneReportTemplate(string newName, ReportTemplate originalTemplate, string currentUserEmail)
         {
