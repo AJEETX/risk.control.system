@@ -99,10 +99,8 @@ namespace risk.control.system.Services.Api
             var claimsCases = await _context.Investigations.AsNoTracking().Where(c => c.AssignedToAgency && !c.Deleted && c.VendorId.HasValue && GetValidStatuses().Contains(c.SubStatus)).ToListAsync();
             var companyUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == userEmail);
             var company = await _context.ClientCompany.AsNoTracking().Include(c => c.EmpanelledVendors).ThenInclude(v => v.State)
-                .Include(c => c.EmpanelledVendors).ThenInclude(v => v.District)
-                .Include(c => c.EmpanelledVendors).ThenInclude(v => v.Country)
-                .Include(c => c.EmpanelledVendors).ThenInclude(v => v.PinCode)
-                .Include(c => c.EmpanelledVendors).ThenInclude(v => v.Ratings)
+                .Include(c => c.EmpanelledVendors).ThenInclude(v => v.District).Include(c => c.EmpanelledVendors).ThenInclude(v => v.Country)
+                .Include(c => c.EmpanelledVendors).ThenInclude(v => v.PinCode).Include(c => c.EmpanelledVendors).ThenInclude(v => v.Ratings)
                 .FirstOrDefaultAsync(c => c.ClientCompanyId == companyUser!.ClientCompanyId);
             if (company == null)
             {

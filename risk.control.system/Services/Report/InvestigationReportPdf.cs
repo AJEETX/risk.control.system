@@ -26,12 +26,74 @@ namespace risk.control.system.Services.Report
 
         public InvestigationReportPdfService(ApplicationDbContext context)
         {
-            this._context = context;
+            _context = context;
         }
 
         public async Task<CaseTransactionModel> GetClaimPdfReport(string currentUserEmail, long id)
         {
-            var caseTask = await _context.Investigations.AsNoTracking()
+            var caseTask = await GetPdf(id);
+            if (caseTask == null)
+            {
+                throw new Exception("Case not found");
+            }
+            caseTask.CustomerDetail!.PhoneNumber = new string('*', caseTask!.CustomerDetail!.PhoneNumber.ToString().Length - 4) + caseTask.CustomerDetail.PhoneNumber.ToString().Substring(caseTask.CustomerDetail.PhoneNumber.ToString().Length - 4);
+            caseTask.BeneficiaryDetail!.PhoneNumber = new string('*', caseTask.BeneficiaryDetail!.PhoneNumber.ToString().Length - 4) + caseTask.BeneficiaryDetail.PhoneNumber.ToString().Substring(caseTask.BeneficiaryDetail.PhoneNumber.ToString().Length - 4);
+            var lastHistory = caseTask.InvestigationTimeline.OrderByDescending(h => h.StatusChangedAt).FirstOrDefault();
+            var timeTaken = DateTime.UtcNow - caseTask.Created;
+            var invoice = await _context.VendorInvoice.AsNoTracking().FirstOrDefaultAsync(i => i.InvestigationReportId == caseTask.InvestigationReportId);
+            caseTask.InvestigationReport!.ReportTemplate = await GetReportTemplate(caseTask.ReportTemplateId);
+            var tracker = await _context.PdfDownloadTracker.AsNoTracking().FirstOrDefaultAsync(t => t.ReportId == id && t.UserEmail == currentUserEmail);
+            bool canDownload = true;
+            if (tracker != null)
+            {
+                canDownload = tracker.DownloadCount <= 3;
+                tracker.DownloadCount++;
+                tracker.LastDownloaded = DateTime.UtcNow;
+                _context.PdfDownloadTracker.Update(tracker);
+            }
+            else
+            {
+                tracker = new PdfDownloadTracker
+                {
+                    ReportId = id,
+                    UserEmail = currentUserEmail,
+                    DownloadCount = 1,
+                    LastDownloaded = DateTime.UtcNow
+                };
+                _context.PdfDownloadTracker.Add(tracker);
+            }
+            _context.SaveChanges();
+            return new CaseTransactionModel
+            {
+                ClaimsInvestigation = caseTask,
+                CaseIsValidToAssign = caseTask.IsValidCaseData(),
+                Beneficiary = caseTask.BeneficiaryDetail,
+                Assigned = caseTask.Status == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER,
+                TimeTaken = timeTaken != TimeSpan.Zero ? $"{(timeTaken.Days > 0 ? $"{timeTaken.Days}d " : "")}" + $"{(timeTaken.Hours > 0 ? $"{timeTaken.Hours}h " : "")}" + $"{(timeTaken.Minutes > 0 ? $"{timeTaken.Minutes}m " : "")}" + $"{(timeTaken.Seconds > 0 ? $"{timeTaken.Seconds}s" : "less than a sec")}" : "-",
+                VendorInvoice = invoice,
+                CanDownload = canDownload,
+                Withdrawable = (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR)
+            };
+        }
+
+        private async Task<ReportTemplate?> GetReportTemplate(long? reportTemplateId)
+        {
+            return await _context.ReportTemplates.AsNoTracking()
+                .Include(r => r.LocationReport)
+                  .ThenInclude(l => l.AgentIdReport)
+              .Include(r => r.LocationReport)
+               .ThenInclude(l => l.MediaReports)
+              .Include(r => r.LocationReport)
+                  .ThenInclude(l => l.FaceIds)
+              .Include(r => r.LocationReport)
+                  .ThenInclude(l => l.DocumentIds)
+              .Include(r => r.LocationReport)
+                  .ThenInclude(l => l.Questions)
+                .FirstOrDefaultAsync(q => q.Id == reportTemplateId);
+        }
+        private async Task<InvestigationTask?> GetPdf(long id)
+        {
+            return await _context.Investigations.AsNoTracking()
                 .Include(c => c.CaseMessages)
                 .Include(c => c.CaseNotes)
                 .Include(c => c.InvestigationReport)
@@ -63,74 +125,7 @@ namespace risk.control.system.Services.Report
                 .Include(c => c.CustomerDetail)
                 .ThenInclude(c => c!.PinCode)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            var maskedCustomerContact = new string('*', caseTask!.CustomerDetail!.PhoneNumber.ToString().Length - 4) + caseTask.CustomerDetail.PhoneNumber.ToString().Substring(caseTask.CustomerDetail.PhoneNumber.ToString().Length - 4);
-            caseTask.CustomerDetail.PhoneNumber = maskedCustomerContact;
-            var maskedBeneficiaryContact = new string('*', caseTask.BeneficiaryDetail!.PhoneNumber.ToString().Length - 4) + caseTask.BeneficiaryDetail.PhoneNumber.ToString().Substring(caseTask.BeneficiaryDetail.PhoneNumber.ToString().Length - 4);
-            caseTask.BeneficiaryDetail.PhoneNumber = maskedBeneficiaryContact;
-            var companyUser = await _context.ApplicationUser.AsNoTracking().Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == currentUserEmail);
-            var lastHistory = caseTask.InvestigationTimeline.OrderByDescending(h => h.StatusChangedAt).FirstOrDefault();
-
-            var timeTaken = DateTime.UtcNow - caseTask.Created;
-            var totalTimeTaken = timeTaken != TimeSpan.Zero
-                ? $"{(timeTaken.Days > 0 ? $"{timeTaken.Days}d " : "")}" +
-              $"{(timeTaken.Hours > 0 ? $"{timeTaken.Hours}h " : "")}" +
-              $"{(timeTaken.Minutes > 0 ? $"{timeTaken.Minutes}m " : "")}" +
-              $"{(timeTaken.Seconds > 0 ? $"{timeTaken.Seconds}s" : "less than a sec")}"
-            : "-";
-
-            var invoice = await _context.VendorInvoice.AsNoTracking().FirstOrDefaultAsync(i => i.InvestigationReportId == caseTask.InvestigationReportId);
-            var templates = await _context.ReportTemplates.AsNoTracking()
-               .Include(r => r.LocationReport)
-                  .ThenInclude(l => l.AgentIdReport)
-              .Include(r => r.LocationReport)
-               .ThenInclude(l => l.MediaReports)
-              .Include(r => r.LocationReport)
-                  .ThenInclude(l => l.FaceIds)
-              .Include(r => r.LocationReport)
-                  .ThenInclude(l => l.DocumentIds)
-              .Include(r => r.LocationReport)
-                  .ThenInclude(l => l.Questions)
-                  .FirstOrDefaultAsync(q => q.Id == caseTask.ReportTemplateId);
-
-            caseTask.InvestigationReport!.ReportTemplate = templates;
-
-            var tracker = await _context.PdfDownloadTracker.AsNoTracking()
-                          .FirstOrDefaultAsync(t => t.ReportId == id && t.UserEmail == currentUserEmail);
-            bool canDownload = true;
-            if (tracker != null)
-            {
-                canDownload = tracker.DownloadCount <= 3;
-                tracker.DownloadCount++;
-                tracker.LastDownloaded = DateTime.UtcNow;
-                _context.PdfDownloadTracker.Update(tracker);
-            }
-            else
-            {
-                tracker = new PdfDownloadTracker
-                {
-                    ReportId = id,
-                    UserEmail = currentUserEmail,
-                    DownloadCount = 1,
-                    LastDownloaded = DateTime.UtcNow
-                };
-                _context.PdfDownloadTracker.Add(tracker);
-            }
-            _context.SaveChanges();
-            var model = new CaseTransactionModel
-            {
-                ClaimsInvestigation = caseTask,
-                CaseIsValidToAssign = caseTask.IsValidCaseData(),
-                Beneficiary = caseTask.BeneficiaryDetail,
-                Assigned = caseTask.Status == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER,
-                TimeTaken = totalTimeTaken,
-                VendorInvoice = invoice,
-                CanDownload = canDownload,
-                Withdrawable = (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR)
-            };
-
-            return model;
         }
-
         public byte[] GeneratePdf(InvestigationTask task, ReportTemplate report)
         {
             //var document = new InvestigationReportPdf(task, report);

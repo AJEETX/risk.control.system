@@ -101,13 +101,9 @@ namespace risk.control.system.Services.AgencyAdmin
                 return (false, "Error creating user.", errors);
             }
             await _userManager.AddToRoleAsync(model, model.Role.ToString()!);
-
             await HandleLockAndNotificationsAsync(model, portal_base_url);
-
             await tx.CommitAsync();
-
             var userAdded = (true, $"User <b> {email} </b> created successfully.", errors);
-
             await _faceImageCheckService.SetImageToAws(email);
             return userAdded;
         }

@@ -63,8 +63,7 @@ namespace risk.control.system.Services.Api
             var caseCounts = await dashboardService.CalculateAgentCaseStatus(userEmail);
             var loginVerificationEnabled = await featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION);
             var users = await context.ApplicationUser.AsNoTracking().Where(u => u.VendorId == vendor.VendorId && !u.Deleted && u.Email != userEmail)
-                .OrderBy(u => u.IsUpdated).ThenBy(u => u.Updated)
-                .Select(u => new
+                .OrderBy(u => u.IsUpdated).ThenBy(u => u.Updated).Select(u => new
                 {
                     u.Id,
                     u.Email,
@@ -129,9 +128,7 @@ namespace risk.control.system.Services.Api
                     OnlineStatus = status,
                     OnlineStatusName = statusName,
                     OnlineStatusIcon = icon,
-                    LoginVerified = loginVerificationEnabled
-                        ? !u.IsPasswordChangeRequired
-                        : true
+                    LoginVerified = loginVerificationEnabled ? !u.IsPasswordChangeRequired : true
                 };
             });
             var response = (await Task.WhenAll(responseTasks)).ToList();

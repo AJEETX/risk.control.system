@@ -39,7 +39,33 @@ namespace risk.control.system.Services.Agency
 
         public async Task<CaseTransactionModel> GetClaimDetails(string currentUserEmail, long caseId)
         {
-            var caseTask = await context.Investigations.AsNoTracking()
+            var caseTask = await GetCaseDetail(caseId);
+
+            var lastHistory = caseTask!.InvestigationTimeline.OrderByDescending(h => h.StatusChangedAt).FirstOrDefault();
+
+            var maskedCustomerContact = new string('*', caseTask.CustomerDetail!.PhoneNumber.ToString().Length - 4) + caseTask.CustomerDetail.PhoneNumber.ToString().Substring(caseTask.CustomerDetail.PhoneNumber.ToString().Length - 4);
+            caseTask.CustomerDetail.PhoneNumber = maskedCustomerContact;
+            var maskedBeneficiaryContact = new string('*', caseTask.BeneficiaryDetail!.PhoneNumber.ToString().Length - 4) + caseTask.BeneficiaryDetail.PhoneNumber.ToString().Substring(caseTask.BeneficiaryDetail.PhoneNumber.ToString().Length - 4);
+            caseTask.BeneficiaryDetail.PhoneNumber = maskedBeneficiaryContact;
+
+            var timeTaken = DateTime.UtcNow - lastHistory!.StatusChangedAt;
+            var model = new CaseTransactionModel
+            {
+                ClaimsInvestigation = caseTask,
+                CaseIsValidToAssign = caseTask.IsValidCaseData(),
+                Beneficiary = caseTask.BeneficiaryDetail,
+                Assigned = caseTask.Status == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER,
+                TimeTaken = timeTaken.ToString(@"hh\:mm\:ss") ?? "-",
+                Withdrawable = (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR),
+                Currency = CustomExtensions.GetCultureByCountry(caseTask.ClientCompany!.Country!.Code.ToUpper()).NumberFormat.CurrencySymbol,
+                Culture = CustomExtensions.GetCultureByCountry(caseTask.ClientCompany!.Country!.Code.ToUpper())
+            };
+
+            return model;
+        }
+        private async Task<InvestigationTask?> GetCaseDetail(long caseId)
+        {
+            return await context.Investigations.AsNoTracking()
                 .Include(c => c.CaseMessages)
                 .Include(c => c.CaseNotes)
                 .Include(c => c.PolicyDetail)
@@ -72,30 +98,7 @@ namespace risk.control.system.Services.Agency
                 .Include(c => c.CustomerDetail)
                 .ThenInclude(c => c!.PinCode)
                 .FirstOrDefaultAsync(m => m.Id == caseId);
-
-            var lastHistory = caseTask!.InvestigationTimeline.OrderByDescending(h => h.StatusChangedAt).FirstOrDefault();
-
-            var maskedCustomerContact = new string('*', caseTask.CustomerDetail!.PhoneNumber.ToString().Length - 4) + caseTask.CustomerDetail.PhoneNumber.ToString().Substring(caseTask.CustomerDetail.PhoneNumber.ToString().Length - 4);
-            caseTask.CustomerDetail.PhoneNumber = maskedCustomerContact;
-            var maskedBeneficiaryContact = new string('*', caseTask.BeneficiaryDetail!.PhoneNumber.ToString().Length - 4) + caseTask.BeneficiaryDetail.PhoneNumber.ToString().Substring(caseTask.BeneficiaryDetail.PhoneNumber.ToString().Length - 4);
-            caseTask.BeneficiaryDetail.PhoneNumber = maskedBeneficiaryContact;
-
-            var timeTaken = DateTime.UtcNow - lastHistory!.StatusChangedAt;
-            var model = new CaseTransactionModel
-            {
-                ClaimsInvestigation = caseTask,
-                CaseIsValidToAssign = caseTask.IsValidCaseData(),
-                Beneficiary = caseTask.BeneficiaryDetail,
-                Assigned = caseTask.Status == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER,
-                TimeTaken = timeTaken.ToString(@"hh\:mm\:ss") ?? "-",
-                Withdrawable = (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR),
-                Currency = CustomExtensions.GetCultureByCountry(caseTask.ClientCompany!.Country!.Code.ToUpper()).NumberFormat.CurrencySymbol,
-                Culture = CustomExtensions.GetCultureByCountry(caseTask.ClientCompany!.Country!.Code.ToUpper())
-            };
-
-            return model;
         }
-
         public async Task<CaseAgencyAgentModel> SelectVendorAgent(string userEmail, long selectedcase)
         {
             var caseAllocate2Agent = await GetCases().Include(c => c.CaseNotes).Include(c => c.CaseMessages).FirstOrDefaultAsync(v => v.Id == selectedcase);
@@ -128,15 +131,8 @@ namespace risk.control.system.Services.Agency
         {
             try
             {
-                var caseTask = await context.Investigations
-                    .Include(c => c.InvestigationReport)
-                    .Include(c => c.PolicyDetail)
-                    .Include(c => c.CustomerDetail)
-                    .Include(c => c.BeneficiaryDetail)
-                    .FirstOrDefaultAsync(c => c.Id == caseId);
-
+                var caseTask = await context.Investigations.Include(c => c.InvestigationReport).Include(c => c.PolicyDetail).Include(c => c.CustomerDetail).Include(c => c.BeneficiaryDetail).FirstOrDefaultAsync(c => c.Id == caseId);
                 var agentUser = await context.ApplicationUser.AsNoTracking().Include(u => u.Vendor).FirstOrDefaultAsync(u => u.Email == vendorAgentEmail);
-
                 string drivingDistance, drivingDuration, drivingMap;
                 float distanceInMeters;
                 int durationInSeconds;
@@ -166,10 +162,8 @@ namespace risk.control.system.Services.Agency
                 caseTask.SelectedAgentDrivingDurationInSeconds = durationInSeconds;
                 caseTask.SelectedAgentDrivingMap = string.Format(drivingMap, "400", "400");
                 caseTask.TaskToAgentTime = DateTime.UtcNow;
-
                 context.Investigations.Update(caseTask);
                 var rows = await context.SaveChangesAsync(null, false);
-
                 await timelineService.UpdateTaskStatus(caseTask.Id, currentUser);
                 return caseTask;
             }
@@ -182,7 +176,61 @@ namespace risk.control.system.Services.Agency
 
         public async Task<CaseTransactionModel> GetClaimDetailsReport(string currentUserEmail, long caseId)
         {
-            var caseTask = await context.Investigations.AsNoTracking()
+            var caseTask = await GetCaseDetailReport(caseId);
+            var companyUser = await context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(u => u.Email == currentUserEmail);
+            var lastHistory = caseTask!.InvestigationTimeline.OrderByDescending(h => h.StatusChangedAt).FirstOrDefault();
+            var endTIme = caseTask.Status == CONSTANTS.CASE_STATUS.FINISHED ? caseTask.ProcessedByAssessorTime.GetValueOrDefault() : DateTime.UtcNow;
+            var timeTaken = endTIme - caseTask.Created;
+            var totalTimeTaken = timeTaken != TimeSpan.Zero
+                ? $"{(timeTaken.Days > 0 ? $"{timeTaken.Days}d " : "")}" +
+              $"{(timeTaken.Hours > 0 ? $"{timeTaken.Hours}h " : "")}" +
+              $"{(timeTaken.Minutes > 0 ? $"{timeTaken.Minutes}m " : "")}" +
+              $"{(timeTaken.Seconds > 0 ? $"{timeTaken.Seconds}s" : "less than a sec")}"
+            : "-";
+            var invoice = await context.VendorInvoice.AsNoTracking().FirstOrDefaultAsync(i => i.InvestigationReportId == caseTask.InvestigationReportId);
+            caseTask.InvestigationReport!.ReportTemplate = await GetReportTemplate(caseTask.ReportTemplateId);
+            var tracker = await context.PdfDownloadTracker.AsNoTracking().FirstOrDefaultAsync(t => t.ReportId == caseId && t.UserEmail == currentUserEmail);
+            bool canDownload = true;
+            if (tracker != null)
+            {
+                canDownload = tracker.DownloadCount <= 3;
+            }
+            var maskedCustomerContact = new string('*', caseTask.CustomerDetail!.PhoneNumber.ToString().Length - 4) + caseTask.CustomerDetail.PhoneNumber.ToString().Substring(caseTask.CustomerDetail.PhoneNumber.ToString().Length - 4);
+            caseTask.CustomerDetail.PhoneNumber = maskedCustomerContact;
+            var maskedBeneficiaryContact = new string('*', caseTask.BeneficiaryDetail!.PhoneNumber.ToString().Length - 4) + caseTask.BeneficiaryDetail.PhoneNumber.ToString().Substring(caseTask.BeneficiaryDetail.PhoneNumber.ToString().Length - 4);
+            caseTask.BeneficiaryDetail.PhoneNumber = maskedBeneficiaryContact;
+            return new CaseTransactionModel
+            {
+                ClaimsInvestigation = caseTask,
+                CaseIsValidToAssign = caseTask.IsValidCaseData(),
+                Beneficiary = caseTask.BeneficiaryDetail,
+                Assigned = caseTask.Status == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER,
+                TimeTaken = totalTimeTaken,
+                VendorInvoice = invoice,
+                CanDownload = canDownload,
+                Withdrawable = (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR),
+                Currency = CustomExtensions.GetCultureByCountry(caseTask.ClientCompany!.Country!.Code.ToUpper()).NumberFormat.CurrencySymbol,
+                Culture = CustomExtensions.GetCultureByCountry(caseTask.ClientCompany!.Country!.Code.ToUpper())
+            };
+        }
+        private async Task<ReportTemplate?> GetReportTemplate(long? templateId)
+        {
+            return await context.ReportTemplates.AsNoTracking()
+               .Include(r => r.LocationReport)
+                  .ThenInclude(l => l.AgentIdReport)
+              .Include(r => r.LocationReport)
+               .ThenInclude(l => l.MediaReports)
+              .Include(r => r.LocationReport)
+                  .ThenInclude(l => l.FaceIds)
+              .Include(r => r.LocationReport)
+                  .ThenInclude(l => l.DocumentIds)
+              .Include(r => r.LocationReport)
+                  .ThenInclude(l => l.Questions)
+              .FirstOrDefaultAsync(q => q.Id == templateId);
+        }
+        private async Task<InvestigationTask?> GetCaseDetailReport(long caseId)
+        {
+            return await context.Investigations.AsNoTracking()
                 .Include(c => c.CaseMessages)
                 .Include(c => c.CaseNotes)
                 .Include(c => c.InvestigationReport)
@@ -217,63 +265,7 @@ namespace risk.control.system.Services.Agency
                 .Include(c => c.CustomerDetail)
                 .ThenInclude(c => c!.PinCode)
                 .FirstOrDefaultAsync(m => m.Id == caseId);
-
-            var companyUser = await context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(u => u.Email == currentUserEmail);
-            var lastHistory = caseTask!.InvestigationTimeline.OrderByDescending(h => h.StatusChangedAt).FirstOrDefault();
-            var endTIme = caseTask.Status == CONSTANTS.CASE_STATUS.FINISHED ? caseTask.ProcessedByAssessorTime.GetValueOrDefault() : DateTime.UtcNow;
-            var timeTaken = endTIme - caseTask.Created;
-            var totalTimeTaken = timeTaken != TimeSpan.Zero
-                ? $"{(timeTaken.Days > 0 ? $"{timeTaken.Days}d " : "")}" +
-              $"{(timeTaken.Hours > 0 ? $"{timeTaken.Hours}h " : "")}" +
-              $"{(timeTaken.Minutes > 0 ? $"{timeTaken.Minutes}m " : "")}" +
-              $"{(timeTaken.Seconds > 0 ? $"{timeTaken.Seconds}s" : "less than a sec")}"
-            : "-";
-
-            var invoice = await context.VendorInvoice.AsNoTracking().FirstOrDefaultAsync(i => i.InvestigationReportId == caseTask.InvestigationReportId);
-            var templates = await context.ReportTemplates.AsNoTracking()
-               .Include(r => r.LocationReport)
-                  .ThenInclude(l => l.AgentIdReport)
-              .Include(r => r.LocationReport)
-               .ThenInclude(l => l.MediaReports)
-              .Include(r => r.LocationReport)
-                  .ThenInclude(l => l.FaceIds)
-              .Include(r => r.LocationReport)
-                  .ThenInclude(l => l.DocumentIds)
-              .Include(r => r.LocationReport)
-                  .ThenInclude(l => l.Questions)
-                  .FirstOrDefaultAsync(q => q.Id == caseTask.ReportTemplateId);
-
-            caseTask.InvestigationReport!.ReportTemplate = templates;
-
-            var tracker = await context.PdfDownloadTracker.AsNoTracking()
-                          .FirstOrDefaultAsync(t => t.ReportId == caseId && t.UserEmail == currentUserEmail);
-            bool canDownload = true;
-            if (tracker != null)
-            {
-                canDownload = tracker.DownloadCount <= 3;
-            }
-            var maskedCustomerContact = new string('*', caseTask.CustomerDetail!.PhoneNumber.ToString().Length - 4) + caseTask.CustomerDetail.PhoneNumber.ToString().Substring(caseTask.CustomerDetail.PhoneNumber.ToString().Length - 4);
-            caseTask.CustomerDetail.PhoneNumber = maskedCustomerContact;
-            var maskedBeneficiaryContact = new string('*', caseTask.BeneficiaryDetail!.PhoneNumber.ToString().Length - 4) + caseTask.BeneficiaryDetail.PhoneNumber.ToString().Substring(caseTask.BeneficiaryDetail.PhoneNumber.ToString().Length - 4);
-            caseTask.BeneficiaryDetail.PhoneNumber = maskedBeneficiaryContact;
-
-            var model = new CaseTransactionModel
-            {
-                ClaimsInvestigation = caseTask,
-                CaseIsValidToAssign = caseTask.IsValidCaseData(),
-                Beneficiary = caseTask.BeneficiaryDetail,
-                Assigned = caseTask.Status == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER,
-                TimeTaken = totalTimeTaken,
-                VendorInvoice = invoice,
-                CanDownload = canDownload,
-                Withdrawable = (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR),
-                Currency = CustomExtensions.GetCultureByCountry(caseTask.ClientCompany!.Country!.Code.ToUpper()).NumberFormat.CurrencySymbol,
-                Culture = CustomExtensions.GetCultureByCountry(caseTask.ClientCompany!.Country!.Code.ToUpper())
-            };
-
-            return model;
         }
-
         private IQueryable<InvestigationTask> GetCases()
         {
             var caseTasks = context.Investigations.AsNoTracking()

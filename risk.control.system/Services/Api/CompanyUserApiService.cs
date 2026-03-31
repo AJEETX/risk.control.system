@@ -77,41 +77,43 @@ namespace risk.control.system.Services.Api
                         _ => ("#DED5D5", "Offline", "fa fa-circle-o")
                     };
                 }
-                var photo = await base64FileService.GetBase64FileAsync(user.ProfilePictureUrl!, Applicationsettings.NO_USER);
-                activeUsersDetails.Add(new UserDetailResponse
-                {
-                    Id = user.Id,
-                    Name = $"{user.FirstName} {user.LastName}",
-                    Email = $"<a href=/Company/EditUser?userId={user.Id}>{user.Email}</a>",
-                    RawEmail = user.Email,
-                    Phone = $"(+{user.Country!.ISDCode}) {user.PhoneNumber}",
-                    Photo = photo,
-                    Active = user.Active,
-                    Addressline = $"{user.Addressline}, {user.District!.Name}",
-                    District = user.District.Name,
-                    State = user.State!.Code,
-                    StateName = user.State.Name,
-                    Country = user.Country.Code,
-                    Flag = $"/flags/{user.Country.Code.ToLower()}.png",
-                    Role = user.Role!.GetEnumDisplayName(),
-                    Pincode = user.PinCode!.Code,
-                    PincodeName = $"{user.PinCode.Name} - {user.PinCode.Code}",
-                    OnlineStatus = status,
-                    OnlineStatusName = statusName,
-                    OnlineStatusIcon = icon,
-                    IsUpdated = user.IsUpdated,
-                    LastModified = user.Updated ?? user.Created,
-                    Updated = (user.Updated ?? user.Created),
-                    UpdatedBy = user.UpdatedBy,
-                    LoginVerified = await featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION)
-                        ? !user.IsPasswordChangeRequired
-                        : true
-                });
+                var mappedUser = await MapCurrentUser(user, status, statusName, icon);
+                activeUsersDetails.Add(mappedUser);
             }
             await context.ApplicationUser.AsNoTracking().Where(u => u.ClientCompanyId == companyUser.ClientCompanyId).ExecuteUpdateAsync(u => u.SetProperty(x => x.IsUpdated, false));
             return activeUsersDetails;
         }
-
+        private async Task<UserDetailResponse> MapCurrentUser(ApplicationUser user, string status, string statusName, string icon)
+        {
+            var photo = await base64FileService.GetBase64FileAsync(user.ProfilePictureUrl!, Applicationsettings.NO_USER);
+            return new UserDetailResponse
+            {
+                Id = user.Id,
+                Name = $"{user.FirstName} {user.LastName}",
+                Email = $"<a href=/Company/EditUser?userId={user.Id}>{user.Email}</a>",
+                RawEmail = user.Email,
+                Phone = $"(+{user.Country!.ISDCode}) {user.PhoneNumber}",
+                Photo = photo,
+                Active = user.Active,
+                Addressline = $"{user.Addressline}, {user.District!.Name}",
+                District = user.District.Name,
+                State = user.State!.Code,
+                StateName = user.State.Name,
+                Country = user.Country.Code,
+                Flag = $"/flags/{user.Country.Code.ToLower()}.png",
+                Role = user.Role!.GetEnumDisplayName(),
+                Pincode = user.PinCode!.Code,
+                PincodeName = $"{user.PinCode.Name} - {user.PinCode.Code}",
+                OnlineStatus = status,
+                OnlineStatusName = statusName,
+                OnlineStatusIcon = icon,
+                IsUpdated = user.IsUpdated,
+                LastModified = user.Updated ?? user.Created,
+                Updated = (user.Updated ?? user.Created),
+                UpdatedBy = user.UpdatedBy,
+                LoginVerified = !await featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION) || !user.IsPasswordChangeRequired
+            };
+        }
         public async Task<List<UserDetailResponse>> GetCompanyUsers(string userEmail, long companyId)
         {
             var companyUser = await context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == userEmail);
@@ -135,37 +137,42 @@ namespace risk.control.system.Services.Api
                     var m when m < sessionTimeoutinMinutes => ("orange", $"Away for {m} minutes", "far fa-clock"),
                     _ => ("#DED5D5", "Offline", "fa fa-circle-o")
                 };
-                var photo = await base64FileService.GetBase64FileAsync(user.ProfilePictureUrl!, Applicationsettings.NO_USER);
-                activeUsersDetails.Add(new UserDetailResponse
-                {
-                    Id = user.Id,
-                    Name = $"{user.FirstName} {user.LastName}",
-                    Email = $"{user.Email}",
-                    Phone = $"(+{user.Country!.ISDCode}) {user.PhoneNumber}",
-                    Photo = photo,
-                    Active = user.Active,
-                    Addressline = $"{user.Addressline}, {user.District!.Name}",
-                    District = user.District.Name,
-                    State = user.State!.Code,
-                    StateName = user.State.Name,
-                    Country = user.Country.Code,
-                    Flag = $"/flags/{user.Country.Code.ToLower()}.png",
-                    Roles = user.Role!.GetEnumDisplayName(),
-                    Pincode = user.PinCode!.Code,
-                    PincodeName = $"{user.PinCode.Name} - {user.PinCode.Code}",
-                    OnlineStatus = status,
-                    OnlineStatusName = statusName,
-                    OnlineStatusIcon = icon,
-                    IsUpdated = user.IsUpdated,
-                    LastModified = user.Updated ?? user.Created,
-                    Updated = (user.Updated ?? user.Created),
-                    UpdatedBy = user.UpdatedBy,
-                    LoginVerified = loginVerificationEnabled ? !user.IsPasswordChangeRequired : true
-                });
+                var mappedUser = await MapUser(user, status, statusName, icon, loginVerificationEnabled);
+                activeUsersDetails.Add(mappedUser);
             }
             users.ForEach(u => u.IsUpdated = false);
             await context.SaveChangesAsync(false);
             return activeUsersDetails;
+        }
+        private async Task<UserDetailResponse> MapUser(ApplicationUser user, string status, string statusName, string icon, bool loginVerificationEnabled)
+        {
+            var photo = await base64FileService.GetBase64FileAsync(user.ProfilePictureUrl!, Applicationsettings.NO_USER);
+            return new UserDetailResponse
+            {
+                Id = user.Id,
+                Name = $"{user.FirstName} {user.LastName}",
+                Email = $"{user.Email}",
+                Phone = $"(+{user.Country!.ISDCode}) {user.PhoneNumber}",
+                Photo = photo,
+                Active = user.Active,
+                Addressline = $"{user.Addressline}, {user.District!.Name}",
+                District = user.District.Name,
+                State = user.State!.Code,
+                StateName = user.State.Name,
+                Country = user.Country.Code,
+                Flag = $"/flags/{user.Country.Code.ToLower()}.png",
+                Roles = user.Role!.GetEnumDisplayName(),
+                Pincode = user.PinCode!.Code,
+                PincodeName = $"{user.PinCode.Name} - {user.PinCode.Code}",
+                OnlineStatus = status,
+                OnlineStatusName = statusName,
+                OnlineStatusIcon = icon,
+                IsUpdated = user.IsUpdated,
+                LastModified = user.Updated ?? user.Created,
+                Updated = (user.Updated ?? user.Created),
+                UpdatedBy = user.UpdatedBy,
+                LoginVerified = loginVerificationEnabled ? !user.IsPasswordChangeRequired : true
+            };
         }
     }
 }
