@@ -130,9 +130,6 @@ namespace risk.control.system.Services.AgencyAdmin
             {
                 var suffix = user.Email!.Split('@').Last();
                 await SaveProfileImageAsync(input, suffix);
-            }
-            if (input.ProfileImage?.Length > 0)
-            {
                 var matchedFace = await _faceImageCheckService.CheckFaceImageAsync(input.ProfileImage);
                 if (matchedFace)
                 {
