@@ -143,13 +143,13 @@ namespace risk.control.system.Services.Common
         }
         private async Task<ApplicationUser> CreateUser(string email, ClaimsPrincipal principal, AzureADUserDetail azureADUserDetail, string azureRole)
         {
-            var countryName = azureADUserDetail.Country;
             var countryCode = ExtractCountryCode(principal);
-            var country = await _context.Country.FirstOrDefaultAsync(c => c.Name == countryName);
-            var pincode = await _context.PinCode.Include(d => d.District).Include(s => s.State).Include(c => c.Country).FirstOrDefaultAsync(p => p.CountryId == country!.CountryId && p.Code == azureADUserDetail.PostalCode);
-            if (pincode == null) throw new Exception($"Location configuration missing for country: {countryCode}");
-            var district = await _context.District.FirstOrDefaultAsync(d => d.Name == azureADUserDetail.City);
-            ClientCompany? company = RoleGroups.CompanyRoles.Contains(azureRole) ? await _context.ClientCompany.FirstOrDefaultAsync(c => !c.Deleted) : null;
+            countryCode = countryCode.ToLower();
+            var country = await _context.Country.FirstOrDefaultAsync(c => c.Code.ToLower() == countryCode) ?? throw new Exception($"Location configuration missing for country: {countryCode}");
+            var pincode = await _context.PinCode.Include(d => d.District).Include(s => s.State).Include(c => c.Country).FirstOrDefaultAsync(p => p.CountryId == country!.CountryId && p.Code == azureADUserDetail.PostalCode) ?? throw new Exception($"Location configuration missing for country: {countryCode}");
+            var cityName = azureADUserDetail.City?.ToLower();
+            var district = await _context.District.FirstOrDefaultAsync(d => d.Name.ToLower() == cityName) ?? throw new Exception($"Location configuration missing for cityName: {cityName}");
+            ClientCompany? company = RoleGroups.CompanyRoles.Contains(azureRole) ? await _context.ClientCompany.FirstOrDefaultAsync(c => !c.Deleted && c.CountryId == country!.CountryId) : null;
             Vendor? vendor = RoleGroups.AgencyRoles.Contains(azureRole) ? await _context.Vendor.FirstOrDefaultAsync(v => !v.Deleted) : null;
             var appRole = Enum.TryParse<AppRoles>(azureRole, out var parsedRole) ? parsedRole : AppRoles.GUEST;
             return new ApplicationUser
