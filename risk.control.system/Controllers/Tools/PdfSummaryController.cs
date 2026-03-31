@@ -47,50 +47,57 @@ public class PdfSummaryController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Summarize(IFormFile pdfFile)
     {
-        if (pdfFile == null || pdfFile.Length == 0) return BadRequest("Please upload a PDF file.");
-        if (pdfFile!.Length > 10 * 1024 * 1024) return BadRequest("File too large.");
-        var extension = Path.GetExtension(pdfFile.FileName).ToLowerInvariant();
-        if (extension != ".pdf") return BadRequest("Only PDF files allowed.");
-        if (pdfFile.ContentType != "application/pdf") return BadRequest("Invalid file type.");
+        // 1. Initial File Validation
+        var validationError = ValidatePdfFile(pdfFile);
+        if (validationError != null) return BadRequest(validationError);
+
+        // 2. User & Rate Limit Validation
         var user = await _userManager.GetUserAsync(User);
         if (user == null) return Unauthorized("Unauthorized");
-        if (user.PdfCount >= 5)
-        {
-            return StatusCode(403, new { errorMessage = "PDF Summary limit reached (5/5)." });
-        }
+        if (user.PdfCount >= 5) return StatusCode(403, new { errorMessage = "PDF Summary limit reached (5/5)." });
+
         try
         {
-            string content = "";
-            if (pdfFile.ContentType == "application/pdf")
-            {
-                using var memoryStream = new MemoryStream();
-                await pdfFile.CopyToAsync(memoryStream);
-                memoryStream.Position = 0;
+            string content = ExtractTextFromPdf(pdfFile);
+            if (string.IsNullOrWhiteSpace(content)) return BadRequest(new { errorMessage = "The file content is empty." });
 
-                using var pdfReader = new PdfReader(memoryStream);
-                using var pdfDocument = new PdfDocument(pdfReader);
-                var textBuilder = new StringBuilder();
-
-                for (int page = 1; page <= pdfDocument.GetNumberOfPages(); page++)
-                {
-                    textBuilder.Append(PdfTextExtractor.GetTextFromPage(pdfDocument.GetPage(page)));
-                }
-                content = textBuilder.ToString();
-            }
-
-            if (string.IsNullOrWhiteSpace(content))
-            {
-                return BadRequest(new { errorMessage = "The file content is empty." });
-            }
             var summary = await textAnalyticsService.AbstractiveSummarizeAsync(content);
+
             user.PdfCount++;
             await _userManager.UpdateAsync(user);
-            return Ok(new { summary = summary, remaining = 5 - user.PdfCount });
+
+            return Ok(new { summary, remaining = 5 - user.PdfCount });
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error processing PDF summary. {UserId}", _userManager.GetUserId(User) ?? "Anonymous");
+            logger.LogError(ex, "Error processing PDF summary. {UserId}", user.Id);
             return Ok(new { summary = "Error occurred", remaining = 5 - user.PdfCount });
         }
+    }
+
+    private string? ValidatePdfFile(IFormFile file)
+    {
+        if (file == null || file.Length == 0) return "Please upload a PDF file.";
+        if (file.Length > 10 * 1024 * 1024) return "File too large.";
+        if (!Path.GetExtension(file.FileName).Equals(".pdf", StringComparison.InvariantCultureIgnoreCase)) return "Only PDF files allowed.";
+        if (file.ContentType != "application/pdf") return "Invalid file type.";
+        return null;
+    }
+
+    private string ExtractTextFromPdf(IFormFile pdfFile)
+    {
+        using var memoryStream = new MemoryStream();
+        pdfFile.CopyTo(memoryStream); // Synchronous is fine here as we are already inside a Task
+        memoryStream.Position = 0;
+
+        using var pdfReader = new PdfReader(memoryStream);
+        using var pdfDocument = new PdfDocument(pdfReader);
+        var textBuilder = new StringBuilder();
+
+        for (int page = 1; page <= pdfDocument.GetNumberOfPages(); page++)
+        {
+            textBuilder.Append(PdfTextExtractor.GetTextFromPage(pdfDocument.GetPage(page)));
+        }
+        return textBuilder.ToString();
     }
 }

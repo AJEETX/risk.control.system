@@ -28,17 +28,15 @@ namespace risk.control.system.Services.Agency
             RoleManager<ApplicationRole> roleManager,
             IFileStorageService fileStorageService)
         {
-            this._context = context;
-            this._roleManager = roleManager;
-            this._fileStorageService = fileStorageService;
+            _context = context;
+            _roleManager = roleManager;
+            _fileStorageService = fileStorageService;
         }
 
         public async Task<bool> CreateAgency(Vendor vendor, string userEmail, string domainAddress, string portal_base_url)
         {
             Domain domainData = (Domain)Enum.Parse(typeof(Domain), domainAddress, true);
-
             vendor.Email = vendor.Email.ToLower() + domainData.GetEnumDisplayName();
-
             var companyExist = await _context.ClientCompany.AsNoTracking().AnyAsync(u => u.Email.Trim().ToLower() == vendor.Email && !u.Deleted);
             if (companyExist)
             {
@@ -52,14 +50,30 @@ namespace risk.control.system.Services.Agency
             if (vendor.Document is not null)
             {
                 var (fileName, relativePath) = await _fileStorageService.SaveAsync(vendor.Document, vendor.Email);
-
                 vendor.DocumentImageExtension = Path.GetExtension(fileName);
                 vendor.DocumentUrl = relativePath;
             }
-
+            UpdateAgency(vendor, domainData, userEmail);
+            _context.Vendor.Add(vendor);
+            var managerRole = await _roleManager.FindByNameAsync(MANAGER.DISPLAY_NAME);
+            var companyUser = await _context.ApplicationUser.Include(c => c.ClientCompany).FirstOrDefaultAsync(c => c.Email == userEmail);
+            var notification = new StatusNotification
+            {
+                RoleId = managerRole!.Id,
+                ClientCompanyId = companyUser!.ClientCompanyId,
+                Symbol = "far fa-hand-point-right i-green",
+                Message = $"Agency {vendor.Email}",
+                Status = "Created",
+                NotifierUserEmail = userEmail
+            };
+            _context.Notifications.Add(notification);
+            var rowsAffected = await _context.SaveChangesAsync();
+            return rowsAffected > 0;
+        }
+        private void UpdateAgency(Vendor vendor, Domain domainData, string userEmail)
+        {
             var textInfo = CultureInfo.CurrentCulture.TextInfo;
             vendor.Name = WebUtility.HtmlEncode(textInfo.ToTitleCase(vendor.Name.ToLower()));
-
             vendor.Status = VendorStatus.ACTIVE;
             vendor.AgreementDate = DateTime.UtcNow;
             vendor.ActivatedDate = DateTime.UtcNow;
@@ -73,39 +87,13 @@ namespace risk.control.system.Services.Agency
             vendor.DistrictId = vendor.SelectedDistrictId;
             vendor.StateId = vendor.SelectedStateId;
             vendor.CountryId = vendor.SelectedCountryId;
-
-            var pinCode = await _context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).FirstOrDefaultAsync(s => s.PinCodeId == vendor.SelectedPincodeId);
-
-            _context.Add(vendor);
-
-            var managerRole = await _roleManager.FindByNameAsync(MANAGER.DISPLAY_NAME);
-            var companyUser = await _context.ApplicationUser.Include(c => c.ClientCompany).FirstOrDefaultAsync(c => c.Email == userEmail);
-
-            var notification = new StatusNotification
-            {
-                RoleId = managerRole!.Id,
-                ClientCompanyId = companyUser!.ClientCompanyId,
-                Symbol = "far fa-hand-point-right i-green",
-                Message = $"Agency {vendor.Email}",
-                Status = "Created",
-                NotifierUserEmail = userEmail
-            };
-            _context.Notifications.Add(notification);
-            var rowsAffected = await _context.SaveChangesAsync();
-            //if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
-            //{
-            //    await smsService.DoSendSmsAsync(pinCode.Country.Code, pinCode.Country.ISDCode + vendor.PhoneNumber, "Agency created. \nDomain : " + vendor.Email + "\n" + portal_base_url);
-            //}
-
-            return rowsAffected > 0;
+            vendor.IsUpdated = true;
         }
-
         public async Task<bool> EditAgency(Vendor vendor, string userEmail, string portal_base_url)
         {
             if (vendor.Document is not null)
             {
                 var (fileName, relativePath) = await _fileStorageService.SaveAsync(vendor.Document, vendor.Email);
-
                 vendor.DocumentImageExtension = Path.GetExtension(fileName);
                 vendor.DocumentUrl = relativePath;
             }
@@ -120,23 +108,17 @@ namespace risk.control.system.Services.Agency
             }
             var textInfo = CultureInfo.CurrentCulture.TextInfo;
             vendor.Name = WebUtility.HtmlEncode(textInfo.ToTitleCase(vendor.Name.ToLower()));
-
             vendor.PinCodeId = vendor.SelectedPincodeId;
             vendor.DistrictId = vendor.SelectedDistrictId;
             vendor.StateId = vendor.SelectedStateId;
             vendor.CountryId = vendor.SelectedCountryId;
             vendor.BankName = WebUtility.HtmlEncode(vendor.BankName!.ToUpper());
             vendor.IFSCCode = WebUtility.HtmlEncode(vendor.IFSCCode!.ToUpper());
-            var pinCode = await _context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).FirstOrDefaultAsync(s => s.PinCodeId == vendor.SelectedPincodeId);
             vendor.IsUpdated = true;
             vendor.Updated = DateTime.UtcNow;
             vendor.UpdatedBy = userEmail;
             _context.Vendor.Update(vendor);
             var rowsAffected = await _context.SaveChangesAsync();
-            //if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
-            //{
-            //    await smsService.DoSendSmsAsync(pinCode.Country.Code, pinCode.Country.ISDCode + vendor.PhoneNumber, "Agency edited. \n\nDomain : " + vendor.Email + "\n" + portal_base_url);
-            //}
             return rowsAffected > 0;
         }
     }

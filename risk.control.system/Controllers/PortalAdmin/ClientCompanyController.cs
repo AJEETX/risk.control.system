@@ -273,26 +273,21 @@ namespace risk.control.system.Controllers
                     }
                 }
                 var pinCode = await _context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).FirstOrDefaultAsync(s => s.PinCodeId == clientCompany.SelectedPincodeId);
-
                 var companyAddress = clientCompany.Addressline + ", " + pinCode!.District!.Name + ", " + pinCode.State!.Name + ", " + pinCode.Country!.Code;
                 var companyCoordinates = await customApiCLient.GetCoordinatesFromAddressAsync(companyAddress);
                 var companyLatLong = companyCoordinates.Latitude + "," + companyCoordinates.Longitude;
-                var url = $"https://maps.googleapis.com/maps/api/staticmap?center={companyLatLong}&zoom=14&size={vendorMapSize}&maptype=roadmap&markers=color:red%7Clabel:S%7C{companyLatLong}&key={EnvHelper.Get("GOOGLE_MAP_KEY")}";
                 clientCompany.AddressLatitude = companyCoordinates.Latitude;
                 clientCompany.AddressLongitude = companyCoordinates.Longitude;
-                clientCompany.AddressMapLocation = url;
-
+                clientCompany.AddressMapLocation = $"https://maps.googleapis.com/maps/api/staticmap?center={companyLatLong}&zoom=14&size={vendorMapSize}&maptype=roadmap&markers=color:red%7Clabel:S%7C{companyLatLong}&key={EnvHelper.Get("GOOGLE_MAP_KEY")}";
                 clientCompany.PinCodeId = clientCompany.SelectedPincodeId;
                 clientCompany.DistrictId = clientCompany.SelectedDistrictId;
                 clientCompany.StateId = clientCompany.SelectedStateId;
                 clientCompany.CountryId = clientCompany.SelectedCountryId;
                 clientCompany.PhoneNumber = clientCompany.PhoneNumber.TrimStart('0');
-
                 clientCompany.Updated = DateTime.UtcNow;
                 clientCompany.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.ClientCompany.Update(clientCompany);
                 await _context.SaveChangesAsync();
-
                 await smsService.DoSendSmsAsync(pinCode.Country.Code, pinCode.Country.ISDCode + clientCompany.PhoneNumber, "Company account edited. \n\nDomain : " + clientCompany.Email + "\n" + _baseUrl);
                 notifyService.Custom($"Company edited successfully.", 3, "orange", "fas fa-building");
                 return RedirectToAction(nameof(ClientCompanyController.Details), "ClientCompany", new { id = clientCompany.ClientCompanyId });

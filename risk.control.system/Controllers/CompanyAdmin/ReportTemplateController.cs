@@ -27,18 +27,15 @@ namespace risk.control.system.Controllers.CompanyAdmin
             this.notifyService = notifyService;
             this.logger = logger;
         }
-
         public IActionResult Index()
         {
             return RedirectToAction(nameof(Profile));
         }
-
         [Breadcrumb(" Report Template")]
         public IActionResult Profile()
         {
             return View();
         }
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> GetReportTemplates(string? insuranceType)
@@ -53,23 +50,12 @@ namespace risk.control.system.Controllers.CompanyAdmin
             var sortColumn = Request.Form["columns[" + Request.Form["order[0][column]"].FirstOrDefault() + "][data]"].FirstOrDefault();
             var sortDirection = Request.Form["order[0][dir]"].FirstOrDefault();
             var searchValue = Request.Form["search[value]"].FirstOrDefault();
-
             int pageSize = length != null ? Convert.ToInt32(length) : 10;
             int skip = start != null ? Convert.ToInt32(start) : 0;
-
             var currentUserEmail = HttpContext.User?.Identity?.Name;
             var companyUser = context.ApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == currentUserEmail);
-            var query = context.ReportTemplates
-                    .Include(r => r.LocationReport)
-                        .ThenInclude(l => l.FaceIds)
-                    .Include(r => r.LocationReport)
-                        .ThenInclude(l => l.DocumentIds)
-                         .Include(r => r.LocationReport)
-                        .ThenInclude(l => l.MediaReports)
-                    .Include(r => r.LocationReport)
-                        .ThenInclude(l => l.Questions)
+            var query = context.ReportTemplates.Include(r => r.LocationReport).ThenInclude(l => l.FaceIds).Include(r => r.LocationReport).ThenInclude(l => l.DocumentIds).Include(r => r.LocationReport).ThenInclude(l => l.MediaReports).Include(r => r.LocationReport).ThenInclude(l => l.Questions)
                 .Where(q => q.ClientCompanyId == companyUser!.ClientCompanyId && !q.IsDeleted && q.UpdatedBy != "system").AsQueryable();
-
             if (!string.IsNullOrEmpty(insuranceType))
             {
                 if (Enum.TryParse<InsuranceType>(insuranceType, out var parsedType))
@@ -79,66 +65,32 @@ namespace risk.control.system.Controllers.CompanyAdmin
             }
             if (!string.IsNullOrWhiteSpace(searchValue))
             {
-                query = query.Where(t =>
-                    t.Name!.Contains(searchValue) ||
-                    t.InsuranceType.GetEnumDisplayName().Contains(searchValue));
+                query = query.Where(t => t.Name!.Contains(searchValue) || t.InsuranceType.GetEnumDisplayName().Contains(searchValue));
             }
-
-            // Sorting
             if (!string.IsNullOrEmpty(sortColumn) && !string.IsNullOrEmpty(sortDirection))
             {
-                switch (sortColumn)
+                query = sortColumn switch
                 {
-                    case "name":
-                        query = sortDirection == "asc" ? query.OrderBy(t => t.Name) : query.OrderByDescending(t => t.Name);
-                        break;
-
-                    case "insuranceType":
-                        query = sortDirection == "asc" ? query.OrderBy(t => t.InsuranceType) : query.OrderByDescending(t => t.InsuranceType);
-                        break;
-
-                    case "isActive":
-                        query = sortDirection == "asc" ? query.OrderBy(t => t.IsActive) : query.OrderByDescending(t => t.IsActive);
-                        break;
-
-                    case "createdOn":
-                        query = sortDirection == "asc" ? query.OrderBy(t => t.Created) : query.OrderByDescending(t => t.Created);
-                        break;
-
-                    case "locations":
-                        query = sortDirection == "asc" ? query.OrderBy(t => t.LocationReport.Count) : query.OrderByDescending(t => t.LocationReport.Count);
-                        break;
-
-                    case "faceCount":
-                        query = sortDirection == "asc"
-                            ? query.OrderBy(t => t.LocationReport.SelectMany(l => l.FaceIds!).Count(i => i.Selected))
-                            : query.OrderByDescending(t => t.LocationReport.SelectMany(l => l.FaceIds!).Count(i => i.Selected));
-                        break;
-
-                    case "docCount":
-                        query = sortDirection == "asc"
-                            ? query.OrderBy(t => t.LocationReport.SelectMany(l => l.DocumentIds!).Count(i => i.Selected))
-                            : query.OrderByDescending(t => t.LocationReport.SelectMany(l => l.DocumentIds!).Count(i => i.Selected));
-                        break;
-
-                    case "mediaCount":
-                        query = sortDirection == "asc"
-                            ? query.OrderBy(t => t.LocationReport.SelectMany(l => l.MediaReports!).Count(i => i.Selected))
-                            : query.OrderByDescending(t => t.LocationReport.SelectMany(l => l.MediaReports!).Count(i => i.Selected));
-                        break;
-
-                    case "questionCount":
-                        query = sortDirection == "asc"
-                            ? query.OrderBy(t => t.LocationReport.SelectMany(l => l.Questions!).Count())
-                            : query.OrderByDescending(t => t.LocationReport.SelectMany(l => l.Questions!).Count());
-                        break;
-
-                    default:
-                        query = query.OrderByDescending(t => t.Id);
-                        break;
-                }
+                    "name" => sortDirection == "asc" ? query.OrderBy(t => t.Name) : query.OrderByDescending(t => t.Name),
+                    "insuranceType" => sortDirection == "asc" ? query.OrderBy(t => t.InsuranceType) : query.OrderByDescending(t => t.InsuranceType),
+                    "isActive" => sortDirection == "asc" ? query.OrderBy(t => t.IsActive) : query.OrderByDescending(t => t.IsActive),
+                    "createdOn" => sortDirection == "asc" ? query.OrderBy(t => t.Created) : query.OrderByDescending(t => t.Created),
+                    "locations" => sortDirection == "asc" ? query.OrderBy(t => t.LocationReport.Count) : query.OrderByDescending(t => t.LocationReport.Count),
+                    "faceCount" => sortDirection == "asc"
+                                                ? query.OrderBy(t => t.LocationReport.SelectMany(l => l.FaceIds!).Count(i => i.Selected))
+                                                : query.OrderByDescending(t => t.LocationReport.SelectMany(l => l.FaceIds!).Count(i => i.Selected)),
+                    "docCount" => sortDirection == "asc"
+                                                ? query.OrderBy(t => t.LocationReport.SelectMany(l => l.DocumentIds!).Count(i => i.Selected))
+                                                : query.OrderByDescending(t => t.LocationReport.SelectMany(l => l.DocumentIds!).Count(i => i.Selected)),
+                    "mediaCount" => sortDirection == "asc"
+                                                ? query.OrderBy(t => t.LocationReport.SelectMany(l => l.MediaReports!).Count(i => i.Selected))
+                                                : query.OrderByDescending(t => t.LocationReport.SelectMany(l => l.MediaReports!).Count(i => i.Selected)),
+                    "questionCount" => sortDirection == "asc"
+                                                ? query.OrderBy(t => t.LocationReport.SelectMany(l => l.Questions!).Count())
+                                                : query.OrderByDescending(t => t.LocationReport.SelectMany(l => l.Questions!).Count()),
+                    _ => query.OrderByDescending(t => t.Id),
+                };
             }
-
             var recordsTotal = await query.CountAsync();
             var data = await query.Skip(skip).Take(pageSize)
                 .Select(t => new
@@ -176,19 +128,8 @@ namespace risk.control.system.Controllers.CompanyAdmin
         [Breadcrumb(" Detail", FromAction = nameof(Profile))]
         public async Task<IActionResult> Details(long id)
         {
-            var template = await context.ReportTemplates
-                .Include(r => r.LocationReport)
-                    .ThenInclude(l => l.AgentIdReport)
-                .Include(r => r.LocationReport)
-                    .ThenInclude(l => l.MediaReports)
-                .Include(r => r.LocationReport)
-                    .ThenInclude(l => l.FaceIds)
-                .Include(r => r.LocationReport)
-                    .ThenInclude(l => l.DocumentIds)
-                .Include(r => r.LocationReport)
-                    .ThenInclude(l => l.Questions)
-                .FirstOrDefaultAsync(r => r.Id == id);
-
+            var template = await context.ReportTemplates.Include(r => r.LocationReport).ThenInclude(l => l.AgentIdReport).Include(r => r.LocationReport).ThenInclude(l => l.MediaReports).Include(r => r.LocationReport).ThenInclude(l => l.FaceIds)
+                .Include(r => r.LocationReport).ThenInclude(l => l.DocumentIds).Include(r => r.LocationReport).ThenInclude(l => l.Questions).FirstOrDefaultAsync(r => r.Id == id);
             if (template == null)
             {
                 return NotFound();
@@ -236,7 +177,6 @@ namespace risk.control.system.Controllers.CompanyAdmin
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-
                 var activated = await cloneService.Activate(id);
                 if (activated)
                 {
@@ -269,12 +209,10 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 {
                     return Json(new { success = false, message = "Template not found." });
                 }
-
                 if (template.IsActive)
                 {
                     return Json(new { success = false, message = "Active templates cannot be deleted." });
                 }
-
                 template.IsDeleted = true;
                 context.ReportTemplates.Update(template);
                 var affected = await context.SaveChangesAsync(null, false) > 0;
@@ -305,11 +243,8 @@ namespace risk.control.system.Controllers.CompanyAdmin
 
             if (question == null)
             {
-                // Return a failure response if the question was not found
                 return Json(new { success = false, message = "Question not found." });
             }
-
-            // Return the question details as JSON
             return Json(new { success = true, question = question });
         }
 
@@ -336,9 +271,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                     IsRequired = isRequired
                 };
                 location.Questions!.Add(question);
-
                 await context.SaveChangesAsync(null, false);
-
                 return Json(new { success = true, updatedQuestion = question });
             }
             catch (Exception ex)
@@ -396,28 +329,19 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 {
                     return Json(new { success = false, message = "Single Location not DELETED." });
                 }
-                var location = await context.LocationReport
-                    .Include(l => l.Questions)
-                    .Include(l => l.AgentIdReport)
-                    .Include(l => l.FaceIds)
-                    .Include(l => l.DocumentIds)
-                    .Include(l => l.MediaReports)
+                var location = await context.LocationReport.Include(l => l.Questions).Include(l => l.AgentIdReport).Include(l => l.FaceIds).Include(l => l.DocumentIds).Include(l => l.MediaReports)
                     .FirstOrDefaultAsync(l => l.Id == id);
-
                 if (location == null)
                 {
                     return Json(new { success = false, message = "Location not found." });
                 }
-
                 context.Questions.RemoveRange(location.Questions!);
                 context.AgentIdReport.Remove(location.AgentIdReport!);
                 context.DigitalIdReport.RemoveRange(location.FaceIds!);
                 context.DocumentIdReport.RemoveRange(location.DocumentIds!);
                 context.MediaReport.RemoveRange(location.MediaReports!);
-
                 context.LocationReport.Remove(location);
                 await context.SaveChangesAsync(null, false);
-
                 return Json(new { success = true, Id = id });
             }
             catch (Exception ex)
@@ -437,57 +361,38 @@ namespace risk.control.system.Controllers.CompanyAdmin
             }
             try
             {
-                var location = await context.LocationReport
-                    .Include(l => l.AgentIdReport)
-                    .Include(l => l.FaceIds)
-                    .Include(l => l.DocumentIds)
-                    .Include(l => l.MediaReports)
-                    .FirstOrDefaultAsync(l => l.Id == model.LocationId);
-
+                var location = await context.LocationReport.Include(l => l.AgentIdReport).Include(l => l.FaceIds).Include(l => l.DocumentIds).Include(l => l.MediaReports).FirstOrDefaultAsync(l => l.Id == model.LocationId);
                 if (location == null)
                     return Json(new { success = false, message = "Location not found." });
-
                 var reportTemplate = await context.ReportTemplates.Include(r => r.LocationReport).FirstOrDefaultAsync(r => r.Id == model.TemplateId);
-
                 var hasAnyLocationName = reportTemplate!.LocationReport.Any(l => l.Id != model.LocationId && l.LocationName!.Trim().Equals(model.LocationName!.Trim(), StringComparison.CurrentCultureIgnoreCase));
-
                 if (hasAnyLocationName)
                 {
                     return Json(new { success = false, message = $"Location name {model.LocationName} exists." });
                 }
                 location.LocationName = model.LocationName!.Trim().ToUpper();
-
-                // Update AgentId
                 var agent = location.AgentIdReport;
                 if (agent != null)
                     agent.Selected = model.AgentId!.Selected;
-
-                // Update FaceIds
                 foreach (var f in model.FaceIds!)
                 {
                     var face = location.FaceIds!.FirstOrDefault(x => x.Id == f.Id);
                     if (face != null)
                         face.Selected = f.Selected;
                 }
-
-                // Update DocumentIds
                 foreach (var d in model.DocumentIds!)
                 {
                     var doc = location.DocumentIds!.FirstOrDefault(x => x.Id == d.Id);
                     if (doc != null)
                         doc.Selected = d.Selected;
                 }
-
-                // Update MediaReports
                 foreach (var m in model.MediaReports!)
                 {
                     var media = location.MediaReports!.FirstOrDefault(x => x.Id == m.Id);
                     if (media != null)
                         media.Selected = m.Selected;
                 }
-
                 await context.SaveChangesAsync(null, false);
-
                 return Json(new { success = true, message = "Location saved successfully!" });
             }
             catch (Exception ex)
@@ -503,80 +408,23 @@ namespace risk.control.system.Controllers.CompanyAdmin
         {
             try
             {
-                var original = await context.LocationReport
-                    .Include(l => l.AgentIdReport)
-                    .Include(l => l.FaceIds)
-                    .Include(l => l.DocumentIds)
-                    .Include(l => l.MediaReports)
-                    .Include(l => l.Questions)
-                    .FirstOrDefaultAsync(l => l.Id == locationId);
-
+                var original = await context.LocationReport.Include(l => l.AgentIdReport).Include(l => l.FaceIds).Include(l => l.DocumentIds).Include(l => l.MediaReports).Include(l => l.Questions).FirstOrDefaultAsync(l => l.Id == locationId);
                 if (original == null)
                     return Json(new { success = false, message = "Original location not found." });
-
                 var locationName = original.LocationName + " (Copy)";
                 var reportTemplate = await context.ReportTemplates.Include(r => r.LocationReport).FirstOrDefaultAsync(r => r.Id == reportTemplateId);
-
                 if (reportTemplate == null)
                 {
                     return Json(new { success = false, message = "Report Template not found." });
                 }
-
                 var hasAnyLocationName = reportTemplate.LocationReport.Any(l => original.Id != locationId && l.LocationName!.Trim().Equals(locationName.Trim(), StringComparison.CurrentCultureIgnoreCase));
-
                 if (hasAnyLocationName)
                 {
                     return Json(new { success = false, message = $"Location name {locationName} exists." });
                 }
-                // Create clone (deep copy)
-                var clone = new LocationReport
-                {
-                    LocationName = original.LocationName + " (Copy)",
-                    ReportTemplateId = reportTemplateId,
-                    Created = DateTime.UtcNow,
-                    AgentIdReport = new AgentIdReport
-                    {
-                        Selected = original.AgentIdReport!.Selected,
-                        IsRequired = original.AgentIdReport.IsRequired,
-                        ReportName = original.AgentIdReport.ReportName,                                          // You can set other properties of Agent here if needed
-                        ReportType = original.AgentIdReport.ReportType,  // Default agent
-                    },
-                    FaceIds = original.FaceIds?.Select(f => new FaceIdReport
-                    {
-                        IsRequired = f.IsRequired,
-                        Selected = f.Selected,
-                        ReportName = f.ReportName,
-                        Has2Face = f.Has2Face,
-                        ReportType = f.ReportType
-                    }).ToList(),
-                    DocumentIds = original.DocumentIds?.Select(d => new DocumentIdReport
-                    {
-                        IsRequired = d.IsRequired,
-                        Selected = d.Selected,
-                        HasBackImage = d.HasBackImage,
-                        ReportName = d.ReportName,
-                        ReportType = d.ReportType
-                    }).ToList(),
-                    MediaReports = original.MediaReports?.Select(m => new MediaReport
-                    {
-                        IsRequired = m.IsRequired,
-                        Selected = m.Selected,
-                        ReportName = m.ReportName,
-                        MediaType = m.MediaType,
-                        MediaExtension = m.MediaExtension
-                    }).ToList(),
-                    Questions = original.Questions?.Select(q => new Question
-                    {
-                        QuestionText = q.QuestionText,
-                        QuestionType = q.QuestionType,
-                        IsRequired = q.IsRequired
-                    }).ToList()
-                };
-
+                var clone = CreateLocationReport(original, reportTemplateId);
                 context.LocationReport.Add(clone);
                 await context.SaveChangesAsync(null, false);
-
-                // Render partial view for new location card
                 var html = await this.RenderViewAsync("_LocationCardPartial", clone, true);
                 return Json(new { success = true, html });
             }
@@ -585,6 +433,54 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 logger.LogError(ex, "Error Location Clone for {ReportTemplateId} {LocationId}. {UserEmail}.", reportTemplateId, locationId, HttpContext.User.Identity?.Name);
                 return Json(new { success = false, message = ex.Message });
             }
+
+        }
+        private LocationReport CreateLocationReport(LocationReport original, long reportTemplateId)
+        {
+            var clone = new LocationReport
+            {
+                LocationName = original.LocationName + " (Copy)",
+                ReportTemplateId = reportTemplateId,
+                Created = DateTime.UtcNow,
+                AgentIdReport = new AgentIdReport
+                {
+                    Selected = original.AgentIdReport!.Selected,
+                    IsRequired = original.AgentIdReport.IsRequired,
+                    ReportName = original.AgentIdReport.ReportName,                                          // You can set other properties of Agent here if needed
+                    ReportType = original.AgentIdReport.ReportType,  // Default agent
+                },
+                FaceIds = original.FaceIds?.Select(f => new FaceIdReport
+                {
+                    IsRequired = f.IsRequired,
+                    Selected = f.Selected,
+                    ReportName = f.ReportName,
+                    Has2Face = f.Has2Face,
+                    ReportType = f.ReportType
+                }).ToList(),
+                DocumentIds = original.DocumentIds?.Select(d => new DocumentIdReport
+                {
+                    IsRequired = d.IsRequired,
+                    Selected = d.Selected,
+                    HasBackImage = d.HasBackImage,
+                    ReportName = d.ReportName,
+                    ReportType = d.ReportType
+                }).ToList(),
+                MediaReports = original.MediaReports?.Select(m => new MediaReport
+                {
+                    IsRequired = m.IsRequired,
+                    Selected = m.Selected,
+                    ReportName = m.ReportName,
+                    MediaType = m.MediaType,
+                    MediaExtension = m.MediaExtension
+                }).ToList(),
+                Questions = original.Questions?.Select(q => new Question
+                {
+                    QuestionText = q.QuestionText,
+                    QuestionType = q.QuestionType,
+                    IsRequired = q.IsRequired
+                }).ToList()
+            };
+            return clone;
         }
     }
 }
