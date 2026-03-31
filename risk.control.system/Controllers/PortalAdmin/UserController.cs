@@ -75,24 +75,21 @@ namespace risk.control.system.Controllers.PortalAdmin
             user.StateId = user.SelectedStateId;
             user.DistrictId = user.SelectedDistrictId;
             user.CountryId = user.SelectedCountryId;
-
             IdentityResult result = await userManager.CreateAsync(user, user.Password!);
-
-            if (result.Succeeded)
-            {
-                notifyService.Custom($"User created successfully.", 3, "green", "fas fa-user-plus");
-                var country = await context.Country.FirstOrDefaultAsync(c => c.CountryId == user.CountryId);
-                await smsService.DoSendSmsAsync(country!.Code, country.ISDCode + user.PhoneNumber, "User created. \n\nEmail : " + user.Email);
-
-                return RedirectToAction(nameof(Index));
-            }
-            else
+            if (!result.Succeeded)
             {
                 notifyService.Error("Error to create user!");
                 foreach (IdentityError error in result.Errors)
                     ModelState.AddModelError("", error.Description);
+                return View(user);
             }
-            return View(user);
+            var roles = await userManager.GetRolesAsync(user);
+            var roleResult = await userManager.RemoveFromRolesAsync(user, roles);
+            await userManager.AddToRoleAsync(user, user.Role.ToString()!);
+            notifyService.Custom($"User created successfully.", 3, "green", "fas fa-user-plus");
+            var country = await context.Country.FirstOrDefaultAsync(c => c.CountryId == user.CountryId);
+            await smsService.DoSendSmsAsync(country!.Code, country.ISDCode + user.PhoneNumber, "User created. \n\nEmail : " + user.Email);
+            return RedirectToAction(nameof(Index));
         }
 
         [Breadcrumb(" Edit")]
@@ -150,26 +147,7 @@ namespace risk.control.system.Controllers.PortalAdmin
                     user.ProfilePictureUrl = relativePath;
                     user.ProfilePictureExtension = Path.GetExtension(fileName);
                 }
-                user.PhoneNumber = applicationUser?.PhoneNumber ?? user.PhoneNumber;
-                user.PhoneNumber = user.PhoneNumber!.TrimStart('0');
-                user.FirstName = applicationUser?.FirstName!;
-                user.LastName = applicationUser?.LastName!;
-                if (!string.IsNullOrWhiteSpace(applicationUser?.Password))
-                {
-                    user.Password = applicationUser.Password;
-                }
-                user.Country = applicationUser!.Country;
-                user.Active = applicationUser.Active;
-                user.Addressline = applicationUser.Addressline;
-                user.CountryId = applicationUser.SelectedCountryId;
-                user.StateId = applicationUser.SelectedStateId;
-                user.DistrictId = applicationUser.SelectedDistrictId;
-                user.PinCodeId = applicationUser.SelectedPincodeId;
-                user.IsUpdated = true;
-                user.Updated = DateTime.UtcNow;
-                user.PhoneNumber = applicationUser.PhoneNumber;
-                user.UpdatedBy = HttpContext.User?.Identity?.Name;
-                user.SecurityStamp = DateTime.UtcNow.ToString();
+                UpdateUser(user, applicationUser!);
                 var result = await userManager.UpdateAsync(user);
                 if (!result.Succeeded)
                 {
@@ -190,7 +168,25 @@ namespace risk.control.system.Controllers.PortalAdmin
                 return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
             }
         }
-
+        private void UpdateUser(ApplicationUser user, ApplicationUser applicationUser)
+        {
+            user.PhoneNumber = applicationUser?.PhoneNumber ?? user.PhoneNumber;
+            user.PhoneNumber = user.PhoneNumber!.TrimStart('0');
+            user.FirstName = applicationUser?.FirstName!;
+            user.LastName = applicationUser?.LastName!;
+            user.Country = applicationUser!.Country;
+            user.Active = applicationUser.Active;
+            user.Addressline = applicationUser.Addressline;
+            user.CountryId = applicationUser.SelectedCountryId;
+            user.StateId = applicationUser.SelectedStateId;
+            user.DistrictId = applicationUser.SelectedDistrictId;
+            user.PinCodeId = applicationUser.SelectedPincodeId;
+            user.IsUpdated = true;
+            user.Updated = DateTime.UtcNow;
+            user.PhoneNumber = applicationUser.PhoneNumber;
+            user.UpdatedBy = HttpContext.User?.Identity?.Name;
+            user.SecurityStamp = DateTime.UtcNow.ToString();
+        }
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteAutoConfirmed(long id)

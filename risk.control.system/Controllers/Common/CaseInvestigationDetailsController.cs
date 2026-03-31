@@ -94,7 +94,6 @@ namespace risk.control.system.Controllers.Common
         public async Task<IActionResult> GetCustomerDetail(long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
-
             try
             {
                 var isAgencyUser = await _context.ApplicationUser.AnyAsync(u => u.Email == userEmail);
@@ -135,7 +134,6 @@ namespace risk.control.system.Controllers.Common
         public async Task<IActionResult> GetBeneficiaryDetail(long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
-
             try
             {
                 var beneficiary = await _context.BeneficiaryDetail
@@ -169,7 +167,6 @@ namespace risk.control.system.Controllers.Common
         public async Task<IActionResult> GetCustomerMap(long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
-
             try
             {
                 var customer = await _context.CustomerDetail
@@ -242,12 +239,12 @@ namespace risk.control.system.Controllers.Common
         public async Task<IActionResult> GetAgentDetail(long caseId, long faceId)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
-
             try
             {
                 var claim = await _caseService.GetCaseDetailForAgentDetail(caseId);
                 var agentReport = await _context.AgentIdReport.FirstOrDefaultAsync(l => l.Id == faceId);
-
+                if (agentReport == null)
+                    return NotFound("Agent report not found.");
                 var longLat = agentReport!.LongLat!.IndexOf(",");
                 var lat = agentReport?.LongLat.Substring(0, longLat)?.Trim();
                 var LatitudeIndex = lat!.IndexOf("=");
@@ -255,48 +252,23 @@ namespace risk.control.system.Controllers.Common
                 var longi = agentReport?.LongLat.Substring(longLat + 1)?.Trim();
                 var LongitudeIndex = longi!.IndexOf("=");
                 var longitude = longi.Substring(LongitudeIndex + 1)?.Trim();
-
+                object center = null!, dakota = null!, frick = null!;
+                string Address = null!;
                 if (claim.PolicyDetail!.InsuranceType == InsuranceType.UNDERWRITING)
                 {
-                    var center = new { Lat = decimal.Parse(claim.CustomerDetail!.Latitude!), Lng = decimal.Parse(claim.CustomerDetail!.Longitude!) };
-                    var dakota = new { Lat = decimal.Parse(claim.CustomerDetail!.Latitude!), Lng = decimal.Parse(claim.CustomerDetail!.Longitude!) };
-
-                    if (agentReport is not null)
-                    {
-                        var frick = new { Lat = decimal.Parse(latitude!), Lng = decimal.Parse(longitude!) };
-                        return Ok(new
-                        {
-                            center,
-                            dakota,
-                            frick,
-                            url = string.Format(agentReport.LocationMapUrl!, "500", "500"),
-                            distance = agentReport.Distance,
-                            duration = agentReport.Duration,
-                            Address = "Life-Assured"
-                        });
-                    }
+                    center = new { Lat = decimal.Parse(claim.CustomerDetail!.Latitude!), Lng = decimal.Parse(claim.CustomerDetail!.Longitude!) };
+                    dakota = new { Lat = decimal.Parse(claim.CustomerDetail!.Latitude!), Lng = decimal.Parse(claim.CustomerDetail!.Longitude!) };
+                    frick = new { Lat = decimal.Parse(latitude!), Lng = decimal.Parse(longitude!) };
+                    Address = "Life-Assured";
                 }
                 else
                 {
-                    var center = new { Lat = decimal.Parse(claim.BeneficiaryDetail!.Latitude!), Lng = decimal.Parse(claim.BeneficiaryDetail!.Longitude!) };
-                    var dakota = new { Lat = decimal.Parse(claim.BeneficiaryDetail!.Latitude!), Lng = decimal.Parse(claim.BeneficiaryDetail!.Longitude!) };
-
-                    if (agentReport is not null)
-                    {
-                        var frick = new { Lat = decimal.Parse(latitude!), Lng = decimal.Parse(longitude!) };
-                        return Ok(new
-                        {
-                            center,
-                            dakota,
-                            frick,
-                            url = string.Format(agentReport.LocationMapUrl!, "500", "500"),
-                            distance = agentReport.Distance,
-                            duration = agentReport.Duration,
-                            Address = "Beneficiary"
-                        });
-                    }
+                    center = new { Lat = decimal.Parse(claim.BeneficiaryDetail!.Latitude!), Lng = decimal.Parse(claim.BeneficiaryDetail!.Longitude!) };
+                    dakota = new { Lat = decimal.Parse(claim.BeneficiaryDetail!.Latitude!), Lng = decimal.Parse(claim.BeneficiaryDetail!.Longitude!) };
+                    frick = new { Lat = decimal.Parse(latitude!), Lng = decimal.Parse(longitude!) };
+                    Address = "Beneficiary";
                 }
-                return Ok();
+                return Ok(new { center, dakota, frick, url = string.Format(agentReport!.LocationMapUrl!, "500", "500"), distance = agentReport.Distance, duration = agentReport.Duration, Address = Address });
             }
             catch (Exception ex)
             {
@@ -314,7 +286,8 @@ namespace risk.control.system.Controllers.Common
             {
                 var claim = await _caseService.GetCaseDetailForAgentDetail(caseId);
                 var faceReport = await _context.DigitalIdReport.FirstOrDefaultAsync(l => l.Id == faceId);
-
+                if (faceReport == null)
+                    return NotFound("Face report not found.");
                 var longLat = faceReport!.LongLat!.IndexOf(",");
                 var lat = faceReport?.LongLat.Substring(0, longLat)?.Trim();
                 var LatitudeIndex = lat!.IndexOf("=");
@@ -322,48 +295,23 @@ namespace risk.control.system.Controllers.Common
                 var longi = faceReport?.LongLat.Substring(longLat + 1)?.Trim();
                 var LongitudeIndex = longi!.IndexOf("=");
                 var longitude = longi.Substring(LongitudeIndex + 1)?.Trim();
-
+                object center = null!, dakota = null!, frick = null!;
+                string Address = null!;
                 if (claim.PolicyDetail!.InsuranceType == InsuranceType.UNDERWRITING)
                 {
-                    var center = new { Lat = decimal.Parse(claim.CustomerDetail!.Latitude!), Lng = decimal.Parse(claim.CustomerDetail!.Longitude!) };
-                    var dakota = new { Lat = decimal.Parse(claim.CustomerDetail!.Latitude!), Lng = decimal.Parse(claim.CustomerDetail!.Longitude!) };
-
-                    if (faceReport is not null)
-                    {
-                        var frick = new { Lat = decimal.Parse(latitude!), Lng = decimal.Parse(longitude!) };
-                        return Ok(new
-                        {
-                            center,
-                            dakota,
-                            frick,
-                            url = string.Format(faceReport.LocationMapUrl!, "500", "500"),
-                            distance = faceReport.Distance,
-                            duration = faceReport.Duration,
-                            Address = "Life-Assured"
-                        });
-                    }
+                    center = new { Lat = decimal.Parse(claim.CustomerDetail!.Latitude!), Lng = decimal.Parse(claim.CustomerDetail!.Longitude!) };
+                    dakota = new { Lat = decimal.Parse(claim.CustomerDetail!.Latitude!), Lng = decimal.Parse(claim.CustomerDetail!.Longitude!) };
+                    frick = new { Lat = decimal.Parse(latitude!), Lng = decimal.Parse(longitude!) };
+                    Address = "Life-Assured";
                 }
                 else
                 {
-                    var center = new { Lat = decimal.Parse(claim.BeneficiaryDetail!.Latitude!), Lng = decimal.Parse(claim.BeneficiaryDetail!.Longitude!) };
-                    var dakota = new { Lat = decimal.Parse(claim.BeneficiaryDetail!.Latitude!), Lng = decimal.Parse(claim.BeneficiaryDetail!.Longitude!) };
-
-                    if (faceReport is not null)
-                    {
-                        var frick = new { Lat = decimal.Parse(latitude!), Lng = decimal.Parse(longitude!) };
-                        return Ok(new
-                        {
-                            center,
-                            dakota,
-                            frick,
-                            url = string.Format(faceReport.LocationMapUrl!, "500", "500"),
-                            distance = faceReport.Distance,
-                            duration = faceReport.Duration,
-                            Address = "Beneficiary"
-                        });
-                    }
+                    center = new { Lat = decimal.Parse(claim.BeneficiaryDetail!.Latitude!), Lng = decimal.Parse(claim.BeneficiaryDetail!.Longitude!) };
+                    dakota = new { Lat = decimal.Parse(claim.BeneficiaryDetail!.Latitude!), Lng = decimal.Parse(claim.BeneficiaryDetail!.Longitude!) };
+                    frick = new { Lat = decimal.Parse(latitude!), Lng = decimal.Parse(longitude!) };
+                    Address = "Beneficiary";
                 }
-                return Ok();
+                return Ok(new { center, dakota, frick, url = string.Format(faceReport!.LocationMapUrl!, "500", "500"), distance = faceReport.Distance, duration = faceReport.Duration, Address = Address });
             }
             catch (Exception ex)
             {
@@ -381,7 +329,8 @@ namespace risk.control.system.Controllers.Common
             {
                 var claim = await _caseService.GetCaseDetailForAgentDetail(caseId);
                 var docReport = await _context.DocumentIdReport.FirstOrDefaultAsync(l => l.Id == docId);
-
+                if (docReport == null)
+                    return NotFound("Document report not found.");
                 var longLat = docReport!.LongLat!.IndexOf(",");
                 var lat = docReport?.LongLat.Substring(0, longLat)?.Trim();
                 var LatitudeIndex = lat!.IndexOf("=");
@@ -389,48 +338,23 @@ namespace risk.control.system.Controllers.Common
                 var longi = docReport?.LongLat.Substring(longLat + 1)?.Trim();
                 var LongitudeIndex = longi!.IndexOf("=");
                 var longitude = longi.Substring(LongitudeIndex + 1)?.Trim();
-
+                object center = null!, dakota = null!, frick = null!;
+                string Address = null!;
                 if (claim.PolicyDetail!.InsuranceType == InsuranceType.UNDERWRITING)
                 {
-                    var center = new { Lat = decimal.Parse(claim.CustomerDetail!.Latitude!), Lng = decimal.Parse(claim.CustomerDetail!.Longitude!) };
-                    var dakota = new { Lat = decimal.Parse(claim.CustomerDetail!.Latitude!), Lng = decimal.Parse(claim.CustomerDetail!.Longitude!) };
-
-                    if (docReport is not null)
-                    {
-                        var frick = new { Lat = decimal.Parse(latitude!), Lng = decimal.Parse(longitude!) };
-                        return Ok(new
-                        {
-                            center,
-                            dakota,
-                            frick,
-                            url = string.Format(docReport.LocationMapUrl!, "500", "500"),
-                            distance = docReport.Distance,
-                            duration = docReport.Duration,
-                            Address = "Life-Assured"
-                        });
-                    }
+                    center = new { Lat = decimal.Parse(claim.CustomerDetail!.Latitude!), Lng = decimal.Parse(claim.CustomerDetail!.Longitude!) };
+                    dakota = new { Lat = decimal.Parse(claim.CustomerDetail!.Latitude!), Lng = decimal.Parse(claim.CustomerDetail!.Longitude!) };
+                    frick = new { Lat = decimal.Parse(latitude!), Lng = decimal.Parse(longitude!) };
+                    Address = "Life-Assured";
                 }
                 else
                 {
-                    var center = new { Lat = decimal.Parse(claim.BeneficiaryDetail!.Latitude!), Lng = decimal.Parse(claim.BeneficiaryDetail!.Longitude!) };
-                    var dakota = new { Lat = decimal.Parse(claim.BeneficiaryDetail!.Latitude!), Lng = decimal.Parse(claim.BeneficiaryDetail!.Longitude!) };
-
-                    if (docReport is not null)
-                    {
-                        var frick = new { Lat = decimal.Parse(latitude!), Lng = decimal.Parse(longitude!) };
-                        return Ok(new
-                        {
-                            center,
-                            dakota,
-                            frick,
-                            url = string.Format(docReport.LocationMapUrl!, "500", "500"),
-                            distance = docReport.Distance,
-                            duration = docReport.Duration,
-                            Address = "Beneficiary"
-                        });
-                    }
+                    center = new { Lat = decimal.Parse(claim.BeneficiaryDetail!.Latitude!), Lng = decimal.Parse(claim.BeneficiaryDetail!.Longitude!) };
+                    dakota = new { Lat = decimal.Parse(claim.BeneficiaryDetail!.Latitude!), Lng = decimal.Parse(claim.BeneficiaryDetail!.Longitude!) };
+                    frick = new { Lat = decimal.Parse(latitude!), Lng = decimal.Parse(longitude!) };
+                    Address = "Beneficiary";
                 }
-                return Ok();
+                return Ok(new { center, dakota, frick, url = string.Format(docReport!.LocationMapUrl!, "500", "500"), distance = docReport.Distance, duration = docReport.Duration, Address = Address });
             }
             catch (Exception ex)
             {
@@ -449,7 +373,8 @@ namespace risk.control.system.Controllers.Common
                 var agent = await _context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == userEmail);
                 var claim = await _caseService.GetCaseDetailForAgentDetail(caseId);
                 var docReport = await _context.MediaReport.FirstOrDefaultAsync(l => l.Id == docId);
-
+                if (docReport == null)
+                    return NotFound("Media report not found.");
                 var longLat = docReport!.LongLat!.IndexOf(",");
                 var lat = docReport?.LongLat.Substring(0, longLat)?.Trim();
                 var LatitudeIndex = lat!.IndexOf("=");
@@ -457,48 +382,23 @@ namespace risk.control.system.Controllers.Common
                 var longi = docReport?.LongLat.Substring(longLat + 1)?.Trim();
                 var LongitudeIndex = longi!.IndexOf("=");
                 var longitude = longi.Substring(LongitudeIndex + 1)?.Trim();
-
+                object center = null!, dakota = null!, frick = null!;
+                string Address = null!;
                 if (claim.PolicyDetail!.InsuranceType == InsuranceType.UNDERWRITING)
                 {
-                    var center = new { Lat = decimal.Parse(claim.CustomerDetail!.Latitude!), Lng = decimal.Parse(claim.CustomerDetail!.Longitude!) };
-                    var dakota = new { Lat = decimal.Parse(claim.CustomerDetail!.Latitude!), Lng = decimal.Parse(claim.CustomerDetail!.Longitude!) };
-
-                    if (docReport is not null)
-                    {
-                        var frick = new { Lat = decimal.Parse(latitude!), Lng = decimal.Parse(longitude!) };
-                        return Ok(new
-                        {
-                            center,
-                            dakota,
-                            frick,
-                            url = string.Format(docReport.LocationMapUrl!, "500", "500"),
-                            distance = docReport.Distance,
-                            duration = docReport.Duration,
-                            Address = "Life-Assured"
-                        });
-                    }
+                    center = new { Lat = decimal.Parse(claim.CustomerDetail!.Latitude!), Lng = decimal.Parse(claim.CustomerDetail!.Longitude!) };
+                    dakota = new { Lat = decimal.Parse(claim.CustomerDetail!.Latitude!), Lng = decimal.Parse(claim.CustomerDetail!.Longitude!) };
+                    frick = new { Lat = decimal.Parse(latitude!), Lng = decimal.Parse(longitude!) };
+                    Address = "Life-Assured";
                 }
                 else
                 {
-                    var center = new { Lat = decimal.Parse(claim.BeneficiaryDetail!.Latitude!), Lng = decimal.Parse(claim.BeneficiaryDetail!.Longitude!) };
-                    var dakota = new { Lat = decimal.Parse(claim.BeneficiaryDetail!.Latitude!), Lng = decimal.Parse(claim.BeneficiaryDetail!.Longitude!) };
-
-                    if (docReport is not null)
-                    {
-                        var frick = new { Lat = decimal.Parse(latitude!), Lng = decimal.Parse(longitude!) };
-                        return Ok(new
-                        {
-                            center,
-                            dakota,
-                            frick,
-                            url = string.Format(docReport.LocationMapUrl!, "500", "500"),
-                            distance = docReport.Distance,
-                            duration = docReport.Duration,
-                            Address = "Beneficiary"
-                        });
-                    }
+                    center = new { Lat = decimal.Parse(claim.BeneficiaryDetail!.Latitude!), Lng = decimal.Parse(claim.BeneficiaryDetail!.Longitude!) };
+                    dakota = new { Lat = decimal.Parse(claim.BeneficiaryDetail!.Latitude!), Lng = decimal.Parse(claim.BeneficiaryDetail!.Longitude!) };
+                    frick = new { Lat = decimal.Parse(latitude!), Lng = decimal.Parse(longitude!) };
+                    Address = "Beneficiary";
                 }
-                return Ok();
+                return Ok(new { center, dakota, frick, url = string.Format(docReport!.LocationMapUrl!, "500", "500"), distance = docReport.Distance, duration = docReport.Duration, Address = Address });
             }
             catch (Exception ex)
             {

@@ -49,7 +49,6 @@ namespace risk.control.system.Services.Creator
                     await uploadFileStatusService.SetFileUploadFailure(uploadFileData, "Error uploading the file", uploadAndAssign);
                     await mailService.NotifyFileUpload(companyUser.Email!, uploadFileData, url);
                 }
-
                 var uploadedCases = uploadedCaseResult!.Where(c => c.InvestigationTask != null).Select(c => c.InvestigationTask).ToList();
                 if (uploadedCases == null || uploadedCases.Count == 0)
                 {
@@ -58,7 +57,6 @@ namespace risk.control.system.Services.Creator
                     await uploadFileStatusService.SetFileUploadFailure(uploadFileData, errorString, uploadAndAssign);
                     await mailService.NotifyFileUpload(companyUser.Email!, uploadFileData, url);
                 }
-
                 var totalAddedAndExistingCount = uploadedCaseResult!.Count + totalClaimsCreated;
                 if (companyUser.ClientCompany!.LicenseType == LicenseType.Trial && totalAddedAndExistingCount > companyUser.ClientCompany.TotalCreatedClaimAllowed)
                 {
@@ -67,21 +65,15 @@ namespace risk.control.system.Services.Creator
                     return;
                 }
                 var sb = new StringBuilder();
-
                 if (uploadedCaseResult.Count > 0)
                 {
                     var rowNum = 0;
                     sb.AppendLine("Row #, [FieldName = Error detail]"); // CSV header
-                    var filteredErrors = uploadedCaseResult
-                        .Select(r => r.Errors)
-                        .Where(e => e!.Count > 0);
-
-                    foreach (var caseErrors in filteredErrors)
+                    foreach (var caseErrors in uploadedCaseResult.Select(r => r.Errors).Where(e => e!.Count > 0))
                     {
                         ++rowNum;
                         sb.AppendLine($"\"{rowNum}\", {string.Join(",", caseErrors!)}");
                     }
-
                     if (rowNum > 0)
                     {
                         uploadFileData.ErrorByteData = Encoding.UTF8.GetBytes(sb.ToString());
@@ -90,14 +82,12 @@ namespace risk.control.system.Services.Creator
                         return;
                     }
                 }
-
                 if (uploadedCases == null || uploadedCases.Count == 0)
                 {
                     await uploadFileStatusService.SetFileUploadFailure(uploadFileData, "Error uploading the file", uploadAndAssign);
                     await mailService.NotifyFileUpload(companyUser.Email!, uploadFileData, url);
                     return;
                 }
-
                 var totalReadyToAssign = await investigationService.GetAutoCount(companyUser.Email!);
                 if (uploadedCases.Count + totalReadyToAssign > companyUser.ClientCompany.TotalToAssignMaxAllowed)
                 {
@@ -105,12 +95,9 @@ namespace risk.control.system.Services.Creator
                     await mailService.NotifyFileUpload(companyUser.Email!, uploadFileData, url);
                     return;
                 }
-
                 await using var _context = await _contextFactory.CreateDbContextAsync();
                 _context.Investigations.AddRange(uploadedCases!);
-
                 await _context.SaveChangesAsync();
-
                 await processor.ProcessloadFile(companyUser.Email!, uploadedCases!, uploadFileData, url, uploadAndAssign);
             }
             catch (Exception ex)

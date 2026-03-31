@@ -56,27 +56,12 @@ namespace risk.control.system.Controllers.Assessor
                     _notifyService.Error("Bad Request..");
                     return RedirectToAction(nameof(AssessorController.SendEnquiry), ControllerName<AssessorController>.Name, new { id = claimId });
                 }
-                if (document != null && document.Length > 0)
+                if (document?.Length > 0)
                 {
-                    if (document.Length > MAX_FILE_SIZE)
+                    var (isValid, errorMessage) = ValidateDocument(document);
+                    if (!isValid)
                     {
-                        _notifyService.Error($"Document image Size exceeds the max size: 5MB");
-                        return RedirectToAction(nameof(AssessorController.SendEnquiry), ControllerName<AssessorController>.Name, new { id = claimId });
-                    }
-                    var ext = Path.GetExtension(document.FileName).ToLowerInvariant();
-                    if (!AllowedExt.Contains(ext))
-                    {
-                        _notifyService.Error($"Invalid Document image type");
-                        return RedirectToAction(nameof(AssessorController.SendEnquiry), ControllerName<AssessorController>.Name, new { id = claimId });
-                    }
-                    if (!AllowedMime.Contains(document.ContentType))
-                    {
-                        _notifyService.Error($"Invalid Document Image content type");
-                        return RedirectToAction(nameof(AssessorController.SendEnquiry), ControllerName<AssessorController>.Name, new { id = claimId });
-                    }
-                    if (!ImageSignatureValidator.HasValidSignature(document))
-                    {
-                        _notifyService.Error($"Invalid or corrupted Document Image ");
+                        _notifyService.Error(errorMessage!);
                         return RedirectToAction(nameof(AssessorController.SendEnquiry), ControllerName<AssessorController>.Name, new { id = claimId });
                     }
                 }
@@ -97,6 +82,23 @@ namespace risk.control.system.Controllers.Assessor
                 _notifyService.Error("Error submitting query. Try again.");
                 return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
             }
+        }
+        private (bool IsValid, string? Error) ValidateDocument(IFormFile document)
+        {
+            if (document.Length > MAX_FILE_SIZE)
+                return (false, "Document image Size exceeds the max size: 5MB");
+
+            var ext = Path.GetExtension(document.FileName).ToLowerInvariant();
+            if (!AllowedExt.Contains(ext))
+                return (false, "Invalid Document image type");
+
+            if (!AllowedMime.Contains(document.ContentType))
+                return (false, "Invalid Document Image content type");
+
+            if (!ImageSignatureValidator.HasValidSignature(document))
+                return (false, "Invalid or corrupted Document Image");
+
+            return (true, null);
         }
     }
 }

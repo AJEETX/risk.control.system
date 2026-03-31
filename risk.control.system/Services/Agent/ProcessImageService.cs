@@ -40,39 +40,7 @@ namespace risk.control.system.Services.Agent
                     {
                         image.Mutate(x => x.Resize(new ResizeOptions { Size = new Size(maxWidth, 0), Mode = ResizeMode.Max }));
                     }
-                    float baseScale = Math.Min(image.Width, image.Height);
-                    float mainFontSize = baseScale * 0.12f;
-                    float dateFontSize = baseScale * 0.045f;
-                    float hPadding = mainFontSize * 0.35f;
-                    float vPadding = mainFontSize * 0.20f;
-                    float borderThickness = Math.Max(1f, baseScale * 0.005f);
-                    float shadowOffset = Math.Max(1f, mainFontSize * 0.04f);
-                    if (!SystemFonts.Collection.TryGet("Arial", out var family)) family = SystemFonts.Collection.Families.First();
-                    Font mainFont = family.CreateFont(mainFontSize, FontStyle.Bold);
-                    Font dateFont = family.CreateFont(dateFontSize, FontStyle.Regular);
-                    string timestamp = DateTime.Now.ToString("dd-MMM-yyyy HH:mm:ss");
-                    image.Mutate(ctx =>
-                    {
-                        var dateOptions = new RichTextOptions(dateFont) { HorizontalAlignment = HorizontalAlignment.Right, VerticalAlignment = VerticalAlignment.Top, Origin = new PointF(image.Width - (baseScale * 0.02f), baseScale * 0.02f) };
-                        var dateSize = TextMeasurer.MeasureSize(timestamp, dateOptions);
-                        var dateRect = new RectangleF(dateOptions.Origin.X - dateSize.Width - 10, dateOptions.Origin.Y - 5, dateSize.Width + 20, dateSize.Height + 10);
-                        ctx.Fill(Color.White.WithAlpha(0.5f), dateRect);
-                        ctx.Draw(Color.Gray.WithAlpha(0.5f), borderThickness / 2, dateRect);
-                        ctx.DrawText(dateOptions, timestamp, Color.Black.WithAlpha(0.8f));
-                        var centerPoint = new PointF(image.Width / 2, image.Height * 0.85f);
-                        float radians = -20f * (MathF.PI / 180f);
-                        var rotationMatrix = Matrix3x2.CreateRotation(radians, centerPoint);
-                        var textOptions = new RichTextOptions(mainFont) { HorizontalAlignment = HorizontalAlignment.Left, VerticalAlignment = VerticalAlignment.Top };
-                        var textSize = TextMeasurer.MeasureSize(watermarkText, textOptions);
-                        var mainRect = new RectangleF(centerPoint.X - (textSize.Width / 2) - hPadding, centerPoint.Y - (textSize.Height / 2) - vPadding, textSize.Width + (hPadding * 2), textSize.Height + (vPadding * 2));
-                        float verticalNudge = mainFont.Size * 0.15f;
-                        var textLocation = new PointF(centerPoint.X - (textSize.Width / 2), centerPoint.Y - (textSize.Height / 2) - verticalNudge);
-                        IPath slantedRectPath = new RectangularPolygon(mainRect).Transform(rotationMatrix);
-                        ctx.Draw(Color.Silver, borderThickness, slantedRectPath);
-                        var textDrawOptions = new DrawingOptions { Transform = rotationMatrix };
-                        ctx.DrawText(textDrawOptions, watermarkText, mainFont, Color.Black, new PointF(textLocation.X + shadowOffset, textLocation.Y + shadowOffset));
-                        ctx.DrawText(textDrawOptions, watermarkText, mainFont, Color.White, textLocation);
-                    });
+                    ApplyWatermarks(image, watermarkText);
                     image.Save(outputStream, new JpegEncoder { Quality = quality });
                 }
                 return outputStream.ToArray();
@@ -83,7 +51,42 @@ namespace risk.control.system.Services.Agent
                 return imageBytes; // Return original on error
             }
         }
-
+        private void ApplyWatermarks(Image image, string watermarkText)
+        {
+            float baseScale = Math.Min(image.Width, image.Height);
+            float mainFontSize = baseScale * 0.12f;
+            float dateFontSize = baseScale * 0.045f;
+            float hPadding = mainFontSize * 0.35f;
+            float vPadding = mainFontSize * 0.20f;
+            float borderThickness = Math.Max(1f, baseScale * 0.005f);
+            float shadowOffset = Math.Max(1f, mainFontSize * 0.04f);
+            if (!SystemFonts.Collection.TryGet("Arial", out var family)) family = SystemFonts.Collection.Families.First();
+            Font mainFont = family.CreateFont(mainFontSize, FontStyle.Bold);
+            Font dateFont = family.CreateFont(dateFontSize, FontStyle.Regular);
+            string timestamp = DateTime.Now.ToString("dd-MMM-yyyy HH:mm:ss");
+            image.Mutate(ctx =>
+            {
+                var dateOptions = new RichTextOptions(dateFont) { HorizontalAlignment = HorizontalAlignment.Right, VerticalAlignment = VerticalAlignment.Top, Origin = new PointF(image.Width - (baseScale * 0.02f), baseScale * 0.02f) };
+                var dateSize = TextMeasurer.MeasureSize(timestamp, dateOptions);
+                var dateRect = new RectangleF(dateOptions.Origin.X - dateSize.Width - 10, dateOptions.Origin.Y - 5, dateSize.Width + 20, dateSize.Height + 10);
+                ctx.Fill(Color.White.WithAlpha(0.5f), dateRect);
+                ctx.Draw(Color.Gray.WithAlpha(0.5f), borderThickness / 2, dateRect);
+                ctx.DrawText(dateOptions, timestamp, Color.Black.WithAlpha(0.8f));
+                var centerPoint = new PointF(image.Width / 2, image.Height * 0.85f);
+                float radians = -20f * (MathF.PI / 180f);
+                var rotationMatrix = Matrix3x2.CreateRotation(radians, centerPoint);
+                var textOptions = new RichTextOptions(mainFont) { HorizontalAlignment = HorizontalAlignment.Left, VerticalAlignment = VerticalAlignment.Top };
+                var textSize = TextMeasurer.MeasureSize(watermarkText, textOptions);
+                var mainRect = new RectangleF(centerPoint.X - (textSize.Width / 2) - hPadding, centerPoint.Y - (textSize.Height / 2) - vPadding, textSize.Width + (hPadding * 2), textSize.Height + (vPadding * 2));
+                float verticalNudge = mainFont.Size * 0.15f;
+                var textLocation = new PointF(centerPoint.X - (textSize.Width / 2), centerPoint.Y - (textSize.Height / 2) - verticalNudge);
+                IPath slantedRectPath = new RectangularPolygon(mainRect).Transform(rotationMatrix);
+                ctx.Draw(Color.Silver, borderThickness, slantedRectPath);
+                var textDrawOptions = new DrawingOptions { Transform = rotationMatrix };
+                ctx.DrawText(textDrawOptions, watermarkText, mainFont, Color.Black, new PointF(textLocation.X + shadowOffset, textLocation.Y + shadowOffset));
+                ctx.DrawText(textDrawOptions, watermarkText, mainFont, Color.White, textLocation);
+            });
+        }
         public byte[] ProcessCompress(byte[] imageByte, string onlyExtension, float cornerRadius = 10, int quality = 99, Amazon.Rekognition.Model.BoundingBox? faceBox = null)
         {
             using var stream = new MemoryStream(imageByte);
