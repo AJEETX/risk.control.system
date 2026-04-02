@@ -17,7 +17,6 @@ namespace risk.control.system.Services.Api
 
     internal class AgencyUserApiService : IAgencyUserApiService
     {
-        private string status = "#DED5D5", statusName = "Offline", icon = "fa fa-circle-o";
         private readonly IDbContextFactory<ApplicationDbContext> _contextFactory;
         private readonly IDashboardService dashboardService;
         private readonly IBase64FileService base64FileService;
@@ -39,7 +38,7 @@ namespace risk.control.system.Services.Api
             onlineThresholdInMinutes = int.Parse(config["LOGIN_SESSION_ACTIVE_MIN"]!);
             sessionTimeoutInSeconds = int.Parse(config["SESSION_TIMEOUT_SEC"]!);
             sessionTimeoutinMinutes = sessionTimeoutInSeconds / 60;
-            cutoffTime = DateTime.UtcNow.AddSeconds(-double.Parse(config["SESSION_TIMEOUT_SEC"]!));
+            cutoffTime = DateTime.UtcNow.AddSeconds(-sessionTimeoutInSeconds);
             _contextFactory = contextFactory;
             this.dashboardService = dashboardService;
             this.base64FileService = base64FileService;
@@ -53,11 +52,11 @@ namespace risk.control.system.Services.Api
             var vendor = await context.ApplicationUser.AsNoTracking().Where(u => u.Email == userEmail).Select(u => new { u.VendorId }).SingleOrDefaultAsync();
             if (vendor == null)
                 return new();
-            var sessionLookup = await context.UserSessionAlive.Where(s => s.Updated >= cutoffTime).GroupBy(s => s.ActiveUser.Email)
+            var latestSessions = await context.UserSessionAlive.Where(s => s.Updated >= cutoffTime || s.Created >= cutoffTime).Include(s => s.ActiveUser).GroupBy(s => s.ActiveUser.Email)
                 .Select(g => new
                 {
                     Email = g.Key!,
-                    LastSeen = g.Max(x => x.Updated),
+                    LastSeen = g.Max(x => x.Updated ?? x.Created),
                     LoggedOut = g.All(x => x.LoggedOut)
                 }).ToDictionaryAsync(x => x.Email, x => new { x.LastSeen, x.LoggedOut });
             var caseCounts = await dashboardService.CalculateAgentCaseStatus(userEmail);
@@ -89,10 +88,15 @@ namespace risk.control.system.Services.Api
             var responseTasks = users.Select(async u =>
             {
                 caseCounts.TryGetValue(u.Email!, out var count);
-                if (sessionLookup.TryGetValue(u.Email!, out var session) && !session.LoggedOut)
+                latestSessions.TryGetValue(u.Email!, out var session);
+                string status, statusName, icon;
+                if (session?.LoggedOut != false)
                 {
-                    var lastSeen = session.LastSeen ?? u.Created; // Fallback to created if null
-                    var minutesAway = (int)(DateTime.UtcNow - lastSeen).TotalMinutes;
+                    status = "#DED5D5"; statusName = "Offline"; icon = "fa fa-circle-o";
+                }
+                else
+                {
+                    var minutesAway = (int)(now - session.LastSeen).TotalMinutes;
                     (status, statusName, icon) = minutesAway switch
                     {
                         var m when m < onlineThresholdInMinutes => ("green", "Online now", "fas fa-circle"),
