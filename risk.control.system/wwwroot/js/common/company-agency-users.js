@@ -189,7 +189,7 @@
                 }
             },
             {
-                "data": "roles",
+                "data": "role",
                 "mRender": function (data, type, row) {
                     return '<span title="' + data + '" data-bs-toggle="tooltip">' + data + '</span>'
                 }
