@@ -14,16 +14,23 @@ namespace risk.control.system.Services.Api
 
     internal class UserService : IUserService
     {
-        private string status = "#DED5D5", statusIcon = "fa fa-circle-o", statusName = "Offline";
         private readonly ApplicationDbContext context;
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly UserManager<ApplicationUser> userManager;
+        private readonly int sessionTimeoutInSeconds;
+        private readonly int sessionTimeoutinMinutes;
+        private readonly int awayThresholdInMinutes;
+        private readonly int onlineThresholdInMinutes;
         private readonly DateTime cutoffTime;
         private readonly IFeatureManager featureManager;
 
         public UserService(IConfiguration config, ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, UserManager<ApplicationUser> userManager, IFeatureManager featureManager)
         {
-            cutoffTime = DateTime.UtcNow.AddSeconds(-double.Parse(config["SESSION_TIMEOUT_SEC"]!));
+            awayThresholdInMinutes = int.Parse(config["LOGIN_SESSION_INACTIVE_MIN"]!);
+            onlineThresholdInMinutes = int.Parse(config["LOGIN_SESSION_ACTIVE_MIN"]!);
+            sessionTimeoutInSeconds = int.Parse(config["SESSION_TIMEOUT_SEC"]!);
+            sessionTimeoutinMinutes = sessionTimeoutInSeconds / 60;
+            cutoffTime = DateTime.UtcNow.AddSeconds(-sessionTimeoutInSeconds);
             this.context = context;
             this.webHostEnvironment = webHostEnvironment;
             this.userManager = userManager;
@@ -32,33 +39,44 @@ namespace risk.control.system.Services.Api
 
         public async Task<List<UserDetailResponse>> GetUsers(string userEmail)
         {
-            var activeUsers = await context.UserSessionAlive.AsNoTracking().Where(u => u.Updated >= cutoffTime && !u.LoggedOut).GroupBy(u => u.ActiveUser.Email).Select(g => g.Key).ToListAsync();
+            var now = DateTime.UtcNow;
+            var latestSessions = await context.UserSessionAlive.Where(s => s.Updated >= cutoffTime || s.Created >= cutoffTime).Include(s => s.ActiveUser).GroupBy(s => s.ActiveUser.Email)
+                .Select(g => new
+                {
+                    Email = g.Key!,
+                    LastSeen = g.Max(x => x.Updated ?? x.Created),
+                    LoggedOut = g.All(x => x.LoggedOut)
+                }).ToDictionaryAsync(x => x.Email, x => new { x.LastSeen, x.LoggedOut });
             var users = context.ApplicationUser.Include(a => a.District).Include(a => a.State).Include(a => a.Country).Include(a => a.PinCode).Where(u => !u.Deleted && u.Email != userEmail);
             var allUsers = users.OrderBy(u => u.FirstName).ThenBy(u => u.LastName);
             var activeUsersDetails = new List<UserDetailResponse>();
             foreach (var user in allUsers)
             {
-                var currentOnlineTime = context.UserSessionAlive.Where(a => a.ActiveUser.Email == user.Email && activeUsers.Contains(a.ActiveUser.Email))?.AsEnumerable()?.Select(d => (DateTime?)d.Created).DefaultIfEmpty(null).Max();
-                if (currentOnlineTime != null && DateTime.UtcNow.Subtract(currentOnlineTime.GetValueOrDefault()).Minutes >= 5 && DateTime.UtcNow.Subtract(currentOnlineTime.GetValueOrDefault()).Minutes < 15)
+                latestSessions.TryGetValue(user.Email!, out var session);
+                string status, statusName, icon;
+                if (session?.LoggedOut != false)
                 {
-                    status = "orange"; statusIcon = "far fa-clock"; statusName = $"Away for {DateTime.UtcNow.Subtract(currentOnlineTime.GetValueOrDefault()).Minutes} minutes";
+                    status = "#DED5D5"; statusName = "Offline"; icon = "fa fa-circle-o";
                 }
-                else if (DateTime.UtcNow.Subtract(currentOnlineTime.GetValueOrDefault()).Minutes >= 1 && DateTime.UtcNow.Subtract(currentOnlineTime.GetValueOrDefault()).Minutes < 5)
+                else
                 {
-                    status = "orange"; statusIcon = "fas fa-clock"; statusName = $"Inactive for {DateTime.UtcNow.Subtract(currentOnlineTime.GetValueOrDefault()).Minutes} minutes";
+                    var minutesAway = (int)(now - session.LastSeen).TotalMinutes;
+                    (status, statusName, icon) = minutesAway switch
+                    {
+                        var m when m < onlineThresholdInMinutes => ("green", "Online now", "fas fa-circle"),
+                        var m when m < awayThresholdInMinutes => ("orange", $"Inactive for {m} minutes", "fas fa-clock"),
+                        var m when m < sessionTimeoutinMinutes => ("orange", $"Away for {m} minutes", "far fa-clock"),
+                        _ => ("#DED5D5", "Offline", "fa fa-circle-o")
+                    };
                 }
-                else if (DateTime.UtcNow.Subtract(currentOnlineTime.GetValueOrDefault()).Minutes >= 0 && DateTime.UtcNow.Subtract(currentOnlineTime.GetValueOrDefault()).Minutes < 1)
-                {
-                    status = "green"; statusName = $"Online now"; statusIcon = "fas fa-circle";
-                }
-                var activeUser = await MapUsers(user);
+                var activeUser = await MapUsers(user, status, statusName, icon);
                 activeUsersDetails.Add(activeUser);
             }
             users?.ToList().ForEach(u => u.IsUpdated = false);
             await context.SaveChangesAsync(null, false);
             return activeUsersDetails;
         }
-        private async Task<UserDetailResponse> MapUsers(ApplicationUser user)
+        private async Task<UserDetailResponse> MapUsers(ApplicationUser user, string status, string statusName, string icon)
         {
             return new UserDetailResponse
             {
@@ -80,7 +98,7 @@ namespace risk.control.system.Services.Api
                 Updated = user!.Updated ?? user.Created,
                 UpdatedBy = user.UpdatedBy,
                 OnlineStatusName = statusName,
-                OnlineStatusIcon = statusIcon,
+                OnlineStatusIcon = icon,
                 IsUpdated = user.IsUpdated,
                 LastModified = user.Updated ?? DateTime.UtcNow,
                 LoginVerified = (!await featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION) || !user.IsPasswordChangeRequired)
