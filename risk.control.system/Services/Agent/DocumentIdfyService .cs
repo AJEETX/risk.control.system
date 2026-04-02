@@ -66,7 +66,8 @@ internal class DocumentIdfyService : IDocumentIdfyService
             documentReport!.FilePath = relativePath;
             documentReport.ImageExtension = Path.GetExtension(fileName);
             byte[] docImage = await VerificationHelper.GetBytesFromIFormFile(data.Image!);
-            var googleTask = googleApi.DetectTextAsync(documentReport.FilePath);
+            var googleTask = googleApi.DetectText(documentReport.FilePath);
+            //var googleTask = googleApi.DetectTextAsync(documentReport.FilePath);
             var addressTask = httpClientService.GetRawAddress(lat, lon);
             var mapTask = customApiCLient.GetMap(expected.lat, expected.lon, double.Parse(lat), double.Parse(lon));
             await Task.WhenAll(googleTask, addressTask, mapTask /*, ocrTask*/);
@@ -96,6 +97,33 @@ internal class DocumentIdfyService : IDocumentIdfyService
         }
     }
 
+    private async Task ProcessOcrResults(DocumentIdReport doc, byte[] docImage, IReadOnlyList<TextBlock> ocrResult, InvestigationTask claim)
+    {
+        if (ocrResult != null && ocrResult.Count > 0)
+        {
+            var company = await context.ClientCompany.FindAsync(claim.ClientCompanyId);
+
+            if (doc.ReportName == DocumentIdReportType.PAN.GetEnumDisplayName())
+            {
+                await panCardService.Process(docImage, ocrResult, company!, doc, doc.ImageExtension!);
+            }
+            else
+            {
+                var compressed = processImageService.CompressImage(docImage);
+                await File.WriteAllBytesAsync(doc.FilePath!, compressed);
+                doc.ImageValid = true;
+                doc.LocationInfo = ocrResult.FirstOrDefault()?.Text;
+            }
+        }
+        else
+        {
+            doc.ImageValid = false;
+            doc.LocationInfo = "No OCR data detected";
+            await File.WriteAllBytesAsync(doc.FilePath!, processImageService.CompressImage(docImage));
+        }
+        doc.ValidationExecuted = true;
+    }
+
     private async Task ProcessOcrResults(DocumentIdReport doc, byte[] docImage, IReadOnlyList<EntityAnnotation> ocrResult, InvestigationTask claim)
     {
         if (ocrResult != null && ocrResult.Count > 0)
@@ -123,7 +151,7 @@ internal class DocumentIdfyService : IDocumentIdfyService
         doc.ValidationExecuted = true;
     }
 
-    private AppiCheckifyResponse MapResponse(InvestigationTask claim, DocumentIdReport doc, byte[] image)
+    private static AppiCheckifyResponse MapResponse(InvestigationTask claim, DocumentIdReport doc, byte[] image)
     {
         return new AppiCheckifyResponse
         {
