@@ -20,26 +20,26 @@ namespace risk.control.system.Controllers.Api.PortalAdmin
 
         public async Task<DashboardData> GetSuperAdminCount(string userEmail, string role)
         {
-            var allCompaniesCountTask = _context.ClientCompany.CountAsync(c => !c.Deleted);
-            var allAgenciesCountTask = _context.Vendor.CountAsync(v => !v.Deleted);
-            var AllUsersCountTask = _context.ApplicationUser.CountAsync(u => !u.Deleted && u.Email != userEmail);
+            var allCompaniesCountTask = await _context.ClientCompany.CountAsync(c => !c.Deleted);
+            var allAgenciesCountTask = await _context.Vendor.CountAsync(v => !v.Deleted);
+            var AllUsersCountTask = await _context.ApplicationUser.CountAsync(u => !u.Deleted && u.Email != userEmail);
 
-            await Task.WhenAll(allCompaniesCountTask, allAgenciesCountTask, AllUsersCountTask);
+            //await Task.WhenAll(allCompaniesCountTask, allAgenciesCountTask, AllUsersCountTask);
 
-            var data = new DashboardData();
-            data.FirstBlockName = "Companies";
-            data.FirstBlockCount = await allCompaniesCountTask;
-            data.FirstBlockUrl = "/ClientCompany/Companies";
+            return new DashboardData
+            {
+                FirstBlockName = "Companies",
+                FirstBlockCount = allCompaniesCountTask,
+                FirstBlockUrl = "/ClientCompany/Companies",
 
-            data.SecondBlockName = "Agencies";
-            data.SecondBlockCount = await allAgenciesCountTask;
-            data.SecondBlockUrl = "/ClientCompany/Agencies";
+                SecondBlockName = "Agencies",
+                SecondBlockCount = allAgenciesCountTask,
+                SecondBlockUrl = "/ClientCompany/Agencies",
 
-            data.ThirdBlockName = "Users";
-            data.ThirdBlockCount = await AllUsersCountTask;
-            data.ThirdBlockUrl = "/User";
-
-            return data;
+                ThirdBlockName = "Users",
+                ThirdBlockCount = AllUsersCountTask,
+                ThirdBlockUrl = "/User"
+            };
         }
     }
 }

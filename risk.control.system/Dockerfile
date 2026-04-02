@@ -7,6 +7,8 @@ ARG APP_UID=1000
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
+    libfontconfig1 \
+    libfreetype6 \
     libgssapi-krb5-2 \
     libkrb5-3 \
     libicu-dev \
