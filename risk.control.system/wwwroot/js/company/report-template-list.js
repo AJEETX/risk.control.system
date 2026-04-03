@@ -45,7 +45,7 @@
                 render: function (data) {
                     if (!data) return '';
                     let date = new Date(data);
-                    var dateCreated = date.toLocaleString('en-IN', {
+                    var localDate = date.toLocaleString('en-IN', {
                         day: '2-digit',
                         month: 'short',
                         year: 'numeric',
@@ -54,7 +54,7 @@
                         second: '2-digit',
                         hour12: true
                     });
-                    return '<span title="Date created: ' + dateCreated + '" data-bs-toggle="tooltip">' + dateCreated + '</span>';
+                    return `<span title="Updated time: ${localDate}" data-bs-toggle="tooltip"><small><strong>${localDate}</strong></small></span>`;
                 }
             },
             {

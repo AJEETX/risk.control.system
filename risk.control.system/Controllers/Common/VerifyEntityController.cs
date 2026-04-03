@@ -42,13 +42,10 @@ namespace risk.control.system.Controllers.Common
             {
                 return null;
             }
-            Domain domainData = (Domain)Enum.Parse(typeof(Domain), domain, true);
-
+            Domain domainData = Enum.Parse<Domain>(domain, true);
             var newDomain = input.Trim().ToLower(CultureInfo.InvariantCulture) + domainData.GetEnumDisplayName();
-
             var agencyCompanyCount = await _context.ClientCompany.AsNoTracking().CountAsync(u => u.Email.Trim().ToLower() == newDomain && !u.Deleted);
             var agencyCount = await _context.Vendor.AsNoTracking().CountAsync(u => u.Email.Trim().ToLower() == newDomain);
-
             return agencyCount == 0 && agencyCompanyCount == 0 ? 0 : 1;
         }
 
@@ -88,37 +85,32 @@ namespace risk.control.system.Controllers.Common
 
         [HttpGet("GetUserBySearch")]
         [AllowAnonymous]
-        public async Task<IActionResult> GetUserBySearch(string search = "")
+        public async Task<IActionResult> GetUserBySearch([FromQuery] string search = "")
         {
             try
             {
-                var vendorAgentIds = await _context.Set<ApplicationUser>()
-                .Where(v => v.Role == AppRoles.AGENT)
-                .Select(v => v.Id)
-                .ToListAsync();
+                var query = _context.ApplicationUser.AsNoTracking().Where(u => !u.Deleted);
 
-                IQueryable<ApplicationUser> query = _context.ApplicationUser.AsNoTracking()
-                    .Where(a => !a.Deleted && a.Email != PORTAL_ADMIN.EMAIL &&
-                                !vendorAgentIds.Contains(a.Id));
+                query = query.Where(u => u.Role != AppRoles.AGENT && u.Role != AppRoles.PORTAL_ADMIN);
 
                 if (!string.IsNullOrWhiteSpace(search))
                 {
-                    string loweredSearch = search.Trim();
-                    query = query.Where(a => a.Email!.StartsWith(loweredSearch));
+                    var term = search.Trim().ToLower();
+                    query = query.Where(u => u.Email != null && u.Email.ToLower().Contains(term));
                 }
 
                 var userEmails = await query
-                    .OrderBy(a => a.Email)
+                    .OrderBy(u => u.Email)
                     .Take(10)
-                    .Select(a => a.Email)
+                    .Select(u => u.Email)
                     .ToListAsync();
 
                 return Ok(userEmails);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while getting users");
-                return StatusCode(StatusCodes.Status500InternalServerError);
+                _logger.LogError(ex, "Error fetching user emails for search: {SearchTerm}", search);
+                return StatusCode(StatusCodes.Status500InternalServerError, "An internal error occurred.");
             }
         }
 

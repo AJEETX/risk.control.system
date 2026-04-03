@@ -173,18 +173,18 @@
             {
                 "data": "created",
                 "render": function (data, type, row) {
-                    if (!data) return "";
-
-                    // 1. Parse UTC string (Assuming format: "2023-10-27T10:00:00Z")
-                    var date = new Date(data);
-
-                    // 2. Convert to Local String
-                    // You can customize the format: { dateStyle: 'medium', timeStyle: 'short' }
-                    var localDate = date.toLocaleString();
-
-                    return `<i title="${localDate}" data-bs-toggle="tooltip">
-                    <small><strong>${localDate}</strong></small>
-                </i>`;
+                    if (!data) return '';
+                    let date = new Date(data);
+                    var localDate = date.toLocaleString('en-IN', {
+                        day: '2-digit',
+                        month: 'short',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit',
+                        hour12: true
+                    });
+                    return `<span title="${localDate}" data-bs-toggle="tooltip"><small><strong>${localDate}</strong></small></span>`;
                 }
             },
             {
