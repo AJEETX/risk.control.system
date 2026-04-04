@@ -39,7 +39,7 @@
             orderable: false, targets: [0, 1, 3, 4]
         }, // Disable ordering for specific columns
         {
-            className: 'max-width-column', // Apply the CSS class,
+            className: 'max-width-column-name', // Apply the CSS class,
             targets: 2                      // Index of the column to style
         },
         {

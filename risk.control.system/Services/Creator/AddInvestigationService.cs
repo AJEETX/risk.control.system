@@ -116,6 +116,7 @@ namespace risk.control.system.Services.Creator
                     existingPolicy.PolicyDetail!.DocumentPath = relativePath;
                     existingPolicy.PolicyDetail.DocumentImageExtension = Path.GetExtension(fileName);
                 }
+                existingPolicy.IsNew = true;
                 existingPolicy.PolicyDetail!.ContractNumber = WebUtility.HtmlEncode(model.PolicyDetailDto.ContractNumber.ToUpper());
                 existingPolicy.PolicyDetail.InsuranceType = model.PolicyDetailDto.InsuranceType;
                 existingPolicy.PolicyDetail.InvestigationServiceTypeId = model.PolicyDetailDto.InvestigationServiceTypeId;
@@ -151,6 +152,7 @@ namespace risk.control.system.Services.Creator
                     customerDetail.ImagePath = relativePath;
                 }
                 caseTask!.UpdatedBy = userEmail;
+                caseTask.IsNew = true;
                 caseTask.Updated = DateTime.UtcNow;
                 var textInfo = CultureInfo.CurrentCulture.TextInfo;
                 customerDetail!.Name = WebUtility.HtmlEncode(textInfo.ToTitleCase(customerDetail.Name.ToLower()));
@@ -183,6 +185,11 @@ namespace risk.control.system.Services.Creator
             try
             {
                 var caseTask = await context.Investigations.Include(c => c.PolicyDetail).FirstOrDefaultAsync(c => c.Id == customerDetail.InvestigationTaskId);
+
+                caseTask!.UpdatedBy = userEmail;
+                caseTask.IsNew = true;
+                caseTask.Updated = DateTime.UtcNow;
+
                 if (customerDetail?.ProfileImage is not null)
                 {
                     var (fileName, relativePath) = await fileStorageService.SaveAsync(customerDetail.ProfileImage, "Case", caseTask!.PolicyDetail!.ContractNumber);
@@ -194,8 +201,7 @@ namespace risk.control.system.Services.Creator
                     var existingCustomer = await context.CustomerDetail.AsNoTracking().FirstOrDefaultAsync(c => c.InvestigationTaskId == customerDetail!.InvestigationTaskId);
                     customerDetail!.ImagePath = existingCustomer!.ImagePath;
                 }
-                caseTask!.UpdatedBy = userEmail;
-                caseTask.Updated = DateTime.UtcNow;
+
                 customerDetail.PhoneNumber = customerDetail.PhoneNumber.TrimStart('0');
                 var textInfo = CultureInfo.CurrentCulture.TextInfo;
                 customerDetail.Name = WebUtility.HtmlEncode(textInfo.ToTitleCase(customerDetail.Name.ToLower()));
@@ -233,13 +239,18 @@ namespace risk.control.system.Services.Creator
                     beneficiary.ProfilePictureExtension = Path.GetExtension(fileName);
                     beneficiary.ImagePath = relativePath;
                 }
+
+                caseTask!.UpdatedBy = userEmail;
+                caseTask.Updated = DateTime.UtcNow;
+                caseTask.IsNew = true;
+                caseTask.IsReady2Assign = true;
+                caseTask.SubStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR;
+
                 var textInfo = CultureInfo.CurrentCulture.TextInfo;
                 beneficiary!.Name = WebUtility.HtmlEncode(textInfo.ToTitleCase(beneficiary.Name.ToLower()));
                 beneficiary.Updated = DateTime.UtcNow;
                 beneficiary.UpdatedBy = userEmail;
-                caseTask!.UpdatedBy = userEmail;
-                caseTask.Updated = DateTime.UtcNow;
-                caseTask.IsReady2Assign = true;
+
                 beneficiary.PhoneNumber = beneficiary.PhoneNumber.TrimStart('0');
                 beneficiary.CountryId = beneficiary.SelectedCountryId;
                 beneficiary.StateId = beneficiary.SelectedStateId;
@@ -269,6 +280,13 @@ namespace risk.control.system.Services.Creator
             try
             {
                 var caseTask = await context.Investigations.Include(c => c.PolicyDetail).FirstOrDefaultAsync(m => m.Id == beneficiary.InvestigationTaskId);
+
+                caseTask!.UpdatedBy = userEmail;
+                caseTask.IsNew = true;
+                caseTask.Updated = DateTime.UtcNow;
+                caseTask.SubStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR;
+                caseTask.IsReady2Assign = true;
+
                 if (beneficiary?.ProfileImage != null)
                 {
                     var (fileName, relativePath) = await fileStorageService.SaveAsync(beneficiary.ProfileImage!, "Case", caseTask!.PolicyDetail!.ContractNumber);
@@ -283,10 +301,7 @@ namespace risk.control.system.Services.Creator
                         beneficiary!.ImagePath = existingBeneficiary.ImagePath;
                     }
                 }
-                caseTask!.UpdatedBy = userEmail;
-                caseTask.Updated = DateTime.UtcNow;
-                caseTask.SubStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR;
-                caseTask.IsReady2Assign = true;
+
                 beneficiary!.PhoneNumber = beneficiary.PhoneNumber.TrimStart('0');
                 var textInfo = CultureInfo.CurrentCulture.TextInfo;
                 beneficiary.Name = WebUtility.HtmlEncode(textInfo.ToTitleCase(beneficiary.Name.ToLower()));
