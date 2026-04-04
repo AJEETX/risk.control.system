@@ -12,22 +12,22 @@ namespace risk.control.system.Controllers.Creator
 {
     [Breadcrumb("Cases")]
     [Authorize(Roles = CREATOR.DISPLAY_NAME)]
-    public class CaseDetailController : Controller
+    public class AddAssignController : Controller
     {
-        private readonly ILogger<CaseDetailController> _logger;
+        private readonly ILogger<AddAssignController> _logger;
         private readonly IErrorNotifyService _errorNotifyService;
         private readonly ICaseCreateEditService _caseCreateEditService;
         private readonly INavigationService _navigationService;
         private readonly INotyfService _notifyService;
 
-        public CaseDetailController(ILogger<CaseDetailController> logger,
+        public AddAssignController(ILogger<AddAssignController> logger,
             IErrorNotifyService errorNotifyService,
             ICaseCreateEditService createCreateEditService,
             INavigationService navigationService,
             INotyfService notifyService)
         {
             _logger = logger;
-            this._errorNotifyService = errorNotifyService;
+            _errorNotifyService = errorNotifyService;
             _caseCreateEditService = createCreateEditService;
             _navigationService = navigationService;
             _notifyService = notifyService;

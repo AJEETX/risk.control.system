@@ -36,11 +36,11 @@
             }
         },
         {
-            orderable: false, targets: [0, 2, 3, 4]
+            orderable: false, targets: [0, 1, 3, 4]
         }, // Disable ordering for specific columns
         {
             className: 'max-width-column', // Apply the CSS class,
-            targets: 1                      // Index of the column to style
+            targets: 2                      // Index of the column to style
         },
         {
             className: 'max-width-column-number', // Apply the CSS class,
@@ -75,12 +75,6 @@
                 }
             },
             {
-                "data": "rawEmail",
-                "mRender": function (data, type, row) {
-                    return '<span title="' + data + '" data-bs-toggle="tooltip">' + data + '</span>';
-                }
-            },
-            {
                 "sDefaultContent": "",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
@@ -89,6 +83,12 @@
                     img += '<img src="' + row.photo + '" class="full-map" title="' + row.name + '" data-bs-toggle="tooltip"/>'; // Full map image with class 'full-map'
                     img += '</div>';
                     return img;
+                }
+            },
+            {
+                "data": "rawEmail",
+                "mRender": function (data, type, row) {
+                    return '<span class="blue" title="' + data + '" data-bs-toggle="tooltip">' + data + '</span>';
                 }
             },
             {

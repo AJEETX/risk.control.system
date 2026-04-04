@@ -58,7 +58,7 @@
 						<li class="small"><span class="fa-li"><i class="fas fa-user-alt"></i></span>Age:<b> @currentAgeInYrs </b></li>
 						<li class="small"><span class="fa-li"><i class="fa fa-money"></i></span>Annual Income:(@Model.Currency)<b> @customerDetail?.Income?.GetEnumDisplayName() </b></li>
 						<li class="small"><span class="fa-li"><i class="fas fa-lg fa-building"></i></span>Address:<b> @address</b></li>
-						<li class="small"><span class="fa-li"><i class="fas fa-lg fa-globe"></i></span>Country:  <img src="@imgPath" class="flag-icon" data-bs-toggle="tooltip" />@customerDetail?.Country?.Name</li>
+						<li class="small"><span class="fa-li"><i class="fas fa-lg fa-globe"></i></span>Country:  <img src="@imgPath" class="flag-icon" data-bs-toggle="tooltip" /><b> @customerDetail?.Country?.Name </b></li>
 						<li class="small"><span class="fa-li"><i class="fas fa-lg fa-phone"></i></span>Mobile #: (+@customerDetail?.Country?.ISDCode)<b> @customerDetail?.PhoneNumber</b></li>
 					</ul>
 				</div>
