@@ -7,7 +7,7 @@ namespace risk.control.system.Services.Creator
 {
     public interface IZipFileService
     {
-        Task<int> Save(string userEmail, IFormFile postedFile, CREATEDBY autoOrManual, bool uploadAndAssign = false);
+        Task<int> Save(string userEmail, IFormFile postedFile, bool uploadAndAssign = false);
     }
 
     internal class ZipFileService : IZipFileService
@@ -25,13 +25,13 @@ namespace risk.control.system.Services.Creator
             this.fileStorageService = fileStorageService;
         }
 
-        public async Task<int> Save(string userEmail, IFormFile postedFile, CREATEDBY autoOrManual, bool uploadAndAssign = false)
+        public async Task<int> Save(string userEmail, IFormFile postedFile, bool uploadAndAssign = false)
         {
             try
             {
                 var (fileName, relativePath) = await fileStorageService.SaveAsync(postedFile, "UploadFile");
 
-                var uploadId = await SaveUpload(postedFile, relativePath, fileName, userEmail, autoOrManual, ORIGIN.FILE, uploadAndAssign);
+                var uploadId = await SaveUpload(postedFile, relativePath, fileName, userEmail, ORIGIN.FILE, uploadAndAssign);
                 return uploadId;
             }
             catch (Exception ex)
@@ -41,7 +41,7 @@ namespace risk.control.system.Services.Creator
             }
         }
 
-        private async Task<int> SaveUpload(IFormFile file, string filePath, string description, string uploadedBy, CREATEDBY autoOrManual, ORIGIN fileOrFtp, bool uploadAndAssign = false)
+        private async Task<int> SaveUpload(IFormFile file, string filePath, string description, string uploadedBy, ORIGIN fileOrFtp, bool uploadAndAssign = false)
         {
             var fileName = Path.GetFileName(file.FileName);
             var extension = Path.GetExtension(file.FileName);
@@ -62,7 +62,6 @@ namespace risk.control.system.Services.Creator
                 FilePath = filePath,
                 UploadedBy = uploadedBy,
                 CompanyId = company!.ClientCompanyId,
-                AutoOrManual = autoOrManual,
                 Message = uploadAndAssign ? "Assign In progress" : "Upload In progress",
                 FileOrFtp = fileOrFtp,
                 DirectAssign = uploadAndAssign

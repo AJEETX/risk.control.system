@@ -9,7 +9,6 @@ namespace risk.control.system.Models
         public int Id { get; set; }
 
         public long InvestigationTaskId { get; set; }
-        public InvestigationTask InvestigationTask { get; set; } = default!;
 
         public string SubStatus { get; set; } = default!;
         public string Status { get; set; } = default!;

@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using risk.control.system.AppConstant;
 using risk.control.system.Helpers;
-using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services.Creator;
 
@@ -49,7 +48,7 @@ namespace risk.control.system.Controllers.Creator
                     return RedirectToAction(nameof(CaseUploadController.Uploads), ControllerName<CaseUploadController>.Name);
                 }
 
-                var uploadId = await _zipFileService.Save(userEmail, postedFile, CREATEDBY.AUTO, model.UploadAndAssign);
+                var uploadId = await _zipFileService.Save(userEmail, postedFile, model.UploadAndAssign);
                 var jobId = _backgroundJobClient.Enqueue<IUploadZipFileService>(service => service.StartFileUpload(userEmail, uploadId, _baseUrl, model.UploadAndAssign));
 
                 if (!model.UploadAndAssign)

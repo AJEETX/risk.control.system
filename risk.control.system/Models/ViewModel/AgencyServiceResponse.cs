@@ -13,7 +13,6 @@
         public string CountryCode { get; set; } = default!;
         public string Country { get; set; } = default!;
         public string Flag { get; set; } = default!;
-        public string RawPincodes { get; set; } = default!;
         public string Pincodes { get; set; } = default!;
         public string Rate { get; set; } = default!;
         public string UpdatedBy { get; set; } = default!;

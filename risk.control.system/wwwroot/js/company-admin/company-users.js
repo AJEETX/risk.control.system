@@ -139,6 +139,12 @@
                 }
             },
             {
+                "data": "updatedBy",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + data + '" data-bs-toggle="tooltip">' + data + '</span>'
+                }
+            },
+            {
                 "data": "updated",
                 "render": function (data, type, row) {
                     if (!data) return '';
@@ -152,13 +158,7 @@
                         second: '2-digit',
                         hour12: true
                     });
-                    return `<span title="Updated time: ${localDate}" data-bs-toggle="tooltip"><small><strong>${localDate}</strong></small></span>`;
-                }
-            },
-            {
-                "data": "updatedBy",
-                "mRender": function (data, type, row) {
-                    return '<span title="' + data + '" data-bs-toggle="tooltip">' + data + '</span>'
+                    return `<span title="${localDate}" data-bs-toggle="tooltip"><small><strong>${localDate}</strong></small></span>`;
                 }
             },
             {

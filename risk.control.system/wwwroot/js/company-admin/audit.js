@@ -12,7 +12,7 @@
             },
             error: DataTableErrorHandler
         },
-        order: [[3, "desc"]],
+        order: [[5, "desc"]],
         fixedHeader: true,
         paging: true,
         language: {
@@ -30,7 +30,7 @@
             },
             {
                 className: 'max-width-column-name', // Apply the CSS class,
-                targets: 3                      // Index of the column to style
+                targets: 5                      // Index of the column to style
             }],
         columns: [
             {
@@ -49,23 +49,6 @@
                 data: 'tableName',
                 render: function (data) {
                     return `<span title=${data} data-bs-toggle="tooltip">${data} </span>`
-                }
-            },
-            {
-                data: 'dateTime',
-                render: function (data) {
-                    if (!data) return '';
-                    let date = new Date(data);
-                    var localDate = date.toLocaleString('en-IN', {
-                        day: '2-digit',
-                        month: 'short',
-                        year: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        second: '2-digit',
-                        hour12: true
-                    });
-                    return `<span title="Updated time: ${localDate}" data-bs-toggle="tooltip"><small><strong>${localDate}</strong></small></span>`;
                 }
             },
             {
@@ -116,6 +99,23 @@
                     return data.length > 50
                         ? `<div title="${encoded}"><small>${data.substring(0, 50)}...</small></div>`
                         : `<div data-bs-toggle="tooltip" title="${encoded}"><small>${encoded}</small></div>`;
+                }
+            },
+            {
+                data: 'dateTime',
+                render: function (data) {
+                    if (!data) return '';
+                    let date = new Date(data);
+                    var localDate = date.toLocaleString('en-IN', {
+                        day: '2-digit',
+                        month: 'short',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit',
+                        hour12: true
+                    });
+                    return `<span title="${localDate}" data-bs-toggle="tooltip"><small><strong>${localDate}</strong></small></span>`;
                 }
             },
             {
