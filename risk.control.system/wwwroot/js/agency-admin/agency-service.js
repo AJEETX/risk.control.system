@@ -117,7 +117,7 @@ $(document).ready(function () {
                         second: '2-digit',
                         hour12: true
                     });
-                    return `<span title="Updated time: ${localDate}" data-bs-toggle="tooltip"><small><strong>${localDate}</strong></small></span>`;
+                    return `<span title="${localDate}" data-bs-toggle="tooltip"><small><strong>${localDate}</strong></small></span>`;
                 }
             },
             {

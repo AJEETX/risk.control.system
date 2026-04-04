@@ -13,7 +13,6 @@
         public string Customer { get; set; } = default!;
         public string Name { get; set; } = default!;
         public string Policy { get; set; } = default!;
-        public bool IsUploaded { get; set; }
         public string Origin { get; set; } = default!;
         public string SubStatus { get; set; } = default!;
         public bool Ready2Assign { get; set; }
