@@ -72,27 +72,6 @@
                             }
                         }
                     </dd>
-
-                    <dt class="col-sm-2 font-weight-bold"> @Html.DisplayNameFor(m => m.AffectedColumns) </dt>
-                    <dd class="col-sm-10 border-bottom pb-2 text-break">
-                        @{
-                            if (!string.IsNullOrEmpty(Model.AffectedColumns))
-                            {
-                                try
-                                {
-                                    var jsonElement = JsonSerializer.Deserialize<JsonElement>(Model.AffectedColumns);
-                                    var formatted = JsonSerializer.Serialize(jsonElement, new JsonSerializerOptions { WriteIndented = true });
-                                    @:<pre>@formatted</pre>
-                                }
-                                catch
-                                {
-                                    @Model.AffectedColumns
-                                    // fallback if it's not valid JSON
-                                }
-                            }
-                        }
-                    </dd>
-
                     <dt class="col-sm-2 font-weight-bold"> @Html.DisplayNameFor(m => m.PrimaryKey) </dt>
                     <dd class="col-sm-10 border-bottom pb-2 text-break"> @Html.DisplayFor(m => m.PrimaryKey) </dd>
                 </dl>

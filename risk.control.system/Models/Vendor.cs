@@ -77,8 +77,6 @@ namespace risk.control.system.Models
 
         public List<ApplicationUser>? ApplicationUser { get; set; }
 
-        public List<ClientCompany>? Clients { get; set; } = new List<ClientCompany>();
-
         public bool Deleted { get; set; } = false;
 
         public int? RateCount
@@ -97,7 +95,6 @@ namespace risk.control.system.Models
         public virtual ICollection<AgencyRating>? Ratings { get; set; }
         public string? MobileAppUrl { get; set; } = EnvHelper.Get("APP_URL");
         public bool CanChangePassword { get; set; } = true;
-        public bool HasClaims { get; set; } = false;
 
         [NotMapped]
         public bool SelectedByCompany { get; set; }
