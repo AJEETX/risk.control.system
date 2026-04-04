@@ -4,12 +4,9 @@
     {
         public long StatusNotificationId { get; set; }
         public long? RoleId { get; set; }
-        public ApplicationRole? Role { get; set; }
         public string? Status { get; set; }
         public long? ClientCompanyId { get; set; }
-        public ClientCompany? Company { get; set; }
         public long? VendorId { get; set; }
-        public Vendor? Vendor { get; set; }
         public string? NotifierUserEmail { get; set; }
         public string? AgenctUserEmail { get; set; }
         public string Message { get; set; } = default!;
@@ -21,6 +18,5 @@
 
         public string Symbol { get; set; } = "fas fa-check-circle i-green";
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-        public string? CreatedBy { get; set; }
     }
 }

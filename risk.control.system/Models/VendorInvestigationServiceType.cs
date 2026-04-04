@@ -45,16 +45,10 @@ namespace risk.control.system.Models
         public bool Deleted { get; set; } = false;
 
         [NotMapped]
-        public long SelectedDistrictId { get; set; }
-
-        [NotMapped]
         public long SelectedStateId { get; set; }
 
         [NotMapped]
         public long SelectedCountryId { get; set; }
-
-        [NotMapped]
-        public List<SelectListItem> DistrictList { get; set; } = new();
 
         [NotMapped]
         public string? Currency { get; set; }

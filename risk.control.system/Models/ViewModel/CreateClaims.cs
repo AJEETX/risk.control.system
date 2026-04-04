@@ -7,7 +7,6 @@
         public bool HasClaims { get; set; }
         public bool IsManager { get; set; }
         public bool HasFileUploads { get; set; } = false;
-        public CREATEDBY CREATEDBY { get; set; }
         public string? FileSampleIdentifier { get; set; }
     }
 }
