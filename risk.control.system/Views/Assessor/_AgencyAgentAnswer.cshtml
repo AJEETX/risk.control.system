@@ -34,27 +34,27 @@
             <div class="card-footer text-muted border-bottom-0">
                 <i class="fas fa-user-shield"></i>  Agent :<span class="badge badge-light">  @Model.CaseTask?.InvestigationReport.AgentEmail </span>
             </div>
-            <div class="card-body text-muted text-sm">
+            <div class="card-body">
                 <div class="row">
                     <div class="col-12">
                         <div class="table-responsive">
-                            <table class="table table-bordered table-sm table-hover">
+                            <table class="table table-sm">
                                 <thead class="thead-light">
                                     <tr>
-                                        <th> Agent Remarks</th>
-                                        <th class="w-30">Edited Remarks</th>
+                                        <th class="w-50"> Agent Remarks</th>
+                                        <th class="w-50">Edited Remarks</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr>
                                         <td class="text-start">
-                                            <div class="bg-light rounded p-2 text-muted">
-                                                @Model.CaseTask?.InvestigationReport?.AgentRemarks
+                                            <div class="remark-container">
+                                            @Model.CaseTask?.InvestigationReport?.AgentRemarks
                                             </div>
                                         </td>
                                         <td class="text-start">
-                                            <div class="bg-light rounded p-2 text-muted">
-                                                @Model.CaseTask?.InvestigationReport?.AgentRemarksEdit
+                                            <div class="remark-container">
+                                            @Model.CaseTask?.InvestigationReport?.AgentRemarksEdit
                                             </div>
                                         </td>
                                     </tr>

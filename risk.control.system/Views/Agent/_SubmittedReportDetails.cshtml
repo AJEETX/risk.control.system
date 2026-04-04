@@ -146,7 +146,7 @@
 
 				var customerSMSCount = @Model.ClaimsInvestigation?.CaseMessages?.Where(x => x.IsCustomer).Count();
 				var beneficiarySMSCount = @Model.ClaimsInvestigation?.CaseMessages?.Where(x => !x.IsCustomer).Count();
-
+			}
 				@if (Model.ClaimsInvestigation?.PolicyDetail?.InsuranceType == InsuranceType.UNDERWRITING)
 				{
 					<div class="col-12 col-sm-6 col-md-6 d-flex align-items-stretch flex-column">
@@ -230,93 +230,92 @@
 									</div>
 								</div>
 							</div>
-						</div>
-					}
-					@if (Model?.ClaimsInvestigation?.PolicyDetail?.InsuranceType == InsuranceType.CLAIM)
-					{
-						<div class="col-12 col-sm-6 col-md-6 d-flex align-items-stretch flex-column">
-							<div class="card bg-light d-flex flex-fill">
-								<div class="card-header text-muted border-bottom-0">
-									<i class="fas fa-user-tie"></i>  Beneficiary Details
-									<span class="hover-text">
-										<i class="fas fa-info-circle"></i>
-										<span class="tooltip-text" id="beneficiary-information">
+					</div>
+				}
+				@if (Model?.ClaimsInvestigation?.PolicyDetail?.InsuranceType == InsuranceType.CLAIM)
+				{
+					<div class="col-12 col-sm-6 col-md-6 d-flex align-items-stretch flex-column">
+						<div class="card bg-light d-flex flex-fill">
+							<div class="card-header text-muted border-bottom-0">
+								<i class="fas fa-user-tie"></i>  Beneficiary Details
+								<span class="hover-text">
+									<i class="fas fa-info-circle"></i>
+									<span class="tooltip-text" id="beneficiary-information">
 
-											<b> <i class='fas fa-user-tie'></i> Beneficiary Details </b>
-										</span>
+										<b> <i class='fas fa-user-tie'></i> Beneficiary Details </b>
 									</span>
+								</span>
+							</div>
+							<div class="progress">
+								<i class="far fa-bookmark bookmark-green"></i>
+								<div class="progress-bar progress-bar-green" role="progressbar">
+									<i class="fas fa-user-tie"></i>
 								</div>
-								<div class="progress">
-									<i class="far fa-bookmark bookmark-green"></i>
-									<div class="progress-bar progress-bar-green" role="progressbar">
-										<i class="fas fa-user-tie"></i>
+							</div>
+							<div class="card-body">
+								<div class="row">
+									<div class="col-7">
+										<h2 class="lead"><b>@Model.Beneficiary?.Name</b></h2>
+										<p class="text-muted text-sm">
+											<b>Relation: </b> @Model.Beneficiary?.BeneficiaryRelation?.Name
+										</p>
+										<ul class="ml-4 mb-0 fa-ul text-muted">
+											<li class="small">
+												<span class="fa-li">
+													<i class="fas fa-user-clock"></i>
+												</span>
+												Age: @beneficaryAge years
+											</li>
+											<li class="small">
+												<span class="fa-li">
+													<i class="fa fa-money"></i>
+												</span>
+												Annual Income: (@Model.Currency) @Model.Beneficiary?.Income
+											</li>
+											<li class="small">
+												<span class="fa-li">
+													<i class="fas fa-lg fa-building"></i>
+												</span>
+												Address: @baddress
+											</li>
+											<li class="small">
+												<span class="fa-li">
+													<i class="fas fa-lg fa-phone"></i>
+												</span>
+												Mobile #: + @Model.Beneficiary?.PhoneNumber
+											</li>
+										</ul>
 									</div>
-								</div>
-								<div class="card-body">
-									<div class="row">
-										<div class="col-7">
-											<h2 class="lead"><b>@Model.Beneficiary?.Name</b></h2>
-											<p class="text-muted text-sm">
-												<b>Relation: </b> @Model.Beneficiary?.BeneficiaryRelation?.Name
-											</p>
-											<ul class="ml-4 mb-0 fa-ul text-muted">
-												<li class="small">
-													<span class="fa-li">
-														<i class="fas fa-user-clock"></i>
-													</span>
-													Age: @beneficaryAge years
-												</li>
-												<li class="small">
-													<span class="fa-li">
-														<i class="fa fa-money"></i>
-													</span>
-													Annual Income: (@Model.Currency) @Model.Beneficiary?.Income
-												</li>
-												<li class="small">
-													<span class="fa-li">
-														<i class="fas fa-lg fa-building"></i>
-													</span>
-													Address: @baddress
-												</li>
-												<li class="small">
-													<span class="fa-li">
-														<i class="fas fa-lg fa-phone"></i>
-													</span>
-													Mobile #: + @Model.Beneficiary?.PhoneNumber
-												</li>
-											</ul>
-										</div>
-										<div class="col-5 text-center">
-											<p class="text-muted text-sm">
-												@if (Model?.Beneficiary?.ImagePath is not null)
-												{
-													<img id="bImage" class="img-fluid block-data" src="/Document/GetBeneficiaryDocument/@Model?.Beneficiary.BeneficiaryDetailId" data-bs-toggle="tooltip" title="Beneficiary Photo" />
-												}
-												else
-												{
-													<img id="bImage" class="img-fluid block-data" src="@Applicationsettings.NO_USER">
-												}
-											</p>
-											<p class="text-muted text-sm">
-												<img id="beneficiaryGoogleMap" class="img-fluid block-data" src="@bmap" />
-											</p>
-										</div>
-									</div>
-								</div>
-								<div class="card-footer">
-									<div class="text-right">
-										<button id="beneficiary-comments" class="btn btn-sm bg-teal" title="Send Sms to Beneficiary" data-bs-toggle="tooltip">
-											<i class="fas fa-comments"></i>
-											<span id="beneficiary-sms-count" class="badge bg-danger ms-1">@beneficiarySMSCount</span>
-										</button>
-										<button id="beneficiary-detail" class="btn btn-sm btn-success" title="Display Beneficiary Detail" data-bs-toggle="tooltip">
-											<i class="fas fa-user-tie"></i> ...
-										</button>
+									<div class="col-5 text-center">
+										<p class="text-muted text-sm">
+											@if (Model?.Beneficiary?.ImagePath is not null)
+											{
+												<img id="bImage" class="img-fluid block-data" src="/Document/GetBeneficiaryDocument/@Model?.Beneficiary.BeneficiaryDetailId" data-bs-toggle="tooltip" title="Beneficiary Photo" />
+											}
+											else
+											{
+												<img id="bImage" class="img-fluid block-data" src="@Applicationsettings.NO_USER">
+											}
+										</p>
+										<p class="text-muted text-sm">
+											<img id="beneficiaryGoogleMap" class="img-fluid block-data" src="@bmap" />
+										</p>
 									</div>
 								</div>
 							</div>
+							<div class="card-footer">
+								<div class="text-right">
+									<button id="beneficiary-comments" class="btn btn-sm bg-teal" title="Send Sms to Beneficiary" data-bs-toggle="tooltip">
+										<i class="fas fa-comments"></i>
+										<span id="beneficiary-sms-count" class="badge bg-danger ms-1">@beneficiarySMSCount</span>
+									</button>
+									<button id="beneficiary-detail" class="btn btn-sm btn-success" title="Display Beneficiary Detail" data-bs-toggle="tooltip">
+										<i class="fas fa-user-tie"></i> ...
+									</button>
+								</div>
+							</div>
 						</div>
-					}
+					</div>
 				}
 			</div>
 		</div>
@@ -383,42 +382,13 @@
 									</div>
 								</div>
 								<div class="card-body">
-
 									<div class="row">
-
-										<div class="col-7">
-											<p class="text-muted text-sm">
-												<br />
-												<ul class="ml-4 mb-0 fa-ul text-muted">
-
-													<li class="small">
-														Remarks?
-														<span class="fa-li">
-															<i class="far fa-comment"></i>
-														</span>
-													</li>
-												</ul>
-											</p>
-										</div>
-
-										<div class="col-5">
-											<p class="text-muted text-sm">
-												<br />
-												<ul class="ml-4 mb-0 fa-ul text-muted">
-													<li class="small">
-														<span class="fa-li">
-															<i class="far fa-comment"></i>
-														</span>
-														@Model.ClaimsInvestigation?.InvestigationReport?.AgentRemarks
-													</li>
-												</ul>
-											</p>
-										</div>
+										<p class="text-muted text-sm">
+											
+											@Model.ClaimsInvestigation?.InvestigationReport?.AgentRemarks
+										</p>
 									</div>
 								</div>
-							</div>
-							<div class="text-center">
-								<i class='fas fa-check-circle i-green'></i>
 							</div>
 						</div>
 

@@ -17,6 +17,10 @@
             {
                 className: 'max-width-column-name', // Apply the CSS class,
                 targets: 7                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column-name', // Apply the CSS class,
+                targets: 10                      // Index of the column to style
             }],
         order: [[13, 'asc']],
         fixedHeader: true,
@@ -109,7 +113,18 @@
             {
                 "data": "created",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.created + '" data-toggle="tooltip">' + data + '</span>'
+                    if (!data) return '';
+                    let date = new Date(data);
+                    var localDate = date.toLocaleString('en-IN', {
+                        day: '2-digit',
+                        month: 'short',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit',
+                        hour12: true
+                    });
+                    return `<span title="${localDate}" data-bs-toggle="tooltip"><small><strong>${localDate}</strong></small></span>`;
                 }
             },
             { "data": "timePending" },
