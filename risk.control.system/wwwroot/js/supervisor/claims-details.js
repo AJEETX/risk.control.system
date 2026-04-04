@@ -4,7 +4,7 @@
         $.alert(
             {
                 title: " Decline Case !",
-                content: "This Case can not be declined as per the status.",
+                content: "<small>This Case can not be declined as per the status.</small>",
                 icon: 'fas fa-info',
                 animationBounce: 2.5,
                 type: 'red',

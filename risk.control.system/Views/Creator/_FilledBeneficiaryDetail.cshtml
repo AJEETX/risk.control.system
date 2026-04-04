@@ -50,7 +50,7 @@
 				<div class="col-7">
 					<h2 class="lead"><b>@Model.Beneficiary?.Name</b></h2>
 					<p class="text-muted text-sm">
-						<b>Relation: </b> @Model.Beneficiary?.BeneficiaryRelation?.Name
+						Relation: <b> @Model.Beneficiary?.BeneficiaryRelation?.Name</b>
 					</p>
 					<ul class="ml-4 mb-0 fa-ul text-muted">
 						<li class="small">
@@ -67,7 +67,7 @@
 						</li>
 						<li class="small">
 							<span class="fa-li"><i class="fas fa-lg fa-globe"></i></span>
-							Country:<img src="@imgPath" class="flag-icon" data-bs-toggle="tooltip" /> @Model.Beneficiary?.Country?.Name
+							Country:<img src="@imgPath" class="flag-icon" data-bs-toggle="tooltip" /><b> @Model.Beneficiary?.Country?.Name </b>
 						</li>
 						<li class="small">
 							<span class="fa-li"><i class="fas fa-lg fa-phone"></i></span>

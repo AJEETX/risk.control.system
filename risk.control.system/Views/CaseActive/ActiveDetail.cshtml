@@ -105,42 +105,29 @@
 		<partial name="Investigation/_TimelineReport" model="@Model" />
 	</div>
 	<div class="card-footer">
-		@if (Model.Withdrawable)
-		{
-			<form id="withdraw-form" method="post" asp-action="Withdraw" asp-controller="WithdrawCase">
-				<input type="hidden" name="caseId" asp-for="@Model.ClaimsInvestigation.Id" />
-				<div class="row float-right">
-					<div class="col-md-12">
-						<a id="back" asp-action="Active" class="btn btn-sm btn-outline-secondary" data-bs-toggle="tooltip" title="Back to Active cases">
-							<i class="fas fa-arrow-left"></i>
-							<span class="badge badge-light"> <i class="fa fa-toggle-on"></i> </span> Back
-						</a>
-						<button id="submit-case" type="submit" class="btn btn-sm btn-danger"><i class="fas fa-undo"></i> Withdraw</button>
-					</div>
-				</div>
-			</form>
-		}
-		else
-		{
-
+		<form id="withdraw-form" method="post" asp-action="Withdraw" asp-controller="WithdrawCase">
+			<input type="hidden" name="caseId" asp-for="@Model.ClaimsInvestigation.Id" />
 			<div class="row float-right">
 				<div class="col-md-12">
-					<span class="text-maroon text-muted">The case cannot be withdrawn. See the <b>Timeline</b> section above <i class="far fa-hand-point-up"></i> for more info.</span>
-
 					<a id="back" asp-action="Active" class="btn btn-sm btn-outline-secondary" data-bs-toggle="tooltip" title="Back to Active cases">
 						<i class="fas fa-arrow-left"></i>
 						<span class="badge badge-light"> <i class="fa fa-toggle-on"></i> </span> Back
 					</a>
-					<span id="withdraw-information-popup" class="badge badge-light" data-bs-toggle="tooltip" title="Disabled">
-						<div class="btn btn-sm btn-outline-danger">
+					@if (Model.Withdrawable)
+					{
+						<button id="submit-case" type="submit" class="btn btn-sm btn-danger"><i class="fas fa-undo"></i> Withdraw</button>
+					}
+					else
+					{
+						<div id="withdraw-information-popup" class="btn btn-sm btn-outline-danger">
 							<span class="badge badge-light"> <i class="fas fa-undo"></i> </span> Withdraw <span class="badge badge-danger">
 							<i class="fas fa-info"></i>
 						</span>
 					</div>
-				</span>
+				}
 			</div>
 		</div>
-	}
+	</form>
 </div>
 </div>
 </section>

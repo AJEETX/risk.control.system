@@ -33,9 +33,9 @@ namespace risk.control.system.Services.Common
     {
         private MvcBreadcrumbNode GetCaseBasePath(long id)
         {
-            var cases = new MvcBreadcrumbNode(nameof(CaseDetailController.New), ControllerName<CaseDetailController>.Name, "Cases");
+            var cases = new MvcBreadcrumbNode(nameof(AddAssignController.New), ControllerName<AddAssignController>.Name, "Cases");
 
-            return new MvcBreadcrumbNode(nameof(CaseDetailController.New), ControllerName<CaseDetailController>.Name, "Add/Assign") { Parent = cases };
+            return new MvcBreadcrumbNode(nameof(AddAssignController.New), ControllerName<AddAssignController>.Name, "Add/Assign") { Parent = cases };
         }
 
         private MvcBreadcrumbNode GetCaseDetailsBase(long id)
@@ -63,8 +63,8 @@ namespace risk.control.system.Services.Common
 
         public MvcBreadcrumbNode GetEditCasePath(long id)
         {
-            return new MvcBreadcrumbNode(nameof(CaseDetailController.Edit),
-                ControllerName<CaseDetailController>.Name, "Edit Case")
+            return new MvcBreadcrumbNode(nameof(AddAssignController.Edit),
+                ControllerName<AddAssignController>.Name, "Edit Case")
             {
                 Parent = GetCaseDetailsBase(id),
                 RouteValues = new { id }

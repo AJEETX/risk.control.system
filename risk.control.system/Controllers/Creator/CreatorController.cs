@@ -76,7 +76,7 @@ namespace risk.control.system.Controllers.Creator
                 if (!ModelState.IsValid || id < 1)
                 {
                     _notifyService.Error("No Case selected!!!. Please select Case to allocate.");
-                    return RedirectToAction(nameof(CaseDetailController.New), ControllerName<CaseDetailController>.Name);
+                    return RedirectToAction(nameof(AddAssignController.New), ControllerName<AddAssignController>.Name);
                 }
 
                 var model = await _empanelledAgencyService.GetEmpanelledVendors(id, userEmail, vendorId, fromEditPage);
@@ -89,18 +89,18 @@ namespace risk.control.system.Controllers.Creator
             {
                 _logger.LogError(ex, "Error getting Empanelled Agencies of case {Id}. {UserEmail}", id, userEmail);
                 _notifyService.Error("Error getting Agencies. Try again.");
-                return RedirectToAction(nameof(CaseDetailController.New), ControllerName<CaseDetailController>.Name);
+                return RedirectToAction(nameof(AddAssignController.New), ControllerName<AddAssignController>.Name);
             }
         }
 
-        [Breadcrumb("Details", FromAction = "New", FromController = typeof(CaseDetailController))]
+        [Breadcrumb("Details", FromAction = "New", FromController = typeof(AddAssignController))]
         public async Task<IActionResult> Details(long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name!;
             if (!ModelState.IsValid || id < 1)
             {
                 _notifyService.Error("Case Not Found.Try Again");
-                return RedirectToAction(nameof(CaseDetailController.New), ControllerName<CaseDetailController>.Name);
+                return RedirectToAction(nameof(AddAssignController.New), ControllerName<AddAssignController>.Name);
             }
             try
             {
@@ -111,7 +111,7 @@ namespace risk.control.system.Controllers.Creator
             {
                 _logger.LogError(ex, "Error getting case details {Id}. {UserEmail}", id, userEmail);
                 _notifyService.Error("Error getting case details. Try again.");
-                return RedirectToAction(nameof(CaseDetailController.New), ControllerName<CaseDetailController>.Name);
+                return RedirectToAction(nameof(AddAssignController.New), ControllerName<AddAssignController>.Name);
             }
         }
 
@@ -120,7 +120,7 @@ namespace risk.control.system.Controllers.Creator
             if (id <= 0 || selectedcase <= 0)
             {
                 _notifyService.Error("Invalid request.");
-                return RedirectToAction(nameof(CaseDetailController.New), ControllerName<CaseDetailController>.Name);
+                return RedirectToAction(nameof(AddAssignController.New), ControllerName<AddAssignController>.Name);
             }
 
             var userEmail = User.Identity?.Name;
@@ -143,7 +143,7 @@ namespace risk.control.system.Controllers.Creator
             {
                 _logger.LogError(ex, "Error getting agency details. VendorId: {VendorId}, User: {UserEmail}", id, userEmail ?? "Anonymous");
                 _notifyService.Error("Error getting agency details. Try again.");
-                return RedirectToAction(nameof(CaseDetailController.New), ControllerName<CaseDetailController>.Name);
+                return RedirectToAction(nameof(AddAssignController.New), ControllerName<AddAssignController>.Name);
             }
         }
     }
