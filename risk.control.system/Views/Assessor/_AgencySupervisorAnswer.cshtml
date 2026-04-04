@@ -46,12 +46,14 @@
                             <tbody>
                                 <tr>
                                     <td class="text-start">
-                                        <div class="bg-light rounded p-2 text-muted">
+                                        <div class="remark-container">
                                             @Model?.CaseTask?.InvestigationReport?.SupervisorRemarks
                                         </div>
                                     </td>
 
                                     <td>
+                                        <div class="remark-container">
+
                                         @if (Model?.CaseTask?.InvestigationReport?.SupervisorAttachment != null)
                                         {
                                             <img class="img-fluid doc-profile-image" src="data:image/*;base64,@(Convert.ToBase64String(Model.CaseTask.InvestigationReport.SupervisorAttachment))" alt="Attachment">
@@ -67,6 +69,7 @@
                                         {
                                             <img src="@Applicationsettings.NO_IMAGE" alt="No Document" class="img-thumbnail doc-preview">
                                         }
+                                        </div>
                                     </td>
                                 </tr>
                             </tbody>
