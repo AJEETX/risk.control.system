@@ -33,7 +33,7 @@
                 {
                     var questionTime = @Model.ClaimsInvestigation.InvestigationReport.AgentRemarksUpdated != null ?
                     @Model.ClaimsInvestigation.InvestigationReport.AgentRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt") : null;
-                <div class="col-12 col-md-6">
+                    <div class="col-md-12">
                     <div class="card bg-light d-flex flex-fill border-success">
                         <div class="card-header text-muted border-bottom-0">
                             <h3 class="card-title">
@@ -68,8 +68,8 @@
 
                                             <thead class="thead-light">
                                                 <tr>
-                                                    <th> Agent Remarks</th>
-                                                    <th class="w-30">Edited Remarks</th>
+                                                    <th class="w-50"> Agent Remarks</th>
+                                                    <th class="w-50">Edited Remarks</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -96,7 +96,10 @@
                 </div>
 
                 }
-            <div class="col-12 col-md-6">
+            
+        </div>
+        <div class="row">
+            <div class="col-md-12">
                 @if (!string.IsNullOrWhiteSpace(Model.ClaimsInvestigation?.InvestigationReport?.SupervisorRemarks))
                 {
                     <div class="card bg-light  border-success">
@@ -139,7 +142,7 @@
                                             <thead class="thead-light">
                                                 <tr>
                                                     <th>Remarks</th>
-                                                    <th class="w-25">Document</th>
+                                                    <th class="w-10">Document</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -156,8 +159,8 @@
                                                         {
                                                             <img title="enquiry document" id="enquiryDocument" class="img-fluid doc-profile-image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.ClaimsInvestigation.InvestigationReport?.SupervisorAttachment!))">
                                                             <a asp-controller="Download" asp-action="SupervisorFileAttachment" target="_blank"
-                                                               asp-route-id="@Model.ClaimsInvestigation.InvestigationReport?.Id"
-                                                               class="mailbox-attachment-name">
+                                                                   asp-route-id="@Model.ClaimsInvestigation.InvestigationReport?.Id"
+                                                                   class="mailbox-attachment-name">
                                                                 <i class="fas fa-paperclip"></i>
                                                             </a>
                                                         }
@@ -177,9 +180,9 @@
                         </div>
                     </div>
                 }
+            
             </div>
         </div>
-
         @if (@Model!.ClaimsInvestigation!.IsQueryCase && @Model.ClaimsInvestigation.InvestigationReport?.EnquiryRequest != null)
         {
             <partial name="_EnquiryReport" model="@Model" />
