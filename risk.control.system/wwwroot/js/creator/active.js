@@ -43,12 +43,16 @@
                 targets: 8                      // Index of the column to style
             },
             {
+                className: 'max-width-column-name', // Apply the CSS class,
+                targets: 9                      // Index of the column to style
+            },
+            {
                 className: 'max-width-column-number', // Apply the CSS class,
                 targets: 10                      // Index of the column to style
             },
             {
                 className: 'max-width-column-name', // Apply the CSS class,
-                targets: 9                      // Index of the column to style
+                targets: 11                      // Index of the column to style
             },
             {
                 'targets': 16, // Index for the "Case Type" column

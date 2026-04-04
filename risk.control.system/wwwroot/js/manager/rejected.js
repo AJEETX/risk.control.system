@@ -80,7 +80,11 @@
                 "data": "agency",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    return '<span title="' + data + '" data-bs-toggle="tooltip">' + data + '</span>';
+                    var img = '<div class="map-thumbnail profile-image doc-profile-image">';
+                    img += '<img src="' + row.ownerDetail + '" class="full-map" title="' + row.agency + '" data-bs-toggle="tooltip"/>'; // Full map image with class 'full-map'
+                    img += '<img src="' + row.ownerDetail + '" class="thumbnail profile-image doc-profile-image" title="' + row.agency + '" data-bs-toggle="tooltip"/>'; // Thumbnail image with class 'thumbnail'
+                    img += '</div>';
+                    return img;
                 }
                 ///<button type="button" class="btn btn-lg btn-danger" data-bs-toggle="popover" title="Popover title" data-content="And here's some amazing content. It's very engaging. Right?">Click to toggle popover</button>
             },
