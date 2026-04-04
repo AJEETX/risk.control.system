@@ -121,7 +121,7 @@
                         return '<i class="fas fa-exclamation-triangle i-orangered" data-bs-toggle="tooltip" title="Incomplete"></i>';
                     }
                     else {
-                        var img = '<input class="vendors" name="claims" type="checkbox" id="' + row.id + '"  value="' + row.id + '"  data-bs-toggle="tooltip" title="Assign <sub>auto</sub> / delete" />';
+                        var img = '<input class="vendors" name="cases" type="checkbox" id="' + row.id + '"  value="' + row.id + '"  data-bs-toggle="tooltip" title="Assign <sub>auto</sub> / delete" />';
                         return img;
                     }
                 }
@@ -618,11 +618,11 @@
             }
         });
     });
-    function deleteSelectedCases(claims) {
+    function deleteSelectedCases(cases) {
         $.ajax({
             url: "/DeleteCase/DeleteCases", // Update with your actual delete endpoint
             type: "POST",
-            data: JSON.stringify({ claims: claims }),
+            data: JSON.stringify({ cases: cases }),
             headers: {
                 "X-CSRF-TOKEN": $('input[name="__RequestVerificationToken"]').val(),
             },
