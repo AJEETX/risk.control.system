@@ -55,6 +55,10 @@
             {
                 className: 'max-width-column-name', // Apply the CSS class,
                 targets: 9                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column-name', // Apply the CSS class,
+                targets: 12                      // Index of the column to style
             }],
         order: [[14, 'asc']],
         responsive: true,
