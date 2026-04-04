@@ -211,7 +211,7 @@ $(document).ready(function () {
         $.alert(
             {
                 title: " Withdraw Case !",
-                content: "<small>The case can not be withdrawn. <br />See <i class='fas fa-clock'></i> Timeline section  for more info</small>",
+                content: "<small>The case can not be withdrawn. <br />See Status or <i class='fas fa-clock'></i> Timeline section for more info</small>",
                 icon: 'fas fa-info',
                 animationBounce: 2.5,
                 type: 'red',

@@ -1,4 +1,4 @@
-<img src="risk.control.system/wwwroot/img/iCheckifyLogo.png" />™️ engine
+<img src="risk.control.system/wwwroot/img/logo.jpeg" />™️ engine
 ### a simple and secure investigation workflow system [Multi-tenant SAAS^]
 
 ### 1. iCheckify™️ engine highlights [web-portal]

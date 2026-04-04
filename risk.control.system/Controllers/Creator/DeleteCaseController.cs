@@ -61,7 +61,7 @@ namespace risk.control.system.Controllers.Creator
             var userEmail = User.Identity?.Name!;
             try
             {
-                var (success, message) = await _deleteService.SoftDeleteBulkCasesAsync(request.claims, userEmail);
+                var (success, message) = await _deleteService.SoftDeleteBulkCasesAsync(request.cases, userEmail);
 
                 if (!success) return Json(new { success = false, message });
 

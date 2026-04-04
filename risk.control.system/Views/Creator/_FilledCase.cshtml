@@ -93,19 +93,10 @@
 		<!-- Card Footer -->
 		<div class="card-footer">
 			<div class="text-right">
-				@if (Model.ClaimsInvestigation != null)
-				{
-					<input type="hidden" asp-for="ClaimsInvestigation.Id" />
-					<a id="edit-policy" class="btn btn-warning" asp-controller="CaseDetail" asp-action="Edit" asp-route-id="@Model.ClaimsInvestigation.Id">
-						<i class="far fa-file-powerpoint"></i> Edit Case
-					</a>
-				}
-				else
-				{
-					<a class="btn btn-success" asp-action="Create" asp-controller="CaseDetail">
-						<i class="far fa-file-powerpoint"></i> Add Case
-					</a>
-				}
+				<input type="hidden" asp-for="ClaimsInvestigation.Id" />
+				<a id="edit-policy" class="btn btn-warning" asp-controller="AddAssign" asp-action="Edit" asp-route-id="@Model.ClaimsInvestigation!.Id">
+					<i class="far fa-file-powerpoint"></i> Edit Case
+				</a>
 			</div>
 		</div>
 	</div>

@@ -43,7 +43,7 @@ namespace risk.control.system.Controllers.Creator
                 if (!ModelState.IsValid || id < 1)
                 {
                     _errorNotifyService.ShowErrorNotification(ModelState, "OOPS!!!.Case Not Found.Try Again");
-                    return RedirectToAction(nameof(CaseDetailController.Create), ControllerName<CaseDetailController>.Name);
+                    return RedirectToAction(nameof(AddAssignController.Create), ControllerName<AddAssignController>.Name);
                 }
                 ViewData["BreadcrumbNode"] = _navigationService.GetInvestigationPath(id, "Add Customer", nameof(Create), ControllerName<CustomerController>.Name);
 
@@ -103,7 +103,7 @@ namespace risk.control.system.Controllers.Creator
                 if (!ModelState.IsValid || id < 1)
                 {
                     _notifyService.Error("OOPS!!!.Case Not Found.Try Again");
-                    return RedirectToAction(nameof(CaseDetailController.Create), ControllerName<CaseDetailController>.Name);
+                    return RedirectToAction(nameof(AddAssignController.Create), ControllerName<AddAssignController>.Name);
                 }
 
                 var model = await _customerService.GetEditViewModelAsync(id, userEmail);
