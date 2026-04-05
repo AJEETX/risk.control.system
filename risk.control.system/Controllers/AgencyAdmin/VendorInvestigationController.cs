@@ -52,7 +52,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
 
         [HttpGet]
         [Breadcrumb("Agents", FromAction = nameof(Allocate))]
-        public async Task<IActionResult> SelectVendorAgent(long id)
+        public async Task<IActionResult> SelectAgent(long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name!;
             try
@@ -60,7 +60,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
                 if (!ModelState.IsValid || id < 1)
                 {
                     _notifyService.Error("No case selected!!!. Please select case to be allocate.");
-                    return RedirectToAction(nameof(SelectVendorAgent), new { id = id });
+                    return RedirectToAction(nameof(SelectAgent), new { id = id });
                 }
 
                 var model = await _agencyInvestigationDetailService.SelectVendorAgent(userEmail, id);
@@ -77,7 +77,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
 
         [HttpGet]
         [Breadcrumb("Re-Allocate", FromAction = nameof(CaseReport))]
-        public async Task<IActionResult> ReSelectVendorAgent(long id)
+        public async Task<IActionResult> ReSelectAgent(long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name!;
             try
@@ -85,7 +85,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
                 if (!ModelState.IsValid || id < 1)
                 {
                     _notifyService.Error("No case selected!!!. Please select case to be allocate.");
-                    return RedirectToAction(nameof(SelectVendorAgent), new { id = id });
+                    return RedirectToAction(nameof(SelectAgent), new { id = id });
                 }
 
                 var model = await _agencyInvestigationDetailService.SelectVendorAgent(userEmail, id);
