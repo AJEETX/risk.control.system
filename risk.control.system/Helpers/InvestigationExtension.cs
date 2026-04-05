@@ -47,11 +47,11 @@ namespace risk.control.system.Helpers
                     var isRequested = caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR;
                     if (isRequested)
                     {
-                        return string.Join("", contractNumber + "<i class=\"fa fa-asterisk asterik-style\" title=\"ENQUIRY\"></i>");
+                        return string.Join("", "<i class=\"fa fa-asterisk asterik-style\" title=\"ENQUIRY\"></i>" + contractNumber);
                     }
                 }
             }
-            return string.Join("", contractNumber + $"<i class=\"fa fa-asterisk asterik-style{style}\" title=\"{title}\"></i>");
+            return string.Join("", $"<i class=\"fa fa-asterisk asterik-style{style}\" title=\"{title}\"></i>" + contractNumber);
         }
 
         public static string GetPolicyNumForAgency(this InvestigationTask caseTask, string id)
@@ -62,10 +62,10 @@ namespace risk.control.system.Helpers
                 var isRequested = caseTask.SubStatus == id;
                 if (isRequested)
                 {
-                    return string.Join("", caseTask.PolicyDetail?.ContractNumber + "<i class=\"fa fa-asterisk asterik-style\" title=\"ENQUIRY\"></i>");
+                    return string.Join("", "<i class=\"fa fa-asterisk asterik-style\" title=\"ENQUIRY\"></i>" + caseTask.PolicyDetail?.ContractNumber);
                 }
             }
-            return string.Join("", caseTask.PolicyDetail?.ContractNumber + "<i class=\"fa fa-asterisk asterik-style-none\"></i>");
+            return string.Join("", "<i class=\"fa fa-asterisk asterik-style-none\"></i>" + caseTask.PolicyDetail?.ContractNumber);
         }
 
         public static string GetAgentTimePending(this InvestigationTask caseTask, bool open = false)
