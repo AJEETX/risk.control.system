@@ -94,7 +94,7 @@
 				<partial name="_Location" model="@template" />
 			</div>
 			<div class="row">
-				<div class="col-12 col-md-6">
+				<div class="col-md-12">
 					@if (!string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.InvestigationReport?.AgentRemarks))
 					{
 						var questionTime = @Model.ClaimsInvestigation.InvestigationReport.AgentRemarksUpdated != null ?
@@ -166,85 +166,87 @@
 
 					}
 				</div>
-				<div class="col-12 col-md-6">
-					@if (!string.IsNullOrWhiteSpace(Model.ClaimsInvestigation?.InvestigationReport?.SupervisorRemarks))
-					{
-						<div class="card bg-light  border-success">
+				
+			</div>
+			<div class="row">
+			<div class="col-md-12">
+				@if (!string.IsNullOrWhiteSpace(Model.ClaimsInvestigation?.InvestigationReport?.SupervisorRemarks))
+				{
+					<div class="card bg-light  border-success">
 
-							<div class="card-header">
-								<h3 class="card-title">
-									<i class="fas fa-user-edit"></i> Agency comments:
-									<span class="hover-text">
-										<i class="fas fa-info-circle"></i>
-										<span class="tooltip-text" id="information">
-											<span>
-												<i class="fas fa-user-shield"></i><b> @Model?.ClaimsInvestigation.InvestigationReport?.SupervisorEmail</b> comments.
-											</span>
+						<div class="card-header">
+							<h3 class="card-title">
+								<i class="fas fa-user-edit"></i> Agency comments:
+								<span class="hover-text">
+									<i class="fas fa-info-circle"></i>
+									<span class="tooltip-text" id="information">
+										<span>
+											<i class="fas fa-user-shield"></i><b> @Model?.ClaimsInvestigation.InvestigationReport?.SupervisorEmail</b> comments.
 										</span>
 									</span>
-								</h3>
-								<div class="card-tools">
-									<span data-bs-toggle="tooltip" title=" Supervisor report time" class="badge badge-light">
-										<i class="nav-icon fas fa-clock"></i> @Model?.ClaimsInvestigation.InvestigationReport?.SupervisorRemarksUpdated!.Value.ToString("dd-MMM-yy hh:mm tt")
-									</span>
-								</div>
+								</span>
+							</h3>
+							<div class="card-tools">
+								<span data-bs-toggle="tooltip" title=" Supervisor report time" class="badge badge-light">
+									<i class="nav-icon fas fa-clock"></i> @Model?.ClaimsInvestigation.InvestigationReport?.SupervisorRemarksUpdated!.Value.ToString("dd-MMM-yy hh:mm tt")
+								</span>
 							</div>
-							<div class="progress">
-								<i class="far fa-bookmark bookmark-green"></i>
-								<div class="progress-bar progress-bar-green" role="progressbar">
-									agency comments
-								</div>
+						</div>
+						<div class="progress">
+							<i class="far fa-bookmark bookmark-green"></i>
+							<div class="progress-bar progress-bar-green" role="progressbar">
+								agency comments
 							</div>
-							<div class="card-footer text-muted border-bottom-0">
-								<i class="fas fa-user-shield"></i>  Remarks by:<span class="badge badge-light">  @Model?.ClaimsInvestigation.InvestigationReport.SupervisorEmail </span>
-							</div>
-							<div class="card-body">
+						</div>
+						<div class="card-footer text-muted border-bottom-0">
+							<i class="fas fa-user-shield"></i>  Remarks by:<span class="badge badge-light">  @Model?.ClaimsInvestigation.InvestigationReport.SupervisorEmail </span>
+						</div>
+						<div class="card-body">
 
-								<div class="row">
-									<div class="col-12">
-										<div class="table-responsive">
-											<table class="table table-bordered table-sm table-hover">
-												<thead class="thead-light">
-													<tr>
-														<th>Remarks</th>
-														<th class="w-25">Document</th>
-													</tr>
-												</thead>
-												<tbody>
-													<tr>
-														<td class="text-start">
-															<div class="bg-light rounded p-2 text-muted">
+							<div class="row">
+								<div class="col-12">
+									<div class="table-responsive">
+										<table class="table table-bordered table-sm table-hover">
+											<thead class="thead-light">
+												<tr>
+													<th>Remarks</th>
+													<th class="w-10">Document</th>
+												</tr>
+											</thead>
+											<tbody>
+												<tr>
+													<td class="text-start">
+														<div class="bg-light rounded p-2 text-muted">
 
-																@Model?.ClaimsInvestigation.InvestigationReport?.SupervisorRemarks
-															</div>
-														</td>
-														<td>
-															@if (Model?.ClaimsInvestigation.InvestigationReport?.SupervisorAttachment != null)
-															{
-																<img title="enquiry document" id="enquiryDocument" class="img-fluid doc-profile-image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.ClaimsInvestigation.InvestigationReport?.SupervisorAttachment!))">
-																<a asp-controller="Download" asp-action="SupervisorFileAttachment" target="_blank"
-																	   asp-route-id="@Model.ClaimsInvestigation.InvestigationReport!.Id"
-																	   class="mailbox-attachment-name">
-																	<i class="fas fa-paperclip"></i>
-																</a>
-															}
-															else
-															{
-																<img title="enquiry document" id="enquiryDocument" alt="face image" class="img-fluid doc-profile-image" src=@Applicationsettings.NO_IMAGE>
-															}
-														</td>
-													</tr>
-												</tbody>
-											</table>
-										</div>
+															@Model?.ClaimsInvestigation.InvestigationReport?.SupervisorRemarks
+														</div>
+													</td>
+													<td>
+														@if (Model?.ClaimsInvestigation.InvestigationReport?.SupervisorAttachment != null)
+														{
+															<img title="enquiry document" id="enquiryDocument" class="img-fluid doc-profile-image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.ClaimsInvestigation.InvestigationReport?.SupervisorAttachment!))">
+															<a asp-controller="Download" asp-action="SupervisorFileAttachment" target="_blank"
+																   asp-route-id="@Model.ClaimsInvestigation.InvestigationReport!.Id"
+																   class="mailbox-attachment-name">
+																<i class="fas fa-paperclip"></i>
+															</a>
+														}
+														else
+														{
+															<img title="enquiry document" id="enquiryDocument" alt="face image" class="img-fluid doc-profile-image" src=@Applicationsettings.NO_IMAGE>
+														}
+													</td>
+												</tr>
+											</tbody>
+										</table>
 									</div>
 								</div>
 							</div>
 						</div>
-					}
-				</div>
+					</div>
+				}
 			</div>
-
+			</div>
 			@if (@Model!.ClaimsInvestigation!.IsQueryCase && @Model.ClaimsInvestigation.InvestigationReport?.EnquiryRequest != null)
 			{
 				<partial name="_EnquiryReport" model="@Model" />
