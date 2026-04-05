@@ -330,7 +330,7 @@
 
         if (id) {
             // Redirect to the clean URL
-            window.location.href = 'SelectVendorAgent/' + id;
+            window.location.href = 'SelectAgent/' + id;
         } else {
             $.alert("Please select a case.");
         }
