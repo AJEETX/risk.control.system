@@ -210,7 +210,6 @@ namespace risk.control.system.Services.Api
             {
                 await context.Investigations.AsNoTracking()
                     .Where(x => idsToUpdate.Contains(x.Id))
-
                     .ExecuteUpdateAsync(setters => setters.SetProperty(i => i.IsNew, false));
             }
 

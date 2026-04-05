@@ -52,7 +52,19 @@
 		<div class="submit-progress hidden">
 			<i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
 		</div>
-		<partial name="_Withdraw" model="@data" />
+		<div class="row">
+			@{
+				<partial name="_CaseDetails" model="@data" />
+				@if (Model.ClaimsInvestigation?.PolicyDetail?.InsuranceType == InsuranceType.UNDERWRITING)
+				{
+					<partial name="_CustomerDetails" model="@data" />
+				}
+				else
+				{
+					<partial name="_BeneficiaryDetails" model="@data" />
+				}
+			}
+		</div>
 	</div>
 	<div class="card-footer">
 		<div class="row float-right">
