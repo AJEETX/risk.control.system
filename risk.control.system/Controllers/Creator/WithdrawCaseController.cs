@@ -54,9 +54,9 @@ namespace risk.control.system.Controllers.Creator
 
                 var (policyNumber, vendorId) = await _withdrawCaseService.WithdrawCaseByCompany(userEmail, model, caseId);
 
-                _backgroundJobClient.Enqueue(() => _mailboxService.NotifyCaseWithdrawlToCompany(userEmail, caseId, vendorId, _baseUrl));
+                _backgroundJobClient.Enqueue(() => _mailboxService.NotifyCaseWithdrawlToCompany(userEmail, policyNumber, caseId, vendorId, _baseUrl));
 
-                _notifyService.Custom($"Case <b> #{policyNumber}</b>  withdrawn successfully", 3, "orange", "far fa-file-powerpoint");
+                _notifyService.Custom($"Case <b> #{policyNumber}</b>  withdrawn successfully", 3, "red", "far fa-file-powerpoint");
 
                 return RedirectToAction(nameof(AddAssignController.New), ControllerName<AddAssignController>.Name);
             }
