@@ -5,7 +5,7 @@
             dataSrc: '',
             error: DataTableErrorHandler
         },
-        order: [[2, 'asc'], [12, 'desc'], [13, 'desc']], // Sort by `isUpdated` and `lastModified`,
+        order: [[12, 'desc'], [13, 'desc'], [2, 'asc']], // Sort by `isUpdated` and `lastModified`,
         columnDefs: [{
             'targets': 0,
             'searchable': false,

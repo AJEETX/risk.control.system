@@ -12,121 +12,17 @@ namespace risk.control.system.Services.Common
         Task MarkAsRead(long id, string userEmail);
 
         Task<List<StatusNotification>> GetNotifications(string userEmail);
-
-        Task<string> SendSms2Customer(string currentUser, long claimId, string sms);
-
-        Task<string> SendSms2Beneficiary(string currentUser, long claimId, string sms);
-
-        Task<List<CaseMessage>> GetSmsHistory(long caseId, bool isCustomer);
     }
 
     internal class NotificationService : INotificationService
     {
         private readonly ApplicationDbContext context;
         private readonly RoleManager<ApplicationRole> roleManager;
-        private readonly ISmsService smsService;
-        private static string logo = Applicationsettings.WEBSITE_SITE_URL;
 
-        public NotificationService(ApplicationDbContext context,
-            RoleManager<ApplicationRole> roleManager,
-            ISmsService SmsService)
+        public NotificationService(ApplicationDbContext context, RoleManager<ApplicationRole> roleManager)
         {
             this.context = context;
             this.roleManager = roleManager;
-            smsService = SmsService;
-        }
-
-        public async Task<string> SendSms2Customer(string currentUser, long claimId, string sms)
-        {
-            var caseDetail = await context.Investigations.Include(c => c.CaseMessages).Include(c => c.PolicyDetail).Include(c => c.CustomerDetail).ThenInclude(c => c!.PinCode)
-                .Include(c => c.CustomerDetail).ThenInclude(c => c!.Country).FirstOrDefaultAsync(c => c.Id == claimId);
-            var mobile = caseDetail!.CustomerDetail!.PhoneNumber.ToString();
-            var user = await context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(u => u.Email == currentUser);
-            var isdCode = caseDetail.CustomerDetail.Country!.ISDCode;
-            var isInsurerUser = user!.ClientCompanyId > 0;
-            var isVendorUser = user.VendorId > 0;
-            string entityName = string.Empty;
-            ApplicationUser insurerUser;
-            ApplicationUser agencyUser;
-            if (isInsurerUser)
-            {
-                insurerUser = user;
-                var entity = await context.ClientCompany.AsNoTracking().FirstOrDefaultAsync(c => c.ClientCompanyId == insurerUser.ClientCompanyId);
-                entityName = entity?.Name ?? string.Empty;
-            }
-            else if (isVendorUser)
-            {
-                agencyUser = user;
-                var entity = await context.Vendor.AsNoTracking().FirstOrDefaultAsync(v => v.VendorId == agencyUser.VendorId);
-                entityName = entity?.Name ?? string.Empty;
-            }
-            if (!isInsurerUser && !isVendorUser)
-            {
-                return string.Empty;
-            }
-            var message = $"Dear {caseDetail.CustomerDetail.Name}\n\n" + $"{sms}\n\n" + $"Thanks\n\n" + "{user.FirstName} {user.LastName}\n\n" + $"Policy #:{caseDetail.PolicyDetail!.ContractNumber}\n\n" + $"{entityName}\n\n";
-            message += $"{logo}";
-
-            var scheduleMessage = new CaseMessage
-            {
-                Message = sms,
-                IsCustomer = true,
-                InvestigationTaskId = claimId,
-                RecepicientEmail = caseDetail.CustomerDetail.Name,
-                SenderEmail = user.Email,
-                UpdatedBy = user.Email,
-                Updated = DateTime.UtcNow
-            };
-            caseDetail.CaseMessages!.Add(scheduleMessage);
-            await context.SaveChangesAsync(null, false);
-            await smsService.DoSendSmsAsync(caseDetail.CustomerDetail.Country.Code, "+" + isdCode + mobile, message);
-            return caseDetail.CustomerDetail.Name;
-        }
-
-        public async Task<string> SendSms2Beneficiary(string currentUser, long claimId, string sms)
-        {
-            var beneficiary = await context.BeneficiaryDetail.AsNoTracking().Include(b => b.Country).FirstOrDefaultAsync(c => c.InvestigationTaskId == claimId);
-            var mobile = beneficiary!.PhoneNumber.ToString();
-            var user = await context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(u => u.Email == currentUser);
-            var isdCode = beneficiary.Country!.ISDCode;
-            var isInsurerUser = user!.ClientCompanyId > 0;
-            var isVendorUser = user.VendorId > 0;
-            string entityName = string.Empty;
-            ApplicationUser insurerUser;
-            ApplicationUser agencyUser;
-            if (isInsurerUser)
-            {
-                insurerUser = user;
-                var entity = await context.ClientCompany.AsNoTracking().FirstOrDefaultAsync(c => c.ClientCompanyId == insurerUser.ClientCompanyId);
-                entityName = entity!.Name;
-            }
-            else if (isVendorUser)
-            {
-                agencyUser = user;
-                var entity = await context.Vendor.AsNoTracking().FirstOrDefaultAsync(v => v.VendorId == agencyUser.VendorId);
-                entityName = entity!.Name;
-            }
-            if (!isInsurerUser && !isVendorUser)
-            {
-                return string.Empty;
-            }
-            var caseTask = await context.Investigations.Include(c => c.CaseMessages).Include(c => c.PolicyDetail).FirstOrDefaultAsync(c => c.Id == claimId);
-            var message = $"Dear {beneficiary.Name}\n\n" + $"{sms}\n\n" + $"Thanks\n\n" + $"{user.FirstName} {user.LastName}\n\n" + $"Policy #:{caseTask!.PolicyDetail!.ContractNumber}\n\n";
-            message += $"{entityName}\n\n";
-            message += $"{logo}";
-            var scheduleMessage = new CaseMessage
-            {
-                Message = sms,
-                InvestigationTaskId = claimId,
-                RecepicientEmail = beneficiary.Name,
-                SenderEmail = user.Email,
-                UpdatedBy = user.Email,
-                Updated = DateTime.UtcNow
-            };
-            caseTask.CaseMessages!.Add(scheduleMessage);
-            await context.SaveChangesAsync(null, false);
-            await smsService.DoSendSmsAsync(beneficiary.Country.Code, "+" + isdCode + mobile, message);
-            return beneficiary.Name;
         }
 
         public async Task<List<StatusNotification>> GetNotifications(string userEmail)
@@ -151,7 +47,11 @@ namespace risk.control.system.Services.Common
                 }
                 else if (role?.Name == CREATOR.DISPLAY_NAME)
                 {
-                    notifications = notifications.Where(n => ((n.RoleId == role.Id && n.NotifierUserEmail == userEmail) && !n.IsReadByCreator) || ((n.RoleId == role.Id && n.Status == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY) && !n.IsReadByCreator));
+                    notifications = notifications.Where(n => (n.RoleId == role.Id && n.NotifierUserEmail == userEmail) && !n.IsReadByCreator);
+                }
+                else if (role?.Name == COMPANY_ADMIN.DISPLAY_NAME)
+                {
+                    notifications = notifications.Where(n => n.RoleId == role.Id && !n.IsReadByCompanyAdmin);
                 }
                 return await notifications.OrderByDescending(n => n.CreatedAt).ToListAsync();
             }
@@ -162,7 +62,7 @@ namespace risk.control.system.Services.Common
                 var notifications = context.Notifications.AsNoTracking().Where(n => n.VendorId == vendorUser.VendorId && (!n.IsReadByVendor || !n.IsReadByVendorAgent));
                 if (role?.Name == AGENT.DISPLAY_NAME)
                 {
-                    notifications = notifications.Where(n => n.AgenctUserEmail == userEmail);
+                    notifications = notifications.Where(n => n.AgentUserEmail == userEmail);
                 }
                 else
                 {
@@ -209,6 +109,10 @@ namespace risk.control.system.Services.Common
                 {
                     notification.IsReadByCreator = true;
                 }
+                else if (role?.Name == COMPANY_ADMIN.DISPLAY_NAME)
+                {
+                    notification.IsReadByCompanyAdmin = true;
+                }
                 context.Notifications.Update(notification);
                 var rows = await context.SaveChangesAsync(null, false);
             }
@@ -241,16 +145,6 @@ namespace risk.control.system.Services.Common
             {
                 await MarkAsRead(notification.StatusNotificationId, userEmail);
             }
-        }
-
-        public async Task<List<CaseMessage>> GetSmsHistory(long caseId, bool isCustomer)
-        {
-            var messages = await context.CaseMessages
-                .Where(m => m.InvestigationTaskId == caseId && m.IsCustomer == isCustomer)
-                .OrderByDescending(m => m.Updated) // Show newest first
-
-                .ToListAsync();
-            return messages;
         }
     }
 }

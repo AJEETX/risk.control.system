@@ -24,7 +24,7 @@ namespace risk.control.system.Controllers.Assessor
         private readonly IAssessorQueryService _assessorQueryService;
         private readonly string _baseUrl;
         private readonly IBackgroundJobClient _backgroundJobClient;
-        private readonly IMailService _mailService;
+        private readonly ICaseNotificationService _mailService;
 
         public EnquiryController(
             ILogger<EnquiryController> logger,
@@ -32,7 +32,7 @@ namespace risk.control.system.Controllers.Assessor
             IAssessorQueryService assessorQueryService,
             IHttpContextAccessor httpContextAccessor,
             IBackgroundJobClient backgroundJobClient,
-            IMailService mailService)
+            ICaseNotificationService mailService)
         {
             _logger = logger;
             _notifyService = notifyService;

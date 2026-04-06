@@ -19,7 +19,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
         private static readonly string[] AllowedMime = new[] { "image/jpeg", "image/png" };
         private IDeclineCaseService _declineCaseService;
         private readonly INotyfService _notifyService;
-        private readonly IMailService _mailService;
+        private readonly ICaseNotificationService _mailService;
         private readonly ILogger<DeclineCaseController> _logger;
         private readonly IBackgroundJobClient _backgroundJobClient;
 
@@ -28,7 +28,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
             INotyfService notifyService,
             IBackgroundJobClient backgroundJobClient,
             IHttpContextAccessor httpContextAccessor,
-            IMailService mailService,
+            ICaseNotificationService mailService,
             ILogger<DeclineCaseController> logger)
         {
             _declineCaseService = declineCaseService;
@@ -55,7 +55,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
             {
                 var agency = await _declineCaseService.DeclineCaseByAgency(userEmail, model, claimId);
 
-                _backgroundJobClient.Enqueue(() => _mailService.NotifyCaseWithdrawlToCompany(userEmail, policyNumber, claimId, agency.VendorId, _baseUrl));
+                _backgroundJobClient.Enqueue(() => _mailService.NotifyCaseDeclineByAgency(userEmail, policyNumber, claimId, agency.VendorId, _baseUrl));
 
                 _notifyService.Custom($"Case <b> #{policyNumber}</b> Declined successfully", 3, "red", "far fa-file-powerpoint");
 

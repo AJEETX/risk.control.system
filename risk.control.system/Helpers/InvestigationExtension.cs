@@ -25,33 +25,31 @@ namespace risk.control.system.Helpers
         {
             string title = $"";
             string style = "-none";
-            if (caseTask is not null)
+            if (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY)
             {
-                if (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY)
-                {
-                    style = "";
-                    title = $"({caseTask.UpdatedBy}) Withdrawn";
-                }
-                else if (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY)
-                {
-                    style = "";
-                    title = $"Agency ({caseTask.UpdatedBy}) Declined";
-                }
-                else if (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR)
-                {
-                    style = "";
-                    title = $"Agency ({caseTask.UpdatedBy}) Reply";
-                }
-                else if (caseTask is not null)
-                {
-                    var isRequested = caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR;
-                    if (isRequested)
-                    {
-                        return string.Join("", "<i class=\"fa fa-asterisk asterik-style\" title=\"ENQUIRY\"></i>" + contractNumber);
-                    }
-                }
+                style = "";
+                title = $"({caseTask.UpdatedBy}) {CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY}";
+                return $"<sup><i class=\"fa fa-asterisk asterik-style{style}\" title=\"{title}\"></i></sup>" + contractNumber;
             }
-            return string.Join("", $"<i class=\"fa fa-asterisk asterik-style{style}\" title=\"{title}\"></i>" + contractNumber);
+            else if (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY)
+            {
+                style = "";
+                title = $"Agency ({caseTask.UpdatedBy}) {CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY}";
+                return $"<sup><i class=\"fa fa-asterisk asterik-style{style}\" title=\"{title}\"></i></sup>" + contractNumber;
+            }
+            else if (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR)
+            {
+                style = "";
+                title = $"Agency ({caseTask.UpdatedBy}) {CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR}";
+                return $"<sup><i class=\"fa fa-asterisk asterik-style{style}\" title=\"{title}\"></i></sup>" + contractNumber;
+            }
+            else if (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR)
+            {
+                style = "";
+                title = $"Company ({caseTask.UpdatedBy}) {CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR}";
+                return $"<sup><i class=\"fa fa-asterisk asterik-style{style}\" title=\"{title}\"></i></sup>" + contractNumber;
+            }
+            return contractNumber;
         }
 
         public static string GetPolicyNumForAgency(this InvestigationTask caseTask, string id)

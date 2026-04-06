@@ -24,7 +24,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
         private static readonly string[] AllowedMime = new[] { "image/jpeg", "image/png" };
         private readonly IAgencyQueryReplyService _agencyQueryReplyService;
         private readonly INotyfService _notifyService;
-        private readonly IMailService _mailService;
+        private readonly ICaseNotificationService _mailService;
         private readonly ILogger<AgencyQueryController> _logger;
         private readonly IBackgroundJobClient _backgroundJobClient;
 
@@ -33,7 +33,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
             INotyfService notifyService,
             IBackgroundJobClient backgroundJobClient,
             IHttpContextAccessor httpContextAccessor,
-            IMailService mailService,
+            ICaseNotificationService mailService,
             ILogger<AgencyQueryController> logger)
         {
             _agencyQueryReplyService = agencyQueryReplyService;
