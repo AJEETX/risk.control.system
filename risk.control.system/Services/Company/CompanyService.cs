@@ -172,7 +172,7 @@ namespace risk.control.system.Services.Company
 
         private async Task SendNotificationAsync(ClientCompany company, string email, string portal_base_url)
         {
-            string message = $"Company edited.\nDomain : {email}\n{portal_base_url}";
+            string message = $"Company {company.Email} profile edited.\nDomain :{email}\n{portal_base_url}";
 
             await smsService.DoSendSmsAsync(company.Country!.Code, company.Country.ISDCode + company.PhoneNumber, message);
         }

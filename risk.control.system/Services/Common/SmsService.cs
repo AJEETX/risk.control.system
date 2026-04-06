@@ -43,7 +43,6 @@ namespace risk.control.system.Services.Common
             try
             {
                 mobile = mobile.StartsWith("+") ? mobile : "+" + mobile;
-                //var localIps = GetActiveIPAddressesInNetwork();
                 var url = EnvHelper.Get("SMS_Url");
 
                 var username = countryCode.ToLower(CultureInfo.InvariantCulture) == "au" ? EnvHelper.Get("SMS_User") : EnvHelper.Get("SMS_User_India");

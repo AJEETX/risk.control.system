@@ -15,12 +15,12 @@ namespace risk.control.system.Services.Creator
         private readonly ApplicationDbContext context;
         private readonly IUploadFileStatusService uploadFileStatusService;
         private readonly ILogger<UploadFileDataProcessor> logger;
-        private readonly IMailService mailService;
+        private readonly ICaseNotificationService mailService;
 
         public UploadFileDataProcessor(ApplicationDbContext context,
             IUploadFileStatusService uploadFileStatusService,
             ILogger<UploadFileDataProcessor> logger,
-            IMailService mailService)
+            ICaseNotificationService mailService)
         {
             this.context = context;
             this.uploadFileStatusService = uploadFileStatusService;

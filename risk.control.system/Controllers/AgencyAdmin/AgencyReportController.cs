@@ -23,7 +23,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
         private static readonly string[] AllowedMime = new[] { "image/jpeg", "image/png" };
         private IProcessSubmittedReportService _processSubmittedReportService;
         private readonly INotyfService _notifyService;
-        private readonly IMailService _mailService;
+        private readonly ICaseNotificationService _mailService;
         private readonly ILogger<AgencyReportController> _logger;
         private readonly IBackgroundJobClient _backgroundJobClient;
 
@@ -32,7 +32,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
             INotyfService notifyService,
             IBackgroundJobClient backgroundJobClient,
             IHttpContextAccessor httpContextAccessor,
-            IMailService mailboxService,
+            ICaseNotificationService mailboxService,
             ILogger<AgencyReportController> logger)
         {
             this._processSubmittedReportService = processSubmittedReportService;

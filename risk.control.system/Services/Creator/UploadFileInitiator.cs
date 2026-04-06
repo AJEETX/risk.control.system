@@ -19,7 +19,7 @@ namespace risk.control.system.Services.Creator
         private readonly IUploadFileStatusService uploadFileStatusService;
         private readonly ILogger<UploadFileInitiator> logger;
         private readonly IInvestigationService investigationService;
-        private readonly IMailService mailService;
+        private readonly ICaseNotificationService mailService;
         private readonly IUploadService uploadService;
 
         public UploadFileInitiator(IDbContextFactory<ApplicationDbContext> contextFactory,
@@ -27,7 +27,7 @@ namespace risk.control.system.Services.Creator
             IUploadFileStatusService uploadFileStatusService,
             ILogger<UploadFileInitiator> logger,
             IInvestigationService investigationService,
-            IMailService mailService,
+            ICaseNotificationService mailService,
             IUploadService uploadService)
         {
             _contextFactory = contextFactory;

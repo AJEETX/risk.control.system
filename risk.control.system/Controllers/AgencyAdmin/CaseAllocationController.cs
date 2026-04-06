@@ -16,7 +16,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
         private readonly string baseUrl;
         private readonly IAgencyAgentAllocationService _agentAllocationService;
         private readonly INotyfService _notifyService;
-        private readonly IMailService _mailService;
+        private readonly ICaseNotificationService _mailService;
         private readonly ILogger<CaseAllocationController> _logger;
         private readonly IBackgroundJobClient _backgroundJobClient;
 
@@ -25,7 +25,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
             INotyfService notifyService,
             IBackgroundJobClient backgroundJobClient,
             IHttpContextAccessor httpContextAccessor,
-            IMailService mailboxService,
+            ICaseNotificationService mailboxService,
             ILogger<CaseAllocationController> logger)
         {
             _agentAllocationService = vendorAgentAllocationService;
