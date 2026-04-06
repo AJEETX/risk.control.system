@@ -178,7 +178,7 @@ namespace risk.control.system.Controllers.PortalAdmin
                 }
                 else
                 {
-                    await smsService.DoSendSmsAsync(country!.Code, country.ISDCode + user.PhoneNumber, "Agency user created. \n\nEmail : " + user.Email);
+                    await smsService.DoSendSmsAsync(country!.Code, country.ISDCode + user.PhoneNumber, "Agency user created. \nEmail : " + user.Email);
                     notifyService.Custom($"User created successfully.", 3, "green", "fas fa-user-plus");
                 }
                 return RedirectToAction(nameof(VendorUserController.Index), "VendorUser", new { id = user.VendorId });
@@ -291,7 +291,7 @@ namespace risk.control.system.Controllers.PortalAdmin
 
                     if (lockUser.Succeeded && lockDate.Succeeded)
                     {
-                        await smsService.DoSendSmsAsync(country!.Code, country.ISDCode + user.PhoneNumber, "Agency user edited and unlocked. \n\nEmail : " + user.Email);
+                        await smsService.DoSendSmsAsync(country!.Code, country.ISDCode + user.PhoneNumber, "Agency user edited and unlocked. \nEmail : " + user.Email);
                         notifyService.Custom($"User edited.", 3, "green", "fas fa-user-check");
                     }
                 }

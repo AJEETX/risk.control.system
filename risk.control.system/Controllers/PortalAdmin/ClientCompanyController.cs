@@ -181,7 +181,7 @@ namespace risk.control.system.Controllers
                 }
                 await _context.SaveChangesAsync();
 
-                await smsService.DoSendSmsAsync(clientCompany.Country!.Code, clientCompany.Country.ISDCode + clientCompany.PhoneNumber, "Company account deleted. \n\nDomain : " + clientCompany.Email);
+                await smsService.DoSendSmsAsync(clientCompany.Country!.Code, clientCompany.Country.ISDCode + clientCompany.PhoneNumber, "Company account deleted. \nDomain : " + clientCompany.Email);
 
                 notifyService.Custom($"Company {clientCompany.Email} deleted successfully.", 3, "red", "fas fa-building");
                 return RedirectToAction(nameof(Index));
@@ -288,7 +288,7 @@ namespace risk.control.system.Controllers
                 clientCompany.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.ClientCompany.Update(clientCompany);
                 await _context.SaveChangesAsync();
-                await smsService.DoSendSmsAsync(pinCode.Country.Code, pinCode.Country.ISDCode + clientCompany.PhoneNumber, "Company account edited. \n\nDomain : " + clientCompany.Email + "\n" + _baseUrl);
+                await smsService.DoSendSmsAsync(pinCode.Country.Code, pinCode.Country.ISDCode + clientCompany.PhoneNumber, "Company account edited. \nDomain : " + clientCompany.Email + "\n" + _baseUrl);
                 notifyService.Custom($"Company edited successfully.", 3, "orange", "fas fa-building");
                 return RedirectToAction(nameof(ClientCompanyController.Details), "ClientCompany", new { id = clientCompany.ClientCompanyId });
             }
