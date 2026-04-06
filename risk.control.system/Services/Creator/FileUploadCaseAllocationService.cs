@@ -17,13 +17,13 @@ namespace risk.control.system.Services.Creator
     {
         private readonly IDbContextFactory<ApplicationDbContext> _contextFactory;
         private readonly ILogger<FileUploadCaseAllocationService> logger;
-        private readonly IMailService mailboxService;
+        private readonly ICaseNotificationService mailboxService;
         private readonly ITimelineService timelineService;
         private readonly IBackgroundJobClient backgroundJobClient;
 
         public FileUploadCaseAllocationService(IDbContextFactory<ApplicationDbContext> contextFactory,
             ILogger<FileUploadCaseAllocationService> logger,
-            IMailService mailboxService,
+            ICaseNotificationService mailboxService,
             ITimelineService timelineService,
             IBackgroundJobClient backgroundJobClient)
         {

@@ -16,14 +16,14 @@ namespace risk.control.system.Controllers.Creator
     {
         private readonly string _baseUrl;
         private readonly IWithdrawCaseService _withdrawCaseService;
-        private readonly IMailService _mailboxService;
+        private readonly ICaseNotificationService _mailboxService;
         private readonly INotyfService _notifyService;
         private readonly ILogger<WithdrawCaseController> _logger;
         private readonly IBackgroundJobClient _backgroundJobClient;
 
         public WithdrawCaseController(
             IWithdrawCaseService withdrawCaseService,
-            IMailService mailboxService,
+            ICaseNotificationService mailboxService,
             INotyfService notifyService,
             IHttpContextAccessor httpContextAccessor,
             ILogger<WithdrawCaseController> logger,
@@ -54,7 +54,7 @@ namespace risk.control.system.Controllers.Creator
 
                 var (policyNumber, vendorId) = await _withdrawCaseService.WithdrawCaseByCompany(userEmail, model, caseId);
 
-                _backgroundJobClient.Enqueue(() => _mailboxService.NotifyCaseWithdrawlToCompany(userEmail, policyNumber, caseId, vendorId, _baseUrl));
+                _backgroundJobClient.Enqueue(() => _mailboxService.NotifyCaseWithdrawlByCompany(userEmail, policyNumber, caseId, vendorId, _baseUrl));
 
                 _notifyService.Custom($"Case <b> #{policyNumber}</b>  withdrawn successfully", 3, "red", "far fa-file-powerpoint");
 

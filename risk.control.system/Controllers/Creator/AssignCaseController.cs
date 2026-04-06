@@ -14,14 +14,14 @@ namespace risk.control.system.Controllers.Creator
     {
         private readonly string _baseUrl;
         private readonly IAssignCaseService _assignCaseService;
-        private readonly IMailService _mailService;
+        private readonly ICaseNotificationService _mailService;
         private readonly INotyfService _notifyService;
         private readonly ILogger<AssignCaseController> _logger;
         private readonly IBackgroundJobClient _backgroundJobClient;
 
         public AssignCaseController(
             IAssignCaseService assignCaseService,
-            IMailService mailboxService,
+            ICaseNotificationService mailboxService,
             INotyfService notifyService,
             IHttpContextAccessor httpContextAccessor,
             ILogger<AssignCaseController> logger,

@@ -25,14 +25,14 @@ namespace risk.control.system.Services
         private readonly IDbContextFactory<ApplicationDbContext> _contextFactory;
         private readonly IAgencyCaseLoadService _agencyCaseLoadService;
         private readonly ILogger<AssignCaseService> logger;
-        private readonly IMailService mailboxService;
+        private readonly ICaseNotificationService mailboxService;
         private readonly ITimelineService timelineService;
         private readonly IBackgroundJobClient backgroundJobClient;
 
         public AssignCaseService(IDbContextFactory<ApplicationDbContext> contextFactory,
             IAgencyCaseLoadService agencyCaseLoadService,
             ILogger<AssignCaseService> logger,
-            IMailService mailboxService,
+            ICaseNotificationService mailboxService,
             ITimelineService timelineService,
             IBackgroundJobClient backgroundJobClient)
         {
