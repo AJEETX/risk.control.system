@@ -55,7 +55,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
             {
                 var agency = await _declineCaseService.DeclineCaseByAgency(userEmail, model, claimId);
 
-                _backgroundJobClient.Enqueue(() => _mailService.NotifyCaseWithdrawlToCompany(userEmail, claimId, agency.VendorId, _baseUrl));
+                _backgroundJobClient.Enqueue(() => _mailService.NotifyCaseWithdrawlToCompany(userEmail, policyNumber, claimId, agency.VendorId, _baseUrl));
 
                 _notifyService.Custom($"Case <b> #{policyNumber}</b> Declined successfully", 3, "red", "far fa-file-powerpoint");
 
