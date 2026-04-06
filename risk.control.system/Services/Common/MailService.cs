@@ -19,7 +19,7 @@ namespace risk.control.system.Services.Common
 
         Task NotifyCaseAssignmentToAssigner(string senderUserEmail, List<long> caseIds, string url = "");
 
-        Task NotifyCaseWithdrawlToCompany(string senderUserEmail, long caseId, long vendorId, string url = "");
+        Task NotifyCaseWithdrawlToCompany(string senderUserEmail, string policyNumber, long caseId, long vendorId, string url = "");
 
         Task NotifyCaseWithdrawlFromAgent(string senderUserEmail, long caseId, long vendorId, string url = "");
 
@@ -164,14 +164,21 @@ namespace risk.control.system.Services.Common
             }
         }
 
-        public async Task NotifyCaseWithdrawlToCompany(string senderUserEmail, long caseId, long vendorId, string url = "")
+        public async Task NotifyCaseWithdrawlToCompany(string senderUserEmail, string policyNumber, long caseId, long vendorId, string url = "")
         {
-            await using var _context = await _contextFactory.CreateDbContextAsync();
-            var caseTask = await _context.Investigations.AsNoTracking().FirstOrDefaultAsync(v => v.Id == caseId);
-            var creatorRole = await roleManager.FindByNameAsync(CREATOR.DISPLAY_NAME);
-            var recipients = await _context.ApplicationUser.AsNoTracking().Include(u => u.Country).Where(u => u.ClientCompanyId == caseTask!.ClientCompanyId).Where(u => _context.UserRoles.Any(ur => ur.UserId == u.Id && ur.RoleId == creatorRole!.Id)).ToListAsync();
-            senderUserEmail = senderUserEmail.Replace("\n", "").Replace("\r", "").Trim();
-            await SendNotificationInternal(caseId, senderUserEmail, creatorRole!.Id, caseTask!.ClientCompanyId, null, WarningSymbol, caseTask.SubStatus, $"Case #{caseId} Withdrawn", url, recipients);
+            try
+            {
+                await using var _context = await _contextFactory.CreateDbContextAsync();
+                var caseTask = await _context.Investigations.AsNoTracking().FirstOrDefaultAsync(v => v.Id == caseId);
+                var creatorRole = await roleManager.FindByNameAsync(CREATOR.DISPLAY_NAME);
+                var recipients = await _context.ApplicationUser.AsNoTracking().Include(u => u.Country).Where(u => u.ClientCompanyId == caseTask!.ClientCompanyId).Where(u => _context.UserRoles.Any(ur => ur.UserId == u.Id && ur.RoleId == creatorRole!.Id)).ToListAsync();
+                senderUserEmail = senderUserEmail.Replace("\n", "").Replace("\r", "").Trim();
+                await SendNotificationInternal(caseId, senderUserEmail, creatorRole!.Id, caseTask!.ClientCompanyId, null, WarningSymbol, caseTask.SubStatus, $"Case #{policyNumber}", url, recipients);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Withdrawal Notification Error for Case {CaseId}", caseId);
+            }
         }
 
         public async Task NotifyCaseAssignmentToVendorAgent(string senderUserEmail, long caseId, string agentEmail, long vendorId, string url = "")
@@ -282,13 +289,20 @@ namespace risk.control.system.Services.Common
 
         public async Task NotifySubmitReplyToCompany(string senderUserEmail, long caseId, string url = "")
         {
-            await using var _context = await _contextFactory.CreateDbContextAsync();
-            var caseTask = await _context.Investigations.AsNoTracking().FirstOrDefaultAsync(v => v.Id == caseId);
-            var assessorRole = await roleManager.FindByNameAsync(ASSESSOR.DISPLAY_NAME);
-            var recipients = await _context.ApplicationUser.AsNoTracking().Include(u => u.Country).Where(u => u.ClientCompanyId == caseTask!.ClientCompanyId)
-                .Where(u => _context.UserRoles.Any(ur => ur.UserId == u.Id && ur.RoleId == assessorRole!.Id)).ToListAsync();
-            senderUserEmail = senderUserEmail.Replace("\n", "").Replace("\r", "").Trim();
-            await SendNotificationInternal(caseId, senderUserEmail, assessorRole!.Id, caseTask!.ClientCompanyId, null, BlueSymbol, caseTask.SubStatus, $"Reply Submitted for Case #{caseId}", url, recipients);
+            try
+            {
+                await using var _context = await _contextFactory.CreateDbContextAsync();
+                var caseTask = await _context.Investigations.AsNoTracking().FirstOrDefaultAsync(v => v.Id == caseId);
+                var assessorRole = await roleManager.FindByNameAsync(ASSESSOR.DISPLAY_NAME);
+                var recipients = await _context.ApplicationUser.AsNoTracking().Include(u => u.Country).Where(u => u.ClientCompanyId == caseTask!.ClientCompanyId)
+                    .Where(u => _context.UserRoles.Any(ur => ur.UserId == u.Id && ur.RoleId == assessorRole!.Id)).ToListAsync();
+                senderUserEmail = senderUserEmail.Replace("\n", "").Replace("\r", "").Trim();
+                await SendNotificationInternal(caseId, senderUserEmail, assessorRole!.Id, caseTask!.ClientCompanyId, null, BlueSymbol, caseTask.SubStatus, $"Reply Submitted for Case #{caseId}", url, recipients);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Enquiry Reply Notification Error for Case {CaseId}", caseId);
+            }
         }
 
         public async Task NotifyCaseWithdrawlFromAgent(string senderUserEmail, long caseId, long vendorId, string url = "")

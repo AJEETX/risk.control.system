@@ -151,7 +151,7 @@ namespace risk.control.system.Services.Common
                 }
                 else if (role?.Name == CREATOR.DISPLAY_NAME)
                 {
-                    notifications = notifications.Where(n => (n.RoleId == role.Id && n.NotifierUserEmail == userEmail) && !n.IsReadByCreator);
+                    notifications = notifications.Where(n => ((n.RoleId == role.Id && n.NotifierUserEmail == userEmail) && !n.IsReadByCreator) || ((n.RoleId == role.Id && n.Status == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY) && !n.IsReadByCreator));
                 }
                 return await notifications.OrderByDescending(n => n.CreatedAt).ToListAsync();
             }
