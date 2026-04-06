@@ -9,11 +9,11 @@ namespace risk.control.system.Controllers.Common
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME},{AGENCY_ADMIN.DISPLAY_NAME},{CREATOR.DISPLAY_NAME},{ASSESSOR.DISPLAY_NAME},{MANAGER.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME},{AGENT.DISPLAY_NAME}")]
     public class ConfirmController : Controller
     {
-        private readonly INotificationService _notificationService;
+        private readonly ISmsNotificationService _notificationService;
         private readonly ICaseNotesService _caseNotesService;
         private readonly ILogger<ConfirmController> _logger;
 
-        public ConfirmController(INotificationService notificationService, ICaseNotesService caseNotesService, ILogger<ConfirmController> logger)
+        public ConfirmController(ISmsNotificationService notificationService, ICaseNotesService caseNotesService, ILogger<ConfirmController> logger)
         {
             _notificationService = notificationService;
             _caseNotesService = caseNotesService;

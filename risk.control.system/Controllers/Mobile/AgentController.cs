@@ -41,7 +41,7 @@ namespace risk.control.system.Controllers.Mobile
         private readonly IBackgroundJobClient _backgroundJobClient;
         private readonly IWebHostEnvironment _env;
         private readonly ISmsService _smsService;
-        private readonly IMailService _mailService;
+        private readonly ICaseNotificationService _mailService;
         private string _portalBaseUrl = string.Empty;
 
         //test PAN FNLPM8635N
@@ -64,7 +64,7 @@ namespace risk.control.system.Controllers.Mobile
             IBackgroundJobClient backgroundJobClient,
             IWebHostEnvironment webHostEnvironment,
             ISmsService SmsService,
-            IMailService mailboxService)
+            ICaseNotificationService mailboxService)
         {
             this._context = context;
             this._processSubmittedReportService = processSubmittedReportService;

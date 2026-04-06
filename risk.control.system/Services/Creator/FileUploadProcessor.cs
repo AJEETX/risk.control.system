@@ -15,14 +15,14 @@ namespace risk.control.system.Services.Creator
         private readonly ILogger<FileUploadProcessor> logger;
         private readonly ITimelineService timelineService;
         private readonly IFileUploadCaseAllocationService fileUploadCaseAllocationService;
-        private readonly IMailService mailService;
+        private readonly ICaseNotificationService mailService;
 
         public FileUploadProcessor(
             IUploadFileStatusService uploadFileStatusService,
             ILogger<FileUploadProcessor> logger,
             ITimelineService timelineService,
             IFileUploadCaseAllocationService fileUploadCaseAllocationService,
-            IMailService mailService)
+            ICaseNotificationService mailService)
         {
             this.uploadFileStatusService = uploadFileStatusService;
             this.logger = logger;

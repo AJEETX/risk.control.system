@@ -7,7 +7,7 @@ using risk.control.system.Models.ViewModel;
 
 namespace risk.control.system.Services.Common
 {
-    public interface IMailService
+    public interface ICaseNotificationService
     {
         Task NotifyFileUpload(string senderUserEmail, FileOnFileSystemModel file, string url);
 
@@ -19,7 +19,9 @@ namespace risk.control.system.Services.Common
 
         Task NotifyCaseAssignmentToAssigner(string senderUserEmail, List<long> caseIds, string url = "");
 
-        Task NotifyCaseWithdrawlToCompany(string senderUserEmail, string policyNumber, long caseId, long vendorId, string url = "");
+        Task NotifyCaseWithdrawlByCompany(string senderUserEmail, string policyNumber, long caseId, long vendorId, string url = "");
+
+        Task NotifyCaseDeclineByAgency(string senderUserEmail, string policyNumber, long caseId, long vendorId, string url = "");
 
         Task NotifyCaseWithdrawlFromAgent(string senderUserEmail, long caseId, long vendorId, string url = "");
 
@@ -36,19 +38,19 @@ namespace risk.control.system.Services.Common
         Task NotifySubmitReplyToCompany(string senderUserEmail, long caseId, string url = "");
     }
 
-    internal class MailService : IMailService
+    internal class CaseNotificationService : ICaseNotificationService
     {
         private const string BlueSymbol = "fa fa-info i-blue";
         private const string WarningSymbol = "fa fa-times i-orangered";
         private readonly IDbContextFactory<ApplicationDbContext> _contextFactory;
         private readonly RoleManager<ApplicationRole> roleManager;
-        private readonly ILogger<MailService> logger;
+        private readonly ILogger<CaseNotificationService> logger;
         private readonly ISmsService smsService;
         private readonly IFeatureManager featureManager;
 
-        public MailService(IDbContextFactory<ApplicationDbContext> contextFactory,
+        public CaseNotificationService(IDbContextFactory<ApplicationDbContext> contextFactory,
             RoleManager<ApplicationRole> roleManager,
-            ILogger<MailService> logger,
+            ILogger<CaseNotificationService> logger,
             ISmsService SmsService,
             IFeatureManager featureManager)
         {
@@ -164,20 +166,42 @@ namespace risk.control.system.Services.Common
             }
         }
 
-        public async Task NotifyCaseWithdrawlToCompany(string senderUserEmail, string policyNumber, long caseId, long vendorId, string url = "")
+        public async Task NotifyCaseWithdrawlByCompany(string senderUserEmail, string policyNumber, long caseId, long vendorId, string url = "")
         {
             try
             {
                 await using var _context = await _contextFactory.CreateDbContextAsync();
                 var caseTask = await _context.Investigations.AsNoTracking().FirstOrDefaultAsync(v => v.Id == caseId);
                 var creatorRole = await roleManager.FindByNameAsync(CREATOR.DISPLAY_NAME);
+                var agencyAdminRole = await roleManager.FindByNameAsync(AGENCY_ADMIN.DISPLAY_NAME);
                 var recipients = await _context.ApplicationUser.AsNoTracking().Include(u => u.Country).Where(u => u.ClientCompanyId == caseTask!.ClientCompanyId).Where(u => _context.UserRoles.Any(ur => ur.UserId == u.Id && ur.RoleId == creatorRole!.Id)).ToListAsync();
                 senderUserEmail = senderUserEmail.Replace("\n", "").Replace("\r", "").Trim();
+                var agencyAdmin = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(v => v.VendorId == vendorId && v.IsVendorAdmin);
                 await SendNotificationInternal(caseId, senderUserEmail, creatorRole!.Id, caseTask!.ClientCompanyId, null, WarningSymbol, caseTask.SubStatus, $"Case #{policyNumber}", url, recipients);
+                await SendNotificationInternal(caseId, agencyAdmin!.Email!, agencyAdminRole!.Id, null, vendorId, WarningSymbol, caseTask.SubStatus, $"Case #{policyNumber}", url);
             }
             catch (Exception ex)
             {
                 logger.LogError(ex, "Withdrawal Notification Error for Case {CaseId}", caseId);
+            }
+        }
+
+        public async Task NotifyCaseDeclineByAgency(string senderUserEmail, string policyNumber, long caseId, long vendorId, string url = "")
+        {
+            try
+            {
+                await using var _context = await _contextFactory.CreateDbContextAsync();
+                var caseTask = await _context.Investigations.AsNoTracking().FirstOrDefaultAsync(v => v.Id == caseId);
+                var creatorRole = await roleManager.FindByNameAsync(CREATOR.DISPLAY_NAME);
+                var agencyAdminRole = await roleManager.FindByNameAsync(AGENCY_ADMIN.DISPLAY_NAME);
+                var recipients = await _context.ApplicationUser.AsNoTracking().Include(u => u.Country).Where(u => u.ClientCompanyId == caseTask!.ClientCompanyId).Where(u => _context.UserRoles.Any(ur => ur.UserId == u.Id && ur.RoleId == creatorRole!.Id)).ToListAsync();
+                senderUserEmail = senderUserEmail.Replace("\n", "").Replace("\r", "").Trim();
+                await SendNotificationInternal(caseId, senderUserEmail, agencyAdminRole!.Id, null, vendorId, WarningSymbol, caseTask!.SubStatus, $"Case #{policyNumber}", url, recipients);
+                await SendNotificationInternal(caseId, caseTask.CreatedUser!, creatorRole!.Id, caseTask!.ClientCompanyId, null, WarningSymbol, caseTask.SubStatus, $"Case #{policyNumber}", url);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Decline Notification Error for Case {CaseId}", caseId);
             }
         }
 
@@ -331,7 +355,7 @@ namespace risk.control.system.Services.Common
                             (vendorId.HasValue && u.VendorId == vendorId)).Where(u => _context.UserRoles.Any(ur => ur.UserId == u.Id && roleIds.Contains(ur.RoleId))).ToListAsync();
         }
 
-        private async Task SendNotificationInternal(long caseId, string senderUserEmail, long? targetRoleId, long? clientCompanyId, long? vendorId, string symbol, string status, string message, string url, List<ApplicationUser> smsRecipients, string? agentEmail = null) // Added as optional parameter
+        private async Task SendNotificationInternal(long caseId, string senderUserEmail, long? targetRoleId, long? clientCompanyId, long? vendorId, string symbol, string status, string message, string url, List<ApplicationUser>? smsRecipients = null, string? agentEmail = null) // Added as optional parameter
         {
             await using var _context = await _contextFactory.CreateDbContextAsync();
             var notification = new StatusNotification
@@ -339,7 +363,7 @@ namespace risk.control.system.Services.Common
                 RoleId = targetRoleId,
                 ClientCompanyId = clientCompanyId,
                 VendorId = vendorId,
-                AgenctUserEmail = agentEmail, // Now the engine knows where to put it
+                AgentUserEmail = agentEmail, // Now the engine knows where to put it
                 Symbol = symbol ?? BlueSymbol,
                 Message = message,
                 Status = status,

@@ -20,7 +20,7 @@ namespace risk.control.system.Controllers.Assessor
         private static readonly string[] AllowedMime = new[] { "image/jpeg", "image/png" };
         private readonly IProcessCaseService _processCaseService;
         private readonly IAssessorQueryService _assessorQueryService;
-        private readonly IMailService _mailService;
+        private readonly ICaseNotificationService _mailService;
         private readonly INotyfService _notifyService;
         private readonly ILogger<CaseActionController> _logger;
         private readonly IBackgroundJobClient backgroundJobClient;
@@ -28,7 +28,7 @@ namespace risk.control.system.Controllers.Assessor
         public CaseActionController(
             IProcessCaseService processCaseService,
             IAssessorQueryService assessorQueryService,
-            IMailService mailboxService,
+            ICaseNotificationService mailboxService,
             INotyfService notifyService,
             IHttpContextAccessor httpContextAccessor,
             ILogger<CaseActionController> logger,

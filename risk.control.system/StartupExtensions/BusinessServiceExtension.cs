@@ -30,6 +30,7 @@ public static class BusinessServiceExtension
 
         //services.AddHttpClient(Options.DefaultName).AddPolicyHandler(retryPolicy);
         services.AddHttpClient();
+        services.AddScoped<ISmsNotificationService, SmsNotificationService>();
         services.AddScoped<IUserFaceImageCheckService, UserFaceImageCheckService>();
         services.AddScoped<IOcrService, OcrService>();
         services.AddScoped<IManageAgencyUserService, ManageAgencyUserService>();
@@ -127,7 +128,7 @@ public static class BusinessServiceExtension
         services.AddScoped<IAgencyInvestigationService, AgencyInvestigationService>();
         services.AddScoped<IAgencyDashboardService, AgencyDashboardService>();
         services.AddScoped<ITimelineService, TimelineService>();
-        services.AddScoped<IMailService, MailService>();
+        services.AddScoped<ICaseNotificationService, CaseNotificationService>();
         services.AddScoped<IProcessCaseService, ProcessCaseService>();
         services.AddScoped<IInvestigationService, InvestigationService>();
         services.AddScoped<IHangfireJobService, HangfireJobService>();
