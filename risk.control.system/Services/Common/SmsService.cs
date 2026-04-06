@@ -1,5 +1,4 @@
-﻿using System.Globalization;
-using System.Net.Http.Headers;
+﻿using System.Net.Http.Headers;
 using System.Text;
 
 using Microsoft.FeatureManagement;
@@ -45,9 +44,9 @@ namespace risk.control.system.Services.Common
                 mobile = mobile.StartsWith("+") ? mobile : "+" + mobile;
                 var url = EnvHelper.Get("SMS_Url");
 
-                var username = countryCode.ToLower(CultureInfo.InvariantCulture) == "au" ? EnvHelper.Get("SMS_User") : EnvHelper.Get("SMS_User_India");
-                var password = countryCode.ToLower(CultureInfo.InvariantCulture) == "au" ? EnvHelper.Get("SMS_PWD") : EnvHelper.Get("SMS_PWD_INDIA");
-                var sim = countryCode.ToLower(CultureInfo.InvariantCulture) == "au" ? EnvHelper.Get("SMS_Sim") : EnvHelper.Get("SMS_Sim_India");
+                var username = countryCode.Equals("au", StringComparison.CurrentCultureIgnoreCase) ? EnvHelper.Get("SMS_User") : EnvHelper.Get("SMS_User_India");
+                var password = countryCode.Equals("au", StringComparison.CurrentCultureIgnoreCase) ? EnvHelper.Get("SMS_PWD") : EnvHelper.Get("SMS_PWD_INDIA");
+                var sim = countryCode.Equals("au", StringComparison.CurrentCultureIgnoreCase) ? EnvHelper.Get("SMS_Sim") : EnvHelper.Get("SMS_Sim_India");
                 var authToken = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{username}:{password}"));
                 var httpClient = httpClientFactory.CreateClient();
                 httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authToken);
