@@ -145,7 +145,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                     await Load(model);
                     return View(model);
                 }
-                notifyService.Custom($"Company <b>{model.Email}</b> edited successfully.", 3, "orange", "fas fa-building");
+                notifyService.Custom($"Company <b>{model.Email}</b> profile edited successfully.", 3, "orange", "fas fa-building");
             }
             catch (Exception ex)
             {

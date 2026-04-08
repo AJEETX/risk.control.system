@@ -103,7 +103,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
                     return View(model);
                 }
 
-                _notifyService.Custom($"Agency edited successfully.", 3, "orange", "fas fa-building");
+                _notifyService.Custom($"Agency profile edited successfully.", 3, "orange", "fas fa-building");
                 return RedirectToAction(nameof(Profile));
             }
             catch (Exception ex)
