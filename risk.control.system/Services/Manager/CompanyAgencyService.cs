@@ -25,7 +25,7 @@ namespace risk.control.system.Services.Manager
         {
             try
             {
-                if (vendorIds == null || !vendorIds.Any())
+                if (vendorIds?.Any() != true)
                     return (false, "No agency selected !!!");
 
                 var companyUser = await _context.ApplicationUser.AsNoTracking()
@@ -45,13 +45,17 @@ namespace risk.control.system.Services.Manager
                     .Where(v => vendorIds.Contains(v.VendorId))
                     .ToListAsync();
 
-                // Prevent adding duplicates if they already exist in the list
                 var newVendors = vendorsToEmpanel
                     .Where(v => !company.EmpanelledVendors.Any(existing => existing.VendorId == v.VendorId))
                     .ToList();
 
                 if (newVendors.Any())
                 {
+                    foreach (var vendor in newVendors)
+                    {
+                        vendor.IsUpdated = true;
+                        vendor.Updated = DateTime.UtcNow;
+                    }
                     company.EmpanelledVendors.AddRange(newVendors);
                     company.Updated = DateTime.UtcNow;
                     company.UpdatedBy = userEmail;
@@ -60,7 +64,7 @@ namespace risk.control.system.Services.Manager
                     await _context.SaveChangesAsync();
                 }
 
-                return (true, "Agency(s) empanelled successfully");
+                return (true, $"<b>{newVendors.Count}</b> Agency(s) empanelled successfully");
             }
             catch (Exception ex)
             {
@@ -73,42 +77,29 @@ namespace risk.control.system.Services.Manager
         {
             try
             {
-                if (vendorIds == null || !vendorIds.Any())
+                if (vendorIds?.Any() != true)
                     return (false, "No agency selected !!!");
-
-                var companyUser = await _context.ApplicationUser.AsNoTracking()
-                    .FirstOrDefaultAsync(c => c.Email == userEmail);
-
+                var companyUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == userEmail);
                 if (companyUser == null)
                     return (false, "User Not Found.");
-
-                var company = await _context.ClientCompany
-                    .Include(c => c.EmpanelledVendors)
-                    .FirstOrDefaultAsync(c => c.ClientCompanyId == companyUser.ClientCompanyId);
-
+                var company = await _context.ClientCompany.Include(c => c.EmpanelledVendors).FirstOrDefaultAsync(c => c.ClientCompanyId == companyUser.ClientCompanyId);
                 if (company == null)
                     return (false, "Company Not Found.");
-
-                // Identify the agencies currently empanelled that match the provided IDs
-                var agenciesToDepanel = company.EmpanelledVendors
-                    .Where(v => vendorIds.Contains(v.VendorId))
-                    .ToList();
-
-                if (!agenciesToDepanel.Any())
+                var agenciesToDepanel = company.EmpanelledVendors.Where(v => vendorIds.Contains(v.VendorId)).ToList();
+                if (agenciesToDepanel.Count == 0)
                     return (false, "None of the selected agencies are currently empanelled.");
-
                 foreach (var agency in agenciesToDepanel)
                 {
                     company.EmpanelledVendors.Remove(agency);
+                    agency.IsUpdated = true;
+                    agency.Updated = DateTime.UtcNow;
                 }
-
                 company.Updated = DateTime.UtcNow;
                 company.UpdatedBy = userEmail;
-
                 _context.ClientCompany.Update(company);
                 await _context.SaveChangesAsync();
 
-                return (true, "Agency(s) De-panelled successfully.");
+                return (true, $"<b>{agenciesToDepanel.Count}</b> Agency(s) De-panelled successfully.");
             }
             catch (Exception ex)
             {
