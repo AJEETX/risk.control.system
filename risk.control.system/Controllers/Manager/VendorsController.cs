@@ -94,7 +94,7 @@ namespace risk.control.system.Controllers.Manager
                     await _agencyCreateEditService.LoadModel(model);
                     return View(model);
                 }
-                _notifyService.Custom($"Agency <b>{model.Email}</b>  created successfully.", 3, "green", "fas fa-building");
+                _notifyService.Custom($"Agency <b>{model.Email}</b> profile  created successfully.", 3, "green", "fas fa-building");
                 return RedirectToAction(nameof(AvailableAgencyController.Agencies), "AvailableAgency");
             }
             catch (Exception ex)
