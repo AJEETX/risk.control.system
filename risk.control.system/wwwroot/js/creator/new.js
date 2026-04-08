@@ -71,7 +71,7 @@
             }
         },
         {
-            className: 'max-width-column-name', // Apply the CSS class,
+            className: 'max-width-column-number', // Apply the CSS class,
             targets: 1                      // Index of the column to style
         },
         {

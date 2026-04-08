@@ -172,11 +172,5 @@ namespace risk.control.system.Controllers.Manager
             }
             return RedirectToAction(nameof(Detail), ControllerName<EmpanelledAgencyController>.Name, new { id = vendorId });
         }
-
-        private void ShowErrorNotification()
-        {
-            var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).Distinct();
-            _notifyService.Error($"<b>Please fix:</b><br/>{string.Join("<br/>", errors)}");
-        }
     }
 }
