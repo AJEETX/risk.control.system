@@ -163,7 +163,7 @@ namespace risk.control.system.Controllers.Manager
                     await _manageAgencyService.LoadModel(model);
                     return View(model);
                 }
-                _notifyService.Custom($"Agency <b>{model.Email}</b> edited successfully.", 3, "orange", "fas fa-building");
+                _notifyService.Custom($"Agency <b>{model.Email}</b> profile edited successfully.", 3, "orange", "fas fa-building");
             }
             catch (Exception ex)
             {
