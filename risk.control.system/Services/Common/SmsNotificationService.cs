@@ -28,95 +28,65 @@ namespace risk.control.system.Services.Common
 
         public async Task<string> SendSms2Customer(string currentUser, long claimId, string sms)
         {
-            var caseDetail = await _context.Investigations.Include(c => c.CaseMessages).Include(c => c.PolicyDetail).Include(c => c.CustomerDetail).ThenInclude(c => c!.PinCode)
-                .Include(c => c.CustomerDetail).ThenInclude(c => c!.Country).FirstOrDefaultAsync(c => c.Id == claimId);
-            var mobile = caseDetail!.CustomerDetail!.PhoneNumber;
-            var user = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(u => u.Email == currentUser);
-            var isdCode = caseDetail.CustomerDetail.Country!.ISDCode;
-            var isInsurerUser = user!.ClientCompanyId > 0;
-            var isVendorUser = user.VendorId > 0;
-            string entityName = string.Empty;
-            ApplicationUser insurerUser;
-            ApplicationUser agencyUser;
-            if (isInsurerUser)
-            {
-                insurerUser = user;
-                var entity = await _context.ClientCompany.AsNoTracking().FirstOrDefaultAsync(c => c.ClientCompanyId == insurerUser.ClientCompanyId);
-                entityName = entity?.Name ?? string.Empty;
-            }
-            else if (isVendorUser)
-            {
-                agencyUser = user;
-                var entity = await _context.Vendor.AsNoTracking().FirstOrDefaultAsync(v => v.VendorId == agencyUser.VendorId);
-                entityName = entity?.Name ?? string.Empty;
-            }
-            if (!isInsurerUser && !isVendorUser)
-            {
-                return string.Empty;
-            }
-            var message = $"Dear {caseDetail.CustomerDetail.Name}\n" + $"{sms}\n" + $"Thanks\n" + "{user.FirstName} {user.LastName}\n" + $"Policy #:{caseDetail.PolicyDetail!.ContractNumber}\n" + $"{entityName}\n";
-            message += $"{logo}";
+            var recipient = await _context.CustomerDetail.AsNoTracking()
+                .Include(c => c.Country)
+                .FirstOrDefaultAsync(c => c.InvestigationTaskId == claimId);
 
-            var scheduleMessage = new CaseMessage
-            {
-                Message = sms,
-                IsCustomer = true,
-                InvestigationTaskId = claimId,
-                RecepicientEmail = caseDetail.CustomerDetail.Name,
-                SenderEmail = user.Email,
-                UpdatedBy = user.Email,
-                Updated = DateTime.UtcNow
-            };
-            caseDetail.CaseMessages!.Add(scheduleMessage);
-            await _context.SaveChangesAsync(null, false);
-            await _smsService.DoSendSmsAsync(caseDetail.CustomerDetail.Country.Code, "+" + isdCode + mobile, message);
-            return caseDetail.CustomerDetail.Name;
+            return await ProcessSmsSending(recipient?.Name, recipient?.PhoneNumber, recipient?.Country, currentUser, claimId, sms, true);
         }
 
         public async Task<string> SendSms2Beneficiary(string currentUser, long claimId, string sms)
         {
-            var beneficiary = await _context.BeneficiaryDetail.AsNoTracking().Include(b => b.Country).FirstOrDefaultAsync(c => c.InvestigationTaskId == claimId);
-            var mobile = beneficiary!.PhoneNumber;
-            var user = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(u => u.Email == currentUser);
-            var isdCode = beneficiary.Country!.ISDCode;
-            var isInsurerUser = user!.ClientCompanyId > 0;
-            var isVendorUser = user.VendorId > 0;
-            string entityName = string.Empty;
-            ApplicationUser insurerUser;
-            ApplicationUser agencyUser;
-            if (isInsurerUser)
-            {
-                insurerUser = user;
-                var entity = await _context.ClientCompany.AsNoTracking().FirstOrDefaultAsync(c => c.ClientCompanyId == insurerUser.ClientCompanyId);
-                entityName = entity!.Name;
-            }
-            else if (isVendorUser)
-            {
-                agencyUser = user;
-                var entity = await _context.Vendor.AsNoTracking().FirstOrDefaultAsync(v => v.VendorId == agencyUser.VendorId);
-                entityName = entity!.Name;
-            }
-            if (!isInsurerUser && !isVendorUser)
-            {
-                return string.Empty;
-            }
-            var caseTask = await _context.Investigations.Include(c => c.CaseMessages).Include(c => c.PolicyDetail).FirstOrDefaultAsync(c => c.Id == claimId);
-            var message = $"Dear {beneficiary.Name}\n" + $"{sms}\n" + $"Thanks\n" + $"{user.FirstName} {user.LastName}\n" + $"Policy #:{caseTask!.PolicyDetail!.ContractNumber}\n";
-            message += $"{entityName}\n";
-            message += $"{logo}";
+            var recipient = await _context.BeneficiaryDetail.AsNoTracking()
+                .Include(b => b.Country)
+                .FirstOrDefaultAsync(c => c.InvestigationTaskId == claimId);
+
+            return await ProcessSmsSending(recipient?.Name, recipient?.PhoneNumber, recipient?.Country, currentUser, claimId, sms, false);
+        }
+
+        private async Task<string> ProcessSmsSending(string? name, string? phone, Country? country, string currentUser, long claimId, string sms, bool isCustomer)
+        {
+            if (string.IsNullOrEmpty(name) || country == null) return string.Empty;
+
+            var user = await _context.ApplicationUser.AsNoTracking()
+                .FirstOrDefaultAsync(u => u.Email == currentUser);
+
+            if (user == null || (user.ClientCompanyId <= 0 && user.VendorId <= 0)) return string.Empty;
+
+            var entityName = await GetEntityNameAsync(user);
+            var caseTask = await _context.Investigations
+                .Include(c => c.CaseMessages)
+                .Include(c => c.PolicyDetail)
+                .FirstOrDefaultAsync(c => c.Id == claimId);
+
+            if (caseTask == null) return string.Empty;
+
+            var message = $"Dear {name}\n" +
+                          $"{sms}\n" +
+                          $"Thanks\n" +
+                          $"{user.FirstName} {user.LastName}\n" + // Fixed interpolation bug
+                          $"Policy #:{caseTask.PolicyDetail?.ContractNumber}\n" +
+                          $"{entityName}\n" +
+                          $"{logo}";
+
             var scheduleMessage = new CaseMessage
             {
                 Message = sms,
+                IsCustomer = isCustomer,
                 InvestigationTaskId = claimId,
-                RecepicientEmail = beneficiary.Name,
+                RecepicientEmail = name,
                 SenderEmail = user.Email,
                 UpdatedBy = user.Email,
                 Updated = DateTime.UtcNow
             };
+
             caseTask.CaseMessages!.Add(scheduleMessage);
             await _context.SaveChangesAsync(null, false);
-            await _smsService.DoSendSmsAsync(beneficiary.Country.Code, "+" + isdCode + mobile, message);
-            return beneficiary.Name;
+
+            var fullMobile = $"+{country.ISDCode}{phone}";
+            await _smsService.DoSendSmsAsync(country.Code, fullMobile, message);
+
+            return name;
         }
 
         public async Task<List<CaseMessage>> GetSmsHistory(long caseId, bool isCustomer)
@@ -127,7 +97,24 @@ namespace risk.control.system.Services.Common
                 .ToListAsync();
             return messages;
         }
+        private async Task<string> GetEntityNameAsync(ApplicationUser user)
+        {
+            if (user.ClientCompanyId > 0)
+            {
+                var entity = await _context.ClientCompany.AsNoTracking()
+                    .FirstOrDefaultAsync(c => c.ClientCompanyId == user.ClientCompanyId);
+                return entity?.Name ?? string.Empty;
+            }
 
+            if (user.VendorId > 0)
+            {
+                var entity = await _context.Vendor.AsNoTracking()
+                    .FirstOrDefaultAsync(v => v.VendorId == user.VendorId);
+                return entity?.Name ?? string.Empty;
+            }
+
+            return string.Empty;
+        }
         public override bool Equals(object? obj)
         {
             return obj is SmsNotificationService service &&

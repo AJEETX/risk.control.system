@@ -1,4 +1,5 @@
-﻿using Hangfire;
+﻿using System.Net;
+using Hangfire;
 
 using Microsoft.EntityFrameworkCore;
 using risk.control.system.AppConstant;
@@ -36,6 +37,9 @@ namespace risk.control.system.Services.Assessor
 
         public async Task<(ClientCompany, string)> ProcessCaseReport(string userEmail, string assessorRemarks, long caseId, AssessorRemarkType reportUpdateStatus, string reportAiSummary)
         {
+            assessorRemarks = WebUtility.HtmlEncode(assessorRemarks);
+            reportAiSummary = WebUtility.HtmlEncode(reportAiSummary);
+
             if (reportUpdateStatus == AssessorRemarkType.OK)
             {
                 return await ApproveCaseReport(userEmail, assessorRemarks, caseId, reportUpdateStatus, reportAiSummary);

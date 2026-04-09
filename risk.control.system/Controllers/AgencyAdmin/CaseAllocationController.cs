@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using risk.control.system.AppConstant;
 using risk.control.system.Controllers.Common;
 using risk.control.system.Helpers;
+using risk.control.system.Models.ViewModel;
 using risk.control.system.Services.AgencyAdmin;
 using risk.control.system.Services.Common;
 
@@ -40,42 +41,57 @@ namespace risk.control.system.Controllers.AgencyAdmin
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AllocateToVendorAgent(string selectedcase, long claimId)
+        public async Task<IActionResult> AllocateToAgencyAgent(string selectedcase, long caseId)
         {
             var userEmail = User?.Identity?.Name!;
 
+            // 1. Validation Guard
+            if (!ModelState.IsValid || caseId < 1)
+            {
+                _notifyService.Error("No case selected!!! Please select a case to allocate.", 3);
+                return RedirectToAllocate();
+            }
+
             try
             {
-                if (!ModelState.IsValid || claimId < 1)
-                {
-                    _notifyService.Error("No case selected!!! Please select a case to allocate.", 3);
+                // 2. Business Logic Execution
+                var result = await _agentAllocationService.AllocateAsync(selectedcase, caseId, userEmail);
 
-                    return RedirectToAction(nameof(VendorInvestigationController.Allocate), ControllerName<VendorInvestigationController>.Name);
-                }
-
-                var result = await _agentAllocationService.AllocateAsync(selectedcase, claimId, userEmail);
-
+                // 3. Result Guard
                 if (!result.Success)
                 {
-                    _notifyService.Error(result.ErrorMessage ?? "OOPs !!!..Contact Admin");
-
-                    return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
+                    return HandleError(result.ErrorMessage);
                 }
 
-                _backgroundJobClient.Enqueue(() => _mailService.NotifyCaseAssignmentToVendorAgent(userEmail, claimId, result!.VendorAgentEmail!, result.VendorId, baseUrl));
-
-                _notifyService.Custom($"Case <b>#{result.ContractNumber}</b> Tasked to {result.VendorAgentEmail}", 3, "green", "far fa-file-powerpoint");
-
-                return RedirectToAction(nameof(VendorInvestigationController.Allocate), ControllerName<VendorInvestigationController>.Name);
+                // 4. Success Path
+                ProcessSuccess(result, userEmail, caseId);
+                return RedirectToAllocate();
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error allocating Case {Id} by {UserEmail}", claimId, userEmail ?? "Anonymous");
-
-                _notifyService.Error("OOPs !!!..Contact Admin");
-
-                return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
+                _logger.LogError(ex, "Error allocating Case {Id} by {UserEmail}", caseId, userEmail ?? "Anonymous");
+                return HandleError();
             }
+        }
+
+        // Helper methods to keep the main flow clean and flat
+        private void ProcessSuccess(AllocateVendorAgentResult result, string userEmail, long caseId)
+        {
+            _backgroundJobClient.Enqueue(() =>
+                _mailService.NotifyCaseAssignmentToVendorAgent(userEmail, caseId, result.VendorAgentEmail!, result.VendorId, baseUrl));
+
+            _notifyService.Custom($"Case <b>#{result.ContractNumber}</b> Tasked to {result.VendorAgentEmail}", 3, "green", "far fa-file-powerpoint");
+        }
+
+        private IActionResult HandleError(string? message = null)
+        {
+            _notifyService.Error(message ?? "OOPs !!!..Contact Admin");
+            return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
+        }
+
+        private IActionResult RedirectToAllocate()
+        {
+            return RedirectToAction(nameof(VendorInvestigationController.Allocate), ControllerName<VendorInvestigationController>.Name);
         }
     }
 }
