@@ -37,7 +37,7 @@
             <partial name="Investigation/_Location" model="@template" />
         </div>
         <div class="row">
-            <div class="col-12 col-md-6">
+            <div class="col-md-12">
                 @if (!string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.InvestigationReport?.AgentRemarks))
                 {
                     var questionTime = @Model.ClaimsInvestigation.InvestigationReport.AgentRemarksUpdated != null ?
@@ -82,8 +82,8 @@
 
                                             <thead class="thead-light">
                                                 <tr>
-                                                    <th> Agent Remarks</th>
-                                                    <th class="w-30">Edited Remarks</th>
+                                                    <th class="w-50"> Agent Remarks</th>
+                                                    <th class="w-50">Edited Remarks</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -110,7 +110,7 @@
                 }
             
             </div>
-            <div class="col-12 col-md-6">
+            <div class="col-md-12">
                 @if (!string.IsNullOrWhiteSpace(Model.ClaimsInvestigation?.InvestigationReport?.SupervisorRemarks))
                 {
                     <div class="card bg-light  border-success">
@@ -152,8 +152,8 @@
                                         <table class="table table-bordered table-sm table-hover">
                                             <thead class="thead-light">
                                                 <tr>
-                                                    <th>Remarks</th>
-                                                    <th class="w-30">Document</th>
+                                                    <th class="w-90">Remarks</th>
+                                                    <th class="w-10">Document</th>
                                                 </tr>
                                             </thead>
                                             <tbody>

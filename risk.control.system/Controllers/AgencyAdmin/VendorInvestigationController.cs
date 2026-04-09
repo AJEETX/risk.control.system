@@ -76,7 +76,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
         }
 
         [HttpGet]
-        [Breadcrumb("Re-Allocate", FromAction = nameof(CaseReport))]
+        [Breadcrumb("Re-Allocate", FromAction = nameof(AgentReport))]
         public async Task<IActionResult> ReSelectAgent(long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name!;
@@ -100,13 +100,13 @@ namespace risk.control.system.Controllers.AgencyAdmin
             }
         }
 
-        [Breadcrumb("Submit(report)")]
-        public IActionResult CaseReport()
+        [Breadcrumb("Agent(report)")]
+        public IActionResult AgentReport()
         {
             return View();
         }
 
-        [Breadcrumb("Submit", FromAction = nameof(CaseReport))]
+        [Breadcrumb("Submit", FromAction = nameof(AgentReport))]
         public async Task<IActionResult> GetInvestigateReport(long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name!;
@@ -115,7 +115,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
                 if (!ModelState.IsValid || id < 1)
                 {
                     _notifyService.Error("No case selected!!!. Please select case.");
-                    return RedirectToAction(nameof(CaseReport));
+                    return RedirectToAction(nameof(AgentReport));
                 }
 
                 var model = await _caseReportService.GetInvestigateReport(userEmail, id);
@@ -131,7 +131,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
         }
 
         [Breadcrumb("Active")]
-        public IActionResult Open()
+        public IActionResult Active()
         {
             return View();
         }
@@ -159,8 +159,8 @@ namespace risk.control.system.Controllers.AgencyAdmin
             }
         }
 
-        [Breadcrumb(title: "Details", FromAction = nameof(Open))]
-        public async Task<IActionResult> Detail(long id)
+        [Breadcrumb(title: "Details", FromAction = nameof(Active))]
+        public async Task<IActionResult> ActiveDetail(long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name!;
             try
@@ -168,7 +168,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
                 if (!ModelState.IsValid || id < 1)
                 {
                     _notifyService.Error("NOT FOUND !!!..");
-                    return RedirectToAction(nameof(Open));
+                    return RedirectToAction(nameof(Active));
                 }
 
                 var model = await _agencyInvestigationDetailService.GetClaimDetails(userEmail, id);

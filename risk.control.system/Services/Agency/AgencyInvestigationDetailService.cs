@@ -9,7 +9,7 @@ namespace risk.control.system.Services.Agency
 {
     public interface IAgencyInvestigationDetailService
     {
-        Task<CaseTransactionModel> GetClaimDetails(string currentUserEmail, long caseId);
+        Task<CaseAgencyAgentModel> GetClaimDetails(string currentUserEmail, long caseId);
 
         Task<CaseAgencyAgentModel> SelectVendorAgent(string userEmail, long selectedcase);
 
@@ -37,7 +37,7 @@ namespace risk.control.system.Services.Agency
             this.timelineService = timelineService;
         }
 
-        public async Task<CaseTransactionModel> GetClaimDetails(string currentUserEmail, long caseId)
+        public async Task<CaseAgencyAgentModel> GetClaimDetails(string currentUserEmail, long caseId)
         {
             var caseTask = await GetCaseDetail(caseId);
 
@@ -49,14 +49,10 @@ namespace risk.control.system.Services.Agency
             caseTask.BeneficiaryDetail.PhoneNumber = maskedBeneficiaryContact;
 
             var timeTaken = DateTime.UtcNow - lastHistory!.StatusChangedAt;
-            var model = new CaseTransactionModel
+            var model = new CaseAgencyAgentModel
             {
                 ClaimsInvestigation = caseTask,
-                CaseIsValidToAssign = caseTask.IsValidCaseData(),
                 Beneficiary = caseTask.BeneficiaryDetail,
-                Assigned = caseTask.Status == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER,
-                TimeTaken = timeTaken.ToString(@"hh\:mm\:ss") ?? "-",
-                Withdrawable = (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR),
                 Currency = CustomExtensions.GetCultureByCountry(caseTask.ClientCompany!.Country!.Code.ToUpper()).NumberFormat.CurrencySymbol,
                 Culture = CustomExtensions.GetCultureByCountry(caseTask.ClientCompany!.Country!.Code.ToUpper())
             };
