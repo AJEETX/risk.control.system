@@ -79,7 +79,7 @@ namespace risk.control.system.Controllers.Common
 
                 var response = new
                 {
-                    notes = claim.CaseNotes?.ToList()
+                    notes = claim.CaseNotes?.OrderByDescending(o => o.Created)?.ToList()
                 };
                 return Ok(response);
             }

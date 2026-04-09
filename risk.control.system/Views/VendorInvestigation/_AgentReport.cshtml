@@ -38,11 +38,12 @@
 					<input type="hidden" id="caseId" value="@Model.CaseTask.Id" />
 					<partial name="_Location" model="@template" />
 				</div>
-				<div class="row">
-					<partial name="_AgencyAgentAnswer" model="@Model" />
-					<partial name="_SupervisorRemarks" model="@Model" />
-				</div>
+				
 			</div>
 		</div>
+	</div>
+	<div class="row">
+		<partial name="_AgencyAgentAnswer" model="@Model" />
+		<partial name="_SupervisorRemarks" model="@Model" />
 	</div>
 </article>

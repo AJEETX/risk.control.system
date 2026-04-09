@@ -22,23 +22,17 @@
         columnDefs: [
             {
                 className: 'max-width-column-name', // Apply the CSS class,
-                targets: 0                      // Index of the column to style
+                targets: 1                      // Index of the column to style
             },
             {
                 className: 'max-width-column-name', // Apply the CSS class,
-                targets: 2                      // Index of the column to style
+                targets: 4                      // Index of the column to style
             },
             {
                 className: 'max-width-column-name', // Apply the CSS class,
                 targets: 5                      // Index of the column to style
             }],
         columns: [
-            {
-                data: 'userId',
-                render: function (data) {
-                    return `<span title=${data} data-bs-toggle="tooltip">${data} </span>`
-                }
-            },
             {
                 data: 'type',
                 render: function (data) {
@@ -99,6 +93,13 @@
                     return data.length > 50
                         ? `<div title="${encoded}"><small>${data.substring(0, 50)}...</small></div>`
                         : `<div data-bs-toggle="tooltip" title="${encoded}"><small>${encoded}</small></div>`;
+                }
+            },
+
+            {
+                data: 'userId',
+                render: function (data) {
+                    return `<span title=${data} data-bs-toggle="tooltip">${data} </span>`
                 }
             },
             {
