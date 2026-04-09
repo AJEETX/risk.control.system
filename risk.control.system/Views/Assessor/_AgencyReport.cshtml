@@ -3,7 +3,6 @@
 
 <article>
     <div class="bb-blog-inner">
-
         <div class="card shadow-lg border-1 rounded-lg direct-chat-warning collapsed-card">
             <div class="card-header bg-light text-white text-center">
                 <h3 class="card-title">
@@ -31,9 +30,7 @@
             </div>
 
             <div class="card-body">
-
                 <div class="row">
-
                     @{
                         var template = Model?.InvestigationReport?.ReportTemplate;
                         template!.CaseId = Model!.CaseTask!.Id;

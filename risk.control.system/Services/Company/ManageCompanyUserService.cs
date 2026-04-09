@@ -26,17 +26,20 @@ namespace risk.control.system.Services.Company
     public class ManageCompanyUserService : IManageCompanyUserService
     {
         private readonly ApplicationDbContext _context;
+        private readonly RoleManager<ApplicationRole> roleManager;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ICompanyUserService _companyUserService;
         private readonly IFeatureManager _featureManager;
 
         public ManageCompanyUserService(
             ApplicationDbContext context,
+            RoleManager<ApplicationRole> roleManager,
             UserManager<ApplicationUser> userManager,
             ICompanyUserService companyUserService,
             IFeatureManager featureManager)
         {
             _context = context;
+            this.roleManager = roleManager;
             _userManager = userManager;
             _companyUserService = companyUserService;
             _featureManager = featureManager;
@@ -101,18 +104,11 @@ namespace risk.control.system.Services.Company
 
         private async Task<List<SelectListItem>> GetAvailableRoles(long companyId, long? editingUserId)
         {
-            var usersInCompany = await _context.ApplicationUser.AsNoTracking()
-                .Where(c => !c.Deleted && c.ClientCompanyId == companyId && c.Id != (editingUserId ?? 0)).ToListAsync();
+            var managerRole = await roleManager.FindByNameAsync(MANAGER.DISPLAY_NAME);
 
-            bool isManagerTaken = false;
-            foreach (var user in usersInCompany)
-            {
-                if (await _userManager.IsInRoleAsync(user, MANAGER.DISPLAY_NAME)) // Simplified check
-                {
-                    isManagerTaken = true;
-                    break;
-                }
-            }
+            var isManagerTaken = await _context.ApplicationUser.AsNoTracking()
+                .Where(c => !c.Deleted && c.ClientCompanyId == companyId && c.Id != (editingUserId ?? 0))
+                .AnyAsync(u => _context.UserRoles.Any(ur => ur.UserId == u.Id && ur.RoleId == managerRole!.Id));
 
             return RoleGroups.CompanyAppRoles
                 .Where(r => r != AppRoles.COMPANY_ADMIN && (r != AppRoles.MANAGER || !isManagerTaken))

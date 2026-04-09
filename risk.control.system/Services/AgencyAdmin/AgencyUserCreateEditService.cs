@@ -214,7 +214,7 @@ namespace risk.control.system.Services.AgencyAdmin
                 {
                     var vendor = await _context.Vendor.FirstOrDefaultAsync(v => v.VendorId == user.VendorId);
                     string tinyUrl = await _urlService.ShortenUrlAsync(vendor!.MobileAppUrl!);
-                    var message = $"Dear {user.FirstName},\n" + $"Click on link below to install the mobile app\n\n" + $"{tinyUrl}\n\n" + $"Thanks\n\n" + $"{portal_base_url}";
+                    var message = $"Dear {user.FirstName},\n" + $"Click on link below to install the mobile app\n" + $"{tinyUrl}\n" + $"Thanks\n" + $"{portal_base_url}";
                     await _sms.DoSendSmsAsync(pincode!.Country!.Code, pincode.Country.ISDCode + user.PhoneNumber, message, true);
                     _notify.Custom($"Agent {user.Email} onboarding initiated.", 3, "green", "fas fa-user-check");
                 }
