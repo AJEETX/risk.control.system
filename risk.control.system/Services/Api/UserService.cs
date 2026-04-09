@@ -4,6 +4,7 @@ using Microsoft.FeatureManagement;
 using risk.control.system.AppConstant;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
+using risk.control.system.Services.Common;
 
 namespace risk.control.system.Services.Api
 {
@@ -16,6 +17,7 @@ namespace risk.control.system.Services.Api
     {
         private readonly ApplicationDbContext context;
         private readonly IWebHostEnvironment webHostEnvironment;
+        private readonly IBase64FileService base64FileService;
         private readonly UserManager<ApplicationUser> userManager;
         private readonly int sessionTimeoutInSeconds;
         private readonly int sessionTimeoutinMinutes;
@@ -24,7 +26,12 @@ namespace risk.control.system.Services.Api
         private readonly DateTime cutoffTime;
         private readonly IFeatureManager featureManager;
 
-        public UserService(IConfiguration config, ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, UserManager<ApplicationUser> userManager, IFeatureManager featureManager)
+        public UserService(IConfiguration config,
+            ApplicationDbContext context,
+            IWebHostEnvironment webHostEnvironment,
+            IBase64FileService base64FileService,
+            UserManager<ApplicationUser> userManager,
+            IFeatureManager featureManager)
         {
             awayThresholdInMinutes = int.Parse(config["LOGIN_SESSION_INACTIVE_MIN"]!);
             onlineThresholdInMinutes = int.Parse(config["LOGIN_SESSION_ACTIVE_MIN"]!);
@@ -33,6 +40,7 @@ namespace risk.control.system.Services.Api
             cutoffTime = DateTime.UtcNow.AddSeconds(-sessionTimeoutInSeconds);
             this.context = context;
             this.webHostEnvironment = webHostEnvironment;
+            this.base64FileService = base64FileService;
             this.userManager = userManager;
             this.featureManager = featureManager;
         }
@@ -81,28 +89,55 @@ namespace risk.control.system.Services.Api
             return new UserDetailResponse
             {
                 Id = user.Id,
-                Name = user.FirstName + " " + user.LastName,
-                Email = "<a>" + user.Email + "</a>",
+                Name = $"{user.FirstName} {user.LastName}",
+                Email = $"<a>{user.Email}</a>",
                 RawEmail = user.Email,
-                Phone = "(+" + user.Country?.ISDCode + ") " + user.PhoneNumber,
-                Photo = user.ProfilePictureUrl == null ? Applicationsettings.NO_USER : string.Format("data:image/*;base64,{0}", Convert.ToBase64String(await File.ReadAllBytesAsync(Path.Combine(webHostEnvironment.ContentRootPath, user.ProfilePictureUrl)))),
+                Phone = $"(+{user.Country?.ISDCode}) {user.PhoneNumber}",
+                Photo = await GetUserPhotoBase64(user.ProfilePictureUrl),
                 Active = user.Active,
-                Addressline = user?.Addressline ?? "--",
-                District = user?.District?.Name ?? "--",
-                State = user?.State?.Code ?? "--",
-                Country = user?.Country?.Code ?? "--",
-                Flag = user!.Country == null ? "/flags/in.png" : "/flags/" + user.Country?.Code.ToLower() + ".png",
-                Roles = string.Join(",", GetUserRoles(user!).Result),
-                Pincode = user?.PinCode?.Code ?? 0,
+                Addressline = user.Addressline ?? "--",
+                District = user.District?.Name ?? "--",
+                State = user.State?.Code ?? "--",
+                Country = user.Country?.Code ?? "--",
+                Flag = GetCountryFlagPath(user.Country?.Code),
+                Roles = string.Join(",", await GetUserRoles(user)),
+                Pincode = user.PinCode?.Code ?? 0,
                 OnlineStatus = status,
-                Updated = user!.Updated ?? user.Created,
+                Updated = user.Updated ?? user.Created,
                 UpdatedBy = user.UpdatedBy,
                 OnlineStatusName = statusName,
                 OnlineStatusIcon = icon,
                 IsUpdated = user.IsUpdated,
                 LastModified = user.Updated ?? DateTime.UtcNow,
-                LoginVerified = (!await featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION) || !user.IsPasswordChangeRequired)
+                LoginVerified = await IsLoginVerified(user)
             };
+        }
+        private async Task<string> GetUserPhotoBase64(string? url)
+        {
+            if (string.IsNullOrEmpty(url))
+                return Applicationsettings.NO_USER;
+
+            try
+            {
+                var photo = await base64FileService.GetBase64FileAsync(url!, Applicationsettings.NO_USER);
+                return photo;
+            }
+            catch
+            {
+                return Applicationsettings.NO_USER;
+            }
+        }
+
+        private string GetCountryFlagPath(string? countryCode)
+        {
+            var code = countryCode?.ToLower() ?? "in";
+            return $"/flags/{code}.png";
+        }
+
+        private async Task<bool> IsLoginVerified(ApplicationUser user)
+        {
+            var checkEnabled = await featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION);
+            return !checkEnabled || !user.IsPasswordChangeRequired;
         }
         private async Task<List<string>> GetUserRoles(ApplicationUser user)
         {

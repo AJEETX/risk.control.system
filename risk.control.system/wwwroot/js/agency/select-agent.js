@@ -1,7 +1,7 @@
 ﻿$(document).ready(function () {
     var table = $('#dataTable').DataTable({
         ajax: {
-            url: '/api/Agency/GetAgentWithCases/' + $('#claimId').val(),
+            url: '/api/Agency/GetAgentWithCases/' + $('#caseId').val(),
             dataSrc: '',
             error: function (xhr, status, error) {
                 console.error("AJAX Error:", status, error);
