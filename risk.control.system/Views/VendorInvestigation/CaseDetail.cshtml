@@ -1,4 +1,4 @@
-﻿@model CaseTransactionModel
+﻿@model CaseAgencyAgentModel
 
 @{
 	ViewData["Title"] = "Details";
@@ -38,15 +38,6 @@
 	</h3>
 </div>
 </div>
-@{
-	var data = new CaseAgencyAgentModel
-	{
-		Beneficiary = Model.Beneficiary!,
-		ClaimsInvestigation = Model.ClaimsInvestigation!,
-		Currency = Model.Currency!,
-		Culture = Model.Culture!
-	};
-}
 <div class="card shadow-lg border-1 rounded-lg">
 	<div class="card-body">
 		<div class="submit-progress hidden">
@@ -58,14 +49,14 @@
 				<input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation?.Id" />
 				<input type="hidden" id="beneficiaryId" value="@Model.Beneficiary?.BeneficiaryDetailId" />
 				<input type="hidden" id="policyDetailId" value="@Model.ClaimsInvestigation?.PolicyDetail?.PolicyDetailId" />
-				<partial name="_CaseDetails" model="@data" />
+				<partial name="_CaseDetails" model="@Model" />
 				@if (Model.ClaimsInvestigation?.PolicyDetail?.InsuranceType == InsuranceType.UNDERWRITING)
 				{
-					<partial name="_CustomerDetails" model="@data" />
+					<partial name="_CustomerDetails" model="@Model" />
 				}
 				else
 				{
-					<partial name="_BeneficiaryDetails" model="@data" />
+					<partial name="_BeneficiaryDetails" model="@Model" />
 				}
 			}
 		</div>
