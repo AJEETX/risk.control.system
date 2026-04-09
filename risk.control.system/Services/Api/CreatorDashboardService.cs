@@ -35,6 +35,7 @@ namespace risk.control.system.Services.Api
             var companyUser = await db1.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == userEmail);
             if (companyUser == null || !companyUser.ClientCompanyId.HasValue)
                 throw new InvalidOperationException($"User '{userEmail}' not found or missing ClientCompanyId.");
+
             var companyId = companyUser.ClientCompanyId.Value;
             var companyTask = db1.ClientCompany.AsNoTracking().FirstOrDefaultAsync(c => c.ClientCompanyId == companyId);
             await using var db2 = _contextFactory.CreateDbContext();
@@ -53,12 +54,14 @@ namespace risk.control.system.Services.Api
             var company = await companyTask;
             var investigations = await investigationsTask;
             var files = await filesTask;
+
             int claimAssign = investigations.Count(c => c.InsuranceType == InsuranceType.CLAIM && assignableSubStatuses.Contains(c.SubStatus));
             int claimActive = investigations.Count(c => c.InsuranceType == InsuranceType.CLAIM && c.Status == CONSTANTS.CASE_STATUS.INPROGRESS && !CONSTANTS.ActiveSubStatuses.Contains(c.SubStatus));
             int underwritingAssign = investigations.Count(c => c.InsuranceType == InsuranceType.UNDERWRITING && assignableSubStatuses.Contains(c.SubStatus));
             int underwritingActive = investigations.Count(c => c.InsuranceType == InsuranceType.UNDERWRITING && c.Status == CONSTANTS.CASE_STATUS.INPROGRESS && !CONSTANTS.ActiveSubStatuses.Contains(c.SubStatus));
             int filesUpload = files.Count(f => !f.DirectAssign);
             int filesUploadAssign = files.Count(f => f.DirectAssign);
+
             return new DashboardData
             {
                 FirstBlockName = "ADD/ASSIGN",

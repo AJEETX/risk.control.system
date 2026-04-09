@@ -73,7 +73,7 @@ namespace risk.control.system.Services.Creator
             return (zipFileData, validRecords, errors);
         }
 
-        private CsvConfiguration GetCsvConfiguration(List<string> errors) => new(CultureInfo.InvariantCulture)
+        private static CsvConfiguration GetCsvConfiguration(List<string> errors) => new(CultureInfo.InvariantCulture)
         {
             Delimiter = "|",
             TrimOptions = TrimOptions.Trim,

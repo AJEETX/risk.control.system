@@ -1,5 +1,4 @@
-﻿using System.Net;
-using AspNetCoreHero.ToastNotification.Abstractions;
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
 using Hangfire;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -57,37 +56,31 @@ namespace risk.control.system.Controllers.Assessor
             var userEmail = HttpContext.User?.Identity?.Name!;
             try
             {
-                if (Enum.TryParse<AssessorRemarkType>(assessorRemarkType, true, out var reportUpdateStatus))
-                {
-                    assessorRemarks = WebUtility.HtmlEncode(assessorRemarks);
-                    reportAiSummary = WebUtility.HtmlEncode(reportAiSummary);
-
-                    var (company, contract) = await _processCaseService.ProcessCaseReport(userEmail, assessorRemarks, claimId, reportUpdateStatus, reportAiSummary);
-
-                    backgroundJobClient.Enqueue(() => _mailService.NotifyCaseReportProcess(userEmail, claimId, _baseUrl));
-                    if (reportUpdateStatus == AssessorRemarkType.OK)
-                    {
-                        _notifyService.Custom($"Case <b> #{contract}</b> Approved", 3, "green", "far fa-file-powerpoint");
-                    }
-                    else if (reportUpdateStatus == AssessorRemarkType.REJECT)
-                    {
-                        _notifyService.Custom($"Case <b>#{contract}</b> Rejected", 3, "red", "far fa-file-powerpoint");
-                    }
-                    else
-                    {
-                        _notifyService.Custom($"Case <b> #{contract}</b> Re-Assigned", 3, "yellow", "far fa-file-powerpoint");
-                    }
-                    return RedirectToAction(nameof(AssessorController.Assess), ControllerName<AssessorController>.Name);
-                }
-                else
+                if (!Enum.TryParse<AssessorRemarkType>(assessorRemarkType, true, out var reportUpdateStatus))
                 {
                     _notifyService.Custom($"Error!!! Try again", 3, "red", "far fa-file-powerpoint");
                     return RedirectToAction(nameof(AssessorController.Assess), ControllerName<AssessorController>.Name);
                 }
+
+                var (company, contract) = await _processCaseService.ProcessCaseReport(userEmail, assessorRemarks, claimId, reportUpdateStatus, reportAiSummary);
+
+                backgroundJobClient.Enqueue(() => _mailService.NotifyCaseReportProcess(userEmail, claimId, _baseUrl));
+                if (reportUpdateStatus == AssessorRemarkType.OK)
+                {
+                    _notifyService.Custom($"Case <b> #{contract}</b> Approved", 3, "green", "far fa-file-powerpoint");
+                    return RedirectToAction(nameof(AssessorController.Assess), ControllerName<AssessorController>.Name);
+                }
+                if (reportUpdateStatus == AssessorRemarkType.REJECT)
+                {
+                    _notifyService.Custom($"Case <b>#{contract}</b> Rejected", 3, "red", "far fa-file-powerpoint");
+                    return RedirectToAction(nameof(AssessorController.Assess), ControllerName<AssessorController>.Name);
+                }
+
+                return RedirectToAction(nameof(AssessorController.Assess), ControllerName<AssessorController>.Name);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error withdrawing case {Id}. {UserEmail}", claimId, userEmail);
+                _logger.LogError(ex, "Error processing case {Id}. {UserEmail}", claimId, userEmail);
                 _notifyService.Error("Error processing case. Try again.");
                 return RedirectToAction(nameof(AssessorController.Assess), ControllerName<AssessorController>.Name);
             }

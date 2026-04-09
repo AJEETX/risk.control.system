@@ -5,22 +5,6 @@ namespace risk.control.system.Helpers
 {
     public static class InvestigationExtension
     {
-        public static string GetPincode(bool claimType, CustomerDetail customer, BeneficiaryDetail beneficiary)
-        {
-            if (claimType)
-            {
-                if (customer is null)
-                    return "<span class=\"badge badge-danger\"> <i class=\"fas fa-question\" ></i>  </span>";
-                return string.Join("", "<span class='badge badge-light'>" + customer.PinCode!.Code + "</span>");
-            }
-            else
-            {
-                if (beneficiary is null)
-                    return "<span class=\"badge badge-danger\"> <i class=\"fas fa-question\" ></i>  </span>";
-                return string.Join("", "<span class='badge badge-light'>" + beneficiary.PinCode!.Code + "</span>");
-            }
-        }
-
         public static string GetPolicyNum(this InvestigationTask caseTask, string contractNumber = "")
         {
             string title = $"";
@@ -68,40 +52,48 @@ namespace risk.control.system.Helpers
 
         public static string GetAgentTimePending(this InvestigationTask caseTask, bool open = false)
         {
-            DateTime timeToCompare = caseTask.TaskToAgentTime!.Value;
-            if (open)
+            // 1. Determine base time and calculate duration once
+            DateTime baseTime = open ? caseTask.SubmittedToSupervisorTime!.Value : caseTask.TaskToAgentTime!.Value;
+            TimeSpan elapsed = DateTime.UtcNow.Subtract(baseTime);
+
+            // 2. Handle the "SLA/Warning" logic (The logic-heavy part)
+            if (elapsed.Days >= caseTask.AgentSla)
             {
-                timeToCompare = caseTask.SubmittedToSupervisorTime!.Value;
-                if (DateTime.UtcNow.Subtract(timeToCompare).Days >= caseTask.AgentSla)
-                    return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(timeToCompare).Days} day</span>");
-                else if (DateTime.UtcNow.Subtract(timeToCompare).Days >= 3 || DateTime.UtcNow.Subtract(timeToCompare).Days >= caseTask.AgentSla)
-                    return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(timeToCompare).Days} day</span>");
-            }
-            else
-            {
-                if (DateTime.UtcNow.Subtract(timeToCompare).Days >= caseTask.AgentSla)
-                    return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(timeToCompare).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Hurry up, {DateTime.UtcNow.Subtract(caseTask.Created).Days} days since created!\"></i>");
-                else if (DateTime.UtcNow.Subtract(timeToCompare).Days >= 3 || DateTime.UtcNow.Subtract(timeToCompare).Days >= caseTask.AgentSla)
-                    return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(timeToCompare).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Caution : {DateTime.UtcNow.Subtract(caseTask.Created).Days} day since created.\"></i>");
+                return BuildSlaBadge(elapsed.Days, caseTask.AgentSla, open);
             }
 
-            if (DateTime.UtcNow.Subtract(timeToCompare).Days >= 1)
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(timeToCompare).Days} day</span>");
+            // 3. Handle the "Standard Time Display" logic
+            return BuildStandardTimeBadge(elapsed);
+        }
 
-            if (DateTime.UtcNow.Subtract(timeToCompare).Hours < 24 &&
-                DateTime.UtcNow.Subtract(timeToCompare).Hours > 0)
+        private static string BuildSlaBadge(int elapsedDays, int sla, bool open)
+        {
+            string badge = $"<span class='badge badge-light'>{elapsedDays} day</span>";
+
+            // If it's "open", we just return the badge. 
+            // Otherwise, append the specific warning icon.
+            if (!open)
             {
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(timeToCompare).Hours} hr </span>");
+                string title = elapsedDays >= sla
+                    ? $"Hurry up, {elapsedDays} days since allocated!"
+                    : $"Caution : {elapsedDays} day since allocated.";
+
+                return $"{badge}<i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"{title}\"></i>";
             }
-            if (DateTime.UtcNow.Subtract(timeToCompare).Hours == 0 && DateTime.UtcNow.Subtract(timeToCompare).Minutes > 0)
-            {
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(timeToCompare).Minutes} min </span>");
-            }
-            if (DateTime.UtcNow.Subtract(timeToCompare).Minutes == 0 && DateTime.UtcNow.Subtract(timeToCompare).Seconds > 0)
-            {
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(timeToCompare).Seconds} sec </span>");
-            }
-            return string.Join("", "<span class='badge badge-light'>now</span>");
+
+            return badge;
+        }
+
+        private static string BuildStandardTimeBadge(TimeSpan elapsed)
+        {
+            string value;
+            if (elapsed.Days >= 1) value = $"{elapsed.Days} day";
+            else if (elapsed.Hours > 0) value = $"{elapsed.Hours} hr";
+            else if (elapsed.Minutes > 0) value = $"{elapsed.Minutes} min";
+            else if (elapsed.Seconds > 0) value = $"{elapsed.Seconds} sec";
+            else value = "now";
+
+            return $"<span class='badge badge-light'>{value}</span>";
         }
     }
 }
