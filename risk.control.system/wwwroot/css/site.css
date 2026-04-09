@@ -4516,8 +4516,8 @@ div.form-group.text-center.image-logo-container {
     border-color: gray !important;
 }
 .remark-container {
-    height: 350px; /* Adjust this value as needed */
-    max-height: 350px; /* Adjust this value as needed */
+    height: 100px; /* Adjust this value as needed */
+    max-height: 100px; /* Adjust this value as needed */
     overflow-y: auto; /* Adds a scrollbar if content exceeds max-height */
     word-wrap: break-word; /* Ensures long strings don't break layout */
     font-size: 0.9rem;

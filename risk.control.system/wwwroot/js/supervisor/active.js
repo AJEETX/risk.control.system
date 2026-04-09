@@ -215,7 +215,7 @@
 
         showSpinnerOnButton(element, "Detail");
 
-        const url = `/VendorInvestigation/Detail/${encodeURIComponent(id)}`;
+        const url = `/VendorInvestigation/ActiveDetail/${encodeURIComponent(id)}`;
 
         setTimeout(() => {
             window.location.href = url;

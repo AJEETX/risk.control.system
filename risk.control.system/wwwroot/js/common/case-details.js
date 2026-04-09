@@ -515,7 +515,7 @@ function updateNotesUI(newCount) {
             .attr('data-bs-original-title', 'Display notes'); // For Bootstrap tooltips
     }
 }
-
+    
 // Logic to show existing notes (Extracted from your 'always' block)
 function showNotesModal() {
     $.confirm({

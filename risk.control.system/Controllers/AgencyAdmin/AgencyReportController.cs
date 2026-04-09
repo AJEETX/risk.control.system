@@ -119,7 +119,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
 
                 _notifyService.Custom($"Case <b> #{success.PolicyDetail!.ContractNumber}</b>  Report submitted to Company", 3, "green", "far fa-file-powerpoint");
 
-                return RedirectToAction(nameof(VendorInvestigationController.CaseReport), ControllerName<VendorInvestigationController>.Name);
+                return RedirectToAction(nameof(VendorInvestigationController.AgentReport), ControllerName<VendorInvestigationController>.Name);
             }
             catch (Exception ex)
             {

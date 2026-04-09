@@ -71,7 +71,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> WithdrawCaseFromAgent(CaseTransactionModel model, long claimId, string policyNumber)
+        public async Task<IActionResult> WithdrawCaseFromAgent(CaseTransactionModel model, long caseId, string policyNumber)
         {
             string userEmail = HttpContext?.User?.Identity?.Name!;
             if (!ModelState.IsValid)
@@ -82,9 +82,9 @@ namespace risk.control.system.Controllers.AgencyAdmin
 
             try
             {
-                var agency = await _declineCaseService.WithdrawCaseFromAgent(userEmail, model, claimId);
+                var agency = await _declineCaseService.WithdrawCaseFromAgent(userEmail, model, caseId);
 
-                var jobId = _backgroundJobClient.Enqueue(() => _mailService.NotifyCaseWithdrawlFromAgent(userEmail, claimId, agency.VendorId, _baseUrl));
+                var jobId = _backgroundJobClient.Enqueue(() => _mailService.NotifyCaseWithdrawlFromAgent(userEmail, caseId, agency.VendorId, _baseUrl));
 
                 _notifyService.Custom($"Case <b> #{policyNumber}</b> Withdrawn from Agent successfully", 3, "green", "far fa-file-powerpoint");
 
@@ -92,7 +92,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred for Case {Id}. {UserEmail}.", claimId, userEmail ?? "Anonymous");
+                _logger.LogError(ex, "Error occurred for Case {Id}. {UserEmail}.", caseId, userEmail ?? "Anonymous");
                 _notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(VendorInvestigationController.Allocate), ControllerName<VendorInvestigationController>.Name);
             }
