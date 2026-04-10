@@ -190,7 +190,7 @@
 
         showSpinnerOnButton(element, "Edit");
 
-        const url = `/AvailableAgency/Detail/${encodeURIComponent(id)}`;
+        const url = `/AvailableAgency/Profile/${encodeURIComponent(id)}`;
 
         setTimeout(() => {
             window.location.href = url;

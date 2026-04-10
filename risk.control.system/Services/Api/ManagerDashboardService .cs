@@ -58,7 +58,7 @@ namespace risk.control.system.Services.Api
 
                 data.FifthBlockName = "Active Agencies";
                 data.FifthBlockCount = await activeAgenciesCountTask;
-                data.FifthBlockUrl = "/EmpanelledAgency/Agencies";
+                data.FifthBlockUrl = "/ActiveAgency/Agencies";
 
                 data.SixthBlockName = "Available Agencies";
                 data.SixthBlockCount = await availableAgenciesCountTask;

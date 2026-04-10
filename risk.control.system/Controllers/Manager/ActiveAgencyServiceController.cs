@@ -14,21 +14,21 @@ namespace risk.control.system.Controllers.Manager
 {
     [Authorize(Roles = $"{MANAGER.DISPLAY_NAME}")]
     [Breadcrumb("Manage Agency")]
-    public class EmpanelledAgencyServiceController : Controller
+    public class ActiveAgencyServiceController : Controller
     {
         private readonly INotyfService _notifyService;
         private readonly INavigationService _navigationService;
         private readonly IAgencyServiceTypeManager _agencyServiceTypeManager;
-        private readonly ILogger<EmpanelledAgencyServiceController> _logger;
+        private readonly ILogger<ActiveAgencyServiceController> _logger;
         private readonly IAgencyServiceService _agencyService;
 
-        public EmpanelledAgencyServiceController(
+        public ActiveAgencyServiceController(
             INavigationService navigationService,
             IAgencyServiceTypeManager agencyServiceTypeManager,
             INotyfService notifyService,
             IAgencyServiceService agencyService,
              IHttpContextAccessor httpContextAccessor,
-            ILogger<EmpanelledAgencyServiceController> logger)
+            ILogger<ActiveAgencyServiceController> logger)
         {
             _navigationService = navigationService;
             _agencyServiceTypeManager = agencyServiceTypeManager;
@@ -52,7 +52,7 @@ namespace risk.control.system.Controllers.Manager
 
             var model = new ServiceModel { Id = id };
 
-            ViewData["BreadcrumbNode"] = _navigationService.GetAgencyServiceManagerPath(id, ControllerName<EmpanelledAgencyController>.Name, "Active Agencies");
+            ViewData["BreadcrumbNode"] = _navigationService.GetAgencyServiceManagerPath(id, ControllerName<ActiveAgencyController>.Name, "Active Agencies");
             return View(model);
         }
 
@@ -61,7 +61,7 @@ namespace risk.control.system.Controllers.Manager
             try
             {
                 var model = await _agencyService.PrepareCreateAsync(id);
-                ViewData["BreadcrumbNode"] = _navigationService.GetAgencyServiceActionPath(id, ControllerName<EmpanelledAgencyController>.Name, "Active Agencies", "Add Service", "Create");
+                ViewData["BreadcrumbNode"] = _navigationService.GetAgencyServiceActionPath(id, ControllerName<ActiveAgencyController>.Name, "Active Agencies", "Add Service", "Create");
                 return View(model);
             }
             catch (Exception ex)
@@ -96,7 +96,7 @@ namespace risk.control.system.Controllers.Manager
                 _logger.LogError(ex, "Error occurred creating Service for {AgencyId} . {UserEmail}", VendorId, userEmail);
                 _notifyService.Error("Error creating agency service. Try again.");
             }
-            return RedirectToAction(nameof(Service), ControllerName<EmpanelledAgencyServiceController>.Name, new { id = service.VendorId });
+            return RedirectToAction(nameof(Service), ControllerName<ActiveAgencyServiceController>.Name, new { id = service.VendorId });
         }
 
         public async Task<IActionResult> Edit(long id)
@@ -111,7 +111,7 @@ namespace risk.control.system.Controllers.Manager
                 }
                 var serviceType = await _agencyService.PrepareEditViewModelAsync(id);
 
-                ViewData["BreadcrumbNode"] = _navigationService.GetAgencyServiceActionPath(serviceType.VendorId, ControllerName<EmpanelledAgencyController>.Name, "Active Agencies", "Edit Service", "Edit");
+                ViewData["BreadcrumbNode"] = _navigationService.GetAgencyServiceActionPath(serviceType.VendorId, ControllerName<ActiveAgencyController>.Name, "Active Agencies", "Edit Service", "Edit");
 
                 return View(serviceType);
             }
@@ -145,7 +145,7 @@ namespace risk.control.system.Controllers.Manager
                 _logger.LogError(ex, "Error occurred editing Service. {UserEmail}", userEmail);
                 _notifyService.Error("Error editing agency service. Try again.");
             }
-            return RedirectToAction(nameof(Service), ControllerName<EmpanelledAgencyServiceController>.Name, new { id = service.VendorId });
+            return RedirectToAction(nameof(Service), ControllerName<ActiveAgencyServiceController>.Name, new { id = service.VendorId });
         }
 
         [HttpPost]
