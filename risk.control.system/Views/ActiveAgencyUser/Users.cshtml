@@ -1,6 +1,6 @@
 ﻿@model ServiceModel
 @{
-	ViewData["Title"] = @Applicationsettings.USER;
+	ViewData["Title"] = "Users";
 }
 
 <section class="content">
@@ -36,12 +36,12 @@
 			<div class="row float-right">
 				<div class="col-md-12">
 					<div class="form-group">
-						<a id="back" asp-controller="EmpanelledAgency" asp-action="Detail" asp-route-id="@Model.Id" class="btn btn-sm btn-outline-secondary" data-bs-toggle="tooltip" title="Back to Agency Profile">
+						<a id="back" asp-controller="ActiveAgency" asp-action="Profile" asp-route-id="@Model.Id" class="btn btn-sm btn-outline-secondary" data-bs-toggle="tooltip" title="Back to Agency Profile">
 							<i class="fas fa-arrow-left"></i> 
 							<span class="badge badge-light"> <i class="fas fa-building"></i> </span> Back
 						</a>
 
-						<a class="create-agency-user btn btn-sm btn-success" asp-controller="EmpanelledAgencyUser" asp-action="Create" asp-route-id="@Model.Id"><i class="fas fa-user-plus"></i> @Applicationsettings.CREATE User</a>
+						<a class="create-agency-user btn btn-sm btn-success" asp-controller="ActiveAgencyUser" asp-action="Create" asp-route-id="@Model.Id"><i class="fas fa-user-plus"></i> @Applicationsettings.CREATE User</a>
 					</div>
 				</div>
 			</div>
@@ -50,5 +50,5 @@
 </section>
 @section Scripts
 {
-	<script src="~/js/manager/empanelled-agency-users.js"></script>
+	<script src="~/js/manager/active-agency-users.js"></script>
 }

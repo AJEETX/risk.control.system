@@ -227,7 +227,7 @@
 
         showSpinnerOnButton(element, "Delete");
 
-        const editUrl = `/EmpanelledAgencyUser/Delete/${encodeURIComponent(id)}`;
+        const editUrl = `/ActiveAgencyUser/Delete/${encodeURIComponent(id)}`;
 
         setTimeout(() => {
             window.location.href = editUrl;
@@ -240,7 +240,7 @@
 
         showSpinnerOnButton(element, "Edit");
 
-        const url = `/EmpanelledAgencyUser/Edit/${encodeURIComponent(id)}`;
+        const url = `/ActiveAgencyUser/Edit/${encodeURIComponent(id)}`;
 
         setTimeout(() => {
             window.location.href = url;
