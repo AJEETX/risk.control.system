@@ -13,18 +13,18 @@ namespace risk.control.system.Controllers.Manager
 {
     [Breadcrumb("Manage Agency")]
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{MANAGER.DISPLAY_NAME}")]
-    public class EmpanelledAgencyController : Controller
+    public class ActiveAgencyController : Controller
     {
         private readonly IManageAgencyService _manageAgencyService;
         private readonly IErrorNotifyService _errorNotifyService;
         private readonly IManageAgencyService _agencyCreateEditService;
         private readonly INavigationService _navigationService;
         private readonly INotyfService _notifyService;
-        private readonly ILogger<EmpanelledAgencyController> _logger;
+        private readonly ILogger<ActiveAgencyController> _logger;
         private readonly string _baseUrl;
         private readonly ICompanyAgencyService _companyAgencyService;
 
-        public EmpanelledAgencyController(
+        public ActiveAgencyController(
             IManageAgencyService manageAgencyService,
             IErrorNotifyService errorNotifyService,
             IManageAgencyService agencyCreateEditService,
@@ -32,7 +32,7 @@ namespace risk.control.system.Controllers.Manager
             INavigationService navigationService,
             INotyfService notifyService,
              IHttpContextAccessor httpContextAccessor,
-            ILogger<EmpanelledAgencyController> logger)
+            ILogger<ActiveAgencyController> logger)
         {
             _manageAgencyService = manageAgencyService;
             this._errorNotifyService = errorNotifyService;
@@ -85,7 +85,7 @@ namespace risk.control.system.Controllers.Manager
         }
 
         [Breadcrumb("Agency Profile", FromAction = nameof(Agencies))]
-        public async Task<IActionResult> Detail(long id)
+        public async Task<IActionResult> Profile(long id)
         {
             try
             {
@@ -128,7 +128,7 @@ namespace risk.control.system.Controllers.Manager
                     _notifyService.Error("Error getting Agency. Try again.");
                     return RedirectToAction(nameof(Agencies));
                 }
-                ViewData["BreadcrumbNode"] = _navigationService.GetAgencyActionPath(id, ControllerName<EmpanelledAgencyController>.Name, "Active Agencies", "Edit Agency", nameof(Edit));
+                ViewData["BreadcrumbNode"] = _navigationService.GetAgencyActionPath(id, ControllerName<ActiveAgencyController>.Name, "Active Agencies", "Edit Agency", nameof(Edit));
                 return View(vendor);
             }
             catch (Exception ex)
@@ -170,7 +170,7 @@ namespace risk.control.system.Controllers.Manager
                 _logger.LogError(ex, "Error editing {AgencyId} for {UserEmail}.", vendorId, userEmail);
                 _notifyService.Error("Error editing agency. Try again.");
             }
-            return RedirectToAction(nameof(Detail), ControllerName<EmpanelledAgencyController>.Name, new { id = vendorId });
+            return RedirectToAction(nameof(Profile), ControllerName<ActiveAgencyController>.Name, new { id = vendorId });
         }
     }
 }

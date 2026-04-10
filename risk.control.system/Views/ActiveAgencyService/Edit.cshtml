@@ -1,7 +1,7 @@
 ﻿@model risk.control.system.Models.VendorInvestigationServiceType
 
 @{
-	ViewData["Title"] = @Applicationsettings.EDIT;
+	ViewData["Title"] = "Edit Service";
 }
 <section class="content">
 	<form id="edit-form" asp-action="Edit" method="post" enctype="multipart/form-data">
@@ -19,7 +19,7 @@
 				<div class="row">
 					<div class="col-md-12">
 						<div class="form-group text-right">
-							<a id="cancel" asp-controller="EmpanelledAgencyService" asp-action="Service" asp-route-id="@Model.Vendor?.VendorId" class="btn btn-secondary">
+							<a id="cancel" asp-controller="ActiveAgencyService" asp-action="Service" asp-route-id="@Model.Vendor?.VendorId" class="btn btn-secondary">
 								<i class="fa fa-window-close"></i>
 								Cancel
 							</a>
@@ -39,7 +39,6 @@
 		await Html.RenderPartialAsync("_ValidationScriptsPartial");
 	}
 	<script src="~/js/common/pincode-service.js"></script>
-	<script src="~/js/agency-admin/manage-service.js">
-	</script>
+	<script src="~/js/agency-admin/manage-service.js"></script>
 	<script src="~/js/common/form-validation.js"></script>
 }
