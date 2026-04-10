@@ -145,11 +145,11 @@ namespace risk.control.system.Controllers.Manager
                 _logger.LogError(ex, "Error editing {AgencyId}. {UserEmail}.", vendorId, User?.Identity?.Name);
                 _notifyService.Error("Error editing Agency. Try again.");
             }
-            return RedirectToAction(nameof(Detail), ControllerName<AvailableAgencyController>.Name, new { id = vendorId });
+            return RedirectToAction(nameof(Profile), ControllerName<AvailableAgencyController>.Name, new { id = vendorId });
         }
 
         [Breadcrumb("Agency Profile", FromAction = nameof(Agencies))]
-        public async Task<IActionResult> Detail(long id)
+        public async Task<IActionResult> Profile(long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             try

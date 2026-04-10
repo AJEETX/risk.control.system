@@ -187,7 +187,7 @@
 
         showSpinnerOnButton(element, "Edit");
 
-        const url = `/EmpanelledAgency/Detail/${encodeURIComponent(id)}`;
+        const url = `/ActiveAgency/Profile/${encodeURIComponent(id)}`;
 
         setTimeout(() => {
             window.location.href = url;

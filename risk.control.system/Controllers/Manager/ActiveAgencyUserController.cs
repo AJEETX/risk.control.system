@@ -15,24 +15,24 @@ namespace risk.control.system.Controllers.Manager
 {
     [Breadcrumb("Manage Agency")]
     [Authorize(Roles = $"{MANAGER.DISPLAY_NAME}")]
-    public class EmpanelledAgencyUserController : Controller
+    public class ActiveAgencyUserController : Controller
     {
         private readonly IManageAgencyUserService _manageAgencyUserService;
         private readonly IErrorNotifyService _errorNotifyService;
         private readonly INotyfService _notifyService;
         private readonly INavigationService _navigationService;
         private readonly IFeatureManager _featureManager;
-        private readonly ILogger<EmpanelledAgencyUserController> _logger;
+        private readonly ILogger<ActiveAgencyUserController> _logger;
         private readonly string _baseUrl;
 
-        public EmpanelledAgencyUserController(
+        public ActiveAgencyUserController(
             IManageAgencyUserService manageAgencyUserService,
             IErrorNotifyService errorNotifyService,
             INavigationService navigationService,
             INotyfService notifyService,
             IFeatureManager featureManager,
              IHttpContextAccessor httpContextAccessor,
-            ILogger<EmpanelledAgencyUserController> logger,
+            ILogger<ActiveAgencyUserController> logger,
             ISmsService SmsService)
         {
             this._manageAgencyUserService = manageAgencyUserService;
@@ -58,7 +58,7 @@ namespace risk.control.system.Controllers.Manager
                 Id = id
             };
 
-            ViewData["BreadcrumbNode"] = _navigationService.GetAgencyUserManagerPath(id, ControllerName<EmpanelledAgencyController>.Name, "Available Agencies");
+            ViewData["BreadcrumbNode"] = _navigationService.GetAgencyUserManagerPath(id, ControllerName<ActiveAgencyController>.Name, "Active Agencies");
             return View(model);
         }
 
@@ -75,7 +75,7 @@ namespace risk.control.system.Controllers.Manager
                 _notifyService.Error("OOPS !!!..Agency Not Found. Try again.");
                 return RedirectToAction(nameof(Users), new { id = id });
             }
-            ViewData["BreadcrumbNode"] = _navigationService.GetAgencyUserActionPath(id, ControllerName<EmpanelledAgencyController>.Name, "Active Agencies", "Add User", "Create");
+            ViewData["BreadcrumbNode"] = _navigationService.GetAgencyUserActionPath(id, ControllerName<ActiveAgencyController>.Name, "Active Agencies", "Add User", "Create");
             return View(model);
         }
 
@@ -110,7 +110,7 @@ namespace risk.control.system.Controllers.Manager
                 _logger.LogError(ex, "Error Creating AgencyUser {Id}. {UserEmail}.", model.Id, userEmail);
                 _notifyService.Error("OOPS !!!..Error Creating User. Try again.");
             }
-            return RedirectToAction(nameof(Users), ControllerName<EmpanelledAgencyUserController>.Name, new { id = model.VendorId });
+            return RedirectToAction(nameof(Users), ControllerName<ActiveAgencyUserController>.Name, new { id = model.VendorId });
         }
 
         public async Task<IActionResult> Edit(long id)
@@ -132,7 +132,7 @@ namespace risk.control.system.Controllers.Manager
                     return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
                 }
 
-                ViewData["BreadcrumbNode"] = _navigationService.GetAgencyUserActionPath(agencyUser.VendorId!.Value, ControllerName<EmpanelledAgencyController>.Name, "Active Agencies", "Edit User", "Edit");
+                ViewData["BreadcrumbNode"] = _navigationService.GetAgencyUserActionPath(agencyUser.VendorId!.Value, ControllerName<ActiveAgencyController>.Name, "Active Agencies", "Edit User", "Edit");
 
                 return View(agencyUser);
             }
@@ -177,7 +177,7 @@ namespace risk.control.system.Controllers.Manager
                 _logger.LogError(ex, "Error editing {AgencyId}. {UserEmail}.", sanitizedId, userEmail);
                 _notifyService.Error("OOPS !!!..Error editing User. Try again.");
             }
-            return RedirectToAction(nameof(Users), ControllerName<EmpanelledAgencyUserController>.Name, new { id = model.VendorId });
+            return RedirectToAction(nameof(Users), ControllerName<ActiveAgencyUserController>.Name, new { id = model.VendorId });
         }
 
         public async Task<IActionResult> Delete(long id)
@@ -198,7 +198,7 @@ namespace risk.control.system.Controllers.Manager
                     return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
                 }
 
-                ViewData["BreadcrumbNode"] = _navigationService.GetAgencyUserActionPath(model.VendorId!.Value, ControllerName<EmpanelledAgencyController>.Name, "Active Agencies", "Edit User", "Edit");
+                ViewData["BreadcrumbNode"] = _navigationService.GetAgencyUserActionPath(model.VendorId!.Value, ControllerName<ActiveAgencyController>.Name, "Active Agencies", "Edit User", "Edit");
 
                 return View(model);
             }
