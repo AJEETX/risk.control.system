@@ -50,23 +50,21 @@ namespace risk.control.system.Services.Report
         public async Task<SectionBuilder> Build(SectionBuilder section, InvestigationTask investigation, ReportTemplate investigationReport, bool isClaim = true)
         {
             var paragraph = section.AddParagraph();
-            var pngBytes = ImageConverterToPng.ConvertToPngFromPath(env, investigation.Vendor!.DocumentUrl!);
-            paragraph.AddInlineImage(pngBytes).SetWidth(150); // optional small space between image and text
+            var pngBytes = ImageConverter.ConvertToPngFromPath(env, investigation.Vendor!.DocumentUrl!);
+            paragraph.AddInlineImage(pngBytes).SetWidth(100).SetHeight(100); // optional small space between image and text
             paragraph.AddText($" {investigation.Vendor!.Email} : Investigation detail").SetFontSize(18).SetBold().SetUnderline();
             int locationCount = 1;
             foreach (var loc in investigationReport.LocationReport)
             {
                 if (loc.ValidationExecuted)
                 {
-                    section.AddParagraph().SetLineSpacing(1).AddText($"{locationCount}.  Location Verified: {loc.LocationName}").SetBold().SetFontSize(14);
+                    section.AddParagraph().SetLineSpacing(1).AddText($"{locationCount}. Location Verified: {loc.LocationName}").SetBold().SetFontSize(14);
                     section = await agentService.Build(section, loc, isClaim);
                     section = await faceService.Build(section, loc, isClaim);
                     section = await documentService.Build(section, loc, isClaim);
                     section = questionService.Build(section, loc);
-                    section.AddParagraph().AddText(""); // Empty line
                     section.AddParagraph().AddText(""); // Additional spacing
                     section.AddParagraph().AddText("----------------------------------------------").SetFontSize(10).SetItalic();
-                    section.AddParagraph().AddText(""); // More space if needed
                     section.AddParagraph().AddText("");
                     locationCount++;
                 }
@@ -85,7 +83,7 @@ namespace risk.control.system.Services.Report
             {
                 section.AddParagraph().SetLineSpacing(1).AddText($"Enquiry Report").SetBold().SetFontSize(14);
                 var tableBuilder = section.AddTable().SetBorder(Stroke.Solid);
-                tableBuilder.AddColumnPercentToTable("Question", 20).AddColumnPercentToTable("Selected Answer", 15).AddColumnPercentToTable("Detailed Query", 20).AddColumnPercentToTable("Query Answer", 20).AddColumnPercentToTable("Time", 10).AddColumnPercentToTable("Query Attachment", 7).AddColumnPercentToTable("Answer Attachment", 8);
+                tableBuilder.AddColumnPercentToTable("Question", 10).AddColumnPercentToTable("Selected Answer", 13).AddColumnPercentToTable("Detailed Query", 17).AddColumnPercentToTable("Query Answer", 17).AddColumnPercentToTable("Time", 9).AddColumnPercentToTable("Query Attachment", 13).AddColumnPercentToTable("Answer Attachment", 13);
                 foreach (var request in investigation.InvestigationReport.EnquiryRequests)
                 {
                     var rowBuilder = tableBuilder.AddRow();
@@ -96,8 +94,8 @@ namespace risk.control.system.Services.Report
                     rowBuilder.AddCell().AddParagraph().AddText($"{request.Created:dd-MMM-yy hh:mm tt}").SetFontSize(10);
                     if (request.QuestionImageAttachment != null)
                     {
-                        var pngBytes = ImageConverterToPng.ConvertToPng(request.QuestionImageAttachment);
-                        rowBuilder.AddCell().AddParagraph().AddInlineImage(pngBytes);
+                        var pngBytes = ImageConverter.ConvertToPng(request.QuestionImageAttachment);
+                        rowBuilder.AddCell().AddParagraph().AddInlineImage(pngBytes).SetWidth(150).SetHeight(150);
                     }
                     else
                     {
@@ -105,8 +103,8 @@ namespace risk.control.system.Services.Report
                     }
                     if (request.AnswerImageAttachment != null)
                     {
-                        var pngBytes = ImageConverterToPng.ConvertToPng(request.AnswerImageAttachment);
-                        rowBuilder.AddCell().AddParagraph().AddInlineImage(pngBytes);
+                        var pngBytes = ImageConverter.ConvertToPng(request.AnswerImageAttachment);
+                        rowBuilder.AddCell().AddParagraph().AddInlineImage(pngBytes).SetWidth(150).SetHeight(150);
                     }
                     else
                     {

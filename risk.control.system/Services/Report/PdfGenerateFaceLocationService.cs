@@ -42,43 +42,28 @@ namespace risk.control.system.Services.Report
             string googlePhotoImagePath = Path.Combine(imagePath, "report", $"google-face-map-{DateTime.UtcNow.ToString("ddMMMyyyHHmmsss")}.png");
             if (loc.FaceIds?.Any() == true && loc.FaceIds.Any(f => f.ValidationExecuted))
             {
-                section.AddParagraph().SetLineSpacing(1).AddText($"Face ID Reports ").SetFontSize(14).SetBold().SetUnderline();
+                section.AddParagraph().SetLineSpacing(2).AddText($"    ");
+                section.AddParagraph().SetLineSpacing(1).AddText($"Face ID Reports").SetFontSize(14).SetBold().SetUnderline();
                 var tableBuilder = section.AddTable().SetBorder(Stroke.Solid);
                 tableBuilder.AddColumnPercentToTable("Photo type", 10).AddColumnPercentToTable("Photo", 20).AddColumnPercentToTable("Captured Address", 20).AddColumnPercentToTable("Location Info", 20).AddColumnPercentToTable("Map Image", 25).AddColumnPercentToTable("Match", 5);
                 foreach (var face in loc.FaceIds.Where(f => f.Selected && f.ValidationExecuted))
                 {
                     var rowBuilder = tableBuilder.AddRow();
                     rowBuilder.AddCell().AddParagraph().AddText(face.ReportName!).SetFont(FNT9);
-                    var pngBytes = ImageConverterToPng.ConvertToPngFromPath(webHostEnvironment, face.FilePath!);
-                    rowBuilder.AddCell().AddParagraph().AddInlineImage(pngBytes);
-                    var addressData = $"DateTime:{face.LongLatTime.GetValueOrDefault().ToString("dd-MMM-yyyy HH:mm")} \r\n {face.LocationAddress}";
+                    var pngBytes = ImageConverter.ConvertToPngFromPath(webHostEnvironment, face.FilePath!);
+                    rowBuilder.AddCell().SetVerticalAlignment(VerticalAlignment.Center).SetHorizontalAlignment(HorizontalAlignment.Center).AddParagraph().AddInlineImage(pngBytes).SetWidth(140F);
+                    var addressData = $"{face.LocationAddress}\r\nCaptured Date & Time:{face.LongLatTime.GetValueOrDefault().ToString("dd-MMM-yyyy HH:mm")}";
                     rowBuilder.AddCell().AddParagraph(addressData).SetFont(FNT9);
-                    string location = isClaim ? "Beneficiary " : "Life-Assured ";
-                    var locData = $"Indicative Distance from {location} Address :{face.Distance}\r\n {face.LocationInfo}";
+                    string location = isClaim ? "Beneficiary" : "Life-Assured";
+                    var locData = $"Indicative Distance from {location} Address:{face.Distance}\r\nMore Info: {face.LocationInfo}";
                     rowBuilder.AddCell().AddParagraph(locData).SetFont(FNT9);
-                    string downloadedImagePath = await DownloadMapImageAsync(string.Format(face.LocationMapUrl!, "300", "300"), googlePhotoImagePath);
-                    rowBuilder.AddCell().AddParagraph().AddInlineImage(downloadedImagePath).SetWidth(150).SetHeight(150);
-                    string matchResult = face.ImageValid == true ? "✓" : "✗";
+                    var mapImage = await ImageConverter.DownloadMapImageAsync(httpClientFactory, string.Format(face.LocationMapUrl!, "300", "300"), googlePhotoImagePath);
+                    rowBuilder.AddCell().SetVerticalAlignment(VerticalAlignment.Center).SetHorizontalAlignment(HorizontalAlignment.Center).AddParagraph().AddInlineImage(mapImage).SetWidth(180);
+                    string matchResult = face.ImageValid == true ? "YES" : "NO";
                     rowBuilder.AddCell().AddParagraph(matchResult).SetFontSize(12).SetBold().SetFontColor(face.ImageValid == true ? Gehtsoft.PDFFlow.Models.Shared.Color.Green : Gehtsoft.PDFFlow.Models.Shared.Color.Red);
                 }
             }
             return section;
-        }
-
-        private async Task<string> DownloadMapImageAsync(string url, string outputFilePath)
-        {
-            var client = httpClientFactory.CreateClient();
-            var response = await client.GetAsync(url);
-            if (response.IsSuccessStatusCode)
-            {
-                var imageBytes = await response.Content.ReadAsByteArrayAsync();
-                await File.WriteAllBytesAsync(outputFilePath, imageBytes);
-                return outputFilePath;
-            }
-            else
-            {
-                throw new Exception($"Failed to download map image. Status: {response.StatusCode}");
-            }
         }
     }
 }
