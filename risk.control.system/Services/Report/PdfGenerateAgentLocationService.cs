@@ -45,42 +45,25 @@ namespace risk.control.system.Services.Report
             if (loc.AgentIdReport != null && loc.AgentIdReport.ValidationExecuted)
             {
                 var duration = loc.Updated.GetValueOrDefault().Subtract(loc.AgentIdReport.LongLatTime.GetValueOrDefault());
-                var durationDisplay = "Time spent :" + (duration.Hours > 0 ? $"{duration.Hours}h " : "") + (duration.Minutes > 0 ? $"{duration.Minutes}m" : "less than a min");
-                section.AddParagraph().SetLineSpacing(2).AddText($"{durationDisplay}").SetFontSize(12);
-                section.AddParagraph().SetLineSpacing(2).AddText($"Verifying Agent: {loc.AgentEmail}").SetFontSize(12).SetItalic();
-                section.AddParagraph().SetLineSpacing(2).AddText($"Capture Date:{loc.AgentIdReport.LongLatTime.GetValueOrDefault().ToString("dd-MMM-yyyy HH:mm")}").SetFontSize(10).SetUnderline();
+                var durationDisplay = "Time spent:" + (duration.Hours > 0 ? $"{duration.Hours}h " : "") + (duration.Minutes > 0 ? $"{duration.Minutes}m" : "less than a min");
+                section.AddParagraph().AddText($"{durationDisplay}").SetFontSize(12);
+                section.AddParagraph().AddText($"Verifying Agent: {loc.AgentEmail}").SetFontSize(12).SetItalic();
                 var tableBuilder = section.AddTable().SetBorder(Stroke.Solid);
-                tableBuilder.AddColumnPercentToTable("Agent Photo", 20).AddColumnPercentToTable("Captured Address", 20).AddColumnPercentToTable("Address Info", 20).AddColumnPercentToTable("Map Image", 35).AddColumnPercentToTable("Match", 5);
+                tableBuilder.AddColumnPercentToTable("Agent Photo", 30).AddColumnPercentToTable("Captured Address", 20).AddColumnPercentToTable("Address Info", 20).AddColumnPercentToTable("Map Image", 25).AddColumnPercentToTable("Match", 5);
                 var rowBuilder = tableBuilder.AddRow();
-                var pngBytes = ImageConverterToPng.ConvertToPngFromPath(webHostEnvironment, loc.AgentIdReport.FilePath!);
-                rowBuilder.AddCell().AddParagraph().AddInlineImage(pngBytes).SetWidth(100);
-                var addressData = $"DateTime:{loc.AgentIdReport.LongLatTime.GetValueOrDefault().ToString("dd-MMM-yyyy HH:mm")} \r\n {loc.AgentIdReport.LocationAddress}";
+                byte[] pngBytes = ImageConverter.ConvertToPngFromPath(webHostEnvironment, loc.AgentIdReport.FilePath!);
+                rowBuilder.AddCell().SetVerticalAlignment(VerticalAlignment.Center).SetHorizontalAlignment(HorizontalAlignment.Center).AddParagraph().AddInlineImage(pngBytes).SetWidth(160F);
+                var addressData = $"{loc.AgentIdReport.LocationAddress}\r\nCaptured Date & Time:{loc.AgentIdReport.LongLatTime.GetValueOrDefault().ToString("dd-MMM-yyyy HH:mm")}";
                 rowBuilder.AddCell().AddParagraph(addressData).SetFont(FNT9);
-                string location = isClaim ? "Beneficiary " : "Life-Assured ";
-                var locData = $"Indicative Distance from {location} Address :{loc.AgentIdReport.Distance}\r\n {loc.AgentIdReport.LocationInfo}";
+                string location = isClaim ? "Beneficiary" : "Life-Assured";
+                var locData = $"Indicative Distance from {location} Address:{loc.AgentIdReport.Distance}\r\nMore Info:{loc.AgentIdReport.LocationInfo}";
                 rowBuilder.AddCell().AddParagraph(locData).SetFont(FNT9);
-                string downloadedImagePath = await DownloadMapImageAsync(string.Format(loc.AgentIdReport.LocationMapUrl!, "300", "300"), googlePhotoImagePath);
-                rowBuilder.AddCell().AddParagraph().AddInlineImage(downloadedImagePath).SetWidth(150);
-                string matchResult = loc.AgentIdReport.ImageValid == true ? "✓" : "✗";
+                var mapImage = await ImageConverter.DownloadMapImageAsync(httpClientFactory, string.Format(loc.AgentIdReport.LocationMapUrl!, "400", "400"), googlePhotoImagePath);
+                rowBuilder.AddCell().SetVerticalAlignment(VerticalAlignment.Center).SetHorizontalAlignment(HorizontalAlignment.Center).AddParagraph().AddInlineImage(mapImage).SetWidth(180);
+                string matchResult = loc.AgentIdReport.ImageValid == true ? "YES" : "NO";
                 rowBuilder.AddCell().AddParagraph(matchResult).SetFontSize(14).SetBold().SetFontColor(loc.AgentIdReport.ImageValid == true ? Gehtsoft.PDFFlow.Models.Shared.Color.Green : Gehtsoft.PDFFlow.Models.Shared.Color.Red);
             }
             return section;
-        }
-
-        private async Task<string> DownloadMapImageAsync(string url, string outputFilePath)
-        {
-            var client = httpClientFactory.CreateClient();
-            var response = await client.GetAsync(url);
-            if (response.IsSuccessStatusCode)
-            {
-                var imageBytes = await response.Content.ReadAsByteArrayAsync();
-                await File.WriteAllBytesAsync(outputFilePath, imageBytes);
-                return outputFilePath;
-            }
-            else
-            {
-                throw new Exception($"Failed to download map image. Status: {response.StatusCode}");
-            }
         }
     }
 }
