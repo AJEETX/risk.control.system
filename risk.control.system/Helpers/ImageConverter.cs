@@ -6,7 +6,7 @@ using Image = SixLabors.ImageSharp.Image;
 
 namespace risk.control.system.Helpers
 {
-    public static class ImageConverterToPng
+    public static class ImageConverter
     {
         private static int maxWidth = 100;
         private static int maxHeight = 100;
@@ -75,11 +75,10 @@ namespace risk.control.system.Helpers
         {
             using var image = Image.Load(imageBytes);
 
-            // Resize and Crop to fill the 150x150 area perfectly
             image.Mutate(x => x.Resize(new ResizeOptions
             {
                 Mode = ResizeMode.Crop,
-                Size = new Size(width, height),
+                Size = new Size(width, 0),
                 Position = AnchorPositionMode.Center // Keeps the face/center of the image
             }));
 
@@ -91,6 +90,19 @@ namespace risk.control.system.Helpers
             });
 
             return ms.ToArray();
+        }
+        public static async Task<byte[]> DownloadMapImageAsync(IHttpClientFactory httpClientFactory, string url, string outputFilePath)
+        {
+            var client = httpClientFactory.CreateClient();
+            var response = await client.GetAsync(url);
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadAsByteArrayAsync();
+            }
+            else
+            {
+                throw new Exception($"Failed to download map image. Status: {response.StatusCode}");
+            }
         }
     }
 }
