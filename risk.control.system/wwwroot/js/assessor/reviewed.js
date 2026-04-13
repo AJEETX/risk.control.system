@@ -15,7 +15,7 @@
                     length: d.length || 10,
                     caseType: $('#caseTypeFilter').val() || "",  // Send selected filter value
                     search: d.search?.value || "", // Instead of empty string, send "all"
-                    orderColumn: d.order?.[0]?.column ?? 16, // Default to column 15
+                    orderColumn: d.order?.[0]?.column ?? 14, // Default to column 15
                     orderDir: d.order?.[0]?.dir || "desc"
                 };
             },
@@ -54,7 +54,7 @@
                 'targets': 17, // Index for the "Case Type" column
                 'name': 'policy' // Name for the "Case Type" column
             }],
-        order: [[16, 'asc']],
+        order: [[14, 'desc']],
         responsive: true,
         fixedHeader: true,
         processing: true,

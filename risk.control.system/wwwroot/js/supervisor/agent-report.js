@@ -37,8 +37,8 @@
                     length: d.length || 10,
                     caseType: $('#caseTypeFilter').val() || "",  // Send selected filter value
                     search: d.search?.value || "", // Instead of empty string, send "all"
-                    orderColumn: d.order?.[0]?.column ?? 15,
-                    orderDir: d.order?.[0]?.dir || "asc"
+                    orderColumn: d.order?.[0]?.column ?? 12,
+                    orderDir: d.order?.[0]?.dir || "desc"
                 };
             },
             error: DataTableErrorHandler
@@ -60,7 +60,7 @@
                 className: 'max-width-column-name', // Apply the CSS class,
                 targets: 12                      // Index of the column to style
             }],
-        order: [[14, 'asc']],
+        order: [[12, 'desc']],
         responsive: true,
         fixedHeader: true,
         processing: true,
