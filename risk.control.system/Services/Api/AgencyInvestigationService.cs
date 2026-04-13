@@ -113,8 +113,8 @@ namespace risk.control.system.Services.Api
                                                          : query.OrderByDescending(x => x.PolicyDetail!.InsuranceType),
                 9 => asc ? query.OrderBy(x => x.PolicyDetail!.InvestigationServiceType!.Name)
                                          : query.OrderByDescending(x => x.PolicyDetail!.InvestigationServiceType!.Name),
-                11 => asc ? query.OrderBy(x => x.Created)
-                : query.OrderByDescending(x => x.Created),
+                11 => asc ? query.OrderBy(x => x.Updated)
+                : query.OrderByDescending(x => x.Updated),
                 12 => asc
                         ? query.OrderBy(a =>
                             a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR
@@ -128,7 +128,12 @@ namespace risk.control.system.Services.Api
                                 : a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR
                                     ? a.EnquiredByAssessorTime
                                     : a.Updated),
-                _ => query.OrderByDescending(x => x.Updated)
+                _ => query.OrderByDescending(a =>
+                            a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR
+                                ? a.AllocatedToAgencyTime
+                                : a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR
+                                    ? a.EnquiredByAssessorTime
+                                    : a.Updated)
             };
 
             var pagedRawData = await query
@@ -163,7 +168,7 @@ namespace risk.control.system.Services.Api
                     customerAddressline = a.CustomerDetail != null ? a.CustomerDetail.Addressline : string.Empty,
                     customerDistrict = a.CustomerDetail != null ? a.CustomerDetail.District!.Name : string.Empty,
                     customerState = a.CustomerDetail != null ? a.CustomerDetail.State!.Name : string.Empty,
-                    customerPincode = a.CustomerDetail != null ? a.CustomerDetail!.PinCode!.Code : 0,
+                    customerPincode = a.CustomerDetail!.PinCode!.Code,
                     CustomerDetailLatitude = a.CustomerDetail!.Latitude,
                     CustomerDetailLongitude = a.CustomerDetail.Longitude,
                     BeneficiaryName = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.Name : null,
@@ -172,7 +177,7 @@ namespace risk.control.system.Services.Api
                     beneficiaryAddressline = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.Addressline : string.Empty,
                     beneficiaryDistrict = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.District!.Name : string.Empty,
                     beneficiaryState = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.State!.Name : string.Empty,
-                    beneficiaryPincode = a.BeneficiaryDetail != null ? a.BeneficiaryDetail!.PinCode!.Code : 0,
+                    beneficiaryPincode = a.BeneficiaryDetail!.PinCode!.Code,
                     BeneficiaryDetailLatitude = a.BeneficiaryDetail!.Latitude,
                     BeneficiaryDetailLongitude = a.BeneficiaryDetail.Longitude,
                     BeneficiaryAddressLocationInfo = a.BeneficiaryDetail.AddressLocationInfo,
@@ -196,8 +201,8 @@ namespace risk.control.system.Services.Api
                 var isUW = a.InsuranceType == InsuranceType.UNDERWRITING;
                 var culture = CustomExtensions.GetCultureByCountry(vendorUser.Country!.Code);
                 var pincode = isUW ? a.customerPincode : a.beneficiaryPincode;
-                var customerAddress = a.customerAddressline + ',' + a.customerDistrict + ',' + a.customerState;
-                var beneficiaryAddress = a.beneficiaryAddressline + ',' + a.beneficiaryDistrict + ',' + a.beneficiaryState;
+                var customerAddress = a.customerAddressline + ',' + a.customerDistrict + ',' + a.customerState + ',' + a.customerPincode;
+                var beneficiaryAddress = a.beneficiaryAddressline + ',' + a.beneficiaryDistrict + ',' + a.beneficiaryState + ',' + a.beneficiaryPincode;
                 var pincodeName = isUW ? customerAddress : beneficiaryAddress;
                 var personName = isUW ? a.CustomerName : a.BeneficiaryName;
                 var policy = a.InsuranceType!.GetEnumDisplayName();
@@ -600,14 +605,12 @@ namespace risk.control.system.Services.Api
                                                          : query.OrderByDescending(x => x.PolicyDetail!.InsuranceType!.GetEnumDisplayName()),
                 9 => asc ? query.OrderBy(x => x.PolicyDetail!.InvestigationServiceType!.Name)
                                          : query.OrderByDescending(x => x.PolicyDetail!.InvestigationServiceType!.Name),
-                10 => asc ? query.OrderBy(x => x.Created)
-                : query.OrderByDescending(x => x.Created),
+                10 => asc ? query.OrderBy(x => x.ProcessedByAssessorTime)
+                : query.OrderByDescending(x => x.ProcessedByAssessorTime),
                 11 => asc
-                        ? query.OrderBy(x => x.AllocatedToAgencyTime == null)
-                               .ThenByDescending(x => x.AllocatedToAgencyTime)
-                        : query.OrderBy(x => x.AllocatedToAgencyTime == null)
-                               .ThenBy(x => x.AllocatedToAgencyTime),
-                _ => query.OrderByDescending(x => x.Created)
+                        ? query.OrderBy(x => x.ProcessedByAssessorTime)
+                        : query.OrderBy(x => x.ProcessedByAssessorTime),
+                _ => query.OrderByDescending(x => x.ProcessedByAssessorTime)
             };
 
             var pagedRawData = await query
@@ -788,19 +791,8 @@ namespace risk.control.system.Services.Api
                          : query.OrderByDescending(x => x.ClientCompany!.Name),
                 4 => asc ? query.OrderBy(x => (x.PolicyDetail!.InsuranceType == InsuranceType.UNDERWRITING) ? x.CustomerDetail!.PinCode!.Code : x.BeneficiaryDetail!.PinCode!.Code)
                             : query.OrderByDescending(x => (x.PolicyDetail!.InsuranceType == InsuranceType.UNDERWRITING) ? x.CustomerDetail!.PinCode!.Code : x.BeneficiaryDetail!.PinCode!.Code),
-                5 => asc ? query.OrderBy(x => x.SelectedAgentDrivingDistance) : query.OrderByDescending(x => x.SelectedAgentDrivingDistance),
-                6 => asc ? query.OrderBy(x => x.SelectedAgentDrivingDistance) : query.OrderByDescending(x => x.SelectedAgentDrivingDistance),
-                7 => asc
-                        ? query.OrderBy(x =>
-                            x.PolicyDetail!.InsuranceType == InsuranceType.UNDERWRITING
-                                ? x.CustomerDetail!.Name
-                                : x.BeneficiaryDetail!.Name)
-                        : query.OrderByDescending(x =>
-                            x.PolicyDetail!.InsuranceType == InsuranceType.UNDERWRITING
-                                ? x.CustomerDetail!.PinCode!.Code
-                                : x.BeneficiaryDetail!.PinCode!.Code),
-                8 => asc ? query.OrderBy(x => x.PolicyDetail!.InsuranceType!.GetEnumDisplayName())
-                                                         : query.OrderByDescending(x => x.PolicyDetail!.InsuranceType!.GetEnumDisplayName()),
+                5 => asc ? query.OrderBy(x => x.SelectedAgentDrivingDistanceInMetres) : query.OrderByDescending(x => x.SelectedAgentDrivingDistanceInMetres),
+                6 => asc ? query.OrderBy(x => x.SelectedAgentDrivingDurationInSeconds) : query.OrderByDescending(x => x.SelectedAgentDrivingDurationInSeconds),
                 9 => asc ? query.OrderBy(x => x.PolicyDetail!.InsuranceType == InsuranceType.UNDERWRITING
                                 ? x.CustomerDetail!.Name
                                 : x.BeneficiaryDetail!.Name)
@@ -811,14 +803,11 @@ namespace risk.control.system.Services.Api
                                          : query.OrderByDescending(x => x.PolicyDetail!.InsuranceType),
                 11 => asc ? query.OrderBy(x => x.PolicyDetail!.InvestigationServiceType!.Name)
                 : query.OrderByDescending(x => x.PolicyDetail!.InvestigationServiceType!.Name),
-                12 => asc ? query.OrderBy(x => x.Created)
-                : query.OrderByDescending(x => x.Created),
-                13 => asc
-                        ? query.OrderBy(x => x.SubmittedToSupervisorTime == null)
-                               .ThenByDescending(x => x.SubmittedToSupervisorTime)
-                        : query.OrderBy(x => x.SubmittedToSupervisorTime == null)
-                               .ThenBy(x => x.SubmittedToSupervisorTime),
-                _ => query.OrderByDescending(x => x.Created)
+                12 => asc ? query.OrderBy(x => x.SubmittedToSupervisorTime)
+                : query.OrderByDescending(x => x.SubmittedToSupervisorTime),
+                13 => asc ? query.OrderBy(x => x.SubmittedToSupervisorTime)
+                : query.OrderByDescending(x => x.SubmittedToSupervisorTime),
+                _ => query.OrderByDescending(x => x.SubmittedToSupervisorTime)
             };
             var pagedRawData = await query
                 .Skip(start)

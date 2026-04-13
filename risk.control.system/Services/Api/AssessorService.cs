@@ -12,7 +12,7 @@ namespace risk.control.system.Services
     {
         Task<object> GetInvestigationReports(string userEmail, int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc");
 
-        Task<object> GetReviews(string userEmail, int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc");
+        Task<object> GetReviewCases(string userEmail, int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc");
 
         Task<object> GetApprovededCases(string userEmail, int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc");
 
@@ -241,7 +241,7 @@ namespace risk.control.system.Services
             return string.Join("", "<span class='badge badge-light'>now</span>");
         }
 
-        public async Task<object> GetReviews(string userEmail, int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc")
+        public async Task<object> GetReviewCases(string userEmail, int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc")
         {
             var companyUser = await context.ApplicationUser.AsNoTracking()
                  .Include(c => c.Country)
@@ -279,14 +279,13 @@ namespace risk.control.system.Services
             {
                 1 => isAsc ? query.OrderBy(i => i.PolicyDetail!.SumAssuredValue) : query.OrderByDescending(i => i.PolicyDetail!.SumAssuredValue),
                 3 => isAsc ? query.OrderBy(i => i.Vendor!.Name) : query.OrderByDescending(i => i.Vendor!.Name),
-                4 => isAsc ? query.OrderBy(i => i.SelectedAgentDrivingDistance) : query.OrderByDescending(i => i.SelectedAgentDrivingDistance),
+                4 => isAsc ? query.OrderBy(i => i.SelectedAgentDrivingDistanceInMetres) : query.OrderByDescending(i => i.SelectedAgentDrivingDistanceInMetres),
                 8 => isAsc ? query.OrderBy(i => i.CustomerDetail!.Name) : query.OrderByDescending(i => i.CustomerDetail!.Name),
                 10 => isAsc ? query.OrderBy(i => i.BeneficiaryDetail!.Name) : query.OrderByDescending(i => i.BeneficiaryDetail!.Name),
                 11 => isAsc ? query.OrderBy(i => i.PolicyDetail!.InsuranceType) : query.OrderByDescending(i => i.PolicyDetail!.InsuranceType),
-                12 => isAsc ? query.OrderBy(i => i.Created) : query.OrderByDescending(i => i.Created),
-                14 => isAsc ? query.OrderBy(i => i.EnquiredByAssessorTime != null ? i.EnquiredByAssessorTime : i.Created) :
-                query.OrderByDescending(i => i.EnquiredByAssessorTime != null ? i.EnquiredByAssessorTime : i.Created),
-                _ => query.OrderBy(i => i.EnquiredByAssessorTime != null ? i.EnquiredByAssessorTime : i.Created) // Default sort
+                12 => isAsc ? query.OrderBy(i => i.EnquiredByAssessorTime) : query.OrderByDescending(i => i.EnquiredByAssessorTime),
+                14 => isAsc ? query.OrderBy(i => i.EnquiredByAssessorTime) : query.OrderByDescending(i => i.EnquiredByAssessorTime),
+                _ => query.OrderByDescending(i => i.EnquiredByAssessorTime) // Default sort
             };
 
             // 5. Server-Side Paging & Projection
