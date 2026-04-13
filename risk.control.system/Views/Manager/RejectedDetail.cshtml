@@ -16,14 +16,15 @@
                 <span class="hover-text">
                     <i class="fas fa-info-circle"></i>
                     <span class="tooltip-text" id="information">
+
                         <li>
-                            <i class='far fa-file-powerpoint'></i> Case details
+                            <i class='far fa-file-powerpoint'></i> Case details.
                         </li>
                         <li>
-                            <i class='fa fa-user-plus'></i> Customer details
+                            <i class='fa fa-user-plus'></i> Customer details.
                         </li>
                         <li> <i class='fas fa-user-tie'></i> Beneficiary details </li>
-                        <li> <i class="fas fa-newspaper"></i> Agency report </li>
+                        <li> <i class='far fa-thumbs-up'></i> Agency report </li>
                         <li><i class="far fa-comment"></i> Assessor Remarks </li>
                         <li><i class="fas fa-clock"></i> Timeline </li>
                         <li><i class="fas fa-money-check-alt"></i> Billing Info </li>
@@ -33,13 +34,13 @@
         </div>
     </div>
     <partial name="Investigation/_ApprovedPolicyDetails" model="@Model" />
-    <partial name="Company/_AgencySubmittedReport" model="@Model" />
+    <partial name="Investigation/_AgencySubmittedReport" model="@Model" />
 
     <partial name="Investigation/_TimelineReport" model="@Model" />
-    <partial name="_InvoiceReject" model="@Model" />
+    <partial name="_InvoiceRejected" model="@Model" />
 </section>
 
 @section Scripts {
-    <script src="~/js/common/case-details.js"></script>
     <script src="~/js/case-map.js"></script>
+    <script src="~/js/common/case-details.js"></script>
 }
