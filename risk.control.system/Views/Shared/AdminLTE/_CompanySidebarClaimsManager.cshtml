@@ -24,7 +24,7 @@
     <li class="nav-item">
         <a is-active-page asp-controller="Manager" asp-action="Approved" class="actual-link nav-link @Url.MakeActiveClass("Manager","Approved")
                                                             @Url.MakeActiveClass("Manager","ApprovedDetail")
-                                                            @Url.MakeActiveClass("Manager","ShowInvoice")
+                                                            @Url.MakeActiveClass("Manager","ApprovedInvoice")
                                                                           @Url.MakeActiveClass("Manager","PrintInvoice")">
             <i class="far fa-thumbs-up nav-icon"></i>
             <p>
@@ -33,8 +33,12 @@
         </a>
     </li>
     <li class="nav-item">
-        <a is-active-page asp-controller="Manager" asp-action="Rejected" class="actual-link nav-link @Url.MakeActiveClass("Manager","Rejected")
-                                                                   @Url.MakeActiveClass("Manager","RejectDetail") ">
+        <a is-active-page asp-controller="Manager" asp-action="Rejected" class="actual-link nav-link 
+                                                                    @Url.MakeActiveClass("Manager","Rejected")
+                                                                   @Url.MakeActiveClass("Manager","RejectedDetail") 
+                                                                   @Url.MakeActiveClass("Manager","RejectedInvoice") 
+                                                                @Url.MakeActiveClass("Manager", "PrintInvoice")">
+
            <i class="far fa-thumbs-down nav-icon"></i>
            <p>
                <span class="badge badge-danger">REJECTED</span>

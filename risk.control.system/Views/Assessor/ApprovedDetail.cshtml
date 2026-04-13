@@ -1,8 +1,7 @@
 ﻿@model CaseTransactionModel
 
 @{
-    ViewData["Title"] = "Details";
-
+    ViewData["Title"] = "Approved Details";
 }
 
 <section class="content">
@@ -36,10 +35,10 @@
 
     <partial name="Investigation/_ApprovedPolicyDetails" model="@Model" />
 
-    <partial name="Company/_AgencySubmittedReport" model="@Model" />
+    <partial name="Investigation/_AgencySubmittedReport" model="@Model" />
 
     <partial name="Investigation/_TimelineReport" model="@Model" />
-    <partial name="_Invoice" model="@Model" />
+    <partial name="_InvoiceApproved" model="@Model" />
 </section>
 
 @section Scripts {

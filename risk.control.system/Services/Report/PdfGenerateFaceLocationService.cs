@@ -39,10 +39,9 @@ namespace risk.control.system.Services.Report
         public async Task<SectionBuilder> Build(SectionBuilder section, LocationReport loc, bool isClaim = true)
         {
             var imagePath = webHostEnvironment.WebRootPath;
-            string googlePhotoImagePath = Path.Combine(imagePath, "report", $"google-face-map-{DateTime.UtcNow.ToString("ddMMMyyyHHmmsss")}.png");
             if (loc.FaceIds?.Any() == true && loc.FaceIds.Any(f => f.ValidationExecuted))
             {
-                section.AddParagraph().SetLineSpacing(2).AddText($"    ");
+                section.AddParagraph().AddText("");
                 section.AddParagraph().SetLineSpacing(1).AddText($"Face ID Reports").SetFontSize(14).SetBold().SetUnderline();
                 var tableBuilder = section.AddTable().SetBorder(Stroke.Solid);
                 tableBuilder.AddColumnPercentToTable("Photo type", 10).AddColumnPercentToTable("Photo", 20).AddColumnPercentToTable("Captured Address", 20).AddColumnPercentToTable("Location Info", 20).AddColumnPercentToTable("Map Image", 25).AddColumnPercentToTable("Match", 5);
@@ -52,13 +51,23 @@ namespace risk.control.system.Services.Report
                     rowBuilder.AddCell().AddParagraph().AddText(face.ReportName!).SetFont(FNT9);
                     var pngBytes = ImageConverter.ConvertToPngFromPath(webHostEnvironment, face.FilePath!);
                     rowBuilder.AddCell().SetVerticalAlignment(VerticalAlignment.Center).SetHorizontalAlignment(HorizontalAlignment.Center).AddParagraph().AddInlineImage(pngBytes).SetWidth(140F);
-                    var addressData = $"{face.LocationAddress}\r\nCaptured Date & Time:{face.LongLatTime.GetValueOrDefault().ToString("dd-MMM-yyyy HH:mm")}";
+                    var addressData = $"{face.LocationAddress}\r\nCaptured Date & Time:{face.LongLatTime.GetValueOrDefault().ToString("dd-MMM-yy hh:mm tt")}";
                     rowBuilder.AddCell().AddParagraph(addressData).SetFont(FNT9);
                     string location = isClaim ? "Beneficiary" : "Life-Assured";
                     var locData = $"Indicative Distance from {location} Address:{face.Distance}\r\nMore Info: {face.LocationInfo}";
                     rowBuilder.AddCell().AddParagraph(locData).SetFont(FNT9);
+                    string uniqueFileName = $"map-{Guid.NewGuid():N}.png";
+                    string googlePhotoImagePath = Path.Combine(imagePath, "report", uniqueFileName);
                     var mapImage = await ImageConverter.DownloadMapImageAsync(httpClientFactory, string.Format(face.LocationMapUrl!, "300", "300"), googlePhotoImagePath);
-                    rowBuilder.AddCell().SetVerticalAlignment(VerticalAlignment.Center).SetHorizontalAlignment(HorizontalAlignment.Center).AddParagraph().AddInlineImage(mapImage).SetWidth(180);
+                    var cell = rowBuilder.AddCell().SetVerticalAlignment(VerticalAlignment.Center).SetHorizontalAlignment(HorizontalAlignment.Center);
+                    var paragraph = cell.AddParagraph();
+                    paragraph.AddInlineImage(mapImage).SetWidth(180);
+                    string mapUrl = string.Format(face.LocationMapUrl!, "600", "600");
+                    paragraph.AddText("\r\n");
+                    paragraph.AddUrlToParagraph(mapUrl, "View Full Map")
+                             .SetFont(FNT9)
+                             .SetFontColor(Gehtsoft.PDFFlow.Models.Shared.Color.Blue)
+                             .SetUnderline();
                     string matchResult = face.ImageValid == true ? "YES" : "NO";
                     rowBuilder.AddCell().AddParagraph(matchResult).SetFontSize(12).SetBold().SetFontColor(face.ImageValid == true ? Gehtsoft.PDFFlow.Models.Shared.Color.Green : Gehtsoft.PDFFlow.Models.Shared.Color.Red);
                 }

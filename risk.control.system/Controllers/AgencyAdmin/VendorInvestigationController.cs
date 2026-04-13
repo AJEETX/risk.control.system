@@ -238,7 +238,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
                 }
                 var invoice = await _invoiceService.GetInvoice(id);
 
-                ViewData["BreadcrumbNode"] = _navigationService.GetInvoiceBreadcrumb(id, invoice.CaseId!.Value, "VendorInvestigation", "VendorInvestigation", "Cases", "Approved", "Approved", "CompletedDetail");
+                ViewData["BreadcrumbNode"] = _navigationService.GetInvoiceBreadcrumb(id, invoice.CaseId!.Value, ControllerName<VendorInvestigationController>.Name, ControllerName<VendorInvestigationController>.Name, "Cases", nameof(Completed), nameof(Completed), nameof(CompletedDetail));
 
                 return View(invoice);
             }

@@ -39,8 +39,9 @@ namespace risk.control.system.Services.Report
         }
         public async Task<SectionBuilder> Build(SectionBuilder section, LocationReport loc, bool isClaim = true)
         {
+            string fontPath = Path.Combine(webHostEnvironment.WebRootPath, "fonts", "NotoSans-Regular.ttf");
+
             var imagePath = webHostEnvironment.WebRootPath;
-            string googlePhotoImagePath = Path.Combine(imagePath, "report", $"google-face-map-{DateTime.UtcNow.ToString("ddMMMyyyHHmmsss")}.png");
             if (loc.DocumentIds?.Any() == true)
             {
                 section.AddParagraph().AddText("");
@@ -53,13 +54,24 @@ namespace risk.control.system.Services.Report
                     rowBuilder.AddCell().AddParagraph().AddText(doc.ReportName!).SetFont(FNT9);
                     var pngBytes = ImageConverter.ConvertToPngFromPath(webHostEnvironment, doc.FilePath!);
                     rowBuilder.AddCell().SetVerticalAlignment(VerticalAlignment.Center).SetHorizontalAlignment(HorizontalAlignment.Center).AddParagraph().AddInlineImage(pngBytes).SetWidth(140F);
-                    var addressData = $"{doc.LocationAddress}\r\nCaptured Date & Time:{doc.LongLatTime.GetValueOrDefault().ToString("dd-MMM-yyyy HH:mm")}";
+                    var addressData = $"{doc.LocationAddress}\r\nCaptured Date & Time:{doc.LongLatTime.GetValueOrDefault().ToString("dd-MMM-yy hh:mm tt")}";
                     rowBuilder.AddCell().AddParagraph(addressData).SetFont(FNT9);
                     string location = isClaim ? "Beneficiary" : "Life-Assured";
                     var locData = $"Indicative Distance from {location} Address:{doc.Distance}\r\nMore Info: {doc.LocationInfo}";
                     rowBuilder.AddCell().AddParagraph(locData).SetFont(FNT9);
+                    string uniqueFileName = $"map-{Guid.NewGuid():N}.png";
+                    string googlePhotoImagePath = Path.Combine(imagePath, "report", uniqueFileName);
                     var mapImage = await ImageConverter.DownloadMapImageAsync(httpClientFactory, string.Format(doc.LocationMapUrl!, "300", "300"), googlePhotoImagePath);
-                    rowBuilder.AddCell().SetVerticalAlignment(VerticalAlignment.Center).SetHorizontalAlignment(HorizontalAlignment.Center).AddParagraph().AddInlineImage(mapImage).SetWidth(180);
+                    var cell = rowBuilder.AddCell().SetVerticalAlignment(VerticalAlignment.Center).SetHorizontalAlignment(HorizontalAlignment.Center);
+                    var paragraph = cell.AddParagraph();
+                    paragraph.AddInlineImage(mapImage).SetWidth(180);
+                    string mapUrl = string.Format(doc.LocationMapUrl!, "600", "600");
+                    paragraph.AddText("\r\n");
+                    paragraph.AddUrlToParagraph(mapUrl, "View Full Map")
+                             .SetFont(FNT9)
+                             .SetFontColor(Gehtsoft.PDFFlow.Models.Shared.Color.Blue)
+                             .SetUnderline();
+
                     string matchResult = doc.ImageValid == true ? "YES" : "NO";
                     rowBuilder.AddCell().AddParagraph(matchResult).SetFontSize(14).SetBold().SetFontColor(doc.ImageValid == true ? Gehtsoft.PDFFlow.Models.Shared.Color.Green : Gehtsoft.PDFFlow.Models.Shared.Color.Red);
                 }

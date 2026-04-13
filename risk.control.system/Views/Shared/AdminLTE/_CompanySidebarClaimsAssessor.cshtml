@@ -33,7 +33,7 @@
     <li class="nav-item">
         <a is-active-page asp-controller="Assessor" asp-action="Approved" class="actual-link nav-link @Url.MakeActiveClass("Assessor","Approved")
                                                         @Url.MakeActiveClass("Assessor","ApprovedDetail")
-                                                            @Url.MakeActiveClass("Assessor","ShowInvoice")
+                                                            @Url.MakeActiveClass("Assessor","ApprovedInvoice")
                                                             @Url.MakeActiveClass("Assessor","PrintInvoice")">
             <i class="far fa-thumbs-up nav-icon"></i>
             <p>
@@ -43,7 +43,9 @@
     </li>
     <li class="nav-item">
         <a is-active-page asp-controller="Assessor" asp-action="Rejected" class="actual-link nav-link @Url.MakeActiveClass("Assessor","Rejected")
-                                                               @Url.MakeActiveClass("Assessor","RejectDetail") ">
+            @Url.MakeActiveClass("Assessor", "RejectedDetail") 
+            @Url.MakeActiveClass("Assessor", "RejectedInvoice")
+            @Url.MakeActiveClass("Assessor", "PrintInvoice")">
            <i class="far fa-thumbs-down nav-icon"></i>
            <p>
                <span class="badge badge-danger">REJECTED</span>
