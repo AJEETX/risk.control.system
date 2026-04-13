@@ -14,7 +14,7 @@
                     start: d.start || 0,
                     length: d.length || 10,
                     search: d.search?.value || "", // Instead of empty string, send "all"
-                    orderColumn: d.order?.[0]?.column ?? 14, // Default to column 15
+                    orderColumn: d.order?.[0]?.column ?? 10, // Default to column 15
                     orderDir: d.order?.[0]?.dir || "desc"
                 };
             },
@@ -41,7 +41,7 @@
                 className: 'max-width-column-number', // Apply the CSS class,
                 targets: 10                      // Index of the column to style
             }],
-        order: [[13, 'asc']],
+        order: [[10, 'desc']],
         responsive: true,
         fixedHeader: true,
         processing: true,

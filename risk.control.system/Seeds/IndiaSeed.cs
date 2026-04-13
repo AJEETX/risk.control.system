@@ -25,16 +25,39 @@ namespace risk.control.system.Seeds
             var filteredInPincodes = indiaPincodes.Where(g => indianStates.Contains(g.StateCode)).ToList();
             await PinCodeStateSeed.SeedPincode(ctx, filteredInPincodes, india!);
             await ctx.SaveChangesAsync(null, false);
-            var agencyNames = new[] { "Checker", "Crucible", "Cyber", "Honest", "Hubris", "Investigate", "Investigation", "Nicer", "Proper", "Sample", "Verify", "Zoom" };
-            var vendors = new List<Vendor>();
-            foreach (var name in agencyNames)
+            var agencyData = new[]
             {
-                var agencyInput = CreateSeedInput(name, name.Equals("proper", StringComparison.CurrentCultureIgnoreCase) ||
-                    name.Equals("checker", StringComparison.CurrentCultureIgnoreCase) || name.Equals("verify", StringComparison.CurrentCultureIgnoreCase)
-                    ? "12 MG Road"
-                    : "67 Mehrauli Road");
-                var vendor = await AgencySeed.Seed(ctx, env, apiClient, userManager, agencyInput, servicesTypes, fileStorageService);
-                vendors.Add(vendor);
+                new { Name = "Checker", Address = "12 MG Road", IFSC = "SBIN0001234", Bank = "State Bank of India" },
+                new { Name = "Crucible", Address = "12 MG Road", IFSC = "SBIN0001234", Bank = "State Bank of India" },
+                new { Name = "Cyber", Address = "12 MG Road", IFSC = "SBIN0001234", Bank = "State Bank of India" },
+                new { Name = "Honest", Address = "12 MG Road", IFSC = "SBIN0001234", Bank = "State Bank of India" },
+                new { Name = "Hubris", Address = "12 MG Road", IFSC = "SBIN0001234", Bank = "State Bank of India" },
+                new { Name = "Investigate", Address = "12 MG Road", IFSC = "SBIN0001234", Bank = "State Bank of India" },
+                new { Name = "Investigation", Address = "12 MG Road", IFSC = "SBIN0001234", Bank = "State Bank of India" },
+                new { Name = "Nicer", Address = "12 MG Road", IFSC = "SBIN0001234", Bank = "State Bank of India" },
+                new { Name = "Proper", Address = "12 MG Road", IFSC = "SBIN0001234", Bank = "State Bank of India" },
+                new { Name = "Sample", Address = "12 MG Road", IFSC = "SBIN0001234", Bank = "State Bank of India" },
+                new { Name = "Verify", Address = "12 MG Road", IFSC = "SBIN0001234", Bank = "State Bank of India" },
+                new { Name = "Zoom", Address = "12 MG Road", IFSC = "SBIN0001234", Bank = "State Bank of India" }
+            };
+            var vendors = new List<Vendor>();
+            foreach (var item in agencyData)
+            {
+                var isJpg = item.Name == "Crucible" || item.Name == "Hubris";
+                var input = new SeedInput
+                {
+                    COUNTRY = COUNTRY_CODE,
+                    PINCODE = PINCODE,
+                    DOMAIN = item.Name.ToLower() + DOMAIN_SUFFIX,
+                    NAME = $"{item.Name} Inc India",
+                    PHOTO = $"/img/{item.Name.ToLower()}.{(isJpg ? "jpg" : "png")}",
+                    ADDRESSLINE = item.Address,
+                    BRANCH = "Main Office",
+                    IFSC = item.IFSC,
+                    BANK = item.Bank,
+                    PHONE = "9876543210"
+                };
+                vendors.Add(await AgencySeed.Seed(ctx, env, apiClient, userManager, input, servicesTypes, fileStorageService));
             }
             var agenciesToEmpanel = vendors.Take(vendors.Count / 2).ToList();
             await Insurer.Seed(ctx, agenciesToEmpanel, env, apiClient, userManager, GetInsurer(), fileStorageService);
@@ -54,25 +77,6 @@ namespace risk.control.system.Seeds
                 IFSC = "SBIN0001234",
                 BANK = "State Bank of India",
                 PINCODE = PINCODE,
-                PHONE = "9876543210"
-            };
-        }
-        private static SeedInput CreateSeedInput(string shortName, string address)
-        {
-            var isJpg = shortName.Equals("Crucible", StringComparison.OrdinalIgnoreCase) ||
-                        shortName.Equals("Hubris", StringComparison.OrdinalIgnoreCase);
-
-            return new SeedInput
-            {
-                COUNTRY = COUNTRY_CODE,
-                PINCODE = PINCODE,
-                DOMAIN = shortName.ToLower() + DOMAIN_SUFFIX,
-                NAME = $"{shortName} Inc India",
-                PHOTO = $"/img/{shortName.ToLower()}.{(isJpg ? "jpg" : "png")}",
-                ADDRESSLINE = address,
-                BRANCH = address.Contains("MG Road") ? "Main Office" : "Gurgaon",
-                IFSC = "SBIN0001234",
-                BANK = "State Bank of India",
                 PHONE = "9876543210"
             };
         }
