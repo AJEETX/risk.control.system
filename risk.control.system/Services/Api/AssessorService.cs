@@ -472,11 +472,15 @@ namespace risk.control.system.Services
             bool isAsc = orderDir == "asc";
             query = orderColumn switch
             {
-                1 => isAsc ? query.OrderBy(i => i.PolicyDetail!.ContractNumber) : query.OrderByDescending(i => i.PolicyDetail!.ContractNumber),
-                2 => isAsc ? query.OrderBy(i => i.PolicyDetail!.SumAssuredValue) : query.OrderByDescending(i => i.PolicyDetail!.SumAssuredValue),
-                3 => isAsc ? query.OrderBy(i => i.Vendor!.Name) : query.OrderByDescending(i => i.Vendor!.Name),
-                4 => isAsc ? query.OrderBy(i => i.Created) : query.OrderByDescending(i => i.Created),
-                _ => query.OrderByDescending(i => i.Created) // Default sort
+                1 => isAsc ? query.OrderBy(i => i.PolicyDetail!.SumAssuredValue) : query.OrderByDescending(i => i.PolicyDetail!.SumAssuredValue),
+                4 => isAsc ? query.OrderBy(i => i.SelectedAgentDrivingDistanceInMetres) : query.OrderByDescending(i => i.SelectedAgentDrivingDistanceInMetres),
+                5 => isAsc ? query.OrderBy(i => i.SelectedAgentDrivingDurationInSeconds) : query.OrderByDescending(i => i.SelectedAgentDrivingDurationInSeconds),
+                8 => isAsc ? query.OrderBy(i => i.CustomerDetail!.Name) : query.OrderByDescending(i => i.CustomerDetail!.Name),
+                10 => isAsc ? query.OrderBy(i => i.BeneficiaryDetail!.Name) : query.OrderByDescending(i => i.BeneficiaryDetail!.Name),
+                11 => isAsc ? query.OrderBy(i => i.PolicyDetail!.InsuranceType) : query.OrderByDescending(i => i.PolicyDetail!.InsuranceType),
+                12 => isAsc ? query.OrderBy(i => i.ProcessedByAssessorTime) : query.OrderByDescending(i => i.ProcessedByAssessorTime),
+                14 => isAsc ? query.OrderBy(i => i.Updated) : query.OrderByDescending(i => i.Updated),
+                _ => query.OrderByDescending(i => i.ProcessedByAssessorTime) // Default sort
             };
 
             // 5. Server-Side Paging & Projection
