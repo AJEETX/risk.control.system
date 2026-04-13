@@ -48,7 +48,7 @@ namespace risk.control.system.Controllers.Api.Company
 
             try
             {
-                var response = await assesorService.GetReviews(userEmail, draw, start, length, search, caseType, orderColumn, orderDir);
+                var response = await assesorService.GetReviewCases(userEmail, draw, start, length, search, caseType, orderColumn, orderDir);
 
                 return Ok(response);
             }

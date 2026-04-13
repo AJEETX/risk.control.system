@@ -226,7 +226,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
             return View(model);
         }
 
-        public async Task<IActionResult> ShowInvoice(long id)
+        public async Task<IActionResult> Invoice(long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             try
