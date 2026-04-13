@@ -109,7 +109,7 @@ namespace risk.control.system.Controllers.Manager
         }
 
         [Breadcrumb("Details", FromAction = nameof(Rejected))]
-        public async Task<IActionResult> RejectDetail(long id)
+        public async Task<IActionResult> RejectedDetail(long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name!;
 
@@ -134,7 +134,7 @@ namespace risk.control.system.Controllers.Manager
             }
         }
 
-        public async Task<IActionResult> ShowInvoice(long id)
+        public async Task<IActionResult> ApprovedInvoice(long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 
@@ -146,7 +146,7 @@ namespace risk.control.system.Controllers.Manager
             try
             {
                 var invoice = await _invoiceService.GetInvoice(id);
-                ViewData["BreadcrumbNode"] = _navigationService.GetInvoiceBreadcrumb(id, invoice.CaseId!.Value, "Manager", "Manager", "Cases", "Approved", "Approved", "ApprovedDetail");
+                ViewData["BreadcrumbNode"] = _navigationService.GetInvoiceBreadcrumb(id, invoice.CaseId!.Value, ControllerName<ManagerController>.Name, ControllerName<ManagerController>.Name, "Cases", nameof(Approved), nameof(Approved), nameof(ApprovedDetail));
 
                 return View(invoice);
             }
@@ -159,7 +159,31 @@ namespace risk.control.system.Controllers.Manager
                 return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
             }
         }
+        public async Task<IActionResult> RejectedInvoice(long id)
+        {
+            var userEmail = HttpContext.User?.Identity?.Name;
 
+            if (!ModelState.IsValid || id < 1)
+            {
+                _notifyService.Error("Case Not Found !!!..");
+                return RedirectToAction(nameof(Approved));
+            }
+            try
+            {
+                var invoice = await _invoiceService.GetInvoice(id);
+                ViewData["BreadcrumbNode"] = _navigationService.GetInvoiceBreadcrumb(id, invoice.CaseId!.Value, ControllerName<ManagerController>.Name, ControllerName<ManagerController>.Name, "Cases", nameof(Rejected), nameof(Rejected), nameof(RejectedDetail));
+
+                return View(invoice);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting invoice case detail.User: {UserEmail}, CaseId: {CaseId}",
+                   userEmail,
+                   id);
+                _notifyService.Error("Error getting invoice detail. Try again.");
+                return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
+            }
+        }
         public async Task<IActionResult> PrintInvoice(long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name;

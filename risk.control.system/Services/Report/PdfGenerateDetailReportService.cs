@@ -82,38 +82,47 @@ namespace risk.control.system.Services.Report
             if (investigation.InvestigationReport!.EnquiryRequests != null && investigation.InvestigationReport.EnquiryRequests.Any())
             {
                 section.AddParagraph().SetLineSpacing(1).AddText($"Enquiry Report").SetBold().SetFontSize(14);
+                var questionTableBuilder = section.AddTable().SetBorder(Stroke.Solid);
+                questionTableBuilder.AddColumnPercentToTable("Detailed Question", 35).AddColumnPercentToTable("Detailed Answer", 35).AddColumnPercentToTable("Time", 10).AddColumnPercentToTable("Query Attachment", 10).AddColumnPercentToTable("Answer Attachment", 10);
+                var questionRowBuilder = questionTableBuilder.AddRow();
+                questionRowBuilder.AddCell().AddParagraph().AddText(investigation.InvestigationReport!.EnquiryRequest!.DescriptiveQuestion ?? "N/A").SetFontSize(10);
+                questionRowBuilder.AddCell().AddParagraph().AddText(investigation.InvestigationReport.EnquiryRequest.DescriptiveAnswer ?? "N/A").SetFontSize(10);
+                questionRowBuilder.AddCell().AddParagraph().AddText(investigation.InvestigationReport.EnquiryRequest.Updated?.ToString("dd-MMM-yy hh:mm tt") ?? "N/A").SetFontSize(8);
+                if (investigation.InvestigationReport!.EnquiryRequest!.QuestionImageAttachment != null)
+                {
+                    var pngBytes = ImageConverter.ConvertToPng(investigation.InvestigationReport.EnquiryRequest.QuestionImageAttachment);
+                    questionRowBuilder.AddCell().SetVerticalAlignment(VerticalAlignment.Center).SetHorizontalAlignment(HorizontalAlignment.Center).AddParagraph().AddInlineImage(pngBytes).SetWidth(40);
+                }
+                else
+                {
+                    questionRowBuilder.AddCell().AddParagraph().AddText("");
+                }
+
+                if (investigation.InvestigationReport!.EnquiryRequest!.AnswerImageAttachment != null)
+                {
+                    var pngBytes = ImageConverter.ConvertToPng(investigation.InvestigationReport.EnquiryRequest.AnswerImageAttachment);
+                    questionRowBuilder.AddCell().SetVerticalAlignment(VerticalAlignment.Center).SetHorizontalAlignment(HorizontalAlignment.Center).AddParagraph().AddInlineImage(pngBytes).SetWidth(40);
+                }
+                else
+                {
+                    questionRowBuilder.AddCell().AddParagraph().AddText("");
+                }
+
                 var tableBuilder = section.AddTable().SetBorder(Stroke.Solid);
-                tableBuilder.AddColumnPercentToTable("Question", 10).AddColumnPercentToTable("Selected Answer", 13).AddColumnPercentToTable("Detailed Query", 17).AddColumnPercentToTable("Query Answer", 17).AddColumnPercentToTable("Time", 9).AddColumnPercentToTable("Query Attachment", 13).AddColumnPercentToTable("Answer Attachment", 13);
+
+                tableBuilder.AddColumnPercentToTable("Multiple Choice Question", 60).AddColumnPercentToTable("Selected Answer", 30).AddColumnPercentToTable("Time", 10);
+
                 foreach (var request in investigation.InvestigationReport.EnquiryRequests)
                 {
                     var rowBuilder = tableBuilder.AddRow();
                     rowBuilder.AddCell().AddParagraph().AddText(request.MultipleQuestionText ?? "N/A").SetFontSize(10);
                     rowBuilder.AddCell().AddParagraph().AddText(request.AnswerSelected ?? "N/A").SetFontSize(10);
-                    rowBuilder.AddCell().AddParagraph().AddText(request.DescriptiveQuestion ?? "N/A").SetFontSize(10);
-                    rowBuilder.AddCell().AddParagraph().AddText(request.DescriptiveAnswer ?? "N/A").SetFontSize(10);
-                    rowBuilder.AddCell().AddParagraph().AddText($"{request.Created:dd-MMM-yy hh:mm tt}").SetFontSize(10);
-                    if (request.QuestionImageAttachment != null)
-                    {
-                        var pngBytes = ImageConverter.ConvertToPng(request.QuestionImageAttachment);
-                        rowBuilder.AddCell().AddParagraph().AddInlineImage(pngBytes).SetWidth(150).SetHeight(150);
-                    }
-                    else
-                    {
-                        rowBuilder.AddCell().AddParagraph().AddText("");
-                    }
-                    if (request.AnswerImageAttachment != null)
-                    {
-                        var pngBytes = ImageConverter.ConvertToPng(request.AnswerImageAttachment);
-                        rowBuilder.AddCell().AddParagraph().AddInlineImage(pngBytes).SetWidth(150).SetHeight(150);
-                    }
-                    else
-                    {
-                        rowBuilder.AddCell().AddParagraph().AddText("");
-                    }
+                    rowBuilder.AddCell().AddParagraph().AddText($"{request.Created:dd-MMM-yy hh:mm tt}").SetFontSize(8);
+
                 }
             }
         }
-        private SectionBuilder AddRemarks(SectionBuilder section, string title, string content)
+        private static SectionBuilder AddRemarks(SectionBuilder section, string title, string content)
         {
             var table = section.AddTable().SetBorder(Stroke.Solid);
             table.AddColumnPercentToTable("", 30);

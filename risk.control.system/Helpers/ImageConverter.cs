@@ -8,8 +8,8 @@ namespace risk.control.system.Helpers
 {
     public static class ImageConverter
     {
-        private static int maxWidth = 100;
-        private static int maxHeight = 100;
+        private static int maxWidth = 50;
+        private static int maxHeight = 50;
 
         public static byte[] ConvertToPng(byte[] imageBytes)
         {

@@ -2,8 +2,6 @@
 using Gehtsoft.PDFFlow.Models.Enumerations;
 using Gehtsoft.PDFFlow.Utils;
 using risk.control.system.Models;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Formats.Png;
 
 namespace risk.control.system.Services.Report
 {
@@ -23,26 +21,20 @@ namespace risk.control.system.Services.Report
 
         internal static readonly FontBuilder FNT8 = Fonts.Helvetica(8f);
 
-        internal static readonly FontBuilder FNT8_G =
-            Fonts.Helvetica(8f).SetColor(Gehtsoft.PDFFlow.Models.Shared.Color.Gray);
+        internal static readonly FontBuilder FNT8_G = Fonts.Helvetica(8f).SetColor(Gehtsoft.PDFFlow.Models.Shared.Color.Gray);
 
-        internal static readonly FontBuilder FNT9B =
-            Fonts.Helvetica(9f).SetBold();
+        internal static readonly FontBuilder FNT9B = Fonts.Helvetica(9f).SetBold();
 
-        internal static readonly FontBuilder FNT11B =
-            Fonts.Helvetica(11f).SetBold();
+        internal static readonly FontBuilder FNT11B = Fonts.Helvetica(11f).SetBold();
 
         internal static readonly FontBuilder FNT15 = Fonts.Helvetica(15f);
         internal static readonly FontBuilder FNT16 = Fonts.Helvetica(16f);
 
-        internal static readonly FontBuilder FNT16_R =
-            Fonts.Helvetica(16f).SetColor(Gehtsoft.PDFFlow.Models.Shared.Color.Red);
-        internal static readonly FontBuilder FNT16_G =
-            Fonts.Helvetica(16f).SetColor(Gehtsoft.PDFFlow.Models.Shared.Color.Green);
+        internal static readonly FontBuilder FNT16_R = Fonts.Helvetica(16f).SetColor(Gehtsoft.PDFFlow.Models.Shared.Color.Red);
+        internal static readonly FontBuilder FNT16_G = Fonts.Helvetica(16f).SetColor(Gehtsoft.PDFFlow.Models.Shared.Color.Green);
         internal static readonly FontBuilder FNT17 = Fonts.Helvetica(17f);
         internal static readonly FontBuilder FNT18 = Fonts.Helvetica(18f);
 
-        private string imgPath = string.Empty;
         private readonly ApplicationDbContext context;
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly IPdfGenerateCaseDetailService detailService;
@@ -90,7 +82,7 @@ namespace risk.control.system.Services.Report
             section.AddParagraph().AddText("");
             section.AddParagraph().AddText("");
             section.AddParagraph().AddText("");
-            section.AddParagraph().AddText($"Generated on: {DateTime.UtcNow:yyyy-MM-dd HH:mm}").SetItalic().SetFontSize(10);
+            section.AddParagraph().AddText($"Generated on: {DateTime.UtcNow:dd-MMM-yy hh:mm tt}").SetItalic().SetFontSize(10);
             builder.Build(ReportFilePath);
             investigation.InvestigationReport.PdfReportFilePath = ReportFilePath;
             context.Investigations.Update(investigation);
@@ -98,7 +90,7 @@ namespace risk.control.system.Services.Report
             return reportFilename;
         }
 
-        SectionBuilder AddRemarks(SectionBuilder section, string title, string content)
+        private static SectionBuilder AddRemarks(SectionBuilder section, string title, string content)
         {
             var table = section.AddTable()
                                .SetBorder(Stroke.Solid);
@@ -120,14 +112,6 @@ namespace risk.control.system.Services.Report
                .SetFontSize(11);
 
             return section;
-        }
-        public static byte[] ConvertToPng(byte[] imageBytes)
-        {
-            using var inputStream = new MemoryStream(imageBytes);
-            using var image = Image.Load(inputStream); // Auto-detects format
-            using var outputStream = new MemoryStream();
-            image.Save(outputStream, new PngEncoder()); // Encode as PNG
-            return outputStream.ToArray();
         }
     }
 }

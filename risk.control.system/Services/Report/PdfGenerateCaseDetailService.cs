@@ -31,85 +31,164 @@ namespace risk.control.system.Services.Report
         internal static readonly FontBuilder FNT16_G = Fonts.Helvetica(16f).SetColor(Gehtsoft.PDFFlow.Models.Shared.Color.Green);
         internal static readonly FontBuilder FNT17 = Fonts.Helvetica(17f);
         internal static readonly FontBuilder FNT18 = Fonts.Helvetica(18f);
-
+        private readonly IWebHostEnvironment webHostEnvironment;
+        public PdfGenerateCaseDetailService(IWebHostEnvironment webHostEnvironment)
+        {
+            this.webHostEnvironment = webHostEnvironment;
+        }
         public SectionBuilder BuildUnderwritng(SectionBuilder section, InvestigationTask investigation, PolicyDetail policy, CustomerDetail customer, BeneficiaryDetail beneficiary)
         {
             // Title
-            section.AddParagraph().SetAlignment(HorizontalAlignment.Center).AddText($"{policy?.InsuranceType!.GetEnumDisplayName()} Investigation Report").SetFontSize(20).SetBold();
+            section.AddParagraph()
+                .SetAlignment(HorizontalAlignment.Center)
+                .AddText($"{policy?.InsuranceType!.GetEnumDisplayName()} Investigation Report")
+                .SetFontSize(20).SetBold();
+            section.AddParagraph().AddText("");
+            section.AddParagraph().SetAlignment(HorizontalAlignment.Center).AddText($"Report Assessed Date: {investigation!.InvestigationReport!.AssessorRemarksUpdated.GetValueOrDefault():dd-MMM-yy hh:mm tt}");
 
-            // Investigation Section
-            section.AddParagraph().AddText($"Report Assessed Date: {investigation!.InvestigationReport!.AssessorRemarksUpdated.GetValueOrDefault().ToString("dd-MMM-yyyy HH:mm")}");
-            section.AddParagraph().AddText($"Investigator: {investigation.Vendor!.Email}").SetFontSize(16).SetBold().SetUnderline();
-            section.AddParagraph().AddText($"Insurer: {investigation?.ClientCompany?.Name}");
-            section.AddParagraph().AddText($"Case #: {investigation?.PolicyDetail!.ContractNumber}");
+            // Case overview
+            var overviewTable = section.AddTable().SetBorder(Stroke.Solid);
+            overviewTable.AddColumnPercentToTable("", 35).AddColumnPercentToTable("", 65);
+            AddRow(overviewTable, "Investigator", investigation?.Vendor?.Name ?? "N/A");
+            AddRow(overviewTable, "Insurer", investigation?.ClientCompany?.Name ?? "N/A");
+            AddRow(overviewTable, "Case #", investigation?.PolicyDetail!.ContractNumber ?? "N/A");
+            section.AddParagraph().AddText("");
 
-            // Policy Section
-            section.AddParagraph().AddText($"Case Type: {policy?.InsuranceType!.GetEnumDisplayName()}").SetFontSize(16).SetBold().SetUnderline();
-            section.AddParagraph().AddText($"Verification Type: {policy?.InvestigationServiceType?.Name}");
-
+            // Proposal info
+            section.AddParagraph().SetLineSpacing(1).AddText("Case Info").SetFontSize(14).SetBold().SetUnderline();
+            var proposalTable = section.AddTable().SetBorder(Stroke.Solid);
+            proposalTable.AddColumnPercentToTable("", 35).AddColumnPercentToTable("", 65);
+            AddRow(proposalTable, "Case Type", policy?.InsuranceType!.GetEnumDisplayName() ?? "N/A");
+            AddRow(proposalTable, "Verification Type", policy?.InvestigationServiceType?.Name ?? "N/A");
             var currency = CustomExtensions.GetCultureByCountry(investigation!.ClientCompany!.Country!.Code.ToUpper()).NumberFormat.CurrencySymbol;
             var culture = CustomExtensions.GetCultureByCountry(investigation!.ClientCompany!.Country!.Code.ToUpper());
-
             var sumAssuredValue = string.Format(culture, "{0:c}", policy?.SumAssuredValue.ToString());
+            AddRow(proposalTable, "Assured Amount", currency + " " + policy?.SumAssuredValue.ToString("N2") ?? "N/A");
+            section.AddParagraph().AddText("");
 
-            section.AddParagraph().AddText($"Assured Amount: {currency} {policy?.SumAssuredValue}");
+            // Life Assured Details
+            section.AddParagraph().SetLineSpacing(1).AddText("Life Assured Details").SetFontSize(14).SetBold().SetUnderline();
+            BuildPersonSection(section, customer?.ImagePath, new[]
+            {
+                ("Name", customer?.Name ?? "N/A"),
+                ("Date of Birth", customer?.DateOfBirth?.ToString("dd-MMM-yyyy") ?? "N/A"),
+                ("Occupation", customer?.Occupation?.GetEnumDisplayName() ?? "N/A"),
+                ("Income", customer?.Income?.GetEnumDisplayName() ?? "N/A"),
+                ("Address", $"{customer?.Addressline}, {customer?.District?.Name}, {customer?.State?.Name}, {customer?.Country?.Name}"),
+                ("Pincode", $"{customer?.PinCode!.Code.ToString() ?? "N/A"}")
+            });
+            section.AddParagraph().AddText("");
 
-            // Customer Section
-            section.AddParagraph().AddText("Life Assured Details").SetFontSize(16).SetBold().SetUnderline();
-            section.AddParagraph().AddText($"Life Assured Name: {customer?.Name}");
-            section.AddParagraph().AddText($"Date Of birth: {customer?.DateOfBirth!.Value.ToString("dd-MMM-yyyy")}");
-            section.AddParagraph().AddText($"Occupation: {customer?.Occupation!.GetEnumDisplayName()}");
-            section.AddParagraph().AddText($"Income: {customer?.Income!.GetEnumDisplayName()}");
-            section.AddParagraph().AddText($"Address: {customer?.Addressline},{customer?.District?.Name}, {customer?.State?.Name}, {customer?.Country?.Name}");
+            // Beneficiary Details
+            section.AddParagraph().SetLineSpacing(1).AddText("Beneficiary Details").SetFontSize(14).SetBold().SetUnderline();
+            BuildPersonSection(section, beneficiary?.ImagePath, new[]
+            {
+                ("Name", beneficiary?.Name ?? "N/A"),
+                ("Relation", beneficiary?.BeneficiaryRelation?.Name ?? "N/A"),
+                ("Date of Birth", beneficiary?.DateOfBirth?.ToString("dd-MMM-yyyy") ?? "N/A"),
+                ("Income", beneficiary?.Income?.GetEnumDisplayName() ?? "N/A"),
+                ("Address", $"{beneficiary?.Addressline}, {beneficiary?.District?.Name}, {beneficiary?.State?.Name}, {beneficiary?.Country?.Name}"),
+                ("Pincode", $"{beneficiary?.PinCode!.Code.ToString() ?? "N/A"}")
+            });
 
-            // Beneficiary Section
-            section.AddParagraph().AddText("Beneficiary Details").SetFontSize(16).SetBold().SetUnderline();
-            section.AddParagraph().AddText($"Name: {beneficiary?.Name}");
-            section.AddParagraph().AddText($"Relation: {beneficiary?.BeneficiaryRelation?.Name}");
-            section.AddParagraph().AddText($"Date Of birth: {beneficiary?.DateOfBirth!.Value.ToString("dd-MMM-yyyy")}");
-            section.AddParagraph().AddText($"Income: {beneficiary?.Income!.GetEnumDisplayName()}");
-            section.AddParagraph().AddText($"Address: {beneficiary?.Addressline},{beneficiary?.District?.Name}, {beneficiary?.State?.Name}, {beneficiary?.Country?.Name}");
             return section;
         }
 
         public SectionBuilder BuildClaim(SectionBuilder section, InvestigationTask investigation, PolicyDetail policy, CustomerDetail customer, BeneficiaryDetail beneficiary)
         {
             // Title
-            section.AddParagraph().SetAlignment(HorizontalAlignment.Center).AddText($"{policy?.InsuranceType!.GetEnumDisplayName()} Investigation Report").SetFontSize(20).SetBold();
+            section.AddParagraph()
+                .SetAlignment(HorizontalAlignment.Center)
+                .AddText($"{policy?.InsuranceType!.GetEnumDisplayName()} Investigation Report")
+                .SetFontSize(20).SetBold();
+            section.AddParagraph().AddText("");
+            section.AddParagraph().SetAlignment(HorizontalAlignment.Center).AddText($"Report Assessed Date: {investigation!.InvestigationReport!.AssessorRemarksUpdated.GetValueOrDefault():dd-MMM-yy hh:mm tt}");
 
-            // Investigation Section
-            section.AddParagraph().AddText($"Report Assessed Date: {investigation!.InvestigationReport!.AssessorRemarksUpdated.GetValueOrDefault()}");
-            section.AddParagraph().AddText($"Investigator: {investigation.Vendor!.Email}").SetFontSize(16).SetBold().SetUnderline();
-            section.AddParagraph().AddText($"Insurer: {investigation?.ClientCompany?.Name}");
-            section.AddParagraph().AddText($"Case #: {investigation?.PolicyDetail!.ContractNumber}");
-            section.AddParagraph().AddText($"Policy Issue date: {policy?.ContractIssueDate.ToString("dd-MMM-yyyy")}");
-            section.AddParagraph().AddText($"Date Of Incident: {policy?.DateOfIncident.ToString("dd-MMM-yyyy")}");
-            section.AddParagraph().AddText($"Cause of Death: {policy?.CauseOfLoss}");
+            // Case overview
+            var overviewTable = section.AddTable().SetBorder(Stroke.Solid);
+            overviewTable.AddColumnPercentToTable("", 35).AddColumnPercentToTable("", 65);
+            AddRow(overviewTable, "Investigator", investigation!.Vendor!.Name ?? "N/A");
+            AddRow(overviewTable, "Insurer", investigation?.ClientCompany?.Name ?? "N/A");
+            AddRow(overviewTable, "Case #", investigation?.PolicyDetail!.ContractNumber ?? "N/A");
+            AddRow(overviewTable, "Date of Issue", policy?.ContractIssueDate.ToString("dd-MMM-yyyy") ?? "N/A");
+            AddRow(overviewTable, "Date of Incident", policy?.DateOfIncident.ToString("dd-MMM-yyyy") ?? "N/A");
+            section.AddParagraph().AddText("");
 
-            // Policy Section
-            section.AddParagraph().AddText($"Case Type: {policy?.InsuranceType!.GetEnumDisplayName()}").SetFontSize(16).SetBold().SetUnderline();
-            section.AddParagraph().AddText($"Verification Type: {policy?.InvestigationServiceType?.Name}");
+            // Policy details
+            section.AddParagraph().SetLineSpacing(1).AddText("Case Details").SetFontSize(14).SetBold().SetUnderline();
+            var policyTable = section.AddTable().SetBorder(Stroke.Solid);
+            policyTable.AddColumnPercentToTable("", 35).AddColumnPercentToTable("", 65);
+            AddRow(policyTable, "Verification Type", policy?.InvestigationServiceType?.Name ?? "N/A");
             var currency = CustomExtensions.GetCultureByCountry(investigation!.ClientCompany!.Country!.Code.ToUpper()).NumberFormat.CurrencySymbol;
             var culture = CustomExtensions.GetCultureByCountry(investigation!.ClientCompany!.Country!.Code.ToUpper());
-            var sumAssuredValue = string.Format(culture, "{0:c}", policy?.SumAssuredValue);
-            section.AddParagraph().AddText($"Assured Amount: {currency} {policy?.SumAssuredValue}");
+            var sumAssuredValue = string.Format(culture, "{0:c}", policy?.SumAssuredValue.ToString());
+            AddRow(policyTable, "Assured Amount", currency + " " + policy?.SumAssuredValue.ToString("N2") ?? "N/A");
+            AddRow(policyTable, "Policy Issue Date", policy?.ContractIssueDate.ToString("dd-MMM-yyyy") ?? "N/A");
+            AddRow(policyTable, "Cause of Death", policy?.CauseOfLoss ?? "N/A");
+            section.AddParagraph().AddText("");
 
-            // Customer Section
-            section.AddParagraph().AddText("Life Assured  Details").SetFontSize(16).SetBold().SetUnderline();
-            section.AddParagraph().AddText($"Life Assured Name: {customer?.Name}");
-            section.AddParagraph().AddText($"Date Of birth: {customer?.DateOfBirth!.Value.ToString("dd-MMM-yyyy")}");
-            section.AddParagraph().AddText($"Occupation: {customer?.Occupation!.GetEnumDisplayName()}");
-            section.AddParagraph().AddText($"Income: {customer?.Income!.GetEnumDisplayName()}");
-            section.AddParagraph().AddText($"Address: {customer?.Addressline},{customer?.District?.Name}, {customer?.State?.Name}, {customer?.Country?.Name}");
+            // Life Assured Details
+            section.AddParagraph().SetLineSpacing(1).AddText("Life Assured Details").SetFontSize(14).SetBold().SetUnderline();
+            BuildPersonSection(section, customer?.ImagePath, new[]
+            {
+                ("Name", customer?.Name ?? "N/A"),
+                ("Date of Birth", customer?.DateOfBirth?.ToString("dd-MMM-yyyy") ?? "N/A"),
+                ("Occupation", customer?.Occupation?.GetEnumDisplayName() ?? "N/A"),
+                ("Income", customer?.Income?.GetEnumDisplayName() ?? "N/A"),
+                ("Address", $"{customer?.Addressline}, {customer?.District?.Name}, {customer?.State?.Name}, {customer?.Country?.Name}"),
+                ("Pincode", $"{customer?.PinCode!.Code.ToString() ?? "N/A"}")
+            });
+            section.AddParagraph().AddText("");
 
-            // Beneficiary Section
-            section.AddParagraph().AddText("Beneficiary Details").SetFontSize(16).SetBold().SetUnderline();
-            section.AddParagraph().AddText($"Name: {beneficiary?.Name}");
-            section.AddParagraph().AddText($"Relation: {beneficiary?.BeneficiaryRelation?.Name}");
-            section.AddParagraph().AddText($"Date Of birth: {beneficiary?.DateOfBirth!.Value.ToString("dd-MMM-yyyy")}");
-            section.AddParagraph().AddText($"Income: {beneficiary?.Income!.GetEnumDisplayName()}");
-            section.AddParagraph().AddText($"Address: {beneficiary?.Addressline},{beneficiary?.District?.Name}, {beneficiary?.State?.Name}, {beneficiary?.Country?.Name}");
+            // Claimant Details
+            section.AddParagraph().SetLineSpacing(1).AddText("Claimant Details").SetFontSize(14).SetBold().SetUnderline();
+            BuildPersonSection(section, beneficiary?.ImagePath, new[]
+            {
+                ("Name", beneficiary?.Name ?? "N/A"),
+                ("Relation", beneficiary?.BeneficiaryRelation?.Name ?? "N/A"),
+                ("Date of Birth", beneficiary?.DateOfBirth?.ToString("dd-MMM-yyyy") ?? "N/A"),
+                ("Income", beneficiary?.Income?.GetEnumDisplayName() ?? "N/A"),
+                ("Address", $"{beneficiary?.Addressline}, {beneficiary?.District?.Name}, {beneficiary?.State?.Name}, {beneficiary?.Country?.Name}"),
+                ("Pincode", $"{beneficiary?.PinCode!.Code.ToString() ?? "N/A"}")
+            });
+
             return section;
+        }
+
+        private void BuildPersonSection(SectionBuilder section, string? imagePath, (string Label, string Value)[] fields)
+        {
+            if (!string.IsNullOrEmpty(imagePath))
+            {
+                var table = section.AddTable().SetBorder(Stroke.Solid);
+                table.AddColumnPercentToTable("", 30).AddColumnPercentToTable("", 70);
+                var row = table.AddRow();
+                try
+                {
+                    var photoBytes = ImageConverter.ConvertToPngFromPath(webHostEnvironment, imagePath);
+                    row.AddCell().SetVerticalAlignment(VerticalAlignment.Center).SetHorizontalAlignment(HorizontalAlignment.Center).AddParagraph().AddInlineImage(photoBytes).SetWidth(160F).SetHeight(200F);
+                }
+                catch
+                {
+                    row.AddCell().AddParagraph("No Photo").SetFont(FNT9);
+                }
+                var detailsCell = row.AddCell().SetVerticalAlignment(VerticalAlignment.Center).SetHorizontalAlignment(HorizontalAlignment.Center);
+                foreach (var (label, value) in fields)
+                    detailsCell.AddParagraph($"{label}: {(string.IsNullOrWhiteSpace(value) ? "N/A" : value)}").SetFontSize(10);
+            }
+            else
+            {
+                var table = section.AddTable().SetBorder(Stroke.Solid);
+                table.AddColumnPercentToTable("", 35).AddColumnPercentToTable("", 65);
+                foreach (var (label, value) in fields)
+                    AddRow(table, label, value);
+            }
+        }
+
+        private static void AddRow(TableBuilder table, string label, string value)
+        {
+            var row = table.AddRow();
+            row.AddCell().AddParagraph(label).SetFontSize(10).SetBold();
+            row.AddCell().AddParagraph(string.IsNullOrWhiteSpace(value) ? "N/A" : value).SetFontSize(10);
         }
     }
 }

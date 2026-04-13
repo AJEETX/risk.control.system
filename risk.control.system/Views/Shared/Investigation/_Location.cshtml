@@ -47,11 +47,8 @@
 							<table class="table table-bordered table-hover dt-responsive nowrap w-100">
 								<thead class="thead-light">
 									<tr>
-										<th class="col-verifier-name" title="Verifier Name">
-											<img class="action-image" src="~/headers/customer.gif" />Agent ID
-										</th>
 										<th class="col-face-photo">
-											<i class="far fa-user text-primary" title="This Image has Verifier photo at the location" data-bs-toggle="tooltip"></i> Photo
+											<img class="action-image" src="~/headers/customer.gif" title="This Image has Verifier photo at the location" data-bs-toggle="tooltip" />Photo
 										</th>
 										<th class="col-pin-img" title="Indicative Map Route">
 											<img class="action-image" src="~/headers/pincode.gif" /> Indicative Map
@@ -65,36 +62,21 @@
 								</thead>
 								<tbody>
 									<tr>
-										<!-- Email or Report Type -->
-										<td>
-											<small>
-												@if (agent!.ValidationExecuted)
-												{
-													@location.AgentEmail
-												}
-												else
-												{
-													@agent.ReportType.GetEnumDisplayName()
-												}
-											</small>
-											@if (agent.IsRequired)
-											{
-												<span class="required-asterisk" title="Mandatory Location">*</span>
-											}
-										</td>
-
 										<!-- ID Photo -->
 										<td>
-											@if (agent.ValidationExecuted)
+											@if (agent!.ValidationExecuted)
 											{
 												<img id="face-img-@agent.Id"
 													 src="/Document/GetAgentDocument/@agent.Id"
 													 class="mobile-capture-info"
 													 title="@location.AgentEmail photo" />
+												@location.AgentEmail
+
 											}
 											else
 											{
 												<img src="~/img/no-user.png" class="img-thumbnail img-fluid profile-image" />
+												@agent.ReportType.GetEnumDisplayName()
 											}
 										</td>
 

@@ -30,7 +30,7 @@ namespace risk.control.system.Services.Report
         public async Task<string> Generate(long investigationTaskId, string userEmail)
         {
             var investigation = context.Investigations.Include(c => c.CustomerDetail).Include(c => c.BeneficiaryDetail).Include(c => c.ClientCompany)
-                    .ThenInclude(c => c!.Country).Include(c => c.PolicyDetail).Include(c => c.InvestigationReport).ThenInclude(c => c!.EnquiryRequests)
+                    .ThenInclude(c => c!.Country).Include(c => c.PolicyDetail).Include(c => c.InvestigationReport).ThenInclude(c => c!.EnquiryRequest).Include(c => c.InvestigationReport).ThenInclude(c => c!.EnquiryRequests)
                 .FirstOrDefault(c => c.Id == investigationTaskId);
             var policy = context.PolicyDetail.Include(p => p.CaseEnabler).Include(p => p.CostCentre).Include(p => p.InvestigationServiceType)
                 .FirstOrDefault(p => p.PolicyDetailId == investigation!.PolicyDetail!.PolicyDetailId);

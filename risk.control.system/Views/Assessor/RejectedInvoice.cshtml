@@ -91,8 +91,8 @@
 											<tr>
 												<td>@Model.Vendor?.Name</td>
 												<td>@Model.InvestigationServiceType?.Name</td>
-												<td>(@Model.Currency) @Model.SubTotal</td>
-												<td>(@Model.Currency) @Model.GrandTotal + @Model.TaxAmount</td>
+												<td>(@Model.Currency)  @Model.SubTotal</td>
+												<td>(@Model.Currency)  @Model.GrandTotal + @Model.TaxAmount</td>
 											</tr>
 										</tbody>
 									</table>
@@ -135,9 +135,9 @@
 							<!-- this row will not appear when printing -->
 							<div class="row no-print">
 								<div class="col-xs-12">
-									<a id="back" asp-action="ApprovedDetail" asp-route-id="@Model.CaseId" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> Back</a>
+									<a id="back" asp-action="RejectedDetail" asp-route-id="@Model.CaseId" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> Back</a>
 
-									<a id="printInvoiceButton" class="btn btn-primary text-white"><i class="fa fa-print"></i> Print Invoice</a>
+									<button id="printInvoiceButton" class="btn btn-primary"><i class="fa fa-print"></i> Print Invoice</button>
 								</div>
 							</div>
 						</section>

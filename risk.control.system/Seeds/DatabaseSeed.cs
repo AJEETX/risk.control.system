@@ -12,7 +12,7 @@ namespace risk.control.system.Seeds
         public static async Task SeedDatabase(WebApplication app)
         {
             using var scope = app.Services.CreateScope();
-            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            await using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             var webHostEnvironment = scope.ServiceProvider.GetRequiredService<IWebHostEnvironment>();
             var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
             var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
