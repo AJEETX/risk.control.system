@@ -8,18 +8,13 @@ namespace risk.control.system.Services.Common
         Task UpdateTaskStatus(long taskId, string updatedBy, string subStatus = "");
     }
 
-    internal class TimelineService : ITimelineService
+    internal class TimelineService(IDbContextFactory<ApplicationDbContext> contextFactory) : ITimelineService
     {
-        private readonly IDbContextFactory<ApplicationDbContext> _contextFactory;
-
-        public TimelineService(IDbContextFactory<ApplicationDbContext> contextFactory)
-        {
-            _contextFactory = contextFactory;
-        }
+        private readonly IDbContextFactory<ApplicationDbContext> _contextFactory = contextFactory;
 
         public async Task UpdateTaskStatus(long taskId, string updatedBy, string subStatus = "")
         {
-            using var context = await _contextFactory.CreateDbContextAsync();
+            await using var context = await _contextFactory.CreateDbContextAsync();
             var task = await context.Investigations.AsNoTracking()
                 .Include(t => t.InvestigationTimeline)
                 .FirstOrDefaultAsync(t => t.Id == taskId);

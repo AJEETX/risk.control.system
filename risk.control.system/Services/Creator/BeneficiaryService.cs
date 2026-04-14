@@ -26,27 +26,18 @@ namespace risk.control.system.Services.Creator
         Task<(bool Success, Dictionary<string, string> Errors)> EditAsync(string userEmail, BeneficiaryDetail model);
     }
 
-    public class BeneficiaryService : IBeneficiaryService
+    public class BeneficiaryService(
+        ApplicationDbContext context,
+        IFeatureManager featureManager,
+        IAddInvestigationService addInvestigationService,
+        IPhoneService phoneService,
+        IValidateImageService validateImageService) : IBeneficiaryService
     {
-        private readonly ApplicationDbContext _context;
-        private readonly IFeatureManager featureManager;
-        private readonly IAddInvestigationService addInvestigationService;
-        private readonly IPhoneService phoneService;
-        private readonly IValidateImageService validateImageService;
-
-        public BeneficiaryService(
-            ApplicationDbContext context,
-            IFeatureManager featureManager,
-            IAddInvestigationService addInvestigationService,
-            IPhoneService phoneService,
-            IValidateImageService validateImageService)
-        {
-            this._context = context;
-            this.featureManager = featureManager;
-            this.addInvestigationService = addInvestigationService;
-            this.phoneService = phoneService;
-            this.validateImageService = validateImageService;
-        }
+        private readonly ApplicationDbContext _context = context;
+        private readonly IFeatureManager _featureManager = featureManager;
+        private readonly IAddInvestigationService _addInvestigationService = addInvestigationService;
+        private readonly IPhoneService _phoneService = phoneService;
+        private readonly IValidateImageService _validateImageService = validateImageService;
 
         public async Task<BeneficiaryDetail> GetViewModelAsync(long investigationId, string userEmail)
         {
@@ -82,7 +73,7 @@ namespace risk.control.system.Services.Creator
         {
             var errors = new Dictionary<string, string>();
 
-            validateImageService.ValidateImage(model.ProfileImage!, errors);
+            _validateImageService.ValidateImage(model.ProfileImage!, errors);
             await ValidatePhoneAsync(model, errors);
 
             if (errors.Any())
@@ -90,7 +81,7 @@ namespace risk.control.system.Services.Creator
 
             Sanitize(model);
 
-            var result = await addInvestigationService.CreateBeneficiary(userEmail, model);
+            var result = await _addInvestigationService.CreateBeneficiary(userEmail, model);
             return result
                 ? (true, errors)
                 : (false, new Dictionary<string, string>
@@ -147,7 +138,7 @@ namespace risk.control.system.Services.Creator
             var errors = new Dictionary<string, string>();
             if (model.ProfileImage != null && model.ProfileImage.Length > 0)
             {
-                validateImageService.ValidateImage(model.ProfileImage, errors);
+                _validateImageService.ValidateImage(model.ProfileImage, errors);
             }
             await ValidatePhoneAsync(model, errors);
 
@@ -156,7 +147,7 @@ namespace risk.control.system.Services.Creator
 
             Sanitize(model);
 
-            var result = await addInvestigationService.EditBeneficiary(userEmail, model);
+            var result = await _addInvestigationService.EditBeneficiary(userEmail, model);
             return result
                 ? (true, errors)
                 : (false, new Dictionary<string, string>
@@ -201,14 +192,14 @@ namespace risk.control.system.Services.Creator
 
         private async Task ValidatePhoneAsync(BeneficiaryDetail model, Dictionary<string, string> errors)
         {
-            if (!await featureManager.IsEnabledAsync(FeatureFlags.VALIDATE_PHONE))
+            if (!await _featureManager.IsEnabledAsync(FeatureFlags.VALIDATE_PHONE))
                 return;
 
             var country = await _context.Country.FindAsync(model.SelectedCountryId);
             if (country == null)
                 return;
 
-            if (!phoneService.IsValidMobileNumber(model.PhoneNumber, country.ISDCode.ToString()))
+            if (!_phoneService.IsValidMobileNumber(model.PhoneNumber, country.ISDCode.ToString()))
             {
                 errors[nameof(BeneficiaryDetail.PhoneNumber)] = "Invalid mobile number";
             }

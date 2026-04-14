@@ -8,14 +8,9 @@ namespace risk.control.system.Services.Common
         void CleanFailedJobs();
     }
 
-    internal class HangfireJobService : IHangfireJobService
+    internal class HangfireJobService(IBackgroundJobClient backgroundJobClient) : IHangfireJobService
     {
-        private readonly IBackgroundJobClient _backgroundJobClient;
-
-        public HangfireJobService(IBackgroundJobClient backgroundJobClient)
-        {
-            _backgroundJobClient = backgroundJobClient;
-        }
+        private readonly IBackgroundJobClient _backgroundJobClient = backgroundJobClient;
 
         public void CleanFailedJobs()
         {

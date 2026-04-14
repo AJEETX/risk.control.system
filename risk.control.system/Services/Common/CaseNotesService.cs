@@ -8,14 +8,9 @@ namespace risk.control.system.Services.Common
         Task<(bool, int)> SubmitNotes(string userEmail, long claimId, string notes);
     }
 
-    internal class CaseNotesService : ICaseNotesService
+    internal class CaseNotesService(ApplicationDbContext context) : ICaseNotesService
     {
-        private readonly ApplicationDbContext _context;
-
-        public CaseNotesService(ApplicationDbContext context)
-        {
-            this._context = context;
-        }
+        private readonly ApplicationDbContext _context = context;
 
         public async Task<(bool, int)> SubmitNotes(string userEmail, long claimId, string notes)
         {

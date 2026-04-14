@@ -18,21 +18,14 @@ namespace risk.control.system.Services.Agent
         Task<PassportOcrData> GetPassportOcrResult(byte[] imageBytes, string url, string key, string host);
     }
 
-    internal class HttpClientService : IHttpClientService
+    internal class HttpClientService(
+        IHttpClientFactory httpClientFactory,
+        ILogger<HttpClientService> logger,
+        IWebHostEnvironment env) : IHttpClientService
     {
-        private readonly IHttpClientFactory httpClientFactory;
-        private readonly ILogger<HttpClientService> logger;
-        private readonly IWebHostEnvironment env;
-
-        public HttpClientService(
-            IHttpClientFactory httpClientFactory,
-            ILogger<HttpClientService> logger,
-            IWebHostEnvironment env)
-        {
-            this.httpClientFactory = httpClientFactory;
-            this.logger = logger;
-            this.env = env;
-        }
+        private readonly IHttpClientFactory _httpClientFactory = httpClientFactory;
+        private readonly ILogger<HttpClientService> _logger = logger;
+        private readonly IWebHostEnvironment env = env;
 
         public async Task<string> GetRawAddress(string lat, string lon)
         {
@@ -43,17 +36,16 @@ namespace risk.control.system.Services.Agent
             };
             try
             {
-                var httpClient = httpClientFactory.CreateClient();
-                using (var response = await httpClient.SendAsync(request))
-                {
-                    response.EnsureSuccessStatusCode();
-                    var body = await response.Content.ReadAsStringAsync();
-                    var addressData = JsonConvert.DeserializeObject<MapAddress>(body);
-                    return addressData!.features!.FirstOrDefault()!.properties!.formatted!;
-                }
+                var httpClient = _httpClientFactory.CreateClient();
+                using var response = await httpClient.SendAsync(request);
+                response.EnsureSuccessStatusCode();
+                var body = await response.Content.ReadAsStringAsync();
+                var addressData = JsonConvert.DeserializeObject<MapAddress>(body);
+                return addressData!.features!.FirstOrDefault()!.properties!.formatted!;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "Error getting address");
                 return "Troy Court, Forest Hill, Melbourne, City of Whitehorse, Victoria, 3131, Australia";
             }
         }
@@ -78,16 +70,14 @@ namespace risk.control.system.Services.Agent
                     }
                 }
             };
-            var httpClient = httpClientFactory.CreateClient();
+            var httpClient = _httpClientFactory.CreateClient();
 
-            using (var response = await httpClient.SendAsync(request))
-            {
-                response.EnsureSuccessStatusCode();
-                var body = await response.Content.ReadAsStringAsync();
-                Console.WriteLine(body);
-                var panResponse = JsonConvert.DeserializeObject<PanResponse>(body);
-                return panResponse;
-            }
+            using HttpResponseMessage response = await httpClient.SendAsync(request);
+            response.EnsureSuccessStatusCode();
+            var body = await response.Content.ReadAsStringAsync();
+            Console.WriteLine(body);
+            var panResponse = JsonConvert.DeserializeObject<PanResponse>(body);
+            return panResponse;
         }
 
         public async Task<bool> VerifyPassport(string passport, string dateOfBirth)
@@ -104,7 +94,7 @@ namespace risk.control.system.Services.Agent
                     { "x-rapidapi-host", "passport-verification.p.rapidapi.com" },
                 },
             };
-            var httpClient = httpClientFactory.CreateClient();
+            var httpClient = _httpClientFactory.CreateClient();
             using (var response = await httpClient.SendAsync(request))
             {
                 response.EnsureSuccessStatusCode();
@@ -149,7 +139,7 @@ namespace risk.control.system.Services.Agent
             };
             try
             {
-                var httpClient = httpClientFactory.CreateClient();
+                var httpClient = _httpClientFactory.CreateClient();
                 using var response = await httpClient.SendAsync(request);
                 response.EnsureSuccessStatusCode();
                 var body = await response.Content.ReadAsStringAsync();
@@ -194,7 +184,7 @@ namespace risk.control.system.Services.Agent
                     }
                 }
             };
-            var httpClient = httpClientFactory.CreateClient();
+            var httpClient = _httpClientFactory.CreateClient();
             using (var response = await httpClient.SendAsync(request))
             {
                 response.EnsureSuccessStatusCode();

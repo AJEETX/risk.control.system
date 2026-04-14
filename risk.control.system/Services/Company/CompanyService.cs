@@ -20,14 +20,13 @@ namespace risk.control.system.Services.Company
 
     internal class CompanyService : ICompanyService
     {
-        private readonly IWebHostEnvironment env;
-        private readonly ISmsService smsService;
-        private readonly ApplicationDbContext context;
-        private readonly IValidateImageService validateImageService;
-        private readonly IPhoneService phoneService;
-        private readonly IFeatureManager featureManager;
-        private readonly IFileStorageService fileStorageService;
-
+        private readonly IWebHostEnvironment _env;
+        private readonly ISmsService _smsService;
+        private readonly ApplicationDbContext _context;
+        private readonly IValidateImageService _validateImageService;
+        private readonly IPhoneService _phoneService;
+        private readonly IFeatureManager _featureManager;
+        private readonly IFileStorageService _fileStorageService;
         public CompanyService(
             IWebHostEnvironment env,
             ISmsService smsService,
@@ -37,18 +36,18 @@ namespace risk.control.system.Services.Company
             IFeatureManager featureManager,
             IFileStorageService fileStorageService)
         {
-            this.env = env;
-            this.smsService = smsService;
-            this.context = context;
-            this.validateImageService = validateImageService;
-            this.phoneService = phoneService;
-            this.featureManager = featureManager;
-            this.fileStorageService = fileStorageService;
+            this._env = env;
+            this._smsService = smsService;
+            this._context = context;
+            this._validateImageService = validateImageService;
+            this._phoneService = phoneService;
+            this._featureManager = featureManager;
+            this._fileStorageService = fileStorageService;
         }
 
         public async Task<object[]> GetCompanies()
         {
-            var companies = context.ClientCompany.
+            var companies = _context.ClientCompany.
                  Where(v => !v.Deleted)
                  .Include(v => v.Country)
                  .Include(v => v.PinCode)
@@ -61,7 +60,7 @@ namespace risk.control.system.Services.Company
                 {
                     Id = u.ClientCompanyId,
                     Document = string.IsNullOrWhiteSpace(u.DocumentUrl) ? Applicationsettings.NO_IMAGE : string.Format("data:image/*;base64,{0}", Convert.ToBase64String(System.IO.File.ReadAllBytes(
-                    Path.Combine(env.ContentRootPath, u.DocumentUrl)))),
+                    Path.Combine(_env.ContentRootPath, u.DocumentUrl)))),
                     Domain = u.Email,
                     Name = u.Name,
                     //Code = u.Code,
@@ -80,7 +79,7 @@ namespace risk.control.system.Services.Company
                     LastModified = u.Updated
                 })?.ToArray();
             companies.ToList().ForEach(u => u.IsUpdated = false);
-            await context.SaveChangesAsync(null, false);
+            await _context.SaveChangesAsync(null, false);
             return result!;
         }
 
@@ -89,7 +88,7 @@ namespace risk.control.system.Services.Company
             var errors = new Dictionary<string, string>();
             if (model.Document != null)
             {
-                validateImageService.ValidateImage(model.Document, errors);
+                _validateImageService.ValidateImage(model.Document, errors);
                 if (errors.Any())
                     return (false, errors);
             }
@@ -98,14 +97,14 @@ namespace risk.control.system.Services.Company
             if (errors.Any())
                 return (false, errors);
 
-            var companyUser = await context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
+            var companyUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
 
             if (companyUser == null)
             {
                 errors[nameof(ApplicationUser.Email)] = "User not found.";
                 return (false, errors);
             }
-            var company = await context.ClientCompany.Include(c => c.Country).FirstOrDefaultAsync(c => c.ClientCompanyId == companyUser.ClientCompanyId);
+            var company = await _context.ClientCompany.Include(c => c.Country).FirstOrDefaultAsync(c => c.ClientCompanyId == companyUser.ClientCompanyId);
 
             if (company == null)
             {
@@ -118,8 +117,8 @@ namespace risk.control.system.Services.Company
             }
             ApplyCompanyChanges(company, model, userEmail);
 
-            context.ClientCompany.Update(company);
-            await context.SaveChangesAsync(null, false);
+            _context.ClientCompany.Update(company);
+            await _context.SaveChangesAsync(null, false);
 
             await SendNotificationAsync(company, model.Email, portal_base_url);
 
@@ -128,14 +127,14 @@ namespace risk.control.system.Services.Company
 
         private async Task ValidatePhoneAsync(ClientCompany model, Dictionary<string, string> errors)
         {
-            if (!await featureManager.IsEnabledAsync(FeatureFlags.VALIDATE_PHONE))
+            if (!await _featureManager.IsEnabledAsync(FeatureFlags.VALIDATE_PHONE))
                 return;
 
-            var country = await context.Country.FindAsync(model.SelectedCountryId);
+            var country = await _context.Country.FindAsync(model.SelectedCountryId);
             if (country == null)
                 return;
 
-            if (!phoneService.IsValidMobileNumber(model.PhoneNumber, country.ISDCode.ToString()))
+            if (!_phoneService.IsValidMobileNumber(model.PhoneNumber, country.ISDCode.ToString()))
             {
                 errors[nameof(BeneficiaryDetail.PhoneNumber)] = "Invalid mobile number";
             }
@@ -143,7 +142,7 @@ namespace risk.control.system.Services.Company
 
         private async Task UpdateDocumentAsync(ClientCompany company, ClientCompany model)
         {
-            var (fileName, relativePath) = await fileStorageService.SaveAsync(model.Document!, model.Email, "user");
+            var (fileName, relativePath) = await _fileStorageService.SaveAsync(model.Document!, model.Email, "user");
 
             company.DocumentUrl = relativePath;
             company.DocumentImageExtension = Path.GetExtension(fileName);
@@ -174,7 +173,7 @@ namespace risk.control.system.Services.Company
         {
             string message = $"Company {company.Email} profile edited.\nDomain :{email}\n{portal_base_url}";
 
-            await smsService.DoSendSmsAsync(company.Country!.Code, company.Country.ISDCode + company.PhoneNumber, message);
+            await _smsService.DoSendSmsAsync(company.Country!.Code, company.Country.ISDCode + company.PhoneNumber, message);
         }
     }
 }

@@ -13,14 +13,9 @@ namespace risk.control.system.Services.Creator
         Task SetFileUploadFailure(FileOnFileSystemModel fileData, string message, bool uploadAndAssign, List<long>? claimsIds = null);
     }
 
-    internal class UploadFileStatusService : IUploadFileStatusService
+    internal class UploadFileStatusService(IDbContextFactory<ApplicationDbContext> contextFactory) : IUploadFileStatusService
     {
-        private readonly IDbContextFactory<ApplicationDbContext> _contextFactory;
-
-        public UploadFileStatusService(IDbContextFactory<ApplicationDbContext> contextFactory)
-        {
-            _contextFactory = contextFactory;
-        }
+        private readonly IDbContextFactory<ApplicationDbContext> _contextFactory = contextFactory;
 
         public async Task SetUploadAssignSuccess(FileOnFileSystemModel fileData, List<InvestigationTask> claims, List<long> autoAllocated)
         {
@@ -38,7 +33,7 @@ namespace risk.control.system.Services.Creator
             fileData.Message = message;
             fileData.DirectAssign = true;
             fileData.RecordCount = claims.Count;
-            fileData.CaseIds = claims.Select(c => new CaseListModel { CaseId = c.Id }).ToList();
+            fileData.CaseIds = [.. claims.Select(c => new CaseListModel { CaseId = c.Id })];
             fileData.CompletedOn = DateTime.UtcNow;
             var timeTaken = DateTime.UtcNow.Subtract(fileData.CreatedOn).Seconds;
             fileData.TimeTakenSeconds = timeTaken == 0 ? 1 : timeTaken;
@@ -58,7 +53,7 @@ namespace risk.control.system.Services.Creator
             fileData.Status = "Completed";
             fileData.Message = message;
             fileData.RecordCount = claims.Count;
-            fileData.CaseIds = claims.Select(c => new CaseListModel { CaseId = c.Id }).ToList();
+            fileData.CaseIds = [.. claims.Select(c => new CaseListModel { CaseId = c.Id })];
             fileData.CompletedOn = DateTime.UtcNow;
             var timeTaken = DateTime.UtcNow.Subtract(fileData.CreatedOn).Seconds;
             fileData.TimeTakenSeconds = timeTaken == 0 ? 1 : timeTaken;
@@ -73,7 +68,7 @@ namespace risk.control.system.Services.Creator
             fileData.Icon = "fas fa-times-circle i-orangered";
             fileData.Status = "Error";
             fileData.Message = message;
-            fileData.RecordCount = claimsIds == null ? 0 : claimsIds.Count;
+            fileData.RecordCount = (claimsIds?.Count) ?? 0;
             fileData.DirectAssign = uploadAndAssign;
             fileData.CompletedOn = DateTime.UtcNow;
             fileData.CaseIds = claimsIds?.Select(c => new CaseListModel { CaseId = c }).ToList();

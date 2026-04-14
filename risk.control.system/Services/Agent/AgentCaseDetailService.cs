@@ -24,16 +24,10 @@ namespace risk.control.system.Services.Agent
         Task<InvestigationTask> GetCaseDetailForAgentDetail(long id);
     }
 
-    internal class AgentCaseDetailService : IAgentCaseDetailService
+    internal class AgentCaseDetailService(ApplicationDbContext context, ILogger<AgentCaseDetailService> logger) : IAgentCaseDetailService
     {
-        private readonly ApplicationDbContext _context;
-        private readonly ILogger<AgentCaseDetailService> _logger;
-
-        public AgentCaseDetailService(ApplicationDbContext context, ILogger<AgentCaseDetailService> logger)
-        {
-            _context = context;
-            _logger = logger;
-        }
+        private readonly ApplicationDbContext _context = context;
+        private readonly ILogger<AgentCaseDetailService> _logger = logger;
 
         public async Task<CaseAgencyModel> GetInvestigate(string userEmail, long selectedCaseId, bool uploaded = false)
         {

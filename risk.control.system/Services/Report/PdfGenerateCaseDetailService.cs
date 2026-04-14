@@ -1,8 +1,8 @@
 ﻿using Gehtsoft.PDFFlow.Builder;
 using Gehtsoft.PDFFlow.Models.Enumerations;
-using Gehtsoft.PDFFlow.Utils;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
+using risk.control.system.Services.Common;
 
 namespace risk.control.system.Services.Report
 {
@@ -11,31 +11,11 @@ namespace risk.control.system.Services.Report
         SectionBuilder BuildUnderwritng(SectionBuilder section, InvestigationTask investigation, PolicyDetail policy, CustomerDetail customer, BeneficiaryDetail beneficiary);
         SectionBuilder BuildClaim(SectionBuilder section, InvestigationTask investigation, PolicyDetail policy, CustomerDetail customer, BeneficiaryDetail beneficiary);
     }
-    internal class PdfGenerateCaseDetailService : IPdfGenerateCaseDetailService
+    internal class PdfGenerateCaseDetailService(IWebHostEnvironment env, IImageConverter imageConverter) : IPdfGenerateCaseDetailService
     {
-        internal static readonly FontBuilder FNT9 = Fonts.Helvetica(9f);
-        internal static readonly FontBuilder FNT10 = Fonts.Helvetica(10f);
-        internal static readonly FontBuilder FNT12 = Fonts.Helvetica(12f);
-        internal static readonly FontBuilder FNT12B = Fonts.Helvetica(12f).SetBold(true);
-        internal static readonly FontBuilder FNT20 = Fonts.Helvetica(20f);
-        internal static readonly FontBuilder FNT19B = Fonts.Helvetica(19f).SetBold();
-        internal static readonly FontBuilder FNT8 = Fonts.Helvetica(8f);
+        private readonly IWebHostEnvironment _env = env;
+        private readonly IImageConverter _imageConverter = imageConverter;
 
-        internal static readonly FontBuilder FNT8_G = Fonts.Helvetica(8f).SetColor(Gehtsoft.PDFFlow.Models.Shared.Color.Gray);
-        internal static readonly FontBuilder FNT9B = Fonts.Helvetica(9f).SetBold();
-        internal static readonly FontBuilder FNT11B = Fonts.Helvetica(11f).SetBold();
-        internal static readonly FontBuilder FNT15 = Fonts.Helvetica(15f);
-        internal static readonly FontBuilder FNT16 = Fonts.Helvetica(16f);
-
-        internal static readonly FontBuilder FNT16_R = Fonts.Helvetica(16f).SetColor(Gehtsoft.PDFFlow.Models.Shared.Color.Red);
-        internal static readonly FontBuilder FNT16_G = Fonts.Helvetica(16f).SetColor(Gehtsoft.PDFFlow.Models.Shared.Color.Green);
-        internal static readonly FontBuilder FNT17 = Fonts.Helvetica(17f);
-        internal static readonly FontBuilder FNT18 = Fonts.Helvetica(18f);
-        private readonly IWebHostEnvironment webHostEnvironment;
-        public PdfGenerateCaseDetailService(IWebHostEnvironment webHostEnvironment)
-        {
-            this.webHostEnvironment = webHostEnvironment;
-        }
         public SectionBuilder BuildUnderwritng(SectionBuilder section, InvestigationTask investigation, PolicyDetail policy, CustomerDetail customer, BeneficiaryDetail beneficiary)
         {
             // Title
@@ -68,28 +48,28 @@ namespace risk.control.system.Services.Report
 
             // Life Assured Details
             section.AddParagraph().SetLineSpacing(1).AddText("Life Assured Details").SetFontSize(14).SetBold().SetUnderline();
-            BuildPersonSection(section, customer?.ImagePath, new[]
-            {
+            BuildPersonSection(section, customer?.ImagePath,
+            [
                 ("Name", customer?.Name ?? "N/A"),
                 ("Date of Birth", customer?.DateOfBirth?.ToString("dd-MMM-yyyy") ?? "N/A"),
                 ("Occupation", customer?.Occupation?.GetEnumDisplayName() ?? "N/A"),
                 ("Income", customer?.Income?.GetEnumDisplayName() ?? "N/A"),
                 ("Address", $"{customer?.Addressline}, {customer?.District?.Name}, {customer?.State?.Name}, {customer?.Country?.Name}"),
                 ("Pincode", $"{customer?.PinCode!.Code.ToString() ?? "N/A"}")
-            });
+            ]);
             section.AddParagraph().AddText("");
 
             // Beneficiary Details
             section.AddParagraph().SetLineSpacing(1).AddText("Beneficiary Details").SetFontSize(14).SetBold().SetUnderline();
-            BuildPersonSection(section, beneficiary?.ImagePath, new[]
-            {
+            BuildPersonSection(section, beneficiary?.ImagePath,
+            [
                 ("Name", beneficiary?.Name ?? "N/A"),
                 ("Relation", beneficiary?.BeneficiaryRelation?.Name ?? "N/A"),
                 ("Date of Birth", beneficiary?.DateOfBirth?.ToString("dd-MMM-yyyy") ?? "N/A"),
                 ("Income", beneficiary?.Income?.GetEnumDisplayName() ?? "N/A"),
                 ("Address", $"{beneficiary?.Addressline}, {beneficiary?.District?.Name}, {beneficiary?.State?.Name}, {beneficiary?.Country?.Name}"),
                 ("Pincode", $"{beneficiary?.PinCode!.Code.ToString() ?? "N/A"}")
-            });
+            ]);
 
             return section;
         }
@@ -129,28 +109,28 @@ namespace risk.control.system.Services.Report
 
             // Life Assured Details
             section.AddParagraph().SetLineSpacing(1).AddText("Life Assured Details").SetFontSize(14).SetBold().SetUnderline();
-            BuildPersonSection(section, customer?.ImagePath, new[]
-            {
+            BuildPersonSection(section, customer?.ImagePath,
+            [
                 ("Name", customer?.Name ?? "N/A"),
                 ("Date of Birth", customer?.DateOfBirth?.ToString("dd-MMM-yyyy") ?? "N/A"),
                 ("Occupation", customer?.Occupation?.GetEnumDisplayName() ?? "N/A"),
                 ("Income", customer?.Income?.GetEnumDisplayName() ?? "N/A"),
                 ("Address", $"{customer?.Addressline}, {customer?.District?.Name}, {customer?.State?.Name}, {customer?.Country?.Name}"),
                 ("Pincode", $"{customer?.PinCode!.Code.ToString() ?? "N/A"}")
-            });
+            ]);
             section.AddParagraph().AddText("");
 
             // Claimant Details
             section.AddParagraph().SetLineSpacing(1).AddText("Claimant Details").SetFontSize(14).SetBold().SetUnderline();
-            BuildPersonSection(section, beneficiary?.ImagePath, new[]
-            {
+            BuildPersonSection(section, beneficiary?.ImagePath,
+            [
                 ("Name", beneficiary?.Name ?? "N/A"),
                 ("Relation", beneficiary?.BeneficiaryRelation?.Name ?? "N/A"),
                 ("Date of Birth", beneficiary?.DateOfBirth?.ToString("dd-MMM-yyyy") ?? "N/A"),
                 ("Income", beneficiary?.Income?.GetEnumDisplayName() ?? "N/A"),
                 ("Address", $"{beneficiary?.Addressline}, {beneficiary?.District?.Name}, {beneficiary?.State?.Name}, {beneficiary?.Country?.Name}"),
                 ("Pincode", $"{beneficiary?.PinCode!.Code.ToString() ?? "N/A"}")
-            });
+            ]);
 
             return section;
         }
@@ -164,12 +144,12 @@ namespace risk.control.system.Services.Report
                 var row = table.AddRow();
                 try
                 {
-                    var photoBytes = ImageConverter.ConvertToPngFromPath(webHostEnvironment, imagePath);
+                    var photoBytes = _imageConverter.ConvertToPngFromPath(_env, imagePath);
                     row.AddCell().SetVerticalAlignment(VerticalAlignment.Center).SetHorizontalAlignment(HorizontalAlignment.Center).AddParagraph().AddInlineImage(photoBytes).SetWidth(160F).SetHeight(200F);
                 }
                 catch
                 {
-                    row.AddCell().AddParagraph("No Photo").SetFont(FNT9);
+                    row.AddCell().AddParagraph("No Photo").SetFontSize(10);
                 }
                 var detailsCell = row.AddCell().SetVerticalAlignment(VerticalAlignment.Center).SetHorizontalAlignment(HorizontalAlignment.Center);
                 foreach (var (label, value) in fields)

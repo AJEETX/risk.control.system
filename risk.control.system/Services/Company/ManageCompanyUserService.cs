@@ -23,27 +23,16 @@ namespace risk.control.system.Services.Company
         Task LoadModelAsync(ApplicationUser model, string currentUserEmail);
     }
 
-    public class ManageCompanyUserService : IManageCompanyUserService
+    public class ManageCompanyUserService(
+        ApplicationDbContext context,
+        RoleManager<ApplicationRole> roleManager,
+        ICompanyUserService companyUserService,
+        IFeatureManager featureManager) : IManageCompanyUserService
     {
-        private readonly ApplicationDbContext _context;
-        private readonly RoleManager<ApplicationRole> roleManager;
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly ICompanyUserService _companyUserService;
-        private readonly IFeatureManager _featureManager;
-
-        public ManageCompanyUserService(
-            ApplicationDbContext context,
-            RoleManager<ApplicationRole> roleManager,
-            UserManager<ApplicationUser> userManager,
-            ICompanyUserService companyUserService,
-            IFeatureManager featureManager)
-        {
-            _context = context;
-            this.roleManager = roleManager;
-            _userManager = userManager;
-            _companyUserService = companyUserService;
-            _featureManager = featureManager;
-        }
+        private readonly ApplicationDbContext _context = context;
+        private readonly RoleManager<ApplicationRole> _roleManager = roleManager;
+        private readonly ICompanyUserService _companyUserService = companyUserService;
+        private readonly IFeatureManager _featureManager = featureManager;
 
         public async Task<ApplicationUser> GetUserCreationModelAsync(string currentUserEmail)
         {
@@ -104,7 +93,7 @@ namespace risk.control.system.Services.Company
 
         private async Task<List<SelectListItem>> GetAvailableRoles(long companyId, long? editingUserId)
         {
-            var managerRole = await roleManager.FindByNameAsync(MANAGER.DISPLAY_NAME);
+            var managerRole = await _roleManager.FindByNameAsync(MANAGER.DISPLAY_NAME);
 
             var isManagerTaken = await _context.ApplicationUser.AsNoTracking()
                 .Where(c => !c.Deleted && c.ClientCompanyId == companyId && c.Id != (editingUserId ?? 0))

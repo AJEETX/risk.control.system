@@ -13,26 +13,17 @@ namespace risk.control.system.Services.Creator
         Task<List<long>> UploadAutoAllocation(List<InvestigationTask> caseTasks, string userEmail, string url = "");
     }
 
-    internal class FileUploadCaseAllocationService : IFileUploadCaseAllocationService
+    internal class FileUploadCaseAllocationService(IDbContextFactory<ApplicationDbContext> contextFactory,
+        ILogger<FileUploadCaseAllocationService> logger,
+        ICaseNotificationService caseNotificationService,
+        ITimelineService timelineService,
+        IBackgroundJobClient backgroundJobClient) : IFileUploadCaseAllocationService
     {
-        private readonly IDbContextFactory<ApplicationDbContext> _contextFactory;
-        private readonly ILogger<FileUploadCaseAllocationService> logger;
-        private readonly ICaseNotificationService mailboxService;
-        private readonly ITimelineService timelineService;
-        private readonly IBackgroundJobClient backgroundJobClient;
-
-        public FileUploadCaseAllocationService(IDbContextFactory<ApplicationDbContext> contextFactory,
-            ILogger<FileUploadCaseAllocationService> logger,
-            ICaseNotificationService mailboxService,
-            ITimelineService timelineService,
-            IBackgroundJobClient backgroundJobClient)
-        {
-            _contextFactory = contextFactory;
-            this.logger = logger;
-            this.mailboxService = mailboxService;
-            this.timelineService = timelineService;
-            this.backgroundJobClient = backgroundJobClient;
-        }
+        private readonly IDbContextFactory<ApplicationDbContext> _contextFactory = contextFactory;
+        private readonly ILogger<FileUploadCaseAllocationService> _logger = logger;
+        private readonly ICaseNotificationService _caseNotificationService = caseNotificationService;
+        private readonly ITimelineService _timelineService = timelineService;
+        private readonly IBackgroundJobClient _backgroundJobClient = backgroundJobClient;
 
         public async Task<List<long>> UploadAutoAllocation(List<InvestigationTask> caseTasks, string userEmail, string url = "")
         {
@@ -46,7 +37,7 @@ namespace risk.control.system.Services.Creator
             {
                 await AssignToAssigner(userEmail, notAutoAllocated, url);
             }
-            var jobId = backgroundJobClient.Enqueue(() => mailboxService.NotifyCaseAssignmentToAssigner(userEmail, autoAllocatedCases, notAutoAllocated, url));
+            var jobId = _backgroundJobClient.Enqueue(() => _caseNotificationService.NotifyCaseAssignmentToAssigner(userEmail, autoAllocatedCases, notAutoAllocated, url));
 
             return (autoAllocatedCases);
         }
@@ -80,7 +71,7 @@ namespace risk.control.system.Services.Creator
                 {
                     allocatedCaseIds.Add(caseTask.Id);
                     localVendorLoad[selectedVendorId]++;
-                    backgroundJobClient.Enqueue(() => mailboxService.NotifyCaseAllocationToVendor(userEmail, policy, caseTask.Id, selectedVendorId, url));
+                    _backgroundJobClient.Enqueue(() => _caseNotificationService.NotifyCaseAllocationToVendor(userEmail, policy, caseTask.Id, selectedVendorId, url));
                 }
             }
             return allocatedCaseIds;
@@ -124,12 +115,12 @@ namespace risk.control.system.Services.Creator
                 caseTask.InvestigationReport = investigationReport;
                 context.Investigations.Update(caseTask);
                 await context.SaveChangesAsync(null, false);
-                await timelineService.UpdateTaskStatus(caseTask.Id, currentUser.Email!);
+                await _timelineService.UpdateTaskStatus(caseTask.Id, currentUser.Email!);
                 return (caseTask.PolicyDetail!.ContractNumber, caseTask.SubStatus);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred Case {CasId}. {UserEmail}", caseId, userEmail);
+                _logger.LogError(ex, "Error occurred Case {CasId}. {UserEmail}", caseId, userEmail);
                 throw;
             }
         }
@@ -145,7 +136,7 @@ namespace risk.control.system.Services.Creator
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred getting Existing Agencies {Count}", existingVendors.Count);
+                _logger.LogError(ex, "Error occurred getting Existing Agencies {Count}", existingVendors.Count);
                 throw;
             }
         }
@@ -175,12 +166,12 @@ namespace risk.control.system.Services.Creator
                 }
                 context.Investigations.UpdateRange(cases2Assign);
                 await context.SaveChangesAsync(null, false);
-                var autoAllocatedTasks = cases2Assign.ToList().Select(u => timelineService.UpdateTaskStatus(u.Id, userEmail));
+                var autoAllocatedTasks = cases2Assign.ToList().Select(u => _timelineService.UpdateTaskStatus(u.Id, userEmail));
                 await Task.WhenAll(autoAllocatedTasks);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred Case(s) {Count}. {UserEmail}", caseIds.Count, userEmail);
+                _logger.LogError(ex, "Error occurred Case(s) {Count}. {UserEmail}", caseIds.Count, userEmail);
                 throw;
             }
         }

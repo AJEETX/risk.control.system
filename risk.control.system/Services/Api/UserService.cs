@@ -15,47 +15,44 @@ namespace risk.control.system.Services.Api
 
     internal class UserService : IUserService
     {
-        private readonly ApplicationDbContext context;
-        private readonly IWebHostEnvironment webHostEnvironment;
-        private readonly IBase64FileService base64FileService;
-        private readonly UserManager<ApplicationUser> userManager;
-        private readonly int sessionTimeoutInSeconds;
-        private readonly int sessionTimeoutinMinutes;
-        private readonly int awayThresholdInMinutes;
-        private readonly int onlineThresholdInMinutes;
-        private readonly DateTime cutoffTime;
-        private readonly IFeatureManager featureManager;
+        private readonly ApplicationDbContext _context;
+        private readonly IBase64FileService _base64FileService;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly int _sessionTimeoutInSeconds;
+        private readonly int _sessionTimeoutinMinutes;
+        private readonly int _awayThresholdInMinutes;
+        private readonly int _onlineThresholdInMinutes;
+        private readonly DateTime _cutoffTime;
+        private readonly IFeatureManager _featureManager;
 
         public UserService(IConfiguration config,
             ApplicationDbContext context,
-            IWebHostEnvironment webHostEnvironment,
             IBase64FileService base64FileService,
             UserManager<ApplicationUser> userManager,
             IFeatureManager featureManager)
         {
-            awayThresholdInMinutes = int.Parse(config["LOGIN_SESSION_INACTIVE_MIN"]!);
-            onlineThresholdInMinutes = int.Parse(config["LOGIN_SESSION_ACTIVE_MIN"]!);
-            sessionTimeoutInSeconds = int.Parse(config["SESSION_TIMEOUT_SEC"]!);
-            sessionTimeoutinMinutes = sessionTimeoutInSeconds / 60;
-            cutoffTime = DateTime.UtcNow.AddSeconds(-sessionTimeoutInSeconds);
-            this.context = context;
-            this.webHostEnvironment = webHostEnvironment;
-            this.base64FileService = base64FileService;
-            this.userManager = userManager;
-            this.featureManager = featureManager;
+            _awayThresholdInMinutes = int.Parse(config["LOGIN_SESSION_INACTIVE_MIN"]!);
+            _onlineThresholdInMinutes = int.Parse(config["LOGIN_SESSION_ACTIVE_MIN"]!);
+            _sessionTimeoutInSeconds = int.Parse(config["SESSION_TIMEOUT_SEC"]!);
+            _sessionTimeoutinMinutes = _sessionTimeoutInSeconds / 60;
+            _cutoffTime = DateTime.UtcNow.AddSeconds(-_sessionTimeoutInSeconds);
+            _context = context;
+            _base64FileService = base64FileService;
+            _userManager = userManager;
+            _featureManager = featureManager;
         }
 
         public async Task<List<UserDetailResponse>> GetUsers(string userEmail)
         {
             var now = DateTime.UtcNow;
-            var latestSessions = await context.UserSessionAlive.Where(s => s.Updated >= cutoffTime || s.Created >= cutoffTime).Include(s => s.ActiveUser).GroupBy(s => s.ActiveUser.Email)
+            var latestSessions = await _context.UserSessionAlive.Where(s => s.Updated >= _cutoffTime || s.Created >= _cutoffTime).Include(s => s.ActiveUser).GroupBy(s => s.ActiveUser.Email)
                 .Select(g => new
                 {
                     Email = g.Key!,
                     LastSeen = g.Max(x => x.Updated ?? x.Created),
                     LoggedOut = g.All(x => x.LoggedOut)
                 }).ToDictionaryAsync(x => x.Email, x => new { x.LastSeen, x.LoggedOut });
-            var users = context.ApplicationUser.Include(a => a.District).Include(a => a.State).Include(a => a.Country).Include(a => a.PinCode).Where(u => !u.Deleted && u.Email != userEmail);
+            var users = _context.ApplicationUser.Include(a => a.District).Include(a => a.State).Include(a => a.Country).Include(a => a.PinCode).Where(u => !u.Deleted && u.Email != userEmail);
             var allUsers = users.OrderBy(u => u.FirstName).ThenBy(u => u.LastName);
             var activeUsersDetails = new List<UserDetailResponse>();
             foreach (var user in allUsers)
@@ -71,9 +68,9 @@ namespace risk.control.system.Services.Api
                     var minutesAway = (int)(now - session.LastSeen).TotalMinutes;
                     (status, statusName, icon) = minutesAway switch
                     {
-                        var m when m < onlineThresholdInMinutes => ("green", "Online now", "fas fa-circle"),
-                        var m when m < awayThresholdInMinutes => ("orange", $"Inactive for {m} minutes", "fas fa-clock"),
-                        var m when m < sessionTimeoutinMinutes => ("orange", $"Away for {m} minutes", "far fa-clock"),
+                        var m when m < _onlineThresholdInMinutes => ("green", "Online now", "fas fa-circle"),
+                        var m when m < _awayThresholdInMinutes => ("orange", $"Inactive for {m} minutes", "fas fa-clock"),
+                        var m when m < _sessionTimeoutinMinutes => ("orange", $"Away for {m} minutes", "far fa-clock"),
                         _ => ("#DED5D5", "Offline", "fa fa-circle-o")
                     };
                 }
@@ -81,7 +78,7 @@ namespace risk.control.system.Services.Api
                 activeUsersDetails.Add(activeUser);
             }
             users?.ToList().ForEach(u => u.IsUpdated = false);
-            await context.SaveChangesAsync(null, false);
+            await _context.SaveChangesAsync(null, false);
             return activeUsersDetails;
         }
         private async Task<UserDetailResponse> MapUsers(ApplicationUser user, string status, string statusName, string icon)
@@ -119,7 +116,7 @@ namespace risk.control.system.Services.Api
 
             try
             {
-                var photo = await base64FileService.GetBase64FileAsync(url!, Applicationsettings.NO_USER);
+                var photo = await _base64FileService.GetBase64FileAsync(url!, Applicationsettings.NO_USER);
                 return photo;
             }
             catch
@@ -136,12 +133,12 @@ namespace risk.control.system.Services.Api
 
         private async Task<bool> IsLoginVerified(ApplicationUser user)
         {
-            var checkEnabled = await featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION);
+            var checkEnabled = await _featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION);
             return !checkEnabled || !user.IsPasswordChangeRequired;
         }
         private async Task<List<string>> GetUserRoles(ApplicationUser user)
         {
-            var roles = await userManager.GetRolesAsync(user);
+            var roles = await _userManager.GetRolesAsync(user);
 
             var decoratedRoles = new List<string>();
 

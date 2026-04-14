@@ -18,20 +18,13 @@ namespace risk.control.system.Services.Agency
         Task<bool> EditAgency(Vendor vendor, string userEmail, string portal_base_url);
     }
 
-    internal class AgencyService : IAgencyService
+    internal class AgencyService(ApplicationDbContext context,
+        RoleManager<ApplicationRole> roleManager,
+        IFileStorageService fileStorageService) : IAgencyService
     {
-        private readonly ApplicationDbContext _context;
-        private readonly RoleManager<ApplicationRole> _roleManager;
-        private readonly IFileStorageService _fileStorageService;
-
-        public AgencyService(ApplicationDbContext context,
-            RoleManager<ApplicationRole> roleManager,
-            IFileStorageService fileStorageService)
-        {
-            _context = context;
-            _roleManager = roleManager;
-            _fileStorageService = fileStorageService;
-        }
+        private readonly ApplicationDbContext _context = context;
+        private readonly RoleManager<ApplicationRole> _roleManager = roleManager;
+        private readonly IFileStorageService _fileStorageService = fileStorageService;
 
         public async Task<bool> CreateAgency(Vendor vendor, string userEmail, string domainAddress, string portal_base_url)
         {

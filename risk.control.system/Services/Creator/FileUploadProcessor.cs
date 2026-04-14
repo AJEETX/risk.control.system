@@ -9,27 +9,18 @@ namespace risk.control.system.Services.Creator
         Task ProcessloadFile(string userEmail, List<InvestigationTask> uploadedCases, FileOnFileSystemModel uploadFileData, string url, bool uploadAndAssign = false);
     }
 
-    internal class FileUploadProcessor : IFileUploadProcessor
+    internal class FileUploadProcessor(
+        IUploadFileStatusService uploadFileStatusService,
+        ILogger<FileUploadProcessor> logger,
+        ITimelineService timelineService,
+        IFileUploadCaseAllocationService fileUploadCaseAllocationService,
+        ICaseNotificationService caseNotificationService) : IFileUploadProcessor
     {
-        private readonly IUploadFileStatusService uploadFileStatusService;
-        private readonly ILogger<FileUploadProcessor> logger;
-        private readonly ITimelineService timelineService;
-        private readonly IFileUploadCaseAllocationService fileUploadCaseAllocationService;
-        private readonly ICaseNotificationService mailService;
-
-        public FileUploadProcessor(
-            IUploadFileStatusService uploadFileStatusService,
-            ILogger<FileUploadProcessor> logger,
-            ITimelineService timelineService,
-            IFileUploadCaseAllocationService fileUploadCaseAllocationService,
-            ICaseNotificationService mailService)
-        {
-            this.uploadFileStatusService = uploadFileStatusService;
-            this.logger = logger;
-            this.timelineService = timelineService;
-            this.fileUploadCaseAllocationService = fileUploadCaseAllocationService;
-            this.mailService = mailService;
-        }
+        private readonly IUploadFileStatusService _uploadFileStatusService = uploadFileStatusService;
+        private readonly ILogger<FileUploadProcessor> _logger = logger;
+        private readonly ITimelineService _timelineService = timelineService;
+        private readonly IFileUploadCaseAllocationService _fileUploadCaseAllocationService = fileUploadCaseAllocationService;
+        private readonly ICaseNotificationService _caseNotificationService = caseNotificationService;
 
         public async Task ProcessloadFile(string userEmail, List<InvestigationTask> uploadedCases, FileOnFileSystemModel uploadFileData, string url, bool uploadAndAssign = false)
         {
@@ -38,29 +29,29 @@ namespace risk.control.system.Services.Creator
                 if (uploadAndAssign && uploadedCases.Any())
                 {
                     // Auto-Assign Claims if Enabled
-                    var autoAllocated = await fileUploadCaseAllocationService.UploadAutoAllocation(uploadedCases, userEmail, url);
-                    await uploadFileStatusService.SetUploadAssignSuccess(uploadFileData, uploadedCases, autoAllocated);
+                    var autoAllocated = await _fileUploadCaseAllocationService.UploadAutoAllocation(uploadedCases, userEmail, url);
+                    await _uploadFileStatusService.SetUploadAssignSuccess(uploadFileData, uploadedCases, autoAllocated);
                 }
                 else
                 {
                     // Upload Success
-                    await uploadFileStatusService.SetUploadSuccess(uploadFileData, uploadedCases);
+                    await _uploadFileStatusService.SetUploadSuccess(uploadFileData, uploadedCases);
 
                     // Add Timeline entry for all uploaded cases
-                    var updateTasks = uploadedCases.Select(u => timelineService.UpdateTaskStatus(u.Id, userEmail));
+                    var updateTasks = uploadedCases.Select(u => _timelineService.UpdateTaskStatus(u.Id, userEmail));
                     await Task.WhenAll(updateTasks);
 
                     // Notify User
-                    await mailService.NotifyFileUpload(userEmail, uploadFileData, url);
+                    await _caseNotificationService.NotifyFileUpload(userEmail, uploadFileData, url);
                 }
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred Process Upload File. {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error occurred Process Upload File. {UserEmail}", userEmail);
                 var errorString = "Error processing upload file. Please try again.";
                 uploadFileData.ErrorByteData = System.Text.Encoding.UTF8.GetBytes(errorString);
-                await uploadFileStatusService.SetFileUploadFailure(uploadFileData, "Error processing the uploaded file", uploadAndAssign, uploadedCases.Select(u => u.Id).ToList());
-                await mailService.NotifyFileUpload(userEmail, uploadFileData, url);
+                await _uploadFileStatusService.SetFileUploadFailure(uploadFileData, "Error processing the uploaded file", uploadAndAssign, uploadedCases.Select(u => u.Id).ToList());
+                await _caseNotificationService.NotifyFileUpload(userEmail, uploadFileData, url);
             }
         }
     }

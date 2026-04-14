@@ -8,18 +8,13 @@ namespace risk.control.system.Services.Agent
         Task SaveTranscript(long locationId, string reportName, string transcript);
     }
 
-    internal class MediaDataService : IMediaDataService
+    internal class MediaDataService(ApplicationDbContext context) : IMediaDataService
     {
-        private readonly ApplicationDbContext context;
-
-        public MediaDataService(ApplicationDbContext context)
-        {
-            this.context = context;
-        }
+        private readonly ApplicationDbContext _context = context;
 
         public async Task SaveTranscript(long locationId, string reportName, string transcript)
         {
-            var locationTemplate = await context.LocationReport
+            var locationTemplate = await _context.LocationReport
                .Include(l => l.MediaReports)
                .FirstOrDefaultAsync(l => l.Id == locationId);
 
@@ -28,7 +23,7 @@ namespace risk.control.system.Services.Agent
 
             media!.Transcript = transcript;
 
-            await context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
         }
     }
 }

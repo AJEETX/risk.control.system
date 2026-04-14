@@ -12,20 +12,15 @@ namespace risk.control.system.Services.Creator
             ReadPipeDelimitedCsvFromZip(FileOnFileSystemModel uploadFileData);
     }
 
-    internal sealed class CsvFileReaderService : ICsvFileReaderService
+    internal sealed class CsvFileReaderService(IWebHostEnvironment env) : ICsvFileReaderService
     {
-        private readonly IWebHostEnvironment _environment;
-
-        public CsvFileReaderService(IWebHostEnvironment environment)
-        {
-            _environment = environment;
-        }
+        private readonly IWebHostEnvironment _env = env;
 
         public async Task<(byte[] ZipFileData, List<UploadCase> ValidRecords, List<string> Errors)> ReadPipeDelimitedCsvFromZip(FileOnFileSystemModel uploadFileData)
         {
             var validRecords = new List<UploadCase>();
             var errors = new List<string>();
-            var filePath = Path.Combine(_environment.ContentRootPath, uploadFileData.FilePath ?? string.Empty);
+            var filePath = Path.Combine(_env.ContentRootPath, uploadFileData.FilePath ?? string.Empty);
             if (!File.Exists(filePath))
             {
                 errors.Add("Uploaded ZIP file not found.");

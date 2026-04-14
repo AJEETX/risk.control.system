@@ -13,7 +13,7 @@ namespace risk.control.system.Seeds
             var question4 = QuestionSeed.Q("Tobacco/ Alcohol or Smoking / swimming /\r\ndiving ?", "dropdown", true, "SMOKER, OCCASIONAL DRINKER, DRUG-USER, UNKNOWN");
             var question5 = QuestionSeed.Q("In case LA not healthy –Name of disease/\r\nduration/Place of treatment (hospital and Doctor\r\nname) ?", "text");
             var question6 = QuestionSeed.Q("History of medical investigation, surgery or\r\ntreatment in past or planned in near future (even\r\nif it was a minor or major) ?", "text");
-            var question7 = QuestionSeed.Q("Policy Details Other Than Canara HSBC and\r\ntotal life coverage ?", "text");
+            var question7 = QuestionSeed.Q("Policy Details Other Than Current and\r\ntotal life coverage ?", "text");
             var question8 = QuestionSeed.Q("Residence Locality and type ?", "text");
             var question9 = QuestionSeed.Q("Residence Ownership ?", "dropdown", true, "RENTED, OWNED, UNKNOWN");
             var question10 = QuestionSeed.Q("Date since living at Current Residence ?", "date", true);

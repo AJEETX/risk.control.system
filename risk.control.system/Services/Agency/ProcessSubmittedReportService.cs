@@ -12,18 +12,11 @@ namespace risk.control.system.Services.Agency
         Task<(Vendor, string)> SubmitToVendorSupervisor(string userEmail, long caseId, string remarks);
     }
 
-    internal class ProcessSubmittedReportService : IProcessSubmittedReportService
+    internal class ProcessSubmittedReportService(ApplicationDbContext context, ILogger<ProcessSubmittedReportService> logger, ITimelineService timelineService) : IProcessSubmittedReportService
     {
-        private readonly ApplicationDbContext context;
-        private readonly ILogger<ProcessSubmittedReportService> logger;
-        private readonly ITimelineService timelineService;
-
-        public ProcessSubmittedReportService(ApplicationDbContext context, ILogger<ProcessSubmittedReportService> logger, ITimelineService timelineService)
-        {
-            this.context = context;
-            this.logger = logger;
-            this.timelineService = timelineService;
-        }
+        private readonly ApplicationDbContext context = context;
+        private readonly ILogger<ProcessSubmittedReportService> logger = logger;
+        private readonly ITimelineService timelineService = timelineService;
 
         public async Task<InvestigationTask> ProcessAgentReport(string userEmail, string supervisorRemarks, long caseId, SupervisorRemarkType reportUpdateStatus, IFormFile? document = null, string editRemarks = "")
         {

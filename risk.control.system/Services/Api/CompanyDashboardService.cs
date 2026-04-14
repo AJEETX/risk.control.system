@@ -10,49 +10,40 @@ namespace risk.control.system.Services.Api
         Task<DashboardData> GetCompanyUserCount(string userEmail, string role);
     }
 
-    internal class CompanyDashboardService : ICompanyDashboardService
+    internal class CompanyDashboardService(
+        IDbContextFactory<ApplicationDbContext> contextFactory,
+        ICreatorDashboardService creatorDashboardService,
+        IAssessorDashboardService assessorDashboardService,
+        IManagerDashboardService managerDashboardService) : ICompanyDashboardService
     {
-        private readonly IDbContextFactory<ApplicationDbContext> _contextFactory;
-        private readonly ICreatorDashboardService creatorDashboardService;
-        private readonly IAssessorDashboardService assessorDashboardService;
-        private readonly IManagerDashboardService managerDashboardService;
-
-        public CompanyDashboardService(
-            IDbContextFactory<ApplicationDbContext> contextFactory,
-            ICreatorDashboardService creatorDashboardService,
-            IAssessorDashboardService assessorDashboardService,
-            IManagerDashboardService managerDashboardService)
-        {
-            _contextFactory = contextFactory;
-            this.creatorDashboardService = creatorDashboardService;
-            this.assessorDashboardService = assessorDashboardService;
-            this.managerDashboardService = managerDashboardService;
-        }
+        private readonly IDbContextFactory<ApplicationDbContext> _contextFactory = contextFactory;
+        private readonly ICreatorDashboardService _creatorDashboardService = creatorDashboardService;
+        private readonly IAssessorDashboardService _assessorDashboardService = assessorDashboardService;
+        private readonly IManagerDashboardService _managerDashboardService = managerDashboardService;
 
         public async Task<DashboardData> GetCompanyUserCount(string userEmail, string role)
         {
-            DashboardData data = null!;
             if (role == COMPANY_ADMIN.DISPLAY_NAME)
             {
-                data = await GetCompanyAdminCount(userEmail, role);
+                return await GetCompanyAdminCount(userEmail, role);
             }
             else if (role == CREATOR.DISPLAY_NAME)
             {
-                data = await GetCreatorCount(userEmail, role);
+                return await GetCreatorCount(userEmail, role);
             }
             else if (role == ASSESSOR.DISPLAY_NAME)
             {
-                data = await GetAssessorCount(userEmail, role);
+                return await GetAssessorCount(userEmail, role);
             }
             else if (role == MANAGER.DISPLAY_NAME)
             {
-                data = await GetManagerCount(userEmail, role);
+                return await GetManagerCount(userEmail, role);
             }
-            return data;
+            return null!;
         }
         private async Task<DashboardData> GetCreatorCount(string userEmail, string role)
         {
-            var creatorData = await creatorDashboardService.GetCreatorCount(userEmail);
+            var creatorData = await _creatorDashboardService.GetCreatorCount(userEmail);
             return creatorData;
         }
 
@@ -75,14 +66,14 @@ namespace risk.control.system.Services.Api
 
         private async Task<DashboardData> GetAssessorCount(string userEmail, string role)
         {
-            var assessorData = await assessorDashboardService.GetAssessorCount(userEmail, role);
+            var assessorData = await _assessorDashboardService.GetAssessorCount(userEmail, role);
 
             return assessorData;
         }
 
         private async Task<DashboardData> GetManagerCount(string userEmail, string role)
         {
-            var managerData = await managerDashboardService.GetManagerCount(userEmail, role);
+            var managerData = await _managerDashboardService.GetManagerCount(userEmail, role);
             return managerData;
         }
 

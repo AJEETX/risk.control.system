@@ -16,22 +16,15 @@ namespace risk.control.system.Services.Common
         Task<string> SendSmsAsync(string countryCode, string mobile = "+61432854196", string message = "Testing fom Azy");
     }
 
-    internal class SmsService : ISmsService
+    internal class SmsService(IFeatureManager featureManager, IHttpClientFactory httpClientFactory, ILogger<SmsService> logger) : ISmsService
     {
-        private readonly IFeatureManager featureManager;
-        private readonly IHttpClientFactory httpClientFactory;
-        private readonly ILogger<SmsService> logger;
-
-        public SmsService(IFeatureManager featureManager, IHttpClientFactory httpClientFactory, ILogger<SmsService> logger)
-        {
-            this.featureManager = featureManager;
-            this.httpClientFactory = httpClientFactory;
-            this.logger = logger;
-        }
+        private readonly IFeatureManager _featureManager = featureManager;
+        private readonly IHttpClientFactory _httpClientFactory = httpClientFactory;
+        private readonly ILogger<SmsService> _logger = logger;
 
         public async Task DoSendSmsAsync(string countryCode, string mobile, string message, bool onboard = false)
         {
-            if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN) || onboard)
+            if (await _featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN) || onboard)
             {
                 await SendSmsAsync(countryCode, mobile, message);
             }
@@ -48,7 +41,7 @@ namespace risk.control.system.Services.Common
                 var password = countryCode.Equals("au", StringComparison.CurrentCultureIgnoreCase) ? EnvHelper.Get("SMS_PWD") : EnvHelper.Get("SMS_PWD_INDIA");
                 var sim = countryCode.Equals("au", StringComparison.CurrentCultureIgnoreCase) ? EnvHelper.Get("SMS_Sim") : EnvHelper.Get("SMS_Sim_India");
                 var authToken = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{username}:{password}"));
-                var httpClient = httpClientFactory.CreateClient();
+                var httpClient = _httpClientFactory.CreateClient();
                 httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authToken);
 
                 var newContent = new { message = message, phoneNumbers = new List<string> { mobile }, simNumber = int.Parse(sim!) };
@@ -66,7 +59,7 @@ namespace risk.control.system.Services.Common
             }
             catch (Exception ex)
             {
-                logger.LogError("Error sending SMS to Mobile {Number} with Error {Message}: ", mobile, ex.Message);
+                _logger.LogError("Error sending SMS to Mobile {Number} with Error {Message}: ", mobile, ex.Message);
                 return string.Empty;
             }
         }

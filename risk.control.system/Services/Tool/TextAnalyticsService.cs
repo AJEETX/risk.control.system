@@ -12,15 +12,10 @@ public interface ITextAnalyticsService
     Task<string> CategorizeDocumentAsync(string content);
 }
 
-internal class TextAnalyticsService : ITextAnalyticsService
+internal class TextAnalyticsService(IHttpClientFactory httpClientFactory) : ITextAnalyticsService
 {
     //private readonly string _huggingFaceApiUrl = "https://router.huggingface.co/v1/facebook/bart-large-cnn"; // Hugging Face endpoint for summarization
-    private readonly IHttpClientFactory httpClientFactory;
-
-    public TextAnalyticsService(IHttpClientFactory httpClientFactory)
-    {
-        this.httpClientFactory = httpClientFactory;
-    }
+    private readonly IHttpClientFactory _httpClientFactory = httpClientFactory;
 
     public async Task<string> AbstractiveSummarizeAsync(string content)
     {
@@ -31,7 +26,7 @@ internal class TextAnalyticsService : ITextAnalyticsService
 
         try
         {
-            var httpClient = httpClientFactory.CreateClient();
+            var httpClient = _httpClientFactory.CreateClient();
             httpClient.BaseAddress = new Uri("https://router.huggingface.co/"); ;
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", EnvHelper.Get("HUGING_FACE"));
 

@@ -13,18 +13,12 @@ namespace risk.control.system.Services.Common
         Task<List<CaseMessage>> GetSmsHistory(long caseId, bool isCustomer);
     }
 
-    internal class SmsNotificationService : ISmsNotificationService
+    internal class SmsNotificationService(ApplicationDbContext context,
+        ISmsService SmsService) : ISmsNotificationService
     {
-        private readonly ApplicationDbContext _context;
-        private readonly ISmsService _smsService;
-        private static string logo = Applicationsettings.WEBSITE_SITE_URL;
-
-        public SmsNotificationService(ApplicationDbContext context,
-            ISmsService SmsService)
-        {
-            _context = context;
-            _smsService = SmsService;
-        }
+        private readonly ApplicationDbContext _context = context;
+        private readonly ISmsService _smsService = SmsService;
+        private static readonly string _logo = Applicationsettings.WEBSITE_SITE_URL;
 
         public async Task<string> SendSms2Customer(string currentUser, long claimId, string sms)
         {
@@ -67,7 +61,7 @@ namespace risk.control.system.Services.Common
                           $"{user.FirstName} {user.LastName}\n" + // Fixed interpolation bug
                           $"Policy #:{caseTask.PolicyDetail?.ContractNumber}\n" +
                           $"{entityName}\n" +
-                          $"{logo}";
+                          $"{_logo}";
 
             var scheduleMessage = new CaseMessage
             {

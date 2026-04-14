@@ -18,24 +18,16 @@ namespace risk.control.system.Services.Agency
         Task<CaseTransactionModel> GetClaimDetailsReport(string currentUserEmail, long caseId);
     }
 
-    internal class AgencyInvestigationDetailService : IAgencyInvestigationDetailService
+    internal class AgencyInvestigationDetailService(
+        ILogger<AgencyInvestigationDetailService> logger,
+        ApplicationDbContext context,
+        ICustomApiClient customApiCLient,
+        ITimelineService timelineService) : IAgencyInvestigationDetailService
     {
-        private readonly ILogger<AgencyInvestigationDetailService> logger;
-        private readonly ApplicationDbContext context;
-        private readonly ICustomApiClient customApiCLient;
-        private readonly ITimelineService timelineService;
-
-        public AgencyInvestigationDetailService(
-            ILogger<AgencyInvestigationDetailService> logger,
-            ApplicationDbContext context,
-            ICustomApiClient customApiCLient,
-            ITimelineService timelineService)
-        {
-            this.logger = logger;
-            this.context = context;
-            this.customApiCLient = customApiCLient;
-            this.timelineService = timelineService;
-        }
+        private readonly ILogger<AgencyInvestigationDetailService> logger = logger;
+        private readonly ApplicationDbContext context = context;
+        private readonly ICustomApiClient customApiCLient = customApiCLient;
+        private readonly ITimelineService timelineService = timelineService;
 
         public async Task<CaseAgencyAgentModel> GetClaimDetails(string currentUserEmail, long caseId)
         {

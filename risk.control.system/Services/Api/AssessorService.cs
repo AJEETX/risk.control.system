@@ -19,18 +19,11 @@ namespace risk.control.system.Services
         Task<object> GetRejectedCases(string userEmail, int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc");
     }
 
-    public class AssessorService : IAssessorService
+    public class AssessorService(ApplicationDbContext context, IDbContextFactory<ApplicationDbContext> contextFactory, IBase64FileService base64FileService) : IAssessorService
     {
-        private readonly ApplicationDbContext context;
-        private readonly IDbContextFactory<ApplicationDbContext> contextFactory;
-        private readonly IBase64FileService base64FileService;
-
-        public AssessorService(ApplicationDbContext context, IDbContextFactory<ApplicationDbContext> contextFactory, IBase64FileService base64FileService)
-        {
-            this.context = context;
-            this.contextFactory = contextFactory;
-            this.base64FileService = base64FileService;
-        }
+        private readonly ApplicationDbContext _context = context;
+        private readonly IDbContextFactory<ApplicationDbContext> _contextFactory = contextFactory;
+        private readonly IBase64FileService _base64FileService = base64FileService;
 
         public async Task<object> GetApprovededCases(string userEmail, int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc")
         {
@@ -44,14 +37,14 @@ namespace risk.control.system.Services
         public async Task<object> GetInvestigationReports(string userEmail, int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc")
         {
             // 1. Get User Context (Minimal fetch)
-            var companyUser = await context.ApplicationUser
+            var companyUser = await _context.ApplicationUser
                 .AsNoTracking()
                 .Where(u => u.Email == userEmail)
                 .Select(u => new { u.ClientCompanyId, CountryCode = u.Country!.Code.ToUpper() })
                 .FirstOrDefaultAsync();
 
             // 2. Base Query (IQueryable - Not executed yet)
-            var query = context.Investigations
+            var query = _context.Investigations
                 .AsNoTracking()
                 .Where(i => !i.Deleted &&
                             i.ClientCompanyId == companyUser!.ClientCompanyId &&
@@ -151,10 +144,10 @@ namespace risk.control.system.Services
                 var pincodeName = isUW ? customerAddress : beneficiaryAddress;
 
                 // Run file operations in parallel for this specific row
-                var documentTask = base64FileService.GetBase64FileAsync(a.PolicyDocumentPath!, Applicationsettings.NO_POLICY_IMAGE);
-                var customerTask = base64FileService.GetBase64FileAsync(a.customerImagePath!, Applicationsettings.NO_USER);
-                var beneficiaryTask = base64FileService.GetBase64FileAsync(a.beneficiaryImagePath!, Applicationsettings.NO_USER);
-                var ownerDetailTask = base64FileService.GetBase64FileAsync(a.VendorDocumentUrl!, Applicationsettings.NO_USER);
+                var documentTask = _base64FileService.GetBase64FileAsync(a.PolicyDocumentPath!, Applicationsettings.NO_POLICY_IMAGE);
+                var customerTask = _base64FileService.GetBase64FileAsync(a.customerImagePath!, Applicationsettings.NO_USER);
+                var beneficiaryTask = _base64FileService.GetBase64FileAsync(a.beneficiaryImagePath!, Applicationsettings.NO_USER);
+                var ownerDetailTask = _base64FileService.GetBase64FileAsync(a.VendorDocumentUrl!, Applicationsettings.NO_USER);
 
                 await Task.WhenAll(documentTask, customerTask, beneficiaryTask, ownerDetailTask);
                 return new CaseInvestigationResponse
@@ -200,7 +193,7 @@ namespace risk.control.system.Services
             var idsToUpdate = finalData.Where(x => x.IsNewSubmittedToCompany).Select(x => x.Id).ToList();
             if (idsToUpdate.Any())
             {
-                await context.Investigations
+                await _context.Investigations
                     .Where(x => idsToUpdate.Contains(x.Id))
                     .ExecuteUpdateAsync(setters => setters.SetProperty(i => i.IsNew, false));
             }
@@ -243,11 +236,11 @@ namespace risk.control.system.Services
 
         public async Task<object> GetReviewCases(string userEmail, int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc")
         {
-            var companyUser = await context.ApplicationUser.AsNoTracking()
+            var companyUser = await _context.ApplicationUser.AsNoTracking()
                  .Include(c => c.Country)
                  .FirstOrDefaultAsync(c => c.Email == userEmail);
 
-            var query = context.Investigations
+            var query = _context.Investigations
                 .AsNoTracking()
                 .Where(i => !i.Deleted &&
                             i.ClientCompanyId == companyUser!.ClientCompanyId &&
@@ -344,10 +337,10 @@ namespace risk.control.system.Services
                     var beneficiaryAddress = a.beneficiaryAddressline + ',' + a.beneficiaryDistrict + ',' + a.beneficiaryState;
                     var pincodeName = isUW ? customerAddress : beneficiaryAddress;
 
-                    var documentTask = base64FileService.GetBase64FileAsync(a.PolicyDocumentPath!, Applicationsettings.NO_POLICY_IMAGE);
-                    var customerTask = base64FileService.GetBase64FileAsync(a.customerImagePath!, Applicationsettings.NO_USER);
-                    var beneficiaryTask = base64FileService.GetBase64FileAsync(a.beneficiaryImagePath!, Applicationsettings.NO_USER);
-                    var ownerDetailTask = base64FileService.GetBase64FileAsync(a.VendorDocumentUrl!, Applicationsettings.NO_USER);
+                    var documentTask = _base64FileService.GetBase64FileAsync(a.PolicyDocumentPath!, Applicationsettings.NO_POLICY_IMAGE);
+                    var customerTask = _base64FileService.GetBase64FileAsync(a.customerImagePath!, Applicationsettings.NO_USER);
+                    var beneficiaryTask = _base64FileService.GetBase64FileAsync(a.beneficiaryImagePath!, Applicationsettings.NO_USER);
+                    var ownerDetailTask = _base64FileService.GetBase64FileAsync(a.VendorDocumentUrl!, Applicationsettings.NO_USER);
 
                     await Task.WhenAll(documentTask, customerTask, beneficiaryTask, ownerDetailTask);
 
@@ -434,14 +427,14 @@ namespace risk.control.system.Services
         private async Task<object> GetCompletedCases(string userEmail, string subStatus, int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc")
         {
             // 1. Get User Context (Minimal fetch)
-            var companyUser = await context.ApplicationUser
+            var companyUser = await _context.ApplicationUser
                 .AsNoTracking()
                 .Where(u => u.Email == userEmail)
                 .Select(u => new { u.ClientCompanyId, CountryCode = u.Country!.Code.ToUpper() })
                 .FirstOrDefaultAsync();
 
             // 2. Base Query (IQueryable - Not executed yet)
-            var query = context.Investigations
+            var query = _context.Investigations
                 .AsNoTracking()
                 .Where(i => !i.Deleted &&
                             i.ClientCompanyId == companyUser!.ClientCompanyId &&
@@ -534,10 +527,10 @@ namespace risk.control.system.Services
                 var beneficiaryAddress = a.beneficiaryAddressline + ',' + a.beneficiaryDistrict + ',' + a.beneficiaryState;
                 var pincodeName = isUW ? customerAddress : beneficiaryAddress;
                 // Run file operations in parallel for this specific row
-                var documentTask = base64FileService.GetBase64FileAsync(a.PolicyDocumentPath!, Applicationsettings.NO_POLICY_IMAGE);
-                var customerTask = base64FileService.GetBase64FileAsync(a.customerImagePath!, Applicationsettings.NO_USER);
-                var beneficiaryTask = base64FileService.GetBase64FileAsync(a.beneficiaryImagePath!, Applicationsettings.NO_USER);
-                var ownerDetailTask = base64FileService.GetBase64FileAsync(a.VendorDocumentUrl!, Applicationsettings.NO_USER);
+                var documentTask = _base64FileService.GetBase64FileAsync(a.PolicyDocumentPath!, Applicationsettings.NO_POLICY_IMAGE);
+                var customerTask = _base64FileService.GetBase64FileAsync(a.customerImagePath!, Applicationsettings.NO_USER);
+                var beneficiaryTask = _base64FileService.GetBase64FileAsync(a.beneficiaryImagePath!, Applicationsettings.NO_USER);
+                var ownerDetailTask = _base64FileService.GetBase64FileAsync(a.VendorDocumentUrl!, Applicationsettings.NO_USER);
 
                 await Task.WhenAll(documentTask, customerTask, beneficiaryTask, ownerDetailTask);
                 return new CaseInvestigationResponse
@@ -613,7 +606,7 @@ namespace risk.control.system.Services
 
         private async Task<bool> CanDownload(long id, string userEmail)
         {
-            await using var _context = contextFactory.CreateDbContext();
+            await using var _context = _contextFactory.CreateDbContext();
             var tracker = await _context.PdfDownloadTracker
                           .FirstOrDefaultAsync(t => t.ReportId == id && t.UserEmail == userEmail);
             bool canDownload = true;

@@ -11,14 +11,9 @@ namespace risk.control.system.Services
         void ValidateRequiredFields(UploadCase uc, List<UploadError> errs, List<string> sums);
     }
 
-    internal class BeneficiaryValidator : IBeneficiaryValidator
+    internal class BeneficiaryValidator(IDateParserService dateParserService) : IBeneficiaryValidator
     {
-        private readonly IDateParserService dateParserService;
-
-        public BeneficiaryValidator(IDateParserService dateParserService)
-        {
-            this.dateParserService = dateParserService;
-        }
+        private readonly IDateParserService _dateParserService = dateParserService;
 
         public void ValidateRequiredFields(UploadCase uc, List<UploadError> errs, List<string> sums)
         {
@@ -31,7 +26,7 @@ namespace risk.control.system.Services
 
         public (DateTime Dob, Income Income) ValidateDetails(UploadCase uc, List<UploadError> errs, List<string> sums)
         {
-            var dob = dateParserService.ParseDate(uc.BeneficiaryDob!.Trim(), errs, sums, "Beneficiary");
+            var dob = _dateParserService.ParseDate(uc.BeneficiaryDob!.Trim(), errs, sums, "Beneficiary");
             var income = ValidateIncome(uc, errs, sums);
             return (dob, income);
         }

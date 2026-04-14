@@ -10,18 +10,12 @@ namespace risk.control.system.Services
         Task<Vendor> GetVendorDetailAsync(long vendorId, long selectedCaseId);
     }
 
-    internal class AgencyDetailService : IAgencyDetailService
+    internal class AgencyDetailService(
+        ApplicationDbContext context,
+        IAgencyCaseLoadService agencyCaseLoadService) : IAgencyDetailService
     {
-        private readonly ApplicationDbContext _context;
-        private readonly IAgencyCaseLoadService _agencyCaseLoadService;
-
-        public AgencyDetailService(
-            ApplicationDbContext context,
-            IAgencyCaseLoadService agencyCaseLoadService)
-        {
-            _context = context;
-            _agencyCaseLoadService = agencyCaseLoadService;
-        }
+        private readonly ApplicationDbContext _context = context;
+        private readonly IAgencyCaseLoadService _agencyCaseLoadService = agencyCaseLoadService;
 
         public async Task<Vendor> GetVendorDetailAsync(long vendorId, long selectedCaseId)
         {

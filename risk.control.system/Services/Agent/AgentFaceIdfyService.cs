@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using risk.control.system.AppConstant;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
@@ -12,50 +13,37 @@ public interface IAgentFaceIdfyService
     Task<AppiCheckifyResponse> CaptureAgentId(FaceData data);
 }
 
-internal class AgentFaceIdfyService : IAgentFaceIdfyService
+internal class AgentFaceIdfyService(ApplicationDbContext context,
+    IAgentCaseDetailService caseService,
+    IWeatherInfoService weatherInfoService,
+    ILogger<FaceIdfyService> logger,
+    IFileStorageService fileStorageService,
+    IWebHostEnvironment env,
+    IHttpClientService httpClientService,
+    ICustomApiClient customApiCLient,
+    IFaceMatchService faceMatchService) : IAgentFaceIdfyService
 {
-    private readonly ApplicationDbContext context;
-    private readonly IAgentCaseDetailService caseService;
-    private readonly IWeatherInfoService weatherInfoService;
-    private readonly ILogger<FaceIdfyService> logger;
-    private readonly IFileStorageService fileStorageService;
-    private readonly IWebHostEnvironment webHostEnvironment;
-    private readonly IHttpClientService httpClientService;
-    private readonly ICustomApiClient customApiClient;
-    private readonly IFaceMatchService faceMatchService;
-
-    public AgentFaceIdfyService(ApplicationDbContext context,
-        IAgentCaseDetailService caseService,
-        IWeatherInfoService weatherInfoService,
-        ILogger<FaceIdfyService> logger,
-        IFileStorageService fileStorageService,
-        IWebHostEnvironment webHostEnvironment,
-        IHttpClientService httpClientService,
-        ICustomApiClient customApiCLient,
-        IFaceMatchService faceMatchService)
-    {
-        this.context = context;
-        this.caseService = caseService;
-        this.weatherInfoService = weatherInfoService;
-        this.logger = logger;
-        this.fileStorageService = fileStorageService;
-        this.webHostEnvironment = webHostEnvironment;
-        this.httpClientService = httpClientService;
-        this.customApiClient = customApiCLient;
-        this.faceMatchService = faceMatchService;
-    }
+    private readonly ApplicationDbContext _context = context;
+    private readonly IAgentCaseDetailService _caseService = caseService;
+    private readonly IWeatherInfoService _weatherInfoService = weatherInfoService;
+    private readonly ILogger<FaceIdfyService> _logger = logger;
+    private readonly IFileStorageService _fileStorageService = fileStorageService;
+    private readonly IWebHostEnvironment _env = env;
+    private readonly IHttpClientService _httpClientService = httpClientService;
+    private readonly ICustomApiClient _customApiClient = customApiCLient;
+    private readonly IFaceMatchService _faceMatchService = faceMatchService;
 
     [HttpPost]
     public async Task<AppiCheckifyResponse> CaptureAgentId(FaceData data)
     {
-        InvestigationTask claim = await caseService.GetCaseById(data.CaseId);
+        InvestigationTask claim = await _caseService.GetCaseById(data.CaseId);
         if (claim?.InvestigationReport == null) return null!;
 
-        var agent = await context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == data.Email);
+        var agent = await _context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == data.Email);
         var locationRecord = claim.InvestigationReport.ReportTemplate!.LocationReport
             .FirstOrDefault(l => l.LocationName == data.LocationName);
 
-        var locationTemplate = await context.LocationReport.Include(l => l.AgentIdReport).FirstOrDefaultAsync(l => l.Id == locationRecord!.Id);
+        var locationTemplate = await _context.LocationReport.Include(l => l.AgentIdReport).FirstOrDefaultAsync(l => l.Id == locationRecord!.Id);
 
         var agentIdReport = locationTemplate!.AgentIdReport;
 
@@ -63,19 +51,19 @@ internal class AgentFaceIdfyService : IAgentFaceIdfyService
         {
             // 1. Prepare Data & Save Physical File
             var faceBytes = await VerificationHelper.GetBytesFromIFormFile(data.Image!);
-            var (faceImageFileName, relativePath) = await fileStorageService.SaveAsync(data.Image!, "Case", claim.PolicyDetail!.ContractNumber, "report");
+            var (faceImageFileName, relativePath) = await _fileStorageService.SaveAsync(data.Image!, CONSTANTS.CASE, claim.PolicyDetail!.ContractNumber, CONSTANTS.REPORT);
 
             // 2. Extract Coordinates
             var (lat, lon) = VerificationHelper.ParseCoordinates(data.LocationLatLong!);
             var expectedCoords = VerificationHelper.GetExpectedCoordinates(claim);
 
             // 3. Parallel Service Calls (Orchestration)
-            var registeredImage = await File.ReadAllBytesAsync(Path.Combine(webHostEnvironment.ContentRootPath, agent!.ProfilePictureUrl!));
+            var registeredImage = await File.ReadAllBytesAsync(Path.Combine(_env.ContentRootPath, agent!.ProfilePictureUrl!));
 
-            var faceTask = faceMatchService.GetFaceMatchAsync(registeredImage, faceBytes, Path.GetExtension(faceImageFileName));
-            var weatherTask = weatherInfoService.GetWeatherAsync(lat, lon);
-            var addressTask = httpClientService.GetRawAddress(lat, lon);
-            var mapTask = customApiClient.GetMap(expectedCoords.lat, expectedCoords.lon, double.Parse(lat), double.Parse(lon));
+            var faceTask = _faceMatchService.GetFaceMatchAsync(registeredImage, faceBytes, Path.GetExtension(faceImageFileName));
+            var weatherTask = _weatherInfoService.GetWeatherAsync(lat, lon);
+            var addressTask = _httpClientService.GetRawAddress(lat, lon);
+            var mapTask = _customApiClient.GetMap(expectedCoords.lat, expectedCoords.lon, double.Parse(lat), double.Parse(lon));
 
             await Task.WhenAll(faceTask, weatherTask, addressTask, mapTask);
 
@@ -98,14 +86,14 @@ internal class AgentFaceIdfyService : IAgentFaceIdfyService
 
             await File.WriteAllBytesAsync(agentIdReport.FilePath!, compImage);
 
-            await context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
 
             return AgentFaceIdfyHelper.CreateResponse(claim, agentIdReport, compImage);
         }
         catch (Exception ex)
         {
             var sanitizedEmail = data.Email?.Replace("\n", "").Replace("\r", "").Trim();
-            logger.LogError(ex, "Failed Agent face Id match for CaseId {Id}. {AgentEmail}", data.CaseId, sanitizedEmail);
+            _logger.LogError(ex, "Failed Agent face Id match for CaseId {Id}. {AgentEmail}", data.CaseId, sanitizedEmail);
             return await HandleError(claim, agentIdReport!);
         }
     }
@@ -115,7 +103,7 @@ internal class AgentFaceIdfyService : IAgentFaceIdfyService
         agentIdReport.LocationInfo = "No Data";
         agentIdReport.ValidationExecuted = true;
         agentIdReport.ImageValid = false;
-        await context.SaveChangesAsync();
+        await _context.SaveChangesAsync();
         byte[] fallback = File.Exists(agentIdReport.FilePath) ? await File.ReadAllBytesAsync(agentIdReport.FilePath) : null!;
         return AgentFaceIdfyHelper.CreateResponse(claim, agentIdReport, fallback);
     }

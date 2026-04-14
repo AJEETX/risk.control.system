@@ -18,18 +18,11 @@ namespace risk.control.system.Services.Api
         Task<object> GetRejectedCases(string userEmail, int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc");
     }
 
-    internal class ManagerService : IManagerService
+    internal class ManagerService(IDbContextFactory<ApplicationDbContext> contextFactory, IWebHostEnvironment env, IBase64FileService base64FileService) : IManagerService
     {
-        private readonly IDbContextFactory<ApplicationDbContext> _contextFactory;
-        private readonly IWebHostEnvironment env;
-        private readonly IBase64FileService base64FileService;
-
-        public ManagerService(IDbContextFactory<ApplicationDbContext> contextFactory, IWebHostEnvironment env, IBase64FileService base64FileService)
-        {
-            _contextFactory = contextFactory;
-            this.env = env;
-            this.base64FileService = base64FileService;
-        }
+        private readonly IDbContextFactory<ApplicationDbContext> _contextFactory = contextFactory;
+        private readonly IWebHostEnvironment _env = env;
+        private readonly IBase64FileService _base64FileService = base64FileService;
 
         public async Task<object> GetActiveCases(string currentUserEmail, int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc")
         {
@@ -154,10 +147,10 @@ namespace risk.control.system.Services.Api
                 var PersonMapAddressUrl = string.Format(GetMap(a.investigation, isUW, a.CustomerLocationMap!, a.BeneficiaryLocationMap!, a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR), "400", "400");
 
                 // Fetch files in parallel for this row
-                var docTask = base64FileService.GetBase64FileAsync(a.PolicyDocumentPath!, Applicationsettings.NO_POLICY_IMAGE);
-                var custTask = base64FileService.GetBase64FileAsync(a.customerImagePath!, Applicationsettings.NO_USER);
-                var beneTask = base64FileService.GetBase64FileAsync(a.beneficiaryImagePath!, Applicationsettings.NO_USER);
-                var ownerImageTask = base64FileService.GetBase64FileAsync(await GetOwnerImage(a.investigation));
+                var docTask = _base64FileService.GetBase64FileAsync(a.PolicyDocumentPath!, Applicationsettings.NO_POLICY_IMAGE);
+                var custTask = _base64FileService.GetBase64FileAsync(a.customerImagePath!, Applicationsettings.NO_USER);
+                var beneTask = _base64FileService.GetBase64FileAsync(a.beneficiaryImagePath!, Applicationsettings.NO_USER);
+                var ownerImageTask = _base64FileService.GetBase64FileAsync(await GetOwnerImage(a.investigation));
                 var ownerDetailTask = GetOwner(a.investigation);
                 await Task.WhenAll(docTask, custTask, beneTask, ownerImageTask, ownerDetailTask);
                 return new
@@ -348,10 +341,10 @@ namespace risk.control.system.Services.Api
                 var pincodeName = isUW ? customerAddress : beneficiaryAddress;
 
                 // Run file operations in parallel for this specific row
-                var documentTask = base64FileService.GetBase64FileAsync(a.PolicyDocumentPath!, Applicationsettings.NO_POLICY_IMAGE);
-                var customerTask = base64FileService.GetBase64FileAsync(a.customerImagePath!, Applicationsettings.NO_USER);
-                var beneficiaryTask = base64FileService.GetBase64FileAsync(a.beneficiaryImagePath!, Applicationsettings.NO_USER);
-                var ownerDetailTask = base64FileService.GetBase64FileAsync(a.VendorDocumentUrl!, Applicationsettings.NO_USER);
+                var documentTask = _base64FileService.GetBase64FileAsync(a.PolicyDocumentPath!, Applicationsettings.NO_POLICY_IMAGE);
+                var customerTask = _base64FileService.GetBase64FileAsync(a.customerImagePath!, Applicationsettings.NO_USER);
+                var beneficiaryTask = _base64FileService.GetBase64FileAsync(a.beneficiaryImagePath!, Applicationsettings.NO_USER);
+                var ownerDetailTask = _base64FileService.GetBase64FileAsync(a.VendorDocumentUrl!, Applicationsettings.NO_USER);
 
                 await Task.WhenAll(documentTask, customerTask, beneficiaryTask);
                 return new CaseInvestigationResponse
@@ -457,7 +450,7 @@ namespace risk.control.system.Services.Api
         private async Task<string> GetOwnerImage(InvestigationTask caseTask)
         {
             await using var _context = _contextFactory.CreateDbContext();
-            var noDataImagefilePath = Path.Combine(env.WebRootPath, "img", "no-photo.jpg");
+            var noDataImagefilePath = Path.Combine(_env.WebRootPath, "img", "no-photo.jpg");
 
             if (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR || caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR ||
                 caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR)

@@ -13,31 +13,20 @@ namespace risk.control.system.Services.Api
         Task<ConcurrentBag<AgentData>> GetAgentWithCases(string userEmail, long id);
     }
 
-    internal class AgencyAgentService : IAgencyAgentService
+    internal class AgencyAgentService(
+        IDbContextFactory<ApplicationDbContext> contextFactory,
+        ILogger<AgencyApiService> logger,
+        IFeatureManager featureManager,
+        IDashboardService dashboardService,
+        IBase64FileService base64FileService,
+        ICustomApiClient customApiClient) : IAgencyAgentService
     {
-        private readonly IDbContextFactory<ApplicationDbContext> _contextFactory;
-        private readonly ILogger<AgencyApiService> logger;
-        private readonly IFeatureManager featureManager;
-        private readonly IDashboardService dashboardService;
-        private readonly IBase64FileService base64FileService;
-        private readonly ICustomApiClient customApiClient;
-
-        public AgencyAgentService(
-            IDbContextFactory<ApplicationDbContext> contextFactory,
-            ILogger<AgencyApiService> logger,
-            IFeatureManager featureManager,
-            IDashboardService dashboardService,
-            IBase64FileService base64FileService,
-            ICustomApiClient customApiClient)
-        {
-            _contextFactory = contextFactory;
-            this.logger = logger;
-            this.featureManager = featureManager;
-            this.dashboardService = dashboardService;
-            this.base64FileService = base64FileService;
-            this.customApiClient = customApiClient;
-        }
-
+        private readonly IDbContextFactory<ApplicationDbContext> _contextFactory = contextFactory;
+        private readonly ILogger<AgencyApiService> _logger = logger;
+        private readonly IFeatureManager _featureManager = featureManager;
+        private readonly IDashboardService _dashboardService = dashboardService;
+        private readonly IBase64FileService _base64FileService = base64FileService;
+        private readonly ICustomApiClient _customApiClient = customApiClient;
         public async Task<ConcurrentBag<AgentData>> GetAgentWithCases(string userEmail, long caseId)
         {
             try
@@ -48,7 +37,7 @@ namespace risk.control.system.Services.Api
                 if (caseTask == null || !vendorAgents.Any())
                     return new ConcurrentBag<AgentData>();
 
-                var agentCaseCounts = await dashboardService.CalculateAgentCaseStatus(userEmail);
+                var agentCaseCounts = await _dashboardService.CalculateAgentCaseStatus(userEmail);
 
                 // 2. Determine target coordinates once
                 var isUW = caseTask.PolicyDetail!.InsuranceType == InsuranceType.UNDERWRITING;
@@ -75,7 +64,7 @@ namespace risk.control.system.Services.Api
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error in GetAgentWithCases for {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error in GetAgentWithCases for {UserEmail}", userEmail);
                 throw;
             }
         }
@@ -89,7 +78,7 @@ namespace risk.control.system.Services.Api
 
             if (vendorUser == null) return (new List<ApplicationUser>(), null);
 
-            var onboardingEnabled = await featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED);
+            var onboardingEnabled = await _featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED);
 
             var agentsQuery = context.ApplicationUser.AsNoTracking()
                 .Where(u => u.VendorId == vendorUser.VendorId && !u.Deleted && u.Active && u.Role == AppRoles.AGENT);
@@ -114,8 +103,8 @@ namespace risk.control.system.Services.Api
         private async Task<AgentData> MapToAgentData(ApplicationUser agent, double tLat, double tLng, Dictionary<string, int> counts, string addressInfo)
         {
             var claimCount = counts?.GetValueOrDefault(agent.Email!, 0) ?? 0;
-            var mapTask = customApiClient.GetMap(double.Parse(agent.AddressLatitude!), double.Parse(agent.AddressLongitude!), tLat, tLng);
-            var photoTask = base64FileService.GetBase64FileAsync(agent.ProfilePictureUrl!, Applicationsettings.NO_IMAGE);
+            var mapTask = _customApiClient.GetMap(double.Parse(agent.AddressLatitude!), double.Parse(agent.AddressLongitude!), tLat, tLng);
+            var photoTask = _base64FileService.GetBase64FileAsync(agent.ProfilePictureUrl!, Applicationsettings.NO_IMAGE);
             await Task.WhenAll(mapTask, photoTask);
             var (dist, distMetre, dur, durSec, mapUrl) = await mapTask;
             return new AgentData
