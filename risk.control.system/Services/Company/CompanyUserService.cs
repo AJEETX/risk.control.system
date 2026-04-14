@@ -23,31 +23,22 @@ namespace risk.control.system.Services.Company
         Task LoadModel(ApplicationUser model, string currentUserEmail);
     }
 
-    public sealed class CompanyUserService : ICompanyUserService
+    public sealed class CompanyUserService(
+        UserManager<ApplicationUser> userManager,
+        ApplicationDbContext context,
+        IFileStorageService fileStorage,
+        ISmsService sms,
+        ILogger<CompanyUserService> logger) : ICompanyUserService
     {
         private const long MAX_FILE_SIZE = 5 * 1024 * 1024;
         private static readonly HashSet<string> AllowedExt = new() { ".jpg", ".jpeg", ".png" };
         private static readonly HashSet<string> AllowedMime = new() { "image/jpeg", "image/png" };
 
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly ApplicationDbContext _context;
-        private readonly IFileStorageService _fileStorage;
-        private readonly ISmsService _sms;
-        private readonly ILogger<CompanyUserService> _logger;
-
-        public CompanyUserService(
-            UserManager<ApplicationUser> userManager,
-            ApplicationDbContext context,
-            IFileStorageService fileStorage,
-            ISmsService sms,
-            ILogger<CompanyUserService> logger)
-        {
-            _userManager = userManager;
-            _context = context;
-            _fileStorage = fileStorage;
-            _sms = sms;
-            _logger = logger;
-        }
+        private readonly UserManager<ApplicationUser> _userManager = userManager;
+        private readonly ApplicationDbContext _context = context;
+        private readonly IFileStorageService _fileStorage = fileStorage;
+        private readonly ISmsService _sms = sms;
+        private readonly ILogger<CompanyUserService> _logger = logger;
 
         public async Task<ServiceResult> CreateAsync(ApplicationUser model, string emailSuffix, string performedBy, string portal_base_url)
         {

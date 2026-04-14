@@ -22,39 +22,26 @@ namespace risk.control.system.Services.AgencyAdmin
         Task<(bool Success, string Message, Dictionary<string, string> Errors)> EditVendorUserAsync(EditVendorUserRequest request, ModelStateDictionary modelState, string portal_base_url);
     }
 
-    public class AgencyUserCreateEditService : IAgencyUserCreateEditService
+    public class AgencyUserCreateEditService(
+        IValidateImageService validateImageService,
+        UserManager<ApplicationUser> userManager,
+        ApplicationDbContext context,
+        IFileStorageService fileStorage,
+        IUserFaceImageCheckService faceImageCheckService,
+        INotyfService notify,
+        ISmsService sms,
+        ICustomApiClient geoClient,
+        ITinyUrlService urlService) : IAgencyUserCreateEditService
     {
-        private readonly IValidateImageService _validateImageService;
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly ApplicationDbContext _context;
-        private readonly IFileStorageService _fileStorage;
-        private readonly IUserFaceImageCheckService _faceImageCheckService;
-        private readonly INotyfService _notify;
-        private readonly ISmsService _sms;
-        private readonly ICustomApiClient _geoClient;
-        private readonly ITinyUrlService _urlService;
-
-        public AgencyUserCreateEditService(
-            IValidateImageService validateImageService,
-            UserManager<ApplicationUser> userManager,
-            ApplicationDbContext context,
-            IFileStorageService fileStorage,
-            IUserFaceImageCheckService faceImageCheckService,
-            INotyfService notify,
-            ISmsService sms,
-            ICustomApiClient geoClient,
-            ITinyUrlService urlService)
-        {
-            _validateImageService = validateImageService;
-            _userManager = userManager;
-            _context = context;
-            _fileStorage = fileStorage;
-            _faceImageCheckService = faceImageCheckService;
-            _notify = notify;
-            _sms = sms;
-            _geoClient = geoClient;
-            _urlService = urlService;
-        }
+        private readonly IValidateImageService _validateImageService = validateImageService;
+        private readonly UserManager<ApplicationUser> _userManager = userManager;
+        private readonly ApplicationDbContext _context = context;
+        private readonly IFileStorageService _fileStorage = fileStorage;
+        private readonly IUserFaceImageCheckService _faceImageCheckService = faceImageCheckService;
+        private readonly INotyfService _notify = notify;
+        private readonly ISmsService _sms = sms;
+        private readonly ICustomApiClient _geoClient = geoClient;
+        private readonly ITinyUrlService _urlService = urlService;
 
         public async Task<(bool Success, string Message, Dictionary<string, string> Errors)> CreateVendorUserAsync(CreateVendorUserRequest request, ModelStateDictionary modelState, string portal_base_url)
         {

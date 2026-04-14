@@ -26,18 +26,11 @@ namespace risk.control.system.Services.Agent
 
     public enum CollectionStatus { Existing, Created, Failed }
 
-    internal class AmazonApiService : IAmazonApiService
+    internal class AmazonApiService(IAmazonRekognition rekognitionClient, IAmazonTextract textractClient, ILogger<AmazonApiService> logger) : IAmazonApiService
     {
-        private readonly IAmazonRekognition _rekognitionClient;
-        private readonly IAmazonTextract textractClient;
-        private readonly ILogger<AmazonApiService> _logger;
-
-        public AmazonApiService(IAmazonRekognition rekognitionClient, IAmazonTextract textractClient, ILogger<AmazonApiService> logger)
-        {
-            _rekognitionClient = rekognitionClient;
-            this.textractClient = textractClient;
-            _logger = logger;
-        }
+        private readonly IAmazonRekognition _rekognitionClient = rekognitionClient;
+        private readonly IAmazonTextract _textractClient = textractClient;
+        private readonly ILogger<AmazonApiService> _logger = logger;
 
         public async Task<CollectionStatus> EnsureCollectionExistsAsync(string collectionId)
         {
@@ -162,7 +155,7 @@ namespace risk.control.system.Services.Agent
         {
             try
             {
-                var detectResponse = await textractClient.DetectDocumentTextAsync(new DetectDocumentTextRequest
+                var detectResponse = await _textractClient.DetectDocumentTextAsync(new DetectDocumentTextRequest
                 {
                     Document = new Document
                     {

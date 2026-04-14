@@ -13,14 +13,9 @@ namespace risk.control.system.Services.Creator
         Task<int> GetPendingUploadCount(string userEmail);
     }
 
-    internal class CaseActiveService : ICaseActiveService
+    internal class CaseActiveService(ApplicationDbContext context) : ICaseActiveService
     {
-        private readonly ApplicationDbContext _context;
-
-        public CaseActiveService(ApplicationDbContext context)
-        {
-            _context = context;
-        }
+        private readonly ApplicationDbContext _context = context;
 
         public async Task<CaseTransactionModel> GetActiveCaseDetails(string userEmail, long id)
         {

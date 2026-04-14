@@ -13,12 +13,12 @@ namespace risk.control.system.Services.Api
     internal class ManagerDashboardService : IManagerDashboardService
     {
         private readonly IDbContextFactory<ApplicationDbContext> _contextFactory;
-        private readonly ILogger<ManagerDashboardService> logger;
+        private readonly ILogger<ManagerDashboardService> _logger;
 
         public ManagerDashboardService(IDbContextFactory<ApplicationDbContext> contextFactory, ILogger<ManagerDashboardService> logger)
         {
             _contextFactory = contextFactory;
-            this.logger = logger;
+            _logger = logger;
         }
 
         public async Task<DashboardData> GetManagerCount(string userEmail, string role)
@@ -68,7 +68,7 @@ namespace risk.control.system.Services.Api
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred while fetching manager dashboard data. {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error occurred while fetching manager dashboard data. {UserEmail}", userEmail);
                 throw;
             }
         }

@@ -16,18 +16,11 @@ public interface IOcrService
     Task<byte[]> MaskPanNumber(byte[] imageBytes, BoundingBox box);
 }
 
-public class OcrService : IOcrService
+public class OcrService(ILogger<OcrService> logger, IAmazonTextract amazonTextract, IProcessImageService processImageService) : IOcrService
 {
-    private readonly ILogger _logger;
-    private readonly IAmazonTextract amazonTextract;
-    private readonly IProcessImageService processImageService;
-
-    public OcrService(ILogger<OcrService> logger, IAmazonTextract amazonTextract, IProcessImageService processImageService)
-    {
-        _logger = logger;
-        this.amazonTextract = amazonTextract;
-        this.processImageService = processImageService;
-    }
+    private readonly ILogger _logger = logger;
+    private readonly IAmazonTextract _amazonTextract = amazonTextract;
+    private readonly IProcessImageService _processImageService = processImageService;
 
     // Updated return type to include the PAN string
     public async Task<(string ocrText, string panNumber, byte[] imageBytes)> ExtractTextDataAsync(DocumentIdReport doc, byte[] bytes)
@@ -39,7 +32,7 @@ public class OcrService : IOcrService
                 Document = new Document { Bytes = new MemoryStream(bytes) }
             };
 
-            var response = await amazonTextract.DetectDocumentTextAsync(request);
+            var response = await _amazonTextract.DetectDocumentTextAsync(request);
 
             var lineTexts = response.Blocks.Where(b => b.BlockType == BlockType.LINE).Select(b => b.Text);
             var ocrText = string.Join(Environment.NewLine, lineTexts);
@@ -52,7 +45,7 @@ public class OcrService : IOcrService
                 string panNumber = panBlock?.Text ?? "Not Found";
                 if (panBlock == null)
                 {
-                    var compressedDocumentImage = processImageService.CompressImage(bytes);
+                    var compressedDocumentImage = _processImageService.CompressImage(bytes);
                     await File.WriteAllBytesAsync(doc.FilePath!, compressedDocumentImage);
                     doc.ImageValid = true;
                     doc.LocationInfo = ocrText;
@@ -63,7 +56,7 @@ public class OcrService : IOcrService
                 var boundingBox = panBlock.Geometry.BoundingBox;
                 var maskedImageBytes = await MaskPanNumber(bytes, boundingBox);
 
-                var compressedPanImage = processImageService.CompressImage(maskedImageBytes);
+                var compressedPanImage = _processImageService.CompressImage(maskedImageBytes);
                 await File.WriteAllBytesAsync(doc.FilePath!, compressedPanImage);
                 doc.ImageValid = true;
 
@@ -72,7 +65,7 @@ public class OcrService : IOcrService
             }
             else
             {
-                var compressed = processImageService.CompressImage(bytes);
+                var compressed = _processImageService.CompressImage(bytes);
                 await File.WriteAllBytesAsync(doc.FilePath!, compressed);
                 doc.ImageValid = false;
                 doc.LocationInfo = ocrText;

@@ -18,14 +18,14 @@ namespace risk.control.system.Services.Api
     internal class AgencyUserApiService : IAgencyUserApiService
     {
         private readonly IDbContextFactory<ApplicationDbContext> _contextFactory;
-        private readonly IDashboardService dashboardService;
-        private readonly IBase64FileService base64FileService;
-        private readonly DateTime cutoffTime;
-        private readonly IFeatureManager featureManager;
-        private readonly int sessionTimeoutInSeconds;
-        private readonly int sessionTimeoutinMinutes;
-        private readonly int awayThresholdInMinutes;
-        private readonly int onlineThresholdInMinutes;
+        private readonly IDashboardService _dashboardService;
+        private readonly IBase64FileService _base64FileService;
+        private readonly DateTime _cutoffTime;
+        private readonly IFeatureManager _featureManager;
+        private readonly int _sessionTimeoutInSeconds;
+        private readonly int _sessionTimeoutinMinutes;
+        private readonly int _awayThresholdInMinutes;
+        private readonly int _onlineThresholdInMinutes;
 
         public AgencyUserApiService(
             IConfiguration config,
@@ -34,15 +34,15 @@ namespace risk.control.system.Services.Api
             IBase64FileService base64FileService,
             IFeatureManager featureManager)
         {
-            awayThresholdInMinutes = int.Parse(config["LOGIN_SESSION_INACTIVE_MIN"]!);
-            onlineThresholdInMinutes = int.Parse(config["LOGIN_SESSION_ACTIVE_MIN"]!);
-            sessionTimeoutInSeconds = int.Parse(config["SESSION_TIMEOUT_SEC"]!);
-            sessionTimeoutinMinutes = sessionTimeoutInSeconds / 60;
-            cutoffTime = DateTime.UtcNow.AddSeconds(-sessionTimeoutInSeconds);
+            _awayThresholdInMinutes = int.Parse(config["LOGIN_SESSION_INACTIVE_MIN"]!);
+            _onlineThresholdInMinutes = int.Parse(config["LOGIN_SESSION_ACTIVE_MIN"]!);
+            _sessionTimeoutInSeconds = int.Parse(config["SESSION_TIMEOUT_SEC"]!);
+            _sessionTimeoutinMinutes = _sessionTimeoutInSeconds / 60;
+            _cutoffTime = DateTime.UtcNow.AddSeconds(-_sessionTimeoutInSeconds);
             _contextFactory = contextFactory;
-            this.dashboardService = dashboardService;
-            this.base64FileService = base64FileService;
-            this.featureManager = featureManager;
+            _dashboardService = dashboardService;
+            _base64FileService = base64FileService;
+            _featureManager = featureManager;
         }
 
         public async Task<List<UserDetailResponse>> GetAgencyUsers(string userEmail)
@@ -52,15 +52,15 @@ namespace risk.control.system.Services.Api
             var vendor = await context.ApplicationUser.AsNoTracking().Where(u => u.Email == userEmail).Select(u => new { u.VendorId }).SingleOrDefaultAsync();
             if (vendor == null)
                 return new();
-            var latestSessions = await context.UserSessionAlive.Where(s => s.Updated >= cutoffTime || s.Created >= cutoffTime).Include(s => s.ActiveUser).GroupBy(s => s.ActiveUser.Email)
+            var latestSessions = await context.UserSessionAlive.Where(s => s.Updated >= _cutoffTime || s.Created >= _cutoffTime).Include(s => s.ActiveUser).GroupBy(s => s.ActiveUser.Email)
                 .Select(g => new
                 {
                     Email = g.Key!,
                     LastSeen = g.Max(x => x.Updated ?? x.Created),
                     LoggedOut = g.All(x => x.LoggedOut)
                 }).ToDictionaryAsync(x => x.Email, x => new { x.LastSeen, x.LoggedOut });
-            var caseCounts = await dashboardService.CalculateAgentCaseStatus(userEmail);
-            var loginVerificationEnabled = await featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION);
+            var caseCounts = await _dashboardService.CalculateAgentCaseStatus(userEmail);
+            var loginVerificationEnabled = await _featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION);
             var users = await context.ApplicationUser.AsNoTracking().Where(u => u.VendorId == vendor.VendorId && !u.Deleted && u.Email != userEmail)
                 .OrderBy(u => u.IsUpdated).ThenBy(u => u.Updated).Select(u => new
                 {
@@ -99,13 +99,13 @@ namespace risk.control.system.Services.Api
                     var minutesAway = (int)(now - session.LastSeen).TotalMinutes;
                     (status, statusName, icon) = minutesAway switch
                     {
-                        var m when m < onlineThresholdInMinutes => ("green", "Online now", "fas fa-circle"),
-                        var m when m < awayThresholdInMinutes => ("orange", $"Inactive for {m} minutes", "fas fa-clock"),
-                        var m when m < sessionTimeoutinMinutes => ("orange", $"Away for {m} minutes", "far fa-clock"),
+                        var m when m < _onlineThresholdInMinutes => ("green", "Online now", "fas fa-circle"),
+                        var m when m < _awayThresholdInMinutes => ("orange", $"Inactive for {m} minutes", "fas fa-clock"),
+                        var m when m < _sessionTimeoutinMinutes => ("orange", $"Away for {m} minutes", "far fa-clock"),
                         _ => ("#DED5D5", "Offline", "fa fa-circle-o")
                     };
                 }
-                var photo = await base64FileService.GetBase64FileAsync(u.ProfilePictureUrl!, Applicationsettings.NO_USER);
+                var photo = await _base64FileService.GetBase64FileAsync(u.ProfilePictureUrl!, Applicationsettings.NO_USER);
                 return new UserDetailResponse
                 {
                     Id = u.Id,
@@ -145,7 +145,7 @@ namespace risk.control.system.Services.Api
             var now = DateTime.UtcNow;
             await using var context = await _contextFactory.CreateDbContextAsync();
             var latestSessions = await context.UserSessionAlive
-                .Where(s => s.Updated >= cutoffTime || s.Created >= cutoffTime)
+                .Where(s => s.Updated >= _cutoffTime || s.Created >= _cutoffTime)
                 .Include(s => s.ActiveUser)
                 .GroupBy(s => s.ActiveUser.Email)
                 .Select(g => new
@@ -181,13 +181,13 @@ namespace risk.control.system.Services.Api
                     var minutesAway = (int)(now - session.LastSeen).TotalMinutes;
                     (status, statusName, icon) = minutesAway switch
                     {
-                        var m when m < onlineThresholdInMinutes => ("green", "Online now", "fas fa-circle"),
-                        var m when m < awayThresholdInMinutes => ("orange", $"Inactive for {m} minutes", "fas fa-clock"),
-                        var m when m < sessionTimeoutinMinutes => ("orange", $"Away for {m} minutes", "far fa-clock"),
+                        var m when m < _onlineThresholdInMinutes => ("green", "Online now", "fas fa-circle"),
+                        var m when m < _awayThresholdInMinutes => ("orange", $"Inactive for {m} minutes", "fas fa-clock"),
+                        var m when m < _sessionTimeoutinMinutes => ("orange", $"Away for {m} minutes", "far fa-clock"),
                         _ => ("#DED5D5", "Offline", "fa fa-circle-o")
                     };
                 }
-                var photo = await base64FileService.GetBase64FileAsync(user.ProfilePictureUrl!, Applicationsettings.NO_USER);
+                var photo = await _base64FileService.GetBase64FileAsync(user.ProfilePictureUrl!, Applicationsettings.NO_USER);
                 activeUsersDetails.Add(new UserDetailResponse
                 {
                     Id = user.Id,
@@ -216,7 +216,7 @@ namespace risk.control.system.Services.Api
                     Agent = user.Role == AppRoles.AGENT,
                     IsUpdated = user.IsUpdated,
                     LastModified = user.Updated ?? user.Created,
-                    LoginVerified = await featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION)
+                    LoginVerified = await _featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION)
                         ? !user.IsPasswordChangeRequired
                         : true
                 });

@@ -17,24 +17,16 @@ namespace risk.control.system.Services.Common
         Task<bool> CheckFaceImageAsync(IFormFile imageFile);
     }
 
-    internal class UserFaceImageCheckService : IUserFaceImageCheckService
+    internal class UserFaceImageCheckService(
+        ApplicationDbContext context,
+        IAmazonApiService amazonApiService,
+        IBase64FileService base64FileService,
+        IFeatureManager featureManager) : IUserFaceImageCheckService
     {
-        private readonly ApplicationDbContext _context;
-        private readonly IAmazonApiService _amazonApiService;
-        private readonly IBase64FileService base64FileService;
-        private readonly IFeatureManager _featureManager;
-
-        public UserFaceImageCheckService(
-            ApplicationDbContext context,
-            IAmazonApiService amazonApiService,
-            IBase64FileService base64FileService,
-            IFeatureManager featureManager)
-        {
-            _context = context;
-            _amazonApiService = amazonApiService;
-            this.base64FileService = base64FileService;
-            _featureManager = featureManager;
-        }
+        private readonly ApplicationDbContext _context = context;
+        private readonly IAmazonApiService _amazonApiService = amazonApiService;
+        private readonly IBase64FileService _base64FileService = base64FileService;
+        private readonly IFeatureManager _featureManager = featureManager;
 
         public async Task<bool> CheckFaceImageAsync(IFormFile imageFile)
         {
@@ -73,7 +65,7 @@ namespace risk.control.system.Services.Common
             if (await _featureManager.IsEnabledAsync(FeatureFlags.ENABLE_AGENCY_USER_FACE_MATCH))
             {
                 var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == userEmail);
-                byte[] imageBytes = await base64FileService.GetByteFileAsync(user!.ProfilePictureUrl!);
+                byte[] imageBytes = await _base64FileService.GetByteFileAsync(user!.ProfilePictureUrl!);
 
                 var indexRequest = new IndexFacesRequest
                 {

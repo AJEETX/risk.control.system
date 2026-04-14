@@ -10,18 +10,11 @@ namespace risk.control.system.Services.AgencyAdmin
         Task<AllocateVendorAgentResult> AllocateAsync(string selectedCase, long caseId, string? allocatedByEmail);
     }
 
-    internal class AgencyAgentAllocationService : IAgencyAgentAllocationService
+    internal class AgencyAgentAllocationService(ApplicationDbContext context, IAgencyInvestigationDetailService vendorInvestigationDetailService, ILogger<AgencyAgentAllocationService> logger) : IAgencyAgentAllocationService
     {
-        private readonly ApplicationDbContext _context;
-        private readonly IAgencyInvestigationDetailService _vendorInvestigationDetailService;
-        private readonly ILogger<AgencyAgentAllocationService> _logger;
-
-        public AgencyAgentAllocationService(ApplicationDbContext context, IAgencyInvestigationDetailService vendorInvestigationDetailService, ILogger<AgencyAgentAllocationService> logger)
-        {
-            _context = context;
-            _vendorInvestigationDetailService = vendorInvestigationDetailService;
-            _logger = logger;
-        }
+        private readonly ApplicationDbContext _context = context;
+        private readonly IAgencyInvestigationDetailService _vendorInvestigationDetailService = vendorInvestigationDetailService;
+        private readonly ILogger<AgencyAgentAllocationService> _logger = logger;
 
         public async Task<AllocateVendorAgentResult> AllocateAsync(string selectedCase, long caseId, string? allocatedByEmail)
         {

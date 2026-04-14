@@ -12,7 +12,7 @@ namespace risk.control.system.Services.Common
         bool IsValidMobileNumber(string phoneNumber, string countryCode = "91");
     }
 
-    internal class PhoneService : IPhoneService
+    internal class PhoneService(IHttpClientFactory httpClientFactory) : IPhoneService
     {
         private static readonly Dictionary<string, string> CountryPatterns = new()
         {
@@ -34,18 +34,13 @@ namespace risk.control.system.Services.Common
             // Add more as needed
         };
 
-        private readonly IHttpClientFactory httpClientFactory;
+        private readonly IHttpClientFactory _httpClientFactory = httpClientFactory;
 
         // Ideally move these to configuration or secrets manager
         private const string ApiHost = "phonenumbervalidatefree.p.rapidapi.com";
 
-        private static string ApiKey = EnvHelper.Get("PHONE_API")!;
+        private static readonly string ApiKey = EnvHelper.Get("PHONE_API")!;
         private const string BaseUrl = $"https://{ApiHost}/ts_PhoneNumberValidateTest.jsp";
-
-        public PhoneService(IHttpClientFactory httpClientFactory)
-        {
-            this.httpClientFactory = httpClientFactory;
-        }
 
         public async Task<PhoneNumberInfo?> ValidateAsync(string mobileNumber)
         {
@@ -66,7 +61,7 @@ namespace risk.control.system.Services.Common
 
             try
             {
-                var httpClient = httpClientFactory.CreateClient();
+                var httpClient = _httpClientFactory.CreateClient();
                 using var response = await httpClient.SendAsync(request);
                 response.EnsureSuccessStatusCode();
 

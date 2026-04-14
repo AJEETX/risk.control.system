@@ -8,14 +8,9 @@ namespace risk.control.system.Services.Creator
         Task<ReportTemplate> GetReportTemplate(long caseId);
     }
 
-    internal class ReportTemplateService : IReportTemplateService
+    internal class ReportTemplateService(ApplicationDbContext context) : IReportTemplateService
     {
-        private readonly ApplicationDbContext _context;
-
-        public ReportTemplateService(ApplicationDbContext context)
-        {
-            this._context = context;
-        }
+        private readonly ApplicationDbContext _context = context;
 
         public async Task<ReportTemplate> GetReportTemplate(long caseId)
         {

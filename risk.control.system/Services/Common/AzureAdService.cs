@@ -20,37 +20,25 @@ namespace risk.control.system.Services.Common
         Task<string> ValidateAzureSignIn(TokenValidatedContext contex);
     }
 
-    internal class AzureAdService : IAzureAdService
+    internal class AzureAdService(
+        IConfiguration config,
+        ILogger<AzureAdService> logger,
+        IHttpClientFactory httpClientFactory,
+        INotyfService notifyService,
+        RoleManager<ApplicationRole> roleManager,
+        ApplicationDbContext context,
+        UserManager<ApplicationUser> userManager,
+        SignInManager<ApplicationUser> signInManager) : IAzureAdService
     {
         private static string graphApiEndpointWithParams = "https://graph.microsoft.com/v1.0/me?$select=id,displayName,mail,mobilePhone,department,city,state,country,streetAddress,postalCode,jobTitle";
-        private readonly IConfiguration config;
-        private readonly ILogger<AzureAdService> logger;
-        private readonly IHttpClientFactory httpClientFactory;
-        private readonly INotyfService notifyService;
-        private readonly RoleManager<ApplicationRole> roleManager;
-        private readonly ApplicationDbContext _context;
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly SignInManager<ApplicationUser> signInManager;
-
-        public AzureAdService(
-            IConfiguration config,
-            ILogger<AzureAdService> logger,
-            IHttpClientFactory httpClientFactory,
-            INotyfService notifyService,
-            RoleManager<ApplicationRole> roleManager,
-            ApplicationDbContext context,
-            UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager)
-        {
-            this.config = config;
-            this.logger = logger;
-            this.httpClientFactory = httpClientFactory;
-            this.notifyService = notifyService;
-            this.roleManager = roleManager;
-            _context = context;
-            _userManager = userManager;
-            this.signInManager = signInManager;
-        }
+        private readonly IConfiguration _config = config;
+        private readonly ILogger<AzureAdService> _logger = logger;
+        private readonly IHttpClientFactory _httpClientFactory = httpClientFactory;
+        private readonly INotyfService _notifyService = notifyService;
+        private readonly RoleManager<ApplicationRole> _roleManager = roleManager;
+        private readonly ApplicationDbContext _context = context;
+        private readonly UserManager<ApplicationUser> _userManager = userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager = signInManager;
 
         public async Task<string> ValidateAzureSignIn(TokenValidatedContext context)
         {
@@ -66,7 +54,7 @@ namespace risk.control.system.Services.Common
                     }
                     var user = await _userManager.FindByEmailAsync(email);
                     var accessToken = context.TokenEndpointResponse!.AccessToken;
-                    var httpClient = httpClientFactory.CreateClient();
+                    var httpClient = _httpClientFactory.CreateClient();
                     httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
                     var response = await httpClient.GetAsync(graphApiEndpointWithParams);
                     response.EnsureSuccessStatusCode();
@@ -89,28 +77,28 @@ namespace risk.control.system.Services.Common
                         var claim = claimsIdentity.FindFirst(claimType);
                         if (claim != null) claimsIdentity.RemoveClaim(claim);
                     }
-                    context.Principal = await signInManager.CreateUserPrincipalAsync(user);
+                    context.Principal = await _signInManager.CreateUserPrincipalAsync(user);
                     await SignInWithTimeoutAsync(user);
                     return email;
                 }
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error during Azure AD sign-in validation.");
+                _logger.LogError(ex, "Error during Azure AD sign-in validation.");
             }
-            notifyService.Error($"Error during Azure AD sign-in validation.");
+            _notifyService.Error($"Error during Azure AD sign-in validation.");
             return string.Empty;
         }
 
         private async Task SignInWithTimeoutAsync(ApplicationUser user)
         {
-            var timeout = config["SESSION_TIMEOUT_SEC"] ?? "900";
+            var timeout = _config["SESSION_TIMEOUT_SEC"] ?? "900";
             var properties = new AuthenticationProperties
             {
                 IsPersistent = true,
                 ExpiresUtc = DateTimeOffset.UtcNow.AddSeconds(double.Parse(timeout))
             };
-            await signInManager.SignInAsync(user, properties);
+            await _signInManager.SignInAsync(user, properties);
         }
 
         private async Task<ApplicationUser> CreateOrUpdateExternalUserAsync(ClaimsPrincipal principal, AzureADUserDetail azureADUserDetail)
@@ -183,9 +171,9 @@ namespace risk.control.system.Services.Common
         {
             if (string.IsNullOrEmpty(roleName)) return;
 
-            if (!await roleManager.RoleExistsAsync(roleName))
+            if (!await _roleManager.RoleExistsAsync(roleName))
             {
-                await roleManager.CreateAsync(new ApplicationRole
+                await _roleManager.CreateAsync(new ApplicationRole
                 {
                     Name = roleName
                 });

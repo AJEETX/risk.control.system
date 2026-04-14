@@ -26,27 +26,18 @@ namespace risk.control.system.Services.Api
         Task<ConcurrentBag<AgentData>> GetAgentWithCases(string userEmail, long id);
     }
 
-    internal class AgencyApiService : IAgencyApiService
+    internal class AgencyApiService(
+        IDbContextFactory<ApplicationDbContext> contextFactory,
+        IAgencyInvestigationServiceService agencyInvestigationServiceService,
+        ICompanyAgencyApiService empanelledAvailableAgencyService,
+        IAgencyAgentService agencyAgentService,
+        IBase64FileService base64FileService) : IAgencyApiService
     {
-        private readonly IDbContextFactory<ApplicationDbContext> _contextFactory;
-        private readonly IAgencyInvestigationServiceService agencyInvestigationServiceService;
-        private readonly ICompanyAgencyApiService empanelledAvailableAgencyService;
-        private readonly IAgencyAgentService agencyAgentService;
-        private readonly IBase64FileService base64FileService;
-
-        public AgencyApiService(
-            IDbContextFactory<ApplicationDbContext> contextFactory,
-            IAgencyInvestigationServiceService agencyInvestigationServiceService,
-            ICompanyAgencyApiService empanelledAvailableAgencyService,
-            IAgencyAgentService agencyAgentService,
-            IBase64FileService base64FileService)
-        {
-            _contextFactory = contextFactory;
-            this.agencyInvestigationServiceService = agencyInvestigationServiceService;
-            this.empanelledAvailableAgencyService = empanelledAvailableAgencyService;
-            this.agencyAgentService = agencyAgentService;
-            this.base64FileService = base64FileService;
-        }
+        private readonly IDbContextFactory<ApplicationDbContext> _contextFactory = contextFactory;
+        private readonly IAgencyInvestigationServiceService _agencyInvestigationServiceService = agencyInvestigationServiceService;
+        private readonly ICompanyAgencyApiService _empanelledAvailableAgencyService = empanelledAvailableAgencyService;
+        private readonly IAgencyAgentService _agencyAgentService = agencyAgentService;
+        private readonly IBase64FileService _base64FileService = base64FileService;
 
         public async Task<object[]> AllAgencies()
         {
@@ -73,7 +64,7 @@ namespace risk.control.system.Services.Api
 
             var result = agencyData.Select(async u =>
             {
-                var documentImage = await base64FileService.GetBase64FileAsync(u.DocumentUrl!, Applicationsettings.NO_IMAGE);
+                var documentImage = await _base64FileService.GetBase64FileAsync(u.DocumentUrl!, Applicationsettings.NO_IMAGE);
                 return new
                 {
                     Id = u.VendorId,
@@ -100,37 +91,37 @@ namespace risk.control.system.Services.Api
 
         public async Task<object[]> GetAllEmpanelledAgenciesAsync(string userEmail)
         {
-            var emapanelledAgencies = await empanelledAvailableAgencyService.GetAllEmpanelledAgenciesAsync(userEmail);
+            var emapanelledAgencies = await _empanelledAvailableAgencyService.GetAllEmpanelledAgenciesAsync(userEmail);
             return emapanelledAgencies;
         }
 
         public async Task<object[]> GetEmpanelledAgency(string userEmail, long caseId)
         {
-            var empanelledAgenciesForCase = await empanelledAvailableAgencyService.GetEmpanelledAgency(userEmail, caseId);
+            var empanelledAgenciesForCase = await _empanelledAvailableAgencyService.GetEmpanelledAgency(userEmail, caseId);
             return empanelledAgenciesForCase;
         }
 
         public async Task<object[]> GetAvailableAgencies(string userEmail)
         {
-            var availableAgencies = await empanelledAvailableAgencyService.GetAvailableAgencies(userEmail);
+            var availableAgencies = await _empanelledAvailableAgencyService.GetAvailableAgencies(userEmail);
             return availableAgencies;
         }
 
         public async Task<List<AgencyServiceResponse>> GetAgencyService(long vendorId)
         {
-            var agencyServices = await agencyInvestigationServiceService.GetAgencyService(vendorId);
+            var agencyServices = await _agencyInvestigationServiceService.GetAgencyService(vendorId);
             return agencyServices;
         }
 
         public async Task<List<AgencyServiceResponse>> AllServices(string userEmail)
         {
-            var agencyAllServices = await agencyInvestigationServiceService.AllServices(userEmail);
+            var agencyAllServices = await _agencyInvestigationServiceService.AllServices(userEmail);
             return agencyAllServices;
         }
 
         public async Task<ConcurrentBag<AgentData>> GetAgentWithCases(string userEmail, long caseId)
         {
-            var agentsWithCases = await agencyAgentService.GetAgentWithCases(userEmail, caseId);
+            var agentsWithCases = await _agencyAgentService.GetAgentWithCases(userEmail, caseId);
             return agentsWithCases;
         }
     }

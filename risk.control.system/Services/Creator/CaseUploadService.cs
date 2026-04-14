@@ -17,27 +17,18 @@ namespace risk.control.system.Services.Creator
         Task<(bool Success, string Message)> DeleteLogAsync(int id, string userEmail);
     }
 
-    internal class CaseUploadService : ICaseUploadService
+    internal class CaseUploadService(
+        ApplicationDbContext context,
+        ILogger<CaseUploadService> logger,
+        UserManager<ApplicationUser> userManager,
+        IWebHostEnvironment env,
+        ILicenseService licenseService) : ICaseUploadService
     {
-        private readonly ApplicationDbContext _context;
-        private readonly ILogger<CaseUploadService> _logger;
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly IWebHostEnvironment _env;
-        private readonly ILicenseService _licenseService;
-
-        public CaseUploadService(
-            ApplicationDbContext context,
-            ILogger<CaseUploadService> logger,
-            UserManager<ApplicationUser> userManager,
-            IWebHostEnvironment env,
-            ILicenseService licenseService)
-        {
-            _context = context;
-            _logger = logger;
-            _userManager = userManager;
-            _env = env;
-            _licenseService = licenseService;
-        }
+        private readonly ApplicationDbContext _context = context;
+        private readonly ILogger<CaseUploadService> _logger = logger;
+        private readonly UserManager<ApplicationUser> _userManager = userManager;
+        private readonly IWebHostEnvironment _env = env;
+        private readonly ILicenseService _licenseService = licenseService;
 
         public async Task<UploadPermissionResult> GetUploadViewDataAsync(string userEmail, int uploadId)
         {

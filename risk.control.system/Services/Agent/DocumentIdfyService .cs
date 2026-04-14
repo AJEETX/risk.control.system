@@ -1,6 +1,4 @@
-﻿using Google.Cloud.Vision.V1;
-
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using risk.control.system.AppConstant;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
@@ -15,61 +13,45 @@ public interface IDocumentIdfyService
     Task<AppiCheckifyResponse> CaptureDocumentId(DocumentData data);
 }
 
-internal class DocumentIdfyService : IDocumentIdfyService
+internal class DocumentIdfyService(ApplicationDbContext context,
+    IAgentCaseDetailService caseService,
+    IProcessImageService processImageService,
+    ILogger<FaceIdfyService> logger,
+    IFileStorageService fileStorageService,
+    IPanCardService panCardService,
+    IGoogleService googleApi,
+    IHttpClientService httpClientService,
+    ICustomApiClient customApiCLient) : IDocumentIdfyService
 {
-    private readonly ApplicationDbContext context;
-    private readonly IAgentCaseDetailService caseService;
-    private readonly IProcessImageService processImageService;
-    private readonly ILogger<FaceIdfyService> logger;
-    private readonly IFileStorageService fileStorageService;
-    private readonly IPanCardService panCardService;
-    private readonly IOcrService ocrService;
-    private readonly IGoogleService googleApi;
-    private readonly IHttpClientService httpClientService;
-    private readonly ICustomApiClient customApiCLient;
-
-    public DocumentIdfyService(ApplicationDbContext context,
-        IAgentCaseDetailService caseService,
-        IProcessImageService processImageService,
-        ILogger<FaceIdfyService> logger,
-        IFileStorageService fileStorageService,
-        IPanCardService panCardService,
-        IOcrService ocrService,
-        IGoogleService googleApi,
-        IHttpClientService httpClientService,
-        ICustomApiClient customApiCLient)
-    {
-        this.context = context;
-        this.caseService = caseService;
-        this.processImageService = processImageService;
-        this.logger = logger;
-        this.fileStorageService = fileStorageService;
-        this.panCardService = panCardService;
-        this.ocrService = ocrService;
-        this.googleApi = googleApi;
-        this.httpClientService = httpClientService;
-        this.customApiCLient = customApiCLient;
-    }
+    private readonly ApplicationDbContext _context = context;
+    private readonly IAgentCaseDetailService _caseService = caseService;
+    private readonly IProcessImageService _processImageService = processImageService;
+    private readonly ILogger<FaceIdfyService> _logger = logger;
+    private readonly IFileStorageService _fileStorageService = fileStorageService;
+    private readonly IPanCardService _panCardService = panCardService;
+    private readonly IGoogleService _googleApi = googleApi;
+    private readonly IHttpClientService _httpClientService = httpClientService;
+    private readonly ICustomApiClient _customApiCLient = customApiCLient;
 
     public async Task<AppiCheckifyResponse> CaptureDocumentId(DocumentData data)
     {
-        var claim = await caseService.GetCaseById(data.CaseId);
+        var claim = await _caseService.GetCaseById(data.CaseId);
         if (claim?.InvestigationReport == null) return null!;
         var location = claim.InvestigationReport.ReportTemplate!.LocationReport.FirstOrDefault(l => l.LocationName == data.LocationName);
-        var locationTemplate = await context.LocationReport.Include(l => l.DocumentIds).FirstOrDefaultAsync(l => l.Id == location!.Id);
+        var locationTemplate = await _context.LocationReport.Include(l => l.DocumentIds).FirstOrDefaultAsync(l => l.Id == location!.Id);
         var documentReport = locationTemplate!.DocumentIds!.FirstOrDefault(c => c.ReportName == data.ReportName);
         try
         {
             var (lat, lon) = VerificationHelper.ParseCoordinates(data.LocationLatLong);
             var expected = VerificationHelper.GetExpectedCoordinates(claim);
-            var (fileName, relativePath) = await fileStorageService.SaveAsync(data.Image!, CONSTANTS.CASE, claim.PolicyDetail!.ContractNumber, "report");
+            var (fileName, relativePath) = await _fileStorageService.SaveAsync(data.Image!, CONSTANTS.CASE, claim.PolicyDetail!.ContractNumber, CONSTANTS.REPORT);
             documentReport!.FilePath = relativePath;
             documentReport.ImageExtension = Path.GetExtension(fileName);
             byte[] docImage = await VerificationHelper.GetBytesFromIFormFile(data.Image!);
-            var googleTask = googleApi.DetectText(documentReport.FilePath);
+            var googleTask = _googleApi.DetectText(documentReport.FilePath);
             //var googleTask = googleApi.DetectTextAsync(documentReport.FilePath);
-            var addressTask = httpClientService.GetRawAddress(lat, lon);
-            var mapTask = customApiCLient.GetMap(expected.lat, expected.lon, double.Parse(lat), double.Parse(lon));
+            var addressTask = _httpClientService.GetRawAddress(lat, lon);
+            var mapTask = _customApiCLient.GetMap(expected.lat, expected.lon, double.Parse(lat), double.Parse(lon));
             await Task.WhenAll(googleTask, addressTask, mapTask /*, ocrTask*/);
             var (dist, distM, dur, durS, mapUrl) = await mapTask;
             documentReport.LocationMapUrl = mapUrl;
@@ -85,31 +67,31 @@ internal class DocumentIdfyService : IDocumentIdfyService
             locationTemplate.ValidationExecuted = true;
             locationTemplate.Updated = DateTime.UtcNow;
             locationTemplate.UpdatedBy = data.Email;
-            context.DocumentIdReport.Update(documentReport);
-            context.Investigations.Update(claim);
-            await context.SaveChangesAsync();
+            _context.DocumentIdReport.Update(documentReport);
+            _context.Investigations.Update(claim);
+            await _context.SaveChangesAsync();
             return MapResponse(claim, documentReport, docImage);
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed Document file capture/processing for Case {CaseId}. {AgentEmail}", data.CaseId, data.Email?.Replace("\n", "").Replace("\r", "").Trim());
+            _logger.LogError(ex, "Failed Document file capture/processing for Case {CaseId}. {AgentEmail}", data.CaseId, data.Email?.Replace("\n", "").Replace("\r", "").Trim());
             return await HandleError(claim, documentReport!);
         }
     }
 
     private async Task ProcessOcrResults(DocumentIdReport doc, byte[] docImage, IReadOnlyList<TextBlock> ocrResult, InvestigationTask claim)
     {
-        if (ocrResult != null && ocrResult.Count > 0)
+        if (ocrResult?.Count > 0)
         {
-            var company = await context.ClientCompany.FindAsync(claim.ClientCompanyId);
+            var company = await _context.ClientCompany.FindAsync(claim.ClientCompanyId);
 
             if (doc.ReportName == DocumentIdReportType.PAN.GetEnumDisplayName())
             {
-                await panCardService.Process(docImage, ocrResult, company!, doc, doc.ImageExtension!);
+                await _panCardService.Process(docImage, ocrResult, company!, doc, doc.ImageExtension!);
             }
             else
             {
-                var compressed = processImageService.CompressImage(docImage);
+                var compressed = _processImageService.CompressImage(docImage);
                 await File.WriteAllBytesAsync(doc.FilePath!, compressed);
                 doc.ImageValid = true;
                 doc.LocationInfo = ocrResult.FirstOrDefault()?.Text;
@@ -119,34 +101,7 @@ internal class DocumentIdfyService : IDocumentIdfyService
         {
             doc.ImageValid = false;
             doc.LocationInfo = "No OCR data detected";
-            await File.WriteAllBytesAsync(doc.FilePath!, processImageService.CompressImage(docImage));
-        }
-        doc.ValidationExecuted = true;
-    }
-
-    private async Task ProcessOcrResults(DocumentIdReport doc, byte[] docImage, IReadOnlyList<EntityAnnotation> ocrResult, InvestigationTask claim)
-    {
-        if (ocrResult != null && ocrResult.Count > 0)
-        {
-            var company = await context.ClientCompany.FindAsync(claim.ClientCompanyId);
-
-            if (doc.ReportName == DocumentIdReportType.PAN.GetEnumDisplayName())
-            {
-                await panCardService.Process(docImage, ocrResult, company!, doc, doc.ImageExtension!);
-            }
-            else
-            {
-                var compressed = processImageService.CompressImage(docImage);
-                await File.WriteAllBytesAsync(doc.FilePath!, compressed);
-                doc.ImageValid = true;
-                doc.LocationInfo = ocrResult.FirstOrDefault()?.Description;
-            }
-        }
-        else
-        {
-            doc.ImageValid = false;
-            doc.LocationInfo = "No OCR data detected";
-            await File.WriteAllBytesAsync(doc.FilePath!, processImageService.CompressImage(docImage));
+            await File.WriteAllBytesAsync(doc.FilePath!, _processImageService.CompressImage(docImage));
         }
         doc.ValidationExecuted = true;
     }
@@ -169,7 +124,7 @@ internal class DocumentIdfyService : IDocumentIdfyService
         doc.LocationInfo = "No Data";
         doc.ImageValid = false;
         doc.ValidationExecuted = true;
-        await context.SaveChangesAsync();
+        await _context.SaveChangesAsync();
 
         var img = File.Exists(doc.FilePath) ? await File.ReadAllBytesAsync(doc.FilePath) : null;
         return MapResponse(claim, doc, img!);

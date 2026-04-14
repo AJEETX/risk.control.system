@@ -1,5 +1,4 @@
-﻿using System.Globalization;
-using System.IO.Compression;
+﻿using System.IO.Compression;
 
 using Microsoft.EntityFrameworkCore;
 
@@ -12,23 +11,16 @@ namespace risk.control.system.Services
 
     internal class CaseImageCreationService : ICaseImageCreationService
     {
-        private readonly ILogger<CaseImageCreationService> logger;
-
-        public CaseImageCreationService(ILogger<CaseImageCreationService> logger)
-        {
-            this.logger = logger;
-        }
-
         public async Task<byte[]> GetImagesWithDataInSubfolder(byte[] zipData, string subfolderName, string filename = "")
         {
             if (string.IsNullOrWhiteSpace(subfolderName) || string.IsNullOrWhiteSpace(filename))
             {
                 return null!;
             }
-            List<(string FileName, byte[] ImageData)> images = new List<(string, byte[])>();
+            List<(string FileName, byte[] ImageData)> images = [];
 
-            using (MemoryStream zipStream = new MemoryStream(zipData))
-            using (ZipArchive archive = new ZipArchive(zipStream, ZipArchiveMode.Read))
+            await using (MemoryStream zipStream = new MemoryStream(zipData))
+            await using (ZipArchive archive = new ZipArchive(zipStream, ZipArchiveMode.Read))
             {
                 // Loop through each entry in the archive
                 foreach (var entry in archive.Entries)
@@ -37,29 +29,23 @@ namespace risk.control.system.Services
                     string folderPath = entry.FullName.Replace("/", "\\");
 
                     // Check if the entry is inside the desired subfolder and is an image file
-                    if (folderPath.ToLower(CultureInfo.InvariantCulture).Contains("\\" + subfolderName + "\\") && IsImageFile(entry.FullName))
+                    if (folderPath.Contains("\\" + subfolderName + "\\", StringComparison.CurrentCultureIgnoreCase) && IsImageFile(entry.FullName))
                     {
                         // Extract image data
-                        using (MemoryStream imageStream = new MemoryStream())
+                        await using MemoryStream imageStream = new();
+                        await using (Stream entryStream = entry.Open())
                         {
-                            using (Stream entryStream = entry.Open())
-                            {
-                                await entryStream.CopyToAsync(imageStream);
-                            }
-
-                            // Add file name and byte array to the result list
-                            images.Add((entry.Name, imageStream.ToArray()));
+                            await entryStream.CopyToAsync(imageStream);
                         }
+
+                        // Add file name and byte array to the result list
+                        images.Add((entry.Name, imageStream.ToArray()));
                     }
                 }
             }
 
-            var image = images.FirstOrDefault(i => i.FileName == filename);
-            if (image.ImageData != null)
-            {
-                return image.ImageData;
-            }
-            return null!;
+            var (FileName, ImageData) = images.FirstOrDefault(i => i.FileName == filename);
+            return ImageData ?? null!;
         }
 
         private static bool IsImageFile(string filePath)

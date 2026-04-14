@@ -11,26 +11,17 @@ namespace risk.control.system.Services.Creator
         Task<UploadResult> AddCaseDetail(UploadCase uc, ApplicationUser user, byte[] data, ORIGIN origin);
     }
 
-    internal class CaseDetailCreationService : ICaseDetailCreationService
+    internal class CaseDetailCreationService(IPolicyProcessor policyProcessor,
+        ICloneReportService cloneService,
+        IBeneficiaryCreationService beneficiaryCreationService,
+        ICustomerCreationService customerCreationService,
+        ILogger<CaseDetailCreationService> logger) : ICaseDetailCreationService
     {
-        private readonly IPolicyProcessor policyProcessor;
-        private readonly ICloneReportService cloneService;
-        private readonly IBeneficiaryCreationService beneficiaryCreationService;
-        private readonly ICustomerCreationService customerCreationService;
-        private readonly ILogger<CaseDetailCreationService> logger;
-
-        public CaseDetailCreationService(IPolicyProcessor policyProcessor,
-            ICloneReportService cloneService,
-            IBeneficiaryCreationService beneficiaryCreationService,
-            ICustomerCreationService customerCreationService,
-            ILogger<CaseDetailCreationService> logger)
-        {
-            this.policyProcessor = policyProcessor;
-            this.cloneService = cloneService;
-            this.beneficiaryCreationService = beneficiaryCreationService;
-            this.customerCreationService = customerCreationService;
-            this.logger = logger;
-        }
+        private readonly IPolicyProcessor _policyProcessor = policyProcessor;
+        private readonly ICloneReportService _cloneService = cloneService;
+        private readonly IBeneficiaryCreationService _beneficiaryCreationService = beneficiaryCreationService;
+        private readonly ICustomerCreationService _customerCreationService = customerCreationService;
+        private readonly ILogger<CaseDetailCreationService> _logger = logger;
 
         public async Task<UploadResult> AddCaseDetail(UploadCase uc, ApplicationUser user, byte[] data, ORIGIN origin)
         {
@@ -40,9 +31,9 @@ namespace risk.control.system.Services.Creator
             try
             {
                 // 1. Kick off all major tasks in parallel immediately
-                var customerTask = customerCreationService.AddCustomer(user, uc, data);
-                var beneficiaryTask = beneficiaryCreationService.AddBeneficiary(user, uc, data);
-                var policyTask = policyProcessor.ProcessPolicy(uc, user, data);
+                var customerTask = _customerCreationService.AddCustomer(user, uc, data);
+                var beneficiaryTask = _beneficiaryCreationService.AddBeneficiary(user, uc, data);
+                var policyTask = _policyProcessor.ProcessPolicy(uc, user, data);
 
                 // 2. Wait for all core data to be processed
                 await Task.WhenAll(customerTask, beneficiaryTask, policyTask);
@@ -59,7 +50,7 @@ namespace risk.control.system.Services.Creator
                 if (policy?.InsuranceType == null)
                     throw new Exception("Policy or Insurance Type missing.");
 
-                var template = await cloneService.DeepCloneReportTemplate(user.ClientCompanyId!.Value, policy.InsuranceType.Value);
+                var template = await _cloneService.DeepCloneReportTemplate(user.ClientCompanyId!.Value, policy.InsuranceType.Value);
 
                 var task = new InvestigationTask
                 {
@@ -84,7 +75,7 @@ namespace risk.control.system.Services.Creator
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Fatal error orchestrating case {CaseId}", uc.CaseId);
+                _logger.LogError(ex, "Fatal error orchestrating case {CaseId}", uc.CaseId);
                 return new UploadResult { ErrorDetail = resultErrors, Errors = resultSummaries };
             }
         }

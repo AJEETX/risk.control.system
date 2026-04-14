@@ -12,14 +12,9 @@ namespace risk.control.system.Services.Tool
         Task<IReadOnlyList<TextBlock>> DetectText(string imagePath);
     }
 
-    internal class GoogleService : IGoogleService
+    internal class GoogleService(ILogger<GoogleService> logger) : IGoogleService
     {
-        private readonly ILogger<GoogleService> logger;
-
-        public GoogleService(ILogger<GoogleService> logger)
-        {
-            this.logger = logger;
-        }
+        private readonly ILogger<GoogleService> _logger = logger;
 
         public async Task<IReadOnlyList<TextBlock>> DetectText(string imagePath)
         {
@@ -48,7 +43,7 @@ namespace risk.control.system.Services.Tool
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred While text detection.");
+                _logger.LogError(ex, "Error occurred While text detection.");
                 return null!;
             }
         }
@@ -72,7 +67,7 @@ namespace risk.control.system.Services.Tool
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred While text detection.");
+                _logger.LogError(ex, "Error occurred While text detection.");
                 return null!;
             }
         }

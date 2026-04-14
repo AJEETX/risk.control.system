@@ -10,16 +10,10 @@ namespace risk.control.system.Services.Creator
         Task<BeneficiaryRelation> GetRelationAsync(string code);
     }
 
-    internal class ExtractorService : IExtractorService
+    internal class ExtractorService(IDbContextFactory<ApplicationDbContext> contextFactory, ILogger<ExtractorService> logger) : IExtractorService
     {
-        private readonly IDbContextFactory<ApplicationDbContext> _contextFactory;
-        private readonly ILogger<ExtractorService> logger;
-
-        public ExtractorService(IDbContextFactory<ApplicationDbContext> contextFactory, ILogger<ExtractorService> logger)
-        {
-            _contextFactory = contextFactory;
-            this.logger = logger;
-        }
+        private readonly IDbContextFactory<ApplicationDbContext> _contextFactory = contextFactory;
+        private readonly ILogger<ExtractorService> _logger = logger;
 
         public async Task<PinCode?> GetPinCodeAsync(int code, string district, long countryId)
         {
@@ -35,7 +29,7 @@ namespace risk.control.system.Services.Creator
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error fetching PinCode for Code: {Code}, District: {District}, CountryId: {CountryId}", code, district, countryId);
+                _logger.LogError(ex, "Error fetching PinCode for Code: {Code}, District: {District}, CountryId: {CountryId}", code, district, countryId);
                 return null;
             }
         }
@@ -53,7 +47,7 @@ namespace risk.control.system.Services.Creator
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error fetching BeneficiaryRelation for Code: {Code}", code);
+                _logger.LogError(ex, "Error fetching BeneficiaryRelation for Code: {Code}", code);
                 return null!;
             }
         }

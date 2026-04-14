@@ -15,21 +15,15 @@ namespace risk.control.system.Services.Api
         Task<RefreshToken> GenerateRefreshTokenAsync(string userId);
     }
 
-    internal class TokenService : ITokenService
+    internal class TokenService(IConfiguration config, ApplicationDbContext context) : ITokenService
     {
-        private readonly IConfiguration config;
-        private readonly ApplicationDbContext context;
-
-        public TokenService(IConfiguration config, ApplicationDbContext context)
-        {
-            this.config = config;
-            this.context = context;
-        }
+        private readonly IConfiguration _config = config;
+        private readonly ApplicationDbContext _context = context;
 
         public string GenerateJwtToken(ApplicationUser model)
         {
             // Fetch the signing key from configuration
-            var key = config["Jwt:Data"]!;
+            var key = _config["Jwt:Data"]!;
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
@@ -44,8 +38,8 @@ namespace risk.control.system.Services.Api
 
             // Generate the token
             var token = new JwtSecurityToken(
-                issuer: config["Jwt:Issuer"],
-                audience: config["Jwt:Audience"],
+                issuer: _config["Jwt:Issuer"],
+                audience: _config["Jwt:Audience"],
                 claims: claims,
                 expires: DateTime.UtcNow.AddMinutes(15),
                 signingCredentials: credentials);
@@ -66,7 +60,7 @@ namespace risk.control.system.Services.Api
             };
 
             // Save to the database
-            context.RefreshTokens.Add(new RefreshTokenEntity
+            _context.RefreshTokens.Add(new RefreshTokenEntity
             {
                 Token = refreshToken.Token,
                 UserId = refreshToken.UserId,
@@ -75,7 +69,7 @@ namespace risk.control.system.Services.Api
                 IsUsed = refreshToken.IsUsed
             });
 
-            await context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
 
             return refreshToken;
         }

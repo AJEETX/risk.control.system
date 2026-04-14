@@ -10,14 +10,9 @@ namespace risk.control.system.Services.Creator
         Task<CaseTransactionModel> GetEmpanelledVendors(long selectedcase, string userEmail, long vendorId, bool fromEditPage = false);
     }
 
-    internal class EmpanelledAgencyService : IEmpanelledAgencyService
+    internal class EmpanelledAgencyService(ApplicationDbContext context) : IEmpanelledAgencyService
     {
-        private readonly ApplicationDbContext _context;
-
-        public EmpanelledAgencyService(ApplicationDbContext context)
-        {
-            this._context = context;
-        }
+        private readonly ApplicationDbContext _context = context;
 
         public async Task<CaseTransactionModel> GetEmpanelledVendors(long selectedcase, string userEmail, long vendorId, bool fromEditPage = false)
         {

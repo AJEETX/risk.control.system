@@ -10,24 +10,17 @@ namespace risk.control.system.Services.Assessor
         Task<InvestigationTask> SubmitQueryToAgency(string userEmail, long caseId, EnquiryRequest request, List<EnquiryRequest> requests, IFormFile? document);
     }
 
-    public class AssessorQueryService : IAssessorQueryService
+    public class AssessorQueryService(ApplicationDbContext context, ILogger<AssessorQueryService> logger, ITimelineService timelineService) : IAssessorQueryService
     {
-        private readonly ApplicationDbContext context;
-        private readonly ILogger<AssessorQueryService> logger;
-        private readonly ITimelineService timelineService;
-
-        public AssessorQueryService(ApplicationDbContext context, ILogger<AssessorQueryService> logger, ITimelineService timelineService)
-        {
-            this.context = context;
-            this.logger = logger;
-            this.timelineService = timelineService;
-        }
+        private readonly ApplicationDbContext _context = context;
+        private readonly ILogger<AssessorQueryService> _logger = logger;
+        private readonly ITimelineService _timelineService = timelineService;
 
         public async Task<InvestigationTask> SubmitQueryToAgency(string userEmail, long caseId, EnquiryRequest request, List<EnquiryRequest> requests, IFormFile? document)
         {
             try
             {
-                var caseTask = await context.Investigations
+                var caseTask = await _context.Investigations
                 .Include(c => c.Vendor)
                 .Include(c => c.InvestigationReport)
                 .ThenInclude(c => c!.EnquiryRequest)
@@ -36,9 +29,7 @@ namespace risk.control.system.Services.Assessor
                 .Include(c => c.Vendor)
                 .FirstOrDefaultAsync(c => c.Id == caseId);
 
-                var requestedByAssessor = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR;
-
-                caseTask!.SubStatus = requestedByAssessor;
+                caseTask!.SubStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR;
                 caseTask.UpdatedBy = userEmail;
                 caseTask.CaseOwner = caseTask.Vendor!.Email;
                 caseTask.RequestedAssessordEmail = userEmail;
@@ -46,7 +37,7 @@ namespace risk.control.system.Services.Assessor
                 caseTask.IsQueryCase = true;
                 if (document != null)
                 {
-                    using var ms = new MemoryStream();
+                    await using var ms = new MemoryStream();
                     document.CopyTo(ms);
                     request.QuestionImageAttachment = ms.ToArray();
                     request.QuestionImageFileName = Path.GetFileName(document.FileName);
@@ -60,18 +51,18 @@ namespace risk.control.system.Services.Assessor
                 caseTask.InvestigationReport.EnquiryRequest.Updated = DateTime.UtcNow;
                 caseTask.InvestigationReport.EnquiryRequest.UpdatedBy = userEmail;
                 caseTask.EnquiredByAssessorTime = DateTime.UtcNow;
-                context.QueryRequest.Update(request);
-                context.Investigations.Update(caseTask);
+                _context.QueryRequest.Update(request);
+                _context.Investigations.Update(caseTask);
 
-                var saved = await context.SaveChangesAsync(null, false) > 0;
+                var saved = await _context.SaveChangesAsync(null, false) > 0;
 
-                await timelineService.UpdateTaskStatus(caseTask.Id, userEmail);
+                await _timelineService.UpdateTaskStatus(caseTask.Id, userEmail);
 
                 return saved ? caseTask : null!;
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred Submit Query case {Id}. {UserEmail}", caseId, userEmail);
+                _logger.LogError(ex, "Error occurred Submit Query case {Id}. {UserEmail}", caseId, userEmail);
                 return null!;
             }
         }

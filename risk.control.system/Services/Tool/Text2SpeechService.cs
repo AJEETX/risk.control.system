@@ -7,14 +7,10 @@ namespace risk.control.system.Services.Tool
     {
         Task<byte[]> Convert(string text);
     }
-    internal class Text2SpeechService : IText2SpeechService
+    internal class Text2SpeechService(IAmazonPolly client) : IText2SpeechService
     {
-        private readonly IAmazonPolly client;
+        private readonly IAmazonPolly _client = client;
 
-        public Text2SpeechService(IAmazonPolly client)
-        {
-            this.client = client;
-        }
         public async Task<byte[]> Convert(string text)
         {
             var request = new SynthesizeSpeechRequest
@@ -26,7 +22,7 @@ namespace risk.control.system.Services.Tool
 
             try
             {
-                var response = await client.SynthesizeSpeechAsync(request);
+                var response = await _client.SynthesizeSpeechAsync(request);
 
                 using (var memoryStream = new MemoryStream())
                 {

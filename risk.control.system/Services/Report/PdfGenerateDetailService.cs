@@ -1,6 +1,6 @@
 ﻿using Gehtsoft.PDFFlow.Builder;
 using Gehtsoft.PDFFlow.Models.Enumerations;
-using Gehtsoft.PDFFlow.Utils;
+using risk.control.system.AppConstant;
 using risk.control.system.Models;
 
 namespace risk.control.system.Services.Report
@@ -12,55 +12,25 @@ namespace risk.control.system.Services.Report
     }
     internal class PdfGenerateDetailService : IPdfGenerateDetailService
     {
-        internal static readonly FontBuilder FNT9 = Fonts.Helvetica(9f);
-        internal static readonly FontBuilder FNT10 = Fonts.Helvetica(10f);
-        internal static readonly FontBuilder FNT12 = Fonts.Helvetica(12f);
-        internal static readonly FontBuilder FNT12B = Fonts.Helvetica(12f).SetBold(true);
-        internal static readonly FontBuilder FNT20 = Fonts.Helvetica(20f);
-        internal static readonly FontBuilder FNT19B = Fonts.Helvetica(19f).SetBold();
+        private const string reportFilename = "report.pdf";
+        private readonly IWebHostEnvironment _env;
+        private readonly IPdfGenerateCaseDetailService _caseDetailService;
+        private readonly IPdfGenerateDetailReportService _detailReportService;
 
-        internal static readonly FontBuilder FNT8 = Fonts.Helvetica(8f);
-
-        internal static readonly FontBuilder FNT8_G = Fonts.Helvetica(8f).SetColor(Gehtsoft.PDFFlow.Models.Shared.Color.Gray);
-
-        internal static readonly FontBuilder FNT9B = Fonts.Helvetica(9f).SetBold();
-
-        internal static readonly FontBuilder FNT11B = Fonts.Helvetica(11f).SetBold();
-
-        internal static readonly FontBuilder FNT15 = Fonts.Helvetica(15f);
-        internal static readonly FontBuilder FNT16 = Fonts.Helvetica(16f);
-
-        internal static readonly FontBuilder FNT16_R = Fonts.Helvetica(16f).SetColor(Gehtsoft.PDFFlow.Models.Shared.Color.Red);
-        internal static readonly FontBuilder FNT16_G = Fonts.Helvetica(16f).SetColor(Gehtsoft.PDFFlow.Models.Shared.Color.Green);
-        internal static readonly FontBuilder FNT17 = Fonts.Helvetica(17f);
-        internal static readonly FontBuilder FNT18 = Fonts.Helvetica(18f);
-
-        private readonly ApplicationDbContext context;
-        private readonly IWebHostEnvironment webHostEnvironment;
-        private readonly IPdfGenerateCaseDetailService detailService;
-        private readonly IPdfGenerateDetailReportService detailReportService;
-
-        public PdfGenerateDetailService(ApplicationDbContext context,
-            IWebHostEnvironment webHostEnvironment,
-            IPdfGenerateCaseDetailService detailService,
+        public PdfGenerateDetailService(
+            IWebHostEnvironment env,
+            IPdfGenerateCaseDetailService caseDetailService,
             IPdfGenerateDetailReportService detailReportService)
         {
-            this.context = context;
-            this.webHostEnvironment = webHostEnvironment;
-            this.detailService = detailService;
-            this.detailReportService = detailReportService;
+            _env = env;
+            _env = env;
+            _caseDetailService = caseDetailService;
+            _detailReportService = detailReportService;
         }
         public async Task<string> BuildInvestigationPdfReport(InvestigationTask investigation, PolicyDetail policy, CustomerDetail customer, BeneficiaryDetail beneficiary
            , ReportTemplate investigationReport)
         {
-            string folder = Path.Combine(webHostEnvironment.WebRootPath, "report");
-
-            if (!Directory.Exists(folder))
-            {
-                Directory.CreateDirectory(folder);
-            }
-            var reportFilename = "report" + investigation.Id + ".pdf";
-            var ReportFilePath = Path.Combine(webHostEnvironment.WebRootPath, "report", reportFilename);
+            string ReportFilePath = Path.GetFullPath(Path.Combine(_env.ContentRootPath, Applicationsettings.DOCUMENT, CONSTANTS.CASE, policy.ContractNumber, reportFilename));
             DocumentBuilder builder = DocumentBuilder.New();
             SectionBuilder section = builder.AddSection();
             section.SetOrientation(PageOrientation.Landscape);
@@ -68,13 +38,13 @@ namespace risk.control.system.Services.Report
             if (policy.InsuranceType == InsuranceType.UNDERWRITING)
             {
                 isClaim = false;
-                section = detailService.BuildUnderwritng(section, investigation, policy, customer, beneficiary);
+                section = _caseDetailService.BuildUnderwritng(section, investigation, policy, customer, beneficiary);
             }
             else
             {
-                section = detailService.BuildClaim(section, investigation, policy, customer, beneficiary);
+                section = _caseDetailService.BuildClaim(section, investigation, policy, customer, beneficiary);
             }
-            section = await detailReportService.Build(section, investigation, investigationReport, isClaim);
+            section = await _detailReportService.Build(section, investigation, investigationReport, isClaim);
             section.AddParagraph().AddText("");
             section = AddRemarks(section, "Assessor remarks", investigation.InvestigationReport!.AssessorRemarks!);
             section.AddParagraph().AddText("");
@@ -85,8 +55,7 @@ namespace risk.control.system.Services.Report
             section.AddParagraph().AddText($"Generated on: {DateTime.UtcNow:dd-MMM-yy hh:mm tt}").SetItalic().SetFontSize(10);
             builder.Build(ReportFilePath);
             investigation.InvestigationReport.PdfReportFilePath = ReportFilePath;
-            context.Investigations.Update(investigation);
-            await context.SaveChangesAsync(null, false);
+
             return reportFilename;
         }
 

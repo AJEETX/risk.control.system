@@ -14,18 +14,12 @@ namespace risk.control.system.Services.Api
         Task<object[]> GetAvailableAgencies(string userEmail);
     }
 
-    internal class CompanyAgencyApiService : ICompanyAgencyApiService
+    internal class CompanyAgencyApiService(
+        IDbContextFactory<ApplicationDbContext> contextFactory,
+        IBase64FileService base64FileService) : ICompanyAgencyApiService
     {
-        private readonly IDbContextFactory<ApplicationDbContext> _contextFactory;
-        private readonly IBase64FileService base64FileService;
-
-        public CompanyAgencyApiService(
-            IDbContextFactory<ApplicationDbContext> contextFactory,
-            IBase64FileService base64FileService)
-        {
-            _contextFactory = contextFactory;
-            this.base64FileService = base64FileService;
-        }
+        private readonly IDbContextFactory<ApplicationDbContext> _contextFactory = contextFactory;
+        private readonly IBase64FileService _base64FileService = base64FileService;
 
         public async Task<object[]> GetAllEmpanelledAgenciesAsync(string userEmail)
         {
@@ -61,7 +55,7 @@ namespace risk.control.system.Services.Api
             var result =
                 availableVendors?.Select(async u =>
                 {
-                    var documentImage = await base64FileService.GetBase64FileAsync(u.DocumentUrl!, Applicationsettings.NO_IMAGE);
+                    var documentImage = await _base64FileService.GetBase64FileAsync(u.DocumentUrl!, Applicationsettings.NO_IMAGE);
                     return new
                     {
                         Id = u.VendorId,
@@ -112,7 +106,7 @@ namespace risk.control.system.Services.Api
                 .Select(async u =>
                 {
                     var hasService = GetPinCodeAndServiceForTheCase(caseId, u.VendorId);
-                    var document = base64FileService.GetBase64FileAsync(u.DocumentUrl!, Applicationsettings.NO_IMAGE);
+                    var document = _base64FileService.GetBase64FileAsync(u.DocumentUrl!, Applicationsettings.NO_IMAGE);
                     await Task.WhenAll(document, hasService);
                     return new
                     {
@@ -200,7 +194,7 @@ namespace risk.control.system.Services.Api
 
         private async Task<object> MapVendor(Vendor u, ApplicationUser companyUser, List<InvestigationTask> caseTasks)
         {
-            var document = await base64FileService.GetBase64FileAsync(u.DocumentUrl!, Applicationsettings.NO_IMAGE);
+            var document = await _base64FileService.GetBase64FileAsync(u.DocumentUrl!, Applicationsettings.NO_IMAGE);
             return new
             {
                 Id = u.VendorId,

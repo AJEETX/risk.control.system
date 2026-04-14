@@ -23,20 +23,13 @@ namespace risk.control.system.Services.AgencyAdmin
         Task<bool> SoftDeleteUserAsync(string email, string deletedBy);
     }
 
-    internal class AgencyAdminUserService : IAgencyAdminUserService
+    internal class AgencyAdminUserService(
+        ApplicationDbContext context,
+        IFeatureManager featureManager, IAmazonApiService amazonApiService) : IAgencyAdminUserService
     {
-        private readonly ApplicationDbContext _context;
-        private readonly IFeatureManager _featureManager;
-        private readonly IAmazonApiService _amazonApiService;
-
-        public AgencyAdminUserService(
-            ApplicationDbContext context,
-            IFeatureManager featureManager, IAmazonApiService amazonApiService)
-        {
-            _context = context;
-            _featureManager = featureManager;
-            _amazonApiService = amazonApiService;
-        }
+        private readonly ApplicationDbContext _context = context;
+        private readonly IFeatureManager _featureManager = featureManager;
+        private readonly IAmazonApiService _amazonApiService = amazonApiService;
 
         public async Task<ApplicationUser> PrepareCreateModelAsync(string currentUserEmail)
         {

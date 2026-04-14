@@ -7,14 +7,9 @@ namespace risk.control.system.Services.Common
         Task<string> GetWeatherAsync(string latitude, string longitude);
     }
 
-    internal class WeatherInfoService : IWeatherInfoService
+    internal class WeatherInfoService(IHttpClientFactory httpClientFctory) : IWeatherInfoService
     {
-        private readonly IHttpClientFactory httpClientFctory;
-
-        public WeatherInfoService(IHttpClientFactory httpClientFctory)
-        {
-            this.httpClientFctory = httpClientFctory;
-        }
+        private readonly IHttpClientFactory _httpClientFctory = httpClientFctory;
 
         public async Task<string> GetWeatherAsync(string latitude, string longitude)
         {
@@ -26,7 +21,7 @@ namespace risk.control.system.Services.Common
 
             try
             {
-                var httpClient = httpClientFctory.CreateClient();
+                var httpClient = _httpClientFctory.CreateClient();
                 var response = await httpClient.SendAsync(request);
                 response.EnsureSuccessStatusCode(); // Throws if the server returns 4xx or 5xx
 

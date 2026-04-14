@@ -11,15 +11,9 @@ namespace risk.control.system.Services.Common
         Task<(string FileName, string RelativePath)> SaveMediaAsync(IFormFile file, string category, string? subFolder = null, string? subSubFolder = null);
     }
 
-    internal class FileStorageService : IFileStorageService
+    internal class FileStorageService(IWebHostEnvironment env) : IFileStorageService
     {
-        private const string RootFolder = "Document";
-        private readonly IWebHostEnvironment env;
-
-        public FileStorageService(IWebHostEnvironment env)
-        {
-            this.env = env;
-        }
+        private readonly IWebHostEnvironment env = env;
 
         public async Task<(string FileName, string RelativePath)> SaveMediaAsync(IFormFile file, string category, string? subFolder = null, string? subSubFolder = null)
         {
@@ -28,7 +22,7 @@ namespace risk.control.system.Services.Common
 
             // Allowed audio and video MIME types
             string[] allowedTypes =
-            {
+            [
                 // Audio
                 "audio/mpeg", "audio/wav", "audio/x-wav",
                 "audio/ogg", "audio/aac", "audio/flac",
@@ -37,14 +31,14 @@ namespace risk.control.system.Services.Common
                 "video/mp4", "video/mpeg", "video/ogg",
                 "video/webm", "video/quicktime",
                 "video/x-msvideo", "video/x-ms-wmv"
-             };
+             ];
 
             // Allowed extensions
             string[] allowedExt =
-            {
+            [
                 ".mp3", ".wav", ".ogg", ".aac", ".flac",
                 ".mp4", ".mpeg", ".webm", ".mov", ".avi", ".wmv"
-            };
+            ];
 
             if (!allowedTypes.Contains(file.ContentType))
                 throw new InvalidOperationException($"Unsupported type: {file.ContentType}");
@@ -58,7 +52,7 @@ namespace risk.control.system.Services.Common
             var folderPath = GetOrCreateFolder(category, subFolder, subSubFolder);
             var filePath = Path.Combine(folderPath, fileName);
 
-            using (var stream = new FileStream(filePath, FileMode.Create))
+            await using (var stream = new FileStream(filePath, FileMode.Create))
                 await file.CopyToAsync(stream);
 
             var relativePath = BuildRelativePath(category, subFolder, subSubFolder, fileName);
@@ -71,7 +65,7 @@ namespace risk.control.system.Services.Common
             if (file == null || file.Length == 0)
                 throw new ArgumentException("Invalid file");
 
-            allowedTypes ??= new[] { "application/zip", "application/x-zip-compressed", "multipart/x-zip", "image/jpeg", "image/png" };
+            allowedTypes ??= ["application/zip", "application/x-zip-compressed", "multipart/x-zip", "image/jpeg", "image/png"];
 
             if (!allowedTypes.Contains(file.ContentType))
                 throw new InvalidOperationException($"Unsupported content type: {file.ContentType}");
@@ -86,7 +80,7 @@ namespace risk.control.system.Services.Common
             var folderPath = GetOrCreateFolder(category, subFolder, subSubFolder);
             var filePath = Path.Combine(folderPath, fileName);
 
-            using (var stream = new FileStream(filePath, FileMode.Create))
+            await using (var stream = new FileStream(filePath, FileMode.Create))
             {
                 await file.CopyToAsync(stream);
             }
@@ -103,7 +97,7 @@ namespace risk.control.system.Services.Common
 
             extension = extension.StartsWith(".") ? extension : "." + extension;
 
-            allowedExtensions ??= new[] { ".jpg", ".jpeg", ".png" };
+            allowedExtensions ??= [".jpg", ".jpeg", ".png"];
 
             if (!allowedExtensions.Contains(extension.ToLowerInvariant()))
                 throw new InvalidOperationException($"Unsupported extension: {extension}");
@@ -135,7 +129,7 @@ namespace risk.control.system.Services.Common
             }
             return finalPath;
         }
-        private string Sanitize(string? input)
+        private static string Sanitize(string? input)
         {
             if (string.IsNullOrWhiteSpace(input) || input == ".") return string.Empty;
             if (input.Contains(".."))

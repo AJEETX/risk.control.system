@@ -23,24 +23,16 @@ namespace risk.control.system.Services.AgencyAdmin
         Task LoadModel(Vendor model);
     }
 
-    internal class ManageAgencyService : IManageAgencyService
+    internal class ManageAgencyService(
+        ApplicationDbContext context,
+        IValidateImageService validateImageService,
+        IAgencyCaseLoadService agencyCaseLoadService,
+        IAgencyService agencyService) : IManageAgencyService
     {
-        private readonly ApplicationDbContext _context;
-        private readonly IValidateImageService _validateImageService;
-        private readonly IAgencyCaseLoadService _agencyCaseLoadService;
-        private readonly IAgencyService _agencyService;
-
-        public ManageAgencyService(
-            ApplicationDbContext context,
-            IValidateImageService validateImageService,
-            IAgencyCaseLoadService agencyCaseLoadService,
-            IAgencyService agencyService)
-        {
-            _context = context;
-            _validateImageService = validateImageService;
-            _agencyCaseLoadService = agencyCaseLoadService;
-            _agencyService = agencyService;
-        }
+        private readonly ApplicationDbContext _context = context;
+        private readonly IValidateImageService _validateImageService = validateImageService;
+        private readonly IAgencyCaseLoadService _agencyCaseLoadService = agencyCaseLoadService;
+        private readonly IAgencyService _agencyService = agencyService;
 
         public async Task<(bool Success, Dictionary<string, string> Errors)> CreateAsync(string domainAddress, string userEmail, Vendor model, string baseUrl)
         {

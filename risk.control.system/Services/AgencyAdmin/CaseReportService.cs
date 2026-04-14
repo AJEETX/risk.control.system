@@ -10,15 +10,10 @@ namespace risk.control.system.Services.AgencyAdmin
         Task<CaseAgencyModel> GetInvestigateReport(string userEmail, long selectedcase);
     }
 
-    internal class CaseReportService : ICaseReportService
+    internal class CaseReportService(
+        ApplicationDbContext context) : ICaseReportService
     {
-        private readonly ApplicationDbContext _context;
-
-        public CaseReportService(
-            ApplicationDbContext context)
-        {
-            this._context = context;
-        }
+        private readonly ApplicationDbContext _context = context;
 
         public async Task<CaseAgencyModel> GetInvestigateReport(string userEmail, long selectedcase)
         {

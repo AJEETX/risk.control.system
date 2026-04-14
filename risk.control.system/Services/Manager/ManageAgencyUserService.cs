@@ -32,24 +32,16 @@ namespace risk.control.system.Services.Manager
         Task LoadEditModelAsync(ApplicationUser model);
     }
 
-    public class ManageAgencyUserService : IManageAgencyUserService
+    public class ManageAgencyUserService(
+        ApplicationDbContext context,
+        IFeatureManager featureManager,
+        IAgencyUserCreateEditService agencyUserCreateEditService,
+        ILogger<ManageAgencyUserService> logger) : IManageAgencyUserService
     {
-        private readonly ApplicationDbContext _context;
-        private readonly IFeatureManager _featureManager;
-        private readonly IAgencyUserCreateEditService _agencyUserCreateEditService;
-        private readonly ILogger<ManageAgencyUserService> _logger;
-
-        public ManageAgencyUserService(
-            ApplicationDbContext context,
-            IFeatureManager featureManager,
-            IAgencyUserCreateEditService agencyUserCreateEditService,
-            ILogger<ManageAgencyUserService> logger)
-        {
-            _context = context;
-            _featureManager = featureManager;
-            _agencyUserCreateEditService = agencyUserCreateEditService;
-            _logger = logger;
-        }
+        private readonly ApplicationDbContext _context = context;
+        private readonly IFeatureManager _featureManager = featureManager;
+        private readonly IAgencyUserCreateEditService _agencyUserCreateEditService = agencyUserCreateEditService;
+        private readonly ILogger<ManageAgencyUserService> _logger = logger;
 
         public async Task<ApplicationUser> GetUserCreationModelAsync(long vendorId)
         {

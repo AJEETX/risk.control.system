@@ -13,25 +13,18 @@ namespace risk.control.system.Services.Agency
         Task<Vendor> WithdrawCaseFromAgent(string userEmail, CaseTransactionModel model, long caseId);
     }
 
-    internal class DeclineCaseService : IDeclineCaseService
+    internal class DeclineCaseService(ApplicationDbContext context, ILogger<DeclineCaseService> logger, ITimelineService timelineService) : IDeclineCaseService
     {
-        private readonly ApplicationDbContext context;
-        private readonly ILogger<DeclineCaseService> logger;
-        private readonly ITimelineService timelineService;
-
-        public DeclineCaseService(ApplicationDbContext context, ILogger<DeclineCaseService> logger, ITimelineService timelineService)
-        {
-            this.context = context;
-            this.logger = logger;
-            this.timelineService = timelineService;
-        }
+        private readonly ApplicationDbContext _context = context;
+        private readonly ILogger<DeclineCaseService> logger = logger;
+        private readonly ITimelineService timelineService = timelineService;
 
         public async Task<Vendor> WithdrawCaseFromAgent(string userEmail, CaseTransactionModel model, long caseId)
         {
             try
             {
-                var currentUser = await context.ApplicationUser.AsNoTracking().Include(u => u.Vendor).FirstOrDefaultAsync(u => u.Email == userEmail);
-                var caseTask = await context.Investigations.AsNoTracking()
+                var currentUser = await _context.ApplicationUser.AsNoTracking().Include(u => u.Vendor).FirstOrDefaultAsync(u => u.Email == userEmail);
+                var caseTask = await _context.Investigations.AsNoTracking()
                     .FirstOrDefaultAsync(c => c.Id == caseId);
 
                 caseTask!.IsNewAssignedToAgency = true;
@@ -40,8 +33,8 @@ namespace risk.control.system.Services.Agency
                 caseTask.Updated = DateTime.UtcNow;
                 caseTask.UpdatedBy = currentUser.Email;
                 caseTask.SubStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR;
-                context.Investigations.Update(caseTask);
-                var rows = await context.SaveChangesAsync(null, false);
+                _context.Investigations.Update(caseTask);
+                var rows = await _context.SaveChangesAsync(null, false);
 
                 await timelineService.UpdateTaskStatus(caseTask.Id, currentUser.Email!);
 
@@ -58,10 +51,10 @@ namespace risk.control.system.Services.Agency
         {
             try
             {
-                var currentUser = await context.ApplicationUser.AsNoTracking().Include(u => u.Vendor).FirstOrDefaultAsync(u => u.Email == userEmail);
-                var caseTask = await context.Investigations.AsNoTracking()
+                var currentUser = await _context.ApplicationUser.AsNoTracking().Include(u => u.Vendor).FirstOrDefaultAsync(u => u.Email == userEmail);
+                var caseTask = await _context.Investigations.AsNoTracking()
                     .FirstOrDefaultAsync(c => c.Id == caseId);
-                var company = await context.ClientCompany.AsNoTracking().FirstOrDefaultAsync(c => c.ClientCompanyId == caseTask!.ClientCompanyId);
+                var company = await _context.ClientCompany.AsNoTracking().FirstOrDefaultAsync(c => c.ClientCompanyId == caseTask!.ClientCompanyId);
                 caseTask!.CaseOwner = company!.Email;
                 caseTask.IsAutoAllocated = false;
                 caseTask.IsNew = true;
@@ -73,8 +66,8 @@ namespace risk.control.system.Services.Agency
                 caseTask.VendorId = null;
                 caseTask.Vendor = null;
                 caseTask.SubStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY;
-                context.Investigations.Update(caseTask);
-                var rows = await context.SaveChangesAsync(null, false);
+                _context.Investigations.Update(caseTask);
+                var rows = await _context.SaveChangesAsync(null, false);
                 await timelineService.UpdateTaskStatus(caseTask.Id, currentUser.Email!);
                 return currentUser.Vendor!;
             }

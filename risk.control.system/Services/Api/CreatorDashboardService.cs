@@ -10,10 +10,10 @@ namespace risk.control.system.Services.Api
         Task<DashboardData> GetCreatorCount(string userEmail);
     }
 
-    internal class CreatorDashboardService : ICreatorDashboardService
+    internal class CreatorDashboardService(IDbContextFactory<ApplicationDbContext> contextFactory) : ICreatorDashboardService
     {
-        private static string[] assignableSubStatuses = new[]
-            {
+        private static string[] assignableSubStatuses =
+            [
                 CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.UPLOAD_COMPLETED,
                 CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.DRAFTED_BY_CREATOR,
                 CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.EDITED_BY_CREATOR,
@@ -21,13 +21,8 @@ namespace risk.control.system.Services.Api
                 CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY,
                 CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY,
                 CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER
-            };
-        private readonly IDbContextFactory<ApplicationDbContext> _contextFactory;
-
-        public CreatorDashboardService(IDbContextFactory<ApplicationDbContext> contextFactory)
-        {
-            _contextFactory = contextFactory;
-        }
+            ];
+        private readonly IDbContextFactory<ApplicationDbContext> _contextFactory = contextFactory;
 
         public async Task<DashboardData> GetCreatorCount(string userEmail)
         {

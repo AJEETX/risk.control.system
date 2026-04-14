@@ -4,14 +4,19 @@ using SixLabors.ImageSharp.Processing;
 
 using Image = SixLabors.ImageSharp.Image;
 
-namespace risk.control.system.Helpers
+namespace risk.control.system.Services.Common
 {
-    public static class ImageConverter
+    public interface IImageConverter
     {
-        private static int maxWidth = 50;
-        private static int maxHeight = 50;
-
-        public static byte[] ConvertToPng(byte[] imageBytes)
+        byte[] ConvertToPng(byte[] imageBytes);
+        byte[] ConvertToPngFromPath(IWebHostEnvironment webHostEnvironment, string imagePath);
+        Task<byte[]> DownloadMapImageAsync(IHttpClientFactory httpClientFactory, string url);
+    }
+    internal class ImageConverter : IImageConverter
+    {
+        private const int maxWidth = 50;
+        private const int maxHeight = 50;
+        public byte[] ConvertToPng(byte[] imageBytes)
         {
             if (imageBytes == null || imageBytes.Length == 0)
                 throw new ArgumentException("Input image data is null or empty.", nameof(imageBytes));
@@ -56,7 +61,7 @@ namespace risk.control.system.Helpers
             }
         }
 
-        public static byte[] ConvertToPngFromPath(IWebHostEnvironment webHostEnvironment, string imagePath)
+        public byte[] ConvertToPngFromPath(IWebHostEnvironment webHostEnvironment, string imagePath)
         {
             if (string.IsNullOrWhiteSpace(imagePath))
                 throw new ArgumentException("Input image URL is null or empty.", nameof(imagePath));
@@ -71,7 +76,7 @@ namespace risk.control.system.Helpers
             }
         }
 
-        private static byte[] ResizeCropToPng(byte[] imageBytes, int width = 150, int height = 150)
+        private static byte[] ResizeCropToPng(byte[] imageBytes, int width = 150)
         {
             using var image = Image.Load(imageBytes);
 
@@ -91,7 +96,7 @@ namespace risk.control.system.Helpers
 
             return ms.ToArray();
         }
-        public static async Task<byte[]> DownloadMapImageAsync(IHttpClientFactory httpClientFactory, string url, string outputFilePath)
+        public async Task<byte[]> DownloadMapImageAsync(IHttpClientFactory httpClientFactory, string url)
         {
             var client = httpClientFactory.CreateClient();
             var response = await client.GetAsync(url);

@@ -17,29 +17,24 @@ namespace risk.control.system.Services.Report
         Task<object> GetReportTemplate(long caseId, string agentEmail);
     }
 
-    internal class CloneReportService : ICloneReportService
+    internal class CloneReportService(ApplicationDbContext context) : ICloneReportService
     {
-        private readonly ApplicationDbContext context;
-
-        public CloneReportService(ApplicationDbContext context)
-        {
-            this.context = context;
-        }
+        private readonly ApplicationDbContext _context = context;
 
         public async Task<bool> Activate(long templateId)
         {
-            var template = await context.ReportTemplates.FirstOrDefaultAsync(r => r.Id == templateId);
+            var template = await _context.ReportTemplates.FirstOrDefaultAsync(r => r.Id == templateId);
             if (template == null)
                 return false;
-            var sameTypeTemplates = await context.ReportTemplates.Where(r => r.InsuranceType == template.InsuranceType && r.Id != templateId).ToListAsync();
+            var sameTypeTemplates = await _context.ReportTemplates.Where(r => r.InsuranceType == template.InsuranceType && r.Id != templateId).ToListAsync();
             foreach (var t in sameTypeTemplates)
             {
                 t.IsActive = false;
             }
             template.IsActive = true;
-            context.ReportTemplates.UpdateRange(sameTypeTemplates);
-            context.ReportTemplates.Update(template);
-            var rowsAffected = await context.SaveChangesAsync(null, false);
+            _context.ReportTemplates.UpdateRange(sameTypeTemplates);
+            _context.ReportTemplates.Update(template);
+            var rowsAffected = await _context.SaveChangesAsync(null, false);
             return rowsAffected > 0;
         }
 
@@ -48,8 +43,8 @@ namespace risk.control.system.Services.Report
             var originalTemplate = await GetReportTemplateDetails(templateId);
             string newName = $"{Regex.Replace(originalTemplate!.Name!, @"_\d{8}_\d{6,9}$", "")}_{DateTime.UtcNow:yyyyMMdd_HHmmss}";
             var clone = CloneReportTemplate(newName, originalTemplate, currentUserEmail);
-            var addedTemplate = await context.ReportTemplates.AddAsync(clone);
-            var rowsAffected = await context.SaveChangesAsync(null, false);
+            var addedTemplate = await _context.ReportTemplates.AddAsync(clone);
+            var rowsAffected = await _context.SaveChangesAsync(null, false);
             return addedTemplate.Entity;
         }
 
@@ -62,7 +57,7 @@ namespace risk.control.system.Services.Report
 
         public async Task<object> GetReportTemplate(long caseId, string agentEmail)
         {
-            var investigation = await context.Investigations.FindAsync(caseId);
+            var investigation = await _context.Investigations.FindAsync(caseId);
             var originalTemplate = await GetReportTemplateDetails(investigation!.ReportTemplateId!);
             var locationTemplate = originalTemplate!.LocationReport.Select(loc => new
             {
@@ -224,7 +219,7 @@ namespace risk.control.system.Services.Report
         }
         private async Task<ReportTemplate?> GetReportTemplateDetails(long? id)
         {
-            return await context.ReportTemplates
+            return await _context.ReportTemplates
                 .Include(r => r.LocationReport)
                     .ThenInclude(l => l.AgentIdReport)
                 .Include(r => r.LocationReport)
@@ -239,7 +234,7 @@ namespace risk.control.system.Services.Report
         }
         private async Task<ReportTemplate?> GetReportDefaultTemplateDetails(long? clientCompanyId, InsuranceType insuranceType)
         {
-            return await context.ReportTemplates
+            return await _context.ReportTemplates
                 .Include(r => r.LocationReport)
                     .ThenInclude(l => l.AgentIdReport)
                 .Include(r => r.LocationReport)

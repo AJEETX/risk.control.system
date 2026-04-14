@@ -8,18 +8,13 @@ namespace risk.control.system.Services.Report
         Task<VendorInvoice> GetInvoice(long id);
     }
 
-    internal class InvoiceService : IInvoiceService
+    internal class InvoiceService(ApplicationDbContext context) : IInvoiceService
     {
-        private readonly ApplicationDbContext context;
-
-        public InvoiceService(ApplicationDbContext context)
-        {
-            this.context = context;
-        }
+        private readonly ApplicationDbContext _context = context;
 
         public async Task<VendorInvoice> GetInvoice(long id)
         {
-            var invoice = await context.VendorInvoice
+            var invoice = await _context.VendorInvoice
               .Where(x => x.VendorInvoiceId.Equals(id))
               .Include(x => x.ClientCompany)
               .ThenInclude(c => c!.District)
