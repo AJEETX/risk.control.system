@@ -13,19 +13,12 @@ namespace risk.control.system.Services.Tool
         Task<string> ConvertSpeech(Speech2TextData input);
     }
 
-    internal class Speech2TextService : ISpeech2TextService
+    internal class Speech2TextService(IAmazonS3 s3Client, IAmazonTranscribeService transcribeClient, IHttpClientFactory clientFactory) : ISpeech2TextService
     {
         private string bucketName = "icheckify-bucket";
-        private readonly IAmazonS3 s3Client;
-        private readonly IAmazonTranscribeService transcribeClient;
-        private readonly IHttpClientFactory clientFactory;
-
-        public Speech2TextService(IAmazonS3 s3Client, IAmazonTranscribeService transcribeClient, IHttpClientFactory clientFactory)
-        {
-            this.s3Client = s3Client;
-            this.transcribeClient = transcribeClient;
-            this.clientFactory = clientFactory;
-        }
+        private readonly IAmazonS3 _s3Client = s3Client;
+        private readonly IAmazonTranscribeService _transcribeClient = transcribeClient;
+        private readonly IHttpClientFactory _clientFactory = clientFactory;
 
         public async Task<string> ConvertSpeech(Speech2TextData input)
         {
@@ -33,32 +26,32 @@ namespace risk.control.system.Services.Tool
             string transcribedText = "";
             try
             {
-                if (!(await Amazon.S3.Util.AmazonS3Util.DoesS3BucketExistV2Async(s3Client, bucketName)))
+                if (!(await Amazon.S3.Util.AmazonS3Util.DoesS3BucketExistV2Async(_s3Client, bucketName)))
                 {
                     var putBucketRequest = new PutBucketRequest { BucketName = bucketName, UseClientRegion = true };
-                    await s3Client.PutBucketAsync(putBucketRequest);
+                    await _s3Client.PutBucketAsync(putBucketRequest);
                 }
                 using (var stream = input.SpeechInputData.OpenReadStream())
                 {
                     var uploadRequest = new TransferUtilityUploadRequest { InputStream = stream, Key = fileName, BucketName = bucketName };
-                    var fileTransferUtility = new TransferUtility(s3Client);
+                    var fileTransferUtility = new TransferUtility(_s3Client);
                     await fileTransferUtility.UploadAsync(uploadRequest);
                 }
                 var jobName = $"Job_{Guid.NewGuid()}";
                 var startRequest = CreateRequest(jobName, fileName);
-                await transcribeClient.StartTranscriptionJobAsync(startRequest);
+                await _transcribeClient.StartTranscriptionJobAsync(startRequest);
                 TranscriptionJob status;
                 do
                 {
                     await Task.Delay(2000); // Wait 2 seconds
                     var getRequest = new GetTranscriptionJobRequest { TranscriptionJobName = jobName };
-                    var response = await transcribeClient.GetTranscriptionJobAsync(getRequest);
+                    var response = await _transcribeClient.GetTranscriptionJobAsync(getRequest);
                     status = response.TranscriptionJob;
                 } while (status.TranscriptionJobStatus == TranscriptionJobStatus.IN_PROGRESS);
 
                 if (status.TranscriptionJobStatus == TranscriptionJobStatus.COMPLETED)
                 {
-                    var httpClient = clientFactory.CreateClient();
+                    var httpClient = _clientFactory.CreateClient();
                     try
                     {
                         var result = await httpClient.GetFromJsonAsync<JsonElement>(status.Transcript.TranscriptFileUri);

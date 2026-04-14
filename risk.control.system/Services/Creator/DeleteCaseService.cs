@@ -10,16 +10,9 @@ namespace risk.control.system.Services.Creator
         Task<(bool Success, string Message)> SoftDeleteBulkCasesAsync(List<long> ids, string currentUserEmail);
     }
 
-    internal class DeleteCaseService : IDeleteCaseService
+    internal class DeleteCaseService(ApplicationDbContext context) : IDeleteCaseService
     {
-        private readonly ApplicationDbContext _context;
-        private readonly ILogger<DeleteCaseService> _logger;
-
-        public DeleteCaseService(ApplicationDbContext context, ILogger<DeleteCaseService> logger)
-        {
-            _context = context;
-            _logger = logger;
-        }
+        private readonly ApplicationDbContext _context = context;
 
         public async Task<(bool Success, string Message)> SoftDeleteCaseAsync(long id, string currentUserEmail)
         {

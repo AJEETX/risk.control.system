@@ -10,33 +10,26 @@ namespace risk.control.system.Services.Creator
         Task<int> Save(string userEmail, IFormFile postedFile, bool uploadAndAssign = false);
     }
 
-    internal class ZipFileService : IZipFileService
+    internal class ZipFileService(IDbContextFactory<ApplicationDbContext> contextFactory,
+        ILogger<ZipFileService> logger,
+        IFileStorageService fileStorageService) : IZipFileService
     {
-        private readonly IDbContextFactory<ApplicationDbContext> _contextFactory;
-        private readonly ILogger<ZipFileService> logger;
-        private readonly IFileStorageService fileStorageService;
-
-        public ZipFileService(IDbContextFactory<ApplicationDbContext> contextFactory,
-            ILogger<ZipFileService> logger,
-            IFileStorageService fileStorageService)
-        {
-            _contextFactory = contextFactory;
-            this.logger = logger;
-            this.fileStorageService = fileStorageService;
-        }
+        private readonly IDbContextFactory<ApplicationDbContext> _contextFactory = contextFactory;
+        private readonly ILogger<ZipFileService> _logger = logger;
+        private readonly IFileStorageService _fileStorageService = fileStorageService;
 
         public async Task<int> Save(string userEmail, IFormFile postedFile, bool uploadAndAssign = false)
         {
             try
             {
-                var (fileName, relativePath) = await fileStorageService.SaveAsync(postedFile, "UploadFile");
+                var (fileName, relativePath) = await _fileStorageService.SaveAsync(postedFile, "UploadFile");
 
                 var uploadId = await SaveUpload(postedFile, relativePath, fileName, userEmail, ORIGIN.FILE, uploadAndAssign);
                 return uploadId;
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error saving file for user {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error saving file for user {UserEmail}", userEmail);
                 throw;
             }
         }

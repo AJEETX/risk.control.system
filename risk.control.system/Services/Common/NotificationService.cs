@@ -14,29 +14,23 @@ namespace risk.control.system.Services.Common
         Task<List<StatusNotification>> GetNotifications(string userEmail);
     }
 
-    internal class NotificationService : INotificationService
+    internal class NotificationService(ApplicationDbContext context, RoleManager<ApplicationRole> roleManager) : INotificationService
     {
-        private readonly ApplicationDbContext context;
-        private readonly RoleManager<ApplicationRole> roleManager;
-
-        public NotificationService(ApplicationDbContext context, RoleManager<ApplicationRole> roleManager)
-        {
-            this.context = context;
-            this.roleManager = roleManager;
-        }
+        private readonly ApplicationDbContext _context = context;
+        private readonly RoleManager<ApplicationRole> _roleManager = roleManager;
 
         public async Task<List<StatusNotification>> GetNotifications(string userEmail)
         {
-            var companyUser = await context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == userEmail && c.ClientCompanyId > 0);
-            var vendorUser = await context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == userEmail && c.VendorId > 0);
+            var companyUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == userEmail && c.ClientCompanyId > 0);
+            var vendorUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == userEmail && c.VendorId > 0);
             ApplicationRole? role = null!;
             ClientCompany? company = null!;
             Vendor? agency = null!;
             if (companyUser != null)
             {
-                role = await roleManager.FindByNameAsync(companyUser.Role.ToString()!);
-                company = await context.ClientCompany.AsNoTracking().FirstOrDefaultAsync(c => c.ClientCompanyId == companyUser.ClientCompanyId);
-                var notifications = context.Notifications.AsNoTracking().Where(n => n.ClientCompanyId == company!.ClientCompanyId && (!n.IsReadByCreator || !n.IsReadByManager || !n.IsReadByAssessor));
+                role = await _roleManager.FindByNameAsync(companyUser.Role.ToString()!);
+                company = await _context.ClientCompany.AsNoTracking().FirstOrDefaultAsync(c => c.ClientCompanyId == companyUser.ClientCompanyId);
+                var notifications = _context.Notifications.AsNoTracking().Where(n => n.ClientCompanyId == company!.ClientCompanyId && (!n.IsReadByCreator || !n.IsReadByManager || !n.IsReadByAssessor));
                 if (role?.Name == ASSESSOR.DISPLAY_NAME)
                 {
                     notifications = notifications.Where(n => n.RoleId == role.Id && !n.IsReadByAssessor);
@@ -57,9 +51,9 @@ namespace risk.control.system.Services.Common
             }
             else if (vendorUser != null)
             {
-                role = await roleManager.FindByNameAsync(vendorUser.Role.ToString()!);
-                agency = await context.Vendor.AsNoTracking().FirstOrDefaultAsync(c => c.VendorId == vendorUser.VendorId);
-                var notifications = context.Notifications.AsNoTracking().Where(n => n.VendorId == vendorUser.VendorId && (!n.IsReadByVendor || !n.IsReadByVendorAgent));
+                role = await _roleManager.FindByNameAsync(vendorUser.Role.ToString()!);
+                agency = await _context.Vendor.AsNoTracking().FirstOrDefaultAsync(c => c.VendorId == vendorUser.VendorId);
+                var notifications = _context.Notifications.AsNoTracking().Where(n => n.VendorId == vendorUser.VendorId && (!n.IsReadByVendor || !n.IsReadByVendorAgent));
                 if (role?.Name == AGENT.DISPLAY_NAME)
                 {
                     notifications = notifications.Where(n => n.AgentUserEmail == userEmail);
@@ -77,22 +71,22 @@ namespace risk.control.system.Services.Common
                 }
                 return await notifications.OrderByDescending(n => n.CreatedAt).ToListAsync();
             }
-            return await context.Notifications.AsNoTracking().OrderByDescending(n => n.CreatedAt).ToListAsync();
+            return await _context.Notifications.AsNoTracking().OrderByDescending(n => n.CreatedAt).ToListAsync();
         }
 
         public async Task MarkAsRead(long id, string userEmail)
         {
-            var companyUser = await context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == userEmail && c.ClientCompanyId > 0);
-            var vendorUser = await context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == userEmail && c.VendorId > 0);
+            var companyUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == userEmail && c.ClientCompanyId > 0);
+            var vendorUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == userEmail && c.VendorId > 0);
 
             ApplicationRole? role = null!;
             ClientCompany? company = null!;
             Vendor? agency = null!;
             if (companyUser != null)
             {
-                role = await roleManager.FindByNameAsync(companyUser.Role.ToString()!);
-                company = await context.ClientCompany.AsNoTracking().FirstOrDefaultAsync(c => c.ClientCompanyId == companyUser.ClientCompanyId);
-                var notification = await context.Notifications.FirstOrDefaultAsync(s => s.StatusNotificationId == id);
+                role = await _roleManager.FindByNameAsync(companyUser.Role.ToString()!);
+                company = await _context.ClientCompany.AsNoTracking().FirstOrDefaultAsync(c => c.ClientCompanyId == companyUser.ClientCompanyId);
+                var notification = await _context.Notifications.FirstOrDefaultAsync(s => s.StatusNotificationId == id);
                 if (notification == null)
                 {
                     return;
@@ -113,14 +107,14 @@ namespace risk.control.system.Services.Common
                 {
                     notification.IsReadByCompanyAdmin = true;
                 }
-                context.Notifications.Update(notification);
-                var rows = await context.SaveChangesAsync(null, false);
+                _context.Notifications.Update(notification);
+                var rows = await _context.SaveChangesAsync(null, false);
             }
             else if (vendorUser != null)
             {
-                role = await roleManager.FindByNameAsync(vendorUser.Role.ToString()!);
-                agency = await context.Vendor.AsNoTracking().FirstOrDefaultAsync(c => c.VendorId == vendorUser.VendorId);
-                var notification = await context.Notifications.FirstOrDefaultAsync(s => s.VendorId == vendorUser.VendorId && s.StatusNotificationId == id);
+                role = await _roleManager.FindByNameAsync(vendorUser.Role.ToString()!);
+                agency = await _context.Vendor.AsNoTracking().FirstOrDefaultAsync(c => c.VendorId == vendorUser.VendorId);
+                var notification = await _context.Notifications.FirstOrDefaultAsync(s => s.VendorId == vendorUser.VendorId && s.StatusNotificationId == id);
                 if (notification == null)
                 {
                     return;
@@ -133,8 +127,8 @@ namespace risk.control.system.Services.Common
                 {
                     notification.IsReadByVendorAgent = true;
                 }
-                context.Notifications.Update(notification);
-                var rows = await context.SaveChangesAsync(null, false);
+                _context.Notifications.Update(notification);
+                var rows = await _context.SaveChangesAsync(null, false);
             }
         }
 

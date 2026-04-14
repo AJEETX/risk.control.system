@@ -8,24 +8,17 @@ namespace risk.control.system.Services.Creator
         Task<IReadOnlyList<UploadResult>> FileUploadAsync(ApplicationUser companyUser, IReadOnlyList<UploadCase> uploadCases, byte[] model, ORIGIN source);
     }
 
-    internal class UploadService : IUploadService
+    internal class UploadService(ICaseDetailCreationService caseCreationService, ILogger<UploadService> logger) : IUploadService
     {
-        private readonly ICaseDetailCreationService _caseCreationService;
-        private readonly ILogger<UploadService> logger;
-
-        public UploadService(ICaseDetailCreationService caseCreationService,
-            ILogger<UploadService> logger)
-        {
-            _caseCreationService = caseCreationService;
-            this.logger = logger;
-        }
+        private readonly ICaseDetailCreationService _caseCreationService = caseCreationService;
+        private readonly ILogger<UploadService> _logger = logger;
 
         public async Task<IReadOnlyList<UploadResult>> FileUploadAsync(ApplicationUser companyUser, IReadOnlyList<UploadCase> uploadCases, byte[] model, ORIGIN source)
         {
             if (uploadCases == null || uploadCases.Count == 0)
             {
-                logger.LogWarning("No upload data provided for user {Email}", companyUser.Email);
-                return Array.Empty<UploadResult>();
+                _logger.LogWarning("No upload data provided for user {Email}", companyUser.Email);
+                return [.. Array.Empty<UploadResult>()];
             }
 
             var results = new List<UploadResult>(uploadCases.Count);
@@ -40,7 +33,7 @@ namespace risk.control.system.Services.Creator
 
                     if (result == null)
                     {
-                        logger.LogWarning("Upload failed for row {RowNumber} (User: {Email})", i + 1, companyUser.Email);
+                        _logger.LogWarning("Upload failed for row {RowNumber} (User: {Email})", i + 1, companyUser.Email);
 
                         continue;
                     }
@@ -49,7 +42,7 @@ namespace risk.control.system.Services.Creator
                 }
                 catch (Exception ex)
                 {
-                    logger.LogError(ex, "Error uploading row {RowNumber} for user {Email}", i + 1, companyUser.Email);
+                    _logger.LogError(ex, "Error uploading row {RowNumber} for user {Email}", i + 1, companyUser.Email);
                 }
             }
             return results;

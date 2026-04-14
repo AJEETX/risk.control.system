@@ -8,20 +8,13 @@ public interface IAgentAnswerService
     Task<bool> CaptureAnswers(string agentEmail, string locationName, long caseId, List<QuestionTemplate> Questions);
 }
 
-internal class AgentAnswerService : IAgentAnswerService
+internal class AgentAnswerService(ApplicationDbContext context,
+    IAgentCaseDetailService caseService,
+    ILogger<FaceIdfyService> logger) : IAgentAnswerService
 {
-    private readonly ApplicationDbContext context;
-    private readonly IAgentCaseDetailService caseService;
-    private readonly ILogger<FaceIdfyService> logger;
-
-    public AgentAnswerService(ApplicationDbContext context,
-        IAgentCaseDetailService caseService,
-        ILogger<FaceIdfyService> logger)
-    {
-        this.context = context;
-        this.caseService = caseService;
-        this.logger = logger;
-    }
+    private readonly ApplicationDbContext _context = context;
+    private readonly IAgentCaseDetailService _caseService = caseService;
+    private readonly ILogger<FaceIdfyService> _logger = logger;
 
     public async Task<bool> CaptureAnswers(string agentEmail, string locationName, long caseId, List<QuestionTemplate> Questions)
     {
@@ -29,13 +22,13 @@ internal class AgentAnswerService : IAgentAnswerService
             return false;
         try
         {
-            var caseTask = await caseService.GetCaseByIdForQuestions(caseId);
+            var caseTask = await _caseService.GetCaseByIdForQuestions(caseId);
             if (caseTask == null)
                 return false;
             var location = caseTask.InvestigationReport!.ReportTemplate!.LocationReport.FirstOrDefault(l => l.LocationName == locationName);
             if (location == null)
                 return false;
-            var locationTemplate = await context.LocationReport
+            var locationTemplate = await _context.LocationReport
                 .Include(l => l.Questions)
                 .FirstOrDefaultAsync(l => l.Id == location.Id);
             if (locationTemplate == null)
@@ -56,14 +49,14 @@ internal class AgentAnswerService : IAgentAnswerService
             locationTemplate.ValidationExecuted = true;
             locationTemplate.UpdatedBy = agentEmail;
             locationTemplate.Updated = DateTime.UtcNow;
-            context.LocationReport.Update(locationTemplate);
-            var rowsAffected = await context.SaveChangesAsync(null, false);
+            _context.LocationReport.Update(locationTemplate);
+            var rowsAffected = await _context.SaveChangesAsync(null, false);
             return rowsAffected > 0;
         }
         catch (Exception ex)
         {
             var sanitizedEmail = agentEmail?.Replace("\n", "").Replace("\r", "").Trim();
-            logger.LogError(ex, "Failed capture Answer for {CaseId}. {AgentEmail}", caseId, sanitizedEmail);
+            _logger.LogError(ex, "Failed capture Answer for {CaseId}. {AgentEmail}", caseId, sanitizedEmail);
             return false;
         }
     }

@@ -16,23 +16,22 @@ namespace risk.control.system.Services.Assessor
 
     internal class ProcessCaseService : IProcessCaseService
     {
-        private readonly ApplicationDbContext context;
-        private readonly ILogger<ProcessCaseService> logger;
-        private readonly IPdfGenerativeService pdfGenerativeService;
-        private readonly ITimelineService timelineService;
-        private readonly IBackgroundJobClient backgroundJobClient;
-
+        private readonly ApplicationDbContext _context;
+        private readonly ILogger<ProcessCaseService> _logger;
+        private readonly IPdfGenerativeService _pdfGenerativeService;
+        private readonly ITimelineService _timelineService;
+        private readonly IBackgroundJobClient _backgroundJobClient;
         public ProcessCaseService(ApplicationDbContext context,
             ILogger<ProcessCaseService> logger,
             IPdfGenerativeService pdfGenerativeService,
             ITimelineService timelineService,
             IBackgroundJobClient backgroundJobClient)
         {
-            this.context = context;
-            this.logger = logger;
-            this.pdfGenerativeService = pdfGenerativeService;
-            this.timelineService = timelineService;
-            this.backgroundJobClient = backgroundJobClient;
+            this._context = context;
+            this._logger = logger;
+            this._pdfGenerativeService = pdfGenerativeService;
+            this._timelineService = timelineService;
+            this._backgroundJobClient = backgroundJobClient;
         }
 
         public async Task<(ClientCompany, string)> ProcessCaseReport(string userEmail, string assessorRemarks, long caseId, AssessorRemarkType reportUpdateStatus, string reportAiSummary)
@@ -62,7 +61,7 @@ namespace risk.control.system.Services.Assessor
 
             try
             {
-                var caseTask = await context.Investigations
+                var caseTask = await _context.Investigations
                 .Include(c => c.ClientCompany)
                 .Include(c => c.PolicyDetail)
                 .Include(r => r.InvestigationReport)
@@ -81,20 +80,19 @@ namespace risk.control.system.Services.Assessor
                 caseTask.ProcessedByAssessorTime = DateTime.UtcNow;
                 caseTask.SubmittedAssessordEmail = userEmail;
                 caseTask.CaseOwner = caseTask.ClientCompany!.Email;
-                context.Investigations.Update(caseTask);
+                _context.Investigations.Update(caseTask);
 
-                var saveCount = await context.SaveChangesAsync(null, false);
+                var saveCount = await _context.SaveChangesAsync(null, false);
 
-                await timelineService.UpdateTaskStatus(caseTask.Id, userEmail);
+                await _timelineService.UpdateTaskStatus(caseTask.Id, userEmail);
+                _backgroundJobClient.Enqueue(() => _pdfGenerativeService.Generate(caseId, userEmail));
 
-                backgroundJobClient.Enqueue(() => pdfGenerativeService.Generate(caseId, userEmail));
-
-                var currentUser = await context.ApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == userEmail);
+                var currentUser = await _context.ApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == userEmail);
                 return saveCount > 0 ? (currentUser!.ClientCompany!, caseTask.PolicyDetail!.ContractNumber) : (null!, string.Empty);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred Rejecting Case {CaseId}. {UserEmail}", caseId, userEmail);
+                _logger.LogError(ex, "Error occurred Rejecting Case {CaseId}. {UserEmail}", caseId, userEmail);
                 throw;
             }
         }
@@ -106,7 +104,7 @@ namespace risk.control.system.Services.Assessor
                 var approved = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR;
                 var finished = CONSTANTS.CASE_STATUS.FINISHED;
 
-                var caseTask = await context.Investigations
+                var caseTask = await _context.Investigations
                 .Include(c => c.ClientCompany)
                 .Include(c => c.PolicyDetail)
                 .Include(r => r.InvestigationReport)
@@ -125,19 +123,18 @@ namespace risk.control.system.Services.Assessor
                 caseTask.CaseOwner = caseTask.ClientCompany!.Email;
                 caseTask.ProcessedByAssessorTime = DateTime.UtcNow;
                 caseTask.SubmittedAssessordEmail = userEmail;
-                context.Investigations.Update(caseTask);
+                _context.Investigations.Update(caseTask);
 
-                var saveCount = await context.SaveChangesAsync(null, false);
+                var saveCount = await _context.SaveChangesAsync(null, false);
 
-                await timelineService.UpdateTaskStatus(caseTask.Id, userEmail);
-
-                backgroundJobClient.Enqueue(() => pdfGenerativeService.Generate(caseId, userEmail));
+                await _timelineService.UpdateTaskStatus(caseTask.Id, userEmail);
+                _backgroundJobClient.Enqueue(() => _pdfGenerativeService.Generate(caseId, userEmail));
 
                 return saveCount > 0 ? (caseTask.ClientCompany, caseTask.PolicyDetail!.ContractNumber) : (null!, string.Empty);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred Approving Case {CaseId}. {UserEmail}", caseId, userEmail);
+                _logger.LogError(ex, "Error occurred Approving Case {CaseId}. {UserEmail}", caseId, userEmail);
                 throw;
             }
         }

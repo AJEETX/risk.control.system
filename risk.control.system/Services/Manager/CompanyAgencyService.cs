@@ -10,16 +10,10 @@ namespace risk.control.system.Services.Manager
         Task<(bool Success, string Message)> DepanelAgenciesAsync(string userEmail, List<long> vendorIds);
     }
 
-    internal class CompanyAgencyService : ICompanyAgencyService
+    internal class CompanyAgencyService(ApplicationDbContext context, ILogger<CompanyAgencyService> logger) : ICompanyAgencyService
     {
-        private readonly ApplicationDbContext _context;
-        private readonly ILogger<CompanyAgencyService> _logger;
-
-        public CompanyAgencyService(ApplicationDbContext context, ILogger<CompanyAgencyService> logger)
-        {
-            _context = context;
-            _logger = logger;
-        }
+        private readonly ApplicationDbContext _context = context;
+        private readonly ILogger<CompanyAgencyService> _logger = logger;
 
         public async Task<(bool Success, string Message)> EmpanelAgenciesAsync(string userEmail, List<long> vendorIds)
         {

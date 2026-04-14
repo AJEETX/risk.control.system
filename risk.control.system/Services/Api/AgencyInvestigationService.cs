@@ -18,30 +18,21 @@ namespace risk.control.system.Services.Api
         Task<DataTableResponse<CaseInvestigationAgencyResponse>> GetCompletedCases(string userEmail, string userClaim, int draw, int start, int length, string search = "", int orderColumn = 0, string orderDir = "asc");
     }
 
-    internal class AgencyInvestigationService : IAgencyInvestigationService
+    internal class AgencyInvestigationService(ApplicationDbContext context,
+        IDbContextFactory<ApplicationDbContext> contextFactory,
+        IBase64FileService base64FileService,
+        IWeatherInfoService weatherInfoService,
+        IWebHostEnvironment env) : IAgencyInvestigationService
     {
-        private readonly ApplicationDbContext context;
-        private readonly IDbContextFactory<ApplicationDbContext> _contextFactory;
-        private readonly IBase64FileService base64FileService;
-        private readonly IWeatherInfoService weatherInfoService;
-        private readonly IWebHostEnvironment env;
-
-        public AgencyInvestigationService(ApplicationDbContext context,
-            IDbContextFactory<ApplicationDbContext> contextFactory,
-            IBase64FileService base64FileService,
-            IWeatherInfoService weatherInfoService,
-            IWebHostEnvironment env)
-        {
-            this.context = context;
-            this._contextFactory = contextFactory;
-            this.base64FileService = base64FileService;
-            this.weatherInfoService = weatherInfoService;
-            this.env = env;
-        }
+        private readonly ApplicationDbContext _context = context;
+        private readonly IDbContextFactory<ApplicationDbContext> _contextFactory = contextFactory;
+        private readonly IBase64FileService _base64FileService = base64FileService;
+        private readonly IWeatherInfoService _weatherInfoService = weatherInfoService;
+        private readonly IWebHostEnvironment _env = env;
 
         public async Task<DataTableResponse<CaseInvestigationAgencyResponse>> GetNewCases(string userEmail, int draw, int start, int length, string search = "", int orderColumn = 0, string orderDir = "asc")
         {
-            var vendorUser = await context.ApplicationUser
+            var vendorUser = await _context.ApplicationUser
                 .AsNoTracking()
                 .Include(v => v.Country)
                 .FirstOrDefaultAsync(x => x.Email == userEmail);
@@ -60,7 +51,7 @@ namespace risk.control.system.Services.Api
             // -----------------------------
             // BASE QUERY
             // -----------------------------
-            var query = context.Investigations
+            var query = _context.Investigations
                 .AsNoTracking()
                 .Where(a =>
                     a.VendorId == vendorUser.VendorId &&
@@ -217,13 +208,13 @@ namespace risk.control.system.Services.Api
                 var personMapAddressUrl = isUW ?
                         string.Format(a.CustomerLocationMap!, "400", "400") : string.Format(a.BeneficiaryLocationMap!, "400", "400");
                 var addressLocationInfoTask = isUW ?
-                    weatherInfoService.GetWeatherAsync(a.CustomerDetailLatitude!, a.CustomerDetailLongitude!) :
-                        weatherInfoService.GetWeatherAsync(a.BeneficiaryDetailLatitude!, a.BeneficiaryDetailLongitude!);
+                    _weatherInfoService.GetWeatherAsync(a.CustomerDetailLatitude!, a.CustomerDetailLongitude!) :
+                        _weatherInfoService.GetWeatherAsync(a.BeneficiaryDetailLatitude!, a.BeneficiaryDetailLongitude!);
 
-                var ownerDetailTask = base64FileService.GetBase64FileAsync(a.ClientCompanyDocumentUrl!);
-                var documentTask = base64FileService.GetBase64FileAsync(a.PolicyDocumentPath!, Applicationsettings.NO_POLICY_IMAGE);
-                var customerPhotoTask = base64FileService.GetBase64FileAsync(isUW ? a.customerImagePath! : a.beneficiaryImagePath!);
-                var beneficiaryPhotoTask = base64FileService.GetBase64FileAsync(a.beneficiaryImagePath!, Applicationsettings.NO_USER);
+                var ownerDetailTask = _base64FileService.GetBase64FileAsync(a.ClientCompanyDocumentUrl!);
+                var documentTask = _base64FileService.GetBase64FileAsync(a.PolicyDocumentPath!, Applicationsettings.NO_POLICY_IMAGE);
+                var customerPhotoTask = _base64FileService.GetBase64FileAsync(isUW ? a.customerImagePath! : a.beneficiaryImagePath!);
+                var beneficiaryPhotoTask = _base64FileService.GetBase64FileAsync(a.beneficiaryImagePath!, Applicationsettings.NO_USER);
 
                 // Wait for all images for THIS case to load
                 await Task.WhenAll(ownerDetailTask, documentTask, customerPhotoTask, beneficiaryPhotoTask, addressLocationInfoTask);
@@ -268,7 +259,7 @@ namespace risk.control.system.Services.Api
 
             if (newIds.Any())
             {
-                await context.Investigations
+                await _context.Investigations
                     .Where(x => newIds.Contains(x.Id))
                     .ExecuteUpdateAsync(s =>
                         s.SetProperty(p => p.IsNewAssignedToAgency, false));
@@ -457,10 +448,10 @@ namespace risk.control.system.Services.Api
                 var policy = $"<span class='badge badge-light'>{a.InsuranceType!.GetEnumDisplayName()}</span>";
                 var beneficiaryName = a.BeneficiaryName;
 
-                var documentTask = base64FileService.GetBase64FileAsync(a.PolicyDocumentPath!, Applicationsettings.NO_POLICY_IMAGE);
-                var customerPhotoTask = base64FileService.GetBase64FileAsync(isUW ? a.customerImagePath! : a.beneficiaryImagePath!);
-                var beneficiaryPhotoTask = base64FileService.GetBase64FileAsync(a.beneficiaryImagePath!, Applicationsettings.NO_USER);
-                var ownerImageTask = base64FileService.GetBase64FileAsync(await GetOwner(a.investigation), Applicationsettings.NO_USER);
+                var documentTask = _base64FileService.GetBase64FileAsync(a.PolicyDocumentPath!, Applicationsettings.NO_POLICY_IMAGE);
+                var customerPhotoTask = _base64FileService.GetBase64FileAsync(isUW ? a.customerImagePath! : a.beneficiaryImagePath!);
+                var beneficiaryPhotoTask = _base64FileService.GetBase64FileAsync(a.beneficiaryImagePath!, Applicationsettings.NO_USER);
+                var ownerImageTask = _base64FileService.GetBase64FileAsync(await GetOwner(a.investigation), Applicationsettings.NO_USER);
                 var ownerEmailTask = GetOwnerEmail(a.investigation);
 
                 // Wait for all images for THIS case to load
@@ -538,7 +529,7 @@ namespace risk.control.system.Services.Api
 
         public async Task<DataTableResponse<CaseInvestigationAgencyResponse>> GetCompletedCases(string userEmail, string userClaim, int draw, int start, int length, string search = "", int orderColumn = 0, string orderDir = "asc")
         {
-            var vendorUser = await context.ApplicationUser
+            var vendorUser = await _context.ApplicationUser
                 .AsNoTracking()
                 .Include(v => v.Country)
                 .FirstOrDefaultAsync(c => c.Email == userEmail);
@@ -556,7 +547,7 @@ namespace risk.control.system.Services.Api
             var approvedStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR;
             var rejectedStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR;
 
-            var query = context.Investigations
+            var query = _context.Investigations
                 .AsNoTracking()
                 .Where(a =>
                     a.VendorId == vendorUser.VendorId &&
@@ -683,13 +674,13 @@ namespace risk.control.system.Services.Api
                 var isQueryCase = a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR;
                 var personMapAddressUrl = isUW ? string.Format(a.CustomerLocationMap!, "400", "400") : string.Format(a.BeneficiaryLocationMap!, "400", "400");
                 var addressLocationInfoTask = isUW ?
-                    weatherInfoService.GetWeatherAsync(a.CustomerDetailLatitude!, a.CustomerDetailLongitude!) :
-                        weatherInfoService.GetWeatherAsync(a.BeneficiaryDetailLatitude!, a.BeneficiaryDetailLongitude!);
+                    _weatherInfoService.GetWeatherAsync(a.CustomerDetailLatitude!, a.CustomerDetailLongitude!) :
+                        _weatherInfoService.GetWeatherAsync(a.BeneficiaryDetailLatitude!, a.BeneficiaryDetailLongitude!);
 
-                var ownerDetailTask = base64FileService.GetBase64FileAsync(a.ClientCompanyDocumentUrl!);
-                var documentTask = base64FileService.GetBase64FileAsync(a.PolicyDocumentPath!, Applicationsettings.NO_POLICY_IMAGE);
-                var customerPhotoTask = base64FileService.GetBase64FileAsync(isUW ? a.customerImagePath! : a.beneficiaryImagePath!);
-                var beneficiaryPhotoTask = base64FileService.GetBase64FileAsync(a.beneficiaryImagePath!, Applicationsettings.NO_USER);
+                var ownerDetailTask = _base64FileService.GetBase64FileAsync(a.ClientCompanyDocumentUrl!);
+                var documentTask = _base64FileService.GetBase64FileAsync(a.PolicyDocumentPath!, Applicationsettings.NO_POLICY_IMAGE);
+                var customerPhotoTask = _base64FileService.GetBase64FileAsync(isUW ? a.customerImagePath! : a.beneficiaryImagePath!);
+                var beneficiaryPhotoTask = _base64FileService.GetBase64FileAsync(a.beneficiaryImagePath!, Applicationsettings.NO_USER);
 
                 // Wait for all images for THIS case to load
                 await Task.WhenAll(ownerDetailTask, documentTask, customerPhotoTask, beneficiaryPhotoTask);
@@ -739,7 +730,7 @@ namespace risk.control.system.Services.Api
 
         public async Task<DataTableResponse<CaseInvestigationAgencyResponse>> GetAgentReports(string userEmail, int draw, int start, int length, string search = "", int orderColumn = 0, string orderDir = "asc")
         {
-            var vendorUser = await context.ApplicationUser
+            var vendorUser = await _context.ApplicationUser
                             .AsNoTracking()
                             .Include(v => v.Country)
                             .FirstOrDefaultAsync(x => x.Email == userEmail);
@@ -755,7 +746,7 @@ namespace risk.control.system.Services.Api
                 };
             }
 
-            var query = context.Investigations
+            var query = _context.Investigations
                 .AsNoTracking()
                 .Where(a =>
                     a.VendorId == vendorUser.VendorId &&
@@ -876,13 +867,13 @@ namespace risk.control.system.Services.Api
                 var personMapAddressUrl = isUW ?
                         string.Format(a.CustomerLocationMap!, "400", "400") : string.Format(a.BeneficiaryLocationMap!, "400", "400");
                 var addressLocationInfoTask = isUW ?
-                    weatherInfoService.GetWeatherAsync(a.CustomerDetailLatitude!, a.CustomerDetailLongitude!) :
-                        weatherInfoService.GetWeatherAsync(a.BeneficiaryDetailLatitude!, a.BeneficiaryDetailLongitude!);
+                    _weatherInfoService.GetWeatherAsync(a.CustomerDetailLatitude!, a.CustomerDetailLongitude!) :
+                        _weatherInfoService.GetWeatherAsync(a.BeneficiaryDetailLatitude!, a.BeneficiaryDetailLongitude!);
 
-                var ownerDetailTask = base64FileService.GetBase64FileAsync(a.ClientCompanyDocumentUrl!);
-                var documentTask = base64FileService.GetBase64FileAsync(a.PolicyDocumentPath!, Applicationsettings.NO_POLICY_IMAGE);
-                var customerPhotoTask = base64FileService.GetBase64FileAsync(isUW ? a.customerImagePath! : a.beneficiaryImagePath!);
-                var beneficiaryPhotoTask = base64FileService.GetBase64FileAsync(a.beneficiaryImagePath!, Applicationsettings.NO_USER);
+                var ownerDetailTask = _base64FileService.GetBase64FileAsync(a.ClientCompanyDocumentUrl!);
+                var documentTask = _base64FileService.GetBase64FileAsync(a.PolicyDocumentPath!, Applicationsettings.NO_POLICY_IMAGE);
+                var customerPhotoTask = _base64FileService.GetBase64FileAsync(isUW ? a.customerImagePath! : a.beneficiaryImagePath!);
+                var beneficiaryPhotoTask = _base64FileService.GetBase64FileAsync(a.beneficiaryImagePath!, Applicationsettings.NO_USER);
 
                 // Wait for all images for THIS case to load
                 await Task.WhenAll(ownerDetailTask, documentTask, customerPhotoTask, beneficiaryPhotoTask, addressLocationInfoTask);
@@ -927,7 +918,7 @@ namespace risk.control.system.Services.Api
 
             if (newIds.Any())
             {
-                await context.Investigations
+                await _context.Investigations
                     .Where(x => newIds.Contains(x.Id))
                     .ExecuteUpdateAsync(s =>
                         s.SetProperty(p => p.IsNewAssignedToAgency, false));
@@ -1080,7 +1071,7 @@ namespace risk.control.system.Services.Api
         {
             string ownerEmail = string.Empty;
             var allocated2agent = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT;
-            var noDataImagefilePath = Path.Combine(env.WebRootPath, "img", "no-photo.jpg");
+            var noDataImagefilePath = Path.Combine(_env.WebRootPath, "img", "no-photo.jpg");
             await using var _context = _contextFactory.CreateDbContext();
 
             if (caseTask.SubStatus == allocated2agent)

@@ -10,18 +10,11 @@ namespace risk.control.system.Services.AgencyAdmin
         Task<bool> SubmitQueryReplyToCompany(string userEmail, long caseId, EnquiryRequest request, List<EnquiryRequest> requests, IFormFile? document);
     }
 
-    internal class AgencyQueryReplyService : IAgencyQueryReplyService
+    internal class AgencyQueryReplyService(ApplicationDbContext context, ILogger<AgencyQueryReplyService> logger, ITimelineService timelineService) : IAgencyQueryReplyService
     {
-        private readonly ApplicationDbContext context;
-        private readonly ILogger<AgencyQueryReplyService> logger;
-        private readonly ITimelineService timelineService;
-
-        public AgencyQueryReplyService(ApplicationDbContext context, ILogger<AgencyQueryReplyService> logger, ITimelineService timelineService)
-        {
-            this.context = context;
-            this.logger = logger;
-            this.timelineService = timelineService;
-        }
+        private readonly ApplicationDbContext context = context;
+        private readonly ILogger<AgencyQueryReplyService> logger = logger;
+        private readonly ITimelineService timelineService = timelineService;
 
         public async Task<bool> SubmitQueryReplyToCompany(string userEmail, long caseId, EnquiryRequest request, List<EnquiryRequest> requests, IFormFile? document)
         {

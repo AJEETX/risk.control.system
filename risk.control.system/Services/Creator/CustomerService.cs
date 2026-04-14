@@ -26,27 +26,18 @@ namespace risk.control.system.Services.Creator
         Task<(bool Success, Dictionary<string, string> Errors)> EditAsync(string userEmail, CustomerDetail model);
     }
 
-    internal class CustomerService : ICustomerService
+    internal class CustomerService(
+        ApplicationDbContext context,
+        IFeatureManager featureManager,
+        IAddInvestigationService addInvestigationService,
+        IPhoneService phoneService,
+        IValidateImageService validateImageService) : ICustomerService
     {
-        private readonly ApplicationDbContext _context;
-        private readonly IFeatureManager _featureManager;
-        private readonly IAddInvestigationService _addInvestigationService;
-        private readonly IPhoneService _phoneService;
-        private readonly IValidateImageService _validateImageService;
-
-        public CustomerService(
-            ApplicationDbContext context,
-            IFeatureManager featureManager,
-            IAddInvestigationService addInvestigationService,
-            IPhoneService phoneService,
-            IValidateImageService validateImageService)
-        {
-            this._context = context;
-            this._featureManager = featureManager;
-            this._addInvestigationService = addInvestigationService;
-            this._phoneService = phoneService;
-            this._validateImageService = validateImageService;
-        }
+        private readonly ApplicationDbContext _context = context;
+        private readonly IFeatureManager _featureManager = featureManager;
+        private readonly IAddInvestigationService _addInvestigationService = addInvestigationService;
+        private readonly IPhoneService _phoneService = phoneService;
+        private readonly IValidateImageService _validateImageService = validateImageService;
 
         public async Task<CustomerDetail> GetCreateViewModelAsync(long investigationId, string userEmail)
         {

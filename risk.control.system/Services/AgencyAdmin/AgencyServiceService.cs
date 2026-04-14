@@ -16,14 +16,9 @@ namespace risk.control.system.Services.AgencyAdmin
         Task<bool> DeleteServiceAsync(long id);
     }
 
-    internal class AgencyServiceService : IAgencyServiceService
+    internal class AgencyServiceService(ApplicationDbContext context) : IAgencyServiceService
     {
-        private readonly ApplicationDbContext _context;
-
-        public AgencyServiceService(ApplicationDbContext context)
-        {
-            _context = context;
-        }
+        private readonly ApplicationDbContext _context = context;
 
         public async Task<VendorInvestigationServiceType> PrepareCreateViewModelAsync(string userEmail)
         {

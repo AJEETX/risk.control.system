@@ -11,18 +11,11 @@ namespace risk.control.system.Services.Creator
         Task<(PolicyDetail Policy, List<UploadError> Errors, List<string> Summaries)> ProcessPolicy(UploadCase uc, ApplicationUser user, byte[] zipData);
     }
 
-    public class PolicyProcessor : IPolicyProcessor
+    public class PolicyProcessor(IDbContextFactory<ApplicationDbContext> contextFactory, IVerifierProcessor verifierProcessor, IDateParserService dateParserService) : IPolicyProcessor
     {
-        private readonly IDbContextFactory<ApplicationDbContext> _contextFactory;
-        private readonly IVerifierProcessor verifierProcessor;
-        private readonly IDateParserService dateParserService;
-
-        public PolicyProcessor(IDbContextFactory<ApplicationDbContext> contextFactory, IVerifierProcessor verifierProcessor, IDateParserService dateParserService)
-        {
-            _contextFactory = contextFactory;
-            this.verifierProcessor = verifierProcessor;
-            this.dateParserService = dateParserService;
-        }
+        private readonly IDbContextFactory<ApplicationDbContext> _contextFactory = contextFactory;
+        private readonly IVerifierProcessor _verifierProcessor = verifierProcessor;
+        private readonly IDateParserService _dateParserService = dateParserService;
 
         public async Task<(PolicyDetail Policy, List<UploadError> Errors, List<string> Summaries)> ProcessPolicy(UploadCase uc, ApplicationUser user, byte[] zipData)
         {
@@ -33,7 +26,7 @@ namespace risk.control.system.Services.Creator
             var insuranceType = uc.InsuranceType == InsuranceType.CLAIM.GetEnumDisplayName() ? InsuranceType.CLAIM : InsuranceType.UNDERWRITING;
 
             // 2. Validate Dates & Amount
-            var (issueDate, incidentDate) = dateParserService.ValidateDates(uc, errs, sums);
+            var (issueDate, incidentDate) = _dateParserService.ValidateDates(uc, errs, sums);
             decimal.TryParse(uc.Amount, out var amount);
 
             // 3. Lookups (Service Type, Enabler, Cost Centre)
@@ -46,7 +39,7 @@ namespace risk.control.system.Services.Creator
             var enabler = await enablerTask;
             var costCentre = await costCentreTask;
             // 4. Image Processing
-            var (imgPath, ext) = await verifierProcessor.ProcessImage(uc, zipData, errs, sums, POLICY_IMAGE, "CaseDetail");
+            var (imgPath, ext) = await _verifierProcessor.ProcessImage(uc, zipData, errs, sums, POLICY_IMAGE, "CaseDetail");
 
             var policy = new PolicyDetail
             {

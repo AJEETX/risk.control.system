@@ -10,6 +10,7 @@
         public const string AgencyUsersImageCollection = "AgencyUsersImageCollection";
         public const string LogsDirectory = "Logs";
         public const string CASE = "Case";
+        public const string REPORT = "Report";
 
         public static class CASE_STATUS
         {
@@ -40,7 +41,7 @@
             }
         }
 
-        public readonly static string[] CreatedAndDraftStatuses = new[] {
+        public readonly static string[] CreatedAndDraftStatuses = [
                 CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.UPLOAD_COMPLETED,
                 CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.DRAFTED_BY_CREATOR,
                 CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.EDITED_BY_CREATOR,
@@ -48,10 +49,10 @@
                 CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY,
                 CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY,
                 CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER
-            };
+            ];
 
-        public static readonly string[] ActiveSubStatuses = new[]
-            {
+        public static readonly string[] ActiveSubStatuses =
+            [
                 CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.UPLOAD_IN_PROGRESS,
                 CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.UPLOAD_COMPLETED,
                 CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.DRAFTED_BY_CREATOR,
@@ -62,7 +63,7 @@
                 CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY
             //,
             //    CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR
-            };
+            ];
 
         public const string UNDERWRITING = "underwriting";
         public const string CLAIM = "claim";

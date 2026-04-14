@@ -10,16 +10,10 @@ namespace risk.control.system.Services.Creator
         Task<LicenseStatus> GetUploadPermissionsAsync(ApplicationUser user, bool isManager = false);
     }
 
-    public class LicenseService : ILicenseService
+    public class LicenseService(ApplicationDbContext context, IInvestigationService investigationService) : ILicenseService
     {
-        private readonly ApplicationDbContext context;
-        private readonly IInvestigationService investigationService;
-
-        public LicenseService(ApplicationDbContext context, IInvestigationService investigationService)
-        {
-            this.context = context;
-            this.investigationService = investigationService;
-        }
+        private readonly ApplicationDbContext _context = context;
+        private readonly IInvestigationService _investigationService = investigationService;
 
         public async Task<LicenseStatus> GetUploadPermissionsAsync(ApplicationUser user, bool isManager = false)
         {
@@ -27,18 +21,18 @@ namespace risk.control.system.Services.Creator
             if (company!.LicenseType != LicenseType.Trial)
                 return LicenseStatus.Unlimited();
 
-            var totalReadyToAssign = await investigationService.GetAutoCount(user.Email!);
+            var totalReadyToAssign = await _investigationService.GetAutoCount(user.Email!);
             bool hasUploadFiles = false;
             if (!isManager)
             {
-                hasUploadFiles = await context.FilesOnFileSystem.AsNoTracking().AnyAsync(f => f.UploadedBy == user.Email && !f.Deleted);
+                hasUploadFiles = await _context.FilesOnFileSystem.AsNoTracking().AnyAsync(f => f.UploadedBy == user.Email && !f.Deleted);
             }
             else
             {
-                hasUploadFiles = await context.FilesOnFileSystem.AsNoTracking().AnyAsync(f => f.CompanyId == user.ClientCompanyId && !f.Deleted);
+                hasUploadFiles = await _context.FilesOnFileSystem.AsNoTracking().AnyAsync(f => f.CompanyId == user.ClientCompanyId && !f.Deleted);
             }
 
-            var totalClaimsCreated = await context.Investigations
+            var totalClaimsCreated = await _context.Investigations
                 .CountAsync(c => !c.Deleted && c.ClientCompanyId == company.ClientCompanyId);
 
             int available = company.TotalCreatedClaimAllowed - totalClaimsCreated;
