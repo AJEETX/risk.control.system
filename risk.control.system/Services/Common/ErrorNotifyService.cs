@@ -8,14 +8,9 @@ namespace risk.control.system.Services.Common
         void ShowErrorNotification(ModelStateDictionary ModelState, string message = "An error occurred. Please try again.");
     }
 
-    internal class ErrorNotifyService : IErrorNotifyService
+    internal class ErrorNotifyService(INotyfService notifyService) : IErrorNotifyService
     {
-        private readonly INotyfService _notifyService;
-
-        public ErrorNotifyService(INotyfService notifyService)
-        {
-            _notifyService = notifyService;
-        }
+        private readonly INotyfService _notifyService = notifyService;
 
         public void ShowErrorNotification(ModelStateDictionary ModelState, string message = "An error occurred. Please try again.")
         {

@@ -9,16 +9,10 @@ namespace risk.control.system.Controllers.Api.Agency
     [Route("api/agency/[controller]")]
     [ApiController]
     [Authorize(Roles = AGENT.DISPLAY_NAME)]
-    public class AgentController : ControllerBase
+    public class AgentController(IAgentService agentService, ILogger<AgentController> logger) : ControllerBase
     {
-        private readonly IAgentService agentService;
-        private readonly ILogger<AgentController> logger;
-
-        public AgentController(IAgentService agentService, ILogger<AgentController> logger)
-        {
-            this.agentService = agentService;
-            this.logger = logger;
-        }
+        private readonly IAgentService _agentService = agentService;
+        private readonly ILogger<AgentController> logger = logger;
 
         [HttpGet("GetNewCases")]
         public async Task<IActionResult> GetNewCases()
@@ -27,7 +21,7 @@ namespace risk.control.system.Controllers.Api.Agency
 
             try
             {
-                var response = await agentService.GetNewCases(userEmail);
+                var response = await _agentService.GetNewCases(userEmail);
                 return Ok(response);
             }
             catch (Exception ex)
@@ -44,7 +38,7 @@ namespace risk.control.system.Controllers.Api.Agency
 
             try
             {
-                var response = await agentService.GetSubmittedCases(userEmail);
+                var response = await _agentService.GetSubmittedCases(userEmail);
                 return Ok(response);
             }
             catch (Exception ex)

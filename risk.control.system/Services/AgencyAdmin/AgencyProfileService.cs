@@ -14,16 +14,10 @@ namespace risk.control.system.Services.AgencyAdmin
         Task LoadAgencyMetadataAsync(Vendor model, string userEmail);
     }
 
-    internal class AgencyProfileService : IAgencyProfileService
+    internal class AgencyProfileService(ApplicationDbContext context, IAgencyCaseLoadService agencyCaseLoadService) : IAgencyProfileService
     {
-        private readonly ApplicationDbContext _context;
-        private readonly IAgencyCaseLoadService _agencyCaseLoadService;
-
-        public AgencyProfileService(ApplicationDbContext context, IAgencyCaseLoadService agencyCaseLoadService)
-        {
-            _context = context;
-            _agencyCaseLoadService = agencyCaseLoadService;
-        }
+        private readonly ApplicationDbContext _context = context;
+        private readonly IAgencyCaseLoadService _agencyCaseLoadService = agencyCaseLoadService;
 
         public async Task<Vendor> GetAgencyProfileAsync(string userEmail)
         {

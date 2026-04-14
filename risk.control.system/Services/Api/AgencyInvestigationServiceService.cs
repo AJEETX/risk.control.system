@@ -13,15 +13,10 @@ namespace risk.control.system.Services.Api
         Task<List<AgencyServiceResponse>> AllServices(string userEmail);
     }
 
-    internal class AgencyInvestigationServiceService : IAgencyInvestigationServiceService
+    internal class AgencyInvestigationServiceService(
+        IDbContextFactory<ApplicationDbContext> contextFactory) : IAgencyInvestigationServiceService
     {
-        private readonly IDbContextFactory<ApplicationDbContext> _contextFactory;
-
-        public AgencyInvestigationServiceService(
-            IDbContextFactory<ApplicationDbContext> contextFactory)
-        {
-            _contextFactory = contextFactory;
-        }
+        private readonly IDbContextFactory<ApplicationDbContext> _contextFactory = contextFactory;
 
         public async Task<List<AgencyServiceResponse>> GetAgencyService(long vendorId)
         {

@@ -9,14 +9,9 @@ namespace risk.control.system.Services.Common
         Task<string> ShortenUrlAsync(string longUrl);
     }
 
-    internal class TinyUrlService : ITinyUrlService
+    internal class TinyUrlService(IHttpClientFactory httpClientFactory) : ITinyUrlService
     {
-        private readonly IHttpClientFactory httpClientFactory;
-
-        public TinyUrlService(IHttpClientFactory httpClientFactory)
-        {
-            this.httpClientFactory = httpClientFactory;
-        }
+        private readonly IHttpClientFactory _httpClientFactory = httpClientFactory;
 
         public async Task<string> ShortenUrlAsync(string longUrl)
         {
@@ -29,7 +24,7 @@ namespace risk.control.system.Services.Common
             var json = JsonSerializer.Serialize(request);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var httpClient = httpClientFactory.CreateClient();
+            var httpClient = _httpClientFactory.CreateClient();
             httpClient.BaseAddress = new Uri("https://api.tinyurl.com/");
             httpClient.DefaultRequestHeaders.Clear();
             httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {EnvHelper.Get("TINY_URL_KEY")}");

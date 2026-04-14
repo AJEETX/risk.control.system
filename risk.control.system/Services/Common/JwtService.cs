@@ -14,16 +14,10 @@ namespace risk.control.system.Services.Common
         Task<bool> ValidateJwtToken(ApplicationDbContext context, HttpContext httpConext, string token);
     }
 
-    internal class JwtService : IJwtService
+    internal class JwtService(IConfiguration config, ILogger<JwtService> logger) : IJwtService
     {
-        private readonly IConfiguration config;
-        private readonly ILogger<JwtService> logger;
-
-        public JwtService(IConfiguration config, ILogger<JwtService> logger)
-        {
-            this.config = config;
-            this.logger = logger;
-        }
+        private readonly IConfiguration _config = config;
+        private readonly ILogger<JwtService> _logger = logger;
 
         public async Task<bool> ValidateJwtToken(ApplicationDbContext context, HttpContext httpContext, string token)
         {
@@ -36,9 +30,9 @@ namespace risk.control.system.Services.Common
                     ValidateAudience = true,
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
-                    ValidIssuer = config["Jwt:Issuer"],
-                    ValidAudience = config["Jwt:Audience"],
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Jwt:Data"]!)),
+                    ValidIssuer = _config["Jwt:Issuer"],
+                    ValidAudience = _config["Jwt:Audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Data"]!)),
                     ClockSkew = TimeSpan.Zero
                 };
 
@@ -59,7 +53,7 @@ namespace risk.control.system.Services.Common
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred.");
+                _logger.LogError(ex, "Error occurred.");
                 throw;
             }
         }

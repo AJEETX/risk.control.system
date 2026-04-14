@@ -30,6 +30,7 @@ public static class BusinessServiceExtension
 
         //services.AddHttpClient(Options.DefaultName).AddPolicyHandler(retryPolicy);
         services.AddHttpClient();
+        services.AddScoped<IImageConverter, ImageConverter>();
         services.AddScoped<ISmsNotificationService, SmsNotificationService>();
         services.AddScoped<IUserFaceImageCheckService, UserFaceImageCheckService>();
         services.AddScoped<IOcrService, OcrService>();

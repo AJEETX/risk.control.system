@@ -12,10 +12,10 @@ namespace risk.control.system.Services.Api
         Task<DashboardData> GetAgentCount(string userEmail, string role);
     }
 
-    internal class AgencyDashboardService : IAgencyDashboardService
+    internal class AgencyDashboardService(IDbContextFactory<ApplicationDbContext> contextFactory, ILogger<AgencyDashboardService> logger) : IAgencyDashboardService
     {
-        private readonly IDbContextFactory<ApplicationDbContext> contextFactory;
-        private readonly ILogger<AgencyDashboardService> logger;
+        private readonly IDbContextFactory<ApplicationDbContext> _contextFactory = contextFactory;
+        private readonly ILogger<AgencyDashboardService> _logger = logger;
 
         // Consts remained the same for logic consistency
         private const string allocated = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR;
@@ -29,17 +29,11 @@ namespace risk.control.system.Services.Api
         private const string approved = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR;
         private const string finished = CONSTANTS.CASE_STATUS.FINISHED;
 
-        public AgencyDashboardService(IDbContextFactory<ApplicationDbContext> contextFactory, ILogger<AgencyDashboardService> logger)
-        {
-            this.contextFactory = contextFactory;
-            this.logger = logger;
-        }
-
         public async Task<DashboardData> GetAgentCount(string userEmail, string role)
         {
             try
             {
-                await using var _context = contextFactory.CreateDbContext();
+                await using var _context = _contextFactory.CreateDbContext();
                 var vendorUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == userEmail);
                 var taskCount = await GetCases(_context).CountAsync(c =>
                     c.VendorId == vendorUser!.VendorId &&
@@ -60,7 +54,7 @@ namespace risk.control.system.Services.Api
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred for {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error occurred for {UserEmail}", userEmail);
                 throw;
             }
         }
@@ -92,14 +86,14 @@ namespace risk.control.system.Services.Api
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred while getting supervisor dashboard data for user {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error occurred while getting supervisor dashboard data for user {UserEmail}", userEmail);
                 throw;
             }
         }
 
         private async Task<int> GetSuperVisorActiveCount(string userEmail)
         {
-            await using var _context = contextFactory.CreateDbContext();
+            await using var _context = _contextFactory.CreateDbContext();
             var vendorUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == userEmail);
             var query = GetAgencyClaims(_context).Where(a => a.VendorId == vendorUser!.VendorId && a.Status != finished);
             if (vendorUser!.IsVendorAdmin)
@@ -112,14 +106,14 @@ namespace risk.control.system.Services.Api
 
         private async Task<int> GetAgencyVerifiedCount(string userEmail)
         {
-            await using var _context = contextFactory.CreateDbContext();
+            await using var _context = _contextFactory.CreateDbContext();
             var vendorUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == userEmail);
             return await GetAgencyClaims(_context).CountAsync(i => i.VendorId == vendorUser!.VendorId && i.SubStatus == submitted2Supervisor);
         }
 
         private async Task<int> GetAgencyAllocateCount(string userEmail)
         {
-            await using var _context = contextFactory.CreateDbContext();
+            await using var _context = _contextFactory.CreateDbContext();
             var vendorUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == userEmail);
             return await GetAgencyClaims(_context).CountAsync(i => i.VendorId == vendorUser!.VendorId &&
                 (i.SubStatus == allocated || i.SubStatus == requestedAssessor));
@@ -127,7 +121,7 @@ namespace risk.control.system.Services.Api
 
         private async Task<int> GetAgencyyCompleted(string userEmail)
         {
-            await using var _context = contextFactory.CreateDbContext();
+            await using var _context = _contextFactory.CreateDbContext();
             var agencyUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == userEmail);
             var query = GetAgencyClaims(_context).Where(c => c.VendorId == agencyUser!.VendorId && c.Status == finished);
             if (agencyUser!.IsVendorAdmin)

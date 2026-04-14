@@ -20,29 +20,19 @@ namespace risk.control.system.Services
         Task<(string, string, string)> AllocateToVendor(string userEmail, long caseId, long vendorId, bool autoAllocated = true);
     }
 
-    internal class AssignCaseService : IAssignCaseService
+    internal class AssignCaseService(IDbContextFactory<ApplicationDbContext> contextFactory,
+        IAgencyCaseLoadService agencyCaseLoadService,
+        ILogger<AssignCaseService> logger,
+        ICaseNotificationService notificationService,
+        ITimelineService timelineService,
+        IBackgroundJobClient backgroundJobClient) : IAssignCaseService
     {
-        private readonly IDbContextFactory<ApplicationDbContext> _contextFactory;
-        private readonly IAgencyCaseLoadService _agencyCaseLoadService;
-        private readonly ILogger<AssignCaseService> logger;
-        private readonly ICaseNotificationService mailboxService;
-        private readonly ITimelineService timelineService;
-        private readonly IBackgroundJobClient backgroundJobClient;
-
-        public AssignCaseService(IDbContextFactory<ApplicationDbContext> contextFactory,
-            IAgencyCaseLoadService agencyCaseLoadService,
-            ILogger<AssignCaseService> logger,
-            ICaseNotificationService mailboxService,
-            ITimelineService timelineService,
-            IBackgroundJobClient backgroundJobClient)
-        {
-            _contextFactory = contextFactory;
-            this._agencyCaseLoadService = agencyCaseLoadService;
-            this.logger = logger;
-            this.mailboxService = mailboxService;
-            this.timelineService = timelineService;
-            this.backgroundJobClient = backgroundJobClient;
-        }
+        private readonly IDbContextFactory<ApplicationDbContext> _contextFactory = contextFactory;
+        private readonly IAgencyCaseLoadService _agencyCaseLoadService = agencyCaseLoadService;
+        private readonly ILogger<AssignCaseService> _logger = logger;
+        private readonly ICaseNotificationService _notificationService = notificationService;
+        private readonly ITimelineService _timelineService = timelineService;
+        private readonly IBackgroundJobClient _backgroundJobClient = backgroundJobClient;
 
         public async Task<int> UpdateCaseAllocationStatus(string userEmail, List<long> caseIds)
         {
@@ -71,7 +61,7 @@ namespace risk.control.system.Services
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred. {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error occurred. {UserEmail}", userEmail);
                 throw;
             }
         }
@@ -89,11 +79,11 @@ namespace risk.control.system.Services
                 {
                     await AssignToAssigner(userEmail, notAutoAllocated, url);
                 }
-                var jobId = backgroundJobClient.Enqueue(() => mailboxService.NotifyCaseAssignmentToAssigner(userEmail, autoAllocatedCases, notAutoAllocated, url));
+                var jobId = _backgroundJobClient.Enqueue(() => _notificationService.NotifyCaseAssignmentToAssigner(userEmail, autoAllocatedCases, notAutoAllocated, url));
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred. {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error occurred. {UserEmail}", userEmail);
                 throw;
             }
         }
@@ -134,8 +124,8 @@ namespace risk.control.system.Services
                 var (policy, status, _) = await AllocateToVendor(userEmail, caseTask.Id, selectedVendorId);
                 if (!string.IsNullOrEmpty(policy))
                 {
-                    backgroundJobClient.Enqueue(() =>
-                        mailboxService.NotifyCaseAllocationToVendor(userEmail, policy, caseTask.Id, selectedVendorId, url));
+                    _backgroundJobClient.Enqueue(() =>
+                        _notificationService.NotifyCaseAllocationToVendor(userEmail, policy, caseTask.Id, selectedVendorId, url));
                     return claim;
                 }
                 return 0;
@@ -176,15 +166,15 @@ namespace risk.control.system.Services
                 if (string.IsNullOrEmpty(policy) || string.IsNullOrEmpty(status))
                 {
                     await AssignToAssigner(userEmail, new List<long> { caseId });
-                    await mailboxService.NotifyCaseAssignmentToAssigner(userEmail, new List<long> { caseId }, url);
+                    await _notificationService.NotifyCaseAssignmentToAssigner(userEmail, new List<long> { caseId }, url);
                     return null!;
                 }
-                var jobId = backgroundJobClient.Enqueue(() => mailboxService.NotifyCaseAllocationToVendor(userEmail, policy, caseTask.Id, selectedVendorId.VendorId, url));
+                var jobId = _backgroundJobClient.Enqueue(() => _notificationService.NotifyCaseAllocationToVendor(userEmail, policy, caseTask.Id, selectedVendorId.VendorId, url));
                 return caseTask.PolicyDetail!.ContractNumber; // Return allocated claim
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred Case {CaseId}. {UserEmail}", caseId, userEmail);
+                _logger.LogError(ex, "Error occurred Case {CaseId}. {UserEmail}", caseId, userEmail);
                 throw;
             }
         }
@@ -221,13 +211,13 @@ namespace risk.control.system.Services
                 context.Investigations.UpdateRange(cases2Assign);
                 await context.SaveChangesAsync(null, false);
 
-                var autoAllocatedTasks = cases2Assign.ToList().Select(u => timelineService.UpdateTaskStatus(u.Id, userEmail));
+                var autoAllocatedTasks = cases2Assign.ToList().Select(u => _timelineService.UpdateTaskStatus(u.Id, userEmail));
 
                 await Task.WhenAll(autoAllocatedTasks);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred Case(s) {Count}. {UserEmail}", cases.Count, userEmail);
+                _logger.LogError(ex, "Error occurred Case(s) {Count}. {UserEmail}", cases.Count, userEmail);
                 throw;
             }
         }
@@ -265,12 +255,12 @@ namespace risk.control.system.Services
                 caseTask.InvestigationReport = investigationReport;
                 context.Investigations.Update(caseTask);
                 await context.SaveChangesAsync(null, false);
-                await timelineService.UpdateTaskStatus(caseTask.Id, currentUser.Email!);
+                await _timelineService.UpdateTaskStatus(caseTask.Id, currentUser.Email!);
                 return (caseTask.PolicyDetail!.ContractNumber, caseTask.SubStatus, vendor.Name);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred Case {CasId}. {UserEmail}", caseId, userEmail);
+                _logger.LogError(ex, "Error occurred Case {CasId}. {UserEmail}", caseId, userEmail);
                 throw;
             }
         }

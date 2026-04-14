@@ -21,27 +21,19 @@ namespace risk.control.system.Services.AgencyAdmin
         Task LoadModel(ApplicationUser model, string currentUserEmail);
     }
 
-    internal class AgencyUserService : IAgencyUserService
+    internal class AgencyUserService(
+        UserManager<ApplicationUser> userManager,
+        IFileStorageService fileStorageService,
+        ApplicationDbContext context,
+        ISmsService smsService) : IAgencyUserService
     {
         private const long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
         private static readonly string[] AllowedExt = new[] { ".jpg", ".jpeg", ".png" };
         private static readonly string[] AllowedMime = new[] { "image/jpeg", "image/png" };
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly IFileStorageService _fileStorageService;
-        private readonly ApplicationDbContext _context;
-        private readonly ISmsService _smsService;
-
-        public AgencyUserService(
-            UserManager<ApplicationUser> userManager,
-            IFileStorageService fileStorageService,
-            ApplicationDbContext context,
-            ISmsService smsService)
-        {
-            _userManager = userManager;
-            _fileStorageService = fileStorageService;
-            _context = context;
-            _smsService = smsService;
-        }
+        private readonly UserManager<ApplicationUser> _userManager = userManager;
+        private readonly IFileStorageService _fileStorageService = fileStorageService;
+        private readonly ApplicationDbContext _context = context;
+        private readonly ISmsService _smsService = smsService;
 
         public async Task<ServiceResult> UpdateUserAsync(string id, ApplicationUser model, string updatedBy, string portal_base_url)
         {

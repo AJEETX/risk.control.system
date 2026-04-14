@@ -5,7 +5,6 @@ using risk.control.system.AppConstant;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
-using risk.control.system.Services.Api;
 using risk.control.system.Services.Common;
 
 namespace risk.control.system.Services.Creator
@@ -29,27 +28,16 @@ namespace risk.control.system.Services.Creator
         Task LoadDropDowns(PolicyDetailDto model, string userEmail);
     }
 
-    internal class CaseCreateEditService : ICaseCreateEditService
+    internal class CaseCreateEditService(
+        IAddInvestigationService addInvestigationService,
+        ApplicationDbContext context,
+        INumberSequenceService numberService,
+        IValidateImageService validateImageService) : ICaseCreateEditService
     {
-        private readonly IAddInvestigationService _addInvestigationService;
-        private readonly ApplicationDbContext _context;
-        private readonly INumberSequenceService numberService;
-        private readonly IInvestigationService _investigationService;
-        private readonly IValidateImageService _validateImageService;
-
-        public CaseCreateEditService(
-            IAddInvestigationService addInvestigationService,
-            ApplicationDbContext context,
-            INumberSequenceService numberService,
-            IInvestigationService investigationService,
-            IValidateImageService validateImageService)
-        {
-            _addInvestigationService = addInvestigationService;
-            this._context = context;
-            this.numberService = numberService;
-            this._investigationService = investigationService;
-            this._validateImageService = validateImageService;
-        }
+        private readonly IAddInvestigationService _addInvestigationService = addInvestigationService;
+        private readonly ApplicationDbContext _context = context;
+        private readonly INumberSequenceService _numberService = numberService;
+        private readonly IValidateImageService _validateImageService = validateImageService;
 
         public async Task LoadDropDowns(PolicyDetailDto model, string userEmail)
         {
@@ -139,7 +127,7 @@ namespace risk.control.system.Services.Creator
 
         public async Task<CreateCaseViewModel> AddCaseDetail(string userEmail)
         {
-            var contractNumber = await numberService.GetNumberSequence("PX");
+            var contractNumber = await _numberService.GetNumberSequence("PX");
             var caseEnabler = await _context.CaseEnabler.FirstOrDefaultAsync();
             var costCentre = await _context.CostCentre.FirstOrDefaultAsync();
             var service = await _context.InvestigationServiceType.FirstOrDefaultAsync(i => i.InsuranceType == InsuranceType.CLAIM);

@@ -28,33 +28,22 @@ namespace risk.control.system.Services.Common
         Task<(bool Success, string Message)> VerifyAndLoginAsync(OtpLoginModel request);
     }
 
-    internal class LoginService : ILoginService
+    internal class LoginService(
+        IDbContextFactory<ApplicationDbContext> contextFactory,
+        IMemoryCache cache,
+        ISmsService smsService,
+        IFeatureManager featureManager,
+        UserManager<ApplicationUser> userManager,
+        IConfiguration config,
+        SignInManager<ApplicationUser> signInManager) : ILoginService
     {
-        private readonly IDbContextFactory<ApplicationDbContext> contextFactory;
-        private readonly IMemoryCache cache;
-        private readonly ISmsService smsService;
-        private readonly IFeatureManager _featureManager;
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly IConfiguration config;
-        private readonly SignInManager<ApplicationUser> signInManager;
-
-        public LoginService(
-            IDbContextFactory<ApplicationDbContext> contextFactory,
-            IMemoryCache cache,
-            ISmsService smsService,
-            IFeatureManager featureManager,
-            UserManager<ApplicationUser> userManager,
-            IConfiguration config,
-            SignInManager<ApplicationUser> signInManager)
-        {
-            this.contextFactory = contextFactory;
-            this.cache = cache;
-            this.smsService = smsService;
-            _featureManager = featureManager;
-            _userManager = userManager;
-            this.config = config;
-            this.signInManager = signInManager;
-        }
+        private readonly IDbContextFactory<ApplicationDbContext> _contextFactory = contextFactory;
+        private readonly IMemoryCache _cache = cache;
+        private readonly ISmsService _smsService = smsService;
+        private readonly IFeatureManager _featureManager = featureManager;
+        private readonly UserManager<ApplicationUser> _userManager = userManager;
+        private readonly IConfiguration _config = config;
+        private readonly SignInManager<ApplicationUser> _signInManager = signInManager;
 
         public async Task<(bool IsAuthorized, string DisplayName, bool IsAdmin)> GetUserStatusAsync(ApplicationUser user, string agentLogin = "")
         {
@@ -65,7 +54,7 @@ namespace risk.control.system.Services.Common
             }
 
             // 2. Company User Logic
-            await using var _context = contextFactory.CreateDbContext();
+            await using var _context = _contextFactory.CreateDbContext();
             var companyUser = await _context.ApplicationUser
                 .FirstOrDefaultAsync(u => u.Email == user.Email && !u.Deleted && u.ClientCompanyId > 0);
 
@@ -103,7 +92,7 @@ namespace risk.control.system.Services.Common
 
         public async Task<IEnumerable<SelectListItem>> GetUserSelectListAsync()
         {
-            await using var _context = contextFactory.CreateDbContext();
+            await using var _context = _contextFactory.CreateDbContext();
             var users = await _context.Users
                 .Where(u => !u.Deleted)
                 .OrderBy(o => o.Email)
@@ -114,13 +103,13 @@ namespace risk.control.system.Services.Common
 
         public async Task SignInWithTimeoutAsync(ApplicationUser user)
         {
-            var timeout = config["SESSION_TIMEOUT_SEC"] ?? "900";
+            var timeout = _config["SESSION_TIMEOUT_SEC"] ?? "900";
             var properties = new AuthenticationProperties
             {
                 IsPersistent = true,
                 ExpiresUtc = DateTimeOffset.UtcNow.AddSeconds(double.Parse(timeout))
             };
-            await signInManager.SignInAsync(user, properties);
+            await _signInManager.SignInAsync(user, properties);
         }
 
         public string GetErrorMessage(SignInResult result)
@@ -147,19 +136,19 @@ namespace risk.control.system.Services.Common
             string cleanMobile = request.MobileNumber!.TrimStart('0');
             string cacheKey = $"{cleanIsd}{cleanMobile}";
 
-            if (!cache.TryGetValue(cacheKey, out string? correctOtp) || correctOtp != request.UserEnteredOtp?.Trim())
+            if (!_cache.TryGetValue(cacheKey, out string? correctOtp) || correctOtp != request.UserEnteredOtp?.Trim())
             {
                 return (false, "The OTP entered is invalid or has expired.");
             }
 
-            cache.Remove(cacheKey);
+            _cache.Remove(cacheKey);
 
             var username = $"{cleanIsd}{cleanMobile}@" + Applicationsettings.WEBSITE_SITE_URL;
             var user = await _userManager.FindByNameAsync(username);
 
             if (user == null)
             {
-                await using var _context = contextFactory.CreateDbContext();
+                await using var _context = _contextFactory.CreateDbContext();
                 var country = await _context.Country.FirstOrDefaultAsync(c => c.ISDCode.ToString() == cleanIsd);
 
                 user = new ApplicationUser
@@ -196,10 +185,10 @@ namespace risk.control.system.Services.Common
             var cacheOptions = new MemoryCacheEntryOptions()
                 .SetAbsoluteExpiration(TimeSpan.FromMinutes(5))
                 .SetSize(1);
-            cache.Set(cacheKey, otp, cacheOptions);
+            _cache.Set(cacheKey, otp, cacheOptions);
 
             // 2. Database Lookup
-            await using var _context = contextFactory.CreateDbContext();
+            await using var _context = _contextFactory.CreateDbContext();
             var country = await _context.Country.FirstOrDefaultAsync(c => c.ISDCode.ToString() == cleanIsd);
             if (country == null) return (false, "Invalid country code.");
 
@@ -208,7 +197,7 @@ namespace risk.control.system.Services.Common
                           $"Your code is {otp}\n" +
                           $"{request.BaseUrl}";
 
-            var response = await smsService.SendSmsAsync(country.Code, cleanIsd + cleanMobile, message);
+            var response = await _smsService.SendSmsAsync(country.Code, cleanIsd + cleanMobile, message);
 
             if (!string.IsNullOrWhiteSpace(response))
                 return (true, "OTP sent successfully!");

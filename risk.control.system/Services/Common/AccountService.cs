@@ -19,30 +19,20 @@ namespace risk.control.system.Services.Common
         Task Logout(string email);
     }
 
-    internal class AccountService : IAccountService
+    internal class AccountService(ApplicationDbContext context,
+        ISmsService SmsService,
+        UserManager<ApplicationUser> userManager,
+        SignInManager<ApplicationUser> signInManager,
+        IWebHostEnvironment webHostEnvironment,
+         IHttpContextAccessor httpContextAccessor
+            ) : IAccountService
     {
-        private readonly ApplicationDbContext context;
-        private readonly ISmsService smsService;
-        private readonly IWebHostEnvironment webHostEnvironment;
-        private readonly IHttpContextAccessor httpContextAccessor;
-        private readonly UserManager<ApplicationUser> userManager;
-        private readonly SignInManager<ApplicationUser> signInManager;
-
-        public AccountService(ApplicationDbContext context,
-            ISmsService SmsService,
-            UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager,
-            IWebHostEnvironment webHostEnvironment,
-             IHttpContextAccessor httpContextAccessor
-            )
-        {
-            this.userManager = userManager;
-            this.signInManager = signInManager;
-            this.context = context;
-            this.smsService = SmsService;
-            this.webHostEnvironment = webHostEnvironment;
-            this.httpContextAccessor = httpContextAccessor;
-        }
+        private readonly ApplicationDbContext _context = context;
+        private readonly ISmsService _smsService = SmsService;
+        private readonly IWebHostEnvironment _env = webHostEnvironment;
+        private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
+        private readonly UserManager<ApplicationUser> _userManager = userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager = signInManager;
 
         public async Task<ServiceResult> ChangePasswordAsync(ChangePasswordViewModel model, ClaimsPrincipal userPrincipal, bool isAuthenticated, string portal_base_url)
         {
@@ -55,16 +45,16 @@ namespace risk.control.system.Services.Common
             if (!isAuthenticated)
                 return Error(result, string.Empty, "User not authenticated");
 
-            var user = await userManager.GetUserAsync(userPrincipal);
+            var user = await _userManager.GetUserAsync(userPrincipal);
             if (user == null)
                 return Error(result, string.Empty, "User not found");
 
-            var admin = await context.ApplicationUser.Include(u => u.Country).FirstOrDefaultAsync(u => u.IsSuperAdmin);
+            var admin = await _context.ApplicationUser.Include(u => u.Country).FirstOrDefaultAsync(u => u.IsSuperAdmin);
 
             if (admin == null)
                 return Error(result, string.Empty, "Admin configuration missing");
 
-            var changeResult = await userManager.ChangePasswordAsync(user, WebUtility.HtmlEncode(model.CurrentPassword!), model.NewPassword);
+            var changeResult = await _userManager.ChangePasswordAsync(user, WebUtility.HtmlEncode(model.CurrentPassword!), model.NewPassword);
 
             if (!changeResult.Succeeded)
             {
@@ -78,10 +68,10 @@ namespace risk.control.system.Services.Common
             }
 
             user.IsPasswordChangeRequired = false;
-            context.ApplicationUser.Update(user);
-            await context.SaveChangesAsync();
+            _context.ApplicationUser.Update(user);
+            await _context.SaveChangesAsync();
 
-            await signInManager.RefreshSignInAsync(user);
+            await _signInManager.RefreshSignInAsync(user);
 
             await NotifyAdminAsync(admin, user, portal_base_url, false);
             await NotifyUserAsync(admin, user, model.NewPassword, portal_base_url);
@@ -97,7 +87,7 @@ namespace risk.control.system.Services.Common
                 $"User {user.Email} {(failed ? "attempted" : "changed")} password.\n" +
                 $"{portal_base_url}";
 
-            await smsService.DoSendSmsAsync(admin.Country!.Code, "+" + admin.Country.ISDCode + admin.PhoneNumber, message);
+            await _smsService.DoSendSmsAsync(admin.Country!.Code, "+" + admin.Country.ISDCode + admin.PhoneNumber, message);
         }
 
         private async Task NotifyUserAsync(ApplicationUser admin, ApplicationUser user, string newPassword, string portal_base_url)
@@ -107,7 +97,7 @@ namespace risk.control.system.Services.Common
                 $"Your changed password: {newPassword}\n" +
                 $"{portal_base_url}";
 
-            await smsService.DoSendSmsAsync(
+            await _smsService.DoSendSmsAsync(
                 admin.Country!.Code,
                 "+" + admin.Country.ISDCode + user.PhoneNumber,
                 message);
@@ -128,21 +118,21 @@ namespace risk.control.system.Services.Common
             }
             //CHECK AND VALIDATE EMAIL PASSWORD
             var resetPhone = countryCode.TrimStart('+') + mobile.Trim().ToString();
-            var user = await context.ApplicationUser.Include(a => a.Country).FirstOrDefaultAsync(u => !u.Deleted && u.Email == useremail && string.Concat(u.Country!.ISDCode.ToString(), u.PhoneNumber) == resetPhone);
+            var user = await _context.ApplicationUser.Include(a => a.Country).FirstOrDefaultAsync(u => !u.Deleted && u.Email == useremail && string.Concat(u.Country!.ISDCode.ToString(), u.PhoneNumber) == resetPhone);
             if (user == null)
             {
                 return null!;
             }
             var passwordString = $"Your password is: {user.Password}";
-            var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
-            var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
-            var BaseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
+            var host = _httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
+            var pathBase = _httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
+            var BaseUrl = $"{_httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
 
             string message = $"Dear {useremail}\n";
             message += $"{passwordString}\n";
             message += $"{BaseUrl}";
-            await smsService.DoSendSmsAsync(user.Country!.Code, user.Country.ISDCode + user.PhoneNumber, message);
-            var profileImageByte = await File.ReadAllBytesAsync(Path.Combine(webHostEnvironment.ContentRootPath, user.ProfilePictureUrl!));
+            await _smsService.DoSendSmsAsync(user.Country!.Code, user.Country.ISDCode + user.PhoneNumber, message);
+            var profileImageByte = await File.ReadAllBytesAsync(Path.Combine(_env.ContentRootPath, user.ProfilePictureUrl!));
 
             return new ForgotPasswordResult
             {
@@ -155,7 +145,7 @@ namespace risk.control.system.Services.Common
 
         public async Task<ForgotPassword> CreateDefaultForgotPasswordModel(string email)
         {
-            var imagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-user.png");
+            var imagePath = Path.Combine(_env.WebRootPath, "img", "no-user.png");
 
             byte[] profilePicture = Array.Empty<byte>();
 
@@ -178,7 +168,7 @@ namespace risk.control.system.Services.Common
         {
             if (!string.IsNullOrEmpty(email))
             {
-                var session = await context.UserSessionAlive
+                var session = await _context.UserSessionAlive
                     .Include(x => x.ActiveUser)
                     .Where(x => x.ActiveUser.Email == email && !x.LoggedOut)
                     .OrderByDescending(x => x.Updated ?? x.Created)
@@ -189,11 +179,11 @@ namespace risk.control.system.Services.Common
                     session.LoggedOut = true;
                     session.Updated = DateTime.UtcNow;
                     session.UpdatedBy = email;
-                    await context.SaveChangesAsync(null, false);
+                    await _context.SaveChangesAsync(null, false);
                 }
             }
 
-            await signInManager.SignOutAsync();
+            await _signInManager.SignOutAsync();
         }
     }
 }

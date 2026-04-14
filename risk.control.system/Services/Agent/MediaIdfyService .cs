@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using risk.control.system.AppConstant;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
@@ -11,41 +12,30 @@ public interface IMediaIdfyService
     Task<AppiCheckifyResponse> CaptureMedia(DocumentData data);
 }
 
-internal class MediaIdfyService : IMediaIdfyService
+internal class MediaIdfyService(ApplicationDbContext context,
+    IAgentCaseDetailService caseService,
+    IWeatherInfoService weatherInfoService,
+    ILogger<FaceIdfyService> logger,
+    IFileStorageService fileStorageService,
+    IHttpClientService httpClientService,
+    ICustomApiClient customApiClient) : IMediaIdfyService
 {
-    private readonly ApplicationDbContext context;
-    private readonly IAgentCaseDetailService caseService;
-    private readonly IWeatherInfoService weatherInfoService;
-    private readonly ILogger<FaceIdfyService> logger;
-    private readonly IFileStorageService fileStorageService;
-    private readonly IHttpClientService httpClientService;
-    private readonly ICustomApiClient customApiCLient;
-
-    public MediaIdfyService(ApplicationDbContext context,
-        IAgentCaseDetailService caseService,
-        IWeatherInfoService weatherInfoService,
-        ILogger<FaceIdfyService> logger,
-        IFileStorageService fileStorageService,
-        IHttpClientService httpClientService,
-        ICustomApiClient customApiCLient)
-    {
-        this.context = context;
-        this.caseService = caseService;
-        this.weatherInfoService = weatherInfoService;
-        this.logger = logger;
-        this.fileStorageService = fileStorageService;
-        this.httpClientService = httpClientService;
-        this.customApiCLient = customApiCLient;
-    }
+    private readonly ApplicationDbContext _context = context;
+    private readonly IAgentCaseDetailService _caseService = caseService;
+    private readonly IWeatherInfoService _weatherInfoService = weatherInfoService;
+    private readonly ILogger<FaceIdfyService> _logger = logger;
+    private readonly IFileStorageService _fileStorageService = fileStorageService;
+    private readonly IHttpClientService _httpClientService = httpClientService;
+    private readonly ICustomApiClient _customApiClient = customApiClient;
 
     public async Task<AppiCheckifyResponse> CaptureMedia(DocumentData data)
     {
-        InvestigationTask claim = await caseService.GetCaseByIdForMedia(data.CaseId);
+        InvestigationTask claim = await _caseService.GetCaseByIdForMedia(data.CaseId);
         if (claim?.InvestigationReport == null) return null!;
 
         var location = claim.InvestigationReport.ReportTemplate!.LocationReport.FirstOrDefault(l => l.LocationName == data.LocationName);
 
-        var locationTemplate = await context.LocationReport.Include(l => l.MediaReports).FirstOrDefaultAsync(l => l.Id == location!.Id);
+        var locationTemplate = await _context.LocationReport.Include(l => l.MediaReports).FirstOrDefaultAsync(l => l.Id == location!.Id);
 
         var media = locationTemplate!.MediaReports!.FirstOrDefault(c => c.ReportName == data.ReportName);
 
@@ -57,14 +47,14 @@ internal class MediaIdfyService : IMediaIdfyService
             byte[] fileBytes = await VerificationHelper.GetBytesFromIFormFile(data.Image!);
 
             // 2. Storage & Metadata
-            var (fileName, relativePath) = await fileStorageService.SaveMediaAsync(data.Image!, "Case", claim.PolicyDetail!.ContractNumber, "report");
+            var (fileName, relativePath) = await _fileStorageService.SaveMediaAsync(data.Image!, CONSTANTS.CASE, claim.PolicyDetail!.ContractNumber, CONSTANTS.REPORT);
             MediaIdfyHelper.UpdateMediaMetadata(media!, relativePath, fileName, lat, lon);
             MediaIdfyHelper.DetermineMediaType(media!, data.Image!.ContentType);
 
             // 3. Parallel Service Orchestration
-            var weatherTask = weatherInfoService.GetWeatherAsync(lat, lon);
-            var addressTask = httpClientService.GetRawAddress(lat, lon);
-            var mapTask = customApiCLient.GetMap(expected.lat, expected.lon, double.Parse(lat), double.Parse(lon));
+            var weatherTask = _weatherInfoService.GetWeatherAsync(lat, lon);
+            var addressTask = _httpClientService.GetRawAddress(lat, lon);
+            var mapTask = _customApiClient.GetMap(expected.lat, expected.lon, double.Parse(lat), double.Parse(lon));
 
             await Task.WhenAll(weatherTask, addressTask, mapTask);
 
@@ -81,14 +71,14 @@ internal class MediaIdfyService : IMediaIdfyService
             locationTemplate.ValidationExecuted = true;
             locationTemplate.Updated = DateTime.UtcNow;
             locationTemplate.UpdatedBy = data.Email;
-            await context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
 
             return new AppiCheckifyResponse { Image = fileBytes };
         }
         catch (Exception ex)
         {
             var sanitizedEmail = data.Email?.Replace("\n", "").Replace("\r", "").Trim();
-            logger.LogError(ex, "Failed media file capture for Case {CaseId}. {AgentEmail}", data.CaseId, sanitizedEmail);
+            _logger.LogError(ex, "Failed media file capture for Case {CaseId}. {AgentEmail}", data.CaseId, sanitizedEmail);
             return await HandleMediaError(claim, media!);
         }
     }
@@ -100,7 +90,7 @@ internal class MediaIdfyService : IMediaIdfyService
         media.LocationAddress = "No Address data";
         media.ValidationExecuted = true;
 
-        await context.SaveChangesAsync();
+        await _context.SaveChangesAsync();
 
         return new AppiCheckifyResponse
         {

@@ -8,16 +8,11 @@ namespace risk.control.system.Services.Creator
         Task<string> GetNumberSequence(string module);
         Task SaveNumberSequence(string module);
     }
-    internal class NumberSequenceService : INumberSequenceService
+    internal class NumberSequenceService(ApplicationDbContext context, ILogger<NumberSequenceService> logger) : INumberSequenceService
     {
-        private readonly ApplicationDbContext context;
-        private readonly ILogger<NumberSequenceService> logger;
+        private readonly ApplicationDbContext _context = context;
+        private readonly ILogger<NumberSequenceService> _logger = logger;
 
-        public NumberSequenceService(ApplicationDbContext context, ILogger<NumberSequenceService> logger)
-        {
-            this.context = context;
-            this.logger = logger;
-        }
         public async Task<string> GetNumberSequence(string module)
         {
             string result = "";
@@ -25,7 +20,7 @@ namespace risk.control.system.Services.Creator
             {
                 int counter = 0;
 
-                NumberSequence? numberSequence = await context.NumberSequence.FirstOrDefaultAsync(x => x.Module.Equals(module));
+                NumberSequence? numberSequence = await _context.NumberSequence.FirstOrDefaultAsync(x => x.Module.Equals(module));
 
                 if (numberSequence is null)
                 {
@@ -47,7 +42,7 @@ namespace risk.control.system.Services.Creator
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred.");
+                _logger.LogError(ex, "Error occurred.");
                 throw;
             }
             return result;
@@ -55,7 +50,7 @@ namespace risk.control.system.Services.Creator
 
         public async Task SaveNumberSequence(string module)
         {
-            NumberSequence? numberSequence = await context.NumberSequence.FirstOrDefaultAsync(x => x.Module.Equals(module));
+            NumberSequence? numberSequence = await _context.NumberSequence.FirstOrDefaultAsync(x => x.Module.Equals(module));
             int counter = 0;
 
             if (numberSequence is null)
@@ -66,14 +61,14 @@ namespace risk.control.system.Services.Creator
                 numberSequence.LastNumber = counter;
                 numberSequence.NumberSequenceName = module;
                 numberSequence.Prefix = module;
-                context.Add(numberSequence);
+                _context.Add(numberSequence);
             }
             else
             {
                 counter = numberSequence.LastNumber;
                 Interlocked.Increment(ref counter);
                 numberSequence.LastNumber = counter;
-                context.Update(numberSequence);
+                _context.Update(numberSequence);
             }
         }
     }

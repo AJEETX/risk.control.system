@@ -15,18 +15,12 @@ namespace risk.control.system.Services.Common
         Task<(string distance, float distanceInMetres, string duration, int durationInSeconds, string map)> GetMap(double startLat, double startLong, double endLat, double endLong);
     }
 
-    internal class CustomApiClient : ICustomApiClient
+    internal class CustomApiClient(ILogger<CustomApiClient> logger, IHttpClientFactory httpClientFactory) : ICustomApiClient
     {
         private string startLbl = "S", endLbl = "E", startColor = "red", endColor = "green";
         private static readonly string geocodeUrl = "https://maps.googleapis.com/maps/api/geocode/json";
-        private readonly ILogger<CustomApiClient> logger;
-        private readonly IHttpClientFactory httpClientFactory;
-
-        public CustomApiClient(ILogger<CustomApiClient> logger, IHttpClientFactory httpClientFactory)
-        {
-            this.logger = logger;
-            this.httpClientFactory = httpClientFactory;
-        }
+        private readonly ILogger<CustomApiClient> _logger = logger;
+        private readonly IHttpClientFactory _httpClientFactory = httpClientFactory;
 
         public async Task<(string Latitude, string Longitude)> GetCoordinatesFromAddressAsync(string address)
         {
@@ -34,7 +28,7 @@ namespace risk.control.system.Services.Common
             {
                 var googleKey = EnvHelper.Get("GOOGLE_MAP_KEY");
                 string url = $"https://maps.googleapis.com/maps/api/geocode/json?address={Uri.EscapeDataString(address)}&key={googleKey}";
-                var httpClient = httpClientFactory.CreateClient();
+                var httpClient = _httpClientFactory.CreateClient();
                 HttpResponseMessage response = await httpClient.GetAsync(url);
                 response.EnsureSuccessStatusCode();
                 string content = await response.Content.ReadAsStringAsync();
@@ -48,14 +42,14 @@ namespace risk.control.system.Services.Common
                 }
                 else
                 {
-                    logger.LogError(jsonResponse.ToString());
+                    _logger.LogError(jsonResponse.ToString());
                     Console.WriteLine($"Error: {jsonResponse["status"]}");
                     return ("0", "0"); // Return 0,0 if the request was unsuccessful
                 }
             }
             catch (Exception ex)
             {
-                logger.LogError($"An error occurred: {ex.Message}");
+                _logger.LogError($"An error occurred: {ex.Message}");
                 Console.WriteLine($"An error occurred: {ex.Message}");
                 return ("0", "0"); // Return 0,0 if the request was unsuccessful
             }
@@ -66,7 +60,7 @@ namespace risk.control.system.Services.Common
             try
             {
                 var requestUrl = $"{geocodeUrl}?latlng={latitude},{longitude}&key={EnvHelper.Get("GOOGLE_MAP_KEY")}";
-                var httpClient = httpClientFactory.CreateClient();
+                var httpClient = _httpClientFactory.CreateClient();
                 var response = await httpClient.GetStringAsync(requestUrl);
                 var jsonResponse = JObject.Parse(response);
                 if (jsonResponse["status"]!.ToString() == "OK")
@@ -75,13 +69,13 @@ namespace risk.control.system.Services.Common
                 }
                 else
                 {
-                    logger.LogError($"No address found for the given coordinates.");
+                    _logger.LogError($"No address found for the given coordinates.");
                     return "No address found for the given coordinates.";
                 }
             }
             catch (Exception ex)
             {
-                logger.LogError($"{ex.Message}");
+                _logger.LogError($"{ex.Message}");
                 return $"Error: {ex.Message}";
             }
         }
@@ -90,7 +84,7 @@ namespace risk.control.system.Services.Common
         {
             try
             {
-                var httpClient = httpClientFactory.CreateClient();
+                var httpClient = _httpClientFactory.CreateClient();
                 var (Distance, DistanceInMetres, Duration, DurationInTime) = await GetDrivingDistance(httpClient, (startLat.ToString() + "," + startLong.ToString()), (endLat.ToString() + "," + endLong.ToString()));
                 string directionsUrl = $"https://maps.googleapis.com/maps/api/directions/json?origin={startLat},{startLong}&destination={endLat},{endLong}&mode=driving&key={EnvHelper.Get("GOOGLE_MAP_KEY")}";
 
@@ -114,7 +108,7 @@ namespace risk.control.system.Services.Common
             }
             catch (Exception ex)
             {
-                logger.LogError($"{ex.Message}");
+                _logger.LogError($"{ex.Message}");
                 return (null!, 0, null!, 0, null!);
             }
         }

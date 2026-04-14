@@ -22,31 +22,23 @@ namespace risk.control.system.Services.Api
         Task<(object, bool)> GetFileById(string userEmail, bool isManager, int uploadId);
     }
 
-    internal class InvestigationService : IInvestigationService
+    internal class InvestigationService(ApplicationDbContext context,
+        IDbContextFactory<ApplicationDbContext> contextFactory,
+        IBase64FileService base64FileService,
+        IWebHostEnvironment env) : IInvestigationService
     {
-        private readonly ApplicationDbContext context;
-        private readonly IDbContextFactory<ApplicationDbContext> contextFactory;
-        private readonly IBase64FileService base64FileService;
-        private readonly IWebHostEnvironment webHostEnvironment;
-
-        public InvestigationService(ApplicationDbContext context,
-            IDbContextFactory<ApplicationDbContext> contextFactory,
-            IBase64FileService base64FileService,
-            IWebHostEnvironment webHostEnvironment)
-        {
-            this.context = context;
-            this.contextFactory = contextFactory;
-            this.base64FileService = base64FileService;
-            this.webHostEnvironment = webHostEnvironment;
-        }
+        private readonly ApplicationDbContext _context = context;
+        private readonly IDbContextFactory<ApplicationDbContext> _contextFactory = contextFactory;
+        private readonly IBase64FileService _base64FileService = base64FileService;
+        private readonly IWebHostEnvironment _env = env;
 
         public async Task<object> GetAuto(string currentUserEmail, int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc")
         {
-            var companyUser = await context.ApplicationUser.AsNoTracking().Include(c => c.Country)
+            var companyUser = await _context.ApplicationUser.AsNoTracking().Include(c => c.Country)
                 .Where(c => c.Email == currentUserEmail)
                 .FirstOrDefaultAsync();
 
-            var query = context.Investigations.AsNoTracking().Where(a => !a.Deleted && a.ClientCompanyId == companyUser!.ClientCompanyId && a.CreatedUser == currentUserEmail);
+            var query = _context.Investigations.AsNoTracking().Where(a => !a.Deleted && a.ClientCompanyId == companyUser!.ClientCompanyId && a.CreatedUser == currentUserEmail);
 
             query = query.Where(a => CONSTANTS.CreatedAndDraftStatuses.Contains(a.SubStatus));
 
@@ -165,9 +157,9 @@ namespace risk.control.system.Services.Api
                 var personMapAddressUrl = pincodeName == null ? Applicationsettings.NO_MAP : (isUW ? i.CustomerLocationMap : i.BeneficiaryLocationMap);
 
                 // Run file operations in parallel for this specific row
-                var documentTask = base64FileService.GetBase64FileAsync(i.PolicyDocumentPath!, Applicationsettings.NO_POLICY_IMAGE);
-                var customerTask = base64FileService.GetBase64FileAsync(i.customerImagePath!, Applicationsettings.NO_USER);
-                var beneficiaryTask = base64FileService.GetBase64FileAsync(i.beneficiaryImagePath!, Applicationsettings.NO_USER);
+                var documentTask = _base64FileService.GetBase64FileAsync(i.PolicyDocumentPath!, Applicationsettings.NO_POLICY_IMAGE);
+                var customerTask = _base64FileService.GetBase64FileAsync(i.customerImagePath!, Applicationsettings.NO_USER);
+                var beneficiaryTask = _base64FileService.GetBase64FileAsync(i.beneficiaryImagePath!, Applicationsettings.NO_USER);
 
                 await Task.WhenAll(documentTask, customerTask, beneficiaryTask);
                 return new CaseAutoAllocationResponse
@@ -208,7 +200,7 @@ namespace risk.control.system.Services.Api
 
             if (idsToUpdate.Any())
             {
-                await context.Investigations.AsNoTracking()
+                await _context.Investigations.AsNoTracking()
                     .Where(x => idsToUpdate.Contains(x.Id))
                     .ExecuteUpdateAsync(setters => setters.SetProperty(i => i.IsNew, false));
             }
@@ -225,11 +217,11 @@ namespace risk.control.system.Services.Api
 
         public async Task<object> GetActive(string currentUserEmail, int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc")
         {
-            var companyUser = await context.ApplicationUser.AsNoTracking()
+            var companyUser = await _context.ApplicationUser.AsNoTracking()
                 .Include(u => u.Country)
                 .FirstOrDefaultAsync(c => c.Email == currentUserEmail);
 
-            var query = context.Investigations.AsNoTracking().Where(a => !a.Deleted && a.CreatedUser == currentUserEmail);
+            var query = _context.Investigations.AsNoTracking().Where(a => !a.Deleted && a.CreatedUser == currentUserEmail);
 
             query = query.Where(q => q.Status == CONSTANTS.CASE_STATUS.INPROGRESS && !CONSTANTS.ActiveSubStatuses.Contains(q.SubStatus));
 
@@ -341,9 +333,9 @@ namespace risk.control.system.Services.Api
                     "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\"></i> </span>" : a.BeneficiaryName;
 
                 // Fetch files in parallel for this row
-                var docTask = base64FileService.GetBase64FileAsync(a.PolicyDocumentPath!, Applicationsettings.NO_POLICY_IMAGE);
-                var custTask = base64FileService.GetBase64FileAsync(a.customerImagePath!, Applicationsettings.NO_USER);
-                var beneTask = base64FileService.GetBase64FileAsync(a.beneficiaryImagePath!, Applicationsettings.NO_USER);
+                var docTask = _base64FileService.GetBase64FileAsync(a.PolicyDocumentPath!, Applicationsettings.NO_POLICY_IMAGE);
+                var custTask = _base64FileService.GetBase64FileAsync(a.customerImagePath!, Applicationsettings.NO_USER);
+                var beneTask = _base64FileService.GetBase64FileAsync(a.beneficiaryImagePath!, Applicationsettings.NO_USER);
                 var ownerImageTask = GetOwnerImage(a.investigation);
                 var ownerDetailTask = GetOwner(a.Id);
 
@@ -387,7 +379,7 @@ namespace risk.control.system.Services.Api
             var idsToUpdate = data.Where(x => x.IsNew).Select(x => x.Id).ToList();
             if (idsToUpdate.Any())
             {
-                await context.Investigations.AsNoTracking()
+                await _context.Investigations.AsNoTracking()
                     .Where(x => idsToUpdate.Contains(x.Id))
                     .ExecuteUpdateAsync(s => s.SetProperty(b => b.IsNew, false));
             }
@@ -403,7 +395,7 @@ namespace risk.control.system.Services.Api
 
         public async Task<int> GetAutoCount(string currentUserEmail)
         {
-            var companyUser = await context.ApplicationUser.AsNoTracking().Include(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
+            var companyUser = await _context.ApplicationUser.AsNoTracking().Include(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
 
             if (companyUser == null)
                 return 0;
@@ -418,23 +410,23 @@ namespace risk.control.system.Services.Api
                     CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY
                 };
 
-            var query = context.Investigations.AsNoTracking().Where(a => !a.Deleted && a.ClientCompanyId == companyUser.ClientCompanyId && subStatuses.Contains(a.SubStatus));
+            var query = _context.Investigations.AsNoTracking().Where(a => !a.Deleted && a.ClientCompanyId == companyUser.ClientCompanyId && subStatuses.Contains(a.SubStatus));
 
             return await query.CountAsync(); // Get total count before pagination
         }
 
         public async Task<FilesDataResponse> GetFilesData(string userEmail, bool isManager, int draw, int start, int length, int orderColumn, string orderDir, int uploadId = 0, string? searchTerm = null)
         {
-            var companyUser = await context.ApplicationUser.AsNoTracking().Include(c => c.ClientCompany).FirstOrDefaultAsync(u => u.Email == userEmail);
+            var companyUser = await _context.ApplicationUser.AsNoTracking().Include(c => c.ClientCompany).FirstOrDefaultAsync(u => u.Email == userEmail);
 
-            var query = context.FilesOnFileSystem.AsNoTracking().Where(f => f.CompanyId == companyUser!.ClientCompanyId && !f.Deleted);
+            var query = _context.FilesOnFileSystem.AsNoTracking().Where(f => f.CompanyId == companyUser!.ClientCompanyId && !f.Deleted);
 
             var totalReadyToAssign = await GetAutoCount(userEmail);
             var maxAssignReadyAllowedByCompany = companyUser!.ClientCompany!.TotalToAssignMaxAllowed;
 
             if (uploadId > 0)
             {
-                var file = await context.FilesOnFileSystem.AsNoTracking().Include(c => c.CaseIds).FirstOrDefaultAsync(f => f.Id == uploadId && f.CompanyId == companyUser.ClientCompanyId && f.UploadedBy == userEmail && !f.Deleted);
+                var file = await _context.FilesOnFileSystem.AsNoTracking().Include(c => c.CaseIds).FirstOrDefaultAsync(f => f.Id == uploadId && f.CompanyId == companyUser.ClientCompanyId && f.UploadedBy == userEmail && !f.Deleted);
                 if (file == null)
                 {
                     return (null!);
@@ -550,8 +542,8 @@ namespace risk.control.system.Services.Api
 
         public async Task<(object, bool)> GetFileById(string userEmail, bool isManager, int uploadId)
         {
-            var companyUser = await context.ApplicationUser.AsNoTracking().Include(c => c.ClientCompany).FirstOrDefaultAsync(u => u.Email == userEmail);
-            var file = await context.FilesOnFileSystem.AsNoTracking().Include(c => c.CaseIds).FirstOrDefaultAsync(f => f.Id == uploadId && f.CompanyId == companyUser!.ClientCompanyId && f.UploadedBy == userEmail && !f.Deleted);
+            var companyUser = await _context.ApplicationUser.AsNoTracking().Include(c => c.ClientCompany).FirstOrDefaultAsync(u => u.Email == userEmail);
+            var file = await _context.FilesOnFileSystem.AsNoTracking().Include(c => c.CaseIds).FirstOrDefaultAsync(f => f.Id == uploadId && f.CompanyId == companyUser!.ClientCompanyId && f.UploadedBy == userEmail && !f.Deleted);
             if (file == null)
             {
                 return (null!, false);
@@ -615,8 +607,8 @@ namespace risk.control.system.Services.Api
 
         private async Task<string> GetOwnerImage(InvestigationTask caseTask)
         {
-            var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-photo.jpg");
-            await using var ctx = contextFactory.CreateDbContext();
+            var noDataImagefilePath = Path.Combine(_env.WebRootPath, "img", "no-photo.jpg");
+            await using var ctx = _contextFactory.CreateDbContext();
 
             if (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR || caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR ||
                 caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR)
@@ -624,7 +616,7 @@ namespace risk.control.system.Services.Api
                 var agencyUser = await ctx.Vendor.AsNoTracking().FirstOrDefaultAsync(u => u.VendorId == caseTask.VendorId);
                 if (agencyUser != null && !string.IsNullOrWhiteSpace(agencyUser.DocumentUrl))
                 {
-                    var agentImagePath = Path.Combine(webHostEnvironment.ContentRootPath, agencyUser.DocumentUrl);
+                    var agentImagePath = Path.Combine(_env.ContentRootPath, agencyUser.DocumentUrl);
                     var agentImageByte = await System.IO.File.ReadAllBytesAsync(agentImagePath);
                     return string.Format("data:image/*;base64,{0}", Convert.ToBase64String(agentImageByte));
                 }
@@ -634,7 +626,7 @@ namespace risk.control.system.Services.Api
                 var agent = await ctx.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(v => v.Email == caseTask.TaskedAgentEmail);
                 if (agent != null && !string.IsNullOrWhiteSpace(agent.ProfilePictureUrl))
                 {
-                    var agentImagePath = Path.Combine(webHostEnvironment.ContentRootPath, agent.ProfilePictureUrl);
+                    var agentImagePath = Path.Combine(_env.ContentRootPath, agent.ProfilePictureUrl);
                     var agentImageByte = await File.ReadAllBytesAsync(agentImagePath);
                     return string.Format("data:image/*;base64,{0}", Convert.ToBase64String(agentImageByte));
                 }
@@ -650,7 +642,7 @@ namespace risk.control.system.Services.Api
                 var company = await ctx.ClientCompany.AsNoTracking().FirstOrDefaultAsync(v => v.ClientCompanyId == caseTask.ClientCompanyId);
                 if (company != null && !string.IsNullOrWhiteSpace(company.DocumentUrl))
                 {
-                    var companyImagePath = Path.Combine(webHostEnvironment.ContentRootPath, company.DocumentUrl);
+                    var companyImagePath = Path.Combine(_env.ContentRootPath, company.DocumentUrl);
                     var companyImageByte = await File.ReadAllBytesAsync(companyImagePath);
                     return string.Format("data:image/*;base64,{0}", Convert.ToBase64String(companyImageByte));
                 }
@@ -660,7 +652,7 @@ namespace risk.control.system.Services.Api
 
         private async Task<string> GetOwner(long caseId)
         {
-            await using var ctx = contextFactory.CreateDbContext();
+            await using var ctx = _contextFactory.CreateDbContext();
             var caseTask = await ctx.Investigations.Include(c => c.Vendor).FirstOrDefaultAsync(c => c.Id == caseId);
 
             if (caseTask!.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR ||
@@ -681,7 +673,7 @@ namespace risk.control.system.Services.Api
                 caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY
                 )
             {
-                var company = await context.ClientCompany.AsNoTracking().FirstOrDefaultAsync(v => v.ClientCompanyId == caseTask.ClientCompanyId);
+                var company = await _context.ClientCompany.AsNoTracking().FirstOrDefaultAsync(v => v.ClientCompanyId == caseTask.ClientCompanyId);
                 if (company != null)
                 {
                     return company.Email;

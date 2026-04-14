@@ -25,18 +25,13 @@ namespace risk.control.system.Services.Common
         Task<TatResult> CalculateTimespan(string userEmail);
     }
 
-    internal class DashboardService : IDashboardService
+    internal class DashboardService(IDbContextFactory<ApplicationDbContext> contextFactory) : IDashboardService
     {
-        private readonly IDbContextFactory<ApplicationDbContext> _contextFactory;
+        private readonly IDbContextFactory<ApplicationDbContext> _contextFactory = contextFactory;
         private const string allocatedStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR;
         private const string assignedToAgentStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT;
         private const string submitted2SuperStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR;
         private const string enquiryStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR;
-
-        public DashboardService(IDbContextFactory<ApplicationDbContext> contextFactory)
-        {
-            _contextFactory = contextFactory;
-        }
 
         public async Task<Dictionary<string, int>> CalculateAgencyClaimStatus(string userEmail)
         {

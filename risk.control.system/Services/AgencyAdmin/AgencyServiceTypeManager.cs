@@ -12,16 +12,9 @@ namespace risk.control.system.Services.AgencyAdmin
         Task<ServiceCreateEditResult> EditAsync(VendorInvestigationServiceType service, string currentUserEmail);
     }
 
-    public class AgencyServiceTypeManager : IAgencyServiceTypeManager
+    public class AgencyServiceTypeManager(ApplicationDbContext context) : IAgencyServiceTypeManager
     {
-        private readonly ApplicationDbContext _context;
-        private readonly ILogger<AgencyServiceTypeManager> _logger;
-
-        public AgencyServiceTypeManager(ApplicationDbContext context, ILogger<AgencyServiceTypeManager> logger)
-        {
-            _context = context;
-            _logger = logger;
-        }
+        private readonly ApplicationDbContext _context = context;
 
         public async Task<ServiceCreateEditResult> CreateAsync(VendorInvestigationServiceType service, string currentUserEmail)
         {

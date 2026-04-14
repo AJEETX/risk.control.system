@@ -38,28 +38,19 @@ namespace risk.control.system.Services.Common
         Task NotifySubmitReplyToCompany(string senderUserEmail, long caseId, string url = "");
     }
 
-    internal class CaseNotificationService : ICaseNotificationService
+    internal class CaseNotificationService(IDbContextFactory<ApplicationDbContext> contextFactory,
+        RoleManager<ApplicationRole> roleManager,
+        ILogger<CaseNotificationService> logger,
+        ISmsService SmsService,
+        IFeatureManager featureManager) : ICaseNotificationService
     {
         private const string BlueSymbol = "fa fa-info i-blue";
         private const string WarningSymbol = "fa fa-times i-orangered";
-        private readonly IDbContextFactory<ApplicationDbContext> _contextFactory;
-        private readonly RoleManager<ApplicationRole> roleManager;
-        private readonly ILogger<CaseNotificationService> logger;
-        private readonly ISmsService smsService;
-        private readonly IFeatureManager featureManager;
-
-        public CaseNotificationService(IDbContextFactory<ApplicationDbContext> contextFactory,
-            RoleManager<ApplicationRole> roleManager,
-            ILogger<CaseNotificationService> logger,
-            ISmsService SmsService,
-            IFeatureManager featureManager)
-        {
-            _contextFactory = contextFactory;
-            this.roleManager = roleManager;
-            this.logger = logger;
-            smsService = SmsService;
-            this.featureManager = featureManager;
-        }
+        private readonly IDbContextFactory<ApplicationDbContext> _contextFactory = contextFactory;
+        private readonly RoleManager<ApplicationRole> _roleManager = roleManager;
+        private readonly ILogger<CaseNotificationService> _logger = logger;
+        private readonly ISmsService _smsService = SmsService;
+        private readonly IFeatureManager _featureManager = featureManager;
 
         public async Task NotifyFileUpload(string senderUserEmail, FileOnFileSystemModel file, string url)
         {
@@ -69,7 +60,7 @@ namespace risk.control.system.Services.Common
                 senderUserEmail = senderUserEmail.Replace("\n", "").Replace("\r", "").Trim();
                 var applicationUser = await _context.ApplicationUser.AsNoTracking().Include(i => i.Country).FirstOrDefaultAsync(c => c.Email == senderUserEmail);
                 if (applicationUser == null) return;
-                var creatorRole = await roleManager.FindByNameAsync(CREATOR.DISPLAY_NAME);
+                var creatorRole = await _roleManager.FindByNameAsync(CREATOR.DISPLAY_NAME);
                 bool isCompleted = file.Completed.GetValueOrDefault();
                 string statusMsg = isCompleted ? $"Upload of {file.RecordCount} cases finished" : $"JobId: {file.Id} Upload Error";
                 string dbStatus = isCompleted ? CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR : CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.UPLOAD_ERR;
@@ -78,7 +69,7 @@ namespace risk.control.system.Services.Common
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "File Upload Notification Error for {UserEmail}", senderUserEmail);
+                _logger.LogError(ex, "File Upload Notification Error for {UserEmail}", senderUserEmail);
             }
         }
 
@@ -91,16 +82,16 @@ namespace risk.control.system.Services.Common
                 userEmail = userEmail.Replace("\n", "").Replace("\r", "").Trim();
                 var applicationUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == userEmail);
                 if (applicationUser == null || caseTask == null) return;
-                var managerRole = await roleManager.FindByNameAsync(MANAGER.DISPLAY_NAME);
-                var supervisorRole = await roleManager.FindByNameAsync(SUPERVISOR.DISPLAY_NAME);
-                var agencyAdminRole = await roleManager.FindByNameAsync(AGENCY_ADMIN.DISPLAY_NAME);
+                var managerRole = await _roleManager.FindByNameAsync(MANAGER.DISPLAY_NAME);
+                var supervisorRole = await _roleManager.FindByNameAsync(SUPERVISOR.DISPLAY_NAME);
+                var agencyAdminRole = await _roleManager.FindByNameAsync(AGENCY_ADMIN.DISPLAY_NAME);
                 var vendorRecipients = await GetUsersByRoleAsync(companyId: null, vendorId, new[] { agencyAdminRole!.Id, supervisorRole!.Id });
                 await SendNotificationInternal(caseId, userEmail, supervisorRole.Id, null, vendorId, null!, caseTask.SubStatus, $"Case #{caseTask.PolicyDetail?.ContractNumber}", url, vendorRecipients);
                 await SendNotificationInternal(caseId, userEmail, managerRole!.Id, applicationUser.ClientCompanyId, null, BlueSymbol, caseTask.SubStatus, $"Case #{caseTask.PolicyDetail?.ContractNumber}", url, null!);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Allocation Notification Error for Case: {CaseId}", caseId);
+                _logger.LogError(ex, "Allocation Notification Error for Case: {CaseId}", caseId);
             }
         }
 
@@ -113,14 +104,14 @@ namespace risk.control.system.Services.Common
                 userEmail = userEmail.Replace("\n", "").Replace("\r", "").Trim();
                 var senderUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == userEmail);
                 if (caseTask == null || senderUser == null) return;
-                var supervisorRole = await roleManager.FindByNameAsync(SUPERVISOR.DISPLAY_NAME);
-                var agencyAdminRole = await roleManager.FindByNameAsync(AGENCY_ADMIN.DISPLAY_NAME);
+                var supervisorRole = await _roleManager.FindByNameAsync(SUPERVISOR.DISPLAY_NAME);
+                var agencyAdminRole = await _roleManager.FindByNameAsync(AGENCY_ADMIN.DISPLAY_NAME);
                 var recipients = await GetUsersByRoleAsync(companyId: null, vendorId: vendorId, roleIds: new[] { agencyAdminRole!.Id, supervisorRole!.Id });
                 await SendNotificationInternal(caseId, userEmail, supervisorRole.Id, null, vendorId, BlueSymbol, caseTask.SubStatus, $"Case #{caseTask.PolicyDetail?.ContractNumber}", url, recipients);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Allocation Notification Error for User: {UserEmail}", userEmail);
+                _logger.LogError(ex, "Allocation Notification Error for User: {UserEmail}", userEmail);
             }
         }
 
@@ -132,14 +123,14 @@ namespace risk.control.system.Services.Common
                 senderUserEmail = senderUserEmail.Replace("\n", "").Replace("\r", "").Trim();
                 var applicationUser = await _context.ApplicationUser.AsNoTracking().Include(i => i.Country).FirstOrDefaultAsync(c => c.Email == senderUserEmail);
                 if (applicationUser == null) return;
-                var creatorRole = await roleManager.FindByNameAsync(CREATOR.DISPLAY_NAME);
+                var creatorRole = await _roleManager.FindByNameAsync(CREATOR.DISPLAY_NAME);
                 var caseTasks = await _context.Investigations.AsNoTracking().Include(i => i.PolicyDetail).Where(v => caseIds.Contains(v.Id)).ToListAsync();
                 var notificationTasks = caseTasks.Select(caseTask => SendNotificationInternal(caseTask.Id, senderUserEmail, creatorRole?.Id, applicationUser.ClientCompanyId, null, BlueSymbol, caseTask.SubStatus, $"Case #{caseTask.PolicyDetail?.ContractNumber}", url, smsRecipients: new List<ApplicationUser> { applicationUser }));
                 await Task.WhenAll(notificationTasks);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Batch Assignment Notification Error for {UserEmail}", senderUserEmail);
+                _logger.LogError(ex, "Batch Assignment Notification Error for {UserEmail}", senderUserEmail);
             }
         }
 
@@ -152,17 +143,17 @@ namespace risk.control.system.Services.Common
                 var applicationUser = await _context.ApplicationUser.AsNoTracking().Include(i => i.Country).FirstOrDefaultAsync(c => c.Email == senderUserEmail);
                 if (applicationUser == null)
                 {
-                    logger.LogWarning("Notification failed: User {Email} not found.", senderUserEmail);
+                    _logger.LogWarning("Notification failed: User {Email} not found.", senderUserEmail);
                     return;
                 }
-                var creatorRole = await roleManager.FindByNameAsync(CREATOR.DISPLAY_NAME);
+                var creatorRole = await _roleManager.FindByNameAsync(CREATOR.DISPLAY_NAME);
                 int totalCases = (autoAllocatedCases?.Count ?? 0) + (notAutoAllocatedCases?.Count ?? 0);
                 int autoCount = autoAllocatedCases?.Count ?? 0;
                 await SendNotificationInternal(0, senderUserEmail, creatorRole?.Id, applicationUser.ClientCompanyId, null, BlueSymbol, $"{CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER}={autoCount}", $"Assigning of {totalCases} cases finished", url, smsRecipients: new List<ApplicationUser> { applicationUser });
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Notification Error for {UserEmail}", senderUserEmail);
+                _logger.LogError(ex, "Notification Error for {UserEmail}", senderUserEmail);
             }
         }
 
@@ -172,8 +163,8 @@ namespace risk.control.system.Services.Common
             {
                 await using var _context = await _contextFactory.CreateDbContextAsync();
                 var caseTask = await _context.Investigations.AsNoTracking().FirstOrDefaultAsync(v => v.Id == caseId);
-                var creatorRole = await roleManager.FindByNameAsync(CREATOR.DISPLAY_NAME);
-                var agencyAdminRole = await roleManager.FindByNameAsync(AGENCY_ADMIN.DISPLAY_NAME);
+                var creatorRole = await _roleManager.FindByNameAsync(CREATOR.DISPLAY_NAME);
+                var agencyAdminRole = await _roleManager.FindByNameAsync(AGENCY_ADMIN.DISPLAY_NAME);
                 var recipients = await _context.ApplicationUser.AsNoTracking().Include(u => u.Country).Where(u => u.ClientCompanyId == caseTask!.ClientCompanyId).Where(u => _context.UserRoles.Any(ur => ur.UserId == u.Id && ur.RoleId == creatorRole!.Id)).ToListAsync();
                 senderUserEmail = senderUserEmail.Replace("\n", "").Replace("\r", "").Trim();
                 var agencyAdmin = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(v => v.VendorId == vendorId && v.IsVendorAdmin);
@@ -182,7 +173,7 @@ namespace risk.control.system.Services.Common
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Withdrawal Notification Error for Case {CaseId}", caseId);
+                _logger.LogError(ex, "Withdrawal Notification Error for Case {CaseId}", caseId);
             }
         }
 
@@ -192,8 +183,8 @@ namespace risk.control.system.Services.Common
             {
                 await using var _context = await _contextFactory.CreateDbContextAsync();
                 var caseTask = await _context.Investigations.AsNoTracking().FirstOrDefaultAsync(v => v.Id == caseId);
-                var creatorRole = await roleManager.FindByNameAsync(CREATOR.DISPLAY_NAME);
-                var agencyAdminRole = await roleManager.FindByNameAsync(AGENCY_ADMIN.DISPLAY_NAME);
+                var creatorRole = await _roleManager.FindByNameAsync(CREATOR.DISPLAY_NAME);
+                var agencyAdminRole = await _roleManager.FindByNameAsync(AGENCY_ADMIN.DISPLAY_NAME);
                 var recipients = await _context.ApplicationUser.AsNoTracking().Include(u => u.Country).Where(u => u.ClientCompanyId == caseTask!.ClientCompanyId).Where(u => _context.UserRoles.Any(ur => ur.UserId == u.Id && ur.RoleId == creatorRole!.Id)).ToListAsync();
                 senderUserEmail = senderUserEmail.Replace("\n", "").Replace("\r", "").Trim();
                 await SendNotificationInternal(caseId, senderUserEmail, agencyAdminRole!.Id, null, vendorId, WarningSymbol, caseTask!.SubStatus, $"Case #{policyNumber}", url, recipients);
@@ -201,7 +192,7 @@ namespace risk.control.system.Services.Common
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Decline Notification Error for Case {CaseId}", caseId);
+                _logger.LogError(ex, "Decline Notification Error for Case {CaseId}", caseId);
             }
         }
 
@@ -214,17 +205,17 @@ namespace risk.control.system.Services.Common
                 var recipientUser = await _context.ApplicationUser.AsNoTracking().Include(c => c.Country).FirstOrDefaultAsync(c => c.Email == agentEmail);
                 if (caseTask == null || recipientUser == null)
                 {
-                    logger.LogWarning("Assignment notification aborted: Case {CaseId} or Agent {Email} not found.", caseId, agentEmail);
+                    _logger.LogWarning("Assignment notification aborted: Case {CaseId} or Agent {Email} not found.", caseId, agentEmail);
                     return;
                 }
-                var agentRole = await roleManager.FindByNameAsync(AGENT.DISPLAY_NAME);
+                var agentRole = await _roleManager.FindByNameAsync(AGENT.DISPLAY_NAME);
                 senderUserEmail = senderUserEmail.Replace("\n", "").Replace("\r", "").Trim();
                 agentEmail = agentEmail.Replace("\n", "").Replace("\r", "").Trim();
                 await SendNotificationInternal(caseId, senderUserEmail, agentRole?.Id, null, vendorId, BlueSymbol, caseTask.SubStatus, $"Case #{caseTask.PolicyDetail?.ContractNumber}", url, smsRecipients: new List<ApplicationUser> { recipientUser }, agentEmail);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Notification Error for Agent {AgentEmail} from {Sender}", agentEmail, senderUserEmail);
+                _logger.LogError(ex, "Notification Error for Agent {AgentEmail} from {Sender}", agentEmail, senderUserEmail);
             }
         }
 
@@ -235,8 +226,8 @@ namespace risk.control.system.Services.Common
                 await using var _context = await _contextFactory.CreateDbContextAsync();
                 var caseTask = await _context.Investigations.AsNoTracking().Include(i => i.PolicyDetail).FirstOrDefaultAsync(v => v.Id == caseId);
                 if (caseTask == null) return;
-                var managerRole = await roleManager.FindByNameAsync(MANAGER.DISPLAY_NAME);
-                var agencyAdminRole = await roleManager.FindByNameAsync(AGENCY_ADMIN.DISPLAY_NAME);
+                var managerRole = await _roleManager.FindByNameAsync(MANAGER.DISPLAY_NAME);
+                var agencyAdminRole = await _roleManager.FindByNameAsync(AGENCY_ADMIN.DISPLAY_NAME);
                 string statusSymbol = caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR ? "far fa-thumbs-up i-green" : "far fa-thumbs-down i-orangered";
                 var recipients = await GetUsersByRoleAsync(companyId: caseTask.ClientCompanyId, vendorId: caseTask.VendorId, roleIds: new[] { managerRole!.Id, agencyAdminRole!.Id });
                 senderUserEmail = senderUserEmail.Replace("\n", "").Replace("\r", "").Trim();
@@ -245,7 +236,7 @@ namespace risk.control.system.Services.Common
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Report Process Notification Error for Case {CaseId}", caseId);
+                _logger.LogError(ex, "Report Process Notification Error for Case {CaseId}", caseId);
             }
         }
 
@@ -256,14 +247,14 @@ namespace risk.control.system.Services.Common
                 await using var _context = await _contextFactory.CreateDbContextAsync();
                 var caseTask = await _context.Investigations.AsNoTracking().Include(i => i.PolicyDetail).FirstOrDefaultAsync(v => v.Id == caseId);
                 if (caseTask == null) return;
-                var assessorRole = await roleManager.FindByNameAsync(ASSESSOR.DISPLAY_NAME);
+                var assessorRole = await _roleManager.FindByNameAsync(ASSESSOR.DISPLAY_NAME);
                 var recipients = await GetUsersByRoleAsync(companyId: caseTask.ClientCompanyId, vendorId: null, roleIds: new[] { assessorRole!.Id });
                 senderUserEmail = senderUserEmail.Replace("\n", "").Replace("\r", "").Trim();
                 await SendNotificationInternal(caseId, senderUserEmail, assessorRole?.Id, caseTask.ClientCompanyId, null, BlueSymbol, caseTask.SubStatus, $"Case #{caseTask.PolicyDetail?.ContractNumber}", url, recipients);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Report Submission Notification Error for Case {CaseId}", caseId);
+                _logger.LogError(ex, "Report Submission Notification Error for Case {CaseId}", caseId);
             }
         }
 
@@ -277,17 +268,17 @@ namespace risk.control.system.Services.Common
                 var senderUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(u => u.Email == senderUserEmail);
                 if (caseTask == null || senderUser == null)
                 {
-                    logger.LogWarning("Notification aborted: Case {CaseId} or Sender {Email} not found.", caseId, senderUserEmail);
+                    _logger.LogWarning("Notification aborted: Case {CaseId} or Sender {Email} not found.", caseId, senderUserEmail);
                     return;
                 }
-                var supervisorRole = await roleManager.FindByNameAsync(SUPERVISOR.DISPLAY_NAME);
-                var agencyAdminRole = await roleManager.FindByNameAsync(AGENCY_ADMIN.DISPLAY_NAME);
+                var supervisorRole = await _roleManager.FindByNameAsync(SUPERVISOR.DISPLAY_NAME);
+                var agencyAdminRole = await _roleManager.FindByNameAsync(AGENCY_ADMIN.DISPLAY_NAME);
                 var recipients = await GetUsersByRoleAsync(companyId: null, vendorId: senderUser.VendorId, roleIds: new[] { supervisorRole!.Id, agencyAdminRole!.Id });
                 await SendNotificationInternal(caseId, senderUserEmail, supervisorRole?.Id, null, senderUser.VendorId, BlueSymbol, caseTask.SubStatus, $"Case #{caseTask.PolicyDetail?.ContractNumber}", url, recipients);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Vendor Supervisor Notification Error for Case {CaseId}", caseId);
+                _logger.LogError(ex, "Vendor Supervisor Notification Error for Case {CaseId}", caseId);
             }
         }
 
@@ -300,14 +291,14 @@ namespace risk.control.system.Services.Common
                 senderUserEmail = senderUserEmail.Replace("\n", "").Replace("\r", "").Trim();
                 var senderUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == senderUserEmail);
                 if (caseTask == null || senderUser == null) return;
-                var supervisorRole = await roleManager.FindByNameAsync(SUPERVISOR.DISPLAY_NAME);
-                var agencyAdminRole = await roleManager.FindByNameAsync(AGENCY_ADMIN.DISPLAY_NAME);
+                var supervisorRole = await _roleManager.FindByNameAsync(SUPERVISOR.DISPLAY_NAME);
+                var agencyAdminRole = await _roleManager.FindByNameAsync(AGENCY_ADMIN.DISPLAY_NAME);
                 var recipients = await GetUsersByRoleAsync(companyId: null, vendorId: caseTask.VendorId, roleIds: new[] { supervisorRole!.Id, agencyAdminRole!.Id });
                 await SendNotificationInternal(caseId, senderUserEmail, supervisorRole?.Id, null, caseTask.VendorId, "fa fa-question", caseTask.SubStatus, $"Case #{caseTask.PolicyDetail?.ContractNumber}", url, recipients);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Query Notification Error for Case {CaseId}", caseId);
+                _logger.LogError(ex, "Query Notification Error for Case {CaseId}", caseId);
             }
         }
 
@@ -317,7 +308,7 @@ namespace risk.control.system.Services.Common
             {
                 await using var _context = await _contextFactory.CreateDbContextAsync();
                 var caseTask = await _context.Investigations.AsNoTracking().FirstOrDefaultAsync(v => v.Id == caseId);
-                var assessorRole = await roleManager.FindByNameAsync(ASSESSOR.DISPLAY_NAME);
+                var assessorRole = await _roleManager.FindByNameAsync(ASSESSOR.DISPLAY_NAME);
                 var recipients = await _context.ApplicationUser.AsNoTracking().Include(u => u.Country).Where(u => u.ClientCompanyId == caseTask!.ClientCompanyId)
                     .Where(u => _context.UserRoles.Any(ur => ur.UserId == u.Id && ur.RoleId == assessorRole!.Id)).ToListAsync();
                 senderUserEmail = senderUserEmail.Replace("\n", "").Replace("\r", "").Trim();
@@ -325,7 +316,7 @@ namespace risk.control.system.Services.Common
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Enquiry Reply Notification Error for Case {CaseId}", caseId);
+                _logger.LogError(ex, "Enquiry Reply Notification Error for Case {CaseId}", caseId);
             }
         }
 
@@ -336,15 +327,15 @@ namespace risk.control.system.Services.Common
                 await using var _context = await _contextFactory.CreateDbContextAsync();
                 var caseTask = await _context.Investigations.AsNoTracking().Include(i => i.PolicyDetail).FirstOrDefaultAsync(v => v.Id == caseId);
                 if (caseTask == null) return;
-                var supervisorRole = await roleManager.FindByNameAsync(SUPERVISOR.DISPLAY_NAME);
-                var agencyAdminRole = await roleManager.FindByNameAsync(AGENCY_ADMIN.DISPLAY_NAME);
+                var supervisorRole = await _roleManager.FindByNameAsync(SUPERVISOR.DISPLAY_NAME);
+                var agencyAdminRole = await _roleManager.FindByNameAsync(AGENCY_ADMIN.DISPLAY_NAME);
                 var recipients = await GetUsersByRoleAsync(null, vendorId, supervisorRole!.Id, agencyAdminRole!.Id);
                 senderUserEmail = senderUserEmail.Replace("\n", "").Replace("\r", "").Trim();
                 await SendNotificationInternal(caseId, senderUserEmail, supervisorRole.Id, null, vendorId, WarningSymbol, caseTask.SubStatus, $"Case #{caseTask.PolicyDetail?.ContractNumber}", url, recipients);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Withdrawal Notification Error for Case {CaseId}", caseId);
+                _logger.LogError(ex, "Withdrawal Notification Error for Case {CaseId}", caseId);
             }
         }
 
@@ -372,18 +363,18 @@ namespace risk.control.system.Services.Common
             };
             _context.Notifications.Add(notification);
             await _context.SaveChangesAsync();
-            if (smsRecipients != null && smsRecipients.Any() && await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
+            if (smsRecipients != null && smsRecipients.Any() && await _featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
             {
                 var smsTasks = smsRecipients.Select(async user =>
                 {
                     try
                     {
                         string smsBody = $"Dear {user.Email},\n{message} : {status}.\nThanks\n{senderUserEmail},\n{url}";
-                        await smsService.DoSendSmsAsync(user.Country!.Code, user.Country.ISDCode + user.PhoneNumber, smsBody);
+                        await _smsService.DoSendSmsAsync(user.Country!.Code, user.Country.ISDCode + user.PhoneNumber, smsBody);
                     }
                     catch (Exception ex)
                     {
-                        logger.LogWarning("SMS failed for {Email}: {Msg}", user.Email, ex.Message);
+                        _logger.LogWarning("SMS failed for {Email}: {Msg}", user.Email, ex.Message);
                     }
                 });
                 await Task.WhenAll(smsTasks);

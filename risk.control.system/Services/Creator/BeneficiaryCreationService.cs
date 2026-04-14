@@ -13,26 +13,17 @@ namespace risk.control.system.Services.Creator
         Task<(BeneficiaryDetail?, List<UploadError>, List<string>)> AddBeneficiary(ApplicationUser companyUser, UploadCase uploadCase, byte[] data);
     }
 
-    internal class BeneficiaryCreationService : IBeneficiaryCreationService
+    internal class BeneficiaryCreationService(IVerifierProcessor verifierProcessor,
+        IBeneficiaryValidator beneficiaryValidator,
+        IExtractorService extractorService,
+        ICustomApiClient customApiCLient,
+        ILogger<BeneficiaryCreationService> logger) : IBeneficiaryCreationService
     {
-        private readonly IVerifierProcessor verifierProcessor;
-        private readonly IBeneficiaryValidator beneficiaryValidator;
-        private readonly IExtractorService extractorService;
-        private readonly ICustomApiClient customApiCLient;
-        private readonly ILogger<BeneficiaryCreationService> logger;
-
-        public BeneficiaryCreationService(IVerifierProcessor verifierProcessor,
-            IBeneficiaryValidator beneficiaryValidator,
-            IExtractorService extractorService,
-            ICustomApiClient customApiCLient,
-            ILogger<BeneficiaryCreationService> logger)
-        {
-            this.verifierProcessor = verifierProcessor;
-            this.beneficiaryValidator = beneficiaryValidator;
-            this.extractorService = extractorService;
-            this.customApiCLient = customApiCLient;
-            this.logger = logger;
-        }
+        private readonly IVerifierProcessor _verifierProcessor = verifierProcessor;
+        private readonly IBeneficiaryValidator _beneficiaryValidator = beneficiaryValidator;
+        private readonly IExtractorService _extractorService = extractorService;
+        private readonly ICustomApiClient _customApiClient = customApiCLient;
+        private readonly ILogger<BeneficiaryCreationService> _logger = logger;
 
         public async Task<(BeneficiaryDetail?, List<UploadError>, List<string>)> AddBeneficiary(ApplicationUser companyUser, UploadCase uploadCase, byte[] data)
         {
@@ -40,13 +31,13 @@ namespace risk.control.system.Services.Creator
             var summaries = new List<string>();
             try
             {
-                beneficiaryValidator.ValidateRequiredFields(uploadCase, errors, summaries);
-                var (dob, income) = beneficiaryValidator.ValidateDetails(uploadCase, errors, summaries);
+                _beneficiaryValidator.ValidateRequiredFields(uploadCase, errors, summaries);
+                var (dob, income) = _beneficiaryValidator.ValidateDetails(uploadCase, errors, summaries);
                 if (errors.Count > 0) return (null, errors, summaries);
-                var relationTask = extractorService.GetRelationAsync(uploadCase.Relation!.Trim());
-                var pinCodeTask = extractorService.GetPinCodeAsync(uploadCase.BeneficiaryPincode, uploadCase.BeneficiaryDistrictName!.Trim(), companyUser.ClientCompany!.CountryId!.Value);
-                var imageTask = verifierProcessor.ProcessImage(uploadCase, data, errors, summaries, BENEFICIARY_IMAGE, "Beneficiary");
-                var phoneTask = verifierProcessor.ValidatePhone(companyUser, uploadCase.BeneficiaryContact!.Trim(), errors, summaries);
+                var relationTask = _extractorService.GetRelationAsync(uploadCase.Relation!.Trim());
+                var pinCodeTask = _extractorService.GetPinCodeAsync(uploadCase.BeneficiaryPincode, uploadCase.BeneficiaryDistrictName!.Trim(), companyUser.ClientCompany!.CountryId!.Value);
+                var imageTask = _verifierProcessor.ProcessImage(uploadCase, data, errors, summaries, BENEFICIARY_IMAGE, "Beneficiary");
+                var phoneTask = _verifierProcessor.ValidatePhone(companyUser, uploadCase.BeneficiaryContact!.Trim(), errors, summaries);
                 await Task.WhenAll(relationTask, pinCodeTask, imageTask, phoneTask);
                 var relation = await relationTask;
                 var pinCode = await pinCodeTask;
@@ -58,7 +49,7 @@ namespace risk.control.system.Services.Creator
                 }
                 if (pinCode == null)
                 {
-                    verifierProcessor.AddLocationError(errors, summaries, uploadCase.BeneficiaryPincode, uploadCase.BeneficiaryDistrictName.Trim());
+                    _verifierProcessor.AddLocationError(errors, summaries, uploadCase.BeneficiaryPincode, uploadCase.BeneficiaryDistrictName.Trim());
                 }
                 var beneficiary = CreateBeneficiary(uploadCase, dob, relation, pinCode!, companyUser, income, imagePath, ext);
                 if (pinCode != null) await EnrichLocationData(beneficiary, pinCode);
@@ -66,7 +57,7 @@ namespace risk.control.system.Services.Creator
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "AddBeneficiary failed in Docker. CaseId={CaseId}, Relation='{Relation}'", uploadCase.CaseId!.Trim(), uploadCase.Relation);
+                _logger.LogError(ex, "AddBeneficiary failed in Docker. CaseId={CaseId}, Relation='{Relation}'", uploadCase.CaseId!.Trim(), uploadCase.Relation);
                 return (null, errors, summaries);
             }
         }
@@ -94,7 +85,7 @@ namespace risk.control.system.Services.Creator
         private async Task EnrichLocationData(BeneficiaryDetail beneficiary, PinCode pin)
         {
             var fullAddress = $"{beneficiary.Addressline.Trim()}, {pin.District!.Name}, {pin.State!.Name}, {pin.Country!.Code}, {pin.Code}";
-            var (lat, lon) = await customApiCLient.GetCoordinatesFromAddressAsync(fullAddress);
+            var (lat, lon) = await _customApiClient.GetCoordinatesFromAddressAsync(fullAddress);
             beneficiary.Latitude = lat;
             beneficiary.Longitude = lon;
             var latLong = lat + "," + lon;

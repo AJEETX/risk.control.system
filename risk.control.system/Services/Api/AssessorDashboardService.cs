@@ -10,14 +10,9 @@ namespace risk.control.system.Services.Api
         Task<DashboardData> GetAssessorCount(string userEmail, string role);
     }
 
-    internal class AssessorDashboardService : IAssessorDashboardService
+    internal class AssessorDashboardService(IDbContextFactory<ApplicationDbContext> contextFactory) : IAssessorDashboardService
     {
-        private readonly IDbContextFactory<ApplicationDbContext> _contextFactory;
-
-        public AssessorDashboardService(IDbContextFactory<ApplicationDbContext> contextFactory)
-        {
-            _contextFactory = contextFactory;
-        }
+        private readonly IDbContextFactory<ApplicationDbContext> _contextFactory = contextFactory;
 
         public async Task<DashboardData> GetAssessorCount(string userEmail, string role)
         {

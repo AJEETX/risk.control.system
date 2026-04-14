@@ -13,26 +13,17 @@ namespace risk.control.system.Services.Creator
         Task<(CustomerDetail?, List<UploadError>, List<string>)> AddCustomer(ApplicationUser companyUser, UploadCase uploadCase, byte[] data);
     }
 
-    internal class CustomerCreationService : ICustomerCreationService
+    internal class CustomerCreationService(IVerifierProcessor verifierProcessor,
+        ICustomerValidator customerValidator,
+        IExtractorService customerExtractorService,
+        ICustomApiClient customApiCLient,
+        ILogger<CustomerCreationService> logger) : ICustomerCreationService
     {
-        private readonly IVerifierProcessor verifierProcessor;
-        private readonly ICustomerValidator customerValidator;
-        private readonly IExtractorService customerExtractorService;
-        private readonly ICustomApiClient customApiClient;
-        private readonly ILogger<CustomerCreationService> logger;
-
-        public CustomerCreationService(IVerifierProcessor verifierProcessor,
-            ICustomerValidator customerValidator,
-            IExtractorService customerExtractorService,
-            ICustomApiClient customApiCLient,
-            ILogger<CustomerCreationService> logger)
-        {
-            this.verifierProcessor = verifierProcessor;
-            this.customerValidator = customerValidator;
-            this.customerExtractorService = customerExtractorService;
-            this.customApiClient = customApiCLient;
-            this.logger = logger;
-        }
+        private readonly IVerifierProcessor _verifierProcessor = verifierProcessor;
+        private readonly ICustomerValidator _customerValidator = customerValidator;
+        private readonly IExtractorService _customerExtractorService = customerExtractorService;
+        private readonly ICustomApiClient _customApiClient = customApiCLient;
+        private readonly ILogger<CustomerCreationService> _logger = logger;
 
         public async Task<(CustomerDetail?, List<UploadError>, List<string>)> AddCustomer(ApplicationUser companyUser, UploadCase uploadCase, byte[] data)
         {
@@ -41,20 +32,20 @@ namespace risk.control.system.Services.Creator
             try
             {
                 // 1. Validation
-                customerValidator.ValidateRequiredFields(uploadCase, errors, summaries);
-                var (dob, gender, edu, occ, income) = customerValidator.ValidateDetails(uploadCase, errors, summaries);
+                _customerValidator.ValidateRequiredFields(uploadCase, errors, summaries);
+                var (dob, gender, edu, occ, income) = _customerValidator.ValidateDetails(uploadCase, errors, summaries);
 
                 // 2. Data Lookups
-                var pinCodeTask = customerExtractorService.GetPinCodeAsync(uploadCase.CustomerPincode, uploadCase.CustomerDistrictName!.Trim(), companyUser.ClientCompany!.CountryId!.Value);
+                var pinCodeTask = _customerExtractorService.GetPinCodeAsync(uploadCase.CustomerPincode, uploadCase.CustomerDistrictName!.Trim(), companyUser.ClientCompany!.CountryId!.Value);
 
                 // 3. IO & External Logic
-                var phoneTask = verifierProcessor.ValidatePhone(companyUser, uploadCase.CustomerContact!.Trim(), errors, summaries);
-                var imageTask = verifierProcessor.ProcessImage(uploadCase, data, errors, summaries, CUSTOMER_IMAGE, "Customer");
+                var phoneTask = _verifierProcessor.ValidatePhone(companyUser, uploadCase.CustomerContact!.Trim(), errors, summaries);
+                var imageTask = _verifierProcessor.ProcessImage(uploadCase, data, errors, summaries, CUSTOMER_IMAGE, "Customer");
 
                 await Task.WhenAll(pinCodeTask, imageTask, phoneTask);
                 var pinCode = await pinCodeTask;
                 var (imagePath, extension) = await imageTask;
-                if (pinCode == null) verifierProcessor.AddLocationError(errors, summaries, uploadCase.CustomerPincode, uploadCase.CustomerDistrictName.Trim());
+                if (pinCode == null) _verifierProcessor.AddLocationError(errors, summaries, uploadCase.CustomerPincode, uploadCase.CustomerDistrictName.Trim());
 
                 var textInfo = CultureInfo.CurrentCulture.TextInfo;
                 // 4. Mapping
@@ -84,7 +75,7 @@ namespace risk.control.system.Services.Creator
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error uploading customer detail for case {CaseId}", uploadCase.CaseId!.Trim());
+                _logger.LogError(ex, "Error uploading customer detail for case {CaseId}", uploadCase.CaseId!.Trim());
                 return (null, errors, summaries);
             }
         }
@@ -92,7 +83,7 @@ namespace risk.control.system.Services.Creator
         private async Task EnrichLocation(CustomerDetail c, PinCode p)
         {
             var addr = $"{c.Addressline.Trim()}, {p.District!.Name}, {p.State!.Name}, {p.Country!.Code}, {p.Code}";
-            var (lat, lon) = await customApiClient.GetCoordinatesFromAddressAsync(addr);
+            var (lat, lon) = await _customApiClient.GetCoordinatesFromAddressAsync(addr);
             c.Latitude = lat; c.Longitude = lon;
             var latLong = lat + "," + lon;
 

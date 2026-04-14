@@ -11,29 +11,22 @@ namespace risk.control.system.Services.Creator
         Task<(string, long)> WithdrawCaseByCompany(string userEmail, CaseTransactionModel model, long caseId);
     }
 
-    internal class WithdrawCaseService : IWithdrawCaseService
+    internal class WithdrawCaseService(ApplicationDbContext context, ILogger<WithdrawCaseService> logger, ITimelineService timelineService) : IWithdrawCaseService
     {
-        private readonly ApplicationDbContext context;
-        private readonly ILogger<WithdrawCaseService> logger;
-        private readonly ITimelineService timelineService;
-
-        public WithdrawCaseService(ApplicationDbContext context, ILogger<WithdrawCaseService> logger, ITimelineService timelineService)
-        {
-            this.context = context;
-            this.logger = logger;
-            this.timelineService = timelineService;
-        }
+        private readonly ApplicationDbContext _context = context;
+        private readonly ILogger<WithdrawCaseService> _logger = logger;
+        private readonly ITimelineService _timelineService = timelineService;
 
         public async Task<(string, long)> WithdrawCaseByCompany(string userEmail, CaseTransactionModel model, long caseId)
         {
             try
             {
-                var currentUser = await context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(u => u.Email == userEmail);
-                var caseTask = await context.Investigations
+                var currentUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(u => u.Email == userEmail);
+                var caseTask = await _context.Investigations
                     .Include(t => t.PolicyDetail)
                     .FirstOrDefaultAsync(c => c.Id == caseId);
                 var vendorId = caseTask!.VendorId;
-                var company = await context.ClientCompany.FirstOrDefaultAsync(c => c.ClientCompanyId == caseTask.ClientCompanyId);
+                var company = await _context.ClientCompany.FirstOrDefaultAsync(c => c.ClientCompanyId == caseTask.ClientCompanyId);
 
                 caseTask.IsNew = true;
                 caseTask.Updated = DateTime.UtcNow;
@@ -43,16 +36,16 @@ namespace risk.control.system.Services.Creator
                 caseTask.VendorId = null;
                 caseTask.Vendor = null;
                 caseTask.SubStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY;
-                context.Investigations.Update(caseTask);
-                var rows = await context.SaveChangesAsync(null, false) > 0;
+                _context.Investigations.Update(caseTask);
+                var rows = await _context.SaveChangesAsync(null, false) > 0;
 
-                await timelineService.UpdateTaskStatus(caseTask.Id, currentUser.Email!);
+                await _timelineService.UpdateTaskStatus(caseTask.Id, currentUser.Email!);
 
                 return rows ? (caseTask.PolicyDetail!.ContractNumber!, vendorId.GetValueOrDefault()!) : (null!, 0);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred withdraw case {Id}. {UserEmail}", caseId, userEmail);
+                _logger.LogError(ex, "Error occurred withdraw case {Id}. {UserEmail}", caseId, userEmail);
                 return (null!, 0);
             }
         }

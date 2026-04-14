@@ -11,14 +11,9 @@ namespace risk.control.system.Services.Manager
         Task<CaseTransactionModel> GetClaimDetailsReport(string currentUserEmail, long id);
     }
 
-    internal class CaseDetailService : ICaseDetailService
+    internal class CaseDetailService(ApplicationDbContext context) : ICaseDetailService
     {
-        private readonly ApplicationDbContext _context;
-
-        public CaseDetailService(ApplicationDbContext context)
-        {
-            this._context = context;
-        }
+        private readonly ApplicationDbContext _context = context;
 
         public async Task<CaseTransactionModel> GetClaimDetailsReport(string currentUserEmail, long id)
         {

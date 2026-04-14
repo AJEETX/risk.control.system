@@ -10,14 +10,9 @@ namespace risk.control.system.Services.Creator
         (DateTime Dob, Gender Gen, Education Edu, Occupation Occ, Income Inc) ValidateDetails(UploadCase uc, List<UploadError> errs, List<string> sums);
     }
 
-    internal class CustomerValidator : ICustomerValidator
+    internal class CustomerValidator(IDateParserService dateParserService) : ICustomerValidator
     {
-        private readonly IDateParserService dateParserService;
-
-        public CustomerValidator(IDateParserService dateParserService)
-        {
-            this.dateParserService = dateParserService;
-        }
+        private readonly IDateParserService _dateParserService = dateParserService;
 
         public void ValidateRequiredFields(UploadCase uc, List<UploadError> errs, List<string> sums)
         {
@@ -28,7 +23,7 @@ namespace risk.control.system.Services.Creator
 
         public (DateTime Dob, Gender Gen, Education Edu, Occupation Occ, Income Inc) ValidateDetails(UploadCase uc, List<UploadError> errs, List<string> sums)
         {
-            var dob = dateParserService.ParseDate(uc.CustomerDob!, errs, sums, "Customer");
+            var dob = _dateParserService.ParseDate(uc.CustomerDob!, errs, sums, "Customer");
             var gender = ParseEnum<Gender>(uc.Gender!.Trim(), "Gender", errs, sums);
             var edu = ParseEnum<Education>(uc.Education!.Trim(), "Education", errs, sums);
             var occ = ParseEnum<Occupation>(uc.Occupation!.Trim(), "Occupation", errs, sums);
