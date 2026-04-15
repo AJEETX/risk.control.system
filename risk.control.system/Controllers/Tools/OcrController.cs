@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using risk.control.system.AppConstant;
+using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services.Common;
@@ -10,31 +12,26 @@ using risk.control.system.Services.Tool;
 namespace risk.control.system.Controllers.Tools
 {
     [Authorize(Roles = GUEST.DISPLAY_NAME)]
-    public class OcrController : Controller
+    public class OcrController(
+        ILogger<OcrController> logger,
+        INotyfService notifyService,
+        IGoogleService googleService,
+        IFileStorageService fileStorageService,
+        UserManager<ApplicationUser> userManager) : Controller
     {
-        private readonly ILogger<OcrController> _logger;
-        private readonly IGoogleService _googleService;
-        private readonly IFileStorageService _fileStorageService;
-        private readonly UserManager<ApplicationUser> _userManager; // Add this
-
-        public OcrController(
-            ILogger<OcrController> logger,
-            IGoogleService googleService,
-            IFileStorageService fileStorageService,
-            UserManager<ApplicationUser> userManager) // Inject this
-        {
-            this._logger = logger;
-            this._googleService = googleService;
-            this._fileStorageService = fileStorageService;
-            this._userManager = userManager;
-        }
+        private readonly INotyfService _notifyService = notifyService;
+        private readonly ILogger<OcrController> _logger = logger;
+        private readonly IGoogleService _googleService = googleService;
+        private readonly IFileStorageService _fileStorageService = fileStorageService;
+        private readonly UserManager<ApplicationUser> _userManager = userManager; // Add this
 
         public async Task<IActionResult> Index()
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
-                return Unauthorized("Unauthorized");
+                _notifyService.Error("User UnAuthorized");
+                return RedirectToAction(nameof(ToolsController.Try), ControllerName<ToolsController>.Name);
             }
             var model = new DocumentOcrData
             {
@@ -54,7 +51,8 @@ namespace risk.control.system.Controllers.Tools
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
-                return Unauthorized("Unauthorized");
+                _notifyService.Error("User UnAuthorized");
+                return RedirectToAction(nameof(ToolsController.Try), ControllerName<ToolsController>.Name);
             }
             try
             {
@@ -83,7 +81,11 @@ namespace risk.control.system.Controllers.Tools
                 return BadRequest("Please upload a valid image file.");
 
             var user = await _userManager.GetUserAsync(User);
-            if (user == null) return Unauthorized();
+            if (user == null)
+            {
+                _notifyService.Error("User UnAuthorized");
+                return RedirectToAction(nameof(ToolsController.Try), ControllerName<ToolsController>.Name);
+            }
 
             if (user.OcrCount >= 5)
                 return StatusCode(403, "OCR usage limit reached (5/5).");

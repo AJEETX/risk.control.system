@@ -29,7 +29,7 @@ namespace risk.control.system.Services.Tool
             var elaPath = Path.Combine(_uploadPath, "ela_" + Path.GetFileName(file.FileName));
 
             // Save original file
-            using (var stream = new FileStream(filePath, FileMode.Create))
+            await using (var stream = new FileStream(filePath, FileMode.Create))
             {
                 await file.CopyToAsync(stream);
             }
@@ -50,7 +50,7 @@ namespace risk.control.system.Services.Tool
             return model;
         }
 
-        private double GenerateElaImage(string sourcePath, string outputPath, int quality = 90)
+        private static double GenerateElaImage(string sourcePath, string outputPath, int quality = 90)
         {
             using var image = Image.Load<Rgba32>(sourcePath);
             using var ms = new MemoryStream();

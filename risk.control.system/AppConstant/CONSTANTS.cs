@@ -9,6 +9,7 @@
         public const string ValidDateFormat = "dd-MM-yyyy";
         public const string AgencyUsersImageCollection = "AgencyUsersImageCollection";
         public const string LogsDirectory = "Logs";
+        public const string DOCUMENT = "Document";
         public const string CASE = "Case";
         public const string REPORT = "Report";
 

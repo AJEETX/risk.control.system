@@ -58,10 +58,9 @@
         loader.classList.remove("d-none");
         summaryResult.placeholder = "AI is reading your document...";
         summaryResult.value = "";
-
         const formData = new FormData();
         formData.append("pdfFile", fileInput.files[0]);
-
+        formData.append("__RequestVerificationToken", $('input[name="__RequestVerificationToken"]').val());
         try {
             const response = await fetch('/PdfSummary/Summarize', {
                 method: 'POST',
