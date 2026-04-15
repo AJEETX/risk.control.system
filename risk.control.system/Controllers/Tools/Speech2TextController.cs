@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using risk.control.system.AppConstant;
+using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services.Tool;
@@ -9,25 +11,20 @@ using risk.control.system.Services.Tool;
 namespace risk.control.system.Controllers.Tools
 {
     [Authorize(Roles = GUEST.DISPLAY_NAME)]
-    public class Speech2TextController : Controller
+    public class Speech2TextController(ILogger<Speech2TextController> logger, INotyfService notifyService, UserManager<ApplicationUser> userManager, ISpeech2TextService speech2TextService) : Controller
     {
-        private readonly ILogger<Speech2TextController> _logger;
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly ISpeech2TextService _speech2TextService;
-
-        public Speech2TextController(ILogger<Speech2TextController> logger, UserManager<ApplicationUser> userManager, ISpeech2TextService speech2TextService)
-        {
-            this._logger = logger;
-            this._userManager = userManager;
-            this._speech2TextService = speech2TextService;
-        }
+        private readonly ILogger<Speech2TextController> _logger = logger;
+        private readonly INotyfService _notifyService = notifyService;
+        private readonly UserManager<ApplicationUser> _userManager = userManager;
+        private readonly ISpeech2TextService _speech2TextService = speech2TextService;
 
         public async Task<IActionResult> Index()
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
-                return Unauthorized("Unauthorized");
+                _notifyService.Error("User UnAuthorized");
+                return RedirectToAction(nameof(ToolsController.Try), ControllerName<ToolsController>.Name);
             }
             var model = new Speech2TextData
             {

@@ -91,7 +91,7 @@ namespace risk.control.system.Controllers.Common
             {
                 var query = _context.ApplicationUser.AsNoTracking().Where(u => !u.Deleted);
 
-                query = query.Where(u => u.Role != AppRoles.AGENT && u.Role != AppRoles.PORTAL_ADMIN);
+                query = query.Where(u => u.Role != AppRoles.AGENT && u.Role != AppRoles.PORTAL_ADMIN && u.Role != AppRoles.GUEST && u.Role != null);
 
                 if (!string.IsNullOrWhiteSpace(search))
                 {

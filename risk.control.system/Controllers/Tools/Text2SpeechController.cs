@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using risk.control.system.AppConstant;
+using risk.control.system.Helpers;
 using risk.control.system.Models;
 
 using risk.control.system.Models.ViewModel;
@@ -10,25 +12,20 @@ using risk.control.system.Services.Tool;
 namespace risk.control.system.Controllers.Tools
 {
     [Authorize(Roles = GUEST.DISPLAY_NAME)]
-    public class Text2SpeechController : Controller
+    public class Text2SpeechController(UserManager<ApplicationUser> userManager, ILogger<Text2SpeechController> logger, IText2SpeechService text2SpeechService, INotyfService notifyService) : Controller
     {
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly ILogger<Text2SpeechController> _logger;
-        private readonly IText2SpeechService _text2SpeechService;
-
-        public Text2SpeechController(UserManager<ApplicationUser> userManager, ILogger<Text2SpeechController> logger, IText2SpeechService text2SpeechService)
-        {
-            this._userManager = userManager;
-            this._logger = logger;
-            this._text2SpeechService = text2SpeechService;
-        }
+        private readonly INotyfService _notifyService = notifyService;
+        private readonly UserManager<ApplicationUser> _userManager = userManager;
+        private readonly ILogger<Text2SpeechController> _logger = logger;
+        private readonly IText2SpeechService _text2SpeechService = text2SpeechService;
 
         public async Task<IActionResult> Index()
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
-                return Unauthorized("Unauthorized");
+                _notifyService.Error("User UnAuthorized");
+                return RedirectToAction(nameof(ToolsController.Try), ControllerName<ToolsController>.Name);
             }
             var model = new Text2SpeechData
             {
@@ -44,7 +41,11 @@ namespace risk.control.system.Controllers.Tools
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
             var user = await _userManager.GetUserAsync(User);
-            if (user == null) return Unauthorized();
+            if (user == null)
+            {
+                _notifyService.Error("User UnAuthorized");
+                return RedirectToAction(nameof(ToolsController.Try), ControllerName<ToolsController>.Name);
+            }
 
             // 1. Safety Check
             if (user.Text2SpeechCount >= 5)

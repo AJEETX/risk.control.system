@@ -115,7 +115,7 @@ namespace risk.control.system.Services.Common
 
         private string GetOrCreateFolder(string category, string? subFolder, string? subSubFolder)
         {
-            string rootPath = Path.GetFullPath(Path.Combine(env.ContentRootPath, Applicationsettings.DOCUMENT));
+            string rootPath = Path.GetFullPath(Path.Combine(env.ContentRootPath, CONSTANTS.DOCUMENT));
             string combined = Path.Combine(rootPath, Sanitize(category), Sanitize(subFolder), Sanitize(subSubFolder));
             string finalPath = Path.GetFullPath(combined);
             string rootWithSeparator = rootPath.EndsWith(Path.DirectorySeparatorChar.ToString()) ? rootPath : rootPath + Path.DirectorySeparatorChar;
@@ -138,7 +138,7 @@ namespace risk.control.system.Services.Common
         }
         private static string BuildRelativePath(string category, string? subFolder, string? subSubFolder, string fileName)
         {
-            var path = Path.Combine(Applicationsettings.DOCUMENT, category, subFolder ?? "", subSubFolder ?? "", fileName).Replace("\\", "/").Replace("\n", "").Replace("\r", "");
+            var path = Path.Combine(CONSTANTS.DOCUMENT, category, subFolder ?? "", subSubFolder ?? "", fileName).Replace("\\", "/").Replace("\n", "").Replace("\r", "");
 
             return path;
         }

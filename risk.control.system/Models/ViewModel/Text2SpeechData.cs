@@ -7,7 +7,6 @@ namespace risk.control.system.Models.ViewModel
         [Required]
         public string? TextData { get; set; }
 
-        [Required]
         public byte[]? TextOutputAudio { get; set; }
 
         public int RemainingTries { get; set; } = 5;
