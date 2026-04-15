@@ -19,49 +19,69 @@ internal class TextAnalyticsService(IHttpClientFactory httpClientFactory) : ITex
 
     public async Task<string> AbstractiveSummarizeAsync(string content)
     {
-        if (string.IsNullOrWhiteSpace(content))
+        if (string.IsNullOrWhiteSpace(content)) return "Summary not available.";
+        var chunks = SplitIntoChunks(content);
+        var partialSummaries = new List<string>();
+        foreach (var chunk in chunks)
         {
-            return "Summary not available.";
+            var summary = await CallHuggingFaceApi(chunk);
+            if (summary != "Summary not available.")
+            {
+                partialSummaries.Add(summary);
+            }
         }
 
+        if (partialSummaries.Count == 0) return "Summary not available.";
+        if (partialSummaries.Count == 1) return partialSummaries[0];
+        string combinedSummaries = string.Join(" ", partialSummaries);
+        if (combinedSummaries.Length > 3500)
+        {
+            return await CallHuggingFaceApi(combinedSummaries.Substring(0, 3500));
+        }
+
+        return await CallHuggingFaceApi(combinedSummaries);
+    }
+
+    private async Task<string> CallHuggingFaceApi(string input)
+    {
         try
         {
             var httpClient = _httpClientFactory.CreateClient();
-            httpClient.BaseAddress = new Uri("https://router.huggingface.co/"); ;
+            httpClient.BaseAddress = new Uri("https://router.huggingface.co/");
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", EnvHelper.Get("HUGING_FACE"));
 
-            var requestBody = new
-            {
-                inputs = content
-            };
-
+            var requestBody = new { inputs = input };
             string jsonBody = JsonSerializer.Serialize(requestBody);
             HttpContent httpContent = new StringContent(jsonBody, Encoding.UTF8, "application/json");
 
-            HttpResponseMessage response = await httpClient.PostAsync("hf-inference/models/facebook/bart-large-cnn", httpContent);
+            var response = await httpClient.PostAsync("hf-inference/models/facebook/bart-large-cnn", httpContent);
 
             if (response.IsSuccessStatusCode)
             {
                 string responseBody = await response.Content.ReadAsStringAsync();
                 var result = JsonSerializer.Deserialize<List<Dictionary<string, string>>>(responseBody);
-
-                // Extract and return the summary text
                 return result?[0]?["summary_text"] ?? "Summary not available.";
-            }
-            else
-            {
-                string errorMessage = await response.Content.ReadAsStringAsync();
-                Console.WriteLine($"Hugging Face API error: {response.StatusCode} - {errorMessage}");
             }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Unexpected error: {ex.Message}");
+            Console.WriteLine($"Chunk processing error: {ex.Message}");
         }
-
         return "Summary not available.";
     }
+    private List<string> SplitIntoChunks(string text, int chunkSize = 3000)
+    {
+        var chunks = new List<string>();
+        if (string.IsNullOrEmpty(text)) return chunks;
 
+        for (int i = 0; i < text.Length; i += chunkSize)
+        {
+            // Ensure we don't go out of bounds on the last chunk
+            int length = Math.Min(chunkSize, text.Length - i);
+            chunks.Add(text.Substring(i, length));
+        }
+        return chunks;
+    }
     /// <summary>
     /// Categorize a document based on its content using key phrases.
     /// </summary>

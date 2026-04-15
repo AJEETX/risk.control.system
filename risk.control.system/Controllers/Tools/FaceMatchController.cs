@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using risk.control.system.AppConstant;
@@ -10,25 +11,24 @@ using risk.control.system.Services.Agent;
 namespace risk.control.system.Controllers.Tools
 {
     [Authorize(Roles = GUEST.DISPLAY_NAME)]
-    public class FaceMatchController : Controller
+    public class FaceMatchController(
+        IAmazonApiService amazonService,
+        INotyfService notifyService,
+        ILogger<FaceMatchController> logger,
+        UserManager<ApplicationUser> userManager) : Controller
     {
-        private readonly IAmazonApiService amazonService;
-        private readonly ILogger<FaceMatchController> logger;
-        private readonly UserManager<ApplicationUser> _userManager;
-
-        public FaceMatchController(IAmazonApiService amazonService, ILogger<FaceMatchController> logger, UserManager<ApplicationUser> userManager)
-        {
-            this.amazonService = amazonService;
-            this.logger = logger;
-            this._userManager = userManager; // Inject UserManager
-        }
+        private readonly IAmazonApiService amazonService = amazonService;
+        private readonly ILogger<FaceMatchController> logger = logger;
+        private readonly INotyfService _notifyService = notifyService;
+        private readonly UserManager<ApplicationUser> _userManager = userManager;
 
         public async Task<IActionResult> Index()
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
-                return Unauthorized("Unauthorized");
+                _notifyService.Error("User UnAuthorized");
+                return RedirectToAction(nameof(ToolsController.Try), ControllerName<ToolsController>.Name);
             }
             var model = new FaceMatchData
             {
@@ -48,7 +48,8 @@ namespace risk.control.system.Controllers.Tools
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
-                return Unauthorized("Unauthorized");
+                _notifyService.Error("User UnAuthorized");
+                return RedirectToAction(nameof(ToolsController.Try), ControllerName<ToolsController>.Name);
             }
 
             if (user.FaceMatchCount >= 5)
