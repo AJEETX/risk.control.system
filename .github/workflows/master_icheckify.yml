@@ -123,8 +123,8 @@ jobs:
             exit 0
           fi
 
-          echo "⏳ Not ready, waiting 15s..."
-          sleep 15
+          echo "⏳ Not ready, waiting 60s..."
+          sleep 60
         done
 
         echo "❌ App did NOT become ready in time."

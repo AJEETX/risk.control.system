@@ -1,10 +1,12 @@
 ﻿using System.Text;
+using AspNetCoreHero.ToastNotification.Abstractions;
 using iText.Kernel.Pdf;
 using iText.Kernel.Pdf.Canvas.Parser;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using risk.control.system.AppConstant;
+using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services.Tool;
@@ -12,28 +14,24 @@ using risk.control.system.Services.Tool;
 namespace risk.control.system.Controllers.Tools;
 
 [Authorize(Roles = GUEST.DISPLAY_NAME)]
-public class PdfSummaryController : Controller
+public class PdfSummaryController(
+    ILogger<PdfSummaryController> logger,
+    ITextAnalyticsService textAnalyticsService,
+    INotyfService notifyService,
+    UserManager<ApplicationUser> userManager) : Controller
 {
-    private readonly ILogger<PdfSummaryController> logger;
-    private readonly ITextAnalyticsService textAnalyticsService;
-    private readonly UserManager<ApplicationUser> _userManager; // Add UserManager
-
-    public PdfSummaryController(
-        ILogger<PdfSummaryController> logger,
-        ITextAnalyticsService textAnalyticsService,
-        UserManager<ApplicationUser> userManager) // Inject UserManager
-    {
-        this.logger = logger;
-        this.textAnalyticsService = textAnalyticsService;
-        this._userManager = userManager;
-    }
+    private readonly ILogger<PdfSummaryController> logger = logger;
+    private readonly INotyfService _notifyService = notifyService;
+    private readonly ITextAnalyticsService textAnalyticsService = textAnalyticsService;
+    private readonly UserManager<ApplicationUser> _userManager = userManager; // Add UserManager
 
     public async Task<IActionResult> Index()
     {
         var user = await _userManager.GetUserAsync(User);
         if (user == null)
         {
-            return Unauthorized("Unauthorized");
+            _notifyService.Error("User UnAuthorized");
+            return RedirectToAction(nameof(ToolsController.Try), ControllerName<ToolsController>.Name);
         }
         var model = new PdfSummaryViewModel
         {
@@ -53,7 +51,11 @@ public class PdfSummaryController : Controller
 
         // 2. User & Rate Limit Validation
         var user = await _userManager.GetUserAsync(User);
-        if (user == null) return Unauthorized("Unauthorized");
+        if (user == null)
+        {
+            _notifyService.Error("User UnAuthorized");
+            return RedirectToAction(nameof(ToolsController.Try), ControllerName<ToolsController>.Name);
+        }
         if (user.PdfCount >= 5) return StatusCode(403, new { errorMessage = "PDF Summary limit reached (5/5)." });
 
         try

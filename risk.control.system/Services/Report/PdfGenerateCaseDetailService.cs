@@ -38,6 +38,7 @@ namespace risk.control.system.Services.Report
             section.AddParagraph().SetLineSpacing(1).AddText("Case Info").SetFontSize(14).SetBold().SetUnderline();
             var proposalTable = section.AddTable().SetBorder(Stroke.Solid);
             proposalTable.AddColumnPercentToTable("", 35).AddColumnPercentToTable("", 65);
+            AddRow(proposalTable, "Case #", investigation?.PolicyDetail!.ContractNumber ?? "N/A");
             AddRow(proposalTable, "Case Type", policy?.InsuranceType!.GetEnumDisplayName() ?? "N/A");
             AddRow(proposalTable, "Verification Type", policy?.InvestigationServiceType?.Name ?? "N/A");
             var currency = CustomExtensions.GetCultureByCountry(investigation!.ClientCompany!.Country!.Code.ToUpper()).NumberFormat.CurrencySymbol;
@@ -89,21 +90,21 @@ namespace risk.control.system.Services.Report
             overviewTable.AddColumnPercentToTable("", 35).AddColumnPercentToTable("", 65);
             AddRow(overviewTable, "Investigator", investigation!.Vendor!.Name ?? "N/A");
             AddRow(overviewTable, "Insurer", investigation?.ClientCompany?.Name ?? "N/A");
-            AddRow(overviewTable, "Case #", investigation?.PolicyDetail!.ContractNumber ?? "N/A");
-            AddRow(overviewTable, "Date of Issue", policy?.ContractIssueDate.ToString("dd-MMM-yyyy") ?? "N/A");
-            AddRow(overviewTable, "Date of Incident", policy?.DateOfIncident.ToString("dd-MMM-yyyy") ?? "N/A");
+
             section.AddParagraph().AddText("");
 
             // Policy details
             section.AddParagraph().SetLineSpacing(1).AddText("Case Details").SetFontSize(14).SetBold().SetUnderline();
             var policyTable = section.AddTable().SetBorder(Stroke.Solid);
             policyTable.AddColumnPercentToTable("", 35).AddColumnPercentToTable("", 65);
+            AddRow(policyTable, "Case #", investigation?.PolicyDetail!.ContractNumber ?? "N/A");
+            AddRow(policyTable, "Policy Issue Date", policy?.ContractIssueDate.ToString("dd-MMM-yyyy") ?? "N/A");
+            AddRow(policyTable, "Date of Incident", policy?.DateOfIncident.ToString("dd-MMM-yyyy") ?? "N/A");
             AddRow(policyTable, "Verification Type", policy?.InvestigationServiceType?.Name ?? "N/A");
             var currency = CustomExtensions.GetCultureByCountry(investigation!.ClientCompany!.Country!.Code.ToUpper()).NumberFormat.CurrencySymbol;
             var culture = CustomExtensions.GetCultureByCountry(investigation!.ClientCompany!.Country!.Code.ToUpper());
             var sumAssuredValue = string.Format(culture, "{0:c}", policy?.SumAssuredValue.ToString());
             AddRow(policyTable, "Assured Amount", currency + " " + policy?.SumAssuredValue.ToString("N2") ?? "N/A");
-            AddRow(policyTable, "Policy Issue Date", policy?.ContractIssueDate.ToString("dd-MMM-yyyy") ?? "N/A");
             AddRow(policyTable, "Cause of Death", policy?.CauseOfLoss ?? "N/A");
             section.AddParagraph().AddText("");
 

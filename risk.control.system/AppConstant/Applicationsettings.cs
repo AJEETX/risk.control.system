@@ -61,7 +61,6 @@ namespace risk.control.system.AppConstant
         public const string VENDOR = "Agency";
         public const string MANAGE_USERS = "Manage users";
         public const string MANAGE_SERVICE = "Manage service";
-        public const string DOCUMENT = "Document";
 
         // MENUS / SUBMENUS
 

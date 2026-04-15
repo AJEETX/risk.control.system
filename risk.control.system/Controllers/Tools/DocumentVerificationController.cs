@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using risk.control.system.AppConstant;
+using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services.Tool;
@@ -9,25 +11,24 @@ using risk.control.system.Services.Tool;
 namespace risk.control.system.Controllers.Tools
 {
     [Authorize(Roles = GUEST.DISPLAY_NAME)]
-    public class DocumentVerificationController : Controller
+    public class DocumentVerificationController(
+        UserManager<ApplicationUser> userManager,
+        INotyfService notifyService,
+        ILogger<DocumentVerificationController> logger,
+        IImageAnalysisService imageAnalysisService) : Controller
     {
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly ILogger<DocumentVerificationController> logger;
-        private readonly IImageAnalysisService imageAnalysisService;
-
-        public DocumentVerificationController(UserManager<ApplicationUser> userManager, ILogger<DocumentVerificationController> logger, IImageAnalysisService imageAnalysisService)
-        {
-            this._userManager = userManager;
-            this.logger = logger;
-            this.imageAnalysisService = imageAnalysisService;
-        }
+        private readonly UserManager<ApplicationUser> _userManager = userManager;
+        private readonly ILogger<DocumentVerificationController> logger = logger;
+        private readonly INotyfService _notifyService = notifyService;
+        private readonly IImageAnalysisService imageAnalysisService = imageAnalysisService;
 
         public async Task<IActionResult> Index()
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
-                return Unauthorized("Unauthorized");
+                _notifyService.Error("User UnAuthorized");
+                return RedirectToAction(nameof(ToolsController.Try), ControllerName<ToolsController>.Name);
             }
             var model = new ImageAnalysisViewModel
             {
@@ -52,7 +53,11 @@ namespace risk.control.system.Controllers.Tools
             }
 
             var user = await _userManager.GetUserAsync(User);
-            if (user == null) return Unauthorized();
+            if (user == null)
+            {
+                _notifyService.Error("User UnAuthorized");
+                return RedirectToAction(nameof(ToolsController.Try), ControllerName<ToolsController>.Name);
+            }
 
             if (user.DocumentAnalysisCount >= 5)
             {
