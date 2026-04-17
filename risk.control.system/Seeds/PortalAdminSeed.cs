@@ -14,7 +14,7 @@ namespace risk.control.system.Seeds
         public static async Task Seed(ApplicationDbContext context, IWebHostEnvironment env, UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager, int pinCodeCode, IFileStorageService fileStorageService)
         {
             var pinCode = await context.PinCode.Include(p => p.District).Include(p => p.State).Include(p => p.Country).FirstOrDefaultAsync(p => p.Code == pinCodeCode);
-            string adminImagePath = Path.Combine(env.WebRootPath, "img", Path.GetFileName(PORTAL_ADMIN.PROFILE_IMAGE));
+            string adminImagePath = Path.Combine(env.WebRootPath, "seed", Path.GetFileName(PORTAL_ADMIN.PROFILE_IMAGE));
             var adminImage = await File.ReadAllBytesAsync(adminImagePath);
             var extension = Path.GetExtension(adminImagePath);
             var (fileName, relativePath) = await fileStorageService.SaveAsync(adminImage, extension, "portal-admin");

@@ -1,6 +1,5 @@
 ﻿@using risk.control.system.Helpers
 @model CaseTransactionModel
-@using System.Globalization
 
 @{
 	ViewData["Title"] = "Details";
@@ -77,14 +76,7 @@
 				<!-- Document Image Section -->
 				<div class="col-5 text-center">
 					<p class="text-muted text-sm">
-						@if (Model.ClaimsInvestigation?.PolicyDetail?.DocumentPath != null)
-						{
-							<img id="documentImage" class="img-fluid" src="/Document/GetPolicyDocument/@Model.ClaimsInvestigation.Id" data-bs-toggle="tooltip" title="@Model.ClaimsInvestigation.PolicyDetail.ContractNumber Document" alt="Document" />
-						}
-						else
-						{
-							<img id="documentImage" alt="No Document" class="img-circle img-fluid form-Image" src="@Applicationsettings.NO_POLICY_IMAGE" data-bs-toggle="tooltip" title="No Document" alt="Document" />
-						}
+						<img id="documentImage" class="img-fluid" src="/Document/GetPolicyDocument/@Model.ClaimsInvestigation!.Id" data-bs-toggle="tooltip" title="@Model.ClaimsInvestigation.PolicyDetail!.ContractNumber Document" alt="Document" />
 					</p>
 				</div>
 			</div>

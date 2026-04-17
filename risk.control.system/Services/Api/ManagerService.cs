@@ -450,7 +450,7 @@ namespace risk.control.system.Services.Api
         private async Task<string> GetOwnerImage(InvestigationTask caseTask)
         {
             await using var _context = _contextFactory.CreateDbContext();
-            var noDataImagefilePath = Path.Combine(_env.WebRootPath, "img", "no-photo.jpg");
+            var noDataImagefilePath = Path.Combine(_env.WebRootPath, "img", "no-image.png");
 
             if (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR || caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR ||
                 caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR)

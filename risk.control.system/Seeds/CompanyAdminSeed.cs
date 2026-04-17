@@ -12,8 +12,8 @@ namespace risk.control.system.Seeds
         public static async Task Seed(ApplicationDbContext context, IWebHostEnvironment env, UserManager<ApplicationUser> userManager, ClientCompany clientCompany, string companyDomain, PinCode pinCode, IFileStorageService fileStorageService)
         {
             string adminEmailwithSuffix = COMPANY_ADMIN.CODE + "@" + companyDomain;
-            var adminImage = await File.ReadAllBytesAsync(Path.Combine(env.WebRootPath, "img", Path.GetFileName(COMPANY_ADMIN.PROFILE_IMAGE)));
-            var (fileName, relativePath) = await fileStorageService.SaveAsync(adminImage, Path.GetExtension(Path.Combine(env.WebRootPath, "img", Path.GetFileName(COMPANY_ADMIN.PROFILE_IMAGE))), companyDomain, "user");
+            var adminImage = await File.ReadAllBytesAsync(Path.Combine(env.WebRootPath, "seed", Path.GetFileName(COMPANY_ADMIN.PROFILE_IMAGE)));
+            var (fileName, relativePath) = await fileStorageService.SaveAsync(adminImage, Path.GetExtension(Path.Combine(env.WebRootPath, "seed", Path.GetFileName(COMPANY_ADMIN.PROFILE_IMAGE))), companyDomain, "user");
             var admin = new ApplicationUser()
             {
                 UserName = adminEmailwithSuffix,

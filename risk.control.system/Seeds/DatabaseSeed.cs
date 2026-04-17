@@ -38,7 +38,7 @@ namespace risk.control.system.Seeds
 
             await BsbSeed.LoadBsbData(context);
 
-            await ClientCompanySetupSeed.Seed(context);
+            await InsurerSetupSeed.Seed(context);
 
             var randomPinCode = await StartCountryWiseSeed.Seed(context, webHostEnvironment, userManager, customApiCLient, fileStorageService);
 

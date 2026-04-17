@@ -91,15 +91,7 @@
 				<div class="col-5 text-center">
 
 					<p class="text-muted text-sm">
-						@if (Model?.ClaimsInvestigation?.PolicyDetail?.DocumentPath is not null)
-						{
-							<img id="documentImage" class="img-fluid" src="/Document/GetPolicyDocument/@Model?.ClaimsInvestigation?.PolicyDetail.PolicyDetailId" data-bs-toggle="tooltip" title="@Model?.ClaimsInvestigation?.PolicyDetail.ContractNumber Document" />
-						}
-						else
-						{
-							<img id="documentImage" alt="user-avatar"
-								 class="img-fluid form-Image" src=@Applicationsettings.NO_POLICY_IMAGE data-bs-toggle="tooltip" title="No Document" />
-						}
+						<img id="documentImage" class="img-fluid" src="/Document/GetPolicyDocument/@Model?.ClaimsInvestigation?.PolicyDetail!.PolicyDetailId" data-bs-toggle="tooltip" title="@Model?.ClaimsInvestigation?.PolicyDetail!.ContractNumber Document" />
 					</p>
 					<p class="text-muted text-sm">
 						<div id="notesContainer" class="position-relative d-inline-block">

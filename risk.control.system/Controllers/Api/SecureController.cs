@@ -243,14 +243,13 @@ namespace risk.control.system.Controllers.Api
         {
             try
             {
-                var reportFilename = await pdfGenerativeService.Generate(id, currentUserEmail);
-
-                var ReportFilePath = Path.Combine(webHostEnvironment.WebRootPath, "report", reportFilename);
+                var caseNumber = await pdfGenerativeService.Generate(id, currentUserEmail);
+                var ReportFilePath = Path.Combine(webHostEnvironment.ContentRootPath, CONSTANTS.DOCUMENT, CONSTANTS.CASE, caseNumber, "report.pdf");
                 var memory = new MemoryStream();
                 using var stream = new FileStream(ReportFilePath, FileMode.Open);
                 await stream.CopyToAsync(memory);
                 memory.Position = 0;
-                return File(memory, "application/pdf", reportFilename);
+                return File(memory, "application/pdf", "report.pdf");
             }
             catch (Exception ex)
             {

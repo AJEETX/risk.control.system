@@ -2,7 +2,7 @@
 
 namespace risk.control.system.Seeds
 {
-    public static class ClientCompanySetupSeed
+    public static class InsurerSetupSeed
     {
         public static async Task Seed(ApplicationDbContext context)
         {

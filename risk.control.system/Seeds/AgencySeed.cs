@@ -15,7 +15,7 @@ namespace risk.control.system.Seeds
             UserManager<ApplicationUser> vendorUserManager, SeedInput input, List<InvestigationServiceType> servicesTypes, IFileStorageService fileStorageService)
         {
             var states = await context.State.Include(s => s.Country).Where(s => s.Country!.Code == input.COUNTRY).ToListAsync();
-            string agencyImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", Path.GetFileName(input.PHOTO)!);
+            string agencyImagePath = Path.Combine(webHostEnvironment.WebRootPath, "seed", Path.GetFileName(input.PHOTO)!);
             var agencyImage = await File.ReadAllBytesAsync(agencyImagePath);
             var (fileName, relativePath) = await fileStorageService.SaveAsync(agencyImage, Path.GetExtension(agencyImagePath), input.DOMAIN!);
             var agency = await GetAgency(context, input, customApiCLient, relativePath);
