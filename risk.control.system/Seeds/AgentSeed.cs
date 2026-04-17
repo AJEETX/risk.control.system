@@ -13,7 +13,7 @@ namespace risk.control.system.Seeds
         public static async Task Seed(ApplicationDbContext context, string agentEmailwithSuffix, IWebHostEnvironment env, ICustomApiClient customApiCLient, UserManager<ApplicationUser> userManager,
             Vendor vendor, PinCode pincode, string photo, string firstName, string lastName, IFileStorageService fileStorageService, string addressLine)
         {
-            string agentImagePath = Path.Combine(env.WebRootPath, "img", Path.GetFileName(photo));
+            string agentImagePath = Path.Combine(env.WebRootPath, "seed", Path.GetFileName(photo));
             var agentImage = await File.ReadAllBytesAsync(agentImagePath);
             var (fileName, relativePath) = await fileStorageService.SaveAsync(agentImage, Path.GetExtension(agentImagePath), vendor.Email, "user");
             var address = addressLine + ", " + pincode.District!.Name + ", " + pincode.State!.Name + ", " + pincode.Country!.Code;

@@ -106,7 +106,7 @@ namespace risk.control.system.Services.Report
             var sumAssuredValue = string.Format(culture, "{0:c}", policy?.SumAssuredValue.ToString());
             AddRow(policyTable, "Assured Amount", currency + " " + policy?.SumAssuredValue.ToString("N2") ?? "N/A");
             AddRow(policyTable, "Cause of Death", policy?.CauseOfLoss ?? "N/A");
-            section.AddParagraph().AddText("");
+            section.AddParagraph().SetLineSpacing(1).AddText("");
 
             // Life Assured Details
             section.AddParagraph().SetLineSpacing(1).AddText("Life Assured Details").SetFontSize(14).SetBold().SetUnderline();
@@ -119,7 +119,7 @@ namespace risk.control.system.Services.Report
                 ("Address", $"{customer?.Addressline}, {customer?.District?.Name}, {customer?.State?.Name}, {customer?.Country?.Name}"),
                 ("Pincode", $"{customer?.PinCode!.Code.ToString() ?? "N/A"}")
             ]);
-            section.AddParagraph().AddText("");
+            section.AddParagraph().SetLineSpacing(1).AddText("");
 
             // Claimant Details
             section.AddParagraph().SetLineSpacing(1).AddText("Claimant Details").SetFontSize(14).SetBold().SetUnderline();
@@ -146,13 +146,13 @@ namespace risk.control.system.Services.Report
                 try
                 {
                     var photoBytes = _imageConverter.ConvertToPngFromPath(_env, imagePath);
-                    row.AddCell().SetVerticalAlignment(VerticalAlignment.Center).SetHorizontalAlignment(HorizontalAlignment.Center).AddParagraph().AddInlineImage(photoBytes).SetWidth(160F).SetHeight(200F);
+                    row.AddCell().SetVerticalAlignment(VerticalAlignment.Center).SetHorizontalAlignment(HorizontalAlignment.Center).AddParagraph().AddInlineImage(photoBytes).SetWidth(100F).SetHeight(100F);
                 }
                 catch
                 {
                     row.AddCell().AddParagraph("No Photo").SetFontSize(10);
                 }
-                var detailsCell = row.AddCell().SetVerticalAlignment(VerticalAlignment.Center).SetHorizontalAlignment(HorizontalAlignment.Center);
+                var detailsCell = row.AddCell();
                 foreach (var (label, value) in fields)
                     detailsCell.AddParagraph($"{label}: {(string.IsNullOrWhiteSpace(value) ? "N/A" : value)}").SetFontSize(10);
             }

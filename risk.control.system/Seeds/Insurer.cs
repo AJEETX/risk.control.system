@@ -14,14 +14,14 @@ namespace risk.control.system.Seeds
         public static async Task<ClientCompany> Seed(ApplicationDbContext context, List<Vendor> vendors, IWebHostEnvironment webHostEnvironment,
                     ICustomApiClient customApiCLient, UserManager<ApplicationUser> userManager, SeedInput input, IFileStorageService fileStorageService)
         {
-            string insurerImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", Path.GetFileName(input.PHOTO)!);
-            var insurerImage = File.ReadAllBytes(insurerImagePath);
+            string insurerImagePath = Path.Combine(webHostEnvironment.WebRootPath, "seed", Path.GetFileName(input.PHOTO)!);
+            var insurerImage = await File.ReadAllBytesAsync(insurerImagePath);
             var extension = Path.GetExtension(insurerImagePath);
             var (fileName, relativePath) = await fileStorageService.SaveAsync(insurerImage, extension, input.DOMAIN!);
             var insurer = await GetCompany(context, input, vendors, customApiCLient, relativePath);
             var insurerCompany = await context.ClientCompany.AddAsync(insurer);
             await context.SaveChangesAsync(null, false);
-            var creator = await ClientApplicationUserSeed.Seed(context, webHostEnvironment, userManager, insurerCompany.Entity, fileStorageService);
+            var creator = await InsurerUserSeed.Seed(context, webHostEnvironment, userManager, insurerCompany.Entity, fileStorageService);
             var claimTemplate = ReportTemplateSeed.CLAIM(context, insurer);
             var underwriting = ReportTemplateSeed.UNDERWRITING(context, insurer);
             await context.SaveChangesAsync(null, false);

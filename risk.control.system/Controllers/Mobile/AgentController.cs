@@ -372,7 +372,7 @@ namespace risk.control.system.Controllers.Mobile
                         c.CustomerDetail.PinCode!.Code,
                         CustomerPhoto = c?.CustomerDetail.ImagePath != null ?
                         Convert.ToBase64String(System.IO.File.ReadAllBytes(Path.Combine(_env.ContentRootPath, c?.CustomerDetail.ImagePath!))) :
-                        Applicationsettings.USER_PHOTO,
+                        Applicationsettings.NO_USER,
                         Country = c!.CustomerDetail.Country!.Name,
                         State = c.CustomerDetail.State!.Name,
                         District = c.CustomerDetail.District!.Name,
@@ -381,7 +381,7 @@ namespace risk.control.system.Controllers.Mobile
                             c.BeneficiaryDetail!.BeneficiaryDetailId,
                             Photo = c.BeneficiaryDetail?.ImagePath != null ?
                             Convert.ToBase64String(System.IO.File.ReadAllBytes(Path.Combine(_env.ContentRootPath, c.BeneficiaryDetail.ImagePath))) :
-                            Applicationsettings.USER_PHOTO,
+                            Applicationsettings.NO_USER,
                             c.BeneficiaryDetail!.Country!.Name,
                             BeneficiaryName = c.BeneficiaryDetail.Name,
                             c.BeneficiaryDetail.Addressline,
@@ -532,9 +532,9 @@ namespace risk.control.system.Controllers.Mobile
                 var docBase64 = Convert.ToBase64String(docByte);
                 var documentPhoto = caseDetail.PolicyDetail.DocumentPath != null ? docBase64 : Applicationsettings.NO_POLICY_IMAGE;
                 var customerPhoto = caseDetail.CustomerDetail!.ImagePath != null ?
-                            Convert.ToBase64String(System.IO.File.ReadAllBytes(Path.Combine(_env.ContentRootPath, caseDetail.CustomerDetail.ImagePath))) : Applicationsettings.USER_PHOTO;
+                            Convert.ToBase64String(System.IO.File.ReadAllBytes(Path.Combine(_env.ContentRootPath, caseDetail.CustomerDetail.ImagePath))) : Applicationsettings.NO_USER;
                 var beneficiaryPhoto = beneficiary!.ImagePath != null ?
-                            Convert.ToBase64String(System.IO.File.ReadAllBytes(Path.Combine(_env.ContentRootPath, beneficiary.ImagePath))) : Applicationsettings.USER_PHOTO;
+                            Convert.ToBase64String(System.IO.File.ReadAllBytes(Path.Combine(_env.ContentRootPath, beneficiary.ImagePath))) : Applicationsettings.NO_USER;
                 return Ok(
                     new
                     {
