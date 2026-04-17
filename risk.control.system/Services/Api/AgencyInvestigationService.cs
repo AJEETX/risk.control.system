@@ -1071,7 +1071,7 @@ namespace risk.control.system.Services.Api
         {
             string ownerEmail = string.Empty;
             var allocated2agent = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT;
-            var noDataImagefilePath = Path.Combine(_env.WebRootPath, "img", "no-photo.jpg");
+            var noDataImagefilePath = Path.Combine(_env.WebRootPath, "img", "no-image.png");
             await using var _context = _contextFactory.CreateDbContext();
 
             if (caseTask.SubStatus == allocated2agent)

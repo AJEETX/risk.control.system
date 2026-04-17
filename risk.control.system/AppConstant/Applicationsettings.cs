@@ -24,7 +24,6 @@ namespace risk.control.system.AppConstant
         public static string APP_URL = EnvHelper.Get("APP_URL")!;
 
         //WEBSITE SETTINGS
-
         public static string WEBSITE_NAME = EnvHelper.Get("WEBSITE_NAME")!;
         public static string WEBSITE_SITE_URL = EnvHelper.Get("WEBSITE_SITE_URL")!;
         public static string WEBSITE_SITE_LOGO = EnvHelper.Get("WEBSITE_SITE_LOGO")!;
@@ -32,12 +31,6 @@ namespace risk.control.system.AppConstant
         public static readonly string FTP_SITE_LOG = "its.aby@email.com";
         public static readonly string FTP_SITE_DATA = "C0##ect10n";
         public static readonly string REVERRSE_GEOCODING = "f2a54c0ec9ba4dfdbd450116509c6313";
-
-        public static readonly string NO_POLICY_IMAGE = "/img/no-policy.jpg";
-        public static readonly string POLICY_BLANK_IMAGE = "/img/blank-document.png";
-        public static readonly string NO_AUDIO = "/img/no-audio.png";
-        public static readonly string NO_VIDEO = "/img/no-video.png";
-        public static readonly string MARKER_FLAG = "/img/beachflag.png";
 
         public const string ALL_DISTRICT = "All Districts";
         public const string ALL_DISTRICT_CODE = "-1";
@@ -82,51 +75,12 @@ namespace risk.control.system.AppConstant
         public const string CURRENT_PINCODE5 = "3125";
         public const string CURRENT_PINCODE6 = "3124";
 
-        //public const string CANARADOMAIN = "canarahsbc.com";
-        //public const string CANARALOGO = "/img/chl.jpg";
-
-        //public const string ALLIANZ = "Allianz";
-        //public const string ALLIANZ_DOMAIN = "allianz.com";
-        //public const string ALLIANZ_LOGO = "/img/allianz.png";
-
-        //public const string TATA = "Tata Aia";
-        //public const string TATA_DOMAIN = "tataaia.com";
-        //public const string TATA_LOGO = "/img/tata_logo.png";
-
-        //public const string HDFC = "Hdfc Life";
-        //public const string HDFCDOMAIN = "hdfclife.com";
-        //public const string HDFCLOGO = "/img/hdfc.jpg";
-
-        //public const string AGENCY1NAME = "Checker";
-        //public const string AGENCY1DOMAIN = "checker.com";
-        //public const string AGENCY1PHOTO = "/img/checker.png";
-
-        //public const string AGENCY2NAME = "Verify";
-        //public const string AGENCY2DOMAIN = "verify.com";
-        //public const string AGENCY2PHOTO = "/img/verify.png";
-
-        //public const string AGENCY3NAME = "Investigate";
-        //public const string AGENCY3DOMAIN = "investigate.com";
-        //public const string AGENCY3PHOTO = "/img/investigate.png";
-
-        //public const string AGENCY4NAME = "Proper";
-        //public const string AGENCY4DOMAIN = "proper.com";
-        //public const string AGENCY4PHOTO = "/img/proper.png";
-
-        //public const string AGENCY5NAME = "Honest";
-        //public const string AGENCY5DOMAIN = "honest.com";
-        //public const string AGENCY5PHOTO = "/img/honest.png";
-
-        //public const string AGENCY6NAME = "Nicer";
-        //public const string AGENCY6DOMAIN = "nicer.com";
-        //public const string AGENCY6PHOTO = "/img/nicer.png";
-
+        public static readonly string NO_POLICY_IMAGE = "/img/no-policy.jpg";
+        public static readonly string POLICY_BLANK_IMAGE = "/img/blank-document.png";
+        public static readonly string NO_AUDIO = "/img/no-audio.png";
+        public static readonly string NO_VIDEO = "/img/no-video.png";
         public const string NO_IMAGE = "/img/no-image.png";
-        public const string AUDIO_UPLOAD_IMAGE = "/img/upload-audio.png";
-        public const string VIDEO_UPLOAD_IMAGE = "/img/upload-video.png";
-        public const string USER_PHOTO = "/img/user.png";
         public const string NO_USER = "/img/no-user.png";
         public const string NO_MAP = "/img/no-map.jpeg";
-        public const string MAP_MARKER = "/img/map-marker-icon.png";
     }
 }

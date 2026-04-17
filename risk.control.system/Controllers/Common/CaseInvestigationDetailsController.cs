@@ -48,7 +48,7 @@ namespace risk.control.system.Controllers.Common
 
                 var response = new
                 {
-                    Document = policy?.DocumentPath != null ? policy.DocumentPath : Applicationsettings.NO_POLICY_IMAGE,
+                    Document = policy!.DocumentPath,
                     ContractNumber = policy?.ContractNumber,
                     ClaimType = policy?.InsuranceType!.GetEnumDisplayName(),
                     ContractIssueDate = policy?.ContractIssueDate.ToString("dd-MMM-yyyy"),

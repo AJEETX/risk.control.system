@@ -12,9 +12,8 @@ namespace risk.control.system.Seeds
         public static async Task Seed(ApplicationDbContext context, string emailSuffix, IWebHostEnvironment env, UserManager<ApplicationUser> userManager,
             Vendor vendor, PinCode pinCode, string photo, string firstName, string lastName, IFileStorageService fileStorageService)
         {
-            string noUserImagePath = Path.Combine(env.WebRootPath, "img", NO_USER);
             string supervisorEmailwithSuffix = emailSuffix + "@" + vendor.Email;
-            string supervisorImagePath = Path.Combine(env.WebRootPath, "img", Path.GetFileName(photo));
+            string supervisorImagePath = Path.Combine(env.WebRootPath, "seed", Path.GetFileName(photo));
             var supervisorImage = await File.ReadAllBytesAsync(supervisorImagePath);
             var extension = Path.GetExtension(supervisorImagePath);
             var (fileName, relativePath) = await fileStorageService.SaveAsync(supervisorImage, extension, vendor.Email, "user");
