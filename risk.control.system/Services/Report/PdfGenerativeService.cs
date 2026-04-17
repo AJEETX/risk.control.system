@@ -58,7 +58,7 @@ namespace risk.control.system.Services.Report
             var reportFilename = await _pdfGenerate.BuildInvestigationPdfReport(investigation, policy!, customer!, beneficiary!, investigationReport!);
             _context.Investigations.Update(investigation);
             await _context.SaveChangesAsync(null, false);
-            return reportFilename;
+            return policy!.ContractNumber;
         }
     }
 }

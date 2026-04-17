@@ -7,7 +7,7 @@ using risk.control.system.Services.Common;
 
 namespace risk.control.system.Seeds
 {
-    public static class ClientApplicationUserSeed
+    public static class InsurerUserSeed
     {
         public static async Task<ApplicationUser> Seed(ApplicationDbContext context, IWebHostEnvironment env, UserManager<ApplicationUser> userManager,
             ClientCompany clientCompany, IFileStorageService fileStorageService)

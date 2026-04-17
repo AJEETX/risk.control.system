@@ -1,5 +1,6 @@
 ﻿using Gehtsoft.PDFFlow.Builder;
 using Gehtsoft.PDFFlow.Models.Enumerations;
+using Gehtsoft.PDFFlow.Utils;
 using risk.control.system.Models;
 using risk.control.system.Services.Common;
 
@@ -16,6 +17,7 @@ namespace risk.control.system.Services.Report
         IImageConverter imageConverter,
         IPdfGenerateQuestionLocationService questionService) : IPdfGenerateDetailReportService
     {
+        internal static readonly FontBuilder FNT9 = Fonts.Helvetica(9f);
         public IPdfGenerateAgentLocationService _agentService = agentService;
         private readonly IPdfGenerateFaceLocationService _faceService = faceService;
         private readonly IPdfGenerateDocumentLocationService _documentService = documentService;
@@ -26,9 +28,16 @@ namespace risk.control.system.Services.Report
         public async Task<SectionBuilder> Build(SectionBuilder section, InvestigationTask investigation, ReportTemplate investigationReport, bool isClaim = true)
         {
             var paragraph = section.AddParagraph();
+
+            var tableBuilder = section.AddTable().SetBorder(Stroke.Solid);
+
+            tableBuilder.AddColumnPercentToTable("Agency Logo", 35).AddColumnPercentToTable("Investigating Agency Name", 65);
+            var rowBuilder = tableBuilder.AddRow();
+
             var pngBytes = _imageConverter.ConvertToPngFromPath(_env, investigation.Vendor!.DocumentUrl!);
-            paragraph.AddInlineImage(pngBytes).SetWidth(100).SetHeight(100); // optional small space between image and text
-            paragraph.AddText($" {investigation.Vendor!.Email} : Investigation detail").SetFontSize(18).SetBold().SetUnderline();
+            rowBuilder.AddCell().SetVerticalAlignment(VerticalAlignment.Center).SetHorizontalAlignment(HorizontalAlignment.Center).AddParagraph().AddInlineImage(pngBytes).SetWidth(160F);
+            rowBuilder.AddCell().SetVerticalAlignment(VerticalAlignment.Center).SetHorizontalAlignment(HorizontalAlignment.Center).AddParagraph(investigation.Vendor!.Email).SetFontSize(14);
+
             int locationCount = 1;
             foreach (var loc in investigationReport.LocationReport)
             {

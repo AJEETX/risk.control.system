@@ -47,8 +47,8 @@ namespace risk.control.system.Services.Report
                              .SetFontColor(Gehtsoft.PDFFlow.Models.Shared.Color.Blue)
                              .SetUnderline();
 
-                    string matchResult = doc.ImageValid == true ? "YES" : "NO";
-                    rowBuilder.AddCell().AddParagraph(matchResult).SetFontSize(14).SetBold().SetFontColor(doc.ImageValid == true ? Gehtsoft.PDFFlow.Models.Shared.Color.Green : Gehtsoft.PDFFlow.Models.Shared.Color.Red);
+                    string matchResult = loc.AgentIdReport!.ImageValid == true ? Path.Combine(_env.WebRootPath, "img", "yes.png") : Path.Combine(_env.WebRootPath, "img", "cancel.png");
+                    rowBuilder.AddCell().SetVerticalAlignment(VerticalAlignment.Center).SetHorizontalAlignment(HorizontalAlignment.Center).AddParagraph().AddInlineImage(matchResult).SetWidth(30F);
                 }
                 section.AddParagraph().AddText("");
             }

@@ -70,7 +70,7 @@ namespace risk.control.system.AppConstant
         public static string EMAIL = USERNAME;
         public const string FIRST_NAME = "Simmy";
         public const string LAST_NAME = "Collins";
-        public const string PROFILE_IMAGE = "/img/portal-admin.jpeg";
+        public const string PROFILE_IMAGE = "portal-admin.jpeg";
     }
 
     public static class COMPANY_ADMIN
@@ -79,7 +79,7 @@ namespace risk.control.system.AppConstant
         public const string CODE = "admin";
         public const string FIRST_NAME = "Andy";
         public const string LAST_NAME = "Murrey";
-        public const string PROFILE_IMAGE = "/img/company-admin.jpeg";
+        public const string PROFILE_IMAGE = "company-admin.jpeg";
     }
 
     public static class CREATOR
@@ -88,7 +88,7 @@ namespace risk.control.system.AppConstant
         public const string CODE = "creator";
         public const string FIRST_NAME = "Reita";
         public const string LAST_NAME = "Cremorne";
-        public const string PROFILE_IMAGE = "/img/creator.jpeg";
+        public const string PROFILE_IMAGE = "creator.jpeg";
     }
 
     public static class ASSESSOR
@@ -97,7 +97,7 @@ namespace risk.control.system.AppConstant
         public const string CODE = "assessor";
         public const string FIRST_NAME = "Simone";
         public const string LAST_NAME = "Patrick";
-        public const string PROFILE_IMAGE = "/img/assessor.jpeg";
+        public const string PROFILE_IMAGE = "assessor.jpeg";
     }
 
     public static class MANAGER
@@ -106,7 +106,7 @@ namespace risk.control.system.AppConstant
         public const string CODE = "manager";
         public const string FIRST_NAME = "Keira";
         public const string LAST_NAME = "Mathew";
-        public const string PROFILE_IMAGE = "/img/manager.jpeg";
+        public const string PROFILE_IMAGE = "manager.jpeg";
     }
 
     public static class AGENCY_ADMIN
@@ -115,7 +115,7 @@ namespace risk.control.system.AppConstant
         public const string CODE = "admin";
         public const string FIRST_NAME = "Patricia";
         public const string LAST_NAME = "George";
-        public const string PROFILE_IMAGE = "/img/agency-admin.jpeg";
+        public const string PROFILE_IMAGE = "agency-admin.jpeg";
     }
 
     public static class SUPERVISOR
@@ -124,7 +124,7 @@ namespace risk.control.system.AppConstant
         public const string CODE = "supervisor";
         public const string FIRST_NAME = "Alicia";
         public const string LAST_NAME = "Victor";
-        public const string PROFILE_IMAGE = "/img/supervisor.jpeg";
+        public const string PROFILE_IMAGE = "supervisor.jpeg";
     }
 
     public static class AGENT
@@ -133,7 +133,7 @@ namespace risk.control.system.AppConstant
         public const string CODE = "agent";
         public const string FIRST_NAME = "Denny";
         public const string LAST_NAME = "Travolta";
-        public const string PROFILE_IMAGE = "/img/agent.jpeg";
+        public const string PROFILE_IMAGE = "agent.jpeg";
     }
 
     public static class GUEST
