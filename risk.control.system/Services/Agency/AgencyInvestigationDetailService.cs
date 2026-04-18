@@ -41,12 +41,14 @@ namespace risk.control.system.Services.Agency
             caseTask.BeneficiaryDetail.PhoneNumber = maskedBeneficiaryContact;
 
             var timeTaken = DateTime.UtcNow - lastHistory!.StatusChangedAt;
+            var withDrawable = caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT;
             var model = new CaseAgencyAgentModel
             {
                 ClaimsInvestigation = caseTask,
                 Beneficiary = caseTask.BeneficiaryDetail,
                 Currency = CustomExtensions.GetCultureByCountry(caseTask.ClientCompany!.Country!.Code.ToUpper()).NumberFormat.CurrencySymbol,
-                Culture = CustomExtensions.GetCultureByCountry(caseTask.ClientCompany!.Country!.Code.ToUpper())
+                Culture = CustomExtensions.GetCultureByCountry(caseTask.ClientCompany!.Country!.Code.ToUpper()),
+                Withdrawable = withDrawable,
             };
 
             return model;
