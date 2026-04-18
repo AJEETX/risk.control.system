@@ -1,5 +1,4 @@
-﻿@using risk.control.system.Helpers;
-@model CaseAgencyAgentModel
+﻿@model CaseAgencyAgentModel
 
 @{
 	ViewData["Title"] = "Details";
@@ -30,6 +29,25 @@
 						{
 							<li> <i class='fas fa-user-tie'></i> Beneficiary details </li>
 						}
+						@if (Model.Withdrawable)
+						{
+							<li>
+								<button class='btn btn-danger btn-xs'>
+									<span class='badge badge-danger btn-xs'>
+										<i class='fas fa-undo'></i>
+									</span> <b>Withdraw</b>
+								</button>
+							</li>
+						}
+						else
+						{
+							<li>
+								<button id="back" disabled class="btn btn-outline-danger btn-xs">
+									<span class="badge badge-light"> <i class="fas fa-undo"></i> </span> Withdraw
+									<span class="badge badge-danger"><i class="fas fa-info"></i></span>
+								</button>
+							</li>
+						}
 					</span>
 				</span>
 			</h3>
@@ -39,7 +57,7 @@
 	<div class="card shadow-lg border-1 rounded-lg direct-chat-warning expanding-card">
 		<div class="card-header bg-light text-white text-center">
 			<h3 class="card-title">
-				<span class="badge badge-info" data-bs-toggle="tooltip" title="Status : @Model.ClaimsInvestigation?.SubStatus?">
+				<span class="badge badge-info" data-bs-toggle="tooltip" title="Status : @Model.ClaimsInvestigation?.SubStatus">
 					<b>@Model.ClaimsInvestigation?.SubStatus</b>
 				</span>
 				<b><i class='far fa-hand-point-right'></i></b>
@@ -49,25 +67,6 @@
 					<b>
 						@Model.ClaimsInvestigation?.CaseOwner
 					</b>
-				</span>
-
-				<span class="hover-text">
-					<i class="fas fa-info-circle"></i>
-					<span class="tooltip-text" id="information">
-						<li>
-							<i class='far fa-file-powerpoint'></i> Policy details.
-						</li>
-						@if (Model.ClaimsInvestigation?.PolicyDetail!.InsuranceType == InsuranceType.UNDERWRITING)
-						{
-							<li>
-								<i class='fa fa-user-plus'></i> Customer details
-							</li>
-						}
-						else
-						{
-							<li> <i class='fas fa-user-tie'></i> Beneficiary details </li>
-						}
-					</span>
 				</span>
 			</h3>
 		</div>
@@ -103,13 +102,21 @@
 							<i class="fas fa-arrow-left"></i>
 							<span class="badge badge-light"> <i class="fa fa-toggle-on"></i> </span> Back
 						</a>
-						<span id="decline-information-popup" class="badge badge-light">
+						@if(Model.Withdrawable)
+							{
+							<button id="submit-case" type="submit" class="btn btn-sm btn-danger"><i class="fas fa-undo"></i> Withdraw</button>
+							}
+							else
+							{
+							<span id="decline-information-popup" class="badge badge-light">
 							<div class="btn btn-sm btn-outline-danger">
 								<span class="badge badge-light"> <i class="fas fa-undo"></i> </span> Decline <span class="badge badge-danger">
 								<i class="fas fa-info"></i>
 							</span>
 						</div>
 					</span>
+							}
+							
 				</div>
 			</div>
 		</form>
