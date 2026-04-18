@@ -9,5 +9,6 @@ namespace risk.control.system.Models.ViewModel
         public bool ReSelect { get; set; }
         public string Currency { get; set; } = default!;
         public CultureInfo? Culture { get; set; }
+        public bool Withdrawable { get; set; }
     }
 }
