@@ -1,4 +1,12 @@
-﻿$(document).ready(function () {
+﻿const $detailsFieldset = $('#details-fields');
+
+$(document).ready(function () {
+    if ($('#create-form').length) {
+        // The element exists
+        if ($('#create-form').valid()) {
+            $detailsFieldset.prop('disabled', false);
+        }
+    }
     var askConfirmation = true;
     $('#create-form').submit(function (e) {
         if ($('#create-form').valid() && askConfirmation) {
@@ -182,7 +190,6 @@
 });
 
 function checkUserEmail() {
-    const $detailsFieldset = $('#details-fields');
     var url = "/api/VerifyEntity/GetUserEmail";
     var name = $('#emailAddress').val().toLowerCase();
     var emailSuffix = $('#emailSuffix').val().toLowerCase();

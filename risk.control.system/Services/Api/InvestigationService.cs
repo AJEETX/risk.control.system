@@ -115,14 +115,14 @@ namespace risk.control.system.Services.Api
                     a.Updated,
                     a.ORIGIN,
                     CustomerName = a.CustomerDetail != null ? a.CustomerDetail.Name : null,
-                    customerImagePath = a.CustomerDetail != null ? a.CustomerDetail.ImagePath : Applicationsettings.NO_USER,
+                    customerImagePath = a.CustomerDetail != null ? a.CustomerDetail.ImagePath : Applicationsettings.GUEST_USER,
                     CustomerLocationMap = a.CustomerDetail!.CustomerLocationMap,
                     customerAddressline = a.CustomerDetail != null ? a.CustomerDetail.Addressline : string.Empty,
                     customerDistrict = a.CustomerDetail != null ? a.CustomerDetail.District!.Name : string.Empty,
                     customerState = a.CustomerDetail != null ? a.CustomerDetail.State!.Name : string.Empty,
                     customerPincode = a.CustomerDetail != null ? a.CustomerDetail.PinCode!.Code : 0,
                     BeneficiaryName = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.Name : null,
-                    beneficiaryImagePath = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.ImagePath : Applicationsettings.NO_USER,
+                    beneficiaryImagePath = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.ImagePath : Applicationsettings.GUEST_USER,
                     BeneficiaryLocationMap = a.BeneficiaryDetail!.BeneficiaryLocationMap,
                     beneficiaryAddressline = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.Addressline : string.Empty,
                     beneficiaryDistrict = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.District!.Name : string.Empty,
@@ -334,8 +334,8 @@ namespace risk.control.system.Services.Api
 
                 // Fetch files in parallel for this row
                 var docTask = _base64FileService.GetBase64FileAsync(a.PolicyDocumentPath!, Applicationsettings.NO_POLICY_IMAGE);
-                var custTask = _base64FileService.GetBase64FileAsync(a.customerImagePath!, Applicationsettings.NO_USER);
-                var beneTask = _base64FileService.GetBase64FileAsync(a.beneficiaryImagePath!, Applicationsettings.NO_USER);
+                var custTask = _base64FileService.GetBase64FileAsync(a.customerImagePath!, Applicationsettings.GUEST_USER);
+                var beneTask = _base64FileService.GetBase64FileAsync(a.beneficiaryImagePath!, Applicationsettings.GUEST_USER);
                 var ownerImageTask = GetOwnerImage(a.investigation);
                 var ownerDetailTask = GetOwner(a.Id);
 

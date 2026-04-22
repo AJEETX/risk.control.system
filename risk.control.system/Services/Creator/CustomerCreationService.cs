@@ -40,7 +40,7 @@ namespace risk.control.system.Services.Creator
 
                 // 3. IO & External Logic
                 var phoneTask = _verifierProcessor.ValidatePhone(companyUser, uploadCase.CustomerContact!.Trim(), errors, summaries);
-                var imageTask = _verifierProcessor.ProcessImage(uploadCase, data, errors, summaries, CUSTOMER_IMAGE, "Customer");
+                var imageTask = _verifierProcessor.ProcessFaceImage(uploadCase, data, errors, summaries, CUSTOMER_IMAGE, "Customer");
 
                 await Task.WhenAll(pinCodeTask, imageTask, phoneTask);
                 var pinCode = await pinCodeTask;

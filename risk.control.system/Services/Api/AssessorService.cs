@@ -145,9 +145,9 @@ namespace risk.control.system.Services
 
                 // Run file operations in parallel for this specific row
                 var documentTask = _base64FileService.GetBase64FileAsync(a.PolicyDocumentPath!, Applicationsettings.NO_POLICY_IMAGE);
-                var customerTask = _base64FileService.GetBase64FileAsync(a.customerImagePath!, Applicationsettings.NO_USER);
-                var beneficiaryTask = _base64FileService.GetBase64FileAsync(a.beneficiaryImagePath!, Applicationsettings.NO_USER);
-                var ownerDetailTask = _base64FileService.GetBase64FileAsync(a.VendorDocumentUrl!, Applicationsettings.NO_USER);
+                var customerTask = _base64FileService.GetBase64FileAsync(a.customerImagePath!, Applicationsettings.GUEST_USER);
+                var beneficiaryTask = _base64FileService.GetBase64FileAsync(a.beneficiaryImagePath!, Applicationsettings.GUEST_USER);
+                var ownerDetailTask = _base64FileService.GetBase64FileAsync(a.VendorDocumentUrl!, Applicationsettings.GUEST_USER);
 
                 await Task.WhenAll(documentTask, customerTask, beneficiaryTask, ownerDetailTask);
                 return new CaseInvestigationResponse
@@ -338,9 +338,9 @@ namespace risk.control.system.Services
                     var pincodeName = isUW ? customerAddress : beneficiaryAddress;
 
                     var documentTask = _base64FileService.GetBase64FileAsync(a.PolicyDocumentPath!, Applicationsettings.NO_POLICY_IMAGE);
-                    var customerTask = _base64FileService.GetBase64FileAsync(a.customerImagePath!, Applicationsettings.NO_USER);
-                    var beneficiaryTask = _base64FileService.GetBase64FileAsync(a.beneficiaryImagePath!, Applicationsettings.NO_USER);
-                    var ownerDetailTask = _base64FileService.GetBase64FileAsync(a.VendorDocumentUrl!, Applicationsettings.NO_USER);
+                    var customerTask = _base64FileService.GetBase64FileAsync(a.customerImagePath!, Applicationsettings.GUEST_USER);
+                    var beneficiaryTask = _base64FileService.GetBase64FileAsync(a.beneficiaryImagePath!, Applicationsettings.GUEST_USER);
+                    var ownerDetailTask = _base64FileService.GetBase64FileAsync(a.VendorDocumentUrl!, Applicationsettings.GUEST_USER);
 
                     await Task.WhenAll(documentTask, customerTask, beneficiaryTask, ownerDetailTask);
 
@@ -528,9 +528,9 @@ namespace risk.control.system.Services
                 var pincodeName = isUW ? customerAddress : beneficiaryAddress;
                 // Run file operations in parallel for this specific row
                 var documentTask = _base64FileService.GetBase64FileAsync(a.PolicyDocumentPath!, Applicationsettings.NO_POLICY_IMAGE);
-                var customerTask = _base64FileService.GetBase64FileAsync(a.customerImagePath!, Applicationsettings.NO_USER);
-                var beneficiaryTask = _base64FileService.GetBase64FileAsync(a.beneficiaryImagePath!, Applicationsettings.NO_USER);
-                var ownerDetailTask = _base64FileService.GetBase64FileAsync(a.VendorDocumentUrl!, Applicationsettings.NO_USER);
+                var customerTask = _base64FileService.GetBase64FileAsync(a.customerImagePath!, Applicationsettings.GUEST_USER);
+                var beneficiaryTask = _base64FileService.GetBase64FileAsync(a.beneficiaryImagePath!, Applicationsettings.GUEST_USER);
+                var ownerDetailTask = _base64FileService.GetBase64FileAsync(a.VendorDocumentUrl!, Applicationsettings.GUEST_USER);
 
                 await Task.WhenAll(documentTask, customerTask, beneficiaryTask, ownerDetailTask);
                 return new CaseInvestigationResponse

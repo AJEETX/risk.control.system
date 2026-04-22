@@ -15,6 +15,9 @@ namespace risk.control.system.Services.Common
         Task SetImageToAws(string userEmail);
 
         Task<bool> CheckFaceImageAsync(IFormFile imageFile);
+
+        Task<FaceMatchResult> HasExactlyOneFace(IFormFile file);
+        Task<FaceMatchResult> HasExactlyOneFace(byte[] imageBytes);
     }
 
     internal class UserFaceImageCheckService(
@@ -35,7 +38,7 @@ namespace risk.control.system.Services.Common
                 return false; // If the feature is disabled, skip face matching and return true
             }
 
-            using var memoryStream = new MemoryStream();
+            await using var memoryStream = new MemoryStream();
             await imageFile.CopyToAsync(memoryStream);
 
             var searchRequest = new SearchFacesByImageRequest
@@ -58,6 +61,68 @@ namespace risk.control.system.Services.Common
 
             var match = response.FaceMatches.Count > 0;
             return match;
+        }
+
+        public async Task<FaceMatchResult> HasExactlyOneFace(IFormFile file)
+        {
+            await using var ms = new MemoryStream();
+            await file.CopyToAsync(ms);
+
+            var request = new DetectFacesRequest
+            {
+                Image = new Image { Bytes = ms },
+                Attributes = new List<string> { "ALL" }
+            };
+
+            var response = await _amazonApiService.ValidateSingleFace(request);
+
+            // Filter for high-confidence detections only
+            var highConfidenceFaces = response.FaceDetails
+                .Where(f => f.Confidence > 95f)
+                .ToList();
+
+            if (highConfidenceFaces.Count == 0)
+            {
+                return new FaceMatchResult { IsValid = false, Message = "No face detected." };
+            }
+
+            if (highConfidenceFaces.Count > 1)
+            {
+                return new FaceMatchResult { IsValid = false, Message = "Multiple faces detected. Please upload a photo with only one person." };
+            }
+
+            return new FaceMatchResult { IsValid = true, Message = "Single face validated." };
+
+        }
+        public async Task<FaceMatchResult> HasExactlyOneFace(byte[] imageBytes)
+        {
+            using var stream = new MemoryStream(imageBytes);
+
+            var request = new DetectFacesRequest
+            {
+                Image = new Image { Bytes = stream },
+                Attributes = new List<string> { "DEFAULT" }
+            };
+
+            var response = await _amazonApiService.ValidateSingleFace(request);
+
+            // Filter for high-confidence detections only
+            var highConfidenceFaces = response.FaceDetails
+                .Where(f => f.Confidence > 95f)
+                .ToList();
+
+            if (highConfidenceFaces.Count == 0)
+            {
+                return new FaceMatchResult { IsValid = false, Message = "No face detected." };
+            }
+
+            if (highConfidenceFaces.Count > 1)
+            {
+                return new FaceMatchResult { IsValid = false, Message = "Multiple faces detected. Please upload a photo with only one person." };
+            }
+
+            return new FaceMatchResult { IsValid = true, Message = "Single face validated." };
+
         }
 
         public async Task SetImageToAws(string userEmail)

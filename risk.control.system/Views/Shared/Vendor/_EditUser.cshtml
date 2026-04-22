@@ -34,17 +34,17 @@
         </h6>
         <div class="form-group text-center">
             <div class="profile-img-container mb-2">
-                <img id="document-Image" class="form-Image img-circle" src="/Document/GetUserProfileImage/@Model?.Id" title="User Photo" alt="User" data-bs-toggle="tooltip" />
+                <img id="document-Image" class="form-Image" src="/Document/GetUserProfileImage/@Model?.Id" title="User Photo" alt="User" data-bs-toggle="tooltip" />
             </div>
 
-            <div class="control-label">User Photo <i class="fa fa-asterisk asterik-style-logo"></i></div>
+            <div class="control-label">User Photo <i class="fa fa-asterisk asterik-style-logo"></i> <span asp-validation-for="ProfileImage" class="text-danger"></span></div>
             <div class="row justify-content-center">
                 <div class="col-10 col-md-8">
                     <div class="custom-file text-left">
                         <input id="createImageInput" accept=".jpg,.jpeg,.png" asp-for="ProfileImage"
                                class="custom-file-input document-image-input d-none" type="file"
                                data-preview-id="createProfileImage" data-title-id="user-document" title="Upload User Photo" data-bs-toggle="tooltip" />
-                        <span asp-validation-for="ProfileImage" class="text-danger"></span>
+                        
                         <div class="row justify-content-center">
                             <label for="createImageInput" class="btn btn-outline-primary">
                                 <i class="fa fa-cloud-upload mr-2"></i>
@@ -66,27 +66,27 @@
         <div class="row">
             <div class="col-md-6">
                 <div class="form-group">
-                    <label class="input-group-label" for="FirstName">First Name:</label>
+                    <label class="input-group-label" for="FirstName">First Name: <span asp-validation-for="FirstName" class="text-danger small"></span></label>
                     <div class="input-group">
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="fa fa-user"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                         </div>
                         <input type="text" id="FirstName" asp-for="FirstName" class="form-control title-name remarks" required placeholder="First Name" minlength="3" maxlength="30">
                         </div>
-                        <span asp-validation-for="FirstName" class="text-danger small"></span>
+                        
                     </div>
                 </div>
 
                 <div class="col-md-6">
                     <div class="form-group">
-                        <label class="input-group-label" for="LastName">Last Name:</label>
+                    <label class="input-group-label" for="LastName">Last Name: <span asp-validation-for="LastName" class="text-danger small"></span></label>
                         <div class="input-group">
                             <div class="input-group-prepend">
                                 <span class="input-group-text"> <i class="fa fa-user"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                             </div>
                             <input type="text" id="LastName" asp-for="LastName" class="form-control title-name remarks" required placeholder="Last Name" maxlength="30">
                             </div>
-                            <span asp-validation-for="LastName" class="text-danger small"></span>
+                            
                         </div>
                     </div>
                 </div>
@@ -103,7 +103,7 @@
                     <div class="col-md-6">
 
                         <div class="form-group">
-                            <label class="input-group-label" for="PhoneNumber"> Mobile #:</label>
+                    <label class="input-group-label" for="PhoneNumber"> Mobile #: <span asp-validation-for="PhoneNumber" class="text-danger"></span></label>
                             <div class="input-group">
                                 <div class="input-group-prepend">
                                     @{
@@ -119,7 +119,7 @@
                                 </span>
                                 <span id="phone-valid" class="text-success phone-icon d-none"></span>
                                 <span id="phone-invalid" class="text-danger phone-icon d-none"></span>
-                                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                                
                             </div>
                         </div>
                     </div>
@@ -127,7 +127,7 @@
                     <div class="col-md-6">
 
                         <div class="form-group">
-                            <label class="input-group-label" for="UserRole"> Role:</label>
+                    <label class="input-group-label" for="UserRole"> Role: <span asp-validation-for="@Model!.Role" class="text-danger"></span></label>
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
                                     <span class="input-group-text"><i class="nav-icon fas fa-file-invoice"></i> <i class="fa fa-asterisk asterik-style"></i></span>
@@ -154,7 +154,7 @@
                                     <select required asp-for="@Model.Role" class="form-control remarks" asp-items="@roles">
                                         <option value="">--- SELECT ---</option>
                                     </select>
-                                    <span asp-validation-for="@Model.Role" class="text-danger"></span>
+                                    
                                 }
                             </div>
                         </div>
@@ -169,13 +169,13 @@
             <partial name="_Address" model="@Model" />
 
         <div class="form-group">
-            <label class="input-group-label" for="Addressline">Street Address:</label>
+            <label class="input-group-label" for="Addressline">Street Address: <span asp-validation-for="Addressline" class="text-danger"></span></label>
             <div class="input-group mb-3">
                 <div class="input-group-prepend">
                     <span class="input-group-text"><i class="fa fa-home"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
                 </div>
                 <input type="text" id="Addressline" asp-for="Addressline" class="form-control remarks" placeholder="House/Building/Street..." required maxlength="70" />
-                <span asp-validation-for="Addressline" class="text-danger"></span>
+                
             </div>
         </div>
         </div>
@@ -186,7 +186,7 @@
         @if (Model.Role == AppRoles.AGENCY_ADMIN)
         {
             <div class="form-group">
-                <label class="input-group-label" for="Active"> Status:</label>
+                <label class="input-group-label" for="Active"> Status: <span asp-validation-for="Active" class="text-danger"></span></label>
                 <div class="input-group mb-3">
                     <div class="input-group-prepend">
                         <span class="input-group-text"><i class="fa fa-toggle-on"></i> <i class="fa fa-asterisk asterik-style"></i></span>
@@ -201,7 +201,7 @@
         else
         {
             <div class="form-group">
-                <label class="input-group-label" for="Active"> Status:</label>
+                <label class="input-group-label" for="Active"> Status: <span asp-validation-for="Active" class="text-danger"></span></label>
                 <div class="input-group mb-3">
                     <div class="input-group-prepend">
                         <span class="input-group-text"><i class="fa fa-toggle-on"></i> <i class="fa fa-asterisk asterik-style"></i></span>

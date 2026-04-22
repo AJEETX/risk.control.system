@@ -105,7 +105,7 @@ namespace risk.control.system.Services.Api
                         _ => ("#DED5D5", "Offline", "fa fa-circle-o")
                     };
                 }
-                var photo = await _base64FileService.GetBase64FileAsync(u.ProfilePictureUrl!, Applicationsettings.NO_USER);
+                var photo = await _base64FileService.GetBase64FileAsync(u.ProfilePictureUrl!, Applicationsettings.GUEST_USER);
                 return new UserDetailResponse
                 {
                     Id = u.Id,
@@ -187,7 +187,7 @@ namespace risk.control.system.Services.Api
                         _ => ("#DED5D5", "Offline", "fa fa-circle-o")
                     };
                 }
-                var photo = await _base64FileService.GetBase64FileAsync(user.ProfilePictureUrl!, Applicationsettings.NO_USER);
+                var photo = await _base64FileService.GetBase64FileAsync(user.ProfilePictureUrl!, Applicationsettings.GUEST_USER);
                 activeUsersDetails.Add(new UserDetailResponse
                 {
                     Id = user.Id,

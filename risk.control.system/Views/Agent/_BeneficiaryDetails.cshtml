@@ -85,14 +85,7 @@
 					</div>
 					<div class="col-5 text-center">
 						<p class="text-muted text-sm">
-							@if (Model?.Beneficiary?.ImagePath is not null)
-							{
-								<img id="bImage" class="img-fluid block-data" src="/Document/GetBeneficiaryDocument/@Model?.Beneficiary?.BeneficiaryDetailId" data-bs-toggle="tooltip" title="Beneficiary Photo">
-							}
-							else
-							{
-								<img id="bImage" class="img-fluid block-data" src="@Applicationsettings.NO_USER" data-bs-toggle="tooltip" title="No Beneficiary Photo">
-							}
+															<img id="bImage" class="img-fluid block-data" src="/Document/GetBeneficiaryDocument/@Model?.Beneficiary?.BeneficiaryDetailId" data-bs-toggle="tooltip" title="Beneficiary Photo">
 						</p>
 						<p class="text-muted text-sm">
 							<img id="beneficiaryGoogleMap" class="img-fluid block-data" src="@map" data-bs-toggle="tooltip" title="Display Beneficiary Address in map">

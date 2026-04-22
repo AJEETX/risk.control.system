@@ -241,16 +241,16 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 function toggleSubmitButton(isValid) {
-    const form = document.getElementById("create-form") || document.getElementById("edit-form");
-    const submitButton = document.getElementById("create") || document.getElementById("edit");
-    const inputs = form.querySelectorAll(".remarks[required], .remarks[aria-required='true']");
-    let allValid = [...inputs].every(i => i.value.trim() && !i.classList.contains("is-invalid"));
-    const emailAddress = document.getElementById("emailAddress");
-    if (emailAddress) {
-        const emailData = emailAddress.value;
-        if (!emailData) {
-            allValid = false;
-        }
-    }
-    submitButton.disabled = !allValid;
+    //const form = document.getElementById("create-form") || document.getElementById("edit-form");
+    //const submitButton = document.getElementById("create") || document.getElementById("edit");
+    //const inputs = form.querySelectorAll(".remarks[required], .remarks[aria-required='true']");
+    //let allValid = [...inputs].every(i => i.value.trim() && !i.classList.contains("is-invalid"));
+    //const emailAddress = document.getElementById("emailAddress");
+    //if (emailAddress) {
+    //    const emailData = emailAddress.value;
+    //    if (!emailData) {
+    //        allValid = false;
+    //    }
+    //}
+    //submitButton.disabled = !allValid;
 }

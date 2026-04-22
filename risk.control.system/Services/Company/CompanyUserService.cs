@@ -24,6 +24,7 @@ namespace risk.control.system.Services.Company
     }
 
     public sealed class CompanyUserService(
+        IValidateImageService validateFaceService,
         UserManager<ApplicationUser> userManager,
         ApplicationDbContext context,
         IFileStorageService fileStorage,
@@ -34,6 +35,7 @@ namespace risk.control.system.Services.Company
         private static readonly HashSet<string> AllowedExt = new() { ".jpg", ".jpeg", ".png" };
         private static readonly HashSet<string> AllowedMime = new() { "image/jpeg", "image/png" };
 
+        private readonly IValidateImageService _validateFaceService = validateFaceService;
         private readonly UserManager<ApplicationUser> _userManager = userManager;
         private readonly ApplicationDbContext _context = context;
         private readonly IFileStorageService _fileStorage = fileStorage;
@@ -50,7 +52,8 @@ namespace risk.control.system.Services.Company
                     result.Errors[nameof(model.Email)] = "Invalid email suffix.";
                     return result;
                 }
-                if (!ValidateProfileImage(model.ProfileImage!, result))
+                var profileImageValid = await _validateFaceService.ValidateProfileImage(model.ProfileImage!, result);
+                if (!profileImageValid)
                     return result;
                 var fullEmail = $"{model.Email!.Trim().ToLower(CultureInfo.InvariantCulture)}@{emailSuffix.Trim().ToLower(CultureInfo.InvariantCulture)}";
                 var userCount = await _userManager.Users.AsNoTracking().CountAsync(u => u.Email == fullEmail.ToLower());
@@ -99,8 +102,9 @@ namespace risk.control.system.Services.Company
                 var result = new ServiceResult();
                 if (model.ProfileImage != null)
                 {
-                    if (!ValidateProfileImage(model.ProfileImage, result)) return result;
-                    await SetProfileImageAsync(user, model.ProfileImage, user.Email!.Split('@')[1]);
+                    var profileImageValid = await _validateFaceService.ValidateProfileImage(model.ProfileImage!, result);
+                    if (!profileImageValid)
+                        await SetProfileImageAsync(user, model.ProfileImage, user.Email!.Split('@')[1]);
                 }
                 UpdateUserFields(user, model, performedBy);
                 var updateResult = await _userManager.UpdateAsync(user);
@@ -131,7 +135,7 @@ namespace risk.control.system.Services.Company
                 return Fail("Unexpected error while updating user.");
             }
         }
-        private void UpdateUserFields(ApplicationUser user, ApplicationUser model, string performedBy)
+        private static void UpdateUserFields(ApplicationUser user, ApplicationUser model, string performedBy)
         {
             var textInfo = CultureInfo.CurrentCulture.TextInfo;
             user.FirstName = WebUtility.HtmlEncode(textInfo.ToTitleCase(model.FirstName.Trim().ToLower()));
@@ -166,47 +170,6 @@ namespace risk.control.system.Services.Company
         private static ServiceResult Success(string msg) => new() { Success = true, Message = msg };
 
         private static ServiceResult Fail(string msg) => new() { Success = false, Message = msg };
-
-        private bool ValidateProfileImage(IFormFile file, ServiceResult result)
-        {
-            if (file == null || file.Length == 0)
-            {
-                result.Errors[nameof(ApplicationUser.ProfileImage)] =
-                    "Profile image is required.";
-                return false;
-            }
-
-            if (file.Length > MAX_FILE_SIZE)
-            {
-                result.Errors[nameof(ApplicationUser.ProfileImage)] =
-                    "Profile image exceeds 5MB.";
-                return false;
-            }
-
-            var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
-            if (!AllowedExt.Contains(ext))
-            {
-                result.Errors[nameof(ApplicationUser.ProfileImage)] =
-                    "Invalid file type.";
-                return false;
-            }
-
-            if (!AllowedMime.Contains(file.ContentType))
-            {
-                result.Errors[nameof(ApplicationUser.ProfileImage)] =
-                    "Invalid image content type.";
-                return false;
-            }
-
-            if (!ImageSignatureValidator.HasValidSignature(file))
-            {
-                result.Errors[nameof(ApplicationUser.ProfileImage)] =
-                    "Invalid or corrupted image.";
-                return false;
-            }
-
-            return true;
-        }
 
         private async Task SetProfileImageAsync(ApplicationUser user, IFormFile file, string domain)
         {

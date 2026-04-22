@@ -112,16 +112,16 @@ namespace risk.control.system.Services.Api
         private async Task<string> GetUserPhotoBase64(string? url)
         {
             if (string.IsNullOrEmpty(url))
-                return Applicationsettings.NO_USER;
+                return Applicationsettings.GUEST_USER;
 
             try
             {
-                var photo = await _base64FileService.GetBase64FileAsync(url!, Applicationsettings.NO_USER);
+                var photo = await _base64FileService.GetBase64FileAsync(url!, Applicationsettings.GUEST_USER);
                 return photo;
             }
             catch
             {
-                return Applicationsettings.NO_USER;
+                return Applicationsettings.GUEST_USER;
             }
         }
 
