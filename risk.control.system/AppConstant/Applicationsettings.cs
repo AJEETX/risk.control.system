@@ -81,6 +81,7 @@ namespace risk.control.system.AppConstant
         public static readonly string NO_VIDEO = "/img/no-video.png";
         public const string NO_IMAGE = "/img/no-image.png";
         public const string NO_USER = "/img/no-user.png";
+        public const string GUEST_USER = "/img/guest-user.png";
         public const string NO_MAP = "/img/no-map.jpeg";
     }
 }

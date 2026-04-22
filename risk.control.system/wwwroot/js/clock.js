@@ -99,7 +99,7 @@ function userIsIdle() {
     isExpired = true; // Block further resets
     const idleMinutes = Math.floor(defaultTimeoutSeconds / 60);
     $.confirm({
-        title: '<i class="fas fa-exclamation-triangle text-danger"></i> Session Expired',
+        title: '<i class="fas fa-exclamation-triangle i-orange"></i> Session Expired',
         content: `
         <div class="text-center">
             <div class="mb-3">

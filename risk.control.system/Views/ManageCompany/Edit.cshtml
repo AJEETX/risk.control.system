@@ -25,9 +25,7 @@
 					<div class="col-md-6">
 						<div class="bg-light p-3 rounded mb-3 border">
 							<i class="fas fa fa-globe mr-2"></i>Company Domain: <span class="font-weight-bold blue">@Model?.Email</span>
-
 							<input type="hidden" id="email" asp-for="Email" />
-
 						</div>
 						<div class="bg-light p-3 rounded mb-3 border">
 							<h6 class="text-secondary border-bottom pb-2 mb-3">
@@ -62,17 +60,17 @@
 								<i class="fas fa-id-card mr-2"></i> Name & Contact #
 							</h6>
 						<div class="form-group">
-							<label class="input-group-label" for="Name"> Name: </label>
+								<label class="input-group-label" for="Name"> Name: <span asp-validation-for="Name" class="text-danger"></span></label>
 							<div class="input-group mb-3">
 								<div class="input-group-prepend">
 									<span class="input-group-text"><i class="fas fa-business-time"></i> <i class="fa fa-asterisk asterik-style"></i></span>
 								</div>
 								<input type="text" id="Name" asp-for="Name" class="form-control title-name remarks" required placeholder="Company Name" maxlength="30" />
-								<span asp-validation-for="Name" class="text-danger"></span>
+								
 							</div>
 						</div>
 							<div class="form-group">
-								<label class="input-group-label" for="PhoneNumber"> Mobile #:</label>
+								<label class="input-group-label" for="PhoneNumber"> Mobile #: <span asp-validation-for="PhoneNumber" class="text-danger"></span></label>
 								<div class="input-group">
 									<div class="input-group-prepend">
 										@{
@@ -91,7 +89,7 @@
 									<span id="phone-invalid" class="text-danger phone-icon d-none">
 										<i class="fas fa-times-circle"></i>
 									</span>
-									<span asp-validation-for="PhoneNumber" class="text-danger"></span>
+									
 								</div>
 							</div>
 						</div>
@@ -108,7 +106,7 @@
 							<div class="row">
 								<div class="col-md-6">
 									<div class="form-group">
-										<label class="input-group-label" for="IFSCCode"> IFSC Code: </label>
+										<label class="input-group-label" for="IFSCCode"> IFSC Code: <span asp-validation-for="IFSCCode" class="text-danger"></span></label>
 										<div class="input-group mb-3 position-relative">
 											<div class="input-group-prepend">
 												<span class="input-group-text">
@@ -122,25 +120,25 @@
 											</span>
 											<span id="ifsc-valid-icon" class="ifsc-valid-icon">
 											</span>
-											<span asp-validation-for="IFSCCode" class="text-danger"></span>
+											
 										</div>
 									</div>
 								</div>
 								<div class="col-md-6">
 									<div class="form-group">
-										<label class="input-group-label" for="BankAccountNumber"> Bank Account #: </label>
+										<label class="input-group-label" for="BankAccountNumber"> Bank Account #: <span asp-validation-for="BankAccountNumber" class="text-danger"></span></label>
 										<div class="input-group mb-3">
 											<div class="input-group-prepend">
 												<span class="input-group-text"><i class="fab fa-btc"></i> <i class="fa fa-asterisk asterik-style"></i></span>
 											</div>
 											<input type="text" id="BankAccountNumber" asp-for="BankAccountNumber" class="form-control remarks" required placeholder="Bank Account #" maxlength="20" />
-											<span asp-validation-for="BankAccountNumber" class="text-danger"></span>
+											
 										</div>
 									</div>
 								</div>
 							</div>
 							<div class="form-group">
-								<label class="input-group-label" for="BankName"> Bank Name: </label>
+								<label class="input-group-label" for="BankName"> Bank Name: <span asp-validation-for="BankName" class="text-danger"></span></label>
 								<div class="input-group mb-3">
 									<div class="input-group-prepend">
 										<span class="input-group-text">
@@ -149,7 +147,7 @@
 										</span>
 									</div>
 									<input type="text" id="BankName" asp-for="BankName" class="form-control remarks title-name" required placeholder="..." maxlength="50" readonly tabindex="-1" title="Auto-selected" data-bs-toggle="tooltip" />
-									<span asp-validation-for="BankName" class="text-danger"></span>
+									
 								</div>
 							</div>
 						</div>
@@ -158,7 +156,7 @@
 								<i class="fas fa-map-marker-alt mr-2"></i> Address Details
 							</h6>
 							<div class="form-group">
-								<label class="input-group-label" for="PinCodeText">Pincode:</label>
+								<label class="input-group-label" for="PinCodeText">Pincode: <span asp-validation-for="PinCodeId" class="text-danger"></span></label>
 								<div class="input-group mb-3 autocomplete-wrapper">
 									<div class="input-group-prepend">
 										<span class="input-group-text">
@@ -167,7 +165,7 @@
 										</span>
 									</div>
 									<input type="text" id="PinCodeText" class="form-control remarks auto-dropdown" required data-placeholder="pincode" placeholder="Type pincode or name" autocomplete="off" />
-									<span asp-validation-for="PinCodeId" class="text-danger"></span>
+									
 									<input asp-for="SelectedPincodeId" type="hidden" id="SelectedPincodeId" name="SelectedPincodeId" value="@Model?.PinCodeId" />
 									<input type="hidden" asp-for="PinCodeId" id="PinCodeId" />
 									<div id="pincode-loading" class="loading-spinner">
@@ -178,7 +176,7 @@
 							<div class="row">
 							<div class="col-md-6">
 						<div class="form-group">
-							<label class="input-group-label" for="StateText"> State:</label>
+										<label class="input-group-label" for="StateText"> State: <span asp-validation-for="StateId" class="text-danger"></span></label>
 							<div class="input-group mb-3 autocomplete-wrapper">
 								@{
 									var img = "/flags/" + @Model?.Country?.Code.ToLower() + ".png";
@@ -190,7 +188,7 @@
 									</span>
 								</div>
 								<input readonly type="text" id="StateText" class="form-control remarks" data-placeholder="state" data-bs-toggle="tooltip" placeholder="..." tabindex="-1" title="Auto-selected based on Pincode" />
-								<span asp-validation-for="StateId" class="text-danger"></span>
+								
 								<input asp-for="SelectedStateId" type="hidden" id="SelectedStateId" name="SelectedStateId" value="@Model?.StateId" />
 								<input type="hidden" asp-for="StateId" id="StateId" />
 								<div id="state-loading" class="loading-spinner">
@@ -202,7 +200,7 @@
 								<div class="col-md-6">
 
 						<div class="form-group">
-							<label class="input-group-label" for="DistrictText">District:</label>
+										<label class="input-group-label" for="DistrictText">District: <span asp-validation-for="DistrictId" class="text-danger"></span></label>
 							<div class="input-group mb-3 autocomplete-wrapper">
 								<div class="input-group-prepend">
 									<span class="input-group-text" for="DistrictId">
@@ -211,7 +209,7 @@
 									</span>
 								</div>
 								<input readonly type="text" id="DistrictText" class="form-control remarks" data-placeholder="district" data-bs-toggle="tooltip" placeholder="..." tabindex="-1" title="Auto-selected based on Pincode" />
-								<span asp-validation-for="DistrictId" class="text-danger"></span>
+								
 								<input asp-for="SelectedDistrictId" type="hidden" id="SelectedDistrictId" name="SelectedDistrictId" value="@Model?.DistrictId" />
 								<input type="hidden" asp-for="DistrictId" id="DistrictId" />
 								<div id="district-loading" class="loading-spinner">
@@ -225,13 +223,13 @@
 						
 
 						<div class="form-group">
-							<label class="input-group-label" for="Addressline">Street Address:</label>
+								<label class="input-group-label" for="Addressline">Street Address: <span asp-validation-for="Addressline" class="text-danger"></span></label>
 							<div class="input-group mb-3">
 								<div class="input-group-prepend">
 									<span class="input-group-text"><i class="fas fa-map-marker-alt"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
 								</div>
 									<input type="text" id="Addressline" asp-for="Addressline" class="form-control remarks" placeholder="House/Building/Street..." maxlength="70" required />
-								<span asp-validation-for="Addressline" class="text-danger"></span>
+								
 							</div>
 						</div>
 						</div>

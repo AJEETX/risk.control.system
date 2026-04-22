@@ -15,11 +15,11 @@
 					<th class="col-face-photo">
 						<i class="fas fa-copy text-muted ms-2" title="Scanned Document Image"></i> Document Image
 					</th>
-					<th class="col-pin-img" title="Indicative Map Route"><img class="action-image" src="~/headers/pincode.gif" />  Indicative Map</th>
 					<th class="col-address" title="Indicative Address Info">Indicative Address Info</th>
 					<th class="col-weather" title="Scanned Data">
 						<img class="action-image" src="~/headers/information.gif" /> Scanned Data
 					</th>
+					<th class="col-pin-img" title="Indicative Map Route"><img class="action-image" src="~/headers/pincode.gif" />  Indicative Map</th>
 					<th class="col-match">Valid</th>
 				</tr>
 			</thead>
@@ -52,23 +52,7 @@
 							}
 
 						</td>
-						<td>
-							@if (doc.ValidationExecuted && doc.LocationMapUrl !=  null)
-							{
-								<img id="face-img-@doc.Id"
-									 src="@string.Format(doc.LocationMapUrl, "500","500")"
-									 class="mobile-capture-map map-image"
-									 data-faceid="@doc.Id"
-									 data-locationid="@location.Id"
-									 data-source="document"
-									 title="Click to view map" />
-								
-							}
-							else
-							{
-								<img src="~/img/no-map.jpeg" class="img-thumbnail rounded" />
-							}
-						</td>
+						
 						<td>
 									<div>@doc.LongLat</div>
 
@@ -83,6 +67,23 @@
 							<small>
 							@doc.LocationInfo
 								</small>
+						</td>
+						<td>
+							@if (doc.ValidationExecuted && doc.LocationMapUrl != null)
+							{
+								<img id="face-img-@doc.Id"
+									 src="@string.Format(doc.LocationMapUrl, "500", "500")"
+									 class="mobile-capture-map map-image"
+									 data-faceid="@doc.Id"
+									 data-locationid="@location.Id"
+									 data-source="document"
+									 title="Click to view map" />
+
+							}
+							else
+							{
+								<img src="~/img/no-map.jpeg" class="img-thumbnail rounded" />
+							}
 						</td>
 						<td>
 							@if (doc.ValidationExecuted)

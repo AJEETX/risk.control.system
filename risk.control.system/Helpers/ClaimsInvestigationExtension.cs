@@ -53,7 +53,7 @@ namespace risk.control.system.Helpers
                     return beneficiary.ImagePath!;
                 }
             }
-            return Applicationsettings.NO_USER;
+            return Applicationsettings.GUEST_USER;
         }
 
         public static string GetPincodeName(bool claimType, CustomerDetail customer, BeneficiaryDetail beneficiary)

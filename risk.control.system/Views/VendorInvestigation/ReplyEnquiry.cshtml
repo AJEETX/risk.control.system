@@ -87,7 +87,7 @@
 											<small>File Sent</small>
 											@if (Model.InvestigationReport?.EnquiryRequest?.QuestionImageAttachment is not null)
 											{
-												<img id="profileImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model.InvestigationReport.EnquiryRequest.QuestionImageAttachment))">
+												<img id="profileImage" class="additional-document" src="data:image/*;base64,@(Convert.ToBase64String(Model.InvestigationReport.EnquiryRequest.QuestionImageAttachment))">
 												<a asp-controller="Download" asp-action="EnquiryFileAttachment" asp-route-id="InvestigationReport.EnquiryRequest.QueryRequestId" class="mailbox-attachment-name"><i class="fas fa-paperclip"></i></a>
 											}
 											else

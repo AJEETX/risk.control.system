@@ -36,7 +36,7 @@ namespace risk.control.system.Services.Creator
                 if (errors.Count > 0) return (null, errors, summaries);
                 var relationTask = _extractorService.GetRelationAsync(uploadCase.Relation!.Trim());
                 var pinCodeTask = _extractorService.GetPinCodeAsync(uploadCase.BeneficiaryPincode, uploadCase.BeneficiaryDistrictName!.Trim(), companyUser.ClientCompany!.CountryId!.Value);
-                var imageTask = _verifierProcessor.ProcessImage(uploadCase, data, errors, summaries, BENEFICIARY_IMAGE, "Beneficiary");
+                var imageTask = _verifierProcessor.ProcessFaceImage(uploadCase, data, errors, summaries, BENEFICIARY_IMAGE, "Beneficiary");
                 var phoneTask = _verifierProcessor.ValidatePhone(companyUser, uploadCase.BeneficiaryContact!.Trim(), errors, summaries);
                 await Task.WhenAll(relationTask, pinCodeTask, imageTask, phoneTask);
                 var relation = await relationTask;
