@@ -106,7 +106,7 @@ namespace risk.control.system.Services.Creator
         {
             var errors = new Dictionary<string, string>();
 
-            _validateImageService.ValidateImage(model.ProfileImage, errors);
+            await _validateImageService.ValidateFaceImage(model.ProfileImage, errors);
             await ValidatePhoneAsync(model, errors);
 
             if (errors.Any())
@@ -193,7 +193,7 @@ namespace risk.control.system.Services.Creator
             var errors = new Dictionary<string, string>();
             if (model.ProfileImage != null && model.ProfileImage.Length > 0)
             {
-                _validateImageService.ValidateImage(model.ProfileImage, errors);
+                await _validateImageService.ValidateFaceImage(model.ProfileImage, errors);
             }
             await ValidatePhoneAsync(model, errors);
 

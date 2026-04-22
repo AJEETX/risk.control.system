@@ -10,6 +10,7 @@ namespace risk.control.system.Services.Creator
     public interface IVerifierProcessor
     {
         Task<(string Path, string Extension)> ProcessImage(UploadCase uc, byte[] zipData, List<UploadError> errs, List<string> sums, string imageName, string caseEntityName);
+        Task<(string Path, string Extension)> ProcessFaceImage(UploadCase uc, byte[] zipData, List<UploadError> errs, List<string> sums, string imageName, string caseEntityName);
 
         Task ValidatePhone(ApplicationUser user, string contactNumber, List<UploadError> errs, List<string> sums);
 
@@ -18,6 +19,7 @@ namespace risk.control.system.Services.Creator
 
     internal class VerifierProcessor(
         IDbContextFactory<ApplicationDbContext> contextFactory,
+        IUserFaceImageCheckService faceImageCheckService,
         ICaseImageCreationService caseImageCreationService,
         IPhoneService phoneService,
         IFileStorageService fileStorageService,
@@ -26,6 +28,7 @@ namespace risk.control.system.Services.Creator
     {
         private readonly IDbContextFactory<ApplicationDbContext> _contextFactory = contextFactory;
         private readonly ICaseImageCreationService _caseImageCreationService = caseImageCreationService;
+        private readonly IUserFaceImageCheckService _faceImageCheckService = faceImageCheckService;
         private readonly IPhoneService _phoneService = phoneService;
         private readonly IFileStorageService _fileStorageService = fileStorageService;
         private readonly IFeatureManager _featureManager = featureManager;
@@ -52,6 +55,28 @@ namespace risk.control.system.Services.Creator
                 return (string.Empty, extension);
             }
 
+            // Returns a tuple: (string FileName, string RelativePath)
+            var (_, RelativePath) = await _fileStorageService.SaveAsync(imageData, extension, CONSTANTS.CASE, uc.CaseId);
+            return (RelativePath, extension);
+        }
+        public async Task<(string Path, string Extension)> ProcessFaceImage(UploadCase uc, byte[] zipData, List<UploadError> errs, List<string> sums, string imageName, string caseEntityName)
+        {
+            var extension = Path.GetExtension(imageName).ToLower();
+            var imageData = await _caseImageCreationService.GetImagesWithDataInSubfolder(zipData, uc.CaseId?.ToLower()!, imageName);
+
+            if (imageData == null)
+            {
+                errs.Add(new UploadError { UploadData = $"{caseEntityName} Image", Error = $"Missing {caseEntityName} Image" });
+                sums.Add($"[{caseEntityName} image is missing]");
+                return (string.Empty, extension);
+            }
+            var singleFaceResult = await _faceImageCheckService.HasExactlyOneFace(imageData);
+            if (!singleFaceResult.IsValid)
+            {
+                errs.Add(new UploadError { UploadData = $"{caseEntityName} Image", Error = $"{singleFaceResult.Message}" });
+                sums.Add($"[{caseEntityName} image {singleFaceResult.Message}]");
+                return (string.Empty, extension);
+            }
             // Returns a tuple: (string FileName, string RelativePath)
             var (_, RelativePath) = await _fileStorageService.SaveAsync(imageData, extension, CONSTANTS.CASE, uc.CaseId);
             return (RelativePath, extension);

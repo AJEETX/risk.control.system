@@ -39,18 +39,18 @@
 						<i class="fas fa-id-card mr-2"></i> Name & Status
 					</h6>
 				<div class="form-group">
-					<label class="input-group-label" for="Name"> Agency Name: </label>
+						<label class="input-group-label" for="Name"> Agency Name:  <span asp-validation-for="Name" class="text-danger"></span></label>
 					<div class="input-group mb-3">
 						<div class="input-group-prepend">
 							<span class="input-group-text" asp-for="Name"><i class="fas fa-building"></i> <i class="fa fa-asterisk asterik-style"></i></span>
 						</div>
 						<input type="text" id="Name" asp-for="Name" class="form-control remarks title-name" required placeholder="Agency Name" maxlength="50" autocomplete="off" />
-						<span asp-validation-for="Name" class="text-danger"></span>
+						
 					</div>
 				</div>
 
 				<div class="form-group">
-					<label class="input-group-label" for="Status"> Status:</label>
+						<label class="input-group-label" for="Status"> Status: <span asp-validation-for="Status" class="text-danger"></span></label>
 					<div class="input-group mb-3">
 						<div class="input-group-prepend">
 							<span class="input-group-text">
@@ -63,7 +63,7 @@
 								asp-items="Html.GetEnumSelectList<VendorStatus>()">
 							<option value="">--- SELECT ---</option>
 						</select>
-						<span asp-validation-for="Status" class="text-danger"></span>
+						
 					</div>
 				</div>
 				</div>
@@ -78,7 +78,7 @@
 				<div class="row">
 					<div class="col-md-6">
 				<div class="form-group">
-					<label class="input-group-label" for="IFSCCode"> IFSC Code: </label>
+								<label class="input-group-label" for="IFSCCode"> IFSC Code:  <span asp-validation-for="IFSCCode" class="text-danger"></span></label>
 					<div class="input-group mb-3 position-relative">
 						<div class="input-group-prepend">
 							<span class="input-group-text">
@@ -92,25 +92,25 @@
 						</span>
 						<span id="ifsc-valid-icon" class="ifsc-valid-icon">
 						</span>
-						<span asp-validation-for="IFSCCode" class="text-danger"></span>
+						
 					</div>
 				</div>
 					</div>
 					<div class="col-md-6">
 						<div class="form-group">
-					<label class="input-group-label" for="BankAccountNumber"> Bank Account #: </label>
+								<label class="input-group-label" for="BankAccountNumber"> Bank Account #:  <span asp-validation-for="BankAccountNumber" class="text-danger"></span></label>
 					<div class="input-group mb-3">
 						<div class="input-group-prepend">
 							<span class="input-group-text"><i class="fab fa-btc"></i> <i class="fa fa-asterisk asterik-style"></i></span>
 						</div>
 						<input type="text" id="BankAccountNumber" asp-for="BankAccountNumber" class="form-control remarks" required placeholder="Bank Account #" maxlength="20" />
-						<span asp-validation-for="BankAccountNumber" class="text-danger"></span>
+						
 					</div>
 				</div>
 				</div>
 				</div>
 				<div class="form-group">
-					<label class="input-group-label" for="BankName"> Bank Name: </label>
+						<label class="input-group-label" for="BankName"> Bank Name: <span asp-validation-for="BankName" class="text-danger"></span></label>
 					<div class="input-group mb-3">
 						<div class="input-group-prepend">
 							<span class="input-group-text">
@@ -119,7 +119,7 @@
 							</span>
 						</div>
 						<input type="text" id="BankName" asp-for="BankName" class="form-control remarks title-name" required placeholder="..." maxlength="50" readonly tabindex="-1" title="Auto-selected" data-bs-toggle="tooltip" />
-						<span asp-validation-for="BankName" class="text-danger"></span>
+						
 					</div>
 				</div>
 				</div>
@@ -132,33 +132,28 @@
 				<partial name="Vendor/_AgencyAddress" model="@Model" />
 
 				<div class="form-group">
-					<label class="input-group-label" for="Addressline">Street Address: </label>
+						<label class="input-group-label" for="Addressline">Street Address:  <span asp-validation-for="Addressline" class="text-danger"></span></label>
 					<div class="input-group mb-3">
 						<div class="input-group-prepend">
 							<span class="input-group-text"><i class="fas fa-map-marker-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
 						</div>
 							<input type="text" id="Addressline" asp-for="Addressline" class="form-control remarks" placeholder="House/Building/Street..." required maxlength="70" />
-						<span asp-validation-for="Addressline" class="text-danger"></span>
+						
 					</div>
 				</div>
 				</div>
 			</div>
 		</div>
 	</div>
-</fieldset>
 <div class="card-footer">
 	<div class="row">
 		<div class="col-md-12">
 			<div class="form-group text-right">
-				
-				<a id="cancel" asp-controller="Dashboard" asp-action="Index" class="btn btn-secondary">
-					<i class="fa fa-window-close"></i>
-					Cancel
-				</a>
-				<button disabled id="create" type="submit" class="btn btn-success">
+				<button id="create" type="submit" class="btn btn-success">
 					<i class="fas fa-building"></i> Add Agency
 				</button>
 			</div>
 		</div>
 	</div>
 </div>
+</fieldset>

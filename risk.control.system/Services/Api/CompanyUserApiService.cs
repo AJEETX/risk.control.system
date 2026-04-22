@@ -85,7 +85,7 @@ namespace risk.control.system.Services.Api
         }
         private async Task<UserDetailResponse> MapCurrentUser(ApplicationUser user, string status, string statusName, string icon)
         {
-            var photo = await _base64FileService.GetBase64FileAsync(user.ProfilePictureUrl!, Applicationsettings.NO_USER);
+            var photo = await _base64FileService.GetBase64FileAsync(user.ProfilePictureUrl!, Applicationsettings.GUEST_USER);
             return new UserDetailResponse
             {
                 Id = user.Id,
@@ -146,7 +146,7 @@ namespace risk.control.system.Services.Api
         }
         private async Task<UserDetailResponse> MapUser(ApplicationUser user, string status, string statusName, string icon, bool loginVerificationEnabled)
         {
-            var photo = await _base64FileService.GetBase64FileAsync(user.ProfilePictureUrl!, Applicationsettings.NO_USER);
+            var photo = await _base64FileService.GetBase64FileAsync(user.ProfilePictureUrl!, Applicationsettings.GUEST_USER);
             return new UserDetailResponse
             {
                 Id = user.Id,

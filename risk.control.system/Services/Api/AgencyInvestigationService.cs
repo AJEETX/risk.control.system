@@ -153,7 +153,7 @@ namespace risk.control.system.Services.Api
                     a.AssignedToAgency,
                     a.EnquiredByAssessorTime,
                     CustomerName = a.CustomerDetail != null ? a.CustomerDetail.Name : null,
-                    customerImagePath = a.CustomerDetail != null ? a.CustomerDetail.ImagePath : Applicationsettings.NO_USER,
+                    customerImagePath = a.CustomerDetail != null ? a.CustomerDetail.ImagePath : Applicationsettings.GUEST_USER,
                     CustomerLocationMap = a.CustomerDetail!.CustomerLocationMap,
                     CustomerDetailAddressLocationInfo = a.CustomerDetail.AddressLocationInfo,
                     customerAddressline = a.CustomerDetail != null ? a.CustomerDetail.Addressline : string.Empty,
@@ -163,7 +163,7 @@ namespace risk.control.system.Services.Api
                     CustomerDetailLatitude = a.CustomerDetail!.Latitude,
                     CustomerDetailLongitude = a.CustomerDetail.Longitude,
                     BeneficiaryName = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.Name : null,
-                    beneficiaryImagePath = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.ImagePath : Applicationsettings.NO_USER,
+                    beneficiaryImagePath = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.ImagePath : Applicationsettings.GUEST_USER,
                     BeneficiaryLocationMap = a.BeneficiaryDetail!.BeneficiaryLocationMap,
                     beneficiaryAddressline = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.Addressline : string.Empty,
                     beneficiaryDistrict = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.District!.Name : string.Empty,
@@ -214,7 +214,7 @@ namespace risk.control.system.Services.Api
                 var ownerDetailTask = _base64FileService.GetBase64FileAsync(a.ClientCompanyDocumentUrl!);
                 var documentTask = _base64FileService.GetBase64FileAsync(a.PolicyDocumentPath!, Applicationsettings.NO_POLICY_IMAGE);
                 var customerPhotoTask = _base64FileService.GetBase64FileAsync(isUW ? a.customerImagePath! : a.beneficiaryImagePath!);
-                var beneficiaryPhotoTask = _base64FileService.GetBase64FileAsync(a.beneficiaryImagePath!, Applicationsettings.NO_USER);
+                var beneficiaryPhotoTask = _base64FileService.GetBase64FileAsync(a.beneficiaryImagePath!, Applicationsettings.GUEST_USER);
 
                 // Wait for all images for THIS case to load
                 await Task.WhenAll(ownerDetailTask, documentTask, customerPhotoTask, beneficiaryPhotoTask, addressLocationInfoTask);
@@ -404,7 +404,7 @@ namespace risk.control.system.Services.Api
                     a.IsNewSubmittedToAgent,
                     a.AssignedToAgency,
                     CustomerName = a.CustomerDetail != null ? a.CustomerDetail.Name : null,
-                    customerImagePath = a.CustomerDetail != null ? a.CustomerDetail.ImagePath : Applicationsettings.NO_USER,
+                    customerImagePath = a.CustomerDetail != null ? a.CustomerDetail.ImagePath : Applicationsettings.GUEST_USER,
                     CustomerLocationMap = a.CustomerDetail!.CustomerLocationMap,
                     CustomerDetailAddressLocationInfo = a.CustomerDetail.AddressLocationInfo,
                     customerAddressline = a.CustomerDetail != null ? a.CustomerDetail.Addressline : string.Empty,
@@ -414,7 +414,7 @@ namespace risk.control.system.Services.Api
                     CustomerDetailLatitude = a.CustomerDetail!.Latitude,
                     CustomerDetailLongitude = a.CustomerDetail.Longitude,
                     BeneficiaryName = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.Name : null,
-                    beneficiaryImagePath = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.ImagePath : Applicationsettings.NO_USER,
+                    beneficiaryImagePath = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.ImagePath : Applicationsettings.GUEST_USER,
                     BeneficiaryLocationMap = a.BeneficiaryDetail!.BeneficiaryLocationMap,
                     beneficiaryAddressline = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.Addressline : string.Empty,
                     beneficiaryDistrict = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.District!.Name : string.Empty,
@@ -450,8 +450,8 @@ namespace risk.control.system.Services.Api
 
                 var documentTask = _base64FileService.GetBase64FileAsync(a.PolicyDocumentPath!, Applicationsettings.NO_POLICY_IMAGE);
                 var customerPhotoTask = _base64FileService.GetBase64FileAsync(isUW ? a.customerImagePath! : a.beneficiaryImagePath!);
-                var beneficiaryPhotoTask = _base64FileService.GetBase64FileAsync(a.beneficiaryImagePath!, Applicationsettings.NO_USER);
-                var ownerImageTask = _base64FileService.GetBase64FileAsync(await GetOwner(a.investigation), Applicationsettings.NO_USER);
+                var beneficiaryPhotoTask = _base64FileService.GetBase64FileAsync(a.beneficiaryImagePath!, Applicationsettings.GUEST_USER);
+                var ownerImageTask = _base64FileService.GetBase64FileAsync(await GetOwner(a.investigation), Applicationsettings.GUEST_USER);
                 var ownerEmailTask = GetOwnerEmail(a.investigation);
 
                 // Wait for all images for THIS case to load
@@ -630,7 +630,7 @@ namespace risk.control.system.Services.Api
                     a.AssignedToAgency,
                     a.ProcessedByAssessorTime,
                     CustomerName = a.CustomerDetail != null ? a.CustomerDetail.Name : null,
-                    customerImagePath = a.CustomerDetail != null ? a.CustomerDetail.ImagePath : Applicationsettings.NO_USER,
+                    customerImagePath = a.CustomerDetail != null ? a.CustomerDetail.ImagePath : Applicationsettings.GUEST_USER,
                     CustomerLocationMap = a.CustomerDetail!.CustomerLocationMap,
                     CustomerDetailAddressLocationInfo = a.CustomerDetail.AddressLocationInfo,
                     customerAddressline = a.CustomerDetail != null ? a.CustomerDetail.Addressline : string.Empty,
@@ -640,7 +640,7 @@ namespace risk.control.system.Services.Api
                     CustomerDetailLatitude = a.CustomerDetail!.Latitude,
                     CustomerDetailLongitude = a.CustomerDetail.Longitude,
                     BeneficiaryName = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.Name : null,
-                    beneficiaryImagePath = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.ImagePath : Applicationsettings.NO_USER,
+                    beneficiaryImagePath = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.ImagePath : Applicationsettings.GUEST_USER,
                     BeneficiaryLocationMap = a.BeneficiaryDetail!.BeneficiaryLocationMap,
                     beneficiaryAddressline = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.Addressline : string.Empty,
                     beneficiaryDistrict = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.District!.Name : string.Empty,
@@ -680,7 +680,7 @@ namespace risk.control.system.Services.Api
                 var ownerDetailTask = _base64FileService.GetBase64FileAsync(a.ClientCompanyDocumentUrl!);
                 var documentTask = _base64FileService.GetBase64FileAsync(a.PolicyDocumentPath!, Applicationsettings.NO_POLICY_IMAGE);
                 var customerPhotoTask = _base64FileService.GetBase64FileAsync(isUW ? a.customerImagePath! : a.beneficiaryImagePath!);
-                var beneficiaryPhotoTask = _base64FileService.GetBase64FileAsync(a.beneficiaryImagePath!, Applicationsettings.NO_USER);
+                var beneficiaryPhotoTask = _base64FileService.GetBase64FileAsync(a.beneficiaryImagePath!, Applicationsettings.GUEST_USER);
 
                 // Wait for all images for THIS case to load
                 await Task.WhenAll(ownerDetailTask, documentTask, customerPhotoTask, beneficiaryPhotoTask);
@@ -822,7 +822,7 @@ namespace risk.control.system.Services.Api
                     a.AssignedToAgency,
                     a.SubmittedToSupervisorTime,
                     CustomerName = a.CustomerDetail != null ? a.CustomerDetail.Name : null,
-                    customerImagePath = a.CustomerDetail != null ? a.CustomerDetail.ImagePath : Applicationsettings.NO_USER,
+                    customerImagePath = a.CustomerDetail != null ? a.CustomerDetail.ImagePath : Applicationsettings.GUEST_USER,
                     CustomerLocationMap = a.CustomerDetail!.CustomerLocationMap,
                     CustomerDetailAddressLocationInfo = a.CustomerDetail.AddressLocationInfo,
                     customerAddressline = a.CustomerDetail != null ? a.CustomerDetail.Addressline : string.Empty,
@@ -832,7 +832,7 @@ namespace risk.control.system.Services.Api
                     CustomerDetailLatitude = a.CustomerDetail!.Latitude,
                     CustomerDetailLongitude = a.CustomerDetail.Longitude,
                     BeneficiaryName = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.Name : null,
-                    beneficiaryImagePath = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.ImagePath : Applicationsettings.NO_USER,
+                    beneficiaryImagePath = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.ImagePath : Applicationsettings.GUEST_USER,
                     BeneficiaryLocationMap = a.BeneficiaryDetail!.BeneficiaryLocationMap,
                     beneficiaryAddressline = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.Addressline : string.Empty,
                     beneficiaryDistrict = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.District!.Name : string.Empty,
@@ -873,7 +873,7 @@ namespace risk.control.system.Services.Api
                 var ownerDetailTask = _base64FileService.GetBase64FileAsync(a.ClientCompanyDocumentUrl!);
                 var documentTask = _base64FileService.GetBase64FileAsync(a.PolicyDocumentPath!, Applicationsettings.NO_POLICY_IMAGE);
                 var customerPhotoTask = _base64FileService.GetBase64FileAsync(isUW ? a.customerImagePath! : a.beneficiaryImagePath!);
-                var beneficiaryPhotoTask = _base64FileService.GetBase64FileAsync(a.beneficiaryImagePath!, Applicationsettings.NO_USER);
+                var beneficiaryPhotoTask = _base64FileService.GetBase64FileAsync(a.beneficiaryImagePath!, Applicationsettings.GUEST_USER);
 
                 // Wait for all images for THIS case to load
                 await Task.WhenAll(ownerDetailTask, documentTask, customerPhotoTask, beneficiaryPhotoTask, addressLocationInfoTask);

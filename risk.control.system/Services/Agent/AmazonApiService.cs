@@ -15,6 +15,8 @@ namespace risk.control.system.Services.Agent
 
         Task<SearchFacesByImageResponse> SearchFacesByImageAsync(SearchFacesByImageRequest request);
 
+        Task<DetectFacesResponse> ValidateSingleFace(DetectFacesRequest request);
+
         Task<DeleteFacesResponse> DeleteFacesAsync(string collectionId, List<string> faceIds);
 
         Task<(bool, float, Amazon.Rekognition.Model.BoundingBox?)> FaceMatch(byte[] originalImage, byte[] targetImage);
@@ -106,6 +108,11 @@ namespace risk.control.system.Services.Agent
         public async Task<SearchFacesByImageResponse> SearchFacesByImageAsync(SearchFacesByImageRequest request)
         {
             return await _rekognitionClient.SearchFacesByImageAsync(request);
+        }
+
+        public async Task<DetectFacesResponse> ValidateSingleFace(DetectFacesRequest request)
+        {
+            return await _rekognitionClient.DetectFacesAsync(request);
         }
 
         public async Task<DeleteFacesResponse> DeleteFacesAsync(string collectionId, List<string> faceIds)

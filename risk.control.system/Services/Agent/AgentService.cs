@@ -62,7 +62,7 @@ namespace risk.control.system.Services.Agent
                        var isUW = a.PolicyDetail!.InsuranceType == InsuranceType.UNDERWRITING;
                        var documentTask = _base64FileService.GetBase64FileAsync(a.PolicyDetail!.DocumentPath!, Applicationsettings.NO_POLICY_IMAGE);
                        var customerPhotoTask = _base64FileService.GetBase64FileAsync(isUW ? a.CustomerDetail!.ImagePath! : a.BeneficiaryDetail!.ImagePath!);
-                       var beneficiaryPhotoTask = _base64FileService.GetBase64FileAsync(a.BeneficiaryDetail!.ImagePath!, Applicationsettings.NO_USER);
+                       var beneficiaryPhotoTask = _base64FileService.GetBase64FileAsync(a.BeneficiaryDetail!.ImagePath!, Applicationsettings.GUEST_USER);
 
                        return new CaseInvestigationAgencyResponse
                        {
@@ -127,7 +127,7 @@ namespace risk.control.system.Services.Agent
                        var isUW = a.PolicyDetail!.InsuranceType == InsuranceType.UNDERWRITING;
                        var documentTask = _base64FileService.GetBase64FileAsync(a.PolicyDetail.DocumentPath!, Applicationsettings.NO_POLICY_IMAGE);
                        var customerPhotoTask = _base64FileService.GetBase64FileAsync(isUW ? a.CustomerDetail!.ImagePath! : a.BeneficiaryDetail!.ImagePath!);
-                       var beneficiaryPhotoTask = _base64FileService.GetBase64FileAsync(a.BeneficiaryDetail!.ImagePath!, Applicationsettings.NO_USER);
+                       var beneficiaryPhotoTask = _base64FileService.GetBase64FileAsync(a.BeneficiaryDetail!.ImagePath!, Applicationsettings.GUEST_USER);
                        await Task.WhenAll(documentTask, customerPhotoTask, beneficiaryPhotoTask);
 
                        return new CaseInvestigationAgencyResponse

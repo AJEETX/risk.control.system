@@ -22,6 +22,7 @@
     // Update on Change: Show new filename when user selects a file
     fileInput.on('change', function () {
         const fileName = $(this).val().split('\\').pop();
+        fileInput.removeClass('input-validation-error');
         if (fileName) {
             fileLabel.addClass("selected valid").html(fileName);
         } else {
