@@ -34,7 +34,7 @@
                 template!.CaseId = Model!.ClaimsInvestigation!.Id;
             }
             <input type="hidden" id="caseId" value="@Model.ClaimsInvestigation.Id" />
-            <partial name="Investigation/_Location" model="@template" />
+            <partial name="Report/_Location" model="@template" />
         </div>
         <div class="row">
             <div class="col-md-12">
@@ -78,7 +78,7 @@
                             <div class="row">
                                 <div class="col-12">
                                     <div class="table-responsive">
-                                        <table class="table table-bordered table-sm table-hover">
+                                        <table class="table table-bordered table-sm">
 
                                             <thead class="thead-light">
                                                 <tr>
@@ -89,12 +89,12 @@
                                             <tbody>
                                                 <tr>
                                                     <td class="text-start">
-                                                        <div class="bg-light rounded p-2 text-muted">
+                                                        <div class="remark-container">
                                                             @Model.ClaimsInvestigation?.InvestigationReport?.AgentRemarks
                                                         </div>
                                                     </td>
                                                     <td class="text-start">
-                                                        <div class="bg-light rounded p-2 text-muted">
+                                                        <div class="remark-container">
                                                             @Model.ClaimsInvestigation?.InvestigationReport?.AgentRemarksEdit
                                                         </div>
                                                     </td>
@@ -149,7 +149,7 @@
                             <div class="row">
                                 <div class="col-12">
                                     <div class="table-responsive">
-                                        <table class="table table-bordered table-sm table-hover">
+                                        <table class="table table-bordered table-sm">
                                             <thead class="thead-light">
                                                 <tr>
                                                     <th class="w-90">Remarks</th>

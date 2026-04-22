@@ -15,12 +15,12 @@
 					<th class="col-face-photo">
 						<i class="far fa-user text-primary" title="This Image has photo at the location" data-bs-toggle="tooltip"></i> Photo
 					</th>
-					<th class="col-pin-img" title="Indicative Map Route">
-						<img class="action-image" src="~/headers/pincode.gif" /> Indicative Map
-					</th>
-										<th class="col-address" title="Indicative Address Info">Indicative Address Info</th>
+					<th class="col-address" title="Indicative Address Info">Indicative Address Info</th>
 					<th class="col-weather" title="Location Info">
 						<img class="action-image" src="~/headers/information.gif" /> Location Info
+					</th>
+					<th class="col-pin-img" title="Indicative Map Route">
+						<img class="action-image" src="~/headers/pincode.gif" /> Indicative Map
 					</th>
 					<th class="col-match">Match</th>
 				</tr>
@@ -53,22 +53,7 @@
 							<img id="face-img-@face.Id" src="~/img/no-user.png" class="thumbnail profile-image doc-profile-image" />
 						}
 					</td>
-					<td>
-						@if (face.ValidationExecuted && face.LocationMapUrl != null)
-						{
-								<img src="@string.Format(face.LocationMapUrl, "500","500")"
-									 class="mobile-capture-map map-image"
-								 data-faceid="@face.Id"
-								 data-locationid="@location.Id"
-								 data-source="face"
-								 title="Click to view map" />
-								
-						}
-						else
-						{
-							<img src="~/img/no-map.jpeg" class="thumbnail profile-image doc-profile-image" />
-						}
-					</td>
+					
 					<td>
 									<div>@face.LongLat</div>
 						<small>
@@ -83,6 +68,22 @@
 						@face.LocationInfo
 						</small>
 					</td>
+						<td>
+							@if (face.ValidationExecuted && face.LocationMapUrl != null)
+							{
+								<img src="@string.Format(face.LocationMapUrl, "500", "500")"
+									 class="mobile-capture-map map-image"
+									 data-faceid="@face.Id"
+									 data-locationid="@location.Id"
+									 data-source="face"
+									 title="Click to view map" />
+
+							}
+							else
+							{
+								<img src="~/img/no-map.jpeg" class="thumbnail profile-image doc-profile-image" />
+							}
+						</td>
 					<td>
 						@if (face.ValidationExecuted)
 						{

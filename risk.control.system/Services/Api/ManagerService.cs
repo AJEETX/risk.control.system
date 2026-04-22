@@ -148,8 +148,8 @@ namespace risk.control.system.Services.Api
 
                 // Fetch files in parallel for this row
                 var docTask = _base64FileService.GetBase64FileAsync(a.PolicyDocumentPath!, Applicationsettings.NO_POLICY_IMAGE);
-                var custTask = _base64FileService.GetBase64FileAsync(a.customerImagePath!, Applicationsettings.NO_USER);
-                var beneTask = _base64FileService.GetBase64FileAsync(a.beneficiaryImagePath!, Applicationsettings.NO_USER);
+                var custTask = _base64FileService.GetBase64FileAsync(a.customerImagePath!, Applicationsettings.GUEST_USER);
+                var beneTask = _base64FileService.GetBase64FileAsync(a.beneficiaryImagePath!, Applicationsettings.GUEST_USER);
                 var ownerImageTask = _base64FileService.GetBase64FileAsync(await GetOwnerImage(a.investigation));
                 var ownerDetailTask = GetOwner(a.investigation);
                 await Task.WhenAll(docTask, custTask, beneTask, ownerImageTask, ownerDetailTask);
@@ -342,9 +342,9 @@ namespace risk.control.system.Services.Api
 
                 // Run file operations in parallel for this specific row
                 var documentTask = _base64FileService.GetBase64FileAsync(a.PolicyDocumentPath!, Applicationsettings.NO_POLICY_IMAGE);
-                var customerTask = _base64FileService.GetBase64FileAsync(a.customerImagePath!, Applicationsettings.NO_USER);
-                var beneficiaryTask = _base64FileService.GetBase64FileAsync(a.beneficiaryImagePath!, Applicationsettings.NO_USER);
-                var ownerDetailTask = _base64FileService.GetBase64FileAsync(a.VendorDocumentUrl!, Applicationsettings.NO_USER);
+                var customerTask = _base64FileService.GetBase64FileAsync(a.customerImagePath!, Applicationsettings.GUEST_USER);
+                var beneficiaryTask = _base64FileService.GetBase64FileAsync(a.beneficiaryImagePath!, Applicationsettings.GUEST_USER);
+                var ownerDetailTask = _base64FileService.GetBase64FileAsync(a.VendorDocumentUrl!, Applicationsettings.GUEST_USER);
 
                 await Task.WhenAll(documentTask, customerTask, beneficiaryTask);
                 return new CaseInvestigationResponse

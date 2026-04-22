@@ -61,7 +61,7 @@ namespace risk.control.system.Services.AgencyAdmin
                 errors.Add("Email", $"User with email {email} already exists.");
                 return (false, $"User with email {email} already exists.", errors);
             }
-            _validateImageService.ValidateImage(model.ProfileImage, errors);
+            await _validateImageService.ValidateFaceImage(model.ProfileImage, errors);
             if (errors.Any())
             {
                 return (false, "Invalid profile image.", errors);
@@ -76,7 +76,7 @@ namespace risk.control.system.Services.AgencyAdmin
             await SaveProfileImageAsync(model, request.EmailSuffix);
             PopulateUserEntity(model, email, request.CreatedBy);
             await UpdateGeoLocationAsync(model);
-            using var tx = await _context.Database.BeginTransactionAsync();
+            await using var tx = await _context.Database.BeginTransactionAsync();
             var tempPassword = Applicationsettings.TestingData;
             var result = await _userManager.CreateAsync(model, tempPassword);
             if (!result.Succeeded)
@@ -107,7 +107,7 @@ namespace risk.control.system.Services.AgencyAdmin
             }
             if (input.ProfileImage?.Length > 0)
             {
-                _validateImageService.ValidateImage(input.ProfileImage, errors);
+                await _validateImageService.ValidateFaceImage(input.ProfileImage, errors);
             }
             if (errors.Count != 0)
             {

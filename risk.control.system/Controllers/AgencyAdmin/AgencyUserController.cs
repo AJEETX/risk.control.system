@@ -5,6 +5,7 @@ using risk.control.system.AppConstant;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services.AgencyAdmin;
+using risk.control.system.Services.Common;
 using SmartBreadcrumbs.Attributes;
 
 namespace risk.control.system.Controllers.AgencyAdmin
@@ -15,6 +16,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
     {
         private readonly IAgencyAdminUserService _service;
         private readonly IAgencyUserCreateEditService _createEditService;
+        private readonly IErrorNotifyService _errorNotifyService;
         private readonly INotyfService _notifyService;
         private readonly ILogger<AgencyUserController> _logger;
         private readonly string _baseUrl;
@@ -22,6 +24,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
         public AgencyUserController(
             IAgencyAdminUserService service,
             IAgencyUserCreateEditService createEditService,
+            IErrorNotifyService errorNotifyService,
             INotyfService notifyService,
             IHttpContextAccessor httpContextAccessor,
             ILogger<AgencyUserController> logger)
@@ -30,6 +33,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
             _createEditService = createEditService;
             _notifyService = notifyService;
             _logger = logger;
+            _errorNotifyService = errorNotifyService;
 
             var req = httpContextAccessor?.HttpContext?.Request;
             _baseUrl = $"{req?.Scheme}://{req?.Host.ToUriComponent()}{req?.PathBase.ToUriComponent()}";
@@ -67,6 +71,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
         {
             if (!ModelState.IsValid)
             {
+                _errorNotifyService.ShowErrorNotification(ModelState);
                 await _service.LoadMetadataAsync(model);
                 return View(model);
             }
@@ -81,7 +86,9 @@ namespace risk.control.system.Controllers.AgencyAdmin
 
             if (!result.Success)
             {
-                _notifyService.Error(result.Message);
+                foreach (var error in result.Errors)
+                    ModelState.AddModelError(error.Key, error.Value);
+                _errorNotifyService.ShowErrorNotification(ModelState);
                 await _service.LoadMetadataAsync(model);
                 return View(model);
             }
@@ -107,6 +114,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
         {
             if (!ModelState.IsValid)
             {
+                _errorNotifyService.ShowErrorNotification(ModelState);
                 await _service.LoadMetadataAsync(model);
                 return View(model);
             }
@@ -121,7 +129,9 @@ namespace risk.control.system.Controllers.AgencyAdmin
 
             if (!result.Success)
             {
-                _notifyService.Error(result.Message);
+                foreach (var error in result.Errors)
+                    ModelState.AddModelError(error.Key, error.Value);
+                _errorNotifyService.ShowErrorNotification(ModelState);
                 await _service.LoadMetadataAsync(model);
                 return View(model);
             }

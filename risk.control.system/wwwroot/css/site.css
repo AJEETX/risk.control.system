@@ -161,9 +161,14 @@ table {
 .form-Image {
     height: 2.4rem;
     width: 2.4rem;
-    border: 2px solid #ccc;
+    border: 2px solid #000;
 }
 
+.additional-document {
+    height: 2.4rem;
+    width: 2.4rem;
+    border: 1px solid #ccc;
+}
 .rating {
     height: .7rem;
     width: .7rem;
@@ -284,7 +289,7 @@ a.table-link {
     width: 350px;
     height: 150px;
     object-fit: cover;
-    border: 1px solid #ccc;
+    border: 1px solid #000;
     border-radius: 5px;
 }
 
@@ -397,7 +402,7 @@ a.table-link {
 .block-data {
     width: 8em;
     height: 8em;
-    border: 1px solid #ccc;
+    border: 1px solid #000;
     overflow-y: auto;
     padding: 1px;
     font-weight: 400 !important;
@@ -622,10 +627,6 @@ textarea {
 
 .input-validation-error {
     border-color: red !important;
-}
-
-.field-validation-error {
-    display: none;
 }
 
 .nav-item {
@@ -1259,7 +1260,7 @@ img.table-agency-image {
 }
 
 img.table-profile-image {
-    border-radius: 50%;
+    border-radius: 10%;
     height: 2.5rem;
     width: 2.5rem;
     border: 1px solid green;
@@ -1280,7 +1281,7 @@ img.table-profile-image-user-inactive {
 }
 
 img.table-profile-image-no-user {
-    border-radius: 50%;
+    border-radius: 10%;
     height: 2.5rem;
     width: 2.5rem;
     border: 2px solid red;
@@ -1921,9 +1922,12 @@ input.auto-dropdown {
     border: 1px solid red;
     background-color: #ffe6e6; /* Light red background */
 }
-
+.field-validation-error {
+    display: inline;
+    font-size: 0.8rem !important;
+    color: #dc3545;
+}
 .text-danger {
-    display: none;
     color: red;
     font-size: 0.875rem;
 }
@@ -2089,7 +2093,9 @@ select#PinCodeId {
 .i-orangered {
     color: orangered;
 }
-
+.i-orange {
+    color: orange;
+}
 .i-green {
     color: green;
 }
@@ -2409,7 +2415,7 @@ img.claims-logo {
 .table-profile-image-user-inactive {
     width: 50px; /* Adjust the size of the image */
     height: 50px; /* Adjust the size of the image */
-    border-radius: 50%; /* Optional: to make the image circular */
+    border-radius: 10%; /* Optional: to make the image circular */
 }
 
 .text-light-green {
