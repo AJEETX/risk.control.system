@@ -194,12 +194,12 @@ namespace risk.control.system.Services.Common
                 Parent = root
             };
 
-            // 3. Details: GetInvestigateReport
+            // 3. Details: ReportDetail
             // Note: Uses 'selectedcase' as the route parameter per your requirements
-            var details = new MvcBreadcrumbNode("GetInvestigateReport", controller, "Details")
+            var details = new MvcBreadcrumbNode("ReportDetail", controller, "Report")
             {
                 Parent = list,
-                RouteValues = new { selectedcase = id }
+                RouteValues = new { id = id }
             };
 
             // 4. Leaf: Send Enquiry
