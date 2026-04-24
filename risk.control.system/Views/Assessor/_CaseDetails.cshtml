@@ -5,8 +5,6 @@
 	string address = string.Empty;
 	string baddress = string.Empty;
 	int currentAgeinYrs = 0;
-	bool customerExist = false;
-	bool beneficiaryExist = false;
 	int beneficaryAge = 0;
 	if (Model.CaseTask != null)
 	{
@@ -26,34 +24,9 @@
 		var age = DateTime.UtcNow.Subtract(Model.Beneficiary.DateOfBirth.GetValueOrDefault()).TotalDays;
 		beneficaryAge = (int)age / 365;
 	}
-	if (!string.IsNullOrWhiteSpace(Model.CaseTask?.PolicyDetail?.ContractNumber))
-	{
-		customerExist = true;
-	}
-	if (Model.Beneficiary?.BeneficiaryDetailId > 0)
-	{
-		beneficiaryExist = true;
-	}
-	string customerProgressColor = "progress-bar-grey";
-	if (@customerExist)
-	{
-		customerProgressColor = "progress-bar-green";
-	}
-	string benficiaryProgressColor = "progress-bar-lightgrey";
-	if (@customerExist && @beneficiaryExist)
-	{
-		benficiaryProgressColor = "progress-bar-green";
-	}
-	if (@customerExist && !@beneficiaryExist)
-	{
-		benficiaryProgressColor = "progress-bar-grey";
-	}
-	if (!@customerExist && !@beneficiaryExist)
-	{
-		benficiaryProgressColor = "progress-bar-lightgrey";
-	}
-	var map = string.Format(Model.CaseTask?.CustomerDetail?.CustomerLocationMap!, "400", "400");
-	var bmap = string.Format(Model.Beneficiary?.BeneficiaryLocationMap!, "400", "400");
+	
+	var customerMap = string.Format(Model.CaseTask?.CustomerDetail?.CustomerLocationMap!, "400", "400");
+	var beneficiaryMap = string.Format(Model.Beneficiary?.BeneficiaryLocationMap!, "400", "400");
 
 	var customerSMSCount = Model.CaseTask?.CaseMessages?.Where(x => x.IsCustomer).Count();
 	var beneficiarySMSCount = Model.CaseTask?.CaseMessages?.Where(x => !x.IsCustomer).Count();
@@ -68,10 +41,10 @@
 							<i class="fas fa-info-circle"></i>
 							<span class="tooltip-text" id="information">
 								<li>
-									<i class='far fa-file-powerpoint'></i> Case details.
+									<i class='far fa-file-powerpoint'></i> Case details
 								</li>
 								<li>
-									<i class='fa fa-user-plus'></i> Customer details.
+									<i class='fa fa-user-plus'></i> Customer details
 								</li>
 								<li> <i class='fas fa-user-tie'></i> Beneficiary details </li>
 							</span>
@@ -238,8 +211,8 @@
 								</div>
 								<div class="progress">
 									<i class="far fa-bookmark bookmark-green"></i>
-									<div class="progress-bar @customerProgressColor" role="progressbar">
-										<i class="fa fa-user-plus"></i>
+									<div class="progress-bar progress-bar-green" role="progressbar">
+										<i class="far fa-file-powerpoint"></i>
 									</div>
 								</div>
 								<div class="card-body">
@@ -302,7 +275,7 @@
 												}
 											</p>
 											<p class="text-muted text-sm">
-												<img id="customerGoogleMap" class="img-fluid block-data" src="@map" data-bs-toggle="tooltip" title="Display Customer Address in map">
+												<img id="customerGoogleMap" class="img-fluid block-data" src="@customerMap" data-bs-toggle="tooltip" title="Display Customer Address in map">
 											</p>
 										</div>
 									</div>
@@ -348,8 +321,8 @@
 								</div>
 								<div class="progress">
 									<i class="far fa-bookmark bookmark-green"></i>
-									<div class="progress-bar @benficiaryProgressColor" role="progressbar">
-										<i class="fas fa-user-tie"></i>
+									<div class="progress-bar progress-bar-green" role="progressbar">
+										<i class="far fa-file-powerpoint"></i>
 									</div>
 								</div>
 								<div class="card-body">
@@ -399,7 +372,7 @@
 												}
 											</p>
 											<p class="text-muted text-sm">
-												<img id="beneficiaryGoogleMap" class="img-fluid block-data" src="@bmap" data-bs-toggle="tooltip" title="Display Beneficiary Address in map">
+												<img id="beneficiaryGoogleMap" class="img-fluid block-data" src="@beneficiaryMap" data-bs-toggle="tooltip" title="Display Beneficiary Address in map">
 											</p>
 										</div>
 									</div>
