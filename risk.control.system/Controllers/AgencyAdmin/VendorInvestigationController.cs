@@ -107,7 +107,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
         }
 
         [Breadcrumb("Submit", FromAction = nameof(AgentReport))]
-        public async Task<IActionResult> GetInvestigateReport(long id)
+        public async Task<IActionResult> ReportDetail(long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name!;
             try
