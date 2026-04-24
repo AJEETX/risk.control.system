@@ -46,7 +46,7 @@ namespace risk.control.system.Controllers.Assessor
         }
 
         [Breadcrumb(title: "Report", FromAction = nameof(Assess))]
-        public async Task<IActionResult> GetInvestigateReport(long id)
+        public async Task<IActionResult> ReportDetail(long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name!;
 

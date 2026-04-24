@@ -296,7 +296,7 @@
 
         if (id) {
             // Redirect to the clean URL
-            window.location.href = 'GetInvestigateReport/' + id;
+            window.location.href = 'ReportDetail/' + id;
         } else {
             $.alert("Please select a case.");
         }

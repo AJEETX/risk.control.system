@@ -86,7 +86,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
             if (!ModelState.IsValid || claimId < 1)
             {
                 _notifyService.Error("Error in submitting report");
-                return RedirectToAction(nameof(VendorInvestigationController.GetInvestigateReport), ControllerName<VendorInvestigationController>.Name, new { selectedcase = claimId });
+                return RedirectToAction(nameof(VendorInvestigationController.ReportDetail), ControllerName<VendorInvestigationController>.Name, new { selectedcase = claimId });
             }
             try
             {
@@ -95,23 +95,23 @@ namespace risk.control.system.Controllers.AgencyAdmin
                     if (supervisorAttachment.Length > MAX_FILE_SIZE)
                     {
                         _notifyService.Error($"Document image Size exceeds the max size: 5MB");
-                        return RedirectToAction(nameof(VendorInvestigationController.GetInvestigateReport), ControllerName<VendorInvestigationController>.Name, new { selectedcase = claimId });
+                        return RedirectToAction(nameof(VendorInvestigationController.ReportDetail), ControllerName<VendorInvestigationController>.Name, new { selectedcase = claimId });
                     }
                     var ext = Path.GetExtension(supervisorAttachment.FileName).ToLowerInvariant();
                     if (!AllowedExt.Contains(ext))
                     {
                         _notifyService.Error($"Invalid Document image type");
-                        return RedirectToAction(nameof(VendorInvestigationController.GetInvestigateReport), ControllerName<VendorInvestigationController>.Name, new { selectedcase = claimId });
+                        return RedirectToAction(nameof(VendorInvestigationController.ReportDetail), ControllerName<VendorInvestigationController>.Name, new { selectedcase = claimId });
                     }
                     if (!AllowedMime.Contains(supervisorAttachment.ContentType))
                     {
                         _notifyService.Error($"Invalid Document Image content type");
-                        return RedirectToAction(nameof(VendorInvestigationController.GetInvestigateReport), ControllerName<VendorInvestigationController>.Name, new { selectedcase = claimId });
+                        return RedirectToAction(nameof(VendorInvestigationController.ReportDetail), ControllerName<VendorInvestigationController>.Name, new { selectedcase = claimId });
                     }
                     if (!ImageSignatureValidator.HasValidSignature(supervisorAttachment))
                     {
                         _notifyService.Error($"Invalid or corrupted Document Image ");
-                        return RedirectToAction(nameof(VendorInvestigationController.GetInvestigateReport), ControllerName<VendorInvestigationController>.Name, new { selectedcase = claimId });
+                        return RedirectToAction(nameof(VendorInvestigationController.ReportDetail), ControllerName<VendorInvestigationController>.Name, new { selectedcase = claimId });
                     }
                 }
                 var success = await _processSubmittedReportService.ProcessAgentReport(userEmail, supervisorRemarks, claimId, SupervisorRemarkType.OK, supervisorAttachment, remarks);
@@ -125,7 +125,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
             {
                 _logger.LogError(ex, "Error occurred for Case {Id}. {UserEmail}.", claimId, userEmail ?? "Anonymous");
                 _notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(VendorInvestigationController.GetInvestigateReport), ControllerName<VendorInvestigationController>.Name, new { selectedcase = claimId });
+                return RedirectToAction(nameof(VendorInvestigationController.ReportDetail), ControllerName<VendorInvestigationController>.Name, new { selectedcase = claimId });
             }
         }
     }
