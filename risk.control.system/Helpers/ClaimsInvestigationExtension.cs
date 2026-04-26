@@ -1,5 +1,4 @@
-﻿using risk.control.system.AppConstant;
-using risk.control.system.Models;
+﻿using risk.control.system.Models;
 
 namespace risk.control.system.Helpers
 {
@@ -35,25 +34,6 @@ namespace risk.control.system.Helpers
                     return "<span class=\"badge badge-danger\"> <i class=\"fas fa-question\" ></i>  </span>";
                 return string.Join("", "<span class='badge badge-light'>" + beneficiary.PinCode!.Code + "</span>");
             }
-        }
-
-        public static string GetPersonPhoto(bool claimType, CustomerDetail customer, BeneficiaryDetail beneficiary)
-        {
-            if (claimType)
-            {
-                if (customer is not null)
-                {
-                    return (customer.ImagePath!);
-                }
-            }
-            else
-            {
-                if (beneficiary is not null)
-                {
-                    return beneficiary.ImagePath!;
-                }
-            }
-            return Applicationsettings.GUEST_USER;
         }
 
         public static string GetPincodeName(bool claimType, CustomerDetail customer, BeneficiaryDetail beneficiary)
