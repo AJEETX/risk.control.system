@@ -67,10 +67,10 @@ namespace risk.control.system.Models
         public bool IsNewSubmittedToAgency { get; set; } = true;
         public bool IsNewSubmittedToCompany { get; set; } = true;
 
-        public int CreatorSla { get; set; } = 5;
-        public int AssessorSla { get; set; } = 5;
-        public int SupervisorSla { get; set; } = 5;
-        public int AgentSla { get; set; } = 5;
+        public int CreatorSla { get; set; } = 2;
+        public int AssessorSla { get; set; } = 2;
+        public int SupervisorSla { get; set; } = 2;
+        public int AgentSla { get; set; } = 2;
         public bool UpdateAgentAnswer { get; set; } = false;
         public string? SelectedAgentDrivingMap { get; set; }
 
