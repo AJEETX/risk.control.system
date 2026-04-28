@@ -19,7 +19,7 @@
         <div>
             @if (Model?.Name is not null)
             {
-                var displayName = Model.Name.Length > 15 ? Model.Name.Substring(0, 15) + "..." : Model.Name;
+                var displayName = Model.Name.Length > 20 ? Model.Name.Substring(0, 20) + "..." : Model.Name;
                 <span class="brand-text font-weight-bold" title="@Model.Name" data-bs-toggle="tooltip">@displayName</span>
             }
             else

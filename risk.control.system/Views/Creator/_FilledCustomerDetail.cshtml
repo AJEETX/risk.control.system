@@ -53,9 +53,10 @@
 					<h2 class="lead"><b>@customerDetail?.Name</b></h2>
 					<p class="text-muted text-sm">Occupation:<b> @customerDetail?.Occupation</b></p>
 					<ul class="ml-4 mb-0 fa-ul text-muted">
+						<li class="small"><span class="fa-li"><i class="fas fa-user-alt"></i></span>Age:<b> @currentAgeInYrs </b></li>
 						<li class="small"><span class="fa-li"><i class="fas fa-restroom"></i></span>Gender:<b> @customerDetail?.Gender </b></li>
 						<li class="small"><span class="fa-li"><i class="fas fa-graduation-cap"></i></span>Education:<b> @customerDetail?.Education </b></li>
-						<li class="small"><span class="fa-li"><i class="fas fa-user-alt"></i></span>Age:<b> @currentAgeInYrs </b></li>
+						<li class="small"><span class="fa-li"><i class="fas fa-business-time"></i></span>Occupation:<b> @customerDetail?.Occupation </b></li>
 						<li class="small"><span class="fa-li"><i class="fa fa-money"></i></span>Annual Income:(@Model.Currency)<b> @customerDetail?.Income?.GetEnumDisplayName() </b></li>
 						<li class="small"><span class="fa-li"><i class="fas fa-lg fa-building"></i></span>Address:<b> @address</b></li>
 						<li class="small"><span class="fa-li"><i class="fas fa-lg fa-globe"></i></span>Country:  <img src="@imgPath" class="flag-icon" data-bs-toggle="tooltip" /><b> @customerDetail?.Country?.Name </b></li>
@@ -65,6 +66,7 @@
 
 				<div class="col-5 text-center">
 					<p class="text-muted text-sm">
+						<input type="hidden" id="customerDetailId" value="@customerDetail?.CustomerDetailId" />
 						<img id="profileImage" class="img-fluid block-data" src="/Document/GetCustomerDocument/@customerDetail?.CustomerDetailId" data-bs-toggle="tooltip" title="@customerDetail?.Name Photo" alt="@customerDetail?.Name" />
 					</p>
 					<p class="text-muted text-sm">
