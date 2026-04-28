@@ -54,12 +54,12 @@
 					</p>
 					<ul class="ml-4 mb-0 fa-ul text-muted">
 						<li class="small">
-							<span class="fa-li"><i class="fa fa-money"></i></span>
-							Annual Income: (@Model.Currency)<b> @Model.Beneficiary?.Income?.GetEnumDisplayName()</b>
-						</li>
-						<li class="small">
 							<span class="fa-li"><i class="fas fa-user-alt"></i></span>
 							Age:<b> @beneficiaryAgeInYears</b>
+						</li>
+						<li class="small">
+							<span class="fa-li"><i class="fa fa-money"></i></span>
+							Annual Income: (@Model.Currency)<b> @Model.Beneficiary?.Income?.GetEnumDisplayName()</b>
 						</li>
 						<li class="small">
 							<span class="fa-li"><i class="fas fa-lg fa-building"></i></span>
@@ -79,6 +79,7 @@
 				<!-- Beneficiary Image and Map -->
 				<div class="col-5 text-center">
 					<p class="text-muted text-sm">
+						<input type="hidden" id="beneficiaryId" value="@Model.Beneficiary?.BeneficiaryDetailId" />
 						<img id="bImage" class="img-fluid block-data" src="/Document/GetBeneficiaryDocument/@Model.Beneficiary?.BeneficiaryDetailId" data-bs-toggle="tooltip" title="@Model.Beneficiary?.Name Photo" alt="@Model.Beneficiary?.Name" />
 					</p>
 					<p class="text-muted text-sm">

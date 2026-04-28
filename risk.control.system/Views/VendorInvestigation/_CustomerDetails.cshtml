@@ -1,10 +1,13 @@
 ﻿@model CaseAgencyAgentModel
 @{
 	string address = string.Empty;
+	var country = string.Empty;
+	var imgPath = "/flags/in.png";
 	int currentAgeinYrs = 0;
 	if (Model.ClaimsInvestigation != null)
 	{
-		address = @Model.ClaimsInvestigation?.CustomerDetail?.Addressline + " " + @Model.ClaimsInvestigation?.CustomerDetail?.District?.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail?.State?.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail?.Country?.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail?.PinCode?.Code;
+		address = @Model.ClaimsInvestigation?.CustomerDetail?.Addressline + " " + @Model.ClaimsInvestigation?.CustomerDetail?.District?.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail?.State?.Name +
+		" " + @Model.ClaimsInvestigation?.CustomerDetail?.PinCode?.Code;
 
 		if (Model.ClaimsInvestigation?.CustomerDetail?.DateOfBirth != null)
 		{
@@ -12,6 +15,8 @@
 			currentAgeinYrs = (int)age / 365;
 		}
 	}
+	country = @Model.ClaimsInvestigation?.CustomerDetail?.Country?.Name;
+	imgPath = "/flags/" + @Model.ClaimsInvestigation?.CustomerDetail?.Country?.Code.ToLower() + ".png";
 	var map = string.Format(Model.ClaimsInvestigation?.CustomerDetail?.CustomerLocationMap!, "400", "400");
 	var customerSMSCount = Model.ClaimsInvestigation?.CaseMessages!.Where(x => x.IsCustomer).Count();
 }
@@ -63,9 +68,9 @@
                         </li> *@
 						<li class="small">
 							<span class="fa-li">
-								<i class="fa fa-money"></i>
+								<i class="fas fa-user-alt"></i>
 							</span>
-							Annual Income:(@Model.Currency)<b> @Model.ClaimsInvestigation?.CustomerDetail?.Income</b>
+							Age:<b> @currentAgeinYrs</b>
 						</li>
 						<li class="small">
 							<span class="fa-li">
@@ -80,18 +85,34 @@
 							Education: <b> @Model.ClaimsInvestigation?.CustomerDetail?.Education</b>
 						</li>
 						<li class="small">
-							<span class="fa-li">
-								<i class="fas fa-user-alt"></i>
-							</span>
-							Age:<b> @currentAgeinYrs</b>
+							<span class="fa-li"><i class="fas fa-business-time"></i></span>
+							Occupation: <b> @Model.ClaimsInvestigation?.CustomerDetail?.Occupation</b>
 						</li>
+						<li class="small">
+							<span class="fa-li">
+								<i class="fa fa-money"></i>
+							</span>
+							Annual Income:(@Model.Currency)<b> @Model.ClaimsInvestigation?.CustomerDetail?.Income</b>
+						</li>
+						
 						<li class="small">
 							<span class="fa-li">
 								<i class="fas fa-lg fa-building"></i>
 							</span>
 							Address:<b> @address</b>
 						</li>
+						<li class="small">
+							<span class="fa-li">
+								<i class="fas fa-lg fa-globe"></i>
+							</span>
+							Country:
+							@if (!string.IsNullOrWhiteSpace(country))
+							{
+								<img src="@imgPath" class="flag-icon" data-bs-toggle="tooltip" />
 
+								<b> @country</b>
+							}
+						</li>
 						<li class="small">
 							<span class="fa-li">
 								<i class="fas fa-lg fa-phone"></i>
