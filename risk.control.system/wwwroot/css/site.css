@@ -67,13 +67,16 @@ button.accept-policy {
     width: 3rem;
     background-color: #e9ecef;
     animation: img-pulse 1.5s infinite ease-in-out;
-    opacity: .8
+    opacity: .8;
+    margin-left: .4em !important;
 }
 .brand-image.loaded {
     animation: none;
     background-color: transparent;
 }
-
+.user-panel .image {
+    padding-left:.3em !important;
+}
 @keyframes img-pulse {
     0% {
         opacity: 0.6;
@@ -1263,14 +1266,14 @@ img.table-profile-image {
     border-radius: 10%;
     height: 2.5rem;
     width: 2.5rem;
-    border: 1px solid green;
+    border: 2px solid green;
 }
 
 img.table-profile-image-agent-onboard {
     border-radius: 10%;
     height: 2.5rem;
     width: 2.5rem;
-    border: 2px solid orange;
+    border: 2px solid red;
 }
 
 img.table-profile-image-user-inactive {
@@ -2674,10 +2677,14 @@ input#checkall {
     .profile-inner-section a {
         width: 70%;
     }
+
 /* Profile image */
+.sidebar{
+    overflow-y: visible !important;
+}
 .sidebar-profile {
-    width: 60px !important;
-    height: 60px !important;
+    width: 50px !important;
+    height: 50px !important;
     object-fit: cover;
     border: 3px solid #fff;
     animation: profile-pulse 1.5s infinite ease-in-out;

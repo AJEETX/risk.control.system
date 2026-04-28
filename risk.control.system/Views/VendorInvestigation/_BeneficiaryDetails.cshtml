@@ -1,26 +1,22 @@
 ﻿@model CaseAgencyAgentModel
 @{
 	string address = string.Empty;
-	string baddress = string.Empty;
+	var country = string.Empty;
+	var imgPath = "/flags/in.png";
 	int currentAgeinYrs = 0;
-	int currentBAgeinYrs = 0;
 	if (Model.ClaimsInvestigation != null)
 	{
-		address = @Model.ClaimsInvestigation?.CustomerDetail?.Addressline + " " + @Model.ClaimsInvestigation?.CustomerDetail?.District?.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail?.State?.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail?.Country?.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail?.PinCode?.Code;
-		baddress = @Model.Beneficiary != null ? @Model.Beneficiary?.Addressline + " " +
-		@Model.Beneficiary?.District?.Name + " " + @Model.Beneficiary?.State?.Name + " " +
-		@Model.Beneficiary?.Country?.Name + " " + @Model.Beneficiary?.PinCode?.Code : string.Empty;
-		if (Model.ClaimsInvestigation?.CustomerDetail?.DateOfBirth != null)
-		{
-			var age = DateTime.UtcNow.Subtract(Model.ClaimsInvestigation.CustomerDetail.DateOfBirth.GetValueOrDefault()).TotalDays;
-			currentAgeinYrs = (int)age / 365;
-		}
+		address = @Model.Beneficiary != null ? @Model.Beneficiary?.Addressline + " " +
+		@Model.Beneficiary?.District?.Name + " " + @Model.Beneficiary?.State?.Name + " " + @Model.Beneficiary?.PinCode.Code : string.Empty;
+		
 		if (Model.Beneficiary?.DateOfBirth != null)
 		{
 			var age = DateTime.UtcNow.Subtract(Model.Beneficiary.DateOfBirth.GetValueOrDefault()).TotalDays;
-			currentBAgeinYrs = (int)age / 365;
+			currentAgeinYrs = (int)age / 365;
 		}
 	}
+	country = @Model.Beneficiary?.Country?.Name;
+	imgPath = "/flags/" + @Model.Beneficiary?.Country?.Code.ToLower() + ".png";
 	var map = string.Format(Model.Beneficiary?.BeneficiaryLocationMap!, "400", "400");
 	var beneficiarySMSCount = Model.ClaimsInvestigation?.CaseMessages!.Where(x => !x.IsCustomer).Count();
 }
@@ -65,22 +61,35 @@
 					<ul class="ml-4 mb-0 fa-ul text-muted">
 						<li class="small">
 							<span class="fa-li">
-								<i class="fa fa-money"></i>
-							</span>
-							Annual Income:(@Model?.Currency) <b> @Model?.Beneficiary?.Income</b>
-						</li>
-						<li class="small">
-							<span class="fa-li">
 								<i class="fas fa-user-alt"></i>
 							</span>
-							Age:<b> @currentBAgeinYrs</b>
+							Age:<b> @currentAgeinYrs</b>
 						</li>
 
 						<li class="small">
 							<span class="fa-li">
+								<i class="fa fa-money"></i>
+							</span>
+							Annual Income:(@Model?.Currency) <b> @Model?.Beneficiary?.Income</b>
+						</li>
+						
+						<li class="small">
+							<span class="fa-li">
 								<i class="fas fa-lg fa-building"></i>
 							</span>
-							Address:<b> @baddress</b>
+							Address:<b> @address</b>
+						</li>
+						<li class="small">
+							<span class="fa-li">
+								<i class="fas fa-lg fa-globe"></i>
+							</span>
+							Country:
+							@if (!string.IsNullOrWhiteSpace(country))
+							{
+								<img src="@imgPath" class="flag-icon" data-bs-toggle="tooltip" />
+
+								<b> @country</b>
+							}
 						</li>
 						<li class="small">
 							<span class="fa-li">
