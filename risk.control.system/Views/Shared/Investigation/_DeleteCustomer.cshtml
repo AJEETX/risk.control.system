@@ -44,12 +44,11 @@
 						Occupation: <b> @Model?.ClaimsInvestigation?.CustomerDetail?.Occupation</b>
 					</p>
 					<ul class="ml-4 mb-0 fa-ul text-muted">
-
 						<li class="small">
 							<span class="fa-li">
-								<i class="fa fa-money"></i>
+								<i class="fas fa-user-alt"></i>
 							</span>
-							Annual Income: (@Model?.Currency)<b> @Model?.ClaimsInvestigation?.CustomerDetail?.Income?.GetEnumDisplayName()</b>
+							Age: <b> @currentAgeinYrs years</b>
 						</li>
 						<li class="small">
 							<span class="fa-li">
@@ -57,6 +56,7 @@
 							</span>
 							Gender:<b> @Model?.ClaimsInvestigation?.CustomerDetail?.Gender</b>
 						</li>
+
 						<li class="small">
 							<span class="fa-li">
 								<i class="fas fa-graduation-cap"></i>
@@ -64,10 +64,14 @@
 							Education: <b> @Model?.ClaimsInvestigation?.CustomerDetail?.Education</b>
 						</li>
 						<li class="small">
+							<span class="fa-li"><i class="fas fa-business-time"></i></span>
+							Occupation: <b> @Model?.ClaimsInvestigation?.CustomerDetail?.Occupation</b>
+						</li>
+						<li class="small">
 							<span class="fa-li">
-								<i class="fas fa-user-alt"></i>
+								<i class="fa fa-money"></i>
 							</span>
-							Age: <b> @currentAgeinYrs years</b>
+							Annual Income: (@Model?.Currency)<b> @Model?.ClaimsInvestigation?.CustomerDetail?.Income?.GetEnumDisplayName()</b>
 						</li>
 						<li class="small">
 							<span class="fa-li">
