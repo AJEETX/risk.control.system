@@ -66,10 +66,14 @@ namespace risk.control.system.Models
         public bool IsNewSubmittedToAgent { get; set; } = true;
         public bool IsNewSubmittedToAgency { get; set; } = true;
         public bool IsNewSubmittedToCompany { get; set; } = true;
-
+        [Range(1, int.MaxValue, ErrorMessage = "Sla must be at least 1.")]
         public int CreatorSla { get; set; } = 2;
+        [Range(1, int.MaxValue, ErrorMessage = "Sla must be at least 1.")]
+
         public int AssessorSla { get; set; } = 2;
+        [Range(1, int.MaxValue, ErrorMessage = "Sla must be at least 1.")]
         public int SupervisorSla { get; set; } = 2;
+        [Range(1, int.MaxValue, ErrorMessage = "Sla must be at least 1.")]
         public int AgentSla { get; set; } = 2;
         public bool UpdateAgentAnswer { get; set; } = false;
         public string? SelectedAgentDrivingMap { get; set; }

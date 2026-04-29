@@ -204,7 +204,19 @@ function loadNotifications(keepOpen = false) {
 
                 const $clockIcon = $("<i>").addClass("far fa-clock");
                 const $created = $("<span>").text(" " + safeCreatedAt);
-                $time.append($clockIcon).append($created);
+                let date = new Date(item.createdDateTime);
+                var localDate = date.toLocaleString('en-IN', {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: true
+                });
+                const $dateTimeIcon = $("<i>").addClass("far fa-calendar-alt notification-message");
+                const $createdDateTime = $("<span>").text(" " + localDate);
+                $time.append($clockIcon).append($created).append($dateTimeIcon).append($createdDateTime);
 
                 // Delete button
                 const $delete = $("<span>")

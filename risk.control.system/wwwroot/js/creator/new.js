@@ -249,7 +249,7 @@
             {
                 "data": "timePending",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.timePending + '" data-bs-toggle="tooltip">' + data + '</span>'
+                    return `<small><strong>${data} </strong> </small>`;
                 }
             },
             {

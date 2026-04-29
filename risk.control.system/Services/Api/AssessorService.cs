@@ -211,27 +211,25 @@ namespace risk.control.system.Services
             DateTime time2Compare = SubmittedToAssessorTime;
             time2Compare = SubmittedToAssessorTime;
             if (DateTime.UtcNow.Subtract(time2Compare).Days >= AssessorSla)
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(time2Compare).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Hurry up, {DateTime.UtcNow.Subtract(time2Compare).Days} days since created!\"></i>");
-            else if (DateTime.UtcNow.Subtract(time2Compare).Days >= 3 || DateTime.UtcNow.Subtract(time2Compare).Days >= AssessorSla)
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(time2Compare).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Caution : {DateTime.UtcNow.Subtract(time2Compare).Days} day since created.\"></i>");
+                return string.Join("", $"{DateTime.UtcNow.Subtract(time2Compare).Days} day<sup><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Hurry up, {DateTime.UtcNow.Subtract(time2Compare).Days} days since submitted!\"></i></sup>");
 
             if (DateTime.UtcNow.Subtract(time2Compare).Days >= 1)
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(time2Compare).Days} day</span>");
+                return string.Join("", $"{DateTime.UtcNow.Subtract(time2Compare).Days} day");
 
             if (DateTime.UtcNow.Subtract(time2Compare).Hours < 24 &&
                 DateTime.UtcNow.Subtract(time2Compare).Hours > 0)
             {
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(time2Compare).Hours} hr </span>");
+                return string.Join("", $"{DateTime.UtcNow.Subtract(time2Compare).Hours} hr");
             }
             if (DateTime.UtcNow.Subtract(time2Compare).Hours == 0 && DateTime.UtcNow.Subtract(time2Compare).Minutes > 0)
             {
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(time2Compare).Minutes} min </span>");
+                return string.Join("", $"{DateTime.UtcNow.Subtract(time2Compare).Minutes} min");
             }
             if (DateTime.UtcNow.Subtract(time2Compare).Minutes == 0 && DateTime.UtcNow.Subtract(time2Compare).Seconds > 0)
             {
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(time2Compare).Seconds} sec </span>");
+                return string.Join("", $"{DateTime.UtcNow.Subtract(time2Compare).Seconds} sec");
             }
-            return string.Join("", "<span class='badge badge-light'>now</span>");
+            return string.Join("", "now");
         }
 
         public async Task<object> GetReviewCases(string userEmail, int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc")
@@ -394,27 +392,23 @@ namespace risk.control.system.Services
         private static string GetAssessorReviewTime(DateTime EnquiredByAssessorTime, int AssessorSla)
         {
             DateTime time2Compare = EnquiredByAssessorTime;
-            if (DateTime.UtcNow.Subtract(time2Compare).Days >= AssessorSla)
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(time2Compare).Days} day</span>");
-            else if (DateTime.UtcNow.Subtract(time2Compare).Days >= 3 || DateTime.UtcNow.Subtract(time2Compare).Days >= AssessorSla)
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(time2Compare).Days} day</span>");
             if (DateTime.UtcNow.Subtract(time2Compare).Days >= 1)
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(time2Compare).Days} day</span>");
+                return string.Join("", $"{DateTime.UtcNow.Subtract(time2Compare).Days} day");
 
             if (DateTime.UtcNow.Subtract(time2Compare).Hours < 24 &&
                 DateTime.UtcNow.Subtract(time2Compare).Hours > 0)
             {
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(time2Compare).Hours} hr </span>");
+                return string.Join("", $"{DateTime.UtcNow.Subtract(time2Compare).Hours} hr");
             }
             if (DateTime.UtcNow.Subtract(time2Compare).Hours == 0 && DateTime.UtcNow.Subtract(time2Compare).Minutes > 0)
             {
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(time2Compare).Minutes} min </span>");
+                return string.Join("", $"{DateTime.UtcNow.Subtract(time2Compare).Minutes} min");
             }
             if (DateTime.UtcNow.Subtract(time2Compare).Minutes == 0 && DateTime.UtcNow.Subtract(time2Compare).Seconds > 0)
             {
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(time2Compare).Seconds} sec </span>");
+                return string.Join("", $"{DateTime.UtcNow.Subtract(time2Compare).Seconds} sec");
             }
-            return string.Join("", "<span class='badge badge-light'>now</span>");
+            return string.Join("", "now");
         }
 
         public async Task<object> GetRejectedCases(string userEmail, int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc")
@@ -586,22 +580,22 @@ namespace risk.control.system.Services
             DateTime time2Compare = ProcessedByAssessorTime;
 
             if (DateTime.UtcNow.Subtract(time2Compare).Days >= 1)
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(time2Compare).Days} day</span>");
+                return string.Join("", $"{DateTime.UtcNow.Subtract(time2Compare).Days} day");
 
             if (DateTime.UtcNow.Subtract(time2Compare).Hours < 24 &&
                 DateTime.UtcNow.Subtract(time2Compare).Hours > 0)
             {
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(time2Compare).Hours} hr </span>");
+                return string.Join("", $"{DateTime.UtcNow.Subtract(time2Compare).Hours} hr ");
             }
             if (DateTime.UtcNow.Subtract(time2Compare).Hours == 0 && DateTime.UtcNow.Subtract(time2Compare).Minutes > 0)
             {
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(time2Compare).Minutes} min </span>");
+                return string.Join("", $"{DateTime.UtcNow.Subtract(time2Compare).Minutes} min ");
             }
             if (DateTime.UtcNow.Subtract(time2Compare).Minutes == 0 && DateTime.UtcNow.Subtract(time2Compare).Seconds > 0)
             {
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(time2Compare).Seconds} sec </span>");
+                return string.Join("", $"{DateTime.UtcNow.Subtract(time2Compare).Seconds} sec ");
             }
-            return string.Join("", "<span class='badge badge-light'>now</span>");
+            return string.Join("", "now");
         }
 
         private async Task<bool> CanDownload(long id, string userEmail)

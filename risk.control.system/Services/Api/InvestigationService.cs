@@ -359,7 +359,7 @@ namespace risk.control.system.Services.Api
                     BeneficiaryPhoto = await beneTask,
                     SubStatus = a.SubStatus,
                     Created = a.Updated ?? a.Created,
-                    TimePending = GetCreatorTimePending(a.AllocatedToAgencyTime!.Value, a.CreatorSla),
+                    TimePending = GetActiveTime(a.AllocatedToAgencyTime!.Value, a.CreatorSla),
                     TimeElapsed = DateTime.UtcNow.Subtract(a.Updated.GetValueOrDefault()).TotalSeconds,
                     Service = investigationService,
                     ServiceType = serviceType,
@@ -578,31 +578,26 @@ namespace risk.control.system.Services.Api
 
         private static string GetDraftedTimePending(InvestigationTask a)
         {
-            if (a.CreatorSla == 0)
-            {
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(a.Updated.GetValueOrDefault()).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Hurry up, {DateTime.UtcNow.Subtract(a.Updated.GetValueOrDefault()).Days} days since created!\"></i>");
-            }
             if (DateTime.UtcNow.Subtract(a.Updated.GetValueOrDefault()).Days >= a.CreatorSla)
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(a.Updated.GetValueOrDefault()).Days} day</span>");
-            else if (DateTime.UtcNow.Subtract(a.Updated.GetValueOrDefault()).Days >= 3 || DateTime.UtcNow.Subtract(a.Updated.GetValueOrDefault()).Days >= a.CreatorSla)
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(a.Updated.GetValueOrDefault()).Days} day</span>");
+                return string.Join("", $"{DateTime.UtcNow.Subtract(a.Updated.GetValueOrDefault()).Days} day<sup><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Hurry up, {DateTime.UtcNow.Subtract(a.Updated.GetValueOrDefault()).Days} days since created!\"></i></sup>");
+
             if (DateTime.UtcNow.Subtract(a.Updated.GetValueOrDefault()).Days >= 1)
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(a.Updated.GetValueOrDefault()).Days} day</span>");
+                return string.Join("", $"{DateTime.UtcNow.Subtract(a.Updated.GetValueOrDefault()).Days} day");
 
             if (DateTime.UtcNow.Subtract(a.Updated.GetValueOrDefault()).Hours < 24 &&
                 DateTime.UtcNow.Subtract(a.Updated.GetValueOrDefault()).Hours > 0)
             {
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(a.Updated.GetValueOrDefault()).Hours} hr </span>");
+                return string.Join("", $"{DateTime.UtcNow.Subtract(a.Updated.GetValueOrDefault()).Hours} hr");
             }
             if (DateTime.UtcNow.Subtract(a.Updated.GetValueOrDefault()).Hours == 0 && DateTime.UtcNow.Subtract(a.Updated.GetValueOrDefault()).Minutes > 0)
             {
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(a.Updated.GetValueOrDefault()).Minutes} min </span>");
+                return string.Join("", $"{DateTime.UtcNow.Subtract(a.Updated.GetValueOrDefault()).Minutes} min");
             }
             if (DateTime.UtcNow.Subtract(a.Updated.GetValueOrDefault()).Minutes == 0 && DateTime.UtcNow.Subtract(a.Updated.GetValueOrDefault()).Seconds > 0)
             {
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(a.Updated.GetValueOrDefault()).Seconds} sec </span>");
+                return string.Join("", $"{DateTime.UtcNow.Subtract(a.Updated.GetValueOrDefault()).Seconds} sec");
             }
-            return string.Join("", "<span class='badge badge-light'>now</span>");
+            return string.Join("", "now");
         }
 
         private async Task<string> GetOwnerImage(InvestigationTask caseTask)
@@ -682,33 +677,28 @@ namespace risk.control.system.Services.Api
             return string.Empty;
         }
 
-        public static string GetCreatorTimePending(DateTime AllocatedToAgencyTime, int CreatorSla)
+        public static string GetActiveTime(DateTime AllocatedToAgencyTime, int CreatorSla)
         {
-            if (CreatorSla == 0)
-            {
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(AllocatedToAgencyTime).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Hurry up, {DateTime.UtcNow.Subtract(AllocatedToAgencyTime).Days} days since created!\"></i>");
-            }
             if (DateTime.UtcNow.Subtract(AllocatedToAgencyTime).Days >= CreatorSla)
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(AllocatedToAgencyTime).Days} day</span>");
-            else if (DateTime.UtcNow.Subtract(AllocatedToAgencyTime).Days >= 3 || DateTime.UtcNow.Subtract(AllocatedToAgencyTime).Days >= CreatorSla)
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(AllocatedToAgencyTime).Days} day</span>");
+                return string.Join("", $"{DateTime.UtcNow.Subtract(AllocatedToAgencyTime).Days} day<sup><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"{DateTime.UtcNow.Subtract(AllocatedToAgencyTime).Days} days since allocated!\"></i></sup>");
+
             if (DateTime.UtcNow.Subtract(AllocatedToAgencyTime).Days >= 1)
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(AllocatedToAgencyTime).Days} day</span>");
+                return string.Join("", $"{DateTime.UtcNow.Subtract(AllocatedToAgencyTime).Days} day");
 
             if (DateTime.UtcNow.Subtract(AllocatedToAgencyTime).Hours < 24 &&
                 DateTime.UtcNow.Subtract(AllocatedToAgencyTime).Hours > 0)
             {
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(AllocatedToAgencyTime).Hours} hr </span>");
+                return string.Join("", $"{DateTime.UtcNow.Subtract(AllocatedToAgencyTime).Hours} hr");
             }
             if (DateTime.UtcNow.Subtract(AllocatedToAgencyTime).Hours == 0 && DateTime.UtcNow.Subtract(AllocatedToAgencyTime).Minutes > 0)
             {
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(AllocatedToAgencyTime).Minutes} min </span>");
+                return string.Join("", $"{DateTime.UtcNow.Subtract(AllocatedToAgencyTime).Minutes} min");
             }
             if (DateTime.UtcNow.Subtract(AllocatedToAgencyTime).Minutes == 0 && DateTime.UtcNow.Subtract(AllocatedToAgencyTime).Seconds > 0)
             {
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(AllocatedToAgencyTime).Seconds} sec </span>");
+                return string.Join("", $"{DateTime.UtcNow.Subtract(AllocatedToAgencyTime).Seconds} sec");
             }
-            return string.Join("", "<span class='badge badge-light'>now</span>");
+            return string.Join("", "now");
         }
     }
 }
