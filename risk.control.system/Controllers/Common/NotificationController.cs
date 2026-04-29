@@ -69,7 +69,16 @@ namespace risk.control.system.Controllers.Common
             try
             {
                 var notifications = await _notificationService.GetNotifications(userEmail);
-                var activeNotifications = notifications.Select(n => new { Id = n.StatusNotificationId, Symbol = n.Symbol, n.Message, n.Status, CreatedAt = GetTimeAgo(n.CreatedAt), user = n.NotifierUserEmail });
+                var activeNotifications = notifications.Select(n => new
+                {
+                    Id = n.StatusNotificationId,
+                    Symbol = n.Symbol,
+                    n.Message,
+                    n.Status,
+                    CreatedAt = GetTimeAgo(n.CreatedAt),
+                    CreatedDateTime = n.CreatedAt,
+                    user = n.NotifierUserEmail
+                });
                 return Ok(new
                 {
                     Data = activeNotifications?.Take(maxCountReached).ToList(),
