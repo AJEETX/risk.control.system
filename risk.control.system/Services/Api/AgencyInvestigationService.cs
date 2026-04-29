@@ -199,7 +199,7 @@ namespace risk.control.system.Services.Api
                 var policy = a.InsuranceType!.GetEnumDisplayName();
                 var serviceType = a.InsuranceType!.GetEnumDisplayName();
                 var service = a.ServiceTypeName;
-                var timePending = GetSupervisorNewTimePending(a.investigation);
+                var timePending = GetNewTime(a.investigation);
                 var beneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryName) ?
                         "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\"></i> </span>" : a.BeneficiaryName;
                 var isQueryCase = a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR;
@@ -478,7 +478,7 @@ namespace risk.control.system.Services.Api
                     Service = a.ServiceTypeName,
                     Location = a.SubStatus,
                     Created = time!.Value,
-                    timePending = GetSupervisorOpenTimePending(a.investigation),
+                    timePending = GetActiveTime(a.investigation),
                     TimeElapsed = GetTimeElapsed(a.investigation),
                     BeneficiaryPhoto = await beneficiaryPhotoTask,
                     BeneficiaryName = beneficiaryName!,
@@ -938,22 +938,22 @@ namespace risk.control.system.Services.Api
             DateTime timeToCompare = caseTask.ProcessedByAssessorTime!.Value;
 
             if (DateTime.UtcNow.Subtract(timeToCompare).Days >= 1)
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(timeToCompare).Days} day</span>");
+                return string.Join("", $"{DateTime.UtcNow.Subtract(timeToCompare).Days} day");
 
             if (DateTime.UtcNow.Subtract(timeToCompare).Hours < 24 &&
                 DateTime.UtcNow.Subtract(timeToCompare).Hours > 0)
             {
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(timeToCompare).Hours} hr </span>");
+                return string.Join("", $"{DateTime.UtcNow.Subtract(timeToCompare).Hours} hr ");
             }
             if (DateTime.UtcNow.Subtract(timeToCompare).Hours == 0 && DateTime.UtcNow.Subtract(timeToCompare).Minutes > 0)
             {
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(timeToCompare).Minutes} min </span>");
+                return string.Join("", $"{DateTime.UtcNow.Subtract(timeToCompare).Minutes} min ");
             }
             if (DateTime.UtcNow.Subtract(timeToCompare).Minutes == 0 && DateTime.UtcNow.Subtract(timeToCompare).Seconds > 0)
             {
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(timeToCompare).Seconds} sec </span>");
+                return string.Join("", $"{DateTime.UtcNow.Subtract(timeToCompare).Seconds} sec ");
             }
-            return string.Join("", "<span class='badge badge-light'>now</span>");
+            return string.Join("", "now");
         }
 
         private static string GetSupervisorSubmittedByAgent(InvestigationTask caseTask)
@@ -961,25 +961,25 @@ namespace risk.control.system.Services.Api
             DateTime timeToCompare = caseTask.SubmittedToSupervisorTime!.Value;
 
             if (DateTime.UtcNow.Subtract(timeToCompare).Days >= 1)
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(timeToCompare).Days} day</span>");
+                return string.Join("", $"{DateTime.UtcNow.Subtract(timeToCompare).Days} day");
 
             if (DateTime.UtcNow.Subtract(timeToCompare).Hours < 24 &&
                 DateTime.UtcNow.Subtract(timeToCompare).Hours > 0)
             {
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(timeToCompare).Hours} hr </span>");
+                return string.Join("", $"{DateTime.UtcNow.Subtract(timeToCompare).Hours} hr");
             }
             if (DateTime.UtcNow.Subtract(timeToCompare).Hours == 0 && DateTime.UtcNow.Subtract(timeToCompare).Minutes > 0)
             {
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(timeToCompare).Minutes} min </span>");
+                return string.Join("", $"{DateTime.UtcNow.Subtract(timeToCompare).Minutes} min");
             }
             if (DateTime.UtcNow.Subtract(timeToCompare).Minutes == 0 && DateTime.UtcNow.Subtract(timeToCompare).Seconds > 0)
             {
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(timeToCompare).Seconds} sec </span>");
+                return string.Join("", $"{DateTime.UtcNow.Subtract(timeToCompare).Seconds} sec");
             }
-            return string.Join("", "<span class='badge badge-light'>now</span>");
+            return string.Join("", "now");
         }
 
-        private static string GetSupervisorNewTimePending(InvestigationTask caseTask)
+        private static string GetNewTime(InvestigationTask caseTask)
         {
             DateTime timeToCompare = caseTask.AllocatedToAgencyTime!.Value;
 
@@ -987,32 +987,36 @@ namespace risk.control.system.Services.Api
             {
                 timeToCompare = caseTask.EnquiredByAssessorTime.GetValueOrDefault();
             }
+            if (DateTime.UtcNow.Subtract(timeToCompare).Days >= caseTask.SupervisorSla)
+                return string.Join("", $"{DateTime.UtcNow.Subtract(timeToCompare).Days} day<sup><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Hurry up, {DateTime.UtcNow.Subtract(timeToCompare).Days} days since allocated!\"></i></sup>");
 
             if (DateTime.UtcNow.Subtract(timeToCompare).Days >= 1)
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(timeToCompare).Days} day</span>");
+                return string.Join("", $"{DateTime.UtcNow.Subtract(timeToCompare).Days} day");
 
             if (DateTime.UtcNow.Subtract(timeToCompare).Hours < 24 &&
                 DateTime.UtcNow.Subtract(timeToCompare).Hours > 0)
             {
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(timeToCompare).Hours} hr </span>");
+                return string.Join("", $"{DateTime.UtcNow.Subtract(timeToCompare).Hours} hr");
             }
             if (DateTime.UtcNow.Subtract(timeToCompare).Hours == 0 && DateTime.UtcNow.Subtract(timeToCompare).Minutes > 0)
             {
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(timeToCompare).Minutes} min </span>");
+                return string.Join("", $"{DateTime.UtcNow.Subtract(timeToCompare).Minutes} min");
             }
             if (DateTime.UtcNow.Subtract(timeToCompare).Minutes == 0 && DateTime.UtcNow.Subtract(timeToCompare).Seconds > 0)
             {
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(timeToCompare).Seconds} sec </span>");
+                return string.Join("", $"{DateTime.UtcNow.Subtract(timeToCompare).Seconds} sec");
             }
-            return string.Join("", "<span class='badge badge-light'>now</span>");
+            return string.Join("", "now");
         }
 
-        private static string GetSupervisorOpenTimePending(InvestigationTask caseTask)
+        private static string GetActiveTime(InvestigationTask caseTask)
         {
             DateTime timeToCompare = caseTask.TaskToAgentTime!.Value;
             if (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT)
             {
                 timeToCompare = caseTask.TaskToAgentTime.GetValueOrDefault();
+                if (DateTime.UtcNow.Subtract(timeToCompare).Days >= caseTask.AgentSla)
+                    return string.Join("", $"{DateTime.UtcNow.Subtract(timeToCompare).Days} day<sup><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Hurry up, {DateTime.UtcNow.Subtract(timeToCompare).Days} days since allocated!\"></i></sup>");
             }
             else if (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR)
             {
@@ -1024,22 +1028,22 @@ namespace risk.control.system.Services.Api
             }
 
             if (DateTime.UtcNow.Subtract(timeToCompare).Days >= 1)
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(timeToCompare).Days} day</span>");
+                return string.Join("", $"{DateTime.UtcNow.Subtract(timeToCompare).Days} day");
 
             if (DateTime.UtcNow.Subtract(timeToCompare).Hours < 24 &&
                 DateTime.UtcNow.Subtract(timeToCompare).Hours > 0)
             {
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(timeToCompare).Hours} hr </span>");
+                return string.Join("", $"{DateTime.UtcNow.Subtract(timeToCompare).Hours} hr");
             }
             if (DateTime.UtcNow.Subtract(timeToCompare).Hours == 0 && DateTime.UtcNow.Subtract(timeToCompare).Minutes > 0)
             {
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(timeToCompare).Minutes} min </span>");
+                return string.Join("", $"{DateTime.UtcNow.Subtract(timeToCompare).Minutes} min");
             }
             if (DateTime.UtcNow.Subtract(timeToCompare).Minutes == 0 && DateTime.UtcNow.Subtract(timeToCompare).Seconds > 0)
             {
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.UtcNow.Subtract(timeToCompare).Seconds} sec </span>");
+                return string.Join("", $"{DateTime.UtcNow.Subtract(timeToCompare).Seconds} sec");
             }
-            return string.Join("", "<span class='badge badge-light'>now</span>");
+            return string.Join("", "now");
         }
 
         private async Task<string> GetOwnerEmail(InvestigationTask caseTask)

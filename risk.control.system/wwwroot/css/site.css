@@ -2558,9 +2558,6 @@ input#checkall {
     background-color: #d4edda; /* Light green background */
 }
 
-#notificationList {
-    padding: 5px;
-}
 /* Notification dropdown styling */
 #notificationDropdown {
     min-width: 350px;
@@ -2608,10 +2605,7 @@ input#checkall {
     align-items: center;
     padding: 8px 12px;
     position: relative;
-}
-
-.notification-content:hover {
-    background: #f1f1f1;
+    cursor: text;
 }
 
 /* Notification content */
@@ -2626,7 +2620,7 @@ input#checkall {
 .notification-action-content {
     display: block;
     flex-grow: 1;
-    padding: 0 1em;
+    padding: 0 .5em;
 }
 
 /* Notification timestamp */
