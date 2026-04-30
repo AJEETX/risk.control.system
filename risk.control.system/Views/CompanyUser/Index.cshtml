@@ -32,22 +32,17 @@
                         <th>Action</th>
                     </tr>
                 </thead>
-
             </table>
-
-            <div class="card-footer">
-                <div class="row float-right">
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            <a id="back" asp-controller="ClientCompany" asp-action="Details" asp-route-id="@Model.ClientCompanyId"
-                                   class="btn btn-outline-secondary" data-bs-toggle="tooltip" title="Back to Company">
-                                <i class="fas fa-arrow-left"></i>
-                                <span class="badge badge-light"> <i class="fas fa-building"></i> </span> Back
-                            </a>
-                            <a class="btn btn-success" asp-controller="CompanyUser" asp-action="Create" asp-route-id="@Model.ClientCompanyId"><i class="fas fa-user-plus"></i> @Applicationsettings.CREATE User</a>
-                            
-                        </div>
-                    </div>
+        </div>
+        <div class="card-footer">
+            <div class="row float-right">
+                <div class="col-md-12">
+                    <a id="back" asp-controller="ClientCompany" asp-action="Details" asp-route-id="@Model.ClientCompanyId"
+                       class="btn btn-sm btn-outline-secondary" data-bs-toggle="tooltip" title="Back to Company Profile">
+                        <i class="fas fa-arrow-left"></i>
+                        <span class="badge badge-light"> <i class="fas fa-building"></i> </span> Back
+                    </a>
+                    <a class="btn btn-sm btn-success" asp-controller="CompanyUser" asp-action="Create" asp-route-id="@Model.ClientCompanyId"><i class="fas fa-user-plus"></i> @Applicationsettings.CREATE User</a>
                 </div>
             </div>
         </div>
