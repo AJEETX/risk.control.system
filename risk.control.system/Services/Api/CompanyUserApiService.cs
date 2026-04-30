@@ -122,7 +122,7 @@ namespace risk.control.system.Services.Api
             var lastSeenDict = sessionLookup.GroupBy(s => s.ActiveUser.Email).ToDictionary(g => g.Key!, g => g.Max(s => s.Updated));
             var users = await _context.ApplicationUser.AsNoTracking().Include(u => u.PinCode)
                 .Include(u => u.District).Include(u => u.State).Include(u => u.Country).Where(u => u.ClientCompanyId == companyId && !u.Deleted && u.Email != userEmail)
-                .OrderBy(u => u.FirstName).ThenBy(u => u.LastName).ToListAsync();
+                .OrderBy(u => u.Updated).ThenBy(u => u.FirstName).ThenBy(u => u.LastName).ToListAsync();
             var loginVerificationEnabled = await _featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION);
             var now = DateTime.UtcNow;
             var activeUsersDetails = new List<UserDetailResponse>();
