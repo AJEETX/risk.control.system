@@ -183,9 +183,8 @@ function loadNotifications(keepOpen = false) {
 
                 // ===== BUILD DOM SAFELY (No HTML strings) =====
 
-                const $a = $("<a>")
+                const $a = $("<div>")
                     .addClass("notification-item")
-                    .attr("href", "#")
                     .attr("data-id", item.id);
 
                 const $icon = $("<i>").addClass(safeIconClass);
@@ -222,6 +221,8 @@ function loadNotifications(keepOpen = false) {
                 const $delete = $("<span>")
                     .addClass("delete-notification")
                     .attr("data-id", item.id)
+                    .attr("title", "Delete")
+                    .attr("data-bs-toggle", "tooltip")
                     .append($("<i>").addClass("fas fa-trash"));
 
                 // Build content
