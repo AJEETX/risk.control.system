@@ -102,7 +102,7 @@
 								<table class="table table-bordered table-hover table-sm">
 									<thead class="thead-light">
 										<tr>
-											<th title="Location (Time spent on the location)"><i class="fas fa-map-marker-alt"></i> [Time spent]</th>
+											<th data-bs-toggle="tooltip" title="Location [Time spent on the location]"><i class="fas fa-map-marker-alt"></i> [Time spent]</th>
 											<th>Agent</th>
 											<th>Face ID</th>
 											<th>Document ID</th>
@@ -112,24 +112,23 @@
 										@foreach (var location in locations)
 										{
 											var duration = location.Updated.GetValueOrDefault().Subtract(location.AgentIdReport!.Updated.GetValueOrDefault());
-											var durationText = (duration.Hours > 0 ? $"{duration.Hours}h " : "") +
-											(duration.Minutes > 0 ? $"{duration.Minutes}m" : "less than a min");
+											var durationText = (duration.Hours > 0 ? $"{duration.Hours}hr " : "") +
+											(duration.Minutes > 0 ? $"{duration.Minutes}min" : "less than a min");
 
 											<tr>
 												<td>
-													<span class="badge  @location.LocationStatusButton" title="Location (Time spent on the location)">
+													<span class="badge  @location.LocationStatusButton">
 														@location.LocationName
-													</span>
-													<span>
-														@if (location.ValidationExecuted)
-														{
-															@durationText
-														}
 														@if (location.IsRequired)
 														{
-															<span class="required-asterisk" title="Mandatory Location">*</span>
+															<sup class="required-asterisk" title="Mandatory Location" data-bs-toggle="tooltip">*</sup>
 														}
 													</span>
+													
+														@if (location.ValidationExecuted)
+														{
+															<small>[@durationText]</small>
+														}
 												</td>
 
 												<td>
@@ -137,11 +136,11 @@
 													{
 														@if (location.AgentIdReport.ImageValid.GetValueOrDefault())
 														{
-															<i class='fas fa-check-circle i-green'></i>
+															<i class='fas fa-check-circle i-green' data-bs-toggle="tooltip" title="Success"></i>
 														}
 														else
 														{
-															<i class='fa fa-times i-orangered' aria-hidden='true'></i>
+															<i class='fa fa-times i-orangered' aria-hidden='true' data-bs-toggle="tooltip" title="Fail"></i>
 														}
 													}
 													else
@@ -157,11 +156,11 @@
 															{
 																@if (face.ImageValid.GetValueOrDefault())
 																{
-																	<i class='fas fa-check-circle i-green'></i>
+																	<i class='fas fa-check-circle i-green' data-bs-toggle="tooltip" title="Success"></i>
 																}
 																else
 																{
-																	<i class='fa fa-times i-orangered' aria-hidden='true'></i>
+																	<i class='fa fa-times i-orangered' aria-hidden='true' data-bs-toggle="tooltip" title="Fail"></i>
 																}
 																<span class="badge"> @face.ReportName</span>
 															}
@@ -180,11 +179,11 @@
 															{
 																@if (doc.ImageValid.GetValueOrDefault())
 																{
-																	<i class='fas fa-check-circle i-green'></i>
+																	<i class='fas fa-check-circle i-green' data-bs-toggle="tooltip" title="Success"></i>
 																}
 																else
 																{
-																	<i class='fa fa-times i-orangered' aria-hidden='true'></i>
+																	<i class='fa fa-times i-orangered' aria-hidden='true' data-bs-toggle="tooltip" title="Fail"></i>
 																}
 																<span class="badge"> @doc.ReportName</span>
 															}
