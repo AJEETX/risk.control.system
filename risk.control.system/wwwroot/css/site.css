@@ -2603,7 +2603,7 @@ input#checkall {
 .notification-item {
     justify-content: space-between;
     align-items: center;
-    padding: 8px 12px;
+    padding: 12px 0px;
     position: relative;
     cursor: text;
 }
