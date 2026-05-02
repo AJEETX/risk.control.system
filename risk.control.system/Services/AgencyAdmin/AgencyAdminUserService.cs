@@ -135,7 +135,7 @@ namespace risk.control.system.Services.AgencyAdmin
             user.Updated = DateTime.UtcNow;
             user.UpdatedBy = deletedBy;
             user.Deleted = true;
-            if (await _featureManager.IsEnabledAsync(FeatureFlags.ENABLE_AGENCY_USER_FACE_MATCH))
+            if (await _featureManager.IsEnabledAsync(FeatureFlags.ENABLE_SINGLE_FACE_MATCH_CHECK ))
             {
                 if (!string.IsNullOrEmpty(user.AwsFaceId))
                 {

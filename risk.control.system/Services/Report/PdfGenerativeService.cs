@@ -31,7 +31,7 @@ namespace risk.control.system.Services.Report
             var investigationReport = await _context.ReportTemplates.Include(r => r.LocationReport).ThenInclude(l => l.AgentIdReport)
                .Include(r => r.LocationReport).ThenInclude(l => l.FaceIds).Include(r => r.LocationReport).ThenInclude(l => l.DocumentIds)
                .Include(r => r.LocationReport).ThenInclude(l => l.Questions).FirstOrDefaultAsync(q => q.Id == investigation!.ReportTemplateId);
-            var vendor = _context.Vendor.Include(s => s.VendorInvestigationServiceTypes).FirstOrDefault(v => v.VendorId == investigation!.VendorId);
+            var vendor = _context.Vendor.Include(s => s.District).Include(s => s.State).Include(s => s.Country).Include(s => s.PinCode).Include(s => s.VendorInvestigationServiceTypes).FirstOrDefault(v => v.VendorId == investigation!.VendorId);
             var currentUser = _context.ApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
             var investigationServiced = vendor!.VendorInvestigationServiceTypes!.FirstOrDefault(s => s.InvestigationServiceTypeId == policy!.InvestigationServiceTypeId);
             investigationServiced ??= vendor.VendorInvestigationServiceTypes!.FirstOrDefault();
@@ -42,7 +42,6 @@ namespace risk.control.system.Services.Report
                 GrandTotal = investigationServiced!.Price + (investigationServiced.Price * (1m / 10m)),
                 NoteToRecipient = "Auto generated Invoice",
                 Updated = DateTime.UtcNow,
-                Vendor = vendor,
                 ClientCompany = currentUser.ClientCompany,
                 UpdatedBy = userEmail,
                 VendorId = vendor.VendorId,
@@ -55,7 +54,7 @@ namespace risk.control.system.Services.Report
             };
             _context.VendorInvoice.Add(invoice);
             await _context.SaveChangesAsync(null, false);
-            var reportFilename = await _pdfGenerate.BuildInvestigationPdfReport(investigation, policy!, customer!, beneficiary!, investigationReport!);
+            var reportFilename = await _pdfGenerate.BuildInvestigationPdfReport(investigation, policy!, customer!, beneficiary!, investigationReport!, vendor);
             _context.Investigations.Update(investigation);
             await _context.SaveChangesAsync(null, false);
             return policy!.ContractNumber;

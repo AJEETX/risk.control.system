@@ -7,7 +7,7 @@
 	if (Model.ClaimsInvestigation != null)
 	{
 		address = @Model.Beneficiary != null ? @Model.Beneficiary?.Addressline + " " +
-		@Model.Beneficiary?.District?.Name + " " + @Model.Beneficiary?.State?.Name + " " + @Model.Beneficiary?.PinCode.Code : string.Empty;
+		@Model.Beneficiary?.District?.Name + " " + @Model.Beneficiary?.State?.Name + " " + @Model.Beneficiary?.PinCode?.Code : string.Empty;
 		
 		if (Model.Beneficiary?.DateOfBirth != null)
 		{

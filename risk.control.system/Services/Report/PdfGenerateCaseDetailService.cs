@@ -24,7 +24,7 @@ namespace risk.control.system.Services.Report
                 .AddText($"{policy?.InsuranceType!.GetEnumDisplayName()} Investigation Report")
                 .SetFontSize(20).SetBold();
             section.AddParagraph().AddText("");
-            section.AddParagraph().SetAlignment(HorizontalAlignment.Center).AddText($"Report Assessed Date: {investigation!.InvestigationReport!.AssessorRemarksUpdated.GetValueOrDefault():dd-MMM-yy hh:mm tt}");
+            section.AddParagraph().SetAlignment(HorizontalAlignment.Center).AddText($"Report Assessed Date: {investigation!.InvestigationReport!.AssessorRemarksUpdated.GetValueOrDefault().ToLocalTime():dd-MMM-yy hh:mm tt}");
 
             // Case overview
             var overviewTable = section.AddTable().SetBorder(Stroke.Solid);
@@ -83,15 +83,14 @@ namespace risk.control.system.Services.Report
                 .AddText($"{policy?.InsuranceType!.GetEnumDisplayName()} Investigation Report")
                 .SetFontSize(20).SetBold();
             section.AddParagraph().AddText("");
-            section.AddParagraph().SetAlignment(HorizontalAlignment.Center).AddText($"Report Assessed Date: {investigation!.InvestigationReport!.AssessorRemarksUpdated.GetValueOrDefault():dd-MMM-yy hh:mm tt}");
+            section.AddParagraph().SetAlignment(HorizontalAlignment.Center).AddText($"Report Assessed Date: {investigation!.InvestigationReport!.AssessorRemarksUpdated.GetValueOrDefault().ToLocalTime():dd-MMM-yy hh:mm tt}");
 
             // Case overview
             var overviewTable = section.AddTable().SetBorder(Stroke.Solid);
             overviewTable.AddColumnPercentToTable("", 35).AddColumnPercentToTable("", 65);
-            AddRow(overviewTable, "Investigator", investigation!.Vendor!.Name ?? "N/A");
             AddRow(overviewTable, "Insurer", investigation?.ClientCompany?.Name ?? "N/A");
 
-            section.AddParagraph().AddText("");
+            section.AddParagraph().SetMarginBottom(10f);
 
             // Policy details
             section.AddParagraph().SetLineSpacing(1).AddText("Case Details").SetFontSize(14).SetBold().SetUnderline();
@@ -106,7 +105,8 @@ namespace risk.control.system.Services.Report
             var sumAssuredValue = string.Format(culture, "{0:c}", policy?.SumAssuredValue.ToString());
             AddRow(policyTable, "Assured Amount", currency + " " + policy?.SumAssuredValue.ToString("N2") ?? "N/A");
             AddRow(policyTable, "Cause of Death", policy?.CauseOfLoss ?? "N/A");
-            section.AddParagraph().SetLineSpacing(1).AddText("");
+
+            section.AddParagraph().SetMarginBottom(10f);
 
             // Life Assured Details
             section.AddParagraph().SetLineSpacing(1).AddText("Life Assured Details").SetFontSize(14).SetBold().SetUnderline();
@@ -119,7 +119,7 @@ namespace risk.control.system.Services.Report
                 ("Address", $"{customer?.Addressline}, {customer?.District?.Name}, {customer?.State?.Name}, {customer?.Country?.Name}"),
                 ("Pincode", $"{customer?.PinCode!.Code.ToString() ?? "N/A"}")
             ]);
-            section.AddParagraph().SetLineSpacing(1).AddText("");
+            section.AddParagraph().SetMarginBottom(10f);
 
             // Claimant Details
             section.AddParagraph().SetLineSpacing(1).AddText("Claimant Details").SetFontSize(14).SetBold().SetUnderline();
