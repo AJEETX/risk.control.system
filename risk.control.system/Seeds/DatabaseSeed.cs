@@ -44,7 +44,7 @@ namespace risk.control.system.Seeds
 
             await PortalAdminSeed.Seed(context, webHostEnvironment, userManager, roleManager, randomPinCode, fileStorageService);
 
-            if (await _featureManager.IsEnabledAsync(FeatureFlags.ENABLE_AGENCY_USER_FACE_MATCH))
+            if (await _featureManager.IsEnabledAsync(FeatureFlags.ENABLE_SINGLE_FACE_MATCH_CHECK ))
             {
                 var amazonApiService = scope.ServiceProvider.GetRequiredService<IAmazonApiService>();
                 var base64FileService = scope.ServiceProvider.GetRequiredService<IBase64FileService>();
