@@ -7,8 +7,7 @@ namespace risk.control.system.Services.Report
 {
     public interface IPdfGenerateDetailService
     {
-        Task<string> BuildInvestigationPdfReport(InvestigationTask investigation, PolicyDetail policy, CustomerDetail customer, BeneficiaryDetail beneficiary
-             , ReportTemplate investigationReport);
+        Task<string> BuildInvestigationPdfReport(InvestigationTask investigation, PolicyDetail policy, CustomerDetail customer, BeneficiaryDetail beneficiary, ReportTemplate investigationReport, Vendor vendor);
     }
     internal class PdfGenerateDetailService : IPdfGenerateDetailService
     {
@@ -27,8 +26,7 @@ namespace risk.control.system.Services.Report
             _caseDetailService = caseDetailService;
             _detailReportService = detailReportService;
         }
-        public async Task<string> BuildInvestigationPdfReport(InvestigationTask investigation, PolicyDetail policy, CustomerDetail customer, BeneficiaryDetail beneficiary
-           , ReportTemplate investigationReport)
+        public async Task<string> BuildInvestigationPdfReport(InvestigationTask investigation, PolicyDetail policy, CustomerDetail customer, BeneficiaryDetail beneficiary, ReportTemplate investigationReport, Vendor vendor)
         {
             string ReportFilePath = Path.GetFullPath(Path.Combine(_env.ContentRootPath, CONSTANTS.DOCUMENT, CONSTANTS.CASE, policy.ContractNumber, reportFilename));
             DocumentBuilder builder = DocumentBuilder.New();
@@ -44,15 +42,14 @@ namespace risk.control.system.Services.Report
             {
                 section = _caseDetailService.BuildClaim(section, investigation, policy, customer, beneficiary);
             }
-            section = await _detailReportService.Build(section, investigation, investigationReport, isClaim);
-            section.AddParagraph().AddText("");
+            section.AddParagraph().SetMarginBottom(10f);
+            section = await _detailReportService.Build(section, investigation, investigationReport, vendor, isClaim);
+            section.AddParagraph().SetMarginBottom(10f);
             section = AddRemarks(section, "Assessor remarks", investigation.InvestigationReport!.AssessorRemarks!);
-            section.AddParagraph().AddText("");
+            section.AddParagraph().SetMarginBottom(10f);
             section = AddRemarks(section, "Report Status", investigation.SubStatus);
-            section.AddParagraph().AddText("");
-            section.AddParagraph().AddText("");
-            section.AddParagraph().AddText("");
-            section.AddParagraph().AddText($"Generated on: {DateTime.UtcNow:dd-MMM-yy hh:mm tt}").SetItalic().SetFontSize(10);
+            section.AddParagraph().SetMarginBottom(10f);
+            section.AddParagraph().AddText($"Generated on: {DateTime.UtcNow.ToLocalTime():dd-MMM-yy hh:mm tt}").SetItalic().SetFontSize(10);
             builder.Build(ReportFilePath);
             investigation.InvestigationReport.PdfReportFilePath = ReportFilePath;
 

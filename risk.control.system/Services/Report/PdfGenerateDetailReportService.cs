@@ -1,6 +1,5 @@
 ﻿using Gehtsoft.PDFFlow.Builder;
 using Gehtsoft.PDFFlow.Models.Enumerations;
-using Gehtsoft.PDFFlow.Utils;
 using risk.control.system.Models;
 using risk.control.system.Services.Common;
 
@@ -8,7 +7,7 @@ namespace risk.control.system.Services.Report
 {
     public interface IPdfGenerateDetailReportService
     {
-        Task<SectionBuilder> Build(SectionBuilder section, InvestigationTask investigation, ReportTemplate investigationReport, bool isClaim = true);
+        Task<SectionBuilder> Build(SectionBuilder section, InvestigationTask investigation, ReportTemplate investigationReport, Vendor vendor, bool isClaim = true);
     }
 
     internal class PdfGenerateDetailReportService(IPdfGenerateAgentLocationService agentService,
@@ -17,7 +16,6 @@ namespace risk.control.system.Services.Report
         IImageConverter imageConverter,
         IPdfGenerateQuestionLocationService questionService) : IPdfGenerateDetailReportService
     {
-        internal static readonly FontBuilder FNT9 = Fonts.Helvetica(9f);
         public IPdfGenerateAgentLocationService _agentService = agentService;
         private readonly IPdfGenerateFaceLocationService _faceService = faceService;
         private readonly IPdfGenerateDocumentLocationService _documentService = documentService;
@@ -25,18 +23,19 @@ namespace risk.control.system.Services.Report
         private readonly IImageConverter _imageConverter = imageConverter;
         private readonly IPdfGenerateQuestionLocationService _questionService = questionService;
 
-        public async Task<SectionBuilder> Build(SectionBuilder section, InvestigationTask investigation, ReportTemplate investigationReport, bool isClaim = true)
+        public async Task<SectionBuilder> Build(SectionBuilder section, InvestigationTask investigation, ReportTemplate investigationReport, Vendor vendor, bool isClaim = true)
         {
-            var paragraph = section.AddParagraph();
+            var paragraph = section.AddParagraph("Agency Detail").SetFontSize(14).SetBold();
 
             var tableBuilder = section.AddTable().SetBorder(Stroke.Solid);
 
-            tableBuilder.AddColumnPercentToTable("Agency Logo", 35).AddColumnPercentToTable("Investigating Agency Name", 65);
+            tableBuilder.AddColumnPercentToTable("Logo", 35).AddColumnPercentToTable("Info", 65);
             var rowBuilder = tableBuilder.AddRow();
 
-            var pngBytes = _imageConverter.ConvertToPngFromPath(_env, investigation.Vendor!.DocumentUrl!);
+            var pngBytes = _imageConverter.ConvertToPngFromPath(_env, vendor!.DocumentUrl!);
             rowBuilder.AddCell().SetVerticalAlignment(VerticalAlignment.Center).SetHorizontalAlignment(HorizontalAlignment.Center).AddParagraph().AddInlineImage(pngBytes).SetWidth(160F);
-            rowBuilder.AddCell().SetVerticalAlignment(VerticalAlignment.Center).SetHorizontalAlignment(HorizontalAlignment.Center).AddParagraph(investigation.Vendor!.Email).SetFontSize(14);
+            var agencyDetail = vendor!.Email + "\r\n" + vendor!.Name + "\r\n" + vendor!.Addressline + "\r\n" + vendor!.District!.Name + "\r\n" + vendor!.State!.Name + "\r\n" + vendor!.Country!.Name + "\r\n" + vendor!.PinCode!.Code;
+            rowBuilder.AddCell().AddParagraph(agencyDetail).SetFontSize(10);
 
             int locationCount = 1;
             foreach (var loc in investigationReport.LocationReport)
@@ -45,20 +44,26 @@ namespace risk.control.system.Services.Report
                 {
                     section.AddParagraph().SetLineSpacing(1).AddText($"{locationCount}. Location Verified: {loc.LocationName}").SetBold().SetFontSize(14);
                     section = await _agentService.Build(section, loc, isClaim);
+                    section.AddParagraph().SetMarginBottom(10f);
                     section = await _faceService.Build(section, loc, isClaim);
+                    section.AddParagraph().SetMarginBottom(10f);
                     section = await _documentService.Build(section, loc, isClaim);
+                    section.AddParagraph().SetMarginBottom(10f);
                     section = _questionService.Build(section, loc);
-                    section.AddParagraph().AddText(""); // Additional spacing
-                    section.AddParagraph().AddText("----------------------------------------------").SetFontSize(10).SetItalic();
-                    section.AddParagraph().AddText("");
+                    section.AddParagraph().SetMarginBottom(10f);
                     locationCount++;
                 }
             }
-            section.AddParagraph().AddText("");
+            section.AddParagraph().SetMarginBottom(10f);
+
             AddEnquiry(section, investigation);
-            section.AddParagraph().AddText("");
+            section.AddParagraph().SetMarginBottom(10f);
+
             section = AddRemarks(section, "Agent Remarks", investigation.InvestigationReport!.AgentRemarks!);
+            section.AddParagraph().SetMarginBottom(10f);
+
             section = AddRemarks(section, "Agent Edited Remarks", investigation.InvestigationReport.AgentRemarksEdit!);
+            section.AddParagraph().SetMarginBottom(10f);
             section = AddRemarks(section, "Agency Remarks", investigation.InvestigationReport.SupervisorRemarks!);
             return section;
         }
@@ -72,7 +77,7 @@ namespace risk.control.system.Services.Report
                 var questionRowBuilder = questionTableBuilder.AddRow();
                 questionRowBuilder.AddCell().AddParagraph().AddText(investigation.InvestigationReport!.EnquiryRequest!.DescriptiveQuestion ?? "N/A").SetFontSize(10);
                 questionRowBuilder.AddCell().AddParagraph().AddText(investigation.InvestigationReport.EnquiryRequest.DescriptiveAnswer ?? "N/A").SetFontSize(10);
-                questionRowBuilder.AddCell().AddParagraph().AddText(investigation.InvestigationReport.EnquiryRequest.Updated?.ToString("dd-MMM-yy hh:mm tt") ?? "N/A").SetFontSize(8);
+                questionRowBuilder.AddCell().AddParagraph().AddText($"{investigation.InvestigationReport.EnquiryRequest.Updated.GetValueOrDefault().ToLocalTime():dd-MMM-yy hh:mm tt}").SetFontSize(8);
                 if (investigation.InvestigationReport!.EnquiryRequest!.QuestionImageAttachment != null)
                 {
                     var pngBytes = _imageConverter.ConvertToPng(investigation.InvestigationReport.EnquiryRequest.QuestionImageAttachment);
@@ -102,7 +107,7 @@ namespace risk.control.system.Services.Report
                     var rowBuilder = tableBuilder.AddRow();
                     rowBuilder.AddCell().AddParagraph().AddText(request.MultipleQuestionText ?? "N/A").SetFontSize(10);
                     rowBuilder.AddCell().AddParagraph().AddText(request.AnswerSelected ?? "N/A").SetFontSize(10);
-                    rowBuilder.AddCell().AddParagraph().AddText($"{request.Created:dd-MMM-yy hh:mm tt}").SetFontSize(8);
+                    rowBuilder.AddCell().AddParagraph().AddText($"{request.Created.ToLocalTime():dd-MMM-yy hh:mm tt}").SetFontSize(8);
                 }
             }
         }

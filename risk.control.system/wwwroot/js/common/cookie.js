@@ -8,7 +8,10 @@
     }
 
     if (!getCookie("cookieConsent")) {
-        cookiePopup.fadeIn();
+        cookiePopup.fadeIn(300, function () {
+            // Sets the focus on the primary action button once the animation finishes
+            $("#acceptCookies").focus();
+        });
     }
 
     // Accept all cookies
@@ -36,7 +39,10 @@
     // Manage cookies
     $("#manageCookies").on("click", function () {
         cookiePopup.fadeOut();
-        cookieManagePopup.fadeIn();
+        cookieManagePopup.fadeIn(300, function () {
+            // Focus the first checkbox in the management modal
+            $("#analyticsCookies").focus();
+        });
     });
 
     // Save preferences
@@ -84,7 +90,10 @@
     // Cancel manage
     $("#cancelManage").on("click", function () {
         cookieManagePopup.fadeOut();
-        cookiePopup.fadeIn();
+        cookiePopup.fadeIn(300, function () {
+            // Sets the focus on the primary action button once the animation finishes
+            $("#acceptCookies").focus();
+        });
     });
 });
 

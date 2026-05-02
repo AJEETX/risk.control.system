@@ -102,10 +102,11 @@
 								<table class="table table-bordered table-hover table-sm">
 									<thead class="thead-light">
 										<tr>
-											<th data-bs-toggle="tooltip" title="Location [Time spent on the location]"><i class="fas fa-map-marker-alt"></i> [Time spent]</th>
-											<th>Agent</th>
-											<th>Face ID</th>
-											<th>Document ID</th>
+											<th data-bs-toggle="tooltip" title="Location"><i class="fas fa-map-marker-alt"></i> Location</th>
+											<th data-bs-toggle="tooltip" title="Duration spent on the location"><i class="fas fa-clock"></i> Duration</th>
+											<th data-bs-toggle="tooltip" title="Agent Face Verification"><i class="fa fa-user-secret"></i> Agent</th>
+											<th data-bs-toggle="tooltip" title="Face Verification"><i class="fas fa-portrait"></i> Face ID</th>
+											<th data-bs-toggle="tooltip" title="Document Verification"><i class="fas fa-file"></i> Document ID</th>
 										</tr>
 									</thead>
 									<tbody>
@@ -124,13 +125,17 @@
 															<sup class="required-asterisk" title="Mandatory Location" data-bs-toggle="tooltip">*</sup>
 														}
 													</span>
-													
-														@if (location.ValidationExecuted)
-														{
-															<small>[@durationText]</small>
-														}
 												</td>
-
+												<td>
+													@if (location.ValidationExecuted)
+													{
+														<small>@durationText</small>
+													}
+													else
+														{
+														<span>--</span>
+														}
+													</td>
 												<td>
 													@if (location.AgentIdReport.ValidationExecuted)
 													{
