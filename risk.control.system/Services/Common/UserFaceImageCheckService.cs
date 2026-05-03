@@ -14,8 +14,8 @@ namespace risk.control.system.Services.Common
     {
         Task SetImageToAws(string userEmail);
 
-        Task<bool> CheckFaceImageAsync(IFormFile imageFile);
-
+        Task<bool> CheckFaceImageExistAsync(IFormFile imageFile);
+        Task<bool> CheckUploadFaceImageExistAsync(byte[] image);
         Task<FaceMatchResult> HasExactlyOneFace(IFormFile file);
         Task<FaceMatchResult> HasExactlyOneFace(byte[] imageBytes);
     }
@@ -31,7 +31,33 @@ namespace risk.control.system.Services.Common
         private readonly IBase64FileService _base64FileService = base64FileService;
         private readonly IFeatureManager _featureManager = featureManager;
 
-        public async Task<bool> CheckFaceImageAsync(IFormFile imageFile)
+        public async Task<bool> CheckUploadFaceImageExistAsync(byte[] image)
+        {
+            if (!await _featureManager.IsEnabledAsync(FeatureFlags.ENABLE_SINGLE_FACE_MATCH_CHECK))
+            {
+                return false; // If the feature is disabled, skip face matching and return false indicating there is no matching face that already exist
+            }
+            await using var memoryStream = new MemoryStream(image);
+
+            var searchRequest = new SearchFacesByImageRequest
+            {
+                CollectionId = CONSTANTS.AgencyUsersImageCollection,
+                Image = new Image { Bytes = memoryStream },
+                MaxFaces = 1,
+                FaceMatchThreshold = 90F
+            };
+
+            var response = await _amazonApiService.SearchFacesByImageAsync(searchRequest);
+            if (response.FaceMatches.Count > 0)
+            {
+                string userId = response.FaceMatches[0].Face.ExternalImageId;
+                var matchingUser = await _context.Users.FindAsync(Guid.Parse(userId));
+            }
+
+            var match = response.FaceMatches.Count > 0;
+            return match;
+        }
+        public async Task<bool> CheckFaceImageExistAsync(IFormFile imageFile)
         {
             if (!await _featureManager.IsEnabledAsync(FeatureFlags.ENABLE_SINGLE_FACE_MATCH_CHECK))
             {
@@ -59,7 +85,6 @@ namespace risk.control.system.Services.Common
             var match = response.FaceMatches.Count > 0;
             return match;
         }
-
         public async Task<FaceMatchResult> HasExactlyOneFace(IFormFile file)
         {
             if (!await _featureManager.IsEnabledAsync(FeatureFlags.ENABLE_SINGLE_FACE_MATCH_CHECK))
@@ -127,7 +152,6 @@ namespace risk.control.system.Services.Common
 
             return new FaceMatchResult { IsValid = true, Message = "Single face validated." };
         }
-
         public async Task SetImageToAws(string userEmail)
         {
             if (await _featureManager.IsEnabledAsync(FeatureFlags.ENABLE_SINGLE_FACE_MATCH_CHECK))
