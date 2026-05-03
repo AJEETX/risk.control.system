@@ -8,7 +8,7 @@ namespace risk.control.system.Services.Common
     {
         void ValidateImage(IFormFile? image, Dictionary<string, string> errors);
         Task ValidateFaceImage(IFormFile? image, Dictionary<string, string> errors);
-        Task<bool> ValidateProfileImage(IFormFile file, ServiceResult result);
+        Task<bool> ValidateCompanyUserImage(IFormFile file, ServiceResult result);
     }
 
     public class ValidateImageService(IUserFaceImageCheckService userFaceCheckService) : IValidateImageService
@@ -59,13 +59,21 @@ namespace risk.control.system.Services.Common
 
             if (!ImageSignatureValidator.HasValidSignature(image))
                 errors[image.Name] = "Invalid or corrupted image";
-            var faceCheckResult = await _userFaceCheckService.HasExactlyOneFace(image);
-            if (!faceCheckResult.IsValid)
+            var singleFaceResult = await _userFaceCheckService.HasExactlyOneFace(image);
+            if (!singleFaceResult.IsValid)
             {
-                errors[image.Name] = faceCheckResult.Message!;
+                errors[image.Name] = singleFaceResult.Message!;
+            }
+            else
+            {
+                var matchedFace = await _userFaceCheckService.CheckFaceImageExistAsync(image!);
+                if (matchedFace)
+                {
+                    errors[image.Name] = "Profile image matches with existing users. Please use a different image.";
+                }
             }
         }
-        public async Task<bool> ValidateProfileImage(IFormFile file, ServiceResult result)
+        public async Task<bool> ValidateCompanyUserImage(IFormFile file, ServiceResult result)
         {
             if (file == null || file.Length == 0)
             {
@@ -97,12 +105,20 @@ namespace risk.control.system.Services.Common
                 result.Errors[nameof(ApplicationUser.ProfileImage)] = "Invalid or corrupted image.";
                 return false;
             }
-            var faceCheckResult = await _userFaceCheckService.HasExactlyOneFace(file);
-            if (!faceCheckResult.IsValid)
+            var singleFaceResult = await _userFaceCheckService.HasExactlyOneFace(file);
+            if (!singleFaceResult.IsValid)
             {
-                result.Errors[nameof(ApplicationUser.ProfileImage)] = faceCheckResult.Message!;
+                result.Errors[nameof(ApplicationUser.ProfileImage)] = singleFaceResult.Message!;
                 return false;
             }
+
+            var matchedFace = await _userFaceCheckService.CheckFaceImageExistAsync(file!);
+            if (matchedFace)
+            {
+                result.Errors[nameof(ApplicationUser.ProfileImage)] = "Profile image matches with existing users. Please use a different image.";
+                return false;
+            }
+
             return true;
         }
     }

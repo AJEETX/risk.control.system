@@ -141,7 +141,7 @@
 													{
 														@if (location.AgentIdReport.ImageValid.GetValueOrDefault())
 														{
-															<i class='fas fa-check-circle i-green' data-bs-toggle="tooltip" title="Success"></i>
+															<i class='fas fa-check-circle i-green' data-bs-toggle="tooltip" title="Match"></i>
 														}
 														else
 														{
@@ -161,7 +161,7 @@
 															{
 																@if (face.ImageValid.GetValueOrDefault())
 																{
-																	<i class='fas fa-check-circle i-green' data-bs-toggle="tooltip" title="Success"></i>
+																	<i class='fas fa-check-circle i-green' data-bs-toggle="tooltip" title="Match"></i>
 																}
 																else
 																{
@@ -184,11 +184,11 @@
 															{
 																@if (doc.ImageValid.GetValueOrDefault())
 																{
-																	<i class='fas fa-check-circle i-green' data-bs-toggle="tooltip" title="Success"></i>
+																	<i class='fas fa-check-circle i-green' data-bs-toggle="tooltip" title="Valid"></i>
 																}
 																else
 																{
-																	<i class='fa fa-times i-orangered' aria-hidden='true' data-bs-toggle="tooltip" title="Fail"></i>
+																	<i class='fa fa-times i-orangered' aria-hidden='true' data-bs-toggle="tooltip" title="Invalid"></i>
 																}
 																<span class="badge"> @doc.ReportName</span>
 															}
