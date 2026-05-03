@@ -47,7 +47,7 @@ namespace risk.control.system.Services.Report
             section.AddParagraph().SetMarginBottom(10f);
             section = AddRemarks(section, "Assessor remarks", investigation.InvestigationReport!.AssessorRemarks!);
             section.AddParagraph().SetMarginBottom(10f);
-            section = AddRemarks(section, "Report Status", investigation.SubStatus);
+            section.AddParagraph().AddText($"Report Status: {investigation.SubStatus}").SetBold().SetFontSize(10);
             section.AddParagraph().SetMarginBottom(10f);
             section.AddParagraph().AddText($"Generated on: {DateTime.UtcNow.ToLocalTime():dd-MMM-yy hh:mm tt}").SetItalic().SetFontSize(10);
             builder.Build(ReportFilePath);
@@ -61,8 +61,8 @@ namespace risk.control.system.Services.Report
             var table = section.AddTable()
                                .SetBorder(Stroke.Solid);
 
-            table.AddColumnPercentToTable("", 30);
-            table.AddColumnPercentToTable("", 70);
+            table.AddColumnPercentToTable("", 10);
+            table.AddColumnPercentToTable("", 90);
 
             var row = table.AddRow();
 

@@ -66,14 +66,8 @@ namespace risk.control.system.Services.AgencyAdmin
             {
                 return (false, "Invalid profile image.", errors);
             }
-            var matchedFace = await _faceImageCheckService.CheckFaceImageAsync(model.ProfileImage!);
-            if (matchedFace)
-            {
-                modelState.AddModelError("ProfileImage", "Profile image matches with existing user. Please use a different image.");
-                errors.Add("ProfileImage", "Profile image matches with existing users. Please use a different image.");
-                return (false, "Profile image matches with existing users. Please use a different image.", errors);
-            }
-            await SaveProfileImageAsync(model, request.EmailSuffix);
+
+            await SaveProfileImageAsync(model, request.EmailSuffix, email);
             PopulateUserEntity(model, email, request.CreatedBy);
             await UpdateGeoLocationAsync(model);
             await using var tx = await _context.Database.BeginTransactionAsync();
@@ -91,7 +85,6 @@ namespace risk.control.system.Services.AgencyAdmin
             await HandleLockAndNotificationsAsync(model, portal_base_url);
             await tx.CommitAsync();
             var userAdded = (true, $"User <b> {email} </b> created successfully.", errors);
-            await _faceImageCheckService.SetImageToAws(email);
             return userAdded;
         }
 
@@ -116,14 +109,7 @@ namespace risk.control.system.Services.AgencyAdmin
             if (input.ProfileImage?.Length > 0)
             {
                 var suffix = user.Email!.Split('@').Last();
-                await SaveProfileImageAsync(input, suffix);
-                var matchedFace = await _faceImageCheckService.CheckFaceImageAsync(input.ProfileImage);
-                if (matchedFace)
-                {
-                    modelState.AddModelError("ProfileImage", "Profile image matches with existing user. Please use a different image.");
-                    errors.Add("ProfileImage", "Profile image matches with existing users. Please use a different image.");
-                    return (false, "Profile image matches with existing users. Please use a different image.", errors);
-                }
+                await SaveProfileImageAsync(input, suffix, user.Email!);
             }
             UpdateUserFields(input, user, request.UpdatedBy);
             await UpdateGeoLocationAsync(user);
@@ -141,18 +127,16 @@ namespace risk.control.system.Services.AgencyAdmin
             await HandleLockAndNotificationsAsync(user, portal_base_url, false);
             await tx.CommitAsync();
             var userEdited = (true, $"User <b> {user.Email} </b> updated successfully", errors);
-            await _faceImageCheckService.SetImageToAws(user.Email!);
             return userEdited;
         }
 
-        private async Task SaveProfileImageAsync(ApplicationUser model, string suffix)
+        private async Task SaveProfileImageAsync(ApplicationUser model, string suffix, string email)
         {
             var safeFolder = Regex.Replace(suffix, @"[^a-zA-Z0-9\-\.]", "");
-
             var (fileName, path) = await _fileStorage.SaveAsync(model.ProfileImage!, safeFolder, "user");
-
             model.ProfilePictureUrl = path;
             model.ProfilePictureExtension = Path.GetExtension(fileName);
+            await _faceImageCheckService.SetImageToAws(email);
         }
 
         private static void PopulateUserEntity(ApplicationUser model, string email, string createdBy)

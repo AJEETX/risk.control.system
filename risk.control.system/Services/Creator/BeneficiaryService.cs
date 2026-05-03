@@ -136,7 +136,7 @@ namespace risk.control.system.Services.Creator
         public async Task<(bool Success, Dictionary<string, string> Errors)> EditAsync(string userEmail, BeneficiaryDetail model)
         {
             var errors = new Dictionary<string, string>();
-            if (model.ProfileImage != null && model.ProfileImage.Length > 0)
+            if (model.ProfileImage?.Length > 0)
             {
                 await _validateImageService.ValidateFaceImage(model.ProfileImage, errors);
             }

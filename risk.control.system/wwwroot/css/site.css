@@ -2563,6 +2563,8 @@ input#checkall {
     min-width: 350px;
     max-height: 400px;
     overflow-y: auto;
+    padding-bottom:10px;
+    border: 2px solid #ddd;
 }
 
 /* Notification header */
