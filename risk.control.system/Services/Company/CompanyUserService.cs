@@ -26,6 +26,7 @@ namespace risk.control.system.Services.Company
     public sealed class CompanyUserService(
         IValidateImageService validateFaceService,
         UserManager<ApplicationUser> userManager,
+        IUserFaceImageCheckService faceImageCheckService,
         ApplicationDbContext context,
         IFileStorageService fileStorage,
         ISmsService sms,
@@ -39,6 +40,7 @@ namespace risk.control.system.Services.Company
         private readonly UserManager<ApplicationUser> _userManager = userManager;
         private readonly ApplicationDbContext _context = context;
         private readonly IFileStorageService _fileStorage = fileStorage;
+        private readonly IUserFaceImageCheckService _faceImageCheckService = faceImageCheckService;
         private readonly ISmsService _sms = sms;
         private readonly ILogger<CompanyUserService> _logger = logger;
 
@@ -52,16 +54,19 @@ namespace risk.control.system.Services.Company
                     result.Errors[nameof(model.Email)] = "Invalid email suffix.";
                     return result;
                 }
-                var profileImageValid = await _validateFaceService.ValidateProfileImage(model.ProfileImage!, result);
+                var profileImageValid = await _validateFaceService.ValidateCompanyUserImage(model.ProfileImage!, result);
                 if (!profileImageValid)
+                {
                     return result;
+                }
+
                 var fullEmail = $"{model.Email!.Trim().ToLower(CultureInfo.InvariantCulture)}@{emailSuffix.Trim().ToLower(CultureInfo.InvariantCulture)}";
+                await SetProfileImageAsync(model, model.ProfileImage!, emailSuffix, fullEmail);
                 var userCount = await _userManager.Users.AsNoTracking().CountAsync(u => u.Email == fullEmail.ToLower());
                 if (userCount > 0)
                     return Fail($"User <b>{fullEmail}</b> already exists.");
                 if (await _userManager.Users.AnyAsync(u => u.Email == fullEmail && !u.Deleted))
                     return Fail($"User <b>{fullEmail}</b> already exists.");
-                await SetProfileImageAsync(model, model.ProfileImage!, emailSuffix);
                 var textInfo = CultureInfo.CurrentCulture.TextInfo;
                 model.FirstName = WebUtility.HtmlEncode(textInfo.ToTitleCase(model.FirstName.Trim().ToLower()));
                 model.LastName = WebUtility.HtmlEncode(textInfo.ToTitleCase(model.LastName.Trim().ToLower()));
@@ -102,9 +107,12 @@ namespace risk.control.system.Services.Company
                 var result = new ServiceResult();
                 if (model.ProfileImage != null)
                 {
-                    var profileImageValid = await _validateFaceService.ValidateProfileImage(model.ProfileImage!, result);
+                    var profileImageValid = await _validateFaceService.ValidateCompanyUserImage(model.ProfileImage!, result);
                     if (!profileImageValid)
-                        await SetProfileImageAsync(user, model.ProfileImage, user.Email!.Split('@')[1]);
+                    {
+                        return result;
+                    }
+                    await SetProfileImageAsync(user, model.ProfileImage, user.Email!.Split('@')[1], user.Email);
                 }
                 UpdateUserFields(user, model, performedBy);
                 var updateResult = await _userManager.UpdateAsync(user);
@@ -171,11 +179,12 @@ namespace risk.control.system.Services.Company
 
         private static ServiceResult Fail(string msg) => new() { Success = false, Message = msg };
 
-        private async Task SetProfileImageAsync(ApplicationUser user, IFormFile file, string domain)
+        private async Task SetProfileImageAsync(ApplicationUser user, IFormFile file, string domain, string email)
         {
             var (fileName, relativePath) = await _fileStorage.SaveAsync(file, domain, "user");
             user.ProfilePictureUrl = relativePath;
             user.ProfilePictureExtension = Path.GetExtension(fileName);
+            await _faceImageCheckService.SetImageToAws(email);
         }
 
         public async Task<ApplicationUser> GetUserAsync(long id)

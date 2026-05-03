@@ -51,7 +51,7 @@ namespace risk.control.system.Services
         private static bool IsImageFile(string filePath)
         {
             // Check if the file is an image based on file extension
-            string[] imageExtensions = { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tiff", ".webp" };
+            string[] imageExtensions = { ".jpg", ".jpeg", ".png" };
             string extension = Path.GetExtension(filePath)?.ToLower()!;
             return imageExtensions.Contains(extension);
         }

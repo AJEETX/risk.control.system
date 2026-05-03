@@ -114,8 +114,8 @@ namespace risk.control.system.Services.Report
         private static SectionBuilder AddRemarks(SectionBuilder section, string title, string content)
         {
             var table = section.AddTable().SetBorder(Stroke.Solid);
-            table.AddColumnPercentToTable("", 30);
-            table.AddColumnPercentToTable("", 70);
+            table.AddColumnPercentToTable("", 10);
+            table.AddColumnPercentToTable("", 90);
             var row = table.AddRow();
             row.AddCell().AddParagraph(title).SetFontSize(12).SetBold();
             row.AddCell().AddParagraph(string.IsNullOrWhiteSpace(content) ? "N/A" : content).SetFontSize(11);

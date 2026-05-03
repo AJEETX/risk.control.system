@@ -9,7 +9,7 @@ namespace risk.control.system.Services.Creator
 {
     public interface IVerifierProcessor
     {
-        Task<(string Path, string Extension)> ProcessImage(UploadCase uc, byte[] zipData, List<UploadError> errs, List<string> sums, string imageName, string caseEntityName);
+        Task<(string Path, string Extension)> ProcessDocumentImage(UploadCase uc, byte[] zipData, List<UploadError> errs, List<string> sums, string imageName, string caseEntityName);
         Task<(string Path, string Extension)> ProcessFaceImage(UploadCase uc, byte[] zipData, List<UploadError> errs, List<string> sums, string imageName, string caseEntityName);
 
         Task ValidatePhone(ApplicationUser user, string contactNumber, List<UploadError> errs, List<string> sums);
@@ -26,6 +26,8 @@ namespace risk.control.system.Services.Creator
         IFeatureManager featureManager
             ) : IVerifierProcessor
     {
+        private const long MAX_FILE_SIZE = 5 * 1024 * 1024;
+        private static readonly HashSet<string> AllowedExt = new() { ".jpg", ".jpeg", ".png" };
         private readonly IDbContextFactory<ApplicationDbContext> _contextFactory = contextFactory;
         private readonly ICaseImageCreationService _caseImageCreationService = caseImageCreationService;
         private readonly IUserFaceImageCheckService _faceImageCheckService = faceImageCheckService;
@@ -43,7 +45,7 @@ namespace risk.control.system.Services.Creator
             sums.Add($"[Location={pinCode}/{districtName} not found]");
         }
 
-        public async Task<(string Path, string Extension)> ProcessImage(UploadCase uc, byte[] zipData, List<UploadError> errs, List<string> sums, string imageName, string caseEntityName)
+        public async Task<(string Path, string Extension)> ProcessDocumentImage(UploadCase uc, byte[] zipData, List<UploadError> errs, List<string> sums, string imageName, string caseEntityName)
         {
             var extension = Path.GetExtension(imageName).ToLower();
             var imageData = await _caseImageCreationService.GetImagesWithDataInSubfolder(zipData, uc.CaseId?.ToLower()!, imageName);
@@ -54,7 +56,18 @@ namespace risk.control.system.Services.Creator
                 sums.Add($"[{caseEntityName} image is missing]");
                 return (string.Empty, extension);
             }
-
+            if (imageData.Length > MAX_FILE_SIZE)
+            {
+                errs.Add(new UploadError { UploadData = $"{caseEntityName} Image", Error = $"{caseEntityName} Image size exceeds 5MB" });
+                sums.Add($"[{caseEntityName} image size exceeds 5MB]");
+                return (string.Empty, extension);
+            }
+            if (!AllowedExt.Contains(extension))
+            {
+                errs.Add(new UploadError { UploadData = $"{caseEntityName} Image", Error = $"Invalid {caseEntityName} image type" });
+                sums.Add($"[{caseEntityName} Invalid image type]");
+                return (string.Empty, extension);
+            }
             // Returns a tuple: (string FileName, string RelativePath)
             var (_, RelativePath) = await _fileStorageService.SaveAsync(imageData, extension, CONSTANTS.CASE, uc.CaseId);
             return (RelativePath, extension);
@@ -70,11 +83,32 @@ namespace risk.control.system.Services.Creator
                 sums.Add($"[{caseEntityName} image is missing]");
                 return (string.Empty, extension);
             }
+            if (imageData.Length > MAX_FILE_SIZE)
+            {
+                errs.Add(new UploadError { UploadData = $"{caseEntityName} Image", Error = $"{caseEntityName} Image size exceeds 5MB" });
+                sums.Add($"[{caseEntityName} image size exceeds 5MB]");
+                return (string.Empty, extension);
+            }
+            if (!AllowedExt.Contains(extension))
+            {
+                errs.Add(new UploadError { UploadData = $"{caseEntityName} Image", Error = $"Invalid {caseEntityName} image type" });
+                sums.Add($"[{caseEntityName} Invalid image type]");
+                return (string.Empty, extension);
+            }
+
             var singleFaceResult = await _faceImageCheckService.HasExactlyOneFace(imageData);
             if (!singleFaceResult.IsValid)
             {
                 errs.Add(new UploadError { UploadData = $"{caseEntityName} Image", Error = $"{singleFaceResult.Message}" });
                 sums.Add($"[{caseEntityName} image {singleFaceResult.Message}]");
+                return (string.Empty, extension);
+            }
+
+            var matchedFace = await _faceImageCheckService.CheckUploadFaceImageExistAsync(imageData!);
+            if (matchedFace)
+            {
+                errs.Add(new UploadError { UploadData = $"{caseEntityName} Image", Error = $"{caseEntityName} Face Image already exists" });
+                sums.Add($"[{caseEntityName} Face Image already exists]");
                 return (string.Empty, extension);
             }
             // Returns a tuple: (string FileName, string RelativePath)
