@@ -579,25 +579,24 @@ namespace risk.control.system.Services.Api
         private static string GetDraftedTimePending(InvestigationTask a)
         {
             if (DateTime.UtcNow.Subtract(a.Updated.GetValueOrDefault()).Days >= a.CreatorSla)
-                return string.Join("", $"{DateTime.UtcNow.Subtract(a.Updated.GetValueOrDefault()).Days} day<sup><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Hurry up, {DateTime.UtcNow.Subtract(a.Updated.GetValueOrDefault()).Days} days since created!\"></i></sup>");
+                return string.Join("", $"<span data-toggle='tooltip' title=\"Hurry up, {DateTime.UtcNow.Subtract(a.Updated.GetValueOrDefault()).Days} days since created!\"> {DateTime.UtcNow.Subtract(a.Updated.GetValueOrDefault()).Days} day<sup><i class=\"fa fa-asterisk asterik-style\" ></i></sup></span>");
 
             if (DateTime.UtcNow.Subtract(a.Updated.GetValueOrDefault()).Days >= 1)
-                return string.Join("", $"{DateTime.UtcNow.Subtract(a.Updated.GetValueOrDefault()).Days} day");
+                return string.Join("", $"<span data-toggle='tooltip' title='{DateTime.UtcNow.Subtract(a.Updated.GetValueOrDefault()).Days} day'> {DateTime.UtcNow.Subtract(a.Updated.GetValueOrDefault()).Days} day </span >");
 
-            if (DateTime.UtcNow.Subtract(a.Updated.GetValueOrDefault()).Hours < 24 &&
-                DateTime.UtcNow.Subtract(a.Updated.GetValueOrDefault()).Hours > 0)
+            if (DateTime.UtcNow.Subtract(a.Updated.GetValueOrDefault()).Hours < 24 && DateTime.UtcNow.Subtract(a.Updated.GetValueOrDefault()).Hours > 0)
             {
-                return string.Join("", $"{DateTime.UtcNow.Subtract(a.Updated.GetValueOrDefault()).Hours} hr");
+                return string.Join("", $"<span data-toggle='tooltip' title='{DateTime.UtcNow.Subtract(a.Updated.GetValueOrDefault()).Hours} hr'>{DateTime.UtcNow.Subtract(a.Updated.GetValueOrDefault()).Hours} hr </span>");
             }
             if (DateTime.UtcNow.Subtract(a.Updated.GetValueOrDefault()).Hours == 0 && DateTime.UtcNow.Subtract(a.Updated.GetValueOrDefault()).Minutes > 0)
             {
-                return string.Join("", $"{DateTime.UtcNow.Subtract(a.Updated.GetValueOrDefault()).Minutes} min");
+                return string.Join("", $"<span data-toggle='tooltip' title='{DateTime.UtcNow.Subtract(a.Updated.GetValueOrDefault()).Minutes} min'>{DateTime.UtcNow.Subtract(a.Updated.GetValueOrDefault()).Minutes} min</span>");
             }
             if (DateTime.UtcNow.Subtract(a.Updated.GetValueOrDefault()).Minutes == 0 && DateTime.UtcNow.Subtract(a.Updated.GetValueOrDefault()).Seconds > 0)
             {
-                return string.Join("", $"{DateTime.UtcNow.Subtract(a.Updated.GetValueOrDefault()).Seconds} sec");
+                return string.Join("", $"<span data-toggle='tooltip' title='{DateTime.UtcNow.Subtract(a.Updated.GetValueOrDefault()).Seconds} sec'>{DateTime.UtcNow.Subtract(a.Updated.GetValueOrDefault()).Seconds} sec </span>");
             }
-            return string.Join("", "now");
+            return string.Join("", "<span data-toggle='tooltip' title='now'> now </span>");
         }
 
         private async Task<string> GetOwnerImage(InvestigationTask caseTask)
@@ -680,25 +679,24 @@ namespace risk.control.system.Services.Api
         public static string GetActiveTime(DateTime AllocatedToAgencyTime, int CreatorSla)
         {
             if (DateTime.UtcNow.Subtract(AllocatedToAgencyTime).Days >= CreatorSla)
-                return string.Join("", $"{DateTime.UtcNow.Subtract(AllocatedToAgencyTime).Days} day<sup><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"{DateTime.UtcNow.Subtract(AllocatedToAgencyTime).Days} days since allocated!\"></i></sup>");
+                return string.Join("", $"<span data-toggle='tooltip' title=\"{DateTime.UtcNow.Subtract(AllocatedToAgencyTime).Days} days since allocated!\">{DateTime.UtcNow.Subtract(AllocatedToAgencyTime).Days} day<sup><i class=\"fa fa-asterisk asterik-style\"></i></sup></span>");
 
             if (DateTime.UtcNow.Subtract(AllocatedToAgencyTime).Days >= 1)
-                return string.Join("", $"{DateTime.UtcNow.Subtract(AllocatedToAgencyTime).Days} day");
+                return string.Join("", $"<span data-toggle='tooltip' title='{DateTime.UtcNow.Subtract(AllocatedToAgencyTime).Days} day'> {DateTime.UtcNow.Subtract(AllocatedToAgencyTime).Days} day </span >");
 
-            if (DateTime.UtcNow.Subtract(AllocatedToAgencyTime).Hours < 24 &&
-                DateTime.UtcNow.Subtract(AllocatedToAgencyTime).Hours > 0)
+            if (DateTime.UtcNow.Subtract(AllocatedToAgencyTime).Hours < 24 && DateTime.UtcNow.Subtract(AllocatedToAgencyTime).Hours > 0)
             {
-                return string.Join("", $"{DateTime.UtcNow.Subtract(AllocatedToAgencyTime).Hours} hr");
+                return string.Join("", $"<span data-toggle='tooltip' title='{DateTime.UtcNow.Subtract(AllocatedToAgencyTime).Hours} hr'>{DateTime.UtcNow.Subtract(AllocatedToAgencyTime).Hours} hr </span>");
             }
             if (DateTime.UtcNow.Subtract(AllocatedToAgencyTime).Hours == 0 && DateTime.UtcNow.Subtract(AllocatedToAgencyTime).Minutes > 0)
             {
-                return string.Join("", $"{DateTime.UtcNow.Subtract(AllocatedToAgencyTime).Minutes} min");
+                return string.Join("", $"<span data-toggle='tooltip' title='{DateTime.UtcNow.Subtract(AllocatedToAgencyTime).Minutes} min'>{DateTime.UtcNow.Subtract(AllocatedToAgencyTime).Minutes} min</span>");
             }
             if (DateTime.UtcNow.Subtract(AllocatedToAgencyTime).Minutes == 0 && DateTime.UtcNow.Subtract(AllocatedToAgencyTime).Seconds > 0)
             {
-                return string.Join("", $"{DateTime.UtcNow.Subtract(AllocatedToAgencyTime).Seconds} sec");
+                return string.Join("", $"<span data-toggle='tooltip' title='{DateTime.UtcNow.Subtract(AllocatedToAgencyTime).Seconds} sec'>{DateTime.UtcNow.Subtract(AllocatedToAgencyTime).Seconds} sec </span>");
             }
-            return string.Join("", "now");
+            return string.Join("", "<span data-toggle='tooltip' title='now'> now </span>");
         }
     }
 }

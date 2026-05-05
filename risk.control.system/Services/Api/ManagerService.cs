@@ -394,27 +394,26 @@ namespace risk.control.system.Services.Api
             };
         }
 
-        public static string GetAssessorCompletedTime(DateTime ProcessedByAssessorTime)
+        private static string GetAssessorCompletedTime(DateTime ProcessedByAssessorTime)
         {
             DateTime time2Compare = ProcessedByAssessorTime;
 
             if (DateTime.UtcNow.Subtract(time2Compare).Days >= 1)
-                return string.Join("", $"{DateTime.UtcNow.Subtract(time2Compare).Days} day");
+                return string.Join("", $"<span data-toggle='tooltip' title='{DateTime.UtcNow.Subtract(time2Compare).Days} day'>{DateTime.UtcNow.Subtract(time2Compare).Days} day</span>");
 
-            if (DateTime.UtcNow.Subtract(time2Compare).Hours < 24 &&
-                DateTime.UtcNow.Subtract(time2Compare).Hours > 0)
+            if (DateTime.UtcNow.Subtract(time2Compare).Hours < 24 && DateTime.UtcNow.Subtract(time2Compare).Hours > 0)
             {
-                return string.Join("", $"{DateTime.UtcNow.Subtract(time2Compare).Hours} hr ");
+                return string.Join("", $"<span data-toggle='tooltip' title='{DateTime.UtcNow.Subtract(time2Compare).Hours} hr'>{DateTime.UtcNow.Subtract(time2Compare).Hours} hr</span> ");
             }
             if (DateTime.UtcNow.Subtract(time2Compare).Hours == 0 && DateTime.UtcNow.Subtract(time2Compare).Minutes > 0)
             {
-                return string.Join("", $"{DateTime.UtcNow.Subtract(time2Compare).Minutes} min ");
+                return string.Join("", $"<span data-toggle='tooltip' title='{DateTime.UtcNow.Subtract(time2Compare).Minutes} min'>{DateTime.UtcNow.Subtract(time2Compare).Minutes} min</span>");
             }
             if (DateTime.UtcNow.Subtract(time2Compare).Minutes == 0 && DateTime.UtcNow.Subtract(time2Compare).Seconds > 0)
             {
-                return string.Join("", $"{DateTime.UtcNow.Subtract(time2Compare).Seconds} sec ");
+                return string.Join("", $"<span data-toggle='tooltip' title='{DateTime.UtcNow.Subtract(time2Compare).Seconds} sec'>{DateTime.UtcNow.Subtract(time2Compare).Seconds} sec</span>");
             }
-            return string.Join("", "now");
+            return string.Join("", "<span data-toggle='tooltip' title='now'> now </span>");
         }
 
         private async Task<string> GetOwnerImage(InvestigationTask caseTask)
