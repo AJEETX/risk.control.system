@@ -211,25 +211,24 @@ namespace risk.control.system.Services
             DateTime time2Compare = SubmittedToAssessorTime;
             time2Compare = SubmittedToAssessorTime;
             if (DateTime.UtcNow.Subtract(time2Compare).Days >= AssessorSla)
-                return string.Join("", $"{DateTime.UtcNow.Subtract(time2Compare).Days} day<sup><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Hurry up, {DateTime.UtcNow.Subtract(time2Compare).Days} days since submitted!\"></i></sup>");
+                return string.Join("", $"<span data-toggle='tooltip' title=\"Hurry up, {DateTime.UtcNow.Subtract(time2Compare).Days} days since submitted!\"> {DateTime.UtcNow.Subtract(time2Compare).Days} day<sup><i class=\"fa fa-asterisk asterik-style\"></i></sup></span>");
 
             if (DateTime.UtcNow.Subtract(time2Compare).Days >= 1)
-                return string.Join("", $"{DateTime.UtcNow.Subtract(time2Compare).Days} day");
+                return string.Join("", $"<span data-toggle='tooltip' title='{DateTime.UtcNow.Subtract(time2Compare).Days} day'>{DateTime.UtcNow.Subtract(time2Compare).Days} day</span>");
 
-            if (DateTime.UtcNow.Subtract(time2Compare).Hours < 24 &&
-                DateTime.UtcNow.Subtract(time2Compare).Hours > 0)
+            if (DateTime.UtcNow.Subtract(time2Compare).Hours < 24 && DateTime.UtcNow.Subtract(time2Compare).Hours > 0)
             {
-                return string.Join("", $"{DateTime.UtcNow.Subtract(time2Compare).Hours} hr");
+                return string.Join("", $"<span data-toggle='tooltip' title='{DateTime.UtcNow.Subtract(time2Compare).Hours} hr'>{DateTime.UtcNow.Subtract(time2Compare).Hours} hr</span>");
             }
             if (DateTime.UtcNow.Subtract(time2Compare).Hours == 0 && DateTime.UtcNow.Subtract(time2Compare).Minutes > 0)
             {
-                return string.Join("", $"{DateTime.UtcNow.Subtract(time2Compare).Minutes} min");
+                return string.Join("", $"<span data-toggle='tooltip' title='{DateTime.UtcNow.Subtract(time2Compare).Minutes} min'>{DateTime.UtcNow.Subtract(time2Compare).Minutes} min</span>");
             }
             if (DateTime.UtcNow.Subtract(time2Compare).Minutes == 0 && DateTime.UtcNow.Subtract(time2Compare).Seconds > 0)
             {
-                return string.Join("", $"{DateTime.UtcNow.Subtract(time2Compare).Seconds} sec");
+                return string.Join("", $"<span data-toggle='tooltip' title=' '{DateTime.UtcNow.Subtract(time2Compare).Seconds} sec'>{DateTime.UtcNow.Subtract(time2Compare).Seconds} sec</span>");
             }
-            return string.Join("", "now");
+            return string.Join("", "<span data-toggle='tooltip' title='now'> now </span>");
         }
 
         public async Task<object> GetReviewCases(string userEmail, int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc")
@@ -393,22 +392,21 @@ namespace risk.control.system.Services
         {
             DateTime time2Compare = EnquiredByAssessorTime;
             if (DateTime.UtcNow.Subtract(time2Compare).Days >= 1)
-                return string.Join("", $"{DateTime.UtcNow.Subtract(time2Compare).Days} day");
+                return string.Join("", $"<span data-toggle='tooltip' title='{DateTime.UtcNow.Subtract(time2Compare).Days} day'>{DateTime.UtcNow.Subtract(time2Compare).Days} day</span>");
 
-            if (DateTime.UtcNow.Subtract(time2Compare).Hours < 24 &&
-                DateTime.UtcNow.Subtract(time2Compare).Hours > 0)
+            if (DateTime.UtcNow.Subtract(time2Compare).Hours < 24 && DateTime.UtcNow.Subtract(time2Compare).Hours > 0)
             {
-                return string.Join("", $"{DateTime.UtcNow.Subtract(time2Compare).Hours} hr");
+                return string.Join("", $"<span data-toggle='tooltip' title='{DateTime.UtcNow.Subtract(time2Compare).Hours} hr'>{DateTime.UtcNow.Subtract(time2Compare).Hours} hr</span>");
             }
             if (DateTime.UtcNow.Subtract(time2Compare).Hours == 0 && DateTime.UtcNow.Subtract(time2Compare).Minutes > 0)
             {
-                return string.Join("", $"{DateTime.UtcNow.Subtract(time2Compare).Minutes} min");
+                return string.Join("", $"<span data-toggle='tooltip' title='{DateTime.UtcNow.Subtract(time2Compare).Minutes} min'>{DateTime.UtcNow.Subtract(time2Compare).Minutes} min</span>");
             }
             if (DateTime.UtcNow.Subtract(time2Compare).Minutes == 0 && DateTime.UtcNow.Subtract(time2Compare).Seconds > 0)
             {
-                return string.Join("", $"{DateTime.UtcNow.Subtract(time2Compare).Seconds} sec");
+                return string.Join("", $"<span data-toggle='tooltip' title='{DateTime.UtcNow.Subtract(time2Compare).Seconds} sec'>{DateTime.UtcNow.Subtract(time2Compare).Seconds} sec</span>");
             }
-            return string.Join("", "now");
+            return string.Join("", "<span data-toggle='tooltip' title='now'> now </span>");
         }
 
         public async Task<object> GetRejectedCases(string userEmail, int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc")
@@ -580,22 +578,21 @@ namespace risk.control.system.Services
             DateTime time2Compare = ProcessedByAssessorTime;
 
             if (DateTime.UtcNow.Subtract(time2Compare).Days >= 1)
-                return string.Join("", $"{DateTime.UtcNow.Subtract(time2Compare).Days} day");
+                return string.Join("", $"<span data-toggle='tooltip' title='{DateTime.UtcNow.Subtract(time2Compare).Days} day'>{DateTime.UtcNow.Subtract(time2Compare).Days} day</span>");
 
-            if (DateTime.UtcNow.Subtract(time2Compare).Hours < 24 &&
-                DateTime.UtcNow.Subtract(time2Compare).Hours > 0)
+            if (DateTime.UtcNow.Subtract(time2Compare).Hours < 24 && DateTime.UtcNow.Subtract(time2Compare).Hours > 0)
             {
-                return string.Join("", $"{DateTime.UtcNow.Subtract(time2Compare).Hours} hr ");
+                return string.Join("", $"<span data-toggle='tooltip' title='{DateTime.UtcNow.Subtract(time2Compare).Hours} hr'>{DateTime.UtcNow.Subtract(time2Compare).Hours} hr</span> ");
             }
             if (DateTime.UtcNow.Subtract(time2Compare).Hours == 0 && DateTime.UtcNow.Subtract(time2Compare).Minutes > 0)
             {
-                return string.Join("", $"{DateTime.UtcNow.Subtract(time2Compare).Minutes} min ");
+                return string.Join("", $"<span data-toggle='tooltip' title='{DateTime.UtcNow.Subtract(time2Compare).Minutes} min'>{DateTime.UtcNow.Subtract(time2Compare).Minutes} min</span>");
             }
             if (DateTime.UtcNow.Subtract(time2Compare).Minutes == 0 && DateTime.UtcNow.Subtract(time2Compare).Seconds > 0)
             {
-                return string.Join("", $"{DateTime.UtcNow.Subtract(time2Compare).Seconds} sec ");
+                return string.Join("", $"<span data-toggle='tooltip' title='{DateTime.UtcNow.Subtract(time2Compare).Seconds} sec'>{DateTime.UtcNow.Subtract(time2Compare).Seconds} sec</span>");
             }
-            return string.Join("", "now");
+            return string.Join("", "<span data-toggle='tooltip' title='now'> now </span>");
         }
 
         private async Task<bool> CanDownload(long id, string userEmail)
