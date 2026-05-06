@@ -127,7 +127,12 @@
                     return `<span title="${localDate}" data-bs-toggle="tooltip"><small><strong>${localDate}</strong></small></span>`;
                 }
             },
-            { "data": "timePending" },
+            {
+                "data": "timePending",
+                "mRender": function (data, type, row) {
+                    return `<small><strong>${data} </strong> </small>`;
+                }
+            },
             {
                 "sDefaultContent": "",
                 "bSortable": false,
