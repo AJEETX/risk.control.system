@@ -133,7 +133,12 @@ $(document).ready(function () {
                     return '<span title="' + row.service + '" data-toggle="tooltip">' + data + '</span>'
                 }
             },
-            { "data": "timePending" },
+            {
+                "data": "timePending",
+                "mRender": function (data, type, row) {
+                    return `<small><strong>${data} </strong> </small>`;
+                }
+            },
             { "data": "timeElapsed", "bVisible": false }
         ],
         "rowCallback": function (row, data, index) {
