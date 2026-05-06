@@ -68,17 +68,17 @@ namespace risk.control.system.Helpers
 
         private static string BuildSlaBadge(int elapsedDays, int sla, bool open)
         {
-            string badge = $"<span class='badge badge-light'>{elapsedDays} day</span>";
+            string title = elapsedDays >= sla
+                    ? $"Hurry up, {elapsedDays} days since allocated!"
+                    : $"Caution : {elapsedDays} day since allocated.";
+
+            string badge = $"<span data-toggle='tooltip'   title=\"{title}\">{elapsedDays} day</span>";
 
             // If it's "open", we just return the badge. 
             // Otherwise, append the specific warning icon.
             if (!open)
             {
-                string title = elapsedDays >= sla
-                    ? $"Hurry up, {elapsedDays} days since allocated!"
-                    : $"Caution : {elapsedDays} day since allocated.";
-
-                return $"{badge}<i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"{title}\"></i>";
+                return $"{badge}<i class=\"fa fa-asterisk asterik-style\"></i>";
             }
 
             return badge;
@@ -93,7 +93,7 @@ namespace risk.control.system.Helpers
             else if (elapsed.Seconds > 0) value = $"{elapsed.Seconds} sec";
             else value = "now";
 
-            return $"<span class='badge badge-light'>{value}</span>";
+            return $"<span  data-toggle='tooltip' title=\"{value}\">{value}</span>";
         }
     }
 }
