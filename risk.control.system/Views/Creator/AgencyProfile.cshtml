@@ -42,7 +42,10 @@
 
 						<hr />
 						<p class="text-muted text-sm">
-							<i class="fa fa-star"></i>  <b>Rating: </b>
+							<div class="mt-1">
+								<span class="badge badge-pill badge-dark">Rating: @(Model.RateCount > 0 ? (Model.RateTotal!.Value / Model.RateCount.Value).ToString("F1") : "0")</span>
+								<small class="text-muted">(@Model.RateCount reviews)</small>
+							</div>
 						</p>
 						<ul class="ml-4 mb-0 fa-ul text-muted">
 							<li class="small">
@@ -66,6 +69,7 @@
 								</div>
 							</li>
 						</ul>
+						
 						<div class="dropdown-divider"></div>
 						<div class="card-footer">
 							<div class="row">

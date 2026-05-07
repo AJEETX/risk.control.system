@@ -45,9 +45,9 @@
                     });
                 }
                 if (json.isManager === true) {
-                    table.column(4).visible(true);   // Show UploadedBy
+                    table.column(3).visible(true);   // Show UploadedBy
                 } else {
-                    table.column(4).visible(false);  // Hide UploadedBy
+                    table.column(3).visible(false);  // Hide UploadedBy
                 }
                 console.log(json.data[0]);
 
@@ -69,12 +69,6 @@
         "columns": [
             { "data": "id", "bVisible": false },
             { "data": "sequenceNumber" },
-            {
-                "data": "icon",
-                "mRender": function (data, type, row) {
-                    return '<i class="' + data + '" data-bs-toggle="tooltip"></i>';
-                }
-            },
             {
                 "data": "name",
                 "mRender": function (data, type, row) {
@@ -105,9 +99,9 @@
                 }
             },
             {
-                "data": "timeTakenSeconds",
+                "data": "timeTaken",
                 "mRender": function (data, type, row) {
-                    return '<i>' + row.timeTaken + '</i>';
+                    return `<i  title="${data}" data-bs-toggle="tooltip">${data}</i>`;
                 }
             },
             {
@@ -121,24 +115,21 @@
                 }
             },
             {
+                "data": "icon",
+                "mRender": function (data, type, row) {
+                    return '<i class="' + data + '" data-bs-toggle="tooltip"></i>';
+                }
+            },
+            {
                 data: "message",
                 render: function (data, type, row) {
                     if (!data) return "";
                     if (row.completed) {
-                        return `
-                        <span class="custom-message-badge i-blue" title="${data}" data-toggle="tooltip">
-                            <small><strong> ${data}</strong></small>
-                        </span>`;
+                        return `<span class="custom-message-badge i-blue" title="${data}">${data}</span>`;
                     } else if (row.status == 'Error') {
-                        return `
-                        <span class="custom-message-badge i-red" title="${data}" data-toggle="tooltip">
-                            <small><strong> ${data}</strong></small>
-                        </span>`;
+                        return `<span class="custom-message-badge i-red" title="${data}">${data}</span>`;
                     } else {
-                        return `
-                        <span class="custom-message-badge i-grey" title="${data}" data-toggle="tooltip">
-                            <small><strong> ${data}</strong></small>
-                        </span>`;
+                        return `<span class="custom-message-badge i-grey"  title="${data}">${data}</span>`;
                     }
                 }
             },
@@ -190,28 +181,28 @@
                 targets: 1
             },
             {
-                className: 'max-width-column-claim', // ✅ Apply CSS class
+                className: 'max-width-column-name', // ✅ Apply CSS class
                 targets: 2
             },
             {
                 className: 'max-width-column-name', // ✅ Apply CSS class
-                targets: 3
-            },
-            {
-                className: 'max-width-column-name', // ✅ Apply CSS class
-                "targets": 4
+                "targets": 3
             },
             {
                 className: 'max-width-column-email', // ✅ Apply CSS class
-                targets: 5
+                targets: 4
             },
             {
                 className: 'max-width-column-email', // Apply the CSS class,
-                targets: 6                      // Index of the column to style
+                targets: 5                      // Index of the column to style
             },
             {
                 className: 'max-width-column-name', // Apply the CSS class,
-                targets: 7                      // Index of the column to style
+                targets: 6                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column-claim', // ✅ Apply CSS class
+                targets: 7
             },
             {
                 className: 'max-width-column-status', // Apply the CSS class,

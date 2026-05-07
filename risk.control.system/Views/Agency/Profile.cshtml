@@ -46,16 +46,32 @@
                         
 						<hr />
 
-						<div id="agency-rating" class="mb-3">
-							@for (int i = 1; i <= 5; i++)
-							{
-								<img src="~/img/StarFade.gif" id="@i" class="main-rating" vendorId="@Model?.VendorId" />
-							}
+							<ul class="ml-4 mb-0 fa-ul text-muted">
+								<li class="small">
+									<div id="agency-rating">
+										<img src="/img/StarFade.gif" class="rating" id="1" alt="star" />
+										<img src="/img/StarFade.gif" class="rating" id="2" alt="star" />
+										<img src="/img/StarFade.gif" class="rating" id="3" alt="star" />
+										<img src="/img/StarFade.gif" class="rating" id="4" alt="star" />
+										<img src="/img/StarFade.gif" class="rating" id="5" alt="star" />
+										<span id="rating-result">
+											<span class="badge badge-light">(@Model!.RateCount)</span>
+											@if (Model.RateCount != null && Model.RateCount > 0)
+											{
+												decimal a = @Model.RateTotal!.Value / @Model.RateCount.Value;
+												<sup class="avr"> @a</sup>
+											}
+										</span>
+										<div class="dropdown-divider"></div>
+										<div id="rating-result-data" class="badge badge-light">
+										</div>
+									</div>
+								</li>
+							</ul>
 							<div class="mt-1">
 								<span class="badge badge-pill badge-dark">Rating: @(Model?.RateCount > 0 ? (Model.RateTotal!.Value / Model.RateCount.Value).ToString("F1") : "0")</span>
 								<small class="text-muted">(@Model?.RateCount reviews)</small>
 							</div>
-						</div>
 					</div>
 				</div>
 
