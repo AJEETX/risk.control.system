@@ -138,6 +138,11 @@
             img.attr("src", "/img/FilledStar.jpeg").prevAll("img.main-rating").attr("src", "/img/FilledStar.jpeg");
         }
     });
+
+    var agencyRating = $('#agency-rating');
+    if (agencyRating && agencyRating.length > 0) {
+        refillRating($('#agency-rating'));
+    }
 });
 
 function showedit() {
@@ -201,5 +206,30 @@ function displayBankCodeLabels(countryCode, isdCode) {
         $('.info-box-text:contains("IFSC Code")').text('BSB Code');
     } else if (!isIndia) {
         $('.info-box-text:contains("IFSC Code")').text('Bank Code');
+    }
+}
+
+function refillRating(container) {
+    var avgRating = parseFloat(container.find("span.avr").text()) || 0;
+    $('#agency-rating img.rating').each(function () {
+        var currentStar = parseInt($(this).attr('id'));
+        $(this).attr("src", currentStar <= avgRating ? "/img/FilledStar.jpeg" : "/img/StarFade.gif");
+    });
+
+    var av = parseFloat($('.avr').text()); // Get the average rating from the page
+
+    if (!isNaN(av) && av > 0) {  // Ensure it's a valid rating
+        var stars = $("#agency-rating img.rating"); // Get all star images in the row
+
+        // Loop through each star and highlight them based on the average rating
+        stars.each(function (index) {
+            var star = $(this);
+
+            if (index < Math.floor(av)) {  // Fully filled stars
+                star.attr("src", "/img/FilledStar.jpeg");
+            } else {
+                star.attr("src", "/img/StarFade.gif");  // Faded stars
+            }
+        });
     }
 }
