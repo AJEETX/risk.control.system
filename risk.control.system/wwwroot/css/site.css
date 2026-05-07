@@ -4496,3 +4496,6 @@ img.mobile-capture-map {
         word-wrap: break-word; /* Ensures long strings don't break layout */
         font-size: 0.9rem;
     }
+#rating-result{
+    display:none;
+}
