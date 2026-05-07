@@ -65,7 +65,7 @@
                         img += '<span class="avr"><sup>' + averageRating + '</sup></span>';
                     }
                     img += '</span>';
-                    img += '<br /> <span class="result"></span>';
+                    img += '<br /> <span class="result"  data-toggle="tooltip"></span>';
 
                     return '<span title="' + row.name + '" data-bs-toggle="tooltip" class="blue">' + data + '</span>' + '<br /> ' + img;
                 }
@@ -215,6 +215,27 @@
         });
     });
 
+    table.on('draw', function () {
+        // Loop through each row of the table after it has been redrawn
+        $("#dataTable > tbody > tr").each(function () {
+            var av = parseFloat($(this).find("span.avr").text()); // Get the average rating
+            if (!isNaN(av) && av > 0) {  // Ensure it's a valid rating
+                var stars = $(this).find("img.rating");  // Get all star images in the row
+
+                // Loop through each star and highlight them based on the average rating
+                stars.each(function (index) {
+                    var star = $(this);
+                    if (index < Math.floor(av)) {  // Fully filled stars
+                        star.attr("src", "/img/FilledStar.jpeg");
+                    } else if (index === Math.floor(av) && av % 1 !== 0) {  // Handle half-filled stars
+                        star.attr("src", "/imgHalfStar.jpeg");  // You need a half-star image
+                    } else {
+                        star.attr("src", "/img/StarFade.gif");  // Faded stars
+                    }
+                });
+            }
+        });
+    });
     // Handle click on "Select all" control
     $('#checkall').on('click', function () {
         // Get all rows with search applied
