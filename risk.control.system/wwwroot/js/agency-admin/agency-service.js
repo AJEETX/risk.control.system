@@ -79,7 +79,7 @@ $(document).ready(function () {
                 mRender: (data, type, row) => {
                     const fullText = row.district || '';
                     if (fullText == ALL_DISTRICTS) {
-                        return `<span title="${fullText}" data-toggle="tooltip"> ${fullText} </span>`;
+                        return `<span title="${fullText}"> ${fullText} </span>`;
                     } else {
                         let display = '';
                         try {
