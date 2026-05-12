@@ -8,6 +8,7 @@
         public string Phone { get; set; } = default!;
         public string Addressline { get; set; } = default!;
         public bool Active { get; set; }
+        public string State { get; set; } = default!;
         public string Country { get; set; } = default!;
         public string? Flag { get; set; }
         public int Count { get; set; }
