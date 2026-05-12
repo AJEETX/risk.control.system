@@ -53,9 +53,13 @@
         {
             className: 'max-width-column', // Apply the CSS class,
             targets: 8                      // Index of the column to style
-        }
+            },
+            {
+                className: 'max-width-column', // Apply the CSS class,
+                targets: 9                      // Index of the column to style
+            }
         ],
-        order: [[10, 'asc']],
+        order: [[11, 'asc']],
         fixedHeader: true,
         processing: true,
         paging: true,
@@ -94,7 +98,7 @@
             {
                 "data": "phone",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.phone + '" data-bs-toggle="tooltip">' + data + '</span>';
+                    return '<span title="' + data + '" data-bs-toggle="tooltip">' + data + '</span>';
                 }
             },
             {
@@ -111,39 +115,44 @@
                         return '<img src="/img/no-user.png" class="profile-image doc-profile-image" title="No Photo" data-bs-toggle="tooltip" />'
                     }
 
-                    return '<span title="' + row.personMapAddressUrl + '" data-bs-toggle="tooltip">' + data + '</span>';
+                    return '<span title="' + data + '" data-bs-toggle="tooltip">' + data + '</span>';
                 }
             },
-
             {
                 "data": "distance",
                 "mRender": function (data, type, row) {
-                    return '<span class="distance" title="' + row.distance + '" data-bs-toggle="tooltip">' + data + '</span>';
+                    return '<span class="distance" title="' + data + '" data-bs-toggle="tooltip">' + data + '</span>';
                 }
             },
             {
                 "data": "duration",
                 "mRender": function (data, type, row) {
-                    return '<span class="duration" title="' + row.duration + '" data-bs-toggle="tooltip">' + data + '</span>';
+                    return '<span class="duration" title="' + data + '" data-bs-toggle="tooltip">' + data + '</span>';
                 }
             },
             {
                 "data": "addressline",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.addressline + '" data-bs-toggle="tooltip">' + data + '</span>';
+                    return '<span title="' + data + '" data-bs-toggle="tooltip">' + data + '</span>';
+                }
+            },
+            {
+                "data": "state",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + data + '" data-bs-toggle="tooltip">' + data + '</span>';
                 }
             },
             {
                 "data": "pinCode",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.pinCode + '" data-bs-toggle="tooltip">' + data + '</span>';
+                    return '<span title="' + data + '" data-bs-toggle="tooltip">' + data + '</span>';
                 }
             },
             {
                 "data": "count",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.count + '" data-bs-toggle="tooltip">' + data + '</span>';
+                    return '<span title="' + data + '" data-bs-toggle="tooltip">' + data + '</span>';
                 }
             },
             {
