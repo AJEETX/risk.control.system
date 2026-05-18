@@ -679,7 +679,7 @@ namespace risk.control.system.Services.Api
         public static string GetActiveTime(DateTime AllocatedToAgencyTime, int CreatorSla)
         {
             if (DateTime.UtcNow.Subtract(AllocatedToAgencyTime).Days >= CreatorSla)
-                return string.Join("", $"<span data-toggle='tooltip' title=\"{DateTime.UtcNow.Subtract(AllocatedToAgencyTime).Days} days since allocated!\">{DateTime.UtcNow.Subtract(AllocatedToAgencyTime).Days} day<sup><i class=\"fa fa-asterisk asterik-style\"></i></sup></span>");
+                return string.Join("", $"<span data-toggle='tooltip' title=\"{DateTime.UtcNow.Subtract(AllocatedToAgencyTime).Days} days since allocated!\">{DateTime.UtcNow.Subtract(AllocatedToAgencyTime).Days} day</span>");
 
             if (DateTime.UtcNow.Subtract(AllocatedToAgencyTime).Days >= 1)
                 return string.Join("", $"<span data-toggle='tooltip' title='{DateTime.UtcNow.Subtract(AllocatedToAgencyTime).Days} day'> {DateTime.UtcNow.Subtract(AllocatedToAgencyTime).Days} day </span >");
