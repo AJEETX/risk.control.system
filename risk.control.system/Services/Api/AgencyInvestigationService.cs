@@ -1015,7 +1015,7 @@ namespace risk.control.system.Services.Api
             {
                 timeToCompare = caseTask.TaskToAgentTime.GetValueOrDefault();
                 if (DateTime.UtcNow.Subtract(timeToCompare).Days >= caseTask.AgentSla)
-                    return string.Join("", $"<span data-toggle='tooltip' title=\"Hurry up, {DateTime.UtcNow.Subtract(timeToCompare).Days} days since allocated!\">{DateTime.UtcNow.Subtract(timeToCompare).Days} day<sup><i class=\"fa fa-asterisk asterik-style\"></i></sup></span>");
+                    return string.Join("", $"<span data-toggle='tooltip' title=\"{DateTime.UtcNow.Subtract(timeToCompare).Days} days since allocated!\">{DateTime.UtcNow.Subtract(timeToCompare).Days} day</span>");
             }
             else if (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR)
             {
@@ -1024,13 +1024,13 @@ namespace risk.control.system.Services.Api
             else if (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR)
             {
                 timeToCompare = caseTask.EnquiryReplyByAgencyTime.GetValueOrDefault();
+                return string.Join("", $"<span data-toggle='tooltip' title=\"{DateTime.UtcNow.Subtract(timeToCompare).Days} days since replied!\">{DateTime.UtcNow.Subtract(timeToCompare).Days} day</span>");
             }
 
             if (DateTime.UtcNow.Subtract(timeToCompare).Days >= 1)
                 return string.Join("", $"<span data-toggle='tooltip' title='{DateTime.UtcNow.Subtract(timeToCompare).Days} day'>{DateTime.UtcNow.Subtract(timeToCompare).Days} day </span>");
 
-            if (DateTime.UtcNow.Subtract(timeToCompare).Hours < 24 &&
-                DateTime.UtcNow.Subtract(timeToCompare).Hours > 0)
+            if (DateTime.UtcNow.Subtract(timeToCompare).Hours < 24 && DateTime.UtcNow.Subtract(timeToCompare).Hours > 0)
             {
                 return string.Join("", $"<span data-toggle='tooltip' title='{DateTime.UtcNow.Subtract(timeToCompare).Hours} hr'> {DateTime.UtcNow.Subtract(timeToCompare).Hours} hr</span>");
             }
