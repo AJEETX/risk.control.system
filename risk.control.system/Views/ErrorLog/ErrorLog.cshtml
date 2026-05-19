@@ -23,9 +23,9 @@
 						@foreach (var file in Model)
 						{
 							<tr>
-								<td class="align-middle">@file.Date.ToString("yyyy-MM-dd HH:mm")</td>
-								<td class="align-middle fw-bold text-primary">@file.FileName</td>
-								<td class="align-middle">@file.SizeKB KB</td>
+								<td class="align-middle" title="@file.Date.ToString("yyyy-MM-dd HH:mm")">@file.Date.ToString("yyyy-MM-dd HH:mm")</td>
+								<td class="align-middle fw-bold text-primary" title="@file.FileName">@file.FileName</td>
+								<td class="align-middle" title="@file.SizeKB KB">@file.SizeKB KB</td>
 								<td class="text-end">
 									<a asp-action="Download" asp-route-fileName="@file.FileName"
 										   class="btn btn-outline-success btn-sm">
