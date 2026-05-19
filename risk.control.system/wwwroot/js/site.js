@@ -169,7 +169,11 @@ function loadNotifications(keepOpen = false) {
         $("#notificationCount").text(
             response.maxCountReached ? `${response.maxCount}+` : totalCount
         );
-
+        if (totalCount > 0) {
+            $("#notificationBell").addClass("fas").removeClass('far');
+        } else {
+            $("#notificationBell").addClass("far").removeClass('fas');
+        }
         if (Array.isArray(response.data) && response.data.length > 0) {
 
             response.data.forEach(function (item) {
