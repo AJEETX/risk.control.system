@@ -104,12 +104,12 @@
                         return `
                         <div class="map-thumbnail profile-image doc-profile-image">
                             <img src="${formattedUrl}"  
-                                title="${row.pincodeName}"
+                                title='Address of Interest: ${row.pincodeName}'
                                  class="thumbnail profile-image doc-profile-image preview-map-image open-map-modal"
                                  data-bs-toggle="tooltip"
                                  data-bs-placement="top"
                                  data-img='${row.personMapAddressUrl}'
-                                 data-title='Addresss: ${row.pincodeName}' />
+                                 data-title='Address of Interest: ${row.pincodeName}' />
                         </div>`;
                     } else {
                         return '<img src="/img/no-map.jpeg" class="profile-image doc-profile-image" title="No address" data-bs-toggle="tooltip" />';
@@ -279,13 +279,13 @@
     });
 
     $(document).on("click", ".open-map-modal", function () {
-        $("#mapModal").modal("show");
+        $("#imageModal").modal("show");
 
         const imageUrl = $(this).data("img");
         const title = $(this).data("title");
 
-        $("#modalMapImage").attr("src", imageUrl);
-        $("#mapModalLabel").text(title || "Map Preview");
+        $("#modalImage").attr("src", imageUrl);
+        $("#mapImageLabel").text(title || "Map Preview");
     });
 
     $('#dataTable tbody').hide();

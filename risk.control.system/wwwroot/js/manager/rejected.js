@@ -80,8 +80,7 @@
                 "data": "agency",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    var img = '<div class="map-thumbnail profile-image doc-profile-image">';
-                    img += '<img src="' + row.ownerDetail + '" class="full-map" title="' + row.agency + '" data-bs-toggle="tooltip"/>'; // Full map image with class 'full-map'
+                    var img = '<div class="table-profile-image">';
                     img += '<img src="' + row.ownerDetail + '" class="thumbnail profile-image doc-profile-image" title="' + row.agency + '" data-bs-toggle="tooltip"/>'; // Thumbnail image with class 'thumbnail'
                     img += '</div>';
                     return img;
@@ -92,19 +91,25 @@
                 "data": "pincode",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    if (row.pincodeName != '...') {
-                        return `
-            <div class="map-thumbnail profile-image doc-profile-image">
-                <img src="${row.personMapAddressUrl}" title='${row.pincodeName}'
-                     class="thumbnail profile-image doc-profile-image preview-map-image"
-                     data-toggle="modal"
-                     data-target="#mapModal"
-                     data-img='${row.personMapAddressUrl}'
-                     data-title='${row.pincodeName}' />
-            </div>`;
-                    } else {
-                        return '<img src="/img/no-map.jpeg" class="profile-image doc-profile-image" title="No address" data-bs-toggle="tooltip" />';
-                    }
+                    const formattedUrl = row.personMapAddressUrl
+                        .replace("{0}", "400")
+                        .replace("{1}", "400");
+
+                    return `
+                        <div class="map-thumbnail profile-image doc-profile-image">
+                            <img src="${formattedUrl}"
+                                 title="${row.mapDetails}"
+                                 class="thumbnail profile-image doc-profile-image preview-map-image open-map-modal"
+                                 data-bs-toggle="tooltip"
+                                 data-bs-placement="top"
+                                 data-img='${formattedUrl}'
+                                 data-agent-address='${row.agentAddress}'
+                                 data-person-address='${row.personAddress}'
+                                 data-person-label='${row.personAddressLabel}'
+                                 data-distance='${row.distance}'
+                                 data-duration='${row.duration}'
+                                 data-title='${row.mapDetails}' />
+                        </div>`;
                 }
             },
             {
@@ -123,8 +128,7 @@
                 "sDefaultContent": "",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    var img = '<div class="map-thumbnail profile-image doc-profile-image">';
-                    img += '<img src="' + row.document + '" class="full-map" title="' + row.policyId + '" data-bs-toggle="tooltip"/>'; // Full map image with class 'full-map'
+                    var img = '<div class="table-profile-image">';
                     img += '<img src="' + row.document + '" class="profile-image doc-profile-image" title="' + row.policyId + '" data-bs-toggle="tooltip"/>'; // Thumbnail image with class 'thumbnail'
                     img += '</div>';
                     return img;
@@ -134,8 +138,7 @@
                 "sDefaultContent": "",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    var img = '<div class="map-thumbnail table-profile-image">';
-                    img += '<img src="' + row.customer + '" class="full-map" title="' + row.name + '" data-bs-toggle="tooltip"/>'; // Full map image with class 'full-map'
+                    var img = '<div class="table-profile-image">';
                     img += '<img src="' + row.customer + '" class="table-profile-image" title="' + row.name + '" data-bs-toggle="tooltip"/>'; // Thumbnail image with class 'thumbnail'
                     img += '</div>';
                     return img;
@@ -151,9 +154,8 @@
                 "sDefaultContent": "",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    var img = '<div class="map-thumbnail table-profile-image">';
-                    img += '<img src="' + row.beneficiaryPhoto + '" class="table-profile-image" title="' + row.beneficiaryName + '" data-bs-toggle="tooltip"/>'; // Thumbnail image with class 'thumbnail'
-                    img += '<img src="' + row.beneficiaryPhoto + '" class="full-map" title="' + row.beneficiaryName + '" data-bs-toggle="tooltip"/>'; // Full map image with class 'full-map'
+                    var img = '<div class="table-profile-image">';
+                    img += '<img src="' + row.beneficiaryPhoto + '" class="table-profile-image" title="' + row.beneficiaryName + '" data-bs-toggle="tooltip"/>';
                     img += '</div>';
                     return img;
                 }
@@ -273,32 +275,28 @@
         }
         table.ajax.reload(null, false); // false => Retains current page
     });
-    $(document).on('show.bs.modal', '#mapModal', function (event) {
-        var trigger = $(event.relatedTarget); // The <img> clicked
-        var imageUrl = trigger.data('img');
-        var title = trigger.data('title');
+    $(document).on("click", ".open-map-modal", function () {
+        $("#mapModal").modal("show");
 
-        var modal = $(this);
-        modal.find('#modalMapImage').attr('src', imageUrl);
-        modal.find('.modal-title').text(title || 'Map Preview');
+        const imageUrl = $(this).data("img");
+
+        $("#modalMapImage").attr("src", imageUrl);
+
+        const agentAddress = $(this).data("agentAddress");
+        $("#mapModalAgentAddress").text(agentAddress || "Agent Address (S)");
+
+        const personAddressLabel = $(this).data("personLabel");
+        $("#mapModalPersonAddressLabel").text(personAddressLabel || "Person Address (S)");
+
+        const personAddress = $(this).data("personAddress");
+        $("#mapModalPersonAddress").text(personAddress);
+
+        const distance = $(this).data("distance");
+        $("#mapModalDistance").text(distance);
+
+        const duration = $(this).data("duration");
+        $("#mapModalDuration").text(duration);
     });
-    //table.on('mouseenter', '.map-thumbnail', function () {
-    //         const $this = $(this); // Cache the current element
-
-    //         // Set a timeout to show the full map after 1 second
-    //         hoverTimeout = setTimeout(function () {
-    //             $this.find('.full-map').show(); // Show full map
-    //         }, 1000); // Delay of 1 second
-    //     })
-    //     .on('mouseleave', '.map-thumbnail', function () {
-    //         const $this = $(this); // Cache the current element
-
-    //         // Clear the timeout to cancel showing the map
-    //         clearTimeout(hoverTimeout);
-
-    //         // Immediately hide the full map
-    //         $this.find('.full-map').hide();
-    //     });
 });
 
 function getdetails(id) {

@@ -44,6 +44,10 @@ namespace risk.control.system.Services.Api
                 var targetLocationInfo = isUW ? caseTask.CustomerDetail!.AddressLocationInfo : caseTask.BeneficiaryDetail!.AddressLocationInfo;
                 var targetLatitude = isUW ? caseTask.CustomerDetail!.Latitude : caseTask.BeneficiaryDetail!.Latitude;
                 var targetLongitude = isUW ? caseTask.CustomerDetail!.Longitude : caseTask.BeneficiaryDetail!.Longitude;
+                var personAddress = isUW ?
+                    $"{caseTask.CustomerDetail!.Addressline} {caseTask.CustomerDetail.District!.Name} {caseTask.CustomerDetail.State!.Name} {caseTask.CustomerDetail.PinCode!.Code}"
+                    :
+                    $"{caseTask.BeneficiaryDetail!.Addressline} {caseTask.BeneficiaryDetail.District!.Name} {caseTask.BeneficiaryDetail.State!.Name} {caseTask.BeneficiaryDetail.PinCode!.Code}";
 
                 var targetLat = double.Parse(targetLatitude!);
                 var targetLng = double.Parse(targetLongitude!);
@@ -52,8 +56,7 @@ namespace risk.control.system.Services.Api
                 var agentList = new ConcurrentBag<AgentData>();
                 var tasks = vendorAgents.Select(async agent =>
                 {
-
-                    var data = await MapToAgentData(agent, targetLat, targetLng, agentCaseCounts, targetLocationInfo!);
+                    var data = await MapToAgentData(agent, targetLat, targetLng, agentCaseCounts, targetLocationInfo!, isUW, personAddress);
                     agentList.Add(data);
                 });
 
@@ -94,19 +97,32 @@ namespace risk.control.system.Services.Api
             var caseTask = await context.Investigations.AsNoTracking()
                 .Include(c => c.PolicyDetail)
                 .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c!.District)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c!.State)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c!.PinCode)
                 .Include(c => c.BeneficiaryDetail)
+                .ThenInclude(c => c!.District)
+                .Include(c => c.BeneficiaryDetail)
+                .ThenInclude(c => c!.State)
+                .Include(c => c.BeneficiaryDetail)
+                .ThenInclude(c => c!.PinCode)
                 .FirstOrDefaultAsync(c => c.Id == caseId);
 
             return (agents, caseTask);
         }
 
-        private async Task<AgentData> MapToAgentData(ApplicationUser agent, double tLat, double tLng, Dictionary<string, int> counts, string addressInfo)
+        private async Task<AgentData> MapToAgentData(ApplicationUser agent, double tLat, double tLng, Dictionary<string, int> counts, string addressInfo, bool isUW, string personAddress)
         {
             var claimCount = counts?.GetValueOrDefault(agent.Email!, 0) ?? 0;
             var mapTask = _customApiClient.GetMap(double.Parse(agent.AddressLatitude!), double.Parse(agent.AddressLongitude!), tLat, tLng);
             var photoTask = _base64FileService.GetBase64FileAsync(agent.ProfilePictureUrl!, Applicationsettings.NO_IMAGE);
             await Task.WhenAll(mapTask, photoTask);
             var (dist, distMetre, dur, durSec, mapUrl) = await mapTask;
+            var agentAddress = $"{agent.Addressline}, {agent.District!.Name} {agent.State!.Name} {agent.PinCode!.Code}";
+            var personAddressLabel = isUW ? "Customer Address" : "Beneficiary address";
+            var mapDetails = isUW ? $"Distance: {dist}; Duration: {dur}" : $"Distance: {dist}; Duration: {dur}";
             return new AgentData
             {
                 Id = agent.Id,
@@ -123,13 +139,16 @@ namespace risk.control.system.Services.Api
                 AgentOnboarded = !string.IsNullOrWhiteSpace(agent.MobileUId),
                 RawEmail = agent.Email!,
                 PersonMapAddressUrl = string.Format(mapUrl, "300", "300"),
-                MapDetails = $"Driving distance: {dist}; Duration: {dur}",
+                MapDetails = mapDetails,
                 PinCode = agent.PinCode!.Code,
                 Distance = dist,
                 DistanceInMetres = distMetre,
                 Duration = dur,
                 DurationInSeconds = durSec,
-                AddressLocationInfo = addressInfo
+                AddressLocationInfo = addressInfo,
+                AgentAddress = $"{agentAddress}",
+                PersonAddress = $"{personAddress}",
+                PersonAddressLabel = $"{personAddressLabel} (E)",
             };
         }
     }

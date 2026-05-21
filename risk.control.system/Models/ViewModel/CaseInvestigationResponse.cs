@@ -33,7 +33,11 @@
         public bool AutoAllocated { get; set; }
         public string OwnerDetail { get; set; } = default!;
         public bool CaseWithPerson { get; set; } = false;
+        public string? MapDetails { get; set; }
         public string? PersonMapAddressUrl { get; set; }
+        public string? AgentAddress { get; set; }
+        public string? PersonAddress { get; set; }
+        public string? PersonAddressLabel { get; set; }
         public string? Distance { get; set; }
         public string? Duration { get; set; }
         public bool CanDownload { get; set; } = true;

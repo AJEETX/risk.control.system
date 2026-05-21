@@ -138,13 +138,13 @@ namespace risk.control.system.Services.Api
                 var isUW = a.InsuranceType == InsuranceType.UNDERWRITING;
                 var culture = CustomExtensions.GetCultureByCountry(companyUser!.Country!.Code.ToUpper());
                 var pincode = ClaimsInvestigationExtension.GetPincodeOfInterest(isUW, a.customerPincode, a.beneficiaryPincode);
-                var customerAddress = a.customerAddressline + ',' + a.customerDistrict + ',' + a.customerState;
-                var beneficiaryAddress = a.beneficiaryAddressline + ',' + a.beneficiaryDistrict + ',' + a.beneficiaryState;
+                var customerAddress = $"{a.customerAddressline}  {a.customerDistrict} {a.customerState} {a.customerPincode}";
+                var beneficiaryAddress = $"{a.beneficiaryAddressline} {a.beneficiaryDistrict} {a.beneficiaryState} {a.beneficiaryPincode}";
                 var pincodeName = isUW ? customerAddress : beneficiaryAddress;
                 var customerName = a.CustomerName ?? "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\"></i> </span>";
                 var beneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryName) ?
                     "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\"></i> </span>" : a.BeneficiaryName;
-                var PersonMapAddressUrl = string.Format(GetMap(a.investigation, isUW, a.CustomerLocationMap!, a.BeneficiaryLocationMap!, a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR), "400", "400");
+                var personMapAddressUrl = isUW ? string.Format(a.CustomerLocationMap!, "400", "400") : string.Format(a.BeneficiaryLocationMap!, "400", "400");
 
                 // Fetch files in parallel for this row
                 var docTask = _base64FileService.GetBase64FileAsync(a.PolicyDocumentPath!, Applicationsettings.NO_POLICY_IMAGE);
@@ -184,7 +184,7 @@ namespace risk.control.system.Services.Api
                     BeneficiaryName = beneficiaryName,
                     TimeElapsed = DateTime.UtcNow.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).TotalSeconds,
                     IsNewAssigned = a.IsNewAssignedToManager,
-                    PersonMapAddressUrl = PersonMapAddressUrl
+                    PersonMapAddressUrl = personMapAddressUrl
                 };
             });
             var data = await Task.WhenAll(transformedData);
@@ -228,11 +228,7 @@ namespace risk.control.system.Services.Api
 
         public static string GetMap(InvestigationTask caseTask, bool caseType, string CustomerLocationMap, string BeneficiaryLocationMap, bool allocatedtoAgency = false)
         {
-            if (allocatedtoAgency)
-            {
-                return caseType ? CustomerLocationMap : BeneficiaryLocationMap;
-            }
-            return caseTask.SelectedAgentDrivingMap!;
+            return caseType ? CustomerLocationMap : BeneficiaryLocationMap;
         }
 
         private async Task<object> GetCompletedCases(string userEmail, string subStatus, int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc")
@@ -325,6 +321,9 @@ namespace risk.control.system.Services.Api
                     a.SelectedAgentDrivingMap,
                     a.SelectedAgentDrivingDistance,
                     a.SelectedAgentDrivingDuration,
+                    CustomerLocationMap = a.CustomerDetail.CustomerLocationMap,
+                    BeneficiaryLocationMap = a.BeneficiaryDetail.BeneficiaryLocationMap,
+                    a.TaskedAgentEmail
                 })
                 .ToListAsync();
 
@@ -335,15 +334,21 @@ namespace risk.control.system.Services.Api
                 var culture = CustomExtensions.GetCultureByCountry(companyUser!.CountryCode.ToUpper());
                 var isUW = a.InsuranceType == InsuranceType.UNDERWRITING;
                 var pincode = ClaimsInvestigationExtension.GetPincodeOfInterest(isUW, a.customerPincode, a.beneficiaryPincode);
-                var customerAddress = a.customerAddressline + ',' + a.customerDistrict + ',' + a.customerState;
-                var beneficiaryAddress = a.beneficiaryAddressline + ',' + a.beneficiaryDistrict + ',' + a.beneficiaryState;
-                var pincodeName = isUW ? customerAddress : beneficiaryAddress;
+                var customerAddress = $"{a.customerAddressline} {a.customerDistrict} {a.customerState} {a.customerPincode}";
+                var beneficiaryAddress = $"{a.beneficiaryAddressline} {a.beneficiaryDistrict} {a.beneficiaryState} {a.beneficiaryPincode}";
+                var policy = $"<span class='badge badge-light'>{a.InsuranceType!.GetEnumDisplayName()}</span>";
+                var agent = await _context.ApplicationUser.Include(u => u.District).Include(u => u.State).Include(u => u.PinCode).FirstOrDefaultAsync(u => u.Email == a.TaskedAgentEmail);
+                var agentAddress = $"{agent!.Addressline}, {agent.District!.Name} {agent.State!.Name} {agent.PinCode!.Code}";
+                var personAddressLabel = isUW ? "Customer Address" : "Beneficiary address";
+                var personAddress = isUW ? $"{customerAddress}" : $"{beneficiaryAddress}";
+                var mapDetails = isUW ? $"Distance: {a.SelectedAgentDrivingDistance}; Duration: {a.SelectedAgentDrivingDuration}" : $"Distance: {a.SelectedAgentDrivingDistance}; Duration: {a.SelectedAgentDrivingDuration}";
 
                 // Run file operations in parallel for this specific row
                 var documentTask = _base64FileService.GetBase64FileAsync(a.PolicyDocumentPath!, Applicationsettings.NO_POLICY_IMAGE);
                 var customerTask = _base64FileService.GetBase64FileAsync(a.customerImagePath!, Applicationsettings.GUEST_USER);
                 var beneficiaryTask = _base64FileService.GetBase64FileAsync(a.beneficiaryImagePath!, Applicationsettings.GUEST_USER);
                 var ownerDetailTask = _base64FileService.GetBase64FileAsync(a.VendorDocumentUrl!, Applicationsettings.GUEST_USER);
+                var personMapAddressUrl = string.Format(a.SelectedAgentDrivingMap!, "400", "400");
 
                 await Task.WhenAll(documentTask, customerTask, beneficiaryTask);
                 return new CaseInvestigationResponse
@@ -358,7 +363,6 @@ namespace risk.control.system.Services.Api
 
                     // Helper Methods (Calculated in Memory)
                     Pincode = pincode,
-                    PincodeName = pincodeName,
 
                     // Images (See Note Below regarding File.ReadAllBytes)
                     Document = await documentTask,
@@ -366,7 +370,7 @@ namespace risk.control.system.Services.Api
                     BeneficiaryPhoto = await beneficiaryTask,
                     OwnerDetail = await ownerDetailTask,
 
-                    Name = a.CustomerName ?? "N/A",
+                    Name = a.CustomerName,
                     Policy = a.InsuranceType!.GetEnumDisplayName(),
                     Status = a.ORIGIN.GetEnumDisplayName(),
                     ServiceType = $"{a.InsuranceType!.GetEnumDisplayName()} ({a.ServiceTypeName})",
@@ -375,10 +379,13 @@ namespace risk.control.system.Services.Api
                     Created = a.ProcessedByAssessorTime!.Value,
                     timePending = GetAssessorCompletedTime(a.ProcessedByAssessorTime!.Value),
                     BeneficiaryName = a.BeneficiaryName,
-                    PersonMapAddressUrl = string.Format(a.SelectedAgentDrivingMap!, "300", "300"),
+                    PersonMapAddressUrl = personMapAddressUrl,
                     Distance = a.SelectedAgentDrivingDistance,
                     Duration = a.SelectedAgentDrivingDuration,
-
+                    AgentAddress = $"{agentAddress}",
+                    PersonAddress = $"{personAddress}",
+                    PersonAddressLabel = $"{personAddressLabel} (E)",
+                    MapDetails = mapDetails,
                     TimeElapsed = DateTime.UtcNow.Subtract(a.ProcessedByAssessorTime ?? DateTime.UtcNow).TotalSeconds,
                     CanDownload = await CanDownload(a.Id, userEmail)
                 };

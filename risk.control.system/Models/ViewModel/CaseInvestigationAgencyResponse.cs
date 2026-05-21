@@ -26,7 +26,11 @@
         public bool? IsNewAssigned { get; set; }
         public bool? IsQueryCase { get; set; }
         public string OwnerDetail { get; set; } = default!;
-        public string PersonMapAddressUrl { get; set; } = default!;
+        public string? MapDetails { get; set; }
+        public string? PersonMapAddressUrl { get; set; }
+        public string? AgentAddress { get; set; }
+        public string? PersonAddress { get; set; }
+        public string? PersonAddressLabel { get; set; }
         public string? Distance { get; set; }
         public string? Duration { get; set; }
         public string? AddressLocationInfo { get; set; }

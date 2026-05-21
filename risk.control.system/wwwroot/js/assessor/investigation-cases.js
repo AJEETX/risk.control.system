@@ -92,7 +92,7 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var img = '<div class="map-thumbnail profile-image doc-profile-image">';
-                    img += '<img src="' + row.ownerDetail + '" class="thumbnail profile-image doc-profile-image" title="' + row.agent + '" data-bs-toggle="tooltip"/>'; // Thumbnail image with class 'thumbnail'
+                    img += '<img src="' + row.ownerDetail + '" class="profile-image doc-profile-image" title="' + row.agent + '" data-bs-toggle="tooltip"/>'; // Thumbnail image with class 'thumbnail'
                     img += '<img src="' + row.ownerDetail + '" class="full-map" title="' + row.agent + '" data-bs-toggle="tooltip"/>'; // Full map image with class 'full-map'
                     img += '</div>';
                     return img;
@@ -103,11 +103,25 @@
                 "data": "pincode",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    var img = '<div class="map-thumbnail profile-image doc-profile-image">';
-                    img += '<img src="' + row.personMapAddressUrl + '" class="thumbnail profile-image doc-profile-image" title="' + row.pincodeName + '" data-bs-toggle="tooltip"/>'; // Thumbnail image with class 'thumbnail'
-                    img += '<img src="' + row.personMapAddressUrl + '" class="full-map" title="' + row.pincodeName + '" data-bs-toggle="tooltip"/>'; // Full map image with class 'full-map'
-                    img += '</div>';
-                    return img;
+                    const formattedUrl = row.personMapAddressUrl
+                        .replace("{0}", "400")
+                        .replace("{1}", "400");
+
+                    return `
+                        <div class="map-thumbnail profile-image doc-profile-image">
+                            <img src="${formattedUrl}"
+                                 title="${row.mapDetails}"
+                                 class="thumbnail profile-image doc-profile-image preview-map-image open-map-modal"
+                                 data-bs-toggle="tooltip"
+                                 data-bs-placement="top"
+                                 data-img='${formattedUrl}'
+                                 data-agent-address='${row.agentAddress}'
+                                 data-person-address='${row.personAddress}'
+                                 data-person-label='${row.personAddressLabel}'
+                                 data-distance='${row.distance}'
+                                 data-duration='${row.duration}'
+                                 data-title='${row.mapDetails}' />
+                        </div>`;
                 }
             },
 
@@ -130,7 +144,7 @@
                 "mRender": function (data, type, row) {
                     var img = '<div class="map-thumbnail profile-image doc-profile-image">';
                     img += '<img src="' + row.document + '" class="full-map" title="' + row.policyId + '" data-bs-toggle="tooltip"/>'; // Full map image with class 'full-map'
-                    img += '<img src="' + row.document + '" class="thumbnail profile-image doc-profile-image" title="' + row.policyId + '" data-bs-toggle="tooltip"/>'; // Thumbnail image with class 'thumbnail'
+                    img += '<img src="' + row.document + '" class="profile-image doc-profile-image" title="' + row.policyId + '" data-bs-toggle="tooltip"/>'; // Thumbnail image with class 'thumbnail'
                     img += '</div>';
                     return img;
                 }
@@ -141,7 +155,7 @@
                 "mRender": function (data, type, row) {
                     var img = '<div class="map-thumbnail table-profile-image">';
                     img += '<img src="' + row.customer + '" class="full-map" title="' + row.name + '" data-bs-toggle="tooltip"/>'; // Full map image with class 'full-map'
-                    img += '<img src="' + row.customer + '" class="thumbnail table-profile-image" title="' + row.name + '" data-bs-toggle="tooltip"/>'; // Thumbnail image with class 'thumbnail'
+                    img += '<img src="' + row.customer + '" class="table-profile-image" title="' + row.name + '" data-bs-toggle="tooltip"/>'; // Thumbnail image with class 'thumbnail'
                     img += '</div>';
                     return img;
                 }
@@ -157,7 +171,7 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var img = '<div class="map-thumbnail table-profile-image">';
-                    img += '<img src="' + row.beneficiaryPhoto + '" class="thumbnail table-profile-image" title="' + row.beneficiaryName + '" data-bs-toggle="tooltip"/>'; // Thumbnail image with class 'thumbnail'
+                    img += '<img src="' + row.beneficiaryPhoto + '" class="table-profile-image" title="' + row.beneficiaryName + '" data-bs-toggle="tooltip"/>'; // Thumbnail image with class 'thumbnail'
                     img += '<img src="' + row.beneficiaryPhoto + '" class="full-map" title="' + row.beneficiaryName + '" data-bs-toggle="tooltip"/>'; // Full map image with class 'full-map'
                     img += '</div>';
                     return img;
@@ -251,23 +265,28 @@
     table.on('xhr.dt', function () {
         $('#refreshIcon').removeClass('fa-spin');
     });
-    table.on('mouseenter', '.map-thumbnail', function () {
-        const $this = $(this); // Cache the current element
+    $(document).on("click", ".open-map-modal", function () {
+        $("#mapModal").modal("show");
 
-        // Set a timeout to show the full map after 1 second
-        hoverTimeout = setTimeout(function () {
-            $this.find('.full-map').show(); // Show full map
-        }, 1000); // Delay of 1 second
-    })
-        .on('mouseleave', '.map-thumbnail', function () {
-            const $this = $(this); // Cache the current element
+        const imageUrl = $(this).data("img");
 
-            // Clear the timeout to cancel showing the map
-            clearTimeout(hoverTimeout);
+        $("#modalMapImage").attr("src", imageUrl);
 
-            // Immediately hide the full map
-            $this.find('.full-map').hide();
-        });
+        const agentAddress = $(this).data("agentAddress");
+        $("#mapModalAgentAddress").text(agentAddress || "Agent Address (S)");
+
+        const personAddressLabel = $(this).data("personLabel");
+        $("#mapModalPersonAddressLabel").text(personAddressLabel || "Person Address (S)");
+
+        const personAddress = $(this).data("personAddress");
+        $("#mapModalPersonAddress").text(personAddress);
+
+        const distance = $(this).data("distance");
+        $("#mapModalDistance").text(distance);
+
+        const duration = $(this).data("duration");
+        $("#mapModalDuration").text(duration);
+    });
     $('#dataTable tbody').hide();
     $('#dataTable tbody').fadeIn(2000);
     $('#allocatedcase').on('click', function (event) {

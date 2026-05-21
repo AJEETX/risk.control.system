@@ -22,7 +22,7 @@
 
     var table = $("#dataTable").DataTable({
         ajax: {
-            url: '/api/agency/VendorInvestigation/GetReport',
+            url: '/api/agency/VendorInvestigation/GetAgentReports',
             type: 'GET',
             dataType: 'json',
             dataSrc: function (json) {
@@ -101,8 +101,7 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var img = '<div class="map-thumbnail profile-image doc-profile-image">';
-                    img += '<img src="' + row.ownerDetail + '" class="thumbnail profile-image doc-profile-image" title="' + row.company + '" data-bs-toggle="tooltip"/>'; // Thumbnail image with class 'thumbnail'
-                    img += '<img src="' + row.ownerDetail + '" class="full-map" title="' + row.company + '" data-bs-toggle="tooltip"/>'; // Full map image with class 'full-map'
+                    img += '<img src="' + row.ownerDetail + '" class="profile-image doc-profile-image" title="' + row.company + '" data-bs-toggle="tooltip"/>'; // Thumbnail image with class 'thumbnail'
                     img += '</div>';
                     return img;
                 }
@@ -111,11 +110,25 @@
                 "data": "pincode",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    var img = '<div class="map-thumbnail profile-image doc-profile-image">';
-                    img += '<img src="' + row.personMapAddressUrl + '" class="thumbnail profile-image doc-profile-image" title="' + row.pincodeName + '" data-bs-toggle="tooltip"/>'; // Thumbnail image with class 'thumbnail'
-                    img += '<img src="' + row.personMapAddressUrl + '" class="full-map" title="' + row.pincodeName + '" data-bs-toggle="tooltip"/>'; // Full map image with class 'full-map'
-                    img += '</div>';
-                    return img;
+                    const formattedUrl = row.personMapAddressUrl
+                        .replace("{0}", "400")
+                        .replace("{1}", "400");
+
+                    return `
+                        <div class="map-thumbnail profile-image doc-profile-image">
+                            <img src="${formattedUrl}"
+                                 title="${row.mapDetails}"
+                                 class="thumbnail profile-image doc-profile-image preview-map-image open-map-modal"
+                                 data-bs-toggle="tooltip"
+                                 data-bs-placement="top"
+                                 data-img='${formattedUrl}'
+                                 data-agent-address='${row.agentAddress}'
+                                 data-person-address='${row.personAddress}'
+                                 data-person-label='${row.personAddressLabel}'
+                                 data-distance='${row.distance}'
+                                 data-duration='${row.duration}'
+                                 data-title='${row.mapDetails}' />
+                        </div>`;
                 }
             },
 
@@ -138,8 +151,7 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var img = '<div class="map-thumbnail profile-image doc-profile-image">';
-                    img += '<img src="' + row.document + '" class="full-map" title="' + row.policyId + '" data-bs-toggle="tooltip"/>'; // Full map image with class 'full-map'
-                    img += '<img src="' + row.document + '" class="thumbnail profile-image doc-profile-image" title="' + row.policyId + '" data-bs-toggle="tooltip"/>'; // Thumbnail image with class 'thumbnail'
+                    img += '<img data-title="Case Document: ' + row.policyId + '" data-img="' + row.document + '" src="' + row.document + '" class="thumbnail profile-image doc-profile-image open-image-modal" title="' + row.policyId + '" data-bs-toggle="tooltip"/>'; // Thumbnail image with class 'thumbnail'
                     img += '</div>';
                     return img;
                 }
@@ -150,8 +162,7 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var img = '<div class="map-thumbnail table-profile-image">';
-                    img += '<img src="' + row.customer + '" class="full-map" title="' + row.name + '" data-bs-toggle="tooltip"/>'; // Full map image with class 'full-map'
-                    img += '<img src="' + row.customer + '" class="thumbnail table-profile-image" title="' + row.name + '" data-bs-toggle="tooltip"/>'; // Thumbnail image with class 'thumbnail'
+                    img += '<img data-title="Person: ' + row.name + '" data-img="' + row.customer + '" src="' + row.customer + '" class="thumbnail table-profile-image open-image-modal" title="' + row.name + '" data-bs-toggle="tooltip" />'; // Thumbnail image with class 'thumbnail'
                     img += '</div>';
                     return img;
                 }
@@ -230,24 +241,38 @@
         table.ajax.reload(null, false); // false => Retains current page
         $("#allocatedcase").prop('disabled', true);
     });
+    $(document).on("click", ".open-image-modal", function () {
+        $("#imageModal").modal("show");
+        const imageUrl = $(this).data("img");
+        const title = $(this).data("title");
 
-    table.on('mouseenter', '.map-thumbnail', function () {
-        const $this = $(this); // Cache the current element
+        $("#modalImage").attr("src", imageUrl);
+        $("#mapImageLabel").text(title || "Map Preview");
+    });
+    $(document).on("click", ".open-map-modal", function () {
+        $("#mapModal").modal("show");
 
-        // Set a timeout to show the full map after 1 second
-        hoverTimeout = setTimeout(function () {
-            $this.find('.full-map').show(); // Show full map
-        }, 1000); // Delay of 1 second
-    })
-        .on('mouseleave', '.map-thumbnail', function () {
-            const $this = $(this); // Cache the current element
+        const imageUrl = $(this).data("img");
+        const title = $(this).data("title");
 
-            // Clear the timeout to cancel showing the map
-            clearTimeout(hoverTimeout);
+        $("#modalMapImage").attr("src", imageUrl);
+        $("#mapModalLabel").text(title || "Map Preview");
 
-            // Immediately hide the full map
-            $this.find('.full-map').hide();
-        });
+        const agentAddress = $(this).data("agentAddress");
+        $("#mapModalAgentAddress").text(agentAddress || "Agent Address (S)");
+
+        const personAddressLabel = $(this).data("personLabel");
+        $("#mapModalPersonAddressLabel").text(personAddressLabel || "Person Address (S)");
+
+        const personAddress = $(this).data("personAddress");
+        $("#mapModalPersonAddress").text(personAddress);
+
+        const distance = $(this).data("distance");
+        $("#mapModalDistance").text(distance);
+
+        const duration = $(this).data("duration");
+        $("#mapModalDuration").text(duration);
+    });
     $('#dataTable tbody').hide();
     $('#dataTable tbody').fadeIn(2000);
     table.on('draw.dt', function () {

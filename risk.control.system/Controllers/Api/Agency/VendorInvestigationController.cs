@@ -59,8 +59,8 @@ namespace risk.control.system.Controllers.Api.Agency
             }
         }
 
-        [HttpGet("GetReport")]
-        public async Task<IActionResult> GetReport(int draw, int start, int length, string search = "", int orderColumn = 0, string orderDir = "asc")
+        [HttpGet("GetAgentReports")]
+        public async Task<IActionResult> GetAgentReports(int draw, int start, int length, string search = "", int orderColumn = 0, string orderDir = "asc")
         {
             var userEmail = HttpContext.User?.Identity?.Name!;
 
