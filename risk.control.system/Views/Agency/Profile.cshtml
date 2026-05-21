@@ -47,7 +47,7 @@
 						<hr />
 						<p class="text-muted text-sm">
 							<div class="mt-1">
-								<span class="badge badge-pill badge-dark">Rating: @(Model.RateCount > 0 ? (Model.RateTotal!.Value / Model.RateCount.Value).ToString("F1") : "0")</span>
+								<span class="badge badge-pill badge-dark">Rating: @(Model!.RateCount > 0 ? (Model.RateTotal!.Value / Model.RateCount.Value).ToString("F1") : "0")</span>
 								<small class="text-muted">(@Model.RateCount reviews)</small>
 							</div>
 						</p>

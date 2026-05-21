@@ -164,7 +164,7 @@ table {
 .form-Image {
     height: 2.4rem;
     width: 2.4rem;
-    border: 2px solid #000;
+    border: 1px solid #ddd;
 }
 
 .additional-document {
@@ -1266,7 +1266,7 @@ img.table-profile-image {
     border-radius: 10%;
     height: 2.5rem;
     width: 2.5rem;
-    border: 2px solid green;
+    border: 1px solid green;
 }
 
 img.table-profile-image-agent-onboard {

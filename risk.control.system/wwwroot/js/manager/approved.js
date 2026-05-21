@@ -94,9 +94,8 @@
                 "data": "agency",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    var img = '<div class="map-thumbnail profile-image doc-profile-image">';
-                    img += '<img src="' + row.ownerDetail + '" class="full-map" title="' + row.agency + '" data-bs-toggle="tooltip"/>'; // Full map image with class 'full-map'
-                    img += '<img src="' + row.ownerDetail + '" class="thumbnail profile-image doc-profile-image" title="' + row.agency + '" data-bs-toggle="tooltip"/>'; // Thumbnail image with class 'thumbnail'
+                    var img = '<div class="table-profile-image">';
+                    img += '<img src="' + row.ownerDetail + '" class="profile-image doc-profile-image" title="' + row.agency + '" data-bs-toggle="tooltip"/>'; // Thumbnail image with class 'thumbnail'
                     img += '</div>';
                     return img;
                 }
@@ -105,19 +104,25 @@
             {
                 "data": "pincode",
                 "mRender": function (data, type, row) {
-                    if (row.pincodeName != '...') {
-                        return `
-            <div class="map-thumbnail profile-image doc-profile-image">
-                <img src="${row.personMapAddressUrl}" title='${row.pincodeName}'
-                     class="thumbnail profile-image doc-profile-image preview-map-image"
-                     data-toggle="modal"
-                     data-target="#mapModal"
-                     data-img='${row.personMapAddressUrl}'
-                     data-title='${row.pincodeName}' />
-            </div>`;
-                    } else {
-                        return '<img src="/img/no-map.jpeg" class="profile-image doc-profile-image" title="No address" data-bs-toggle="tooltip" />';
-                    }
+                    const formattedUrl = row.personMapAddressUrl
+                        .replace("{0}", "400")
+                        .replace("{1}", "400");
+
+                    return `
+                        <div class="map-thumbnail profile-image doc-profile-image">
+                            <img src="${formattedUrl}"
+                                 title="${row.mapDetails}"
+                                 class="thumbnail profile-image doc-profile-image preview-map-image open-map-modal"
+                                 data-bs-toggle="tooltip"
+                                 data-bs-placement="top"
+                                 data-img='${formattedUrl}'
+                                 data-agent-address='${row.agentAddress}'
+                                 data-person-address='${row.personAddress}'
+                                 data-person-label='${row.personAddressLabel}'
+                                 data-distance='${row.distance}'
+                                 data-duration='${row.duration}'
+                                 data-title='${row.mapDetails}' />
+                        </div>`;
                 }
             },
             {
@@ -286,14 +291,27 @@
         }
         table.ajax.reload(null, false); // false => Retains current page
     });
-    $(document).on('show.bs.modal', '#mapModal', function (event) {
-        var trigger = $(event.relatedTarget); // The <img> clicked
-        var imageUrl = trigger.data('img');
-        var title = trigger.data('title');
+    $(document).on("click", ".open-map-modal", function () {
+        $("#mapModal").modal("show");
 
-        var modal = $(this);
-        modal.find('#modalMapImage').attr('src', imageUrl);
-        modal.find('.modal-title').text(title || 'Map Preview');
+        const imageUrl = $(this).data("img");
+
+        $("#modalMapImage").attr("src", imageUrl);
+
+        const agentAddress = $(this).data("agentAddress");
+        $("#mapModalAgentAddress").text(agentAddress || "Agent Address (S)");
+
+        const personAddressLabel = $(this).data("personLabel");
+        $("#mapModalPersonAddressLabel").text(personAddressLabel || "Person Address (S)");
+
+        const personAddress = $(this).data("personAddress");
+        $("#mapModalPersonAddress").text(personAddress);
+
+        const distance = $(this).data("distance");
+        $("#mapModalDistance").text(distance);
+
+        const duration = $(this).data("duration");
+        $("#mapModalDuration").text(duration);
     });
     table.on('draw.dt', function () {
         $('[data-toggle="tooltip"]').tooltip({
