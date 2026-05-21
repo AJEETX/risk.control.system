@@ -203,21 +203,16 @@ namespace risk.control.system.Services.Api
                 var beneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryName) ?
                         "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\"></i> </span>" : a.BeneficiaryName;
                 var isQueryCase = a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR;
-                //var timeElapsed = (!isQueryCase && a.AllocatedToAgencyTime.HasValue) ? DateTime.UtcNow.Subtract(a.AllocatedToAgencyTime.Value).TotalSeconds :
-                //    DateTime.UtcNow.Subtract(a.ReviewByAssessorTime.Value).TotalSeconds;
                 var personMapAddressUrl = isUW ?
                         string.Format(a.CustomerLocationMap!, "400", "400") : string.Format(a.BeneficiaryLocationMap!, "400", "400");
-                var addressLocationInfoTask = isUW ?
-                    _weatherInfoService.GetWeatherAsync(a.CustomerDetailLatitude!, a.CustomerDetailLongitude!) :
-                        _weatherInfoService.GetWeatherAsync(a.BeneficiaryDetailLatitude!, a.BeneficiaryDetailLongitude!);
+                var addressLocationInfoTask = isUW ? _weatherInfoService.GetWeatherAsync(a.CustomerDetailLatitude!, a.CustomerDetailLongitude!) : _weatherInfoService.GetWeatherAsync(a.BeneficiaryDetailLatitude!, a.BeneficiaryDetailLongitude!);
 
                 var ownerDetailTask = _base64FileService.GetBase64FileAsync(a.ClientCompanyDocumentUrl!);
                 var documentTask = _base64FileService.GetBase64FileAsync(a.PolicyDocumentPath!, Applicationsettings.NO_POLICY_IMAGE);
                 var customerPhotoTask = _base64FileService.GetBase64FileAsync(isUW ? a.customerImagePath! : a.beneficiaryImagePath!);
-                var beneficiaryPhotoTask = _base64FileService.GetBase64FileAsync(a.beneficiaryImagePath!, Applicationsettings.GUEST_USER);
 
                 // Wait for all images for THIS case to load
-                await Task.WhenAll(ownerDetailTask, documentTask, customerPhotoTask, beneficiaryPhotoTask, addressLocationInfoTask);
+                await Task.WhenAll(ownerDetailTask, documentTask, customerPhotoTask, addressLocationInfoTask);
 
                 return new CaseInvestigationAgencyResponse
                 {
@@ -234,14 +229,10 @@ namespace risk.control.system.Services.Api
                     Customer = await customerPhotoTask,
                     Name = personName!,
                     Policy = policy,
-                    Status = a.Status,
                     ServiceType = serviceType,
                     Service = service,
-                    Location = a.SubStatus,
                     Created = time!.Value,
                     timePending = timePending,
-                    BeneficiaryPhoto = await beneficiaryPhotoTask,
-                    BeneficiaryName = beneficiaryName,
                     TimeElapsed = a.GetTimeElapsed,
                     IsNewAssigned = a.IsNewAssignedToAgency,
                     IsQueryCase = isQueryCase,
@@ -428,7 +419,8 @@ namespace risk.control.system.Services.Api
                     ClientCompanyName = a.ClientCompany.Name,
                     a.SelectedAgentDrivingMap,
                     a.SelectedAgentDrivingDistance,
-                    a.SelectedAgentDrivingDuration
+                    a.SelectedAgentDrivingDuration,
+                    a.TaskedAgentEmail
                 }).ToListAsync();
 
             // -------------------------
@@ -442,20 +434,22 @@ namespace risk.control.system.Services.Api
                 var isUW = a.InsuranceType == InsuranceType.UNDERWRITING;
                 var culture = CustomExtensions.GetCultureByCountry(vendorUser.Country!.Code);
                 var pincode = isUW ? a.customerPincode : a.beneficiaryPincode;
-                var customerAddress = a.customerAddressline + ',' + a.customerDistrict + ',' + a.customerState;
-                var beneficiaryAddress = a.beneficiaryAddressline + ',' + a.beneficiaryDistrict + ',' + a.beneficiaryState;
-                var pincodeName = isUW ? customerAddress : beneficiaryAddress;
+                var customerAddress = $"{a.customerAddressline} {a.customerDistrict} {a.customerState} {a.customerPincode}";
+                var beneficiaryAddress = $"{a.beneficiaryAddressline} {a.beneficiaryDistrict} {a.beneficiaryState} {a.beneficiaryPincode}";
                 var policy = $"<span class='badge badge-light'>{a.InsuranceType!.GetEnumDisplayName()}</span>";
-                var beneficiaryName = a.BeneficiaryName;
+                var agent = await _context.ApplicationUser.Include(u => u.District).Include(u => u.State).Include(u => u.PinCode).FirstOrDefaultAsync(u => u.Email == a.TaskedAgentEmail);
+                var agentAddress = $"{agent!.Addressline}, {agent.District!.Name} {agent.State!.Name} {agent.PinCode!.Code}";
+                var personAddressLabel = isUW ? "Customer Address" : "Beneficiary address";
+                var personAddress = isUW ? $"{customerAddress}" : $"{beneficiaryAddress}";
+                var mapDetails = isUW ? $"Distance: {a.SelectedAgentDrivingDistance}; Duration: {a.SelectedAgentDrivingDuration}" : $"Distance: {a.SelectedAgentDrivingDistance}; Duration: {a.SelectedAgentDrivingDuration}";
 
                 var documentTask = _base64FileService.GetBase64FileAsync(a.PolicyDocumentPath!, Applicationsettings.NO_POLICY_IMAGE);
                 var customerPhotoTask = _base64FileService.GetBase64FileAsync(isUW ? a.customerImagePath! : a.beneficiaryImagePath!);
-                var beneficiaryPhotoTask = _base64FileService.GetBase64FileAsync(a.beneficiaryImagePath!, Applicationsettings.GUEST_USER);
                 var ownerImageTask = _base64FileService.GetBase64FileAsync(await GetOwner(a.investigation), Applicationsettings.GUEST_USER);
                 var ownerEmailTask = GetOwnerEmail(a.investigation);
 
                 // Wait for all images for THIS case to load
-                await Task.WhenAll(documentTask, customerPhotoTask, beneficiaryPhotoTask, ownerImageTask, ownerEmailTask);
+                await Task.WhenAll(documentTask, customerPhotoTask, ownerImageTask, ownerEmailTask);
                 return new CaseInvestigationResponse
                 {
                     Id = a.Id,
@@ -467,24 +461,23 @@ namespace risk.control.system.Services.Api
                     OwnerDetail = await ownerImageTask,
                     CaseWithPerson = a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT,
                     Pincode = pincode.ToString(),
-                    PincodeName = pincodeName,
                     Company = a.ClientCompanyName,
                     Document = await documentTask,
                     Customer = await customerPhotoTask,
                     Name = a.CustomerName!,
                     Policy = policy,
-                    Status = a.Status,
                     ServiceType = a.InsuranceType!.GetEnumDisplayName(),
                     Service = a.ServiceTypeName,
-                    Location = a.SubStatus,
                     Created = time!.Value,
                     timePending = GetActiveTime(a.investigation),
                     TimeElapsed = GetTimeElapsed(a.investigation),
-                    BeneficiaryPhoto = await beneficiaryPhotoTask,
-                    BeneficiaryName = beneficiaryName!,
-                    PersonMapAddressUrl = string.Format(a.SelectedAgentDrivingMap!, "300", "300"),
+                    PersonMapAddressUrl = string.Format(a.SelectedAgentDrivingMap!, "400", "400"),
                     Distance = a.SelectedAgentDrivingDistance,
-                    Duration = a.SelectedAgentDrivingDuration
+                    Duration = a.SelectedAgentDrivingDuration,
+                    AgentAddress = $"{agentAddress}",
+                    PersonAddress = $"{personAddress}",
+                    PersonAddressLabel = $"{personAddressLabel} (E)",
+                    MapDetails = mapDetails
                 };
             });
 
@@ -660,8 +653,8 @@ namespace risk.control.system.Services.Api
                 var isUW = a.InsuranceType == InsuranceType.UNDERWRITING;
                 var culture = CustomExtensions.GetCultureByCountry(vendorUser.Country!.Code);
                 var pincode = isUW ? a.customerPincode : a.beneficiaryPincode;
-                var customerAddress = a.customerAddressline + ',' + a.customerDistrict + ',' + a.customerState;
-                var beneficiaryAddress = a.beneficiaryAddressline + ',' + a.beneficiaryDistrict + ',' + a.beneficiaryState;
+                var customerAddress = $"{a.customerAddressline}  {a.customerDistrict} {a.customerState} {a.customerPincode}";
+                var beneficiaryAddress = $"{a.beneficiaryAddressline} {a.beneficiaryDistrict} {a.beneficiaryState} {a.beneficiaryPincode}";
                 var pincodeName = isUW ? customerAddress : beneficiaryAddress;
                 var personName = isUW ? a.CustomerName : a.BeneficiaryName;
                 var policy = a.InsuranceType!.GetEnumDisplayName();
@@ -844,7 +837,9 @@ namespace risk.control.system.Services.Api
                     ClientCompanyDocumentUrl = a.ClientCompany!.DocumentUrl,
                     ClientCompanyName = a.ClientCompany.Name,
                     a.SelectedAgentDrivingDistance,
-                    a.SelectedAgentDrivingDuration
+                    a.SelectedAgentDrivingDuration,
+                    a.SelectedAgentDrivingMap,
+                    a.TaskedAgentEmail
                 }).ToListAsync();
 
             var data = await Task.WhenAll(pagedRawData.Select(async a =>
@@ -852,9 +847,15 @@ namespace risk.control.system.Services.Api
                 var isUW = a.InsuranceType == InsuranceType.UNDERWRITING;
                 var culture = CustomExtensions.GetCultureByCountry(vendorUser.Country!.Code);
                 var pincode = isUW ? a.customerPincode : a.beneficiaryPincode;
-                var customerAddress = a.customerAddressline + ',' + a.customerDistrict + ',' + a.customerState;
-                var beneficiaryAddress = a.beneficiaryAddressline + ',' + a.beneficiaryDistrict + ',' + a.beneficiaryState;
-                var pincodeName = isUW ? customerAddress : beneficiaryAddress;
+                var customerAddress = $"{a.customerAddressline} {a.customerDistrict} {a.customerState} {a.customerPincode}";
+                var beneficiaryAddress = $"{a.beneficiaryAddressline} {a.beneficiaryDistrict} {a.beneficiaryState} {a.beneficiaryPincode}";
+                var agent = await _context.ApplicationUser.Include(u => u.District).Include(u => u.State).Include(u => u.PinCode).FirstOrDefaultAsync(u => u.Email == a.TaskedAgentEmail);
+                var agentAddress = $"{agent!.Addressline}, {agent.District!.Name} {agent.State!.Name} {agent.PinCode!.Code}";
+                var personAddressLabel = isUW ? "Customer Address" : "Beneficiary address";
+
+                var personAddress = isUW ? $"{customerAddress}" : $"{beneficiaryAddress}";
+                var mapDetails = isUW ? $"Distance: {a.SelectedAgentDrivingDistance}; Duration: {a.SelectedAgentDrivingDuration}" : $"Distance: {a.SelectedAgentDrivingDistance}; Duration: {a.SelectedAgentDrivingDuration}";
+
                 var personName = isUW ? a.CustomerName : a.BeneficiaryName;
                 var policy = a.InsuranceType!.GetEnumDisplayName();
                 var serviceType = a.InsuranceType!.GetEnumDisplayName();
@@ -864,11 +865,7 @@ namespace risk.control.system.Services.Api
                 var beneficiaryName = a.BeneficiaryName;
                 var timeElapsed = a.SubmittedToSupervisorTime.HasValue ? DateTime.UtcNow.Subtract(a.SubmittedToSupervisorTime.Value).TotalSeconds : 0;
                 var isQueryCase = a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR;
-                var personMapAddressUrl = isUW ?
-                        string.Format(a.CustomerLocationMap!, "400", "400") : string.Format(a.BeneficiaryLocationMap!, "400", "400");
-                var addressLocationInfoTask = isUW ?
-                    _weatherInfoService.GetWeatherAsync(a.CustomerDetailLatitude!, a.CustomerDetailLongitude!) :
-                        _weatherInfoService.GetWeatherAsync(a.BeneficiaryDetailLatitude!, a.BeneficiaryDetailLongitude!);
+                var addressLocationInfoTask = isUW ? _weatherInfoService.GetWeatherAsync(a.CustomerDetailLatitude!, a.CustomerDetailLongitude!) : _weatherInfoService.GetWeatherAsync(a.BeneficiaryDetailLatitude!, a.BeneficiaryDetailLongitude!);
 
                 var ownerDetailTask = _base64FileService.GetBase64FileAsync(a.ClientCompanyDocumentUrl!);
                 var documentTask = _base64FileService.GetBase64FileAsync(a.PolicyDocumentPath!, Applicationsettings.NO_POLICY_IMAGE);
@@ -886,16 +883,13 @@ namespace risk.control.system.Services.Api
                     Company = a.ClientCompanyName,
                     OwnerDetail = await ownerDetailTask,
                     Pincode = pincode.ToString(),
-                    PincodeName = pincodeName,
                     AssignedToAgency = a.AssignedToAgency,
                     Document = await documentTask,
                     Customer = await customerPhotoTask,
                     Name = personName!,
                     Policy = policy,
-                    Status = a.Status,
                     ServiceType = serviceType,
                     Service = service,
-                    Location = a.SubStatus,
                     Created = a.SubmittedToSupervisorTime!.Value,
                     timePending = timePending,
                     PolicyNum = policyNum,
@@ -904,10 +898,14 @@ namespace risk.control.system.Services.Api
                     TimeElapsed = timeElapsed,
                     IsNewAssigned = a.IsNewAssignedToAgency,
                     IsQueryCase = isQueryCase,
-                    PersonMapAddressUrl = personMapAddressUrl,
+                    PersonMapAddressUrl = string.Format(a.SelectedAgentDrivingMap!, "400", "400"),
                     AddressLocationInfo = await addressLocationInfoTask,
                     Distance = a.SelectedAgentDrivingDistance,
-                    Duration = a.SelectedAgentDrivingDuration
+                    Duration = a.SelectedAgentDrivingDuration,
+                    AgentAddress = $"{agentAddress}",
+                    PersonAddress = $"{personAddress}",
+                    PersonAddressLabel = $"{personAddressLabel} (E)",
+                    MapDetails = mapDetails
                 };
             }));
 
@@ -1056,7 +1054,7 @@ namespace risk.control.system.Services.Api
                 var agencyUser = await _context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == ownerEmail);
                 if (agencyUser != null && !string.IsNullOrWhiteSpace(agencyUser.Email))
                 {
-                    return agencyUser.Email;
+                    return $"{agencyUser.FirstName} {agencyUser.LastName}";
                 }
             }
             else if (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR || caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR)
@@ -1064,7 +1062,7 @@ namespace risk.control.system.Services.Api
                 var companyUser = await _context.ClientCompany.FirstOrDefaultAsync(v => v.ClientCompanyId == caseTask.ClientCompanyId);
                 if (companyUser != null && !string.IsNullOrWhiteSpace(companyUser.Email))
                 {
-                    return companyUser.Email;
+                    return companyUser.Name;
                 }
             }
             return "...";

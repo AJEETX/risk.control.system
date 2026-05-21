@@ -23,5 +23,8 @@
         public string Duration { get; set; } = default!;
         public int DurationInSeconds { get; set; }
         public string? AddressLocationInfo { get; set; }
+        public string? AgentAddress { get; set; }
+        public string? PersonAddressLabel { get; set; }
+        public string? PersonAddress { get; set; }
     }
 }

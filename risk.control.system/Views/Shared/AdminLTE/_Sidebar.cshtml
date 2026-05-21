@@ -93,7 +93,16 @@
 						</p>
 					</a>
 				</li>
-
+				<li class="nav-item">
+					<a is-active-page asp-controller="Invoice" asp-action="Index" class="actual-link nav-link
+						@Url.MakeActiveClass("Invoice", "Index")
+						@Url.MakeActiveClass("Invoice", "Details")">
+						<i class="nav-icon fas fa-pen-alt"></i>
+						<p>
+							Invoice
+						</p>
+					</a>
+				</li>
 				<li class="nav-item">
 					<a asp-controller="User" asp-action="Index" is-active-page
 						   class="navlink-border nav-link @Url.MakeActiveClass("User", "")

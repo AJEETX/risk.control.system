@@ -153,12 +153,12 @@
                         return `
                         <div class="map-thumbnail profile-image doc-profile-image">
                             <img src="${formattedUrl}"
-                                 title="${row.pincodeAddress}"
+                                 title='Addresss of interest: ${row.pincodeAddress}'
                                  class="thumbnail profile-image doc-profile-image preview-map-image open-map-modal"
                                  data-bs-toggle="tooltip"
                                  data-bs-placement="top"
                                  data-img='${formattedUrl}'
-                                 data-title='Addresss: ${row.pincodeAddress}' />
+                                 data-title='Addresss of interest: ${row.pincodeAddress}' />
                         </div>`;
                     }
                 }
@@ -784,12 +784,12 @@
     // Apply confirmation to both forms
     handleUploadConfirmation("#upload-claims", "#UploadFileButton");
     $(document).on("click", ".open-map-modal", function () {
-        $("#mapModal").modal("show");
+        $("#imageModal").modal("show");
 
         const imageUrl = $(this).data("img");
         const title = $(this).data("title");
 
-        $("#modalMapImage").attr("src", imageUrl);
-        $("#mapModalLabel").text(title || "Map Preview");
+        $("#modalImage").attr("src", imageUrl);
+        $("#mapImageLabel").text(title || "Preview");
     });
 });

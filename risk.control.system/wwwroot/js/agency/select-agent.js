@@ -83,8 +83,7 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var img = '<div class="map-thumbnail profile-image doc-profile-image">';
-                    img += '<img src="' + row.photo + '" class="thumbnail profile-image doc-profile-image" />'; // Thumbnail image with class 'thumbnail'
-                    img += '<img src="' + row.photo + '" class="full-map" title="' + row.name + '" data-bs-toggle="tooltip"/>'; // Full map image with class 'full-map'
+                    img += '<img data-title="Agent: ' + row.name + '" data-img="' + row.photo + '" src="' + row.photo + '" class="thumbnail table-profile-image open-image-modal" title="' + row.name + '" data-bs-toggle="tooltip">'; // Thumbnail image with class 'thumbnail'
                     img += '</div>';
                     return img;
                 }
@@ -104,18 +103,25 @@
             {
                 "data": "personMapAddressUrl",
                 "mRender": function (data, type, row) {
-                    if (row.pincodeName != '...') {
-                        var img = '<div class="map-thumbnail profile-image doc-profile-image">';
-                        img += '<img src="' + row.personMapAddressUrl + '" class="thumbnail profile-image doc-profile-image" data-bs-toggle="tooltip"/>'; // Thumbnail image with class 'thumbnail'
-                        img += '<img src="' + row.personMapAddressUrl + '" class="full-driving-map" title="' + row.mapDetails + '" data-bs-toggle="tooltip"/>'; // Full map image with class 'full-map'
-                        img += '</div>';
-                        return img;
-                    }
-                    else {
-                        return '<img src="/img/no-user.png" class="profile-image doc-profile-image" title="No Photo" data-bs-toggle="tooltip" />'
-                    }
+                    const formattedUrl = row.personMapAddressUrl
+                        .replace("{0}", "400")
+                        .replace("{1}", "400");
 
-                    return '<span title="' + data + '" data-bs-toggle="tooltip">' + data + '</span>';
+                    return `
+                        <div class="map-thumbnail profile-image doc-profile-image">
+                            <img src="${formattedUrl}"
+                                 title="${row.mapDetails}"
+                                 class="thumbnail profile-image doc-profile-image preview-map-image open-map-modal"
+                                 data-bs-toggle="tooltip"
+                                 data-bs-placement="top"
+                                 data-img='${formattedUrl}'
+                                 data-agent-address='${row.agentAddress}'
+                                 data-person-address='${row.personAddress}'
+                                 data-person-label='${row.personAddressLabel}'
+                                 data-distance='${row.distance}'
+                                 data-duration='${row.duration}'
+                                 data-title='${row.mapDetails}' />
+                        </div>`;
                 }
             },
             {
@@ -198,16 +204,36 @@
     $('#dataTable tbody').hide();
     $('#dataTable tbody').fadeIn(2000);
 
-    $('#dataTable').on('mouseenter', '.map-thumbnail', function () {
-        $(this).find('.full-map').show(); // Show full map
-    }).on('mouseleave', '.map-thumbnail', function () {
-        $(this).find('.full-map').hide(); // Hide full map
+    $(document).on("click", ".open-image-modal", function () {
+        $("#imageModal").modal("show");
+        const imageUrl = $(this).data("img");
+        const title = $(this).data("title");
+
+        $("#modalImage").attr("src", imageUrl);
+        $("#mapImageLabel").text(title || "Map Preview");
     });
 
-    $('#dataTable').on('mouseenter', '.map-thumbnail', function () {
-        $(this).find('.full-driving-map').show(); // Show full map
-    }).on('mouseleave', '.map-thumbnail', function () {
-        $(this).find('.full-driving-map').hide(); // Hide full map
+    $(document).on("click", ".open-map-modal", function () {
+        $("#mapModal").modal("show");
+
+        const imageUrl = $(this).data("img");
+
+        $("#modalMapImage").attr("src", imageUrl);
+
+        const agentAddress = $(this).data("agentAddress");
+        $("#mapModalAgentAddress").text(agentAddress || "Agent Address (S)");
+
+        const personAddressLabel = $(this).data("personLabel");
+        $("#mapModalPersonAddressLabel").text(personAddressLabel || "Person Address (S)");
+
+        const personAddress = $(this).data("personAddress");
+        $("#mapModalPersonAddress").text(personAddress);
+
+        const distance = $(this).data("distance");
+        $("#mapModalDistance").text(distance);
+
+        const duration = $(this).data("duration");
+        $("#mapModalDuration").text(duration);
     });
     // Handle click on checkbox to set state of "Select all" control   
     $('#dataTable tbody').on('change', 'input[type="radio"]', function () {

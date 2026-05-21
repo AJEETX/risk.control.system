@@ -140,8 +140,8 @@ namespace risk.control.system.Services.Api
                 var policyId = i.policyId;
                 var amount = string.Format(culture, "{0:C}", i.SumAssuredValue);
                 var pincodeCode = isUW ? i.customerPincode : i.beneficiaryPincode;
-                var customerAddress = i.IsReady2Assign ? i.customerAddressline + ',' + i.customerDistrict + ',' + i.customerState : null;
-                var beneficiaryAddress = i.IsReady2Assign ? i.beneficiaryAddressline + ',' + i.beneficiaryDistrict + ',' + i.beneficiaryState : null;
+                var customerAddress = i.IsReady2Assign ? i.customerAddressline + ',' + i.customerDistrict + ',' + i.customerState + ',' + i.customerPincode : null;
+                var beneficiaryAddress = i.IsReady2Assign ? i.beneficiaryAddressline + ',' + i.beneficiaryDistrict + ',' + i.beneficiaryState + ',' + i.beneficiaryPincode : null;
                 var pincodeName = i.IsReady2Assign ? (isUW ? customerAddress : beneficiaryAddress) : null;
                 var customerName = string.IsNullOrWhiteSpace(i.CustomerName) ? "<span class=\"badge badge-light\">customer name</span>" : i.CustomerName;
                 var policyName = i.InsuranceType!.GetEnumDisplayName();
@@ -325,8 +325,8 @@ namespace risk.control.system.Services.Api
                 var serviceType = a.serviceType;
                 var personMapAddressUrl = isUW ? string.Format(a.CustomerLocationMap!, "400", "400") : string.Format(a.BeneficiaryLocationMap!, "400", "400");
                 var pincode = ClaimsInvestigationExtension.GetPincodeOfInterest(isUW, a.customerPincode, a.beneficiaryPincode);
-                var customerAddress = a.customerAddressline + ',' + a.customerDistrict + ',' + a.customerState;
-                var beneficiaryAddress = a.beneficiaryAddressline + ',' + a.beneficiaryDistrict + ',' + a.beneficiaryState;
+                var customerAddress = $"{a.customerAddressline}  {a.customerDistrict} {a.customerState} {a.customerPincode}";
+                var beneficiaryAddress = $"{a.beneficiaryAddressline} {a.beneficiaryDistrict} {a.beneficiaryState} {a.beneficiaryPincode}";
                 var pincodeName = isUW ? customerAddress : beneficiaryAddress;
                 var customerName = a.CustomerName ?? "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\"></i> </span>";
                 var beneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryName) ?

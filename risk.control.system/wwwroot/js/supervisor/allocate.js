@@ -129,12 +129,12 @@
                         return `
                         <div class="map-thumbnail profile-image doc-profile-image">
                             <img src="${formattedUrl}"
-                                 title="${row.pincodeName}"
+                                 title='Addresss of interest: ${row.pincodeName}' 
                                  class="thumbnail profile-image doc-profile-image preview-map-image open-map-modal"
                                  data-bs-toggle="tooltip"
                                  data-bs-placement="top"
                                  data-img='${formattedUrl}'
-                                 data-title='Addresss: ${row.pincodeName}' />
+                                 data-title='Addresss of interest: ${row.pincodeName}' />
                         </div>`;
                     } else {
                         return '<img src="/img/no-map.jpeg" class="profile-image doc-profile-image" title="No address" data-toggle="tooltip" />';
@@ -156,7 +156,7 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var img = '<div class="map-thumbnail table-profile-image">';
-                    img += '<img data-title="Name: ' + row.name + '" data-img="' + row.customer + '" src="' + row.customer + '" class="thumbnail table-profile-image open-map-modal" title="' + row.name + '" data-bs-toggle="tooltip"/>'; // Thumbnail image with class 'thumbnail'
+                    img += '<img data-title="Person Name: ' + row.name + '" data-img="' + row.customer + '" src="' + row.customer + '" class="thumbnail table-profile-image open-map-modal" title="' + row.name + '" data-bs-toggle="tooltip"/>'; // Thumbnail image with class 'thumbnail'
                     img += '</div>';
                     return img;
                 }
@@ -302,13 +302,13 @@
         $("#allocatedcase").prop('disabled', true);
     });
     $(document).on("click", ".open-map-modal", function () {
-        $("#mapModal").modal("show");
+        $("#imageModal").modal("show");
 
         const imageUrl = $(this).data("img");
         const title = $(this).data("title");
 
-        $("#modalMapImage").attr("src", imageUrl);
-        $("#mapModalLabel").text(title || "Map Preview");
+        $("#modalImage").attr("src", imageUrl);
+        $("#mapImageLabel").text(title || "Preview");
     });
 
     $('#dataTable tbody').hide();

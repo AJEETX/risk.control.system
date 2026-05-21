@@ -127,7 +127,8 @@ namespace risk.control.system.Services
                     a.SelectedAgentDrivingDuration,
                     a.IsNewSubmittedToCompany,
                     SubmittedToAssessorTime = a.SubmittedToAssessorTime!.Value,
-                    a.AssessorSla
+                    a.AssessorSla,
+                    a.TaskedAgentEmail
                 })
                 .ToListAsync();
 
@@ -139,10 +140,14 @@ namespace risk.control.system.Services
                 var culture = CustomExtensions.GetCultureByCountry(companyUser!.CountryCode.ToUpper());
                 var isUW = a.InsuranceType == InsuranceType.UNDERWRITING;
                 var pincode = ClaimsInvestigationExtension.GetPincodeOfInterest(isUW, a.customerPincode, a.beneficiaryPincode);
-                var customerAddress = a.customerAddressline + ',' + a.customerDistrict + ',' + a.customerState;
-                var beneficiaryAddress = a.beneficiaryAddressline + ',' + a.beneficiaryDistrict + ',' + a.beneficiaryState;
+                var customerAddress = $"{a.customerAddressline} {a.customerDistrict} {a.customerState} {a.customerPincode}";
+                var beneficiaryAddress = $"{a.beneficiaryAddressline} {a.beneficiaryDistrict} {a.beneficiaryState} {a.beneficiaryPincode}";
                 var pincodeName = isUW ? customerAddress : beneficiaryAddress;
-
+                var agent = await _context.ApplicationUser.Include(u => u.District).Include(u => u.State).Include(u => u.PinCode).FirstOrDefaultAsync(u => u.Email == a.TaskedAgentEmail);
+                var agentAddress = $"{agent!.Addressline}, {agent.District!.Name} {agent.State!.Name} {agent.PinCode!.Code}";
+                var personAddressLabel = isUW ? "Customer Address" : "Beneficiary address";
+                var personAddress = isUW ? $"{customerAddress}" : $"{beneficiaryAddress}";
+                var mapDetails = isUW ? $"Distance: {a.SelectedAgentDrivingDistance}; Duration: {a.SelectedAgentDrivingDuration}" : $"Distance: {a.SelectedAgentDrivingDistance}; Duration: {a.SelectedAgentDrivingDuration}";
                 // Run file operations in parallel for this specific row
                 var documentTask = _base64FileService.GetBase64FileAsync(a.PolicyDocumentPath!, Applicationsettings.NO_POLICY_IMAGE);
                 var customerTask = _base64FileService.GetBase64FileAsync(a.customerImagePath!, Applicationsettings.GUEST_USER);
@@ -169,13 +174,15 @@ namespace risk.control.system.Services
                     Customer = await customerTask,
                     BeneficiaryPhoto = await beneficiaryTask,
                     OwnerDetail = await ownerDetailTask,
-
+                    AgentAddress = $"{agentAddress}",
+                    PersonAddress = $"{personAddress}",
+                    PersonAddressLabel = $"{personAddressLabel} (E)",
+                    MapDetails = mapDetails,
                     Name = a.CustomerName ?? "N/A",
                     Policy = a.InsuranceType!.GetEnumDisplayName(),
                     Status = a.ORIGIN.GetEnumDisplayName(),
                     ServiceType = $"{a.InsuranceType!.GetEnumDisplayName()} ({a.ServiceTypeName})",
                     Service = a.ServiceTypeName,
-                    Location = a.SubStatus,
                     Created = a.SubmittedToAssessorTime,
                     timePending = GetAssessorSubmittedTimeReport(a.SubmittedToAssessorTime, a.AssessorSla),
                     BeneficiaryName = a.BeneficiaryName,
@@ -184,7 +191,8 @@ namespace risk.control.system.Services
                     Duration = a.SelectedAgentDrivingDuration,
                     IsNewSubmittedToCompany = a.IsNewSubmittedToCompany,
                     TimeElapsed = DateTime.UtcNow.Subtract(a.ProcessedByAssessorTime ?? DateTime.UtcNow).TotalSeconds,
-                    CanDownload = await CanDownload(a.Id, userEmail)
+                    CanDownload = await CanDownload(a.Id, userEmail),
+
                 };
             });
 
@@ -505,6 +513,7 @@ namespace risk.control.system.Services
                     a.SelectedAgentDrivingMap,
                     a.SelectedAgentDrivingDistance,
                     a.SelectedAgentDrivingDuration,
+                    a.TaskedAgentEmail
                 })
                 .ToListAsync();
 
@@ -515,9 +524,14 @@ namespace risk.control.system.Services
                 var culture = CustomExtensions.GetCultureByCountry(companyUser!.CountryCode.ToUpper());
                 var isUW = a.InsuranceType == InsuranceType.UNDERWRITING;
                 var pincode = ClaimsInvestigationExtension.GetPincodeOfInterest(isUW, a.customerPincode, a.beneficiaryPincode);
-                var customerAddress = a.customerAddressline + ',' + a.customerDistrict + ',' + a.customerState;
-                var beneficiaryAddress = a.beneficiaryAddressline + ',' + a.beneficiaryDistrict + ',' + a.beneficiaryState;
+                var customerAddress = $"{a.customerAddressline} {a.customerDistrict} {a.customerState} {a.customerPincode}";
+                var beneficiaryAddress = $"{a.beneficiaryAddressline} {a.beneficiaryDistrict} {a.beneficiaryState} {a.beneficiaryPincode}";
                 var pincodeName = isUW ? customerAddress : beneficiaryAddress;
+                var agent = await _context.ApplicationUser.Include(u => u.District).Include(u => u.State).Include(u => u.PinCode).FirstOrDefaultAsync(u => u.Email == a.TaskedAgentEmail);
+                var agentAddress = $"{agent!.Addressline}, {agent.District!.Name} {agent.State!.Name} {agent.PinCode!.Code}";
+                var personAddressLabel = isUW ? "Customer Address" : "Beneficiary address";
+                var personAddress = isUW ? $"{customerAddress}" : $"{beneficiaryAddress}";
+                var mapDetails = isUW ? $"Distance: {a.SelectedAgentDrivingDistance}; Duration: {a.SelectedAgentDrivingDuration}" : $"Distance: {a.SelectedAgentDrivingDistance}; Duration: {a.SelectedAgentDrivingDuration}";
                 // Run file operations in parallel for this specific row
                 var documentTask = _base64FileService.GetBase64FileAsync(a.PolicyDocumentPath!, Applicationsettings.NO_POLICY_IMAGE);
                 var customerTask = _base64FileService.GetBase64FileAsync(a.customerImagePath!, Applicationsettings.GUEST_USER);
@@ -557,7 +571,10 @@ namespace risk.control.system.Services
                     PersonMapAddressUrl = string.Format(a.SelectedAgentDrivingMap!, "300", "300"),
                     Distance = a.SelectedAgentDrivingDistance,
                     Duration = a.SelectedAgentDrivingDuration,
-
+                    AgentAddress = $"{agentAddress}",
+                    PersonAddress = $"{personAddress}",
+                    PersonAddressLabel = $"{personAddressLabel} (E)",
+                    MapDetails = mapDetails,
                     TimeElapsed = DateTime.UtcNow.Subtract(a.ProcessedByAssessorTime ?? DateTime.UtcNow).TotalSeconds,
                     CanDownload = await CanDownload(a.Id, userEmail)
                 };
