@@ -1,6 +1,6 @@
 ﻿@model CaseAgencyAgentModel
 
-<form id="radioButtons" method="post" asp-controller="CaseAllocation" asp-action="AllocateToAgencyAgent">
+<form id="allocate-agent" method="post" asp-controller="CaseAllocation" asp-action="AllocateToAgencyAgent">
 	<div class="card-body">
 		<div class="submit-progress hidden">
 			<i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
@@ -9,6 +9,7 @@
 		<input type="hidden" id="policyDetailId" name="policyDetailId" value="@Model.ClaimsInvestigation.PolicyDetail?.PolicyDetailId" />
 		<input type="hidden" id="customerDetailId" name="customerDetailId" value="@Model.ClaimsInvestigation.CustomerDetail?.CustomerDetailId" />
 		<input type="hidden" id="beneficiaryId" name="beneficiaryId" value="@Model.Beneficiary.BeneficiaryDetailId" />
+		<input type="hidden" asp-for=ReSelect" />
 		<table id="dataTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
 			<thead>
 				<tr>
@@ -39,17 +40,27 @@
 						<i class="fas fa-arrow-left"></i> 
 						<span class="badge badge-light"> <i class="far fa-file-archive"></i> </span> Back
 					</a>
-					<button disabled="disabled" id="allocatedcase" type="submit" class="btn btn-sm btn-danger">
+					<button disabled="disabled" id="allocatedcase" type="submit" class="btn btn-sm btn-warning">
 						<i class="fas fa-external-link-alt" aria-hidden="true"></i> Re-allocate <sub>agent</sub>
 					</button>
 				}
 				else
 				{
-					<a id="back" asp-action="Allocate" class="btn btn-sm btn-outline-secondary" data-bs-toggle="tooltip" title="Back to Allocate cases">
-						<i class="fas fa-arrow-left"></i>
-						<span class="badge badge-light"> <i class="fas fa-external-link-alt"></i> </span>	Back
-					</a>
-					<button disabled="disabled" id="allocatedcase" type="submit" class="btn btn-sm btn-danger">
+					if(Model.Route)
+					{
+						<a id="back" asp-action="Allocate" class="btn btn-sm btn-outline-secondary" data-bs-toggle="tooltip" title="Back to Allocate cases">
+							<i class="fas fa-arrow-left"></i>
+							<span class="badge badge-light"> <i class="fas fa-external-link-alt"></i> </span>	Back
+						</a>
+						}
+					else
+					{
+						<a id="back" asp-action="CaseDetail" asp-route-id="@Model.ClaimsInvestigation.Id" class="btn btn-sm btn-outline-secondary" data-bs-toggle="tooltip" title="Back to Case detail">
+							<i class="fas fa-arrow-left"></i>
+							<span class="badge badge-light"> <i class="fas fa-newspaper"></i> </span>	Back
+						</a>
+						}
+					<button disabled="disabled" id="allocatedcase" type="submit" class="btn btn-sm btn-warning">
 						<i class="fas fa-external-link-alt" aria-hidden="true"></i> Allocate <sub>agent</sub>
 					</button>
 				}

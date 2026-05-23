@@ -52,7 +52,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
 
         [HttpGet]
         [Breadcrumb("Agents", FromAction = nameof(Allocate))]
-        public async Task<IActionResult> SelectAgent(long id)
+        public async Task<IActionResult> SelectAgent(long id, bool route = true)
         {
             var userEmail = HttpContext.User?.Identity?.Name!;
             try
@@ -64,7 +64,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
                 }
 
                 var model = await _agencyInvestigationDetailService.SelectVendorAgent(userEmail, id);
-
+                model.Route = route;
                 return View(model);
             }
             catch (Exception ex)

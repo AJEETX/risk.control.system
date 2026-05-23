@@ -271,7 +271,7 @@ namespace risk.control.system.Services.Api
                 9 => isAsc ? query.OrderBy(a => a.PolicyDetail!.InvestigationServiceType!.Name) : query.OrderByDescending(a => a.PolicyDetail!.InvestigationServiceType!.Name),
                 10 => isAsc ? query.OrderBy(a => a.SubStatus) : query.OrderByDescending(a => a.SubStatus),
                 11 => isAsc ? query.OrderBy(a => a.Created) : query.OrderByDescending(a => a.Created),
-                _ => isAsc ? query.OrderBy(a => a.Updated) : query.OrderByDescending(a => a.Updated)
+                _ => query.OrderByDescending(a => a.AllocatedToAgencyTime)
             };
 
             var pagedList = await query
@@ -358,7 +358,7 @@ namespace risk.control.system.Services.Api
                     CaseWithPerson = a.CaseOwner,
                     BeneficiaryPhoto = await beneTask,
                     SubStatus = a.SubStatus,
-                    Created = a.Updated ?? a.Created,
+                    Created = a.AllocatedToAgencyTime!.Value,
                     TimePending = GetActiveTime(a.AllocatedToAgencyTime!.Value, a.CreatorSla),
                     TimeElapsed = DateTime.UtcNow.Subtract(a.Updated.GetValueOrDefault()).TotalSeconds,
                     Service = investigationService,

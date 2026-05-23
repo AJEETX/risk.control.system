@@ -268,20 +268,21 @@
         }
     });
     var askConfirmation = true;
-    $('#radioButtons').submit(function (e) {
+    $('#allocate-agent').submit(function (e) {
         if (askConfirmation) {
+            var content = $('#ReSelect').val() == 'True' ? 'Re-Allocate' :'Allocate'
             e.preventDefault();
             $.confirm({
-                title: "Confirm Allocate",
-                content: "Are you sure to allocate?",
+                title: `Confirm ${content}`,
+                content: `Are you sure to ${content}?`,
 
                 icon: 'fas fa-external-link-alt',
-                type: 'red',
+                type: 'orange',
                 closeIcon: true,
                 buttons: {
                     confirm: {
-                        text: "Allocate <sub>agent</sub>",
-                        btnClass: 'btn-danger',
+                        text: `${content} <sub>agent</sub>`,
+                        btnClass: 'btn-warning',
                         action: function () {
                             askConfirmation = false;
 
@@ -292,9 +293,9 @@
                                 $(".submit-progress").removeClass("hidden");
                             }, 1);
                             $('#allocatedcase').attr('disabled', 'disabled');
-                            $('#allocatedcase').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Allocate <sub>agent</sub>");
+                            $('#allocatedcase').html(`<i class='fas fa-sync fa-spin' aria-hidden='true'></i> ${content} <sub>agent</sub>`);
 
-                            $('#radioButtons').submit();
+                            $('#allocate-agent').submit();
                             var article = document.getElementById("article");
                             if (article) {
                                 var nodes = article.getElementsByTagName('*');

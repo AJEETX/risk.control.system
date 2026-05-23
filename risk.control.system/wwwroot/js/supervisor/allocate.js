@@ -17,6 +17,15 @@
                 nodes[i].disabled = true;
             }
         }
+        // Find the checked radio button
+        var id = $("input[name='id']:checked").val();
+
+        if (id) {
+            // Redirect to the clean URL
+            window.location.href = 'SelectAgent/' + id;
+        } else {
+            $.alert("Please select a case.");
+        }
     });
 
     var table = $("#dataTable").DataTable({
@@ -216,10 +225,10 @@
                 "mRender": function (data, type, row) {
                     var buttons = "";
                     if (row.isQueryCase) {
-                        buttons += `<a data-id="${row.id}" class="btn btn-xs btn-warning"><i class="fas fa-question" aria-hidden="true"></i> Enquiry </a> &nbsp;`;
+                        buttons += `<a data-id="${row.id}" class="btn btn-xs btn-info enquiry"><i class="fas fa-question" aria-hidden="true"></i> Enquiry </a> &nbsp;`;
                     }
                     else {
-                        buttons += `<a data-id="${row.id}" class="btn btn-xs btn-info"><i class="fas fa-search"></i> Detail</a>`
+                        buttons += `<a data-id="${row.id}" class="btn btn-xs btn-info detail"><i class="fas fa-search"></i> Detail</a>`
                     }
                     return buttons;
                 }
@@ -250,7 +259,7 @@
             });
         }
     });
-    $('body').on('click', 'a.btn-info', function (e) {
+    $('body').on('click', 'a.btn-info.detail', function (e) {
         e.preventDefault();
         const id = $(this).data('id');
         showdetail(id, this);
@@ -268,7 +277,7 @@
             window.location.href = url;
         }, 1000);
     }
-    $('body').on('click', 'a.btn-warning', function (e) {
+    $('body').on('click', 'a.btn-info.enquiry', function (e) {
         e.preventDefault();
         const id = $(this).data('id');
         showenquiry(id, this);
@@ -322,17 +331,5 @@
     });
     $('#dataTable').on('change', 'input[name="id"]', function () {
         $('#allocatedcase').prop('disabled', false);
-    });
-
-    $('#allocatedcase').on('click', function () {
-        // Find the checked radio button
-        var id = $("input[name='id']:checked").val();
-
-        if (id) {
-            // Redirect to the clean URL
-            window.location.href = 'SelectAgent/' + id;
-        } else {
-            $.alert("Please select a case.");
-        }
     });
 });
