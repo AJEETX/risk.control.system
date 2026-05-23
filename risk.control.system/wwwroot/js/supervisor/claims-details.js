@@ -1,4 +1,34 @@
 ﻿$(document).ready(function () {
+
+    $('#allocatedcase').on('click', function () {
+        $("body").addClass("submit-progress-bg");
+
+        setTimeout(function () {
+            $(".submit-progress").removeClass("hidden");
+        }, 1);
+
+        $('#allocatedcase').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Allocate");
+        disableAllInteractiveElements();
+
+        $('#radioButtons').submit();
+        var article = document.getElementById("article");
+        if (article) {
+            var nodes = article.getElementsByTagName('*');
+            for (var i = 0; i < nodes.length; i++) {
+                nodes[i].disabled = true;
+            }
+        }
+        // Find the checked radio button
+        var id = $("#claimId").val();
+
+        if (id) {
+            // Redirect to the clean URL
+            window.location.href = '/VendorInvestigation/SelectAgent/' + id+'?route=false';
+        } else {
+            $.alert("Please select a case.");
+        }
+    });
+
     var askConfirmation = true;
     $('#decline-information-popup').on('click', function (e) {
         $.alert(
