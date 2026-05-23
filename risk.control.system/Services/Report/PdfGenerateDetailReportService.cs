@@ -54,6 +54,7 @@ namespace risk.control.system.Services.Report
                     locationCount++;
                 }
             }
+
             section.AddParagraph().SetMarginBottom(10f);
 
             AddEnquiry(section, investigation);
@@ -69,7 +70,7 @@ namespace risk.control.system.Services.Report
         }
         private void AddEnquiry(SectionBuilder section, InvestigationTask investigation)
         {
-            if (investigation.InvestigationReport!.EnquiryRequests != null && investigation.InvestigationReport.EnquiryRequests.Count != 0)
+            if (investigation.InvestigationReport!.EnquiryRequest != null)
             {
                 section.AddParagraph().SetLineSpacing(1).AddText("Enquiry Report").SetBold().SetFontSize(14);
                 var questionTableBuilder = section.AddTable().SetBorder(Stroke.Solid);
@@ -97,7 +98,9 @@ namespace risk.control.system.Services.Report
                 {
                     questionRowBuilder.AddCell().AddParagraph().AddText("");
                 }
-
+            }
+            if (investigation.InvestigationReport!.EnquiryRequests != null && investigation.InvestigationReport.EnquiryRequests.Count != 0)
+            {
                 var tableBuilder = section.AddTable().SetBorder(Stroke.Solid);
 
                 tableBuilder.AddColumnPercentToTable("Multiple Choice Question", 60).AddColumnPercentToTable("Selected Answer", 30).AddColumnPercentToTable("Time", 10);
