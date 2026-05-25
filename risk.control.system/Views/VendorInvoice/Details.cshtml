@@ -1,0 +1,83 @@
+﻿@model InvoiceDetail
+
+@{
+    ViewData["Title"] = "Invoice Details";
+}
+<section class="content">
+
+<div class="container mt-4">
+    <div class="card shadow">
+        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+            <h3 class="mb-0">Invoice: @Model.VendorInvoice.InvoiceNumber</h3>
+                <span class="badge bg-success fs-6">Created: @Model.VendorInvoice.Created.ToString("yyyy-MM-dd")</span>
+        </div>
+        <div class="card-body">
+
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <h5>Metadata Details</h5>
+                    <hr />
+                    <dl class="row">
+                        <dt class="col-sm-4">Invoice Date</dt>
+                            <dd class="col-sm-8">@Model.VendorInvoice.InvoiceDate.ToString("MMMM dd, yyyy")</dd>
+
+                        <dt class="col-sm-4">Due Date</dt>
+                            <dd class="col-sm-8 text-danger fw-bold">@Model.VendorInvoice.DueDate.ToString("MMMM dd, yyyy")</dd>
+
+                        <dt class="col-sm-4">Agency (Vendor)</dt>
+                            <dd class="col-sm-8">@(Model.VendorInvoice.Vendor != null ? Model.VendorInvoice.Vendor.Name : "--")</dd>
+
+                        <dt class="col-sm-4">Insurer (Client)</dt>
+                            <dd class="col-sm-8">@(Model.VendorInvoice.ClientCompany != null ? Model.VendorInvoice.ClientCompany.Name : "--")</dd>
+                    </dl>
+                </div>
+
+                <div class="col-md-6">
+                    <h5>Financial Summary</h5>
+                    <hr />
+                    <div class="p-3 bg-light rounded">
+                        <dl class="row mb-0">
+                            <dt class="col-sm-5">Sub Total</dt>
+                                <dd class="col-sm-7 text-end">@Model.VendorInvoice.Currency @Model.VendorInvoice.SubTotal.ToString("N2")</dd>
+
+                            <dt class="col-sm-5">Tax Amount</dt>
+                                <dd class="col-sm-7 text-end text-muted">+ @Model.VendorInvoice.Currency @Model.VendorInvoice.TaxAmount.ToString("N2")</dd>
+
+                            <hr class="my-2" />
+
+                            <dt class="col-sm-5 fs-5">Grand Total</dt>
+                                <dd class="col-sm-7 text-end text-success fs-5 fw-bold">@Model.VendorInvoice.Currency @Model.VendorInvoice.GrandTotal.ToString("N2")</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-12">
+                    <h5>Associated Case References</h5>
+                    <hr />
+                    <dl class="row">
+                        <dt class="col-sm-2">Case ID</dt>
+                        <dd class="col-sm-10">@(Model.ContractNumber?.ToString() ?? "N/A")</dd>
+
+                        <dt class="col-sm-2">Report Link</dt>
+                            <dd class="col-sm-10">@(Model.VendorInvoice.InvestigationReport != null ? Model.VendorInvoice.InvestigationReport.ReportTemplate!.Name : "No linked report")</dd>
+                    </dl>
+                </div>
+            </div>
+
+                @if (!string.IsNullOrEmpty(Model.VendorInvoice.NoteToRecipient))
+            {
+                <div class="alert alert-secondary mt-3">
+                    <strong>Note to Recipient:</strong>
+                        <p class="mb-0 mt-1 italic">@Model.VendorInvoice.NoteToRecipient</p>
+                </div>
+            }
+
+        </div>
+        <div class="card-footer bg-light d-flex justify-content-end gap-2">
+                <a id="back" asp-action="Index" class="btn btn-sm btn-outline-secondary"><i class="fas fa-arrow-left"></i> Back</a>
+        </div>
+    </div>
+</div>
+</section>
