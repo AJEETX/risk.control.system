@@ -114,7 +114,7 @@
                 "data": "duration",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.duration + '" data-bs-toggle="tooltip"><small>' + data + '</small></span>'
+                    return '<span title="' + row.duration + '" data-bs-toggle="tooltip">' + data + '</span>'
                 }
             },
             {
