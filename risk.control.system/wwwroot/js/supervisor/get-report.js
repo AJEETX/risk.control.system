@@ -115,7 +115,8 @@ $(document).ready(function () {
                 buttons: {
                     cancel: {
                         text: "OK",
-                        btnClass: 'btn-danger', action: function () {
+                        btnClass: 'btn-danger',
+                        action: function () {
                             $.alert('Canceled!');
                             $('#description').focus();
                         }
@@ -130,12 +131,12 @@ $(document).ready(function () {
                 content: "Are you sure?",
                 icon: 'far fa-thumbs-up',
 
-                type: 'orange',
+                type: 'blue',
                 closeIcon: true,
                 buttons: {
                     confirm: {
                         text: "Reply Enquiry",
-                        btnClass: 'btn-warning',
+                        btnClass: 'btn-info',
                         action: function () {
                             askConfirmation = true;
                             $("body").addClass("submit-progress-bg");
