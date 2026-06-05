@@ -216,7 +216,7 @@ $(document).ready(function () {
         let template = `
         <div class="card bg-light mb-3 p-3 question-card">
             <div class="d-flex justify-content-between align-items-center mb-2">
-                <span class="input-group-label">Multiple choice question${questionIndex + 1}:</span>
+                <span class="input-group-label">Question${questionIndex + 1}:</span>
                 <button type="button" class="btn btn-sm btn-outline-danger remove-question">
                     <i class="fas fa-trash"></i> Delete
                 </button>
