@@ -44,7 +44,16 @@ namespace risk.control.system.Services.Creator
                .Include(c => c.State)
                .Include(c => c.Country)
                .FirstOrDefaultAsync(c => c.InvestigationTaskId == selectedcase);
-
+            if (caseTask!.CustomerDetail != null)
+            {
+                var maskedCustomerContact = new string('*', caseTask.CustomerDetail.PhoneNumber.ToString().Length - 4) + caseTask.CustomerDetail.PhoneNumber.ToString().Substring(caseTask.CustomerDetail.PhoneNumber.ToString().Length - 4);
+                caseTask.CustomerDetail.PhoneNumber = maskedCustomerContact;
+            }
+            if (beneficiary != null)
+            {
+                var maskedBeneficiaryContact = new string('*', beneficiary.PhoneNumber.ToString().Length - 4) + beneficiary.PhoneNumber.ToString().Substring(beneficiary.PhoneNumber.ToString().Length - 4);
+                beneficiary.PhoneNumber = maskedBeneficiaryContact;
+            }
             var currentUser = await _context.ApplicationUser.AsNoTracking().Include(c => c.ClientCompany).ThenInclude(c => c!.Country).FirstOrDefaultAsync(c => c.Email == userEmail);
 
             return new CaseTransactionModel

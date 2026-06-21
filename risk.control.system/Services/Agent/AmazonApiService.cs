@@ -30,6 +30,7 @@ namespace risk.control.system.Services.Agent
 
     internal class AmazonApiService(IAmazonRekognition rekognitionClient, IAmazonTextract textractClient, ILogger<AmazonApiService> logger) : IAmazonApiService
     {
+        private static float similarityThreshold = 70F;
         private readonly IAmazonRekognition _rekognitionClient = rekognitionClient;
         private readonly IAmazonTextract _textractClient = textractClient;
         private readonly ILogger<AmazonApiService> _logger = logger;
@@ -128,7 +129,6 @@ namespace risk.control.system.Services.Agent
 
         public async Task<(bool, float, Amazon.Rekognition.Model.BoundingBox?)> FaceMatch(byte[] originalImage, byte[] targetImage)
         {
-            float similarityThreshold = 70F;
             Image imageSource = new();
             Image imageTarget = new();
 

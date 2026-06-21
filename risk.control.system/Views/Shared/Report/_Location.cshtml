@@ -55,8 +55,8 @@
 											<i class="far fa-user text-primary" title="This Image has Verifier photo at the location" data-bs-toggle="tooltip"></i> Agent Photo
 										</th>
 										<th class="col-address" title="Indicative Address Info">Indicative Address Info</th>
-										<th class="col-weather" title="Location Info">
-											<img class="action-image" src="~/headers/information.gif" /> Location Info
+										<th class="col-weather" title="More Info">
+											<img class="action-image" src="~/headers/information.gif" /> More Info
 										</th>
 										<th class="col-pin-img" title="Indicative Map Route">
 											<img class="action-image" src="~/headers/pincode.gif" /> Indicative Map
@@ -85,20 +85,125 @@
 										</td>
 
 										<!-- ID Photo -->
-										<td>
+										<td class="text-center face-photo-column">
+											@if (agent.FaceResult != null && agent.FaceResult.TotalFacesDetected > 0)
+											{
+												<div class="badge bg-info text-white bottom-0 end-0 m-2 opacity-90">
+													<i class="fas fa-user-check"></i> AI Verified
+												</div>
+											}
 											@if (agent.ValidationExecuted)
 											{
-												<img id="face-img-@agent.Id"
-													src="/Document/GetAgentDocument/@agent.Id"
-													 class="mobile-capture-info"
-													 title="@location.AgentEmail photo" />
+												<div class="position-relative d-inline-block mb-2 face-image-wrapper">
+													<img id="face-img-@agent.Id"
+														 src="/Document/GetAgentDocument/@agent.Id"
+														 class="mobile-capture-info img-thumbnail img-fluid shadow-sm"
+														 title="@location.AgentEmail photo" />
+												</div>
+
+												@if (agent.FaceResult != null)
+												{
+													<div class="text-start mt-1 p-2 bg-white rounded border face-metrics-box text-left">
+														@if (agent.FaceResult.TotalFacesDetected == 0)
+														{
+															<div class="text-danger text-center fw-bold small">
+																<i class="fas fa-exclamation-triangle"></i> No face detected
+															</div>
+														}
+														else
+														{
+															@foreach (var face in agent.FaceResult.Faces)
+															{
+																<div class="card border-0 shadow-sm mb-3 @(face.FaceNumber > 1 ? "border-top pt-3" : "")">
+																	<div class="card-body p-2">
+																		<!-- Header -->
+																		<span class="d-flex align-items-center text-primary fw-bold small mb-2">
+																			<i class="fas fa-robot"></i>
+																			<span class="badge fw-semibold small">
+																				Face Detail #@face.FaceNumber
+																			</span>
+																		</span>
+
+																		<!-- Metrics Table/Grid -->
+																		<div class="d-flex flex-column gap-2 p-0 mb-2">
+																			<!-- Age Range -->
+																			<div class="p-2 rounded border d-flex align-items-center justify-content-between bg-light border-secondary-subtle">
+																				<div class="d-flex align-items-center text-muted">
+																					<i class="fas fa-hourglass-half fs-6 me-2"></i>
+																					<span class="badge fw-semibold small">Age Range</span>
+																				</div>
+																				<span class="fw-bold small text-dark">@face.AgeRange</span>
+																			</div>
+
+																			<!-- Gender -->
+																			<div class="p-2 rounded border d-flex align-items-center justify-content-between bg-light border-secondary-subtle">
+																				<div class="d-flex align-items-center text-muted">
+																					<i class="fas @(face.Gender?.ToLower() == "female" ? "fa-venus" : face.Gender?.ToLower() == "male" ? "fa-mars" : "fa-genderless") fs-6 me-2"></i>
+																					<span class="badge fw-semibold small">Gender</span>
+																				</div>
+																				<div class="d-flex align-items-center gap-1">
+																					<span class="fw-bold small text-dark">@face.Gender</span>
+																					<span class="badge bg-white text-secondary border fw-normal text-xs">@face.GenderConfidence.ToString("F0")%</span>
+																				</div>
+																			</div>
+
+																			<!-- Primary Emotion -->
+																			<div class="p-2 rounded border d-flex align-items-center justify-content-between bg-light border-secondary-subtle">
+																				<div class="d-flex align-items-center text-muted">
+																					<i class="fas fa-heart fs-6 me-2"></i>
+																					<span class="badge fw-semibold small">Emotion</span>
+																				</div>
+																				<span class="fw-bold small text-dark text-capitalize">@face.PrimaryEmotion</span>
+																			</div>
+																		</div>
+
+																		<!-- Features Badges Grid -->
+																		<div class="d-flex flex-column gap-2 pt-1 mt-2">
+																			<!-- Smile -->
+																			<div class="p-2 rounded border d-flex align-items-center justify-content-between @(face.IsSmiling ? "bg-success-subtle text-success border-success" : "bg-light text-muted border-secondary-subtle")">
+																				<div class="d-flex align-items-center">
+																					<i class="fas @(face.IsSmiling ? "fa-smile" : "fa-meh") fs-5 me-2"></i> <span class="badge  fw-semibold small"> Smile </span>
+																				</div>
+																				<span class="fs-5 fw-bold @(face.IsSmiling ? "text-success" : "text-danger")">
+																					@(face.IsSmiling ? "✓" : "✗")
+																				</span>
+																			</div>
+
+																			<!-- Glasses -->
+																			<div class="p-2 rounded border d-flex align-items-center justify-content-between @(face.IsWearingGlasses ? "bg-info-subtle text-info-emphasis border-info" : "bg-light text-muted border-secondary-subtle")">
+																				<div class="d-flex align-items-center">
+																					<i class="fas fa-glasses fs-5 me-2"></i> <span class="badge fw-semibold small"> Glasses </span>
+
+																				</div>
+																				<span class="fs-5 fw-bold @(face.IsWearingGlasses ? "text-success" : "text-danger")">
+																					@(face.IsWearingGlasses ? "✓" : "✗")
+																				</span>
+																			</div>
+
+																			<!-- Beard -->
+																			<div class="p-2 rounded border d-flex align-items-center justify-content-between @(face.HasBeard ? "bg-warning-subtle text-warning-emphasis border-success" : "bg-light text-muted border-secondary-subtle")">
+																				<div class="d-flex align-items-center">
+																					<i class="fas fa-user-tie fs-5 me-2"></i> <span class="badge fw-semibold small"> Beard </span>
+
+																				</div>
+																				<span class="fs-5 fw-bold @(face.HasBeard ? "text-success" : "text-danger")">
+																					@(face.HasBeard ? "✓" : "✗")
+																				</span>
+																			</div>
+																		</div>
+																	</div>
+																</div>
+															}
+														}
+
+													</div>
+												}
 											}
 											else
 											{
 												<img src="~/img/no-user.png" class="img-thumbnail img-fluid profile-image" />
 											}
 										</td>
-
 
 										<!-- Address or fallback -->
 										<td>
@@ -155,6 +260,7 @@
 											{
 												<i class="fa fa-times-circle text-muted" title="Not validated" data-bs-toggle="tooltip"></i>
 											}
+											<span>@agent.Similarity</span>
 										</td>
 									</tr>
 								</tbody>

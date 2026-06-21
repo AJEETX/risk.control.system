@@ -21,9 +21,10 @@ namespace risk.control.system.Seeds
             var insurer = await GetCompany(context, input, vendors, customApiCLient, relativePath);
             var insurerCompany = await context.ClientCompany.AddAsync(insurer);
             await context.SaveChangesAsync(null, false);
-            var creator = await InsurerUserSeed.Seed(context, webHostEnvironment, userManager, insurerCompany.Entity, fileStorageService);
-            var claimTemplate = ReportTemplateSeed.CLAIM(context, insurer);
-            var underwriting = ReportTemplateSeed.UNDERWRITING(context, insurer);
+            await InsurerUserSeed.Seed(context, webHostEnvironment, userManager, insurerCompany.Entity, fileStorageService);
+            await context.SaveChangesAsync(null, false);
+            ReportTemplateSeed.CLAIM(context, insurer);
+            ReportTemplateSeed.UNDERWRITING(context, insurer);
             await context.SaveChangesAsync(null, false);
             return insurerCompany.Entity;
         }

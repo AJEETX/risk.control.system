@@ -42,15 +42,19 @@ namespace risk.control.system.Services.Agent
             caseTask.BeneficiaryDetail!.PhoneNumber = MaskPhoneNumber(caseTask.BeneficiaryDetail?.PhoneNumber!);
             caseTask.InvestigationReport!.AgentEmail = userEmail;
             var templates = await _context.ReportTemplates.AsNoTracking()
-                .Include(r => r.LocationReport)
+                    .Include(r => r.LocationReport!)
                     .ThenInclude(l => l.AgentIdReport)
-                .Include(r => r.LocationReport)
+                    .ThenInclude(a => a.FaceResult!)
+                    .ThenInclude(f => f.Faces)
+                    .Include(r => r.LocationReport)
                     .ThenInclude(l => l.FaceIds)
-                .Include(r => r.LocationReport)
+                    .ThenInclude(f => f.FaceResult)
+                    .ThenInclude(f => f.Faces)
+                    .Include(r => r.LocationReport)
                     .ThenInclude(l => l.MediaReports)
-                .Include(r => r.LocationReport)
+                    .Include(r => r.LocationReport)
                     .ThenInclude(l => l.DocumentIds)
-                .Include(r => r.LocationReport)
+                    .Include(r => r.LocationReport)
                     .ThenInclude(l => l.Questions)
                 .FirstOrDefaultAsync(r => r.Id == caseTask.ReportTemplateId);
 
