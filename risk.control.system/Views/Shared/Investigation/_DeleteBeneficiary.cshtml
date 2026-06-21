@@ -20,7 +20,7 @@
         var age = DateTime.UtcNow.Subtract(Model.Beneficiary!.DateOfBirth.GetValueOrDefault()).TotalDays;
         currentBAgeinYrs =$"{(int)(age/ 365 )} years";
         country = @Model.Beneficiary?.Country?.Name;
-        phone = +@Model.Beneficiary?.Country?.ISDCode +" (0) "+ @Model.Beneficiary?.PhoneNumber;
+        phone = @Model.Beneficiary?.Country?.ISDCode +"  "+ @Model.Beneficiary?.PhoneNumber;
         imgPath = "/flags/" + @Model.Beneficiary?.Country?.Code.ToLower() + ".png";
         map = string.Format(Model.Beneficiary?.BeneficiaryLocationMap!, "200", "200");
     }
@@ -92,7 +92,7 @@
                             Mobile #:
                             @if(!string.IsNullOrWhiteSpace(phone))
                             {
-                               <b> @phone</b>
+                               <b>+@phone</b>
                             }
                         </li>
                     </ul>

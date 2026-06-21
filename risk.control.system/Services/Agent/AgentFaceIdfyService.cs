@@ -61,11 +61,12 @@ internal class AgentFaceIdfyService(ApplicationDbContext context,
             var registeredImage = await File.ReadAllBytesAsync(Path.Combine(_env.ContentRootPath, agent!.ProfilePictureUrl!));
 
             var faceTask = _faceMatchService.GetFaceMatchAsync(registeredImage, faceBytes, Path.GetExtension(faceImageFileName));
+            var faceDetailTask = _faceMatchService.GetPersonDetailFromFace(faceBytes);
             var weatherTask = _weatherInfoService.GetWeatherAsync(lat, lon);
             var addressTask = _httpClientService.GetRawAddress(lat, lon);
             var mapTask = _customApiClient.GetMap(expectedCoords.lat, expectedCoords.lon, double.Parse(lat), double.Parse(lon));
 
-            await Task.WhenAll(faceTask, weatherTask, addressTask, mapTask);
+            await Task.WhenAll(faceTask, weatherTask, addressTask, mapTask, faceDetailTask);
 
             // 4. Update Entities
             AgentFaceIdfyHelper.MapMetadataToReport(agentIdReport!, locationTemplate, data, relativePath, faceImageFileName, lat, lon);
@@ -79,6 +80,7 @@ internal class AgentFaceIdfyService(ApplicationDbContext context,
             agentIdReport.DistanceInMetres = distM;
             agentIdReport.DurationInSeconds = durS;
             agentIdReport.LocationAddress = await addressTask;
+            agentIdReport.FaceResult = await faceDetailTask;
             agentIdReport.LocationInfo = await weatherTask;
             agentIdReport.DigitalIdImageMatchConfidence = conf;
             agentIdReport.Similarity = sim;
