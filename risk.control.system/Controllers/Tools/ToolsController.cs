@@ -54,7 +54,8 @@ namespace risk.control.system.Controllers.Tools
                 PdfRemaining = 5 - user.PdfCount,
                 DocumentAnalysisRemaining = 5 - user.DocumentAnalysisCount,
                 Speech2TextRemaining = 5 - user.Speech2TextCount,
-                Text2SpeechRemaining = 5 - user.Text2SpeechCount
+                Text2SpeechRemaining = 5 - user.Text2SpeechCount,
+                ItrVerificationRemaining = 5 - user.ItrVerificationCount,
             };
 
             return View(model);

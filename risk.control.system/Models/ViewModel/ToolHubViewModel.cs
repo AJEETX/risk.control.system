@@ -8,6 +8,7 @@
         public int DocumentAnalysisRemaining { get; set; }
         public int Text2SpeechRemaining { get; set; }
         public int Speech2TextRemaining { get; set; }
+        public int ItrVerificationRemaining { get; set; }
         public int MaxLimit { get; set; } = 5;
     }
 }

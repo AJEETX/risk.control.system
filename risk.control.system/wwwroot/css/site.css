@@ -4514,3 +4514,28 @@ img.mobile-capture-map {
 #rating-result{
     display:none;
 }
+/* Custom sizing and formatting rule constraints for Face Analysis elements */
+.face-photo-column {
+    min-width: 175px;
+    max-width: 210px;
+}
+
+.face-image-wrapper img {
+    max-height: 140px;
+    object-fit: cover;
+    width: 100%;
+}
+
+.face-metrics-box {
+    font-size: 0.75rem;
+    line-height: 1.35;
+    background-color: #fafafa;
+}
+
+    .face-metrics-box .row-metric {
+        padding: 1px 0;
+    }
+
+.opacity-90 {
+    opacity: 0.90;
+}

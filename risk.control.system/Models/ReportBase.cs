@@ -12,13 +12,13 @@ namespace risk.control.system.Models
         public string? ReportName { get; set; }
         public string? FilePath { get; set; }
         public string? ImageExtension { get; set; }
-        public string? LocationInfo { get; set; } = "No Location Info...";
+        public string? LocationInfo { get; set; } = "No Info...";
         public string? LocationMapUrl { get; set; }
         public string? Distance { get; set; }
         public float? DistanceInMetres { get; set; }
         public string? Duration { get; set; }
         public int? DurationInSeconds { get; set; }
-        public string? LocationAddress { get; set; } = "No Address data";
+        public string? LocationAddress { get; set; } = "No Info...";
         public string? LongLat { get; set; }
         public DateTime? LongLatTime { get; set; }
         public bool ValidationExecuted { get; set; } = false;

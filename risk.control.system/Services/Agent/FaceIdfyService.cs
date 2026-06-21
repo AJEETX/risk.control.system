@@ -50,17 +50,22 @@ internal class FaceIdfyService(ApplicationDbContext context,
             var faceBytes = await VerificationHelper.GetBytesFromIFormFile(data.Image!);
             var regPath = Path.Combine(_env.ContentRootPath, FaceIdfyHelper.GetRegisteredImagePath(caseDetail, isCustomer));
             var registeredImage = await File.ReadAllBytesAsync(regPath);
+
             var faceTask = _faceMatchService.GetFaceMatchAsync(registeredImage, faceBytes, Path.GetExtension(fileName));
+            var faceDetailTask = _faceMatchService.GetPersonDetailFromFace(faceBytes);
+
             var weatherTask = _weatherInfoService.GetWeatherAsync(lat, lon);
             var addressTask = _httpClientService.GetRawAddress(lat, lon);
             var mapTask = _customApiClient.GetMap(expected.lat, expected.lon, double.Parse(lat), double.Parse(lon));
-            await Task.WhenAll(faceTask, weatherTask, addressTask, mapTask);
+            await Task.WhenAll(faceTask, weatherTask, addressTask, mapTask, faceDetailTask);
+
             FaceIdfyHelper.MapMetadataToReport(faceIdReport, locationTemplate, data, relativePath, Path.GetExtension(fileName), lat, lon);
             var (conf, compImg, sim) = await faceTask;
             var (dist, distM, dur, durS, mapUrl) = await mapTask;
             faceIdReport.LocationMapUrl = mapUrl;
             faceIdReport.Distance = dist;
             faceIdReport.Duration = dur;
+            faceIdReport.FaceResult = await faceDetailTask;
             faceIdReport.LocationInfo = await weatherTask;
             faceIdReport.LocationAddress = await addressTask;
             faceIdReport.MatchConfidence = conf;
