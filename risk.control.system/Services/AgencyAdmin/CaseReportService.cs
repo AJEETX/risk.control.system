@@ -47,13 +47,13 @@ namespace risk.control.system.Services.AgencyAdmin
         {
             return await _context.ReportTemplates
                 .Include(r => r.LocationReport)
-                   .ThenInclude(l => l.AgentIdReport)
+                   .ThenInclude(l => l.AgentIdReport!)
                     .ThenInclude(a => a.FaceResult!)
                     .ThenInclude(f => f.Faces)
                .Include(r => r.LocationReport)
                .ThenInclude(l => l.MediaReports)
                .Include(r => r.LocationReport)
-                   .ThenInclude(l => l.FaceIds)
+                   .ThenInclude(l => l.FaceIds!)
                     .ThenInclude(a => a.FaceResult!)
                     .ThenInclude(f => f.Faces)
                .Include(r => r.LocationReport)

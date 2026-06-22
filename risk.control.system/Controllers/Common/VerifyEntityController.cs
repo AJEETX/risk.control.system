@@ -207,7 +207,7 @@ namespace risk.control.system.Controllers.Common
                     return Ok(new { valid = false, message = "Mobile number is required." });
                 var country = await _context.Country.AsNoTracking().FirstOrDefaultAsync(c => c.ISDCode == countryCode);
 
-                var isMobile = _phoneService.IsValidMobileNumber(phone, country!.ISDCode.ToString());
+                var isMobile = await _phoneService.IsValidMobileNumberAsync(phone, country!.ISDCode.ToString());
 
                 if (!isMobile)
                 {

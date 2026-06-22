@@ -42,6 +42,7 @@ namespace risk.control.system.Services.Creator
                 var relation = await relationTask;
                 var pinCode = await pinCodeTask;
                 var (imagePath, ext) = await imageTask;
+                var phoneValid = await phoneTask;
                 if (relation == null)
                 {
                     errors.Add(new UploadError { UploadData = "Relation", Error = $"Invalid beneficiary relation: '{uploadCase.Relation.Trim()}'" });
@@ -51,7 +52,7 @@ namespace risk.control.system.Services.Creator
                 {
                     _verifierProcessor.AddLocationError(errors, summaries, uploadCase.BeneficiaryPincode, uploadCase.BeneficiaryDistrictName.Trim());
                 }
-                var beneficiary = CreateBeneficiary(uploadCase, dob, relation, pinCode!, companyUser, income, imagePath, ext);
+                var beneficiary = CreateBeneficiary(uploadCase, dob, relation, pinCode!, companyUser, income, imagePath, ext, phoneValid);
                 if (pinCode != null) await EnrichLocationData(beneficiary, pinCode);
                 return (beneficiary, errors, summaries);
             }
@@ -62,7 +63,7 @@ namespace risk.control.system.Services.Creator
             }
         }
 
-        private BeneficiaryDetail CreateBeneficiary(UploadCase uploadCase, DateTime dob, BeneficiaryRelation relation, PinCode pinCode, ApplicationUser companyUser, Income income, string imagePath, string ext)
+        private static BeneficiaryDetail CreateBeneficiary(UploadCase uploadCase, DateTime dob, BeneficiaryRelation relation, PinCode pinCode, ApplicationUser companyUser, Income income, string imagePath, string ext, bool phoneValid)
         {
             return new BeneficiaryDetail
             {
@@ -71,6 +72,7 @@ namespace risk.control.system.Services.Creator
                 DateOfBirth = dob,
                 Income = income,
                 PhoneNumber = uploadCase.BeneficiaryContact!.Trim(),
+                IsValidPhoneNumber = phoneValid,
                 Addressline = uploadCase.BeneficiaryAddressLine!.Trim(),
                 PinCodeId = pinCode?.PinCodeId,
                 DistrictId = pinCode?.DistrictId,

@@ -60,7 +60,17 @@
 						<li class="small"><span class="fa-li"><i class="fa fa-money"></i></span>Annual Income:(@Model.Currency)<b> @customerDetail?.Income?.GetEnumDisplayName() </b></li>
 						<li class="small"><span class="fa-li"><i class="fas fa-lg fa-building"></i></span>Address:<b> @address</b></li>
 						<li class="small"><span class="fa-li"><i class="fas fa-lg fa-globe"></i></span>Country:  <img src="@imgPath" class="flag-icon" data-bs-toggle="tooltip" /><b> @customerDetail?.Country?.Name </b></li>
-						<li class="small"><span class="fa-li"><i class="fas fa-lg fa-phone"></i></span>Mobile #: +<b>@customerDetail?.Country?.ISDCode @customerDetail?.PhoneNumber</b></li>
+						<li class="small margin-top-16">
+							<span class="fa-li"><i class="fas fa-lg fa-phone"></i></span>Mobile #: +<b>@customerDetail?.Country?.ISDCode @customerDetail?.PhoneNumber</b>
+							@if (customerDetail?.IsValidPhoneNumber == true)
+							{
+								<i class="fas fa-check-circle text-success" title="Valid Mobile Number" data-bs-toggle="tooltip"></i>
+							}
+							else
+							{
+								<i class="fas fa-times-circle text-danger" title="Invalid Mobile Number" data-bs-toggle="tooltip"></i>
+							}
+						</li>
 					</ul>
 				</div>
 

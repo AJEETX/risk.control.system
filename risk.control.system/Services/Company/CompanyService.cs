@@ -134,9 +134,9 @@ namespace risk.control.system.Services.Company
             if (country == null)
                 return;
 
-            if (!_phoneService.IsValidMobileNumber(model.PhoneNumber, country.ISDCode.ToString()))
+            if (!await _phoneService.IsValidMobileNumberAsync(model.PhoneNumber, country.ISDCode.ToString()))
             {
-                errors[nameof(BeneficiaryDetail.PhoneNumber)] = "Invalid mobile number";
+                errors[nameof(model.PhoneNumber)] = "Invalid mobile number";
             }
         }
 

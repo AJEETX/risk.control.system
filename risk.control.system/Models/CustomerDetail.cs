@@ -29,6 +29,7 @@ namespace risk.control.system.Models
         [DataType(DataType.PhoneNumber)]
         [StringLength(10, MinimumLength = 9, ErrorMessage = "PhoneNumber must be between 9 and 10 characters.")]
         public string PhoneNumber { get; set; } = default!;
+        public bool IsValidPhoneNumber { get; set; } = default!;
 
         [Required]
         [Display(Name = "Address line")]

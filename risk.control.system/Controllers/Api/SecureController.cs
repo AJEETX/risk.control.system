@@ -208,9 +208,9 @@ namespace risk.control.system.Controllers.Api
 
         [AllowAnonymous]
         [HttpGet("is-mobile-number")]
-        public IActionResult IsValidMobileNumber(string phoneNumber = "+61432854196", string country = "61")
+        public async Task<IActionResult> IsValidMobileNumber(string phoneNumber = "+61432854196", string country = "61")
         {
-            var result = phoneService.IsValidMobileNumber(phoneNumber, country);
+            var result = await phoneService.IsValidMobileNumberAsync(phoneNumber, country);
             return Ok(result);
         }
 
