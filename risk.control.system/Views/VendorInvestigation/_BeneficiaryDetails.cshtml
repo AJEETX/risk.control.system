@@ -91,11 +91,19 @@
 								<b> @country</b>
 							}
 						</li>
-						<li class="small">
+						<li class="small margin-top-16">
 							<span class="fa-li">
 								<i class="fas fa-lg fa-phone"></i>
 							</span>
 							Mobile #: + <b>@Model?.Beneficiary?.Country?.ISDCode  @Model?.Beneficiary?.PhoneNumber</b>
+							@if (Model?.Beneficiary?.IsValidPhoneNumber == true)
+							{
+								<i class="fas fa-check-circle text-success" title="Valid Mobile Number" data-bs-toggle="tooltip"></i>
+							}
+							else
+							{
+								<i class="fas fa-times-circle text-danger" title="Invalid Mobile Number" data-bs-toggle="tooltip"></i>
+							}
 						</li>
 					</ul>
 				</div>

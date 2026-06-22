@@ -35,6 +35,14 @@
 					</a>
 				</li>
 				<li class="nav-item">
+					<a is-active-page asp-controller="Itr" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Itr", "")">
+						<i class="nav-icon fas fa-file-invoice-dollar text-dark"></i>
+						<p>
+							Face Match
+						</p>
+					</a>
+				</li>
+				<li class="nav-item">
 					<a is-active-page asp-controller="FaceMatch" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("FaceMatch", "")">
 						<i class="nav-icon fas fa-user-check text-primary"></i>
 						<p>

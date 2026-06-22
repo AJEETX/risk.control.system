@@ -255,11 +255,19 @@
 													Address: <b> @address </b>
 												</li>
 
-												<li class="small">
+												<li class="small margin-top-16">
 													<span class="fa-li">
 														<i class="fas fa-lg fa-phone"></i>
 													</span>
-													Mobile #: + <b> @Model?.CaseTask?.CustomerDetail?.PhoneNumber </b>
+													Mobile #: + <b>@Model.CaseTask?.CustomerDetail?.Country?.ISDCode @Model?.CaseTask?.CustomerDetail?.PhoneNumber </b>
+													@if (Model?.CaseTask?.CustomerDetail?.IsValidPhoneNumber == true)
+													{
+														<i class="fas fa-check-circle text-success" title="Valid Mobile Number" data-bs-toggle="tooltip"></i>
+													}
+													else
+													{
+														<i class="fas fa-times-circle text-danger" title="Invalid Mobile Number" data-bs-toggle="tooltip"></i>
+													}
 												</li>
 											</ul>
 										</div>
@@ -352,11 +360,19 @@
 													</span>
 													Address: <b> @baddress </b>
 												</li>
-												<li class="small">
+												<li class="small margin-top-16">
 													<span class="fa-li">
 														<i class="fas fa-lg fa-phone"></i>
 													</span>
-													Mobile #: + <b>@Model?.Beneficiary?.PhoneNumber </b>
+													Mobile #: + <b>@Model?.Beneficiary?.Country?.ISDCode @Model?.Beneficiary?.PhoneNumber </b>
+													@if (Model?.Beneficiary?.IsValidPhoneNumber == true)
+													{
+														<i class="fas fa-check-circle text-success" title="Valid Mobile Number" data-bs-toggle="tooltip"></i>
+													}
+													else
+													{
+														<i class="fas fa-times-circle text-danger" title="Invalid Mobile Number" data-bs-toggle="tooltip"></i>
+													}
 												</li>
 											</ul>
 										</div>

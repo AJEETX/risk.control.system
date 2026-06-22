@@ -1,7 +1,9 @@
 ﻿using System.Text.Json;
 using System.Text.RegularExpressions;
+using Microsoft.FeatureManagement;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
+using risk.control.system.Models.ViewModel;
 
 namespace risk.control.system.Services.Common
 {
@@ -9,10 +11,10 @@ namespace risk.control.system.Services.Common
     {
         Task<PhoneNumberInfo?> ValidateAsync(string mobileNumber);
 
-        bool IsValidMobileNumber(string phoneNumber, string countryCode = "91");
+        Task<bool> IsValidMobileNumberAsync(string phoneNumber, string countryCode = "91");
     }
 
-    internal class PhoneService(IHttpClientFactory httpClientFactory) : IPhoneService
+    internal class PhoneService(IHttpClientFactory httpClientFactory, IFeatureManager featureManager) : IPhoneService
     {
         private static readonly Dictionary<string, string> CountryPatterns = new()
         {
@@ -35,6 +37,7 @@ namespace risk.control.system.Services.Common
         };
 
         private readonly IHttpClientFactory _httpClientFactory = httpClientFactory;
+        private readonly IFeatureManager _featureManager = featureManager;
 
         // Ideally move these to configuration or secrets manager
         private const string ApiHost = "phonenumbervalidatefree.p.rapidapi.com";
@@ -89,7 +92,7 @@ namespace risk.control.system.Services.Common
             }
         }
 
-        public bool IsValidMobileNumber(string phoneNumber, string countryCode = "91")
+        public async Task<bool> IsValidMobileNumberAsync(string phoneNumber, string countryCode = "91")
         {
             if (string.IsNullOrWhiteSpace(phoneNumber))
                 return false;
@@ -99,6 +102,12 @@ namespace risk.control.system.Services.Common
 
             if (CountryPatterns.TryGetValue(countryCode, out var pattern))
             {
+                if (await _featureManager.IsEnabledAsync(FeatureFlags.VALIDATE_PHONE))
+                {
+                    var completeMobileNumber = $"{countryCode}{phoneNumber}";
+                    var phoneInfo = await ValidateAsync(completeMobileNumber);
+                    return phoneInfo?.IsValidNumber ?? false;
+                }
                 return Regex.IsMatch(phoneNumber, pattern);
             }
 

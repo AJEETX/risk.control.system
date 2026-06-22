@@ -42,9 +42,11 @@ namespace risk.control.system.Services.Creator
                 var phoneTask = _verifierProcessor.ValidatePhone(companyUser, uploadCase.CustomerContact!.Trim(), errors, summaries);
                 var imageTask = _verifierProcessor.ProcessFaceImage(uploadCase, data, errors, summaries, CUSTOMER_IMAGE, "Customer");
 
-                await Task.WhenAll(pinCodeTask, imageTask, phoneTask);
+                await Task.WhenAll(pinCodeTask, imageTask, phoneTask, phoneTask);
                 var pinCode = await pinCodeTask;
                 var (imagePath, extension) = await imageTask;
+                var phoneValid = await phoneTask;
+
                 if (pinCode == null) _verifierProcessor.AddLocationError(errors, summaries, uploadCase.CustomerPincode, uploadCase.CustomerDistrictName.Trim());
 
                 var textInfo = CultureInfo.CurrentCulture.TextInfo;
@@ -55,6 +57,7 @@ namespace risk.control.system.Services.Creator
                     Gender = gender,
                     DateOfBirth = dob,
                     PhoneNumber = uploadCase.CustomerContact.Trim(),
+                    IsValidPhoneNumber = phoneValid,
                     Education = edu,
                     Occupation = occ,
                     Income = income,
