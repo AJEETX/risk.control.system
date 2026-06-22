@@ -26,6 +26,7 @@ namespace risk.control.system.Models
         [Required]
         [StringLength(10, MinimumLength = 9, ErrorMessage = "PhoneNumber must be between 9 and 10 characters.")]
         public string PhoneNumber { get; set; } = default!;
+        public bool IsValidPhoneNumber { get; set; } = default!;
 
         [Display(Name = "Annual Income")]
         public Income? Income { get; set; }

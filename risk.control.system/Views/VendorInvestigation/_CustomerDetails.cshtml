@@ -113,11 +113,19 @@
 								<b> @country</b>
 							}
 						</li>
-						<li class="small">
+						<li class="small margin-top-16">
 							<span class="fa-li">
 								<i class="fas fa-lg fa-phone"></i>
 							</span>
 							Mobile #: + <b>@Model.ClaimsInvestigation?.CustomerDetail?.Country?.ISDCode @Model.ClaimsInvestigation?.CustomerDetail?.PhoneNumber</b>
+							@if (Model?.ClaimsInvestigation?.CustomerDetail?.IsValidPhoneNumber == true)
+							{
+								<i class="fas fa-check-circle text-success" title="Valid Mobile Number" data-bs-toggle="tooltip"></i>
+							}
+							else
+							{
+								<i class="fas fa-times-circle text-danger" title="Invalid Mobile Number" data-bs-toggle="tooltip"></i>
+							}
 						</li>
 					</ul>
 				</div>

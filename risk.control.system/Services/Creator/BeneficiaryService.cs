@@ -74,8 +74,8 @@ namespace risk.control.system.Services.Creator
             var errors = new Dictionary<string, string>();
 
             await _validateImageService.ValidateFaceImage(model.ProfileImage!, errors);
-            await ValidatePhoneAsync(model, errors);
-
+            var phoneValid = await ValidatePhoneAsync(model, errors);
+            model.IsValidPhoneNumber = phoneValid;
             if (errors.Any())
                 return (false, errors);
 
@@ -111,6 +111,7 @@ namespace risk.control.system.Services.Creator
                 PinCodeId = pinCode.PinCodeId,
                 SelectedPincodeId = pinCode.PinCodeId,
                 PhoneNumber = pinCode.Country!.Code.Equals("au", StringComparison.CurrentCultureIgnoreCase) ? Applicationsettings.SAMPLE_MOBILE_AUSTRALIA : Applicationsettings.SAMPLE_MOBILE_INDIA,
+                IsValidPhoneNumber = true
             };
             return model;
         }
@@ -140,11 +141,12 @@ namespace risk.control.system.Services.Creator
             {
                 await _validateImageService.ValidateFaceImage(model.ProfileImage, errors);
             }
-            await ValidatePhoneAsync(model, errors);
+            var phoneValid = await ValidatePhoneAsync(model, errors);
 
             if (errors.Any())
                 return (false, errors);
 
+            model.IsValidPhoneNumber = phoneValid;
             Sanitize(model);
 
             var result = await _addInvestigationService.EditBeneficiary(userEmail, model);
@@ -190,19 +192,21 @@ namespace risk.control.system.Services.Creator
                 });
         }
 
-        private async Task ValidatePhoneAsync(BeneficiaryDetail model, Dictionary<string, string> errors)
+        private async Task<bool> ValidatePhoneAsync(BeneficiaryDetail model, Dictionary<string, string> errors)
         {
             if (!await _featureManager.IsEnabledAsync(FeatureFlags.VALIDATE_PHONE))
-                return;
+                return true;
 
             var country = await _context.Country.FindAsync(model.SelectedCountryId);
             if (country == null)
-                return;
+                return false;
 
-            if (!_phoneService.IsValidMobileNumber(model.PhoneNumber, country.ISDCode.ToString()))
+            if (!await _phoneService.IsValidMobileNumberAsync(model.PhoneNumber, country.ISDCode.ToString()))
             {
                 errors[nameof(BeneficiaryDetail.PhoneNumber)] = "Invalid mobile number";
+                return false;
             }
+            return true;
         }
 
         private static void Sanitize(BeneficiaryDetail model)

@@ -85,7 +85,7 @@
                                 <img src="@imgPath" class="flag-icon" data-bs-toggle="tooltip" /> <b> @country</b>
                             }
                         </li>
-                        <li class="small">
+                        <li class="small margin-top-16">
                             <span class="fa-li">
                                 <i class="fas fa-lg fa-phone"></i>
                             </span>
@@ -93,6 +93,14 @@
                             @if(!string.IsNullOrWhiteSpace(phone))
                             {
                                <b>+@phone</b>
+                            }
+                            @if (Model.Beneficiary?.IsValidPhoneNumber == true)
+                            {
+                                <i class="fas fa-check-circle text-success" title="Valid Mobile Number" data-bs-toggle="tooltip"></i>
+                            }
+                            else
+                            {
+                                <i class="fas fa-times-circle text-danger" title="Invalid Mobile Number" data-bs-toggle="tooltip"></i>
                             }
                         </li>
                     </ul>

@@ -12,7 +12,7 @@ namespace risk.control.system.Services.Creator
         Task<(string Path, string Extension)> ProcessDocumentImage(UploadCase uc, byte[] zipData, List<UploadError> errs, List<string> sums, string imageName, string caseEntityName);
         Task<(string Path, string Extension)> ProcessFaceImage(UploadCase uc, byte[] zipData, List<UploadError> errs, List<string> sums, string imageName, string caseEntityName);
 
-        Task ValidatePhone(ApplicationUser user, string contactNumber, List<UploadError> errs, List<string> sums);
+        Task<bool> ValidatePhone(ApplicationUser user, string contactNumber, List<UploadError> errs, List<string> sums);
 
         void AddLocationError(List<UploadError> errs, List<string> sums, int pinCode, string districtName);
     }
@@ -116,18 +116,20 @@ namespace risk.control.system.Services.Creator
             return (RelativePath, extension);
         }
 
-        public async Task ValidatePhone(ApplicationUser user, string contactNumber, List<UploadError> errs, List<string> sums)
+        public async Task<bool> ValidatePhone(ApplicationUser user, string contactNumber, List<UploadError> errs, List<string> sums)
         {
-            if (!await _featureManager.IsEnabledAsync(FeatureFlags.VALIDATE_PHONE)) return;
+            if (!await _featureManager.IsEnabledAsync(FeatureFlags.VALIDATE_PHONE)) return true;
 
             await using var context = await _contextFactory.CreateDbContextAsync();
             var country = await context.Country.FirstOrDefaultAsync(c => c.CountryId == user.ClientCompany!.CountryId);
 
-            if (country == null || !_phoneService.IsValidMobileNumber(contactNumber, country.ISDCode.ToString()))
+            if (country == null || !await _phoneService.IsValidMobileNumberAsync(contactNumber, country.ISDCode.ToString()))
             {
                 errs.Add(new UploadError { UploadData = $"[Mobile: {contactNumber}]", Error = "Invalid mobile format" });
                 sums.Add($"[Mobile={contactNumber} is invalid]");
+                return false;
             }
+            return true;
         }
     }
 }
