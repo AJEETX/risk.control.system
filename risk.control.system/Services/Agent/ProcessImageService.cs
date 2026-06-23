@@ -46,7 +46,7 @@ namespace risk.control.system.Services.Agent
                 return imageBytes; // Return original on error
             }
         }
-        private void ApplyWatermarks(Image image, string watermarkText)
+        private static void ApplyWatermarks(Image image, string watermarkText)
         {
             float baseScale = Math.Min(image.Width, image.Height);
             float mainFontSize = baseScale * 0.12f;

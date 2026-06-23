@@ -11,78 +11,100 @@
 		<table class="table table-bordered table-hover dt-responsive nowrap w-100">
 			<thead class="thead-light">
 			<tr>
-					<th class="col-verifier-name"><i class="far fa-file text-muted ms-2" title="Media File"></i> Media File</th>
-				<th>
-						<i class="fas fa-copy text-muted ms-2" title="Media File Data"></i> Media File Data
-				</th>
-					<th class="col-address" title="Indicative Address Info">Indicative Address Info</th>
-					<th class="col-weather" title="Location Info">
-						<img class="action-image" src="~/headers/information.gif" /> Location Info
+					<th scope="col" class="min-vw-25" data-toggle="tooltip" title=" Media File Type">
+						Media File
 					</th>
-					<th class="col-pin-img" title="Indicative Map Route"><img class="action-image" src="~/headers/pincode.gif" />  Indicative Map</th>
+					<th scope="col" class="min-vw-25" data-toggle="tooltip" title="Play Media">
+						<i class="fas fa-copy text-muted ms-2"></i> Play Media
+					</th>
+					<th scope="col" class="min-vw-25" title="Address Info" data-toggle="tooltip"> <i class="fas fa-home"></i>  Address Info</th>
+					<th class="col-weather" title="Weather info" data-toggle="tooltip">
+						<img class="action-image" src="~/headers/information.gif" /> Weather info
+					</th>
+					<th scope="col" class="text-center col-1" title="Map View" data-toggle="tooltip">
+						<img class="action-image me-2" src="~/headers/pincode.gif" alt="Map" />Map View
+					</th>
 				</tr>
 		</thead>
 		<tbody>
 			@foreach (var doc in location.MediaReports.Where(d => d.Selected))
 			{
-				<tr>
-					<td>
-							<small>
-						@doc.ReportName
-								</small>
-						@if (doc.IsRequired)
-						{
-							<span class="required-asterisk" title="Mandatory Media">*</span>
-						}
-					</td>
-					
-					<td>
-						@if (doc.ValidationExecuted)
-						{
+					<tr class="align-middle">
+
+						<td>
+							<div class="text-start mt-1 p-2 bg-white rounded bordertext-left" data-toggle="tooltip" title="Media File Type">
+
+							@doc.ReportName
+							@if (doc.IsRequired)
+							{
+								<span class="required-asterisk" title="Mandatory Location">*</span>
+							}
+							</div>
+							<div class="p-2 bg-white rounded border d-flex align-items-center justify-content-between shadow-sm" title="Captured Time" data-toggle="tooltip">
+								<span class="badge bg-dark px-2.5 py-1.5 fs-7 fw-medium">
+									<i class="fas fa-clock me-1 text-warning"></i>
+									<span class="local-time-display" data-utc="@(doc.LongLatTime.HasValue ? doc.LongLatTime.Value.ToString("o") : "")">
+										@(doc.LongLatTime.HasValue ? "Loading..." : "--")
+									</span>
+								</span>
+							</div>
+							</td>
+
+						<td>
+							@if (doc.ValidationExecuted)
+							{
 								<div id="doc-img-@doc.Id">
 									@if (doc.MediaType == MediaType.VIDEO)
 									{
 										<video class="media-view" controls>
-											<source src="/Document/GetMediaDocument/@doc.Id" type="video/@doc.MediaExtension">
+											<source src="/Document/GetMediaDocument/@doc.Id"
+													type="video/@doc.MediaExtension">
 											Your browser does not support the video tag.
 										</video>
 									}
 									else if (doc.MediaType == MediaType.AUDIO)
 									{
-										<audio class="media-view" controls>
+										<audio controls>
 											<source src="/Document/GetMediaDocument/@doc.Id" type="audio/@doc.MediaExtension" />
 										</audio>
 									}
 								</div>
-						}
-						else
-						{
-							if (doc.MediaType == MediaType.VIDEO)
-									{
-										<img src="~/img/no-video.png" class="thumbnail profile-image doc-profile-image" />
-									}
-									else{
-										<img src="~/img/no-audio.png" class="thumbnail profile-image doc-profile-image" />
-									}
-						}
+							}
+							else
+							{
+								if (doc.MediaType == MediaType.VIDEO)
+								{
+									<img src="~/img/no-video.png" class="thumbnail profile-image doc-profile-image" />
+								}
+								else
+								{
+									<img src="~/img/no-audio.png" class="thumbnail profile-image doc-profile-image" />
+								}
+							}
 
-					</td>
-					
-					<td>
-							<div>@doc.LongLat</div>
-							<small>
-							@doc.LocationAddress
-								</small>
-							<span class="badge badge-light">
-								Indicative Distance from @location.Address Address @doc.Distance
-							</span>
-					</td>
-						<td>
-							<small>
-								@doc.LocationInfo
-							</small>
 						</td>
 						<td>
+							<div class="d-flex flex-column gap-2">
+								<!-- Address Card -->
+								<div class="text-muted  badge text-uppercase mb-1">Captured Address</div>
+								<div class="p-2.5 bg-white rounded border shadow-sm">
+									<div class="text-dark fs-6 fw-bold ps-1 small">@doc.LocationAddress</div>
+								</div>
+								<hr />
+								<!-- Weather Card -->
+								<div class="text-muted badge text-uppercase mb-1">Indicative Distance from @location.Address Address</div>
+								<div class="p-2.5 bg-white rounded border shadow-sm text-center">
+									<div class="text-dark fs-6 fw-bold ps-1 small"> @doc.Distance</div>
+								</div>
+							</div>
+						</td>
+						<td>
+							<div class="text-start mt-1 p-2 bg-white rounded border text-left">
+								@doc.LocationInfo
+
+							</div>
+						</td>
+						<td class="text-center">
 							@if (doc.ValidationExecuted && doc.LocationMapUrl != null)
 							{
 								<img id="face-img-@doc.Id"
