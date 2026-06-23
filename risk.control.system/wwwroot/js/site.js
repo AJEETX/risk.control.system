@@ -1,6 +1,25 @@
 ﻿
 const MaxSizeInBytes = 5242880; // 5MG for upload
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll('.local-time-display').forEach(function (element) {
+        const utcString = element.getAttribute('data-utc');
+        if (utcString) {
+            const date = new Date(utcString);
 
+            // Formats to a clean local string (e.g., "Jun 23, 2026, 11:09 AM")
+            const formattedDate = date.toLocaleString(undefined, {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false
+            });
+
+            element.textContent = formattedDate;
+        }
+    });
+});
 document.addEventListener("DOMContentLoaded", function () {
     var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
     tooltipTriggerList.map(function (tooltipTriggerEl) {
