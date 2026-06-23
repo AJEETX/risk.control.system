@@ -8,38 +8,45 @@
 {
 	<div class="table-responsive mb-4">
 
-	<table class="table table-bordered table-striped">
+		<table class="table table-bordered table-hover dt-responsive nowrap w-100">
 		<thead class="table-light">
 			<tr>
-				<th>Document</th>
-				<th>
-					<i class="fas fa-copy text-muted ms-2" title="Scanned Document Image"></i>
+					<th scope="col" class="min-vw-25" data-toggle="tooltip" title="Document Type">
+					Document Type
+					</th>
+					<th scope="col" class="text-center col-1" title="Scanned Document" data-toggle="tooltip">
+						<i class="fas fa-copy text-muted ms-2"></i> Scanned Document
 				</th>
-				<th title="Verified Address"><img class="action-image" src="~/headers/pincode.gif" /></th>
-				<th>Verified Address</th>
-				<th title="Weather info"><img class="action-image" src="~/headers/information.gif" /></th>
-				<th>Valid</th>
+					<th scope="col" class="min-vw-25" data-toggle="tooltip" title="Address Info">Address Info</th>
+					<th title="Scanned Data" data-toggle="tooltip"><img class="action-image" src="~/headers/information.gif" />Scanned Data</th>
+					<th scope="col" class="text-center col-1" data-toggle="tooltip" title="Map View">
+						<img class="action-image me-2" src="~/headers/pincode.gif" alt="Map" />Map View
+					</th>
+					<th scope="col" class="text-center col-1" data-toggle="tooltip" title="Valid">Valid</th>
 				<th>Action</th>
 			</tr>
 		</thead>
 		<tbody>
 			@foreach (var doc in location.DocumentIds.Where(d => d.Selected))
 			{
-				<tr>
-					<td>@doc.ReportName
-						@if (doc.IsRequired)
-						{
-							<span class="required-asterisk" title="Mandatory Location">*</span>
-						}
-					</td>
-					
+					<tr class="align-middle">
 					<td>
+							<div class="text-start mt-1 p-2 bg-white rounded bordertext-left">
+								@doc.ReportName
+								@if (doc.IsRequired)
+								{
+									<span class="required-asterisk" title="Mandatory Location">*</span>
+								}
+						</div></td>
+						<td class="text-center face-photo-column">
 						@if (doc.ValidationExecuted)
 						{
+								<div class="position-relative d-inline-block mb-2">
 							<img id="doc-img-@doc.Id"
 									 src="/Document/GetOcrDocument/@doc.Id"
-								 class="thumbnail-image thumbnail profile-image doc-profile-image preview-image"
+										 class="mobile-capture-info img-thumbnail img-fluid shadow-sm thumbnail preview-image"
 								 title="Click to view document" />
+								 </div>
 						}
 						else
 						{
@@ -47,50 +54,64 @@
 						}
 
 					</td>
-					<td>
-						@if (doc.ValidationExecuted && doc.LocationMapUrl != null)
-						{
-							<img id="face-img-@doc.Id"
-								 src="@string.Format(@doc.LocationMapUrl, "300","300")"
-								 class="thumbnail-image thumbnail profile-image doc-profile-image map-image"
-								 data-faceid="@doc.Id"
-								 data-locationid="@location.Id"
-								 data-source="document"
-								 title="Click to view map" />
-						}
-						else
-						{
-							<img src="~/img/no-map.jpeg" class="thumbnail profile-image doc-profile-image" />
-						}
-					</td>
-					<td>
-						@doc.LocationAddress
-
-					</td>
-					<td>
-						@doc.LocationInfo
-					</td>
-					<td>
-						@if (doc.ValidationExecuted)
-						{
-							@if (doc.ImageValid.HasValue && doc.ImageValid.Value)
+						<td>
+							<div class="d-flex flex-column gap-2">
+								<!-- Address Card -->
+								<div class="text-muted  badge text-uppercase mb-1">Captured Address</div>
+								<div class="p-2.5 bg-white rounded border shadow-sm">
+									<div class="text-dark fs-6 fw-bold ps-1 small">@doc.LocationAddress</div>
+								</div>
+							</div>
+						</td>
+						<td>
+							<div class="p-2.5 bg-white rounded border shadow-sm">
+								<div class="text-dark fs-6 fw-bold ps-1 small">@doc.LocationInfo</div>
+							</div>
+						</td>
+						<td class="text-center">
+							@if (doc.ValidationExecuted && doc.LocationMapUrl != null)
 							{
-								<i class='fas fa-check-circle i-green'></i>
+								<img id="face-img-@doc.Id"
+									 src="@string.Format(@doc.LocationMapUrl, "300", "300")"
+									 class="mobile-capture-map map-image"
+									 data-faceid="@doc.Id"
+									 data-locationid="@location.Id"
+									 data-source="document"
+									 title="Click to view map" />
 							}
 							else
 							{
-								<i class='fa fa-times i-orangered' aria-hidden='true'></i>
+								<img src="~/img/no-map.jpeg" class="thumbnail profile-image doc-profile-image" />
 							}
-						}
-						else
-						{
-							<i class='fa fa-times i-grey' aria-hidden='true'></i>
-						}
-
-					</td>
+						</td>
+						<td class="text-center">
+							<div class="d-flex flex-column align-items-center justify-content-center gap-1">
+								@if (doc.ValidationExecuted)
+								{
+									if (doc.ImageValid.GetValueOrDefault())
+									{
+										<span class="badge bg-success-subtle text-success border border-success px-2 py-1 small">
+											<i class="fas fa-check-circle me-1"></i> Valid
+										</span>
+									}
+									else
+									{
+										<span class="badge bg-danger-subtle text-danger border border-danger px-2 py-1 small">
+											<i class="fa fa-times-circle me-1"></i> Invalid
+										</span>
+									}
+								}
+								else
+								{
+									<span class="badge bg-secondary-subtle text-muted border px-2 py-1 small">
+										<i class="fa fa-minus-circle me-1"></i> Pending
+									</span>
+								}
+							</div>
+						</td>
 					<td>
 							<input type="file" class="form-control remarks form-control-sm doc-upload" data-docid="@doc.Id" />
-						<button class="btn btn-sm btn-primary mt-1 upload-doc-btn"
+							<button class="btn btn-sm btn-success mt-2  upload-doc-btn"
 								data-docid="@doc.Id"
 								data-locationid="@location.Id"
 								data-location-name="@location.LocationName"

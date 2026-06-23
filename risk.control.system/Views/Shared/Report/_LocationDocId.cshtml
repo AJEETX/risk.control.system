@@ -11,40 +11,51 @@
 		<table class="table table-bordered table-hover dt-responsive nowrap w-100">
 			<thead class="thead-light">
 				<tr>
-					<th class="col-verifier-name"><i class="far fa-file text-muted ms-2" title="Document"></i> Document</th>
-					<th class="col-face-photo">
-						<i class="fas fa-copy text-muted ms-2" title="Scanned Document Image"></i> Document Image
+					<th scope="col" class="min-vw-25" data-toggle="tooltip" title="Document Info">
+						Document Info
 					</th>
-					<th class="col-address" title="Indicative Address Info">Indicative Address Info</th>
-					<th class="col-weather" title="Scanned Data">
-						<img class="action-image" src="~/headers/information.gif" /> Scanned Data
+					<th scope="col" class="text-center col-1" title="Scanned Document" data-toggle="tooltip">
+						<i class="fas fa-copy text-muted ms-2"></i> Scanned Document
+				</th>
+					<th title="Scanned Data" data-toggle="tooltip"><img class="action-image" src="~/headers/information.gif" />Scanned Data</th>
+					<th scope="col" class="min-vw-25" title="Address Info" data-toggle="tooltip"> <i class="fas fa-home"></i>  Address Info</th>
+					<th scope="col" class="text-center col-1" data-toggle="tooltip" title="Map View">
+						<img class="action-image me-2" src="~/headers/pincode.gif" alt="Map" />Map View
 					</th>
-					<th class="col-pin-img" title="Indicative Map Route"><img class="action-image" src="~/headers/pincode.gif" />  Indicative Map</th>
-					<th class="col-match">Valid</th>
+					<th scope="col" class="text-center col-1" data-toggle="tooltip" title="Valid">Valid</th>
 				</tr>
 			</thead>
 			<tbody>
 				@foreach (var doc in location.DocumentIds.Where(d => d.Selected))
 				{
-
-					<tr>
+					<tr class="align-middle">
 						<td>
-							<small>
-							@doc.ReportName
-								</small>
-							@if (doc.IsRequired)
-							{
-								<span class="required-asterisk" title="Mandatory Image">*</span>
-							}
+							
+							<div class="text-start mt-1 p-2 bg-white rounded bordertext-left" data-toggle="tooltip" title="Document Type">
+								@doc.ReportName
+								@if (doc.IsRequired)
+								{
+									<span class="required-asterisk" title="Mandatory Location">*</span>
+								}
+							</div>
+							<div class="p-2 bg-white rounded border d-flex align-items-center justify-content-between shadow-sm" title="Captured Time" data-toggle="tooltip">
+								<span class="badge bg-dark px-2.5 py-1.5 fs-7 fw-medium">
+									<i class="fas fa-clock me-1 text-warning"></i>
+									<span class="local-time-display" data-utc="@(doc.LongLatTime.HasValue ? doc.LongLatTime.Value.ToString("o") : "")">
+										@(doc.LongLatTime.HasValue ? "Loading..." : "--")
+									</span>
+								</span>
+							</div>
 						</td>
-
-						<td>
+						<td class="text-center face-photo-column">
 							@if (doc.ValidationExecuted)
 							{
-								<img id="doc-img-@doc.Id"
-									 src="/Document/GetOcrDocument/@doc.Id"
-									 class="mobile-capture-info  preview-image"
-									 title="@doc.ReportName" />
+								<div class="position-relative d-inline-block mb-2">
+									<img id="doc-img-@doc.Id"
+										 src="/Document/GetOcrDocument/@doc.Id"
+										 class="mobile-capture-map img-thumbnail img-fluid shadow-sm thumbnail preview-image"
+										 title="Click to view document" />
+								</div>
 							}
 							else
 							{
@@ -54,54 +65,73 @@
 						</td>
 						
 						<td>
-									<div>@doc.LongLat</div>
+							<div class="p-4 bg-white rounded border shadow-sm">
+								<div class="text-dark fs-6 fw-bold ps-1 small">@doc.LocationInfo</div>
+							</div>
+						</td>
+						<td>
+							<div class="d-flex flex-column gap-2">
+								<!-- Address Card -->
+								<div class="text-muted  badge text-uppercase mb-1">Captured Address</div>
+								<div class="p-2.5 bg-white rounded border shadow-sm">
+									<div class="text-dark fs-6 fw-bold ps-1 small">@doc.LocationAddress</div>
+								</div>
+								<hr />
+								<!-- Lat/Long-->
+								<div class="text-muted badge text-uppercase mb-1">Latitude, Longitude</div>
+								<div class="p-2.5 bg-white rounded border shadow-sm">
+									<div class="text-dark fs-6 fw-bold ps-1 small text-center">@doc.LongLat</div>
+								</div>
+								<hr />
+								<!-- Distance-->
+								<div class="text-muted badge text-uppercase mb-1">Indicative Distance from @location.Address Address</div>
+								<div class="p-2.5 bg-white rounded border shadow-sm">
+									<div class="text-dark fs-6 fw-bold ps-1 small text-center">@doc.Distance</div>
+								</div>
+								<hr />
 
-							<small>
-							@doc.LocationAddress
-								</small>
-							<span class="badge badge-light">
-								Indicative Distance from @location.Address Address @doc.Distance
-							</span>
+							</div>
 						</td>
-						<td>
-							<small>
-							@doc.LocationInfo
-								</small>
-						</td>
-						<td>
+						<td class="text-center">
 							@if (doc.ValidationExecuted && doc.LocationMapUrl != null)
 							{
 								<img id="face-img-@doc.Id"
-									 src="@string.Format(doc.LocationMapUrl, "500", "500")"
+									 src="@string.Format(@doc.LocationMapUrl, "300", "300")"
 									 class="mobile-capture-map map-image"
 									 data-faceid="@doc.Id"
 									 data-locationid="@location.Id"
 									 data-source="document"
 									 title="Click to view map" />
-
 							}
 							else
 							{
-								<img src="~/img/no-map.jpeg" class="img-thumbnail rounded" />
+								<img src="~/img/no-map.jpeg" class="thumbnail profile-image doc-profile-image" />
 							}
 						</td>
-						<td>
-							@if (doc.ValidationExecuted)
-							{
-								@if (doc.ImageValid.HasValue && doc.ImageValid.Value)
+						<td class="text-center">
+							<div class="d-flex flex-column align-items-center justify-content-center gap-1">
+								@if (doc.ValidationExecuted)
 								{
-									<i class='fas fa-check-circle i-green'></i>
+									if (doc.ImageValid.GetValueOrDefault())
+									{
+										<span class="badge bg-success-subtle text-success border border-success px-2 py-1 small">
+											<i class="fas fa-check-circle me-1"></i> Valid
+										</span>
+									}
+									else
+									{
+										<span class="badge bg-danger-subtle text-danger border border-danger px-2 py-1 small">
+											<i class="fa fa-times-circle me-1"></i> Invalid
+										</span>
+									}
 								}
 								else
 								{
-									<i class='fa fa-times i-orangered' aria-hidden='true'></i>
+									<span class="badge bg-secondary-subtle text-muted border px-2 py-1 small">
+										<i class="fa fa-minus-circle me-1"></i> Pending
+									</span>
 								}
-							}
-							else
-							{
-								<i class='fa fa-times i-grey' aria-hidden='true'></i>
-							}
-
+							</div>
 						</td>
 					</tr>
 				}

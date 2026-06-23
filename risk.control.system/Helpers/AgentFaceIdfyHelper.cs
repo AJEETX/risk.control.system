@@ -14,7 +14,6 @@ namespace risk.control.system.Helpers
             face.LongLatTime = DateTime.UtcNow;
             face.LongLat = $"Latitude = {lat}, Longitude = {lon}";
             face.ValidationExecuted = true;
-
             loc.Updated = DateTime.UtcNow;
             loc.AgentEmail = data.Email;
             loc.ValidationExecuted = true;

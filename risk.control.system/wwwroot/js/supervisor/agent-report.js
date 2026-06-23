@@ -7,7 +7,7 @@
             $(".submit-progress").removeClass("hidden");
         }, 1);
 
-        $('#allocatedcase').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Submit <sub>report</sub>");
+        $('#allocatedcase').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Agent <sub>report</sub>");
 
         $('#allocatedcase').css('pointer-events', 'none')
 

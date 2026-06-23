@@ -12,25 +12,32 @@
 
 		<thead class="table-light">
 			<tr>
-				<th>Media File</th>
-				<th>
-					<i class="fas fa-copy text-muted ms-2" title="Scanned Document Image"></i>
+					<th scope="col" class="min-vw-25" data-toggle="tooltip" title=" Media File Type">
+					Media File</th>
+					<th scope="col" class="min-vw-25" data-toggle="tooltip" title="Play Media">
+						<i class="fas fa-copy text-muted ms-2" ></i> Play Media
 				</th>
-				<th title="Verified Address"><img class="action-image" src="~/headers/pincode.gif" /></th>
-				<th>Verified Address</th>
-					<th class="col-weather" title="Weather info"><img class="action-image" src="~/headers/information.gif" /></th>
-					<th>Action</th>
+				
+					<th scope="col" class="min-vw-25" data-toggle="tooltip" title="Address Info">Address Info</th>
+
+					<th class="col-weather" title="Weather info" data-toggle="tooltip">
+						<img class="action-image" src="~/headers/information.gif" /> Weather info</th>
+					<th scope="col" class="text-center col-1" title="Map View" data-toggle="tooltip">
+						<img class="action-image me-2" src="~/headers/pincode.gif" alt="Map" />Map View
+					</th>
+					<th title ="Action" data-toggle="tooltip">Action</th>
 			</tr>
 		</thead>
 		<tbody>
-			@foreach (var doc in location.MediaReports.Where(d => d.Selected))
+			@foreach (var doc in location.MediaReports.Where(d => d.Selected)) 
 			{
 					var accept = "audio/mpeg, audio/wav, audio/aac, audio / vnd.dlna.adts";
 				if(doc.MediaType == MediaType.VIDEO)
 				{
 					accept = "video/mp4,video/webm";
 				}
-				<tr>
+					<tr class="align-middle">
+
 					<td>@doc.ReportName
 						@if (doc.IsRequired)
 						{
@@ -70,34 +77,42 @@
 						}
 
 					</td>
-					<td>
-						@if (doc.ValidationExecuted && doc.LocationMapUrl != null)
-						{
-							<img id="face-img-@doc.Id"
-								 src="@string.Format(@doc.LocationMapUrl, "300","300")"
-									 class="mobile-capture-map map-image"
-								 data-faceid="@doc.Id"
-								 data-locationid="@location.Id"
-								 data-source="media"
-								 title="Click to view map" />
-						}
-						else
-						{
-							<img src="~/img/no-map.jpeg" class="thumbnail profile-image doc-profile-image" />
-						}
-					</td>
 						<td>
-							<small>
-								@doc.LocationAddress
-							</small>
-							<span class="badge badge-light">
-								Indicative Distance from @location.Address Address @doc.Distance
-							</span>
+							<div class="d-flex flex-column gap-2">
+								<!-- Address Card -->
+								<div class="text-muted  badge text-uppercase mb-1">Captured Address</div>
+								<div class="p-2.5 bg-white rounded border shadow-sm">
+									<div class="text-dark fs-6 fw-bold ps-1 small">@doc.LocationAddress</div>
+								</div>
+								<hr />
+								<!-- Weather Card -->
+								<div class="text-muted badge text-uppercase mb-1">Indicative Distance from @location.Address Address</div>
+								<div class="p-2.5 bg-white rounded border shadow-sm text-center">
+									<div class="text-dark fs-6 fw-bold ps-1 small"> @doc.Distance</div>
+								</div>
+							</div>
 						</td>
 						<td>
-							<small>
+							<div class="text-start mt-1 p-2 bg-white rounded border text-left">
 								@doc.LocationInfo
-							</small>
+
+							</div>
+						</td>
+						<td class="text-center">
+							@if (doc.ValidationExecuted && doc.LocationMapUrl != null)
+							{
+								<img id="face-img-@doc.Id"
+									 src="@string.Format(@doc.LocationMapUrl, "300", "300")"
+									 class="mobile-capture-map map-image"
+									 data-faceid="@doc.Id"
+									 data-locationid="@location.Id"
+									 data-source="media"
+									 title="Click to view map" />
+							}
+							else
+							{
+								<img src="~/img/no-map.jpeg" class="thumbnail profile-image doc-profile-image" />
+							}
 						</td>
 					<td>
 							<input accept="@accept" type="file" class="form-control remarks form-control-sm media-upload" data-docid="@doc.Id" />
