@@ -164,31 +164,41 @@
 							}
 						</td>
 						<td>
-							<div class="d-flex flex-column gap-2">
-								<!-- Address Card -->
-								<div class="text-muted  badge text-uppercase mb-1">Captured Address</div>
-								<div class="p-2.5 bg-white rounded border shadow-sm">
-									<div class="text-dark fs-6 fw-bold ps-1 small">@face.LocationAddress</div>
-								</div>
-								<hr />
-								<!-- Lat/Long-->
-								<div class="text-muted badge text-uppercase mb-1">Latitude, Longitude</div>
-								<div class="p-2.5 bg-white rounded border shadow-sm">
-									<div class="text-dark fs-6 fw-bold ps-1 small text-center">@face.LongLat</div>
-								</div>
-								<hr />
-								<!-- Distance-->
-								<div class="text-muted badge text-uppercase mb-1">Indicative Distance from @location.Address Address</div>
-								<div class="p-2.5 bg-white rounded border shadow-sm">
-									<div class="text-dark fs-6 fw-bold ps-1 small text-center">@face.Distance</div>
-								</div>
-								<hr />
-								<!-- Weather Card -->
-								<div class="text-muted badge text-uppercase mb-1">Weather Info</div>
-								<div class="p-2.5 bg-white rounded border shadow-sm">
-									<div class="text-dark fs-6 fw-bold ps-1 small">@face.LocationInfo</div>
+							<div class="d-flex flex-column gap-2 p-1">
+								<div class="card border border-light-subtle shadow-sm bg-white rounded-3 overflow-hidden">
+									<div class="card-header bg-light py-1 px-2 border-bottom border-light-subtle text-center">
+										<small class="text-secondary fw-bold text-uppercase tracking-wider fs-8">
+											<i class="fas fa-compass me-1 text-primary"></i> Latitude, Longitude
+										</small>
+									</div>
+									<div class="card-body p-2 bg-white text-center">
+										<code class="text-dark fw-bold small">@face.LongLat</code>
+									</div>
 								</div>
 
+								<div class="card border border-light-subtle shadow-sm bg-white rounded-3 overflow-hidden">
+									<div class="card-header bg-light py-1 px-2 border-bottom border-light-subtle text-center">
+										<small class="text-secondary fw-bold text-uppercase tracking-wider fs-8" title="From Agent Address to @location.Address Address">
+											<i class="fas fa-route me-1 text-warning"></i> Indicative Distance
+										</small>
+									</div>
+									<div class="card-body p-2 bg-white text-center">
+										<span class="badge bg-light text-dark border border-secondary-subtle fw-bold fs-7">
+											@face.Distance
+										</span>
+									</div>
+								</div>
+
+								<div class="card border border-light-subtle shadow-sm bg-white rounded-3 overflow-hidden">
+									<div class="card-header bg-light py-1 px-2 border-bottom border-light-subtle text-center">
+										<small class="text-secondary fw-bold text-uppercase tracking-wider fs-8">
+											<i class="fas fa-cloud-sun me-1 text-info"></i> Weather Info
+										</small>
+									</div>
+									<div class="card-body p-2 bg-white">
+										<div class="text-muted small italic">@face.LocationInfo</div>
+									</div>
+								</div>
 							</div>
 						</td>
 						<td class="text-center">
@@ -200,6 +210,18 @@
 									 data-locationid="@location.Id"
 									 data-source="face"
 									 title="Click to view map" />
+								<div class="d-flex flex-column gap-2 p-1">
+									<div class="card border border-light-subtle shadow-sm bg-white rounded-3 overflow-hidden">
+										<div class="card-header bg-light py-1 px-2 border-bottom border-light-subtle text-center">
+											<small class="text-secondary fw-bold text-uppercase tracking-wider fs-8">
+												<i class="fas fa-map-pin me-1 text-danger"></i> Captured Address
+											</small>
+										</div>
+										<div class="card-body p-2 bg-white">
+											<div class="text-dark fw-medium small text-wrap">@face	.LocationAddress</div>
+										</div>
+									</div>
+								</div>
 
 							}
 							else
