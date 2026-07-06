@@ -259,7 +259,7 @@
 													<span class="fa-li">
 														<i class="fas fa-lg fa-phone"></i>
 													</span>
-													Mobile #: + <b>@Model.CaseTask?.CustomerDetail?.Country?.ISDCode @Model?.CaseTask?.CustomerDetail?.PhoneNumber </b>
+													Mobile #: + <b>@Model?.CaseTask?.CustomerDetail?.Country?.ISDCode @Model?.CaseTask?.CustomerDetail?.PhoneNumber </b>
 													@if (Model?.CaseTask?.CustomerDetail?.IsValidPhoneNumber == true)
 													{
 														<i class="fas fa-check-circle text-success" title="Valid Mobile Number" data-bs-toggle="tooltip"></i>
