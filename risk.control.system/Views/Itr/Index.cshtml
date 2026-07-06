@@ -1,0 +1,114 @@
+﻿@model ItrViewModel
+@{
+    ViewData["Title"] = "ITR Validation";
+    Layout = "~/Views/Shared/_LayoutGuest.cshtml";
+}
+<section class="content tool-match-section">
+    <div id="article" class="card shadow-lg border-0 ocr-card">
+        <div class="card-header d-flex align-items-center bg-dark">
+            <i class="fas fa-file-invoice mr-2"></i>
+            <h5 class="mb-0 font-weight-bold">OCR Extraction</h5>
+
+            <div class="ml-auto ms-auto">
+                <span id="usageBadge" class="badge usage-badge-custom shadow-sm @(Model.RemainingTries <= 1 ? "badge-soft-danger" : "badge-soft-secondary")">
+                    <i class="fas @(Model.RemainingTries <= 1 ? "fa-exclamation-circle" : "fa-clock") mr-1 small"></i>
+                    <span id="remainingCount">@Model.RemainingTries</span> tries left
+                </span>
+            </div>
+        </div>
+        <div class="card-body p-4">
+            <div class="submit-progress hidden">
+                <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+            </div>
+            <form asp-action="Verify" method="post" enctype="multipart/form-data">
+                <div class="row">
+                    <div class="col-md-6 mb-4 text-center border-right">
+                        <label class="h6 font-weight-boldmb-3" for="drop-zone">
+                            <span class="badge badge-secondary rounded-circle mr-1 text-white">1</span> Select ITR (pdf)
+                        </label>
+                        <div id="drop-zone" class="pdf-drop-zone d-flex flex-column align-items-center justify-content-center p-4 @(Model.RemainingTries <= 0 ? "disabled-zone" : "")">
+                            <input id="fileInput" name="file" type="file" class="d-none" accept=".pdf" required @(Model.RemainingTries <= 0 ? "disabled" : "") />
+
+                            <div class="text-center">
+                                <i class="fas fa-file-image fa-4x mb-3" id="previewIcon"></i>
+                                <h6 class="text-warning font-weight-bold">Drop Image Here</h6>
+                                <p class="small text-muted mb-0">PDF up to 2MB</p>
+                                <div id="fileNameDisplay" class="badge badge-light p-2 mt-3 d-none text-truncate border"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 mb-4 text-center animate__animated animate__fadeIn">
+                        <label class="h6 font-weight-bold text-secondary mb-3">
+                            <span class="badge badge-secondary rounded-circle mr-1 text-white">2</span> Validation Result
+                        </label>
+                    <!-- Single Page Result Diagnostics Module Logs -->
+                    @if (Model.IsProcessed)
+                    {
+                        <div class="card shadow border-1">
+                            <div class="card-header @(Model.IsDocumentAuthentic && string.IsNullOrEmpty(Model.ErrorMessage) ? "bg-success" : "bg-danger") text-white">
+                                <h5>Cryptographic Diagnostics Report</h5>
+                            </div>
+                            <div class="card-body">
+                        
+                                @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+                                {
+                                    <div class="alert alert-warning">
+                                        <strong>System Notification:</strong> @Model.ErrorMessage
+                                    </div>
+                                }
+                                else if (Model.IsDocumentAuthentic)
+                                {
+                                    <div class="alert alert-success">
+                                        <strong>🛡️ Integrity Clear:</strong> Cryptographic verification passed. No post-generation adjustments detected.
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="alert alert-danger">
+                                        <strong>⚠️ Security Exception:</strong> This asset document contains compromised signature envelopes or modified editor trace strings!
+                                    </div>
+                                }
+
+                                <table class="table table-striped table-bordered mt-3">
+                                    <tbody>
+                                        <tr>
+                                            <th scope="row" class="w-100">Digital Signature Verification Chain</th>
+                                            <td>
+                                                <span class="badge @(Model.IsSignatureValid ? "bg-success" : "bg-danger") rounded-pill p-2">
+                                                    @(Model.IsSignatureValid ? "Passed" : "Failed / Counterfeit Data")
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">Metadata Editor Fingerprint Check</th>
+                                            <td>
+                                                <span class="badge @(Model.IsMetadataClean ? "bg-success" : "bg-danger") rounded-pill p-2">
+                                                    @(Model.IsMetadataClean ? "Clean Structure" : "Tampering Artifacts Identified")
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    }
+
+                </div>
+            </div>
+
+                <div class="mt-2">
+                    <button type="submit" id="analyzeBtn" class="btn btn-outline-secondary btn-lg w-100 shadow rounded-pill" @(Model.RemainingTries <= 0 ? "disabled" : "")>
+                        <i class="fas @(Model.RemainingTries <= 0 ? "fa-lock" : "fa-magic") mr-2"></i>
+                        <span>@(Model.RemainingTries <= 0 ? "Limit Reached" : "Run ITR Validation")</span>
+                        <span id="btnSpinner" class="spinner-border spinner-border-sm d-none"></span>
+                    </button>
+                </div>
+            </form>
+        </div>
+</div>
+</section>
+
+@section Scripts {
+    <script src="~/js/tool/itr-validation.js"></script>
+}

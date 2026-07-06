@@ -260,7 +260,7 @@ namespace risk.control.system.Controllers.Api
 
         [AllowAnonymous]
         [HttpGet("cleanup-agency-user-image-collection")]
-        public async Task<IActionResult> CleanUpAgencyUserCollectionAsync(string collectionId = CONSTANTS.AgencyUsersImageCollection)
+        public async Task<IActionResult> CleanUpAgencyUserCollectionAsync(string collectionId = CONSTANTS.FaceImageCollection)
         {
             try
             {

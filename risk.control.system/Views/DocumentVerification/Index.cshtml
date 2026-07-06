@@ -11,7 +11,7 @@
 		@* 1. Header with integrated Usage Badge *@
 		<div class="card-header d-flex align-items-center bg-warning">
 			<i class="fas fa-microscope mr-2"></i>
-			<h5 class="mb-0 font-weight-bold">Document Analysis</h5>
+			<h5 class="mb-0 font-weight-bold">Tamper Detection</h5>
 
 			<div class="ml-auto ms-auto">
 				<span id="usageBadge"
@@ -51,7 +51,6 @@
 					<div class="col-md-6 mb-4 text-center animate__animated animate__fadeIn">
 						@if (string.IsNullOrEmpty(Model.ElaImageUrl))
 						{
-							@* DEFAULT VIEW: Methodology *@
 							<label class="h6 font-weight-bold text-secondary mb-3">
 								<span class="badge badge-warning rounded-circle mr-1 text-white">2</span> Analysis Methodology
 							</label>

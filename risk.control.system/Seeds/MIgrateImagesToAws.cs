@@ -12,7 +12,7 @@ namespace risk.control.system.Seeds
     {
         public static async Task MigrateExistingUsersToCollectionAsync(IAmazonApiService _amazonApiService, ApplicationDbContext _context, IBase64FileService base64FileService)
         {
-            await _amazonApiService.EnsureCollectionExistsAsync(CONSTANTS.AgencyUsersImageCollection);
+            await _amazonApiService.EnsureCollectionExistsAsync(CONSTANTS.FaceImageCollection);
             await foreach (var user in _context.Users.AsNoTracking().Where(u => u.AwsFaceId == null && u.ProfilePictureUrl != null).Select(u => new { u.Id, u.ProfilePictureUrl }).AsAsyncEnumerable())
             {
                 try
@@ -20,7 +20,7 @@ namespace risk.control.system.Seeds
                     byte[] imageBytes = await base64FileService.GetByteFileAsync(user.ProfilePictureUrl!);
                     var indexRequest = new IndexFacesRequest
                     {
-                        CollectionId = CONSTANTS.AgencyUsersImageCollection,
+                        CollectionId = CONSTANTS.FaceImageCollection,
                         Image = new Image { Bytes = new MemoryStream(imageBytes) },
                         ExternalImageId = user.Id.ToString(),
                         MaxFaces = 1,

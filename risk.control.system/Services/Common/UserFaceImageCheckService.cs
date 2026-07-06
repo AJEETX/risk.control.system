@@ -41,7 +41,7 @@ namespace risk.control.system.Services.Common
 
             var searchRequest = new SearchFacesByImageRequest
             {
-                CollectionId = CONSTANTS.AgencyUsersImageCollection,
+                CollectionId = CONSTANTS.FaceImageCollection,
                 Image = new Image { Bytes = memoryStream },
                 MaxFaces = 1,
                 FaceMatchThreshold = 90F
@@ -69,19 +69,13 @@ namespace risk.control.system.Services.Common
 
             var searchRequest = new SearchFacesByImageRequest
             {
-                CollectionId = CONSTANTS.AgencyUsersImageCollection,
+                CollectionId = CONSTANTS.FaceImageCollection,
                 Image = new Image { Bytes = memoryStream },
                 MaxFaces = 1,
                 FaceMatchThreshold = 90F
             };
 
             var response = await _amazonApiService.SearchFacesByImageAsync(searchRequest);
-            if (response.FaceMatches.Count > 0)
-            {
-                string userId = response.FaceMatches[0].Face.ExternalImageId;
-                var matchingUser = await _context.Users.FindAsync(Guid.Parse(userId));
-            }
-
             var match = response.FaceMatches.Count > 0;
             return match;
         }
@@ -161,7 +155,7 @@ namespace risk.control.system.Services.Common
 
                 var indexRequest = new IndexFacesRequest
                 {
-                    CollectionId = CONSTANTS.AgencyUsersImageCollection,
+                    CollectionId = CONSTANTS.FaceImageCollection,
                     Image = new Image { Bytes = new MemoryStream(imageBytes) },
                     // VERY IMPORTANT: Store the DB Primary Key here
                     ExternalImageId = user.Id.ToString(),

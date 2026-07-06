@@ -8,7 +8,7 @@ namespace risk.control.system.Services.Tool
 {
     public interface IGoogleService
     {
-        Task<IReadOnlyList<EntityAnnotation>> DetectTextAsync(string imagePath);
+        Task<string> DetectTextAsync(string imagePath);
         Task<IReadOnlyList<TextBlock>> DetectText(string imagePath);
     }
 
@@ -48,7 +48,7 @@ namespace risk.control.system.Services.Tool
             }
         }
 
-        public async Task<IReadOnlyList<EntityAnnotation>> DetectTextAsync(string imagePath)
+        public async Task<string> DetectTextAsync(string imagePath)
         {
             try
             {
@@ -63,7 +63,20 @@ namespace risk.control.system.Services.Tool
                 }.Build();
 
                 var image = Image.FromFile(imagePath);
-                return await client.DetectTextAsync(image);
+                var ocrResult = await client.DetectTextAsync(image);
+                if (ocrResult == null)
+                {
+                    return "No text detected in the image.";
+                }
+                var ocrTextData = ocrResult.Select(t => new TextBlock(
+                    t.Description,
+                    t.BoundingPoly.Vertices[0].X, // Left
+                    t.BoundingPoly.Vertices[0].Y, // Top
+                    t.BoundingPoly.Vertices[2].X, // Right
+                    t.BoundingPoly.Vertices[2].Y  // Bottom
+                ));
+
+                return ocrTextData.FirstOrDefault()?.Text ?? string.Empty; ;
             }
             catch (Exception ex)
             {
