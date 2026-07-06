@@ -7,7 +7,7 @@
         public const string EmptyNull = "null/empty";
         public const string NullInvalid = "null/invalid";
         public const string ValidDateFormat = "dd-MM-yyyy";
-        public const string AgencyUsersImageCollection = "AgencyUsersImageCollection";
+        public const string FaceImageCollection = "AgencyUsersImageCollection";
         public const string LogsDirectory = "Logs";
         public const string DOCUMENT = "Document";
         public const string CASE = "Case";

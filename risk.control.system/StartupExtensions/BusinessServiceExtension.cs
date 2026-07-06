@@ -7,6 +7,7 @@ using risk.control.system.Services;
 using risk.control.system.Services.Agency;
 using risk.control.system.Services.AgencyAdmin;
 using risk.control.system.Services.Agent;
+using risk.control.system.Services.Agentic;
 using risk.control.system.Services.Api;
 using risk.control.system.Services.Assessor;
 using risk.control.system.Services.Common;
@@ -30,6 +31,7 @@ public static class BusinessServiceExtension
 
         //services.AddHttpClient(Options.DefaultName).AddPolicyHandler(retryPolicy);
         services.AddHttpClient();
+        services.AddScoped<IAgenticService, AgenticService>();
         services.AddScoped<IItrVerificationService, ItrVerificationService>();
         services.AddScoped<IImageConverter, ImageConverter>();
         services.AddScoped<ISmsNotificationService, SmsNotificationService>();

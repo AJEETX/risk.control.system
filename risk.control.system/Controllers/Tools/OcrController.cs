@@ -96,15 +96,12 @@ namespace risk.control.system.Controllers.Tools
         private async Task<string> ProcessOcrAsync(ApplicationUser user, IFormFile image)
         {
             var (file, path) = await _fileStorageService.SaveAsync(image, "tool");
-            var ocrData = await _googleService.DetectTextAsync(path);
-
-            if (ocrData == null || !ocrData.Any())
-                throw new Exception("Ocr failed to detect text.");
+            var ocrTextData = await _googleService.DetectTextAsync(path);
 
             user.OcrCount++;
             await _userManager.UpdateAsync(user);
 
-            return ocrData.FirstOrDefault()?.Description ?? string.Empty;
+            return ocrTextData;
         }
     }
 }

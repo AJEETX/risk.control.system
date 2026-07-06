@@ -139,7 +139,7 @@ namespace risk.control.system.Services.AgencyAdmin
             {
                 if (!string.IsNullOrEmpty(user.AwsFaceId))
                 {
-                    await _amazonApiService.DeleteFacesAsync(CONSTANTS.AgencyUsersImageCollection, new List<string> { user.AwsFaceId });
+                    await _amazonApiService.DeleteFacesAsync(CONSTANTS.FaceImageCollection, new List<string> { user.AwsFaceId });
 
                     // Clear the fields in your DB
                     user.AwsFaceId = null;
