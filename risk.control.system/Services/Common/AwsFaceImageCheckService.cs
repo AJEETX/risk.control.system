@@ -10,9 +10,10 @@ using Image = Amazon.Rekognition.Model.Image;
 
 namespace risk.control.system.Services.Common
 {
-    public interface IUserFaceImageCheckService
+    public interface IAwsFaceImageCheckService
     {
         Task SetImageToAws(string userEmail);
+        Task SetCaseImagesToAws(long caseId);
 
         Task<bool> CheckFaceImageExistAsync(IFormFile imageFile);
         Task<bool> CheckUploadFaceImageExistAsync(byte[] image);
@@ -20,11 +21,11 @@ namespace risk.control.system.Services.Common
         Task<FaceMatchResult> HasExactlyOneFace(byte[] imageBytes);
     }
 
-    internal class UserFaceImageCheckService(
+    internal class AwsFaceImageCheckService(
         ApplicationDbContext context,
         IAmazonApiService amazonApiService,
         IBase64FileService base64FileService,
-        IFeatureManager featureManager) : IUserFaceImageCheckService
+        IFeatureManager featureManager) : IAwsFaceImageCheckService
     {
         private readonly ApplicationDbContext _context = context;
         private readonly IAmazonApiService _amazonApiService = amazonApiService;
@@ -167,13 +168,63 @@ namespace risk.control.system.Services.Common
                 var faceId = response.FaceRecords.FirstOrDefault()?.Face.FaceId;
                 if (faceId != null)
                 {
-                    var userToUpdate = new ApplicationUser { Id = user.Id };
-                    _context.Users.Attach(userToUpdate);
-
-                    userToUpdate.AwsFaceId = faceId;
-                    userToUpdate.FaceIndexedAt = DateTime.UtcNow;
+                    user.AwsFaceId = faceId;
+                    user.FaceIndexedAt = DateTime.UtcNow;
                     await _context.SaveChangesAsync();
                 }
+            }
+        }
+        public async Task SetCaseImagesToAws(long caseId)
+        {
+            if (await _featureManager.IsEnabledAsync(FeatureFlags.ENABLE_SINGLE_FACE_MATCH_CHECK))
+            {
+                await SetCaseCustomerImageToAws(caseId);
+                await SetCaseBeneficiaryImageToAws(caseId);
+                await _context.SaveChangesAsync();
+            }
+        }
+        private async Task SetCaseCustomerImageToAws(long caseId)
+        {
+            var customer = await _context.CustomerDetail.FirstOrDefaultAsync(i => i.InvestigationTaskId == caseId);
+            var customerImageBytes = await _base64FileService.GetByteFileAsync(customer!.ImagePath!);
+            var indexRequest = new IndexFacesRequest
+            {
+                CollectionId = CONSTANTS.FaceImageCollection,
+                Image = new Image { Bytes = new MemoryStream(customerImageBytes) },
+                // VERY IMPORTANT: Store the DB Primary Key here
+                ExternalImageId = customer.CustomerDetailId.ToString(),
+                MaxFaces = 1,
+                QualityFilter = QualityFilter.AUTO
+            };
+
+            var response = await _amazonApiService.IndexFacesAsync(indexRequest);
+            var faceId = response.FaceRecords.FirstOrDefault()?.Face.FaceId;
+            if (faceId != null)
+            {
+                customer.AwsFaceId = faceId;
+                customer.FaceIndexedAt = DateTime.UtcNow;
+            }
+        }
+        private async Task SetCaseBeneficiaryImageToAws(long caseId)
+        {
+            var beneficiary = await _context.BeneficiaryDetail.FirstOrDefaultAsync(i => i.InvestigationTaskId == caseId);
+            var beneficiaryImageBytes = await _base64FileService.GetByteFileAsync(beneficiary!.ImagePath!);
+            var indexRequest = new IndexFacesRequest
+            {
+                CollectionId = CONSTANTS.FaceImageCollection,
+                Image = new Image { Bytes = new MemoryStream(beneficiaryImageBytes) },
+                // VERY IMPORTANT: Store the DB Primary Key here
+                ExternalImageId = beneficiary.BeneficiaryDetailId.ToString(),
+                MaxFaces = 1,
+                QualityFilter = QualityFilter.AUTO
+            };
+
+            var response = await _amazonApiService.IndexFacesAsync(indexRequest);
+            var faceId = response.FaceRecords.FirstOrDefault()?.Face.FaceId;
+            if (faceId != null)
+            {
+                beneficiary.AwsFaceId = faceId;
+                beneficiary.FaceIndexedAt = DateTime.UtcNow;
             }
         }
     }

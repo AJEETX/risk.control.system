@@ -27,7 +27,7 @@ namespace risk.control.system.Controllers.Api
         private readonly IProcessImageService processImageService;
         private readonly IAmazonApiService _amazonApiService;
         private readonly IWebHostEnvironment webHostEnvironment;
-        private readonly IPdfGenerativeService pdfGenerativeService;
+        private readonly IPdfReportService pdfGenerativeService;
         private readonly IPhoneService phoneService;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IFeatureManager featureManager;
@@ -39,7 +39,7 @@ namespace risk.control.system.Controllers.Api
             IProcessImageService processImageService,
             IAmazonApiService amazonApiService,
             IWebHostEnvironment webHostEnvironment,
-            IPdfGenerativeService generateService,
+            IPdfReportService generateService,
             IPhoneService phoneService,
             SignInManager<ApplicationUser> signInManager,
              IHttpContextAccessor httpContextAccessor,

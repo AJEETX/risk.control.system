@@ -8,22 +8,22 @@ using static risk.control.system.AppConstant.CONSTANTS;
 
 namespace risk.control.system.Services.Creator
 {
-    public interface ICustomerCreationService
+    public interface ICustomerUploadService
     {
         Task<(CustomerDetail?, List<UploadError>, List<string>)> AddCustomer(ApplicationUser companyUser, UploadCase uploadCase, byte[] data);
     }
 
-    internal class CustomerCreationService(IVerifierProcessor verifierProcessor,
+    internal class CustomerUploadService(IVerifierProcessor verifierProcessor,
         ICustomerValidator customerValidator,
         IExtractorService customerExtractorService,
         ICustomApiClient customApiCLient,
-        ILogger<CustomerCreationService> logger) : ICustomerCreationService
+        ILogger<CustomerUploadService> logger) : ICustomerUploadService
     {
         private readonly IVerifierProcessor _verifierProcessor = verifierProcessor;
         private readonly ICustomerValidator _customerValidator = customerValidator;
         private readonly IExtractorService _customerExtractorService = customerExtractorService;
         private readonly ICustomApiClient _customApiClient = customApiCLient;
-        private readonly ILogger<CustomerCreationService> _logger = logger;
+        private readonly ILogger<CustomerUploadService> _logger = logger;
 
         public async Task<(CustomerDetail?, List<UploadError>, List<string>)> AddCustomer(ApplicationUser companyUser, UploadCase uploadCase, byte[] data)
         {

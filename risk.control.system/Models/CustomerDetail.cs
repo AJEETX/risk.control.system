@@ -83,6 +83,8 @@ namespace risk.control.system.Models
         public string? Longitude { get; set; }
 
         public string? AddressLocationInfo { get; set; }
+        public string? AwsFaceId { get; set; }
+        public DateTime? FaceIndexedAt { get; set; }
 
         #region NOT MAPPED PROPERTIES
 

@@ -35,7 +35,7 @@ public static class BusinessServiceExtension
         services.AddScoped<IItrVerificationService, ItrVerificationService>();
         services.AddScoped<IImageConverter, ImageConverter>();
         services.AddScoped<ISmsNotificationService, SmsNotificationService>();
-        services.AddScoped<IUserFaceImageCheckService, UserFaceImageCheckService>();
+        services.AddScoped<IAwsFaceImageCheckService, AwsFaceImageCheckService>();
         services.AddScoped<IOcrService, OcrService>();
         services.AddScoped<IManageAgencyUserService, ManageAgencyUserService>();
         services.AddScoped<IErrorNotifyService, ErrorNotifyService>();
@@ -123,8 +123,8 @@ public static class BusinessServiceExtension
         services.AddScoped<IPdfGenerateAgentLocationService, PdfGenerateAgentLocationService>();
         services.AddScoped<IPdfGenerateDetailReportService, PdfGenerateDetailReportService>();
         services.AddScoped<IPdfGenerateCaseDetailService, PdfGenerateCaseDetailService>();
-        services.AddScoped<IPdfGenerateDetailService, PdfGenerateDetailService>();
-        services.AddScoped<IPdfGenerativeService, PdfGenerativeService>();
+        services.AddScoped<IPdfGenerateReportService, PdfGenerateReportService>();
+        services.AddScoped<IPdfReportService, PdfReportService>();
         services.AddScoped<IPanCardService, PanCardService>();
         services.AddScoped<ICloneReportService, CloneReportService>();
         services.AddScoped<IFaceIdfyService, FaceIdfyService>();
@@ -136,9 +136,9 @@ public static class BusinessServiceExtension
         services.AddScoped<IProcessCaseService, ProcessCaseService>();
         services.AddScoped<IInvestigationService, InvestigationService>();
         services.AddScoped<IHangfireJobService, HangfireJobService>();
-        services.AddScoped<ICaseDetailCreationService, CaseDetailCreationService>();
-        services.AddScoped<ICustomerCreationService, CustomerCreationService>();
-        services.AddScoped<IBeneficiaryCreationService, BeneficiaryCreationService>();
+        services.AddScoped<ICaseDetailUploadService, CaseDetailUploadService>();
+        services.AddScoped<ICustomerUploadService, CustomerUploadService>();
+        services.AddScoped<IBeneficiaryUploadService, BeneficiaryUploadService>();
         services.AddScoped<ICaseImageCreationService, CaseImageCreationService>();
         services.AddScoped<IUploadService, UploadService>();
         services.AddSingleton<IJwtService, JwtService>();

@@ -18,12 +18,12 @@ namespace risk.control.system.Services.Assessor
     {
         private readonly ApplicationDbContext _context;
         private readonly ILogger<ProcessCaseService> _logger;
-        private readonly IPdfGenerativeService _pdfGenerativeService;
+        private readonly IPdfReportService _pdfGenerativeService;
         private readonly ITimelineService _timelineService;
         private readonly IBackgroundJobClient _backgroundJobClient;
         public ProcessCaseService(ApplicationDbContext context,
             ILogger<ProcessCaseService> logger,
-            IPdfGenerativeService pdfGenerativeService,
+            IPdfReportService pdfGenerativeService,
             ITimelineService timelineService,
             IBackgroundJobClient backgroundJobClient)
         {

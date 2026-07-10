@@ -8,22 +8,22 @@ using static risk.control.system.AppConstant.CONSTANTS;
 
 namespace risk.control.system.Services.Creator
 {
-    public interface IBeneficiaryCreationService
+    public interface IBeneficiaryUploadService
     {
         Task<(BeneficiaryDetail?, List<UploadError>, List<string>)> AddBeneficiary(ApplicationUser companyUser, UploadCase uploadCase, byte[] data);
     }
 
-    internal class BeneficiaryCreationService(IVerifierProcessor verifierProcessor,
+    internal class BeneficiaryUploadService(IVerifierProcessor verifierProcessor,
         IBeneficiaryValidator beneficiaryValidator,
         IExtractorService extractorService,
         ICustomApiClient customApiCLient,
-        ILogger<BeneficiaryCreationService> logger) : IBeneficiaryCreationService
+        ILogger<BeneficiaryUploadService> logger) : IBeneficiaryUploadService
     {
         private readonly IVerifierProcessor _verifierProcessor = verifierProcessor;
         private readonly IBeneficiaryValidator _beneficiaryValidator = beneficiaryValidator;
         private readonly IExtractorService _extractorService = extractorService;
         private readonly ICustomApiClient _customApiClient = customApiCLient;
-        private readonly ILogger<BeneficiaryCreationService> _logger = logger;
+        private readonly ILogger<BeneficiaryUploadService> _logger = logger;
 
         public async Task<(BeneficiaryDetail?, List<UploadError>, List<string>)> AddBeneficiary(ApplicationUser companyUser, UploadCase uploadCase, byte[] data)
         {
