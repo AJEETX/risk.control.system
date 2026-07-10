@@ -19,7 +19,7 @@ namespace risk.control.system.Services.Creator
 
     internal class VerifierProcessor(
         IDbContextFactory<ApplicationDbContext> contextFactory,
-        IUserFaceImageCheckService faceImageCheckService,
+        IAwsFaceImageCheckService faceImageCheckService,
         ICaseImageCreationService caseImageCreationService,
         IPhoneService phoneService,
         IFileStorageService fileStorageService,
@@ -30,7 +30,7 @@ namespace risk.control.system.Services.Creator
         private static readonly HashSet<string> AllowedExt = new() { ".jpg", ".jpeg", ".png" };
         private readonly IDbContextFactory<ApplicationDbContext> _contextFactory = contextFactory;
         private readonly ICaseImageCreationService _caseImageCreationService = caseImageCreationService;
-        private readonly IUserFaceImageCheckService _faceImageCheckService = faceImageCheckService;
+        private readonly IAwsFaceImageCheckService _faceImageCheckService = faceImageCheckService;
         private readonly IPhoneService _phoneService = phoneService;
         private readonly IFileStorageService _fileStorageService = fileStorageService;
         private readonly IFeatureManager _featureManager = featureManager;

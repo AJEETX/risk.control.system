@@ -27,7 +27,7 @@ namespace risk.control.system.Services.AgencyAdmin
         UserManager<ApplicationUser> userManager,
         ApplicationDbContext context,
         IFileStorageService fileStorage,
-        IUserFaceImageCheckService faceImageCheckService,
+        IAwsFaceImageCheckService faceImageCheckService,
         INotyfService notify,
         ISmsService sms,
         ICustomApiClient geoClient,
@@ -37,7 +37,7 @@ namespace risk.control.system.Services.AgencyAdmin
         private readonly UserManager<ApplicationUser> _userManager = userManager;
         private readonly ApplicationDbContext _context = context;
         private readonly IFileStorageService _fileStorage = fileStorage;
-        private readonly IUserFaceImageCheckService _faceImageCheckService = faceImageCheckService;
+        private readonly IAwsFaceImageCheckService _faceImageCheckService = faceImageCheckService;
         private readonly INotyfService _notify = notify;
         private readonly ISmsService _sms = sms;
         private readonly ICustomApiClient _geoClient = geoClient;

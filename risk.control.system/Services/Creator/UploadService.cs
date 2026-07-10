@@ -8,9 +8,9 @@ namespace risk.control.system.Services.Creator
         Task<IReadOnlyList<UploadResult>> FileUploadAsync(ApplicationUser companyUser, IReadOnlyList<UploadCase> uploadCases, byte[] model, ORIGIN source);
     }
 
-    internal class UploadService(ICaseDetailCreationService caseCreationService, ILogger<UploadService> logger) : IUploadService
+    internal class UploadService(ICaseDetailUploadService caseCreationService, ILogger<UploadService> logger) : IUploadService
     {
-        private readonly ICaseDetailCreationService _caseCreationService = caseCreationService;
+        private readonly ICaseDetailUploadService _caseCreationService = caseCreationService;
         private readonly ILogger<UploadService> _logger = logger;
 
         public async Task<IReadOnlyList<UploadResult>> FileUploadAsync(ApplicationUser companyUser, IReadOnlyList<UploadCase> uploadCases, byte[] model, ORIGIN source)
