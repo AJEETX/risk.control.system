@@ -1,4 +1,14 @@
 ﻿$(document).ready(function () {
+
+    $(document).on("click", ".open-map-modal", function () {
+        $("#imageModal").modal("show");
+
+        const imageUrl = $(this).data("img");
+        const title = $(this).data("title");
+
+        $("#modalImage").attr("src", imageUrl);
+        $("#mapImageLabel").text(title || "Preview");
+    });
     $('#customerGoogleMap').on('click', function () {
         const customerId = $('#customerDetailId').val();
 

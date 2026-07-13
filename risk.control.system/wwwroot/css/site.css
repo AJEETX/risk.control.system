@@ -1722,7 +1722,9 @@ ul#messagesList {
         transform: translateY(-50%);
         color: white; /* Icon color */
     }
-
+.thumbnail {
+    cursor: pointer;
+}
 .thumbnail-image {
     cursor: pointer;
     max-width: 80px;
