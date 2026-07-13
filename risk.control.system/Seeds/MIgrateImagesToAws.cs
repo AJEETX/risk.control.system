@@ -2,6 +2,7 @@
 using Amazon.Rekognition.Model;
 using Microsoft.EntityFrameworkCore;
 using risk.control.system.AppConstant;
+using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Services.Agent;
 using risk.control.system.Services.Common;
@@ -12,15 +13,21 @@ namespace risk.control.system.Seeds
     {
         public static async Task MigrateExistingUsersToCollectionAsync(IAmazonApiService _amazonApiService, ApplicationDbContext _context, IBase64FileService base64FileService)
         {
-            await _amazonApiService.EnsureCollectionExistsAsync(CONSTANTS.FaceImageCollection);
-            await foreach (var user in _context.Users.AsNoTracking().Where(u => u.AwsFaceId == null && u.ProfilePictureUrl != null).Select(u => new { u.Id, u.ProfilePictureUrl }).AsAsyncEnumerable())
+            var imageCollection = EnvHelper.Get(CONSTANTS.FaceImageCollection);
+
+            var deletedResponse = await _amazonApiService.DeleteCollectionAsync(imageCollection!);
+
+            var ensureCollectionResponse = await _amazonApiService.EnsureCollectionExistsAsync(imageCollection!);
+
+            var portalUsers = _context.Users.AsNoTracking().Where(u => u.AwsFaceId == null && u.ProfilePictureUrl != null).AsAsyncEnumerable();
+            await foreach (var user in portalUsers)
             {
                 try
                 {
                     byte[] imageBytes = await base64FileService.GetByteFileAsync(user.ProfilePictureUrl!);
                     var indexRequest = new IndexFacesRequest
                     {
-                        CollectionId = CONSTANTS.FaceImageCollection,
+                        CollectionId = imageCollection,
                         Image = new Image { Bytes = new MemoryStream(imageBytes) },
                         ExternalImageId = user.Id.ToString(),
                         MaxFaces = 1,
@@ -30,10 +37,9 @@ namespace risk.control.system.Seeds
                     var faceId = response.FaceRecords.FirstOrDefault()?.Face.FaceId;
                     if (faceId != null)
                     {
-                        var userToUpdate = new ApplicationUser { Id = user.Id };
-                        _context.Users.Attach(userToUpdate);
-                        userToUpdate.AwsFaceId = faceId;
-                        userToUpdate.FaceIndexedAt = DateTime.UtcNow;
+                        user.AwsFaceId = faceId;
+                        user.FaceIndexedAt = DateTime.UtcNow;
+                        _context.Users.Update(user);
                         await _context.SaveChangesAsync();
                     }
                     Console.WriteLine($"Indexed User {user.Id}: Found {response.FaceRecords.Count} face(s)");

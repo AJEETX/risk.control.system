@@ -136,7 +136,7 @@ namespace risk.control.system.Services.AgencyAdmin
             var (fileName, path) = await _fileStorage.SaveAsync(model.ProfileImage!, safeFolder, "user");
             model.ProfilePictureUrl = path;
             model.ProfilePictureExtension = Path.GetExtension(fileName);
-            await _faceImageCheckService.SetImageToAws(email);
+            await _faceImageCheckService.SetUserImageToAws(email);
         }
 
         private static void PopulateUserEntity(ApplicationUser model, string email, string createdBy)

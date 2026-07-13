@@ -15,13 +15,13 @@ namespace risk.control.system.Controllers.Tools
     public class OcrController(
         ILogger<OcrController> logger,
         INotyfService notifyService,
-        IGoogleService googleService,
+        IGoogleOcrService googleService,
         IFileStorageService fileStorageService,
         UserManager<ApplicationUser> userManager) : Controller
     {
         private readonly INotyfService _notifyService = notifyService;
         private readonly ILogger<OcrController> _logger = logger;
-        private readonly IGoogleService _googleService = googleService;
+        private readonly IGoogleOcrService _googleService = googleService;
         private readonly IFileStorageService _fileStorageService = fileStorageService;
         private readonly UserManager<ApplicationUser> _userManager = userManager; // Add this
 

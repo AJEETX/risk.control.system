@@ -10,7 +10,7 @@ public static class DatabaseServiceExtension
 {
     public static IServiceCollection AddDatastoreServices(this IServiceCollection services, IConfiguration configuration, IWebHostEnvironment env)
     {
-        if (env.IsDevelopment())
+        if (!env.IsDevelopment())
         {
             var connectionString = EnvHelper.Get("DEFAULT_CONNECTION");
             services.AddDbContextFactory<ApplicationDbContext>(options =>

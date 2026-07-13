@@ -164,7 +164,7 @@ namespace risk.control.system.Controllers.Api
 
         [AllowAnonymous]
         [HttpGet("test-2-get-jwt-token")]
-        public async Task<IActionResult> Jwt(string username = "agent@verify.com")
+        public async Task<IActionResult> Jwt(string username = "agent@checker.com")
         {
             var user = await _userManager.FindByEmailAsync(username);
             if (user == null)
@@ -239,7 +239,7 @@ namespace risk.control.system.Controllers.Api
 
         [AllowAnonymous]
         [HttpGet("pdf")]
-        public async Task<IActionResult> OldPdf(long id = 1, string currentUserEmail = "assessor@insurer.com")
+        public async Task<IActionResult> Pdf(long id = 1, string currentUserEmail = "assessor@insurer.com")
         {
             try
             {
@@ -259,34 +259,53 @@ namespace risk.control.system.Controllers.Api
         }
 
         [AllowAnonymous]
-        [HttpGet("cleanup-agency-user-image-collection")]
-        public async Task<IActionResult> CleanUpAgencyUserCollectionAsync(string collectionId = CONSTANTS.FaceImageCollection)
+        [HttpGet("get-all-face-images")]
+        public async Task<IActionResult> GetAllFacesFromCollection()
         {
+            var imageCollection = EnvHelper.Get(CONSTANTS.FaceImageCollection);
+
             try
             {
-                var response = await _amazonApiService.DeleteCollectionAsync(collectionId);
+                var faces = await _amazonApiService.GetAllFacesFromCollectionAsync(imageCollection!);
+                return Ok(faces);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpGet("cleanup-agency-user-image-collection")]
+        public async Task<IActionResult> CleanUpAgencyUserCollectionAsync()
+        {
+            var imageCollection = EnvHelper.Get(CONSTANTS.FaceImageCollection);
+            try
+            {
+                var response = await _amazonApiService.DeleteCollectionAsync(imageCollection!);
 
                 if (response.StatusCode == 200)
                 {
-                    Console.WriteLine($"Successfully deleted collection: {collectionId}");
-                    return Ok($"Successfully deleted collection: {collectionId}");
+                    Console.WriteLine($"Successfully deleted collection: {imageCollection}");
+                    return Ok($"Successfully deleted collection: {imageCollection}");
                 }
                 else if (response.StatusCode == 400)
                 {
-                    Console.WriteLine($"Collection: {collectionId} Not Found. Status code: {response.StatusCode}");
-                    return BadRequest($"Collection: {collectionId} Not Found. Status code: {response.StatusCode}");
+                    Console.WriteLine($"Collection: {imageCollection} Not Found. Status code: {response.StatusCode}");
+                    return BadRequest($"Collection: {imageCollection} Not Found. Status code: {response.StatusCode}");
                 }
                 else if (response.StatusCode == 500)
                 {
-                    Console.WriteLine($"Server error deleting Collection {collectionId}. Status code: {response.StatusCode}");
-                    return StatusCode(500, $"Server error deleting Collection {collectionId}");
+                    Console.WriteLine($"Server error deleting Collection {imageCollection}. Status code: {response.StatusCode}");
+                    return StatusCode(500, $"Server error deleting Collection {imageCollection}");
                 }
             }
             catch (ResourceNotFoundException ex)
             {
-                Console.WriteLine($"Collection {collectionId} does not exist. Nothing to delete. {ex.Message}");
+                Console.WriteLine($"Collection {imageCollection} does not exist. Nothing to delete. {ex.Message}");
             }
-            return StatusCode(500, $"Server error deleting Collection {collectionId}");
+            return StatusCode(500, $"Server error deleting Collection {imageCollection}");
         }
 
         [AllowAnonymous]

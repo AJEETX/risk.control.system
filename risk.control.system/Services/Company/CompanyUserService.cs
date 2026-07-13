@@ -184,7 +184,7 @@ namespace risk.control.system.Services.Company
             var (fileName, relativePath) = await _fileStorage.SaveAsync(file, domain, "user");
             user.ProfilePictureUrl = relativePath;
             user.ProfilePictureExtension = Path.GetExtension(fileName);
-            await _faceImageCheckService.SetImageToAws(email);
+            await _faceImageCheckService.SetUserImageToAws(email);
         }
 
         public async Task<ApplicationUser> GetUserAsync(long id)

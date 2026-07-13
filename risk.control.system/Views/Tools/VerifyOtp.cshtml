@@ -13,7 +13,7 @@
 	<link rel="icon" href="/favicon.ico" type="image/x-icon">
 	<link rel="stylesheet" href="~/plugins/fontawesome-free/css/all.min.css">
 	<link rel="stylesheet" href="~/css/jquery-ui.css">
-	<link rel="stylesheet" href="~/css/jquery-confirm.min.css">
+	<link rel="stylesheet" href="~/js/jqueryconfirm/dist/jquery-confirm.min.css">
 	<link rel="stylesheet" href="~/css/login.css">
 	<link rel="stylesheet" href="~/css/cookie.css">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -76,16 +76,16 @@
 						{
 							<div id="resendSection" class="account">
 								<p id="resendStatus" class="text-muted small">
-									Didn't get the code? <button id="resendBtn" type="button" class="btn btn-warning btn-block" disabled>
-									Resend in <span id="timer">30</span>s
-								</button>
-							</p>
-						</div>
-					}
+									@* Didn't get the code? <button id="resendBtn" type="button" class="btn btn-warning btn-block" disabled> Resend in 
+									</button>
+								<span id="timer">60</span>s  *@
+								</p>
+							</div>
+						}
 				</div>
 				<div class="error-message try-again">
 					<div class="text-muted text-sm">
-						Try Again <span class="far fa-hand-point-right"></span>
+						Didn't get the code? Try Again <span class="far fa-hand-point-right"></span>
 						<a asp-action="Try" asp-controller="Tools" class="login-link"> Click Here</a>
 					</div>
 				</div>
@@ -100,7 +100,7 @@
 @{
 	await Html.RenderPartialAsync("_ValidationScriptsPartial");
 }
-<script src="~/js/jqueryconfirm/dist/jquery-confirm.min.js"></script>
+<script src="~/js/jqueryconfirm/dist/jquery-confirm.js"></script>
 <script src="~/js/otp.js"></script>
 @await Component.InvokeAsync("Notyf")
 </html>
