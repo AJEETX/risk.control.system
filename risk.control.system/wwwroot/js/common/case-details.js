@@ -1,6 +1,6 @@
 ﻿$(document).ready(function () {
 
-    $(document).on("click", ".open-map-modal", function () {
+    $(document).on("click", ".open-doc-modal", function () {
         $("#imageModal").modal("show");
 
         const imageUrl = $(this).data("img");

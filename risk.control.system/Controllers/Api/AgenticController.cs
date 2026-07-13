@@ -214,31 +214,31 @@ namespace risk.control.system.Controllers.Api
             }
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
-        [HttpPost("convert-image-to-searchable-pdf")]
-        public async Task<IActionResult> ConvertImageToSearchablePdf(IFormFile imageFile)
-        {
-            if (imageFile == null || imageFile.Length == 0)
-            {
-                return BadRequest("No image file provided.");
-            }
+        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
+        //[HttpPost("convert-image-to-searchable-pdf")]
+        //public async Task<IActionResult> ConvertImageToSearchablePdf(IFormFile imageFile)
+        //{
+        //    if (imageFile == null || imageFile.Length == 0)
+        //    {
+        //        return BadRequest("No image file provided.");
+        //    }
 
-            try
-            {
-                var stream = imageFile.OpenReadStream();
-                var imageOnDiskPath = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}{Path.GetExtension(imageFile.FileName)}");
-                using (var fileStream = new FileStream(imageOnDiskPath, FileMode.Create))
-                {
-                    await stream.CopyToAsync(fileStream);
-                }
-                var pdfBytes = _agenticService.ConvertImageToSearchablePdfBytes(imageOnDiskPath);
-                return File(pdfBytes, "application/pdf", "converted_document.pdf");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error converting image to searchable PDF: {ex.Message}");
-                return StatusCode(500, "An error occurred while processing the request.");
-            }
-        }
+        //    try
+        //    {
+        //        var stream = imageFile.OpenReadStream();
+        //        var imageOnDiskPath = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}{Path.GetExtension(imageFile.FileName)}");
+        //        using (var fileStream = new FileStream(imageOnDiskPath, FileMode.Create))
+        //        {
+        //            await stream.CopyToAsync(fileStream);
+        //        }
+        //        var pdfBytes = _agenticService.ConvertImageToSearchablePdfBytes(imageOnDiskPath);
+        //        return File(pdfBytes, "application/pdf", "converted_document.pdf");
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Console.WriteLine($"Error converting image to searchable PDF: {ex.Message}");
+        //        return StatusCode(500, "An error occurred while processing the request.");
+        //    }
+        //}
     }
 }
