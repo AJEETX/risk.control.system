@@ -25,16 +25,16 @@ namespace risk.control.system.Seeds
             {
                 new { Name = "Checker", Address = "57 Mahoneys Road", IFSC = "733112", Bank = "Westpac Banking Corporation" },
                 new { Name = "Crucible", Address = "12 faulkner Street", IFSC = "083251", Bank = "National Australia Bank Limited" },
-                new { Name = "Cyber", Address = "94 Mahoneys Road", IFSC = "083251", Bank = "National Australia Bank Limited" },
-                new { Name = "Honest", Address = "117 Mahoneys Road", IFSC = "083251", Bank = "National Australia Bank Limited" },
-                new { Name = "Hubris", Address = "12 faulkner Street", IFSC = "083251", Bank = "National Australia Bank Limited" },
-                new { Name = "Investigate", Address = "11 Barter Crescent", IFSC = "083251", Bank = "National Australia Bank Limited" },
-                new { Name = "Investigation", Address = "11 Jacana Road", IFSC = "083251", Bank = "National Australia Bank Limited" },
-                new { Name = "Nicer", Address = "45 Mahoneys Road", IFSC = "083251", Bank = "National Australia Bank Limited" },
-                new { Name = "Proper", Address = "11 Jacana Road", IFSC = "083251", Bank = "National Australia Bank Limited" },
-                new { Name = "Sample", Address = "33 Mahoneys Road", IFSC = "083251", Bank = "National Australia Bank Limited" },
-                new { Name = "Verify", Address = "67 Mahoneys Road", IFSC = "083251", Bank = "National Australia Bank Limited" },
-                new { Name = "Zoom", Address = "12 Jackson Road", IFSC = "083251", Bank = "National Australia Bank Limited" }
+                //new { Name = "Cyber", Address = "94 Mahoneys Road", IFSC = "083251", Bank = "National Australia Bank Limited" },
+                //new { Name = "Honest", Address = "117 Mahoneys Road", IFSC = "083251", Bank = "National Australia Bank Limited" },
+                //new { Name = "Hubris", Address = "12 faulkner Street", IFSC = "083251", Bank = "National Australia Bank Limited" },
+                //new { Name = "Investigate", Address = "11 Barter Crescent", IFSC = "083251", Bank = "National Australia Bank Limited" },
+                //new { Name = "Investigation", Address = "11 Jacana Road", IFSC = "083251", Bank = "National Australia Bank Limited" },
+                //new { Name = "Nicer", Address = "45 Mahoneys Road", IFSC = "083251", Bank = "National Australia Bank Limited" },
+                //new { Name = "Proper", Address = "11 Jacana Road", IFSC = "083251", Bank = "National Australia Bank Limited" },
+                //new { Name = "Sample", Address = "33 Mahoneys Road", IFSC = "083251", Bank = "National Australia Bank Limited" },
+                //new { Name = "Verify", Address = "67 Mahoneys Road", IFSC = "083251", Bank = "National Australia Bank Limited" },
+                //new { Name = "Zoom", Address = "12 Jackson Road", IFSC = "083251", Bank = "National Australia Bank Limited" }
             };
             var vendors = new List<Vendor>();
             foreach (var item in agencyData)
@@ -56,7 +56,10 @@ namespace risk.control.system.Seeds
                 vendors.Add(await AgencySeed.Seed(context, env, customApiCLient, userManager, input, servicesTypes, fileStorageService));
             }
             var insurerInput = GetInsurer();
-            await Insurer.Seed(context, vendors.Take(vendors.Count / 2).ToList(), env, customApiCLient, userManager, insurerInput, fileStorageService);
+
+            var agenciesToEmpanel = vendors.Take(vendors.Count / 2).ToList();
+
+            await Insurer.Seed(context, agenciesToEmpanel, env, customApiCLient, userManager, insurerInput, fileStorageService);
             await context.SaveChangesAsync(null, false);
             return auPincodes.FirstOrDefault(p => p.Code == PINCODE)?.Code ?? auPincodes.First().Code;
         }

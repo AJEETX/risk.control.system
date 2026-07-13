@@ -13,13 +13,13 @@ namespace risk.control.system.Seeds
         {
             using var scope = app.Services.CreateScope();
             await using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-            var webHostEnvironment = scope.ServiceProvider.GetRequiredService<IWebHostEnvironment>();
+            var env = scope.ServiceProvider.GetRequiredService<IWebHostEnvironment>();
             var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
             var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
             var customApiCLient = scope.ServiceProvider.GetRequiredService<ICustomApiClient>();
             var httpAccessor = scope.ServiceProvider.GetRequiredService<IHttpContextAccessor>();
             var fileStorageService = scope.ServiceProvider.GetRequiredService<IFileStorageService>();
-            var _featureManager = scope.ServiceProvider.GetRequiredService<IFeatureManager>();
+            var featureManager = scope.ServiceProvider.GetRequiredService<IFeatureManager>();
 
             context.Database.EnsureCreated();
 
@@ -38,11 +38,12 @@ namespace risk.control.system.Seeds
 
             await InsurerSetupSeed.Seed(context);
 
-            var randomPinCode = await StartCountryWiseSeed.Seed(context, webHostEnvironment, userManager, customApiCLient, fileStorageService);
+            var randomPinCode = await StartCountryWiseSeed.Seed(context, env, userManager, customApiCLient, fileStorageService);
 
-            await PortalAdminSeed.Seed(context, webHostEnvironment, userManager, roleManager, randomPinCode, fileStorageService);
+            await PortalAdminSeed.Seed(context, env, userManager, roleManager, randomPinCode, fileStorageService);
 
-            if (await _featureManager.IsEnabledAsync(FeatureFlags.ENABLE_SINGLE_FACE_MATCH_CHECK))
+            var uploadImage2Aws = await featureManager.IsEnabledAsync(FeatureFlags.FACE_MATCH_CHECK);
+            if (uploadImage2Aws)
             {
                 var amazonApiService = scope.ServiceProvider.GetRequiredService<IAmazonApiService>();
                 var base64FileService = scope.ServiceProvider.GetRequiredService<IBase64FileService>();

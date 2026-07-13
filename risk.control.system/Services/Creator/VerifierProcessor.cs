@@ -52,20 +52,20 @@ namespace risk.control.system.Services.Creator
 
             if (imageData == null)
             {
-                errs.Add(new UploadError { UploadData = $"{caseEntityName} Image", Error = $"Missing {caseEntityName} Image" });
-                sums.Add($"[{caseEntityName} image is missing]");
+                errs.Add(new UploadError { UploadData = $"{caseEntityName} Document Image", Error = $"Missing {caseEntityName} Document  Image" });
+                sums.Add($"[{caseEntityName} Document  image is missing]");
                 return (string.Empty, extension);
             }
             if (imageData.Length > MAX_FILE_SIZE)
             {
-                errs.Add(new UploadError { UploadData = $"{caseEntityName} Image", Error = $"{caseEntityName} Image size exceeds 5MB" });
-                sums.Add($"[{caseEntityName} image size exceeds 5MB]");
+                errs.Add(new UploadError { UploadData = $"{caseEntityName} Document  Image", Error = $"{caseEntityName} Document  Image size exceeds 5MB" });
+                sums.Add($"[{caseEntityName} Document  image size exceeds 5MB]");
                 return (string.Empty, extension);
             }
             if (!AllowedExt.Contains(extension))
             {
-                errs.Add(new UploadError { UploadData = $"{caseEntityName} Image", Error = $"Invalid {caseEntityName} image type" });
-                sums.Add($"[{caseEntityName} Invalid image type]");
+                errs.Add(new UploadError { UploadData = $"{caseEntityName} Image", Error = $"Invalid {caseEntityName} Document  image type" });
+                sums.Add($"[{caseEntityName} Invalid Document  image type]");
                 return (string.Empty, extension);
             }
             // Returns a tuple: (string FileName, string RelativePath)

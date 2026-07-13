@@ -159,7 +159,7 @@ public static class BusinessServiceExtension
         services.AddScoped<IUploadZipFileService, UploadZipFileService>();
         services.AddScoped<IDashboardService, DashboardService>();
         services.AddScoped<IFaceMatchService, FaceMatchService>();
-        services.AddScoped<IGoogleService, GoogleService>();
+        services.AddScoped<IGoogleOcrService, GoogleOcrService>();
         services.AddScoped<IGoogleMaskHelper, GoogleMaskHelper>();
         services.AddScoped<ITextAnalyticsService, TextAnalyticsService>();
 

@@ -19,7 +19,7 @@ internal class DocumentIdfyService(ApplicationDbContext context,
     ILogger<FaceIdfyService> logger,
     IFileStorageService fileStorageService,
     IPanCardService panCardService,
-    IGoogleService googleApi,
+    IGoogleOcrService googleApi,
     IHttpClientService httpClientService,
     ICustomApiClient customApiCLient) : IDocumentIdfyService
 {
@@ -29,7 +29,7 @@ internal class DocumentIdfyService(ApplicationDbContext context,
     private readonly ILogger<FaceIdfyService> _logger = logger;
     private readonly IFileStorageService _fileStorageService = fileStorageService;
     private readonly IPanCardService _panCardService = panCardService;
-    private readonly IGoogleService _googleApi = googleApi;
+    private readonly IGoogleOcrService _googleApi = googleApi;
     private readonly IHttpClientService _httpClientService = httpClientService;
     private readonly ICustomApiClient _customApiCLient = customApiCLient;
 

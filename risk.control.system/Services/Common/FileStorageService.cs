@@ -6,7 +6,7 @@ namespace risk.control.system.Services.Common
     {
         Task<(string FileName, string RelativePath)> SaveAsync(IFormFile file, string category, string? subFolder = null, string? subSubFolder = null, string[]? allowedTypes = null);
 
-        Task<(string FileName, string RelativePath)> SaveAsync(byte[] data, string extension, string category, string? subFolder = null, string? subSubFolder = null, string[]? allowedExtensions = null);
+        Task<(string FileName, string RelativePath)> SaveAsync(byte[] data, string extension, string category, string? subFolder = null, string? subSubFolder = null, string[]? allowedExtensions = null, string? fileName = null);
 
         Task<(string FileName, string RelativePath)> SaveMediaAsync(IFormFile file, string category, string? subFolder = null, string? subSubFolder = null);
     }
@@ -90,7 +90,7 @@ namespace risk.control.system.Services.Common
             return (fileName, relative);
         }
 
-        public async Task<(string FileName, string RelativePath)> SaveAsync(byte[] data, string extension, string category, string? subFolder = null, string? subSubFolder = null, string[]? allowedExtensions = null)
+        public async Task<(string FileName, string RelativePath)> SaveAsync(byte[] data, string extension, string category, string? subFolder = null, string? subSubFolder = null, string[]? allowedExtensions = null, string? fileName = null)
         {
             if (data == null || data.Length == 0)
                 throw new ArgumentException("Invalid data bytes");
@@ -102,7 +102,7 @@ namespace risk.control.system.Services.Common
             if (!allowedExtensions.Contains(extension.ToLowerInvariant()))
                 throw new InvalidOperationException($"Unsupported extension: {extension}");
 
-            var fileName = $"{Guid.NewGuid()}{extension}";
+            fileName = fileName ?? $"{Guid.NewGuid()}{extension}";
             var folderPath = GetOrCreateFolder(category, subFolder, subSubFolder);
             var filePath = Path.Combine(folderPath, fileName);
 

@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using risk.control.system.AppConstant;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
+using risk.control.system.Services.Agentic;
+using risk.control.system.Services.Common;
 namespace risk.control.system.Services.Report
 {
     public interface IPdfReportService
@@ -21,14 +23,23 @@ namespace risk.control.system.Services.Report
         ApplicationDbContext context,
         IWebHostEnvironment env,
         IPdfGenerateReportService pdfGenerate,
+        IFileStorageService fileStorageService,
+        IAgenticService agenticService,
         ILogger<PdfReportService> logger,
         IPdfGenerateDetailReportService pdfGenerateDetail) : IPdfReportService
     {
         private const string reportFilename = "Agency_Report.pdf";
+        private const string zipFilename = "Agency_Report.zip";
+        private const string zipFolderName = "Report";
+        private const string ClaimFormName = "Claim_Form.pdf";
+        private const string UnderwritingFormName = "Underwriting_Form.pdf";
+        private const string extension = ".pdf";
         private readonly string bucketName = CONSTANTS.S3_BUCKET;
         private readonly ApplicationDbContext _context = context;
         private readonly IWebHostEnvironment _env = env;
         private readonly IPdfGenerateReportService _pdfGenerate = pdfGenerate;
+        private readonly IFileStorageService _fileStorageService = fileStorageService;
+        private readonly IAgenticService _agenticService = agenticService;
         private readonly IPdfGenerateDetailReportService _pdfGenerateDetail = pdfGenerateDetail;
         private readonly IAmazonS3 _s3Client = s3Client;
         private readonly ILogger<PdfReportService> _logger = logger;
@@ -97,7 +108,9 @@ namespace risk.control.system.Services.Report
             var investigationReport = await _context.ReportTemplates.Include(r => r.LocationReport).ThenInclude(l => l.AgentIdReport)
                .Include(r => r.LocationReport).ThenInclude(l => l.FaceIds).Include(r => r.LocationReport).ThenInclude(l => l.DocumentIds)
                .Include(r => r.LocationReport).ThenInclude(l => l.Questions).FirstOrDefaultAsync(q => q.Id == investigation!.ReportTemplateId);
+
             var vendor = _context.Vendor.Include(s => s.District).Include(s => s.State).Include(s => s.Country).Include(s => s.PinCode).Include(s => s.VendorInvestigationServiceTypes).FirstOrDefault(v => v.VendorId == investigation!.VendorId);
+
             DocumentBuilder builder = DocumentBuilder.New();
             SectionBuilder section = builder.AddSection();
             section.SetOrientation(PageOrientation.Landscape);
@@ -108,10 +121,16 @@ namespace risk.control.system.Services.Report
             }
             section = await _pdfGenerateDetail.Build(section, investigation!, investigationReport!, vendor!, isClaim);
 
-            string agencyReportFilePath = Path.GetFullPath(Path.Combine(_env.ContentRootPath, CONSTANTS.DOCUMENT, CONSTANTS.CASE, policy.ContractNumber, "Report", reportFilename));
+            string agencyReportFilePath = Path.GetFullPath(Path.Combine(_env.ContentRootPath, CONSTANTS.DOCUMENT, CONSTANTS.CASE, policy.ContractNumber, zipFolderName, reportFilename));
             builder.Build(agencyReportFilePath);
-            var sourceFolderPath = Path.GetFullPath(Path.Combine(_env.ContentRootPath, CONSTANTS.DOCUMENT, CONSTANTS.CASE, policy.ContractNumber, "Report"));
-            var s3KeyName = $"backups/{policy.ContractNumber}/Agency_Report.zip";
+
+            var policyDocument = _agenticService.ConvertImageToSearchablePdfBytes(policy.DocumentPath!);
+            var fileName = isClaim ? ClaimFormName : UnderwritingFormName;
+            var allowedExtensions = new[] { extension };
+            var (_, _) = await _fileStorageService.SaveAsync(policyDocument, extension, CONSTANTS.CASE, policy.ContractNumber, zipFolderName, allowedExtensions, fileName);
+
+            var sourceFolderPath = Path.GetFullPath(Path.Combine(_env.ContentRootPath, CONSTANTS.DOCUMENT, CONSTANTS.CASE, policy.ContractNumber, zipFolderName));
+            var s3KeyName = $"backups/{policy.ContractNumber}/{zipFilename}";
             await ZipAndUploadToS3Async(sourceFolderPath, s3KeyName);
         }
         private async Task<bool> ZipAndUploadToS3Async(string sourceFolder, string s3Key)
@@ -149,8 +168,6 @@ namespace risk.control.system.Services.Report
                     Key = s3Key,
                     InputStream = memoryStream,
                     ContentType = "application/zip",
-                    // This tells S3: "Only upload if this object does not exist at all"
-                    IfNoneMatch = "*"
                 };
 
                 PutObjectResponse response = await _s3Client.PutObjectAsync(putRequest);

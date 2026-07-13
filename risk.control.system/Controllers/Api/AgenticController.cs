@@ -20,9 +20,9 @@ namespace risk.control.system.Controllers.Api
     [Route("api/[controller]")]
     [ApiController]
     [IgnoreAntiforgeryToken]
-    public class AgenticController(IGoogleService googleService, IFileStorageService fileStorageService, IAmazonS3 s3Client, IAgenticService agenticService) : ControllerBase
+    public class AgenticController(IGoogleOcrService googleService, IFileStorageService fileStorageService, IAmazonS3 s3Client, IAgenticService agenticService) : ControllerBase
     {
-        private readonly IGoogleService _googleService = googleService;
+        private readonly IGoogleOcrService _googleService = googleService;
         private readonly IFileStorageService _fileStorageService = fileStorageService;
         private readonly IAmazonS3 _s3Client = s3Client;
         private readonly IAgenticService _agenticService = agenticService;
@@ -87,7 +87,7 @@ namespace risk.control.system.Controllers.Api
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
-        [HttpGet("zip-and-upload-report/{contractNumber}")]
+        [HttpPost("zip-and-upload-report/{contractNumber}")]
         public async Task<IActionResult> UploadReport(string contractNumber)
         {
             var s3KeyName = $"backups/{contractNumber}/Agency_Report.zip";
@@ -197,7 +197,7 @@ namespace risk.control.system.Controllers.Api
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
-        [HttpGet("download-zip-report/{contractNumber}")]
+        [HttpPost("download-zip-report/{contractNumber}")]
         public async Task<IActionResult> DownloadReport(string contractNumber)
         {
             var s3KeyName = $"backups/{contractNumber}/Agency_Report.zip";
@@ -211,6 +211,33 @@ namespace risk.control.system.Controllers.Api
             catch (AmazonS3Exception ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
                 return NotFound("The requested report zip file does not exist.");
+            }
+        }
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
+        [HttpPost("convert-image-to-searchable-pdf")]
+        public async Task<IActionResult> ConvertImageToSearchablePdf(IFormFile imageFile)
+        {
+            if (imageFile == null || imageFile.Length == 0)
+            {
+                return BadRequest("No image file provided.");
+            }
+
+            try
+            {
+                var stream = imageFile.OpenReadStream();
+                var imageOnDiskPath = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}{Path.GetExtension(imageFile.FileName)}");
+                using (var fileStream = new FileStream(imageOnDiskPath, FileMode.Create))
+                {
+                    await stream.CopyToAsync(fileStream);
+                }
+                var pdfBytes = _agenticService.ConvertImageToSearchablePdfBytes(imageOnDiskPath);
+                return File(pdfBytes, "application/pdf", "converted_document.pdf");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error converting image to searchable PDF: {ex.Message}");
+                return StatusCode(500, "An error occurred while processing the request.");
             }
         }
     }

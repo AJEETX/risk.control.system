@@ -1,4 +1,5 @@
-﻿using Amazon.Rekognition;
+﻿using System.Net;
+using Amazon.Rekognition;
 using Amazon.Rekognition.Model;
 using Amazon.Textract;
 using Amazon.Textract.Model;
@@ -8,7 +9,7 @@ namespace risk.control.system.Services.Agent
     public interface IAmazonApiService
     {
         Task<CollectionStatus> EnsureCollectionExistsAsync(string collectionId);
-
+        Task<List<Face>> GetAllFacesFromCollectionAsync(string collectionId);
         Task<DeleteCollectionResponse> DeleteCollectionAsync(string collectionId);
 
         Task<IndexFacesResponse> IndexFacesAsync(IndexFacesRequest request);
@@ -30,7 +31,7 @@ namespace risk.control.system.Services.Agent
 
     internal class AmazonApiService(IAmazonRekognition rekognitionClient, IAmazonTextract textractClient, ILogger<AmazonApiService> logger) : IAmazonApiService
     {
-        private static float similarityThreshold = 70F;
+        private const float similarityThreshold = 70F;
         private readonly IAmazonRekognition _rekognitionClient = rekognitionClient;
         private readonly IAmazonTextract _textractClient = textractClient;
         private readonly ILogger<AmazonApiService> _logger = logger;
@@ -56,13 +57,51 @@ namespace risk.control.system.Services.Agent
                 {
                     CollectionId = sanitizedId
                 });
-                return createdResponse.StatusCode == (int)System.Net.HttpStatusCode.OK ? CollectionStatus.Created : CollectionStatus.Failed;
+                return createdResponse.StatusCode == (int)HttpStatusCode.OK ? CollectionStatus.Created : CollectionStatus.Failed;
             }
             catch (Exception ex)
             {
                 _logger.LogError($"Error ensuring collection: {ex.Message}");
             }
             return CollectionStatus.Failed;
+        }
+
+        public async Task<List<Face>> GetAllFacesFromCollectionAsync(string collectionId)
+        {
+            var faceList = new List<Face>();
+            string nextToken = null!;
+
+            try
+            {
+                var sanitizedId = collectionId?.Replace("\n", "").Replace("\r", "");
+
+                do
+                {
+                    var request = new ListFacesRequest
+                    {
+                        CollectionId = sanitizedId,
+                        NextToken = nextToken,
+                        MaxResults = 4096 // You can set this up to 4096
+                    };
+
+                    var response = await _rekognitionClient.ListFacesAsync(request);
+
+                    if (response.HttpStatusCode == HttpStatusCode.OK && response.Faces != null)
+                    {
+                        faceList.AddRange(response.Faces);
+                    }
+
+                    nextToken = response.NextToken;
+
+                } while (!string.IsNullOrEmpty(nextToken));
+
+                return faceList;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Collection {collectionId} not found: {ex.Message}");
+                throw; // Or return an empty list/custom response depending on your architecture
+            }
         }
 
         public async Task<DeleteCollectionResponse> DeleteCollectionAsync(string collectionId)
@@ -75,7 +114,7 @@ namespace risk.control.system.Services.Agent
                 {
                     CollectionId = sanitizedId
                 });
-                if (response.HttpStatusCode == System.Net.HttpStatusCode.OK && response.UserCount > 0)
+                if (response.HttpStatusCode == HttpStatusCode.OK && response.FaceCount > 0)
                 {
                     var request = new DeleteCollectionRequest
                     {
@@ -86,7 +125,7 @@ namespace risk.control.system.Services.Agent
                 else
                 {
                     _logger.LogInformation($"Collection {sanitizedId} does not exist. No need to delete.");
-                    return new DeleteCollectionResponse { StatusCode = (int)System.Net.HttpStatusCode.NotFound };
+                    return new DeleteCollectionResponse { StatusCode = (int)HttpStatusCode.NotFound };
                 }
             }
             catch (Amazon.Rekognition.Model.ResourceNotFoundException ex)
@@ -97,7 +136,7 @@ namespace risk.control.system.Services.Agent
             catch (Exception ex)
             {
                 _logger.LogError($"Error ensuring collection: {ex.Message}");
-                return new DeleteCollectionResponse { StatusCode = (int)System.Net.HttpStatusCode.InternalServerError };
+                return new DeleteCollectionResponse { StatusCode = (int)HttpStatusCode.InternalServerError };
             }
         }
 

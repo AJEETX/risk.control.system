@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.FeatureManagement;
 using risk.control.system.AppConstant;
+using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services.Agent;
@@ -135,11 +136,12 @@ namespace risk.control.system.Services.AgencyAdmin
             user.Updated = DateTime.UtcNow;
             user.UpdatedBy = deletedBy;
             user.Deleted = true;
-            if (await _featureManager.IsEnabledAsync(FeatureFlags.ENABLE_SINGLE_FACE_MATCH_CHECK ))
+            if (await _featureManager.IsEnabledAsync(FeatureFlags.FACE_MATCH_CHECK))
             {
                 if (!string.IsNullOrEmpty(user.AwsFaceId))
                 {
-                    await _amazonApiService.DeleteFacesAsync(CONSTANTS.FaceImageCollection, new List<string> { user.AwsFaceId });
+                    var imageCollection = EnvHelper.Get(CONSTANTS.FaceImageCollection);
+                    await _amazonApiService.DeleteFacesAsync(imageCollection!, new List<string> { user.AwsFaceId });
 
                     // Clear the fields in your DB
                     user.AwsFaceId = null;
