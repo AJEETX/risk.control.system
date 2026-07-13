@@ -124,7 +124,7 @@ namespace risk.control.system.Services.Report
             string agencyReportFilePath = Path.GetFullPath(Path.Combine(_env.ContentRootPath, CONSTANTS.DOCUMENT, CONSTANTS.CASE, policy.ContractNumber, zipFolderName, reportFilename));
             builder.Build(agencyReportFilePath);
 
-            var policyDocument = _agenticService.ConvertImageToSearchablePdfBytes(policy.DocumentPath!);
+            var policyDocument = await File.ReadAllBytesAsync(policy.DocumentPath!);
             var fileName = isClaim ? ClaimFormName : UnderwritingFormName;
             var allowedExtensions = new[] { extension };
             var (_, _) = await _fileStorageService.SaveAsync(policyDocument, extension, CONSTANTS.CASE, policy.ContractNumber, zipFolderName, allowedExtensions, fileName);
