@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.FeatureManagement;
 using risk.control.system.Models;
-using risk.control.system.Models.ViewModel;
 using risk.control.system.Services.Agent;
 using risk.control.system.Services.Common;
 
@@ -42,13 +41,10 @@ namespace risk.control.system.Seeds
 
             await PortalAdminSeed.Seed(context, env, userManager, roleManager, randomPinCode, fileStorageService);
 
-            var uploadImage2Aws = await featureManager.IsEnabledAsync(FeatureFlags.FACE_MATCH_CHECK);
-            if (uploadImage2Aws)
-            {
-                var amazonApiService = scope.ServiceProvider.GetRequiredService<IAmazonApiService>();
-                var base64FileService = scope.ServiceProvider.GetRequiredService<IBase64FileService>();
-                await MigrateImagesToAws.MigrateExistingUsersToCollectionAsync(amazonApiService, context, base64FileService);
-            }
+            //Upload face images to S3 bucket and migrate existing users to AWS collection
+            var amazonApiService = scope.ServiceProvider.GetRequiredService<IAmazonApiService>();
+            var base64FileService = scope.ServiceProvider.GetRequiredService<IBase64FileService>();
+            await MigrateImagesToAws.MigrateExistingUsersToCollectionAsync(amazonApiService, context, base64FileService, featureManager);
         }
     }
 }

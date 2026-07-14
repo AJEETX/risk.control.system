@@ -1,5 +1,6 @@
 ﻿using Gehtsoft.PDFFlow.Builder;
 using Gehtsoft.PDFFlow.Models.Enumerations;
+using Microsoft.EntityFrameworkCore;
 using risk.control.system.Models;
 using risk.control.system.Services.Common;
 
@@ -10,11 +11,12 @@ namespace risk.control.system.Services.Report
         Task<SectionBuilder> Build(SectionBuilder section, LocationReport loc, bool isClaim = true);
     }
 
-    internal class PdfGenerateAgentLocationService(IWebHostEnvironment env, IHttpClientFactory httpClientFactory, IImageConverter imageConverter) : IPdfGenerateAgentLocationService
+    internal class PdfGenerateAgentLocationService(IWebHostEnvironment env, IHttpClientFactory httpClientFactory, IImageConverter imageConverter, ApplicationDbContext context) : IPdfGenerateAgentLocationService
     {
         private readonly IWebHostEnvironment _env = env;
         private readonly IHttpClientFactory _httpClientFactory = httpClientFactory;
         private readonly IImageConverter _imageConverter = imageConverter;
+        private readonly ApplicationDbContext _context = context;
 
         public async Task<SectionBuilder> Build(SectionBuilder section, LocationReport loc, bool isClaim)
         {
@@ -25,7 +27,9 @@ namespace risk.control.system.Services.Report
                 section.AddParagraph().AddText($"{durationDisplay}").SetFontSize(12);
                 var agentPara = section.AddParagraph().SetFontSize(12);
                 agentPara.AddText("Verifying Agent: ");
-                agentPara.AddText($"{loc.AgentEmail}").SetFontColor(Gehtsoft.PDFFlow.Models.Shared.Color.Blue);
+                var agent = await _context.Users.FirstOrDefaultAsync(u => u.Email == loc.AgentEmail);
+                var agentName = $"{agent!.FirstName} {agent.LastName}";
+                agentPara.AddText($"{agentName ?? "N/A"}").SetFontColor(Gehtsoft.PDFFlow.Models.Shared.Color.Blue);
                 var tableBuilder = section.AddTable().SetBorder(Stroke.Solid);
                 tableBuilder.AddColumnPercentToTable("Agent Photo", 30).AddColumnPercentToTable("Captured Address Info", 20).AddColumnPercentToTable("Address Info", 20).AddColumnPercentToTable("Map Image", 25).AddColumnPercentToTable("Match", 5);
                 var rowBuilder = tableBuilder.AddRow();

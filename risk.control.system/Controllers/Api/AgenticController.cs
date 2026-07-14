@@ -11,6 +11,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using risk.control.system.AppConstant;
+using risk.control.system.Helpers;
+using risk.control.system.Services.Agent;
 using risk.control.system.Services.Agentic;
 using risk.control.system.Services.Common;
 using risk.control.system.Services.Tool;
@@ -20,12 +22,13 @@ namespace risk.control.system.Controllers.Api
     [Route("api/[controller]")]
     [ApiController]
     [IgnoreAntiforgeryToken]
-    public class AgenticController(IGoogleOcrService googleService, IFileStorageService fileStorageService, IAmazonS3 s3Client, IAgenticService agenticService) : ControllerBase
+    public class AgenticController(IGoogleOcrService googleService, IFileStorageService fileStorageService, IAmazonS3 s3Client, IAgenticService agenticService, IAmazonApiService amazonApiService) : ControllerBase
     {
         private readonly IGoogleOcrService _googleService = googleService;
         private readonly IFileStorageService _fileStorageService = fileStorageService;
         private readonly IAmazonS3 _s3Client = s3Client;
         private readonly IAgenticService _agenticService = agenticService;
+        private readonly IAmazonApiService _amazonApiService = amazonApiService;
 
         //Ocr Endpoint
         [HttpPost("Ocr")]
@@ -214,6 +217,55 @@ namespace risk.control.system.Controllers.Api
             }
         }
 
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
+        [HttpPost("delete-images-from-aws")]
+        public async Task<IActionResult> DeleteImagesFromAws()
+        {
+            var imageCollection = EnvHelper.Get(CONSTANTS.FaceImageCollection);
+
+            try
+            {
+                var deletedResponse = await _amazonApiService.DeleteCollectionAsync(imageCollection!);
+
+                return Ok(new
+                {
+                    Success = true,
+                    Message = "Images deleted successfully from Aws."
+                });
+            }
+            catch (AmazonS3Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { Success = false, Message = ex.Message });
+            }
+        }
+
+
+        private async Task EmptyBucketAsync(string bucketName)
+        {
+            var request = new ListObjectsV2Request { BucketName = bucketName };
+            ListObjectsV2Response response;
+
+            do
+            {
+                response = await _s3Client.ListObjectsV2Async(request);
+
+                if (response.S3Objects.Any())
+                {
+                    var keysToDelete = response.S3Objects
+                        .Select(obj => new KeyVersion { Key = obj.Key })
+                        .ToList();
+
+                    await _s3Client.DeleteObjectsAsync(new DeleteObjectsRequest
+                    {
+                        BucketName = bucketName,
+                        Objects = keysToDelete
+                    });
+                }
+
+                request.ContinuationToken = response.NextContinuationToken;
+
+            } while (response.IsTruncated ?? false);
+        }
         //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
         //[HttpPost("convert-image-to-searchable-pdf")]
         //public async Task<IActionResult> ConvertImageToSearchablePdf(IFormFile imageFile)
