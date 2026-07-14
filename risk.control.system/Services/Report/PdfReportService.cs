@@ -59,9 +59,12 @@ namespace risk.control.system.Services.Report
                     .FirstOrDefault(c => c.InvestigationTaskId == investigationTaskId);
                 var beneficiary = _context.BeneficiaryDetail.Include(b => b.District).Include(b => b.State).Include(b => b.Country).Include(b => b.PinCode).Include(b => b.BeneficiaryRelation)
                     .FirstOrDefault(b => b.InvestigationTaskId == investigationTaskId);
-                var investigationReport = await _context.ReportTemplates.Include(r => r.LocationReport).ThenInclude(l => l.AgentIdReport)
-                   .Include(r => r.LocationReport).ThenInclude(l => l.FaceIds).Include(r => r.LocationReport).ThenInclude(l => l.DocumentIds)
-                   .Include(r => r.LocationReport).ThenInclude(l => l.Questions).FirstOrDefaultAsync(q => q.Id == investigation!.ReportTemplateId);
+                var investigationReport = await _context.ReportTemplates
+                    .Include(r => r.LocationReport).ThenInclude(l => l.AgentIdReport).ThenInclude(l => l!.FaceResult).ThenInclude(l => l!.Faces)
+                   .Include(r => r.LocationReport).ThenInclude(l => l.FaceIds!).ThenInclude(l => l.FaceResult).ThenInclude(l => l!.Faces)
+                   .Include(r => r.LocationReport).ThenInclude(l => l.DocumentIds)
+                   .Include(r => r.LocationReport).ThenInclude(l => l.Questions)
+                   .FirstOrDefaultAsync(q => q.Id == investigation!.ReportTemplateId);
                 var vendor = _context.Vendor.Include(s => s.District).Include(s => s.State).Include(s => s.Country).Include(s => s.PinCode).Include(s => s.VendorInvestigationServiceTypes).FirstOrDefault(v => v.VendorId == investigation!.VendorId);
                 var currentUser = _context.ApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
                 var investigationServiced = vendor!.VendorInvestigationServiceTypes!.FirstOrDefault(s => s.InvestigationServiceTypeId == policy!.InvestigationServiceTypeId);
@@ -112,9 +115,12 @@ namespace risk.control.system.Services.Report
             var policy = _context.PolicyDetail.Include(p => p.CaseEnabler).Include(p => p.CostCentre).Include(p => p.InvestigationServiceType)
                 .FirstOrDefault(p => p.PolicyDetailId == investigation!.PolicyDetail!.PolicyDetailId);
 
-            var investigationReport = await _context.ReportTemplates.Include(r => r.LocationReport).ThenInclude(l => l.AgentIdReport)
-               .Include(r => r.LocationReport).ThenInclude(l => l.FaceIds).Include(r => r.LocationReport).ThenInclude(l => l.DocumentIds)
-               .Include(r => r.LocationReport).ThenInclude(l => l.Questions).FirstOrDefaultAsync(q => q.Id == investigation!.ReportTemplateId);
+            var investigationReport = await _context.ReportTemplates
+                    .Include(r => r.LocationReport).ThenInclude(l => l.AgentIdReport).ThenInclude(l => l!.FaceResult).ThenInclude(l => l!.Faces)
+                   .Include(r => r.LocationReport).ThenInclude(l => l.FaceIds!).ThenInclude(l => l.FaceResult).ThenInclude(l => l!.Faces)
+                   .Include(r => r.LocationReport).ThenInclude(l => l.DocumentIds)
+                   .Include(r => r.LocationReport).ThenInclude(l => l.Questions)
+                   .FirstOrDefaultAsync(q => q.Id == investigation!.ReportTemplateId);
 
             var vendor = _context.Vendor.Include(s => s.District).Include(s => s.State).Include(s => s.Country).Include(s => s.PinCode).Include(s => s.VendorInvestigationServiceTypes).FirstOrDefault(v => v.VendorId == investigation!.VendorId);
 

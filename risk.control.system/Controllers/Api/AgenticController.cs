@@ -2,6 +2,7 @@
 using Amazon.S3;
 using Amazon.S3.Model;
 using Amazon.S3.Transfer;
+using Amazon.S3.Util;
 using iText.Kernel.Colors;
 using iText.Kernel.Pdf;
 using iText.Layout;
@@ -239,7 +240,64 @@ namespace risk.control.system.Controllers.Api
             }
         }
 
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
+        [HttpPost("empty-bucket-contents/{bucketName}")]
+        public async Task<IActionResult> EmptyBucketContents(string bucketName = CONSTANTS.S3_BUCKET)
+        {
+            try
+            {
+                bool bucketExists = await AmazonS3Util.DoesS3BucketExistV2Async(_s3Client, bucketName);
+                if (!bucketExists)
+                {
+                    return NotFound($"Bucket '{bucketName}' does not exist.");
+                }
 
+                await EmptyBucketAsync(bucketName);
+
+                return Ok(new { Success = true, Message = $"All contents of bucket '{bucketName}' have been deleted." });
+            }
+            catch (AmazonS3Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { Success = false, Message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"General Error: {ex.Message}");
+                return StatusCode(StatusCodes.Status500InternalServerError, new { Success = false, Message = ex.Message });
+            }
+        }
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
+        [HttpPost("delete-bucket/{bucketName}")]
+        public async Task<IActionResult> DeleteBucket(string bucketName = CONSTANTS.S3_BUCKET)
+        {
+            try
+            {
+                bool bucketExists = await AmazonS3Util.DoesS3BucketExistV2Async(_s3Client, bucketName);
+                if (!bucketExists)
+                {
+                    return NotFound($"Bucket '{bucketName}' does not exist.");
+                }
+
+                await EmptyBucketAsync(bucketName);
+
+                await _s3Client.DeleteBucketAsync(new DeleteBucketRequest
+                {
+                    BucketName = bucketName
+                });
+
+                return Ok(new { Success = true, Message = $"Bucket deleted'{bucketName}' have been deleted." });
+            }
+            catch (AmazonS3Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { Success = false, Message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"General Error: {ex.Message}");
+                return StatusCode(StatusCodes.Status500InternalServerError, new { Success = false, Message = ex.Message });
+            }
+        }
         private async Task EmptyBucketAsync(string bucketName)
         {
             var request = new ListObjectsV2Request { BucketName = bucketName };
