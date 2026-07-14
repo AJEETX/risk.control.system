@@ -5,23 +5,22 @@ using risk.control.system.Models;
 
 namespace risk.control.system.Services.Report
 {
-    public interface IPdfGenerateDetailService
+    public interface IPdfGenerateReportService
     {
         Task<string> BuildInvestigationPdfReport(InvestigationTask investigation, PolicyDetail policy, CustomerDetail customer, BeneficiaryDetail beneficiary, ReportTemplate investigationReport, Vendor vendor);
     }
-    internal class PdfGenerateDetailService : IPdfGenerateDetailService
+    internal class PdfGenerateReportService : IPdfGenerateReportService
     {
         private const string reportFilename = "report.pdf";
         private readonly IWebHostEnvironment _env;
         private readonly IPdfGenerateCaseDetailService _caseDetailService;
         private readonly IPdfGenerateDetailReportService _detailReportService;
 
-        public PdfGenerateDetailService(
+        public PdfGenerateReportService(
             IWebHostEnvironment env,
             IPdfGenerateCaseDetailService caseDetailService,
             IPdfGenerateDetailReportService detailReportService)
         {
-            _env = env;
             _env = env;
             _caseDetailService = caseDetailService;
             _detailReportService = detailReportService;

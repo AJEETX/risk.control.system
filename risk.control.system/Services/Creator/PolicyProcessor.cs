@@ -38,6 +38,7 @@ namespace risk.control.system.Services.Creator
             var serviceType = await serviceTypeTask;
             var enabler = await enablerTask;
             var costCentre = await costCentreTask;
+
             // 4. Image Processing
             var (imgPath, ext) = await _verifierProcessor.ProcessDocumentImage(uc, zipData, errs, sums, POLICY_IMAGE, "CaseDetail");
 

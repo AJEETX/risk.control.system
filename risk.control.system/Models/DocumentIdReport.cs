@@ -21,61 +21,58 @@ namespace risk.control.system.Models
 
     public enum DocumentIdReportType
     {
-        [Display(Name = "Aadhaar Card")]
+        [Display(Name = "Aadhaar_Card")]
         ADHAAR,
 
-        [Display(Name = "PAN Card")]
+        [Display(Name = "PAN_Card")]
         PAN,
 
-        [Display(Name = "Driving License")]
+        [Display(Name = "Driving_License")]
         DRIVING_LICENSE,
 
         [Display(Name = "Passport")]
         PASSPORT,
 
-        [Display(Name = "Voter Card")]
+        [Display(Name = "Voter_Card")]
         VOTER_CARD,
 
-        [Display(Name = "Death Certificate")]
+        [Display(Name = "Death_Certificate")]
         DEATH_CERTIFICATE,
 
-        [Display(Name = "Income Tax Return (ITR)")]
+        [Display(Name = "Income_Tax_Return_(ITR)")]
         ITR,
 
-        [Display(Name = "P&L Account Statement")]
+        [Display(Name = "P&L_Account_Statement")]
         P_AND_L_ACCOUNT_STATEMENT,
 
-        [Display(Name = "Birth Certificate")]
+        [Display(Name = "Birth_Certificate")]
         BIRTH_CERTIFICATE,
 
-        [Display(Name = "Marriage Certificate")]
+        [Display(Name = "Marriage_Certificate")]
         MARRIAGE_CERTIFICATE,
 
-        [Display(Name = "Medical Certificate")]
+        [Display(Name = "Medical_Certificate")]
         MEDICAL_CERTIFICATE,
 
-        [Display(Name = "Employment Record")]
+        [Display(Name = "Employment_Record")]
         EMPLOYMENT_RECORD,
 
-        [Display(Name = "Medical Prescription")]
+        [Display(Name = "Medical_Prescription")]
         MEDICAL_PRESCRIPTION,
 
-        [Display(Name = "Hospital Discharge Summary")]
+        [Display(Name = "Hospital_Discharge_Summary")]
         HOSPITAL_DISCHARGE_SUMMARY,
 
-        [Display(Name = "Hospital Admission Summary")]
+        [Display(Name = "Hospital_Admission_Summary")]
         HOSPITAL_ADMISSION_SUMMARY,
 
-        [Display(Name = "Hospital Death Summary")]
-        HOSPITAL_DEATH_SUMMARY,
-
-        [Display(Name = "Hospital Treatment Summary")]
+        [Display(Name = "Hospital_Treatment_Summary")]
         HOSPITAL_TREATMENT_SUMMARY,
 
-        [Display(Name = "Police FIR Report")]
+        [Display(Name = "Police_FIR_Report")]
         POLICE_FIR_REPORT,
 
-        [Display(Name = "Police Case Diary")]
+        [Display(Name = "Police_Case_Diary")]
         POLICE_CASE_DIARY
     }
 }

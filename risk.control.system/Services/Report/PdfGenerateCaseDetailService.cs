@@ -8,15 +8,15 @@ namespace risk.control.system.Services.Report
 {
     public interface IPdfGenerateCaseDetailService
     {
-        SectionBuilder BuildUnderwritng(SectionBuilder section, InvestigationTask investigation, PolicyDetail policy, CustomerDetail customer, BeneficiaryDetail beneficiary);
-        SectionBuilder BuildClaim(SectionBuilder section, InvestigationTask investigation, PolicyDetail policy, CustomerDetail customer, BeneficiaryDetail beneficiary);
+        SectionBuilder BuildUnderwritng(SectionBuilder section, InvestigationTask investigation, PolicyDetail policy, CustomerDetail customer, BeneficiaryDetail beneficiary, bool interimReport = false);
+        SectionBuilder BuildClaim(SectionBuilder section, InvestigationTask investigation, PolicyDetail policy, CustomerDetail customer, BeneficiaryDetail beneficiary, bool interimReport = false);
     }
     internal class PdfGenerateCaseDetailService(IWebHostEnvironment env, IImageConverter imageConverter) : IPdfGenerateCaseDetailService
     {
         private readonly IWebHostEnvironment _env = env;
         private readonly IImageConverter _imageConverter = imageConverter;
 
-        public SectionBuilder BuildUnderwritng(SectionBuilder section, InvestigationTask investigation, PolicyDetail policy, CustomerDetail customer, BeneficiaryDetail beneficiary)
+        public SectionBuilder BuildUnderwritng(SectionBuilder section, InvestigationTask investigation, PolicyDetail policy, CustomerDetail customer, BeneficiaryDetail beneficiary, bool interimReport = false)
         {
             // Title
             section.AddParagraph()
@@ -24,7 +24,13 @@ namespace risk.control.system.Services.Report
                 .AddText($"{policy?.InsuranceType!.GetEnumDisplayName()} Investigation Report")
                 .SetFontSize(20).SetBold();
             section.AddParagraph().AddText("");
-            section.AddParagraph().SetAlignment(HorizontalAlignment.Center).AddText($"Report Assessed Date: {investigation!.InvestigationReport!.AssessorRemarksUpdated.GetValueOrDefault().ToLocalTime():dd-MMM-yy hh:mm tt}");
+            var investigationReportTime = $"{investigation!.InvestigationReport!.AssessorRemarksUpdated.GetValueOrDefault().ToLocalTime():dd-MMM-yy hh:mm tt}";
+            if (interimReport)
+            {
+                investigationReportTime = DateTime.Now.ToLocalTime().ToString("dd-MMM-yy hh:mm tt");
+            }
+
+            section.AddParagraph().SetAlignment(HorizontalAlignment.Center).AddText($"Report Assessed Date: {investigationReportTime}");
 
             // Case overview
             var overviewTable = section.AddTable().SetBorder(Stroke.Solid);
@@ -75,7 +81,7 @@ namespace risk.control.system.Services.Report
             return section;
         }
 
-        public SectionBuilder BuildClaim(SectionBuilder section, InvestigationTask investigation, PolicyDetail policy, CustomerDetail customer, BeneficiaryDetail beneficiary)
+        public SectionBuilder BuildClaim(SectionBuilder section, InvestigationTask investigation, PolicyDetail policy, CustomerDetail customer, BeneficiaryDetail beneficiary, bool interimReport = false)
         {
             // Title
             section.AddParagraph()
@@ -83,7 +89,12 @@ namespace risk.control.system.Services.Report
                 .AddText($"{policy?.InsuranceType!.GetEnumDisplayName()} Investigation Report")
                 .SetFontSize(20).SetBold();
             section.AddParagraph().AddText("");
-            section.AddParagraph().SetAlignment(HorizontalAlignment.Center).AddText($"Report Assessed Date: {investigation!.InvestigationReport!.AssessorRemarksUpdated.GetValueOrDefault().ToLocalTime():dd-MMM-yy hh:mm tt}");
+            var investigationReportTime = $"{investigation!.InvestigationReport!.AssessorRemarksUpdated.GetValueOrDefault().ToLocalTime():dd-MMM-yy hh:mm tt}";
+            if (interimReport)
+            {
+                investigationReportTime = DateTime.Now.ToLocalTime().ToString("dd-MMM-yy hh:mm tt");
+            }
+            section.AddParagraph().SetAlignment(HorizontalAlignment.Center).AddText($"Report Assessed Date: {investigationReportTime}");
 
             // Case overview
             var overviewTable = section.AddTable().SetBorder(Stroke.Solid);

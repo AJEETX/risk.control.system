@@ -4,6 +4,7 @@ using Amazon.S3.Model;
 using Amazon.S3.Transfer;
 using Amazon.TranscribeService;
 using Amazon.TranscribeService.Model;
+using risk.control.system.AppConstant;
 using risk.control.system.Models.ViewModel;
 
 namespace risk.control.system.Services.Tool
@@ -15,7 +16,7 @@ namespace risk.control.system.Services.Tool
 
     internal class Speech2TextService(IAmazonS3 s3Client, IAmazonTranscribeService transcribeClient, IHttpClientFactory clientFactory) : ISpeech2TextService
     {
-        private string bucketName = "icheckify-bucket";
+        private readonly string bucketName = CONSTANTS.S3_BUCKET;
         private readonly IAmazonS3 _s3Client = s3Client;
         private readonly IAmazonTranscribeService _transcribeClient = transcribeClient;
         private readonly IHttpClientFactory _clientFactory = clientFactory;
@@ -30,8 +31,20 @@ namespace risk.control.system.Services.Tool
                 {
                     var putBucketRequest = new PutBucketRequest { BucketName = bucketName, UseClientRegion = true };
                     await _s3Client.PutBucketAsync(putBucketRequest);
+                    var publicAccessBlockRequest = new PutPublicAccessBlockRequest
+                    {
+                        BucketName = bucketName,
+                        PublicAccessBlockConfiguration = new PublicAccessBlockConfiguration
+                        {
+                            BlockPublicAcls = true,
+                            BlockPublicPolicy = true,
+                            IgnorePublicAcls = true,
+                            RestrictPublicBuckets = true
+                        }
+                    };
+                    await _s3Client.PutPublicAccessBlockAsync(publicAccessBlockRequest);
                 }
-                using (var stream = input.SpeechInputData.OpenReadStream())
+                await using (var stream = input.SpeechInputData.OpenReadStream())
                 {
                     var uploadRequest = new TransferUtilityUploadRequest { InputStream = stream, Key = fileName, BucketName = bucketName };
                     var fileTransferUtility = new TransferUtility(_s3Client);

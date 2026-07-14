@@ -1,7 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Hangfire;
+using Microsoft.EntityFrameworkCore;
 using risk.control.system.AppConstant;
 using risk.control.system.Models;
 using risk.control.system.Services.Common;
+using risk.control.system.Services.Report;
 
 namespace risk.control.system.Services.AgencyAdmin
 {
@@ -10,11 +12,18 @@ namespace risk.control.system.Services.AgencyAdmin
         Task<bool> SubmitQueryReplyToCompany(string userEmail, long caseId, EnquiryRequest request, List<EnquiryRequest> requests, IFormFile? document);
     }
 
-    internal class AgencyQueryReplyService(ApplicationDbContext context, ILogger<AgencyQueryReplyService> logger, ITimelineService timelineService) : IAgencyQueryReplyService
+    internal class AgencyQueryReplyService(
+        ApplicationDbContext context,
+        ILogger<AgencyQueryReplyService> logger,
+        IPdfReportService pdfReportService,
+        IBackgroundJobClient backgroundJobClient,
+        ITimelineService timelineService) : IAgencyQueryReplyService
     {
         private readonly ApplicationDbContext context = context;
         private readonly ILogger<AgencyQueryReplyService> logger = logger;
         private readonly ITimelineService timelineService = timelineService;
+        private readonly IBackgroundJobClient _backgroundJobClient = backgroundJobClient;
+        private readonly IPdfReportService _pdfReportService = pdfReportService;
 
         public async Task<bool> SubmitQueryReplyToCompany(string userEmail, long caseId, EnquiryRequest request, List<EnquiryRequest> requests, IFormFile? document)
         {
@@ -57,6 +66,8 @@ namespace risk.control.system.Services.AgencyAdmin
                 context.Investigations.Update(caseTask);
                 var rowsUpdated = await context.SaveChangesAsync(null, false) > 0;
                 await timelineService.UpdateTaskStatus(caseTask.Id, userEmail);
+                _backgroundJobClient.Enqueue(() => _pdfReportService.GenerateAgencyReport(caseId));
+
                 return rowsUpdated ? true : false;
             }
             catch (Exception ex)

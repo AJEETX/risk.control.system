@@ -19,7 +19,7 @@ namespace risk.control.system.Services.Creator
 
     internal class VerifierProcessor(
         IDbContextFactory<ApplicationDbContext> contextFactory,
-        IUserFaceImageCheckService faceImageCheckService,
+        IAwsFaceImageCheckService faceImageCheckService,
         ICaseImageCreationService caseImageCreationService,
         IPhoneService phoneService,
         IFileStorageService fileStorageService,
@@ -30,7 +30,7 @@ namespace risk.control.system.Services.Creator
         private static readonly HashSet<string> AllowedExt = new() { ".jpg", ".jpeg", ".png" };
         private readonly IDbContextFactory<ApplicationDbContext> _contextFactory = contextFactory;
         private readonly ICaseImageCreationService _caseImageCreationService = caseImageCreationService;
-        private readonly IUserFaceImageCheckService _faceImageCheckService = faceImageCheckService;
+        private readonly IAwsFaceImageCheckService _faceImageCheckService = faceImageCheckService;
         private readonly IPhoneService _phoneService = phoneService;
         private readonly IFileStorageService _fileStorageService = fileStorageService;
         private readonly IFeatureManager _featureManager = featureManager;
@@ -52,24 +52,33 @@ namespace risk.control.system.Services.Creator
 
             if (imageData == null)
             {
-                errs.Add(new UploadError { UploadData = $"{caseEntityName} Image", Error = $"Missing {caseEntityName} Image" });
-                sums.Add($"[{caseEntityName} image is missing]");
+                errs.Add(new UploadError { UploadData = $"{caseEntityName} Document Image", Error = $"Missing {caseEntityName} Document  Image" });
+                sums.Add($"[{caseEntityName} Document  image is missing]");
                 return (string.Empty, extension);
             }
             if (imageData.Length > MAX_FILE_SIZE)
             {
-                errs.Add(new UploadError { UploadData = $"{caseEntityName} Image", Error = $"{caseEntityName} Image size exceeds 5MB" });
-                sums.Add($"[{caseEntityName} image size exceeds 5MB]");
+                errs.Add(new UploadError { UploadData = $"{caseEntityName} Document  Image", Error = $"{caseEntityName} Document  Image size exceeds 5MB" });
+                sums.Add($"[{caseEntityName} Document  image size exceeds 5MB]");
                 return (string.Empty, extension);
             }
             if (!AllowedExt.Contains(extension))
             {
-                errs.Add(new UploadError { UploadData = $"{caseEntityName} Image", Error = $"Invalid {caseEntityName} image type" });
-                sums.Add($"[{caseEntityName} Invalid image type]");
+                errs.Add(new UploadError { UploadData = $"{caseEntityName} Image", Error = $"Invalid {caseEntityName} Document  image type" });
+                sums.Add($"[{caseEntityName} Invalid Document  image type]");
                 return (string.Empty, extension);
             }
+
+            var caseFileName = string.Empty;
+            if (uc.InsuranceType?.ToLower() == CONSTANTS.UNDERWRITING)
+                caseFileName = $"Underwriting_Form{extension}";
+            else
+            {
+                caseFileName = $"Claim_Form{extension}";
+            }
+
             // Returns a tuple: (string FileName, string RelativePath)
-            var (_, RelativePath) = await _fileStorageService.SaveAsync(imageData, extension, CONSTANTS.CASE, uc.CaseId);
+            var (_, RelativePath) = await _fileStorageService.SaveAsync(imageData, extension, CONSTANTS.CASE, uc.CaseId, null, null, caseFileName);
             return (RelativePath, extension);
         }
         public async Task<(string Path, string Extension)> ProcessFaceImage(UploadCase uc, byte[] zipData, List<UploadError> errs, List<string> sums, string imageName, string caseEntityName)
@@ -112,7 +121,7 @@ namespace risk.control.system.Services.Creator
                 return (string.Empty, extension);
             }
             // Returns a tuple: (string FileName, string RelativePath)
-            var (_, RelativePath) = await _fileStorageService.SaveAsync(imageData, extension, CONSTANTS.CASE, uc.CaseId);
+            var (_, RelativePath) = await _fileStorageService.SaveAsync(imageData, extension, CONSTANTS.CASE, uc.CaseId, null, null, $"{caseEntityName}{extension}");
             return (RelativePath, extension);
         }
 

@@ -11,12 +11,12 @@ namespace risk.control.system.Services.Common
         Task<bool> ValidateCompanyUserImage(IFormFile file, ServiceResult result);
     }
 
-    public class ValidateImageService(IUserFaceImageCheckService userFaceCheckService) : IValidateImageService
+    public class ValidateImageService(IAwsFaceImageCheckService userFaceCheckService) : IValidateImageService
     {
         private const long MAX_FILE_SIZE = 5 * 1024 * 1024;
         private static readonly HashSet<string> AllowedExt = new() { ".jpg", ".jpeg", ".png" };
         private static readonly HashSet<string> AllowedMime = new() { "image/jpeg", "image/png" };
-        private readonly IUserFaceImageCheckService _userFaceCheckService = userFaceCheckService;
+        private readonly IAwsFaceImageCheckService _userFaceCheckService = userFaceCheckService;
 
         public void ValidateImage(IFormFile? image, Dictionary<string, string> errors)
         {

@@ -19,7 +19,7 @@ internal class DocumentIdfyService(ApplicationDbContext context,
     ILogger<FaceIdfyService> logger,
     IFileStorageService fileStorageService,
     IPanCardService panCardService,
-    IGoogleService googleApi,
+    IGoogleOcrService googleApi,
     IHttpClientService httpClientService,
     ICustomApiClient customApiCLient) : IDocumentIdfyService
 {
@@ -29,7 +29,7 @@ internal class DocumentIdfyService(ApplicationDbContext context,
     private readonly ILogger<FaceIdfyService> _logger = logger;
     private readonly IFileStorageService _fileStorageService = fileStorageService;
     private readonly IPanCardService _panCardService = panCardService;
-    private readonly IGoogleService _googleApi = googleApi;
+    private readonly IGoogleOcrService _googleApi = googleApi;
     private readonly IHttpClientService _httpClientService = httpClientService;
     private readonly ICustomApiClient _customApiCLient = customApiCLient;
 
@@ -44,7 +44,9 @@ internal class DocumentIdfyService(ApplicationDbContext context,
         {
             var (lat, lon) = VerificationHelper.ParseCoordinates(data.LocationLatLong);
             var expected = VerificationHelper.GetExpectedCoordinates(claim);
-            var (fileName, relativePath) = await _fileStorageService.SaveAsync(data.Image!, CONSTANTS.CASE, claim.PolicyDetail!.ContractNumber, CONSTANTS.REPORT);
+            var docName = documentReport!.ReportName;
+            var extension = Path.GetExtension(data.Image!.FileName.ToLowerInvariant());
+            var (fileName, relativePath) = await _fileStorageService.SaveAsync(data.Image!, CONSTANTS.CASE, claim.PolicyDetail!.ContractNumber, CONSTANTS.REPORT, null, $"{docName}{extension}");
             documentReport!.FilePath = relativePath;
             documentReport.ImageExtension = Path.GetExtension(fileName);
             byte[] docImage = await VerificationHelper.GetBytesFromIFormFile(data.Image!);

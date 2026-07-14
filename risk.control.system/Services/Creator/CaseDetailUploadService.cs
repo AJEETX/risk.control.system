@@ -6,22 +6,22 @@ using static risk.control.system.AppConstant.CONSTANTS;
 
 namespace risk.control.system.Services.Creator
 {
-    public interface ICaseDetailCreationService
+    public interface ICaseDetailUploadService
     {
         Task<UploadResult> AddCaseDetail(UploadCase uc, ApplicationUser user, byte[] data, ORIGIN origin);
     }
 
-    internal class CaseDetailCreationService(IPolicyProcessor policyProcessor,
+    internal class CaseDetailUploadService(IPolicyProcessor policyProcessor,
         ICloneReportService cloneService,
-        IBeneficiaryCreationService beneficiaryCreationService,
-        ICustomerCreationService customerCreationService,
-        ILogger<CaseDetailCreationService> logger) : ICaseDetailCreationService
+        IBeneficiaryUploadService beneficiaryUploadService,
+        ICustomerUploadService customerUploadService,
+        ILogger<CaseDetailUploadService> logger) : ICaseDetailUploadService
     {
         private readonly IPolicyProcessor _policyProcessor = policyProcessor;
         private readonly ICloneReportService _cloneService = cloneService;
-        private readonly IBeneficiaryCreationService _beneficiaryCreationService = beneficiaryCreationService;
-        private readonly ICustomerCreationService _customerCreationService = customerCreationService;
-        private readonly ILogger<CaseDetailCreationService> _logger = logger;
+        private readonly IBeneficiaryUploadService _beneficiaryUploadService = beneficiaryUploadService;
+        private readonly ICustomerUploadService _customerUploadService = customerUploadService;
+        private readonly ILogger<CaseDetailUploadService> _logger = logger;
 
         public async Task<UploadResult> AddCaseDetail(UploadCase uc, ApplicationUser user, byte[] data, ORIGIN origin)
         {
@@ -31,8 +31,8 @@ namespace risk.control.system.Services.Creator
             try
             {
                 // 1. Kick off all major tasks in parallel immediately
-                var customerTask = _customerCreationService.AddCustomer(user, uc, data);
-                var beneficiaryTask = _beneficiaryCreationService.AddBeneficiary(user, uc, data);
+                var customerTask = _customerUploadService.AddCustomer(user, uc, data);
+                var beneficiaryTask = _beneficiaryUploadService.AddBeneficiary(user, uc, data);
                 var policyTask = _policyProcessor.ProcessPolicy(uc, user, data);
 
                 // 2. Wait for all core data to be processed

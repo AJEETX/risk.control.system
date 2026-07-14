@@ -26,7 +26,7 @@ namespace risk.control.system.Services.Company
     public sealed class CompanyUserService(
         IValidateImageService validateFaceService,
         UserManager<ApplicationUser> userManager,
-        IUserFaceImageCheckService faceImageCheckService,
+        IAwsFaceImageCheckService faceImageCheckService,
         ApplicationDbContext context,
         IFileStorageService fileStorage,
         ISmsService sms,
@@ -40,7 +40,7 @@ namespace risk.control.system.Services.Company
         private readonly UserManager<ApplicationUser> _userManager = userManager;
         private readonly ApplicationDbContext _context = context;
         private readonly IFileStorageService _fileStorage = fileStorage;
-        private readonly IUserFaceImageCheckService _faceImageCheckService = faceImageCheckService;
+        private readonly IAwsFaceImageCheckService _faceImageCheckService = faceImageCheckService;
         private readonly ISmsService _sms = sms;
         private readonly ILogger<CompanyUserService> _logger = logger;
 
@@ -184,7 +184,7 @@ namespace risk.control.system.Services.Company
             var (fileName, relativePath) = await _fileStorage.SaveAsync(file, domain, "user");
             user.ProfilePictureUrl = relativePath;
             user.ProfilePictureExtension = Path.GetExtension(fileName);
-            await _faceImageCheckService.SetImageToAws(email);
+            await _faceImageCheckService.SetUserImageToAws(email);
         }
 
         public async Task<ApplicationUser> GetUserAsync(long id)

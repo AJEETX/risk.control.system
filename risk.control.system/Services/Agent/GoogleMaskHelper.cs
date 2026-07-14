@@ -112,30 +112,6 @@ namespace risk.control.system.Services.Agent
 
                 canvas.DrawRect(rect, paint);
 
-                //foreach (var vertex in annotation.BoundingPoly.Vertices)
-                //{
-                //    // Assuming each vertex represents a point in the bounding box
-                //    // Convert vertices to SkiaSharp points
-                //    var skiaPoint = new SKPoint(vertex.X, vertex.Y);
-
-                //    // Draw a rectangle around the text to mask it
-                //    canvas.DrawRect(skiaPoint.X, skiaPoint.Y, skiaPoint.X + 100, skiaPoint.Y + 50, paint);
-                //}
-
-                //foreach (var textAnnotation in textAnnotations)
-                //{
-                //    foreach (var vertex in textAnnotation.BoundingPoly.Vertices)
-                //    {
-                //        // Assuming each vertex represents a point in the bounding box
-                //        // Convert vertices to SkiaSharp points
-                //        var skiaPoint = new SKPoint(vertex.X, vertex.Y);
-
-                //        // Draw a rectangle around the text to mask it
-                //        canvas.DrawRect(skiaPoint.X, skiaPoint.Y, skiaPoint.X + 100, skiaPoint.Y + 50, paint);
-                //    }
-                //}
-
-                // Save the modified image
                 using (var image = SKImage.FromBitmap(bitmap))
                 using (var data = image.Encode(SKEncodedImageFormat.Png, 100))
                 using (var ms = new MemoryStream())

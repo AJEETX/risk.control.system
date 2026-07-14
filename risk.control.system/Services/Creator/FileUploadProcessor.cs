@@ -14,6 +14,7 @@ namespace risk.control.system.Services.Creator
         ILogger<FileUploadProcessor> logger,
         ITimelineService timelineService,
         IFileUploadCaseAllocationService fileUploadCaseAllocationService,
+        IAwsFaceImageCheckService awsFaceImageCheckService,
         ICaseNotificationService caseNotificationService) : IFileUploadProcessor
     {
         private readonly IUploadFileStatusService _uploadFileStatusService = uploadFileStatusService;
@@ -21,6 +22,7 @@ namespace risk.control.system.Services.Creator
         private readonly ITimelineService _timelineService = timelineService;
         private readonly IFileUploadCaseAllocationService _fileUploadCaseAllocationService = fileUploadCaseAllocationService;
         private readonly ICaseNotificationService _caseNotificationService = caseNotificationService;
+        private readonly IAwsFaceImageCheckService _awsFaceImageCheckService = awsFaceImageCheckService;
 
         public async Task ProcessloadFile(string userEmail, List<InvestigationTask> uploadedCases, FileOnFileSystemModel uploadFileData, string url, bool uploadAndAssign = false)
         {
@@ -44,6 +46,10 @@ namespace risk.control.system.Services.Creator
                     // Notify User
                     await _caseNotificationService.NotifyFileUpload(userEmail, uploadFileData, url);
                 }
+
+                //Upload face images to AWS for all uploaded cases
+                var awsFaceTasks = uploadedCases.Select(c => _awsFaceImageCheckService.SetCaseImagesToAws(c.Id));
+                await Task.WhenAll(awsFaceTasks);
             }
             catch (Exception ex)
             {

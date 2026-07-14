@@ -73,6 +73,8 @@ namespace risk.control.system.Models
 
         public long? InvestigationTaskId { get; set; }
         public InvestigationTask? InvestigationTask { get; set; }
+        public string? AwsFaceId { get; set; }
+        public DateTime? FaceIndexedAt { get; set; }
 
         #region NOT MAPPED PROPERTIES
 

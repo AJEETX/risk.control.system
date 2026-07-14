@@ -46,7 +46,9 @@ internal class FaceIdfyService(ApplicationDbContext context,
             bool isCustomer = faceIdReport.ReportName == DigitalIdReportType.CUSTOMER_FACE.GetEnumDisplayName();
             var (lat, lon) = VerificationHelper.ParseCoordinates(data.LocationLatLong!);
             var expected = VerificationHelper.GetExpectedCoordinates(caseDetail);
-            var (fileName, relativePath) = await _fileStorageService.SaveAsync(data.Image!, CONSTANTS.CASE, caseDetail.PolicyDetail!.ContractNumber, CONSTANTS.REPORT);
+            var imageName = isCustomer ? "life-assured" : "beneficiary";
+            var imageExtension = Path.GetExtension(data.Image!.FileName.ToLowerInvariant());
+            var (fileName, relativePath) = await _fileStorageService.SaveAsync(data.Image!, CONSTANTS.CASE, caseDetail.PolicyDetail!.ContractNumber, CONSTANTS.REPORT, null, $"{imageName}{imageExtension}");
             var faceBytes = await VerificationHelper.GetBytesFromIFormFile(data.Image!);
             var regPath = Path.Combine(_env.ContentRootPath, FaceIdfyHelper.GetRegisteredImagePath(caseDetail, isCustomer));
             var registeredImage = await File.ReadAllBytesAsync(regPath);

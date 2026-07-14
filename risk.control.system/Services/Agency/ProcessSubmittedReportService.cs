@@ -1,7 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Hangfire;
+using Microsoft.EntityFrameworkCore;
 using risk.control.system.AppConstant;
 using risk.control.system.Models;
 using risk.control.system.Services.Common;
+using risk.control.system.Services.Report;
 
 namespace risk.control.system.Services.Agency
 {
@@ -12,9 +14,16 @@ namespace risk.control.system.Services.Agency
         Task<(Vendor, string)> SubmitToVendorSupervisor(string userEmail, long caseId, string remarks);
     }
 
-    internal class ProcessSubmittedReportService(ApplicationDbContext context, ILogger<ProcessSubmittedReportService> logger, ITimelineService timelineService) : IProcessSubmittedReportService
+    internal class ProcessSubmittedReportService(
+        ApplicationDbContext context,
+        IPdfReportService pdfReportService,
+        ILogger<ProcessSubmittedReportService> logger,
+        IBackgroundJobClient backgroundJobClient,
+        ITimelineService timelineService) : IProcessSubmittedReportService
     {
         private readonly ApplicationDbContext context = context;
+        private readonly IPdfReportService _pdfReportService = pdfReportService;
+        private readonly IBackgroundJobClient _backgroundJobClient = backgroundJobClient;
         private readonly ILogger<ProcessSubmittedReportService> logger = logger;
         private readonly ITimelineService timelineService = timelineService;
 
@@ -98,7 +107,7 @@ namespace risk.control.system.Services.Agency
 
                 if (document is not null)
                 {
-                    using var dataStream = new MemoryStream();
+                    await using var dataStream = new MemoryStream();
                     document.CopyTo(dataStream);
                     report.SupervisorAttachment = dataStream.ToArray();
                     report.SupervisorFileName = Path.GetFileName(document.FileName);
@@ -107,9 +116,12 @@ namespace risk.control.system.Services.Agency
                 }
 
                 context.Investigations.Update(caseTask);
+
                 var rowsAffected = await context.SaveChangesAsync(null, false) > 0;
 
                 await timelineService.UpdateTaskStatus(caseTask.Id, userEmail);
+
+                _backgroundJobClient.Enqueue(() => _pdfReportService.GenerateAgencyReport(caseId));
 
                 return rowsAffected ? caseTask : null!;
             }

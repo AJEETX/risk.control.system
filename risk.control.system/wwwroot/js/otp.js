@@ -151,7 +151,7 @@ $(document).ready(function () {
         $(this).select();
     });
 
-    let timeLeft = 30;
+    let timeLeft = 60;
     let countdown; // Move this variable here so it's accessible everywhere
     const inputs = $('.otp-input');
     const hiddenInput = $('#UserEnteredOtp');
@@ -235,63 +235,63 @@ $(document).ready(function () {
         $('#login').html('<span class="fas fa-sync fa-spin"></span> Verifying...')
             .prop('disabled', true); // Prevent double-submit
     });
-    $('#resendBtn').click(function () {
-        const CountryIsd = $('input[name="CountryIsd"]').val();
-        const MobileNumber = $('input[name="MobileNumber"]').val();
-        const token = $('input[name="__RequestVerificationToken"]').val();
+    // $('#resendBtn').click(function () {
+    //     const CountryIsd = $('input[name="CountryIsd"]').val();
+    //     const MobileNumber = $('input[name="MobileNumber"]').val();
+    //     const token = $('input[name="__RequestVerificationToken"]').val();
 
-        $.ajax({
-            url: '/Tool/ResendOtp',
-            type: 'POST',
-            data: {
-                CountryIsd: CountryIsd,
-                MobileNumber: MobileNumber,
-                __RequestVerificationToken: token
-            },
-            success: function (response) {
-                if (response.success) {
-                    $('.otp-input').val('');
-                    $('#UserEnteredOtp').val('');
-                    $('.otp-input').first().focus();
-                    timeLeft = 60; // Increase cooldown for next attempt
-                    resendBtn.html('Resend in <span id="timer">' + timeLeft + '</span>s');
-                    startTimer();
-                }
-                else {
-                    resendBtn.prop('disabled', false).html('<span class="fa fa-sync"></span> Resend OTP');
-                    $.alert({
-                        title: 'Otp Error!',
-                        content: response.message,
-                        closeIcon: true,
-                        type: 'red',
-                        icon: 'fas fa-key',
-                        buttons: {
-                            ok: {
-                                text: 'Close',
-                                btnClass: 'btn-default',
-                            }
-                        }
-                    });
-                }
-            },
-            error: function () {
-                resendBtn.prop('disabled', false).html('<span class="fa fa-sync"></span> Resend OTP');
-                $.alert({
-                    title: 'Otp Error!',
-                    content: 'Error resending OTP. Please try again later.',
-                    closeIcon: true,
-                    type: 'red',
-                    icon: 'fas fa-key',
-                    buttons: {
-                        ok: {
-                            text: 'Close',
-                            btnClass: 'btn-default',
-                        }
-                    }
-                });
-            }
-        });
-    });
+    //     $.ajax({
+    //         url: '/Tool/ResendOtp',
+    //         type: 'POST',
+    //         data: {
+    //             CountryIsd: CountryIsd,
+    //             MobileNumber: MobileNumber,
+    //             __RequestVerificationToken: token
+    //         },
+    //         success: function (response) {
+    //             if (response.success) {
+    //                 $('.otp-input').val('');
+    //                 $('#UserEnteredOtp').val('');
+    //                 $('.otp-input').first().focus();
+    //                 timeLeft = 60; // Increase cooldown for next attempt
+    //                 resendBtn.html('Resend in <span id="timer">' + timeLeft + '</span>s');
+    //                 startTimer();
+    //             }
+    //             else {
+    //                 resendBtn.prop('disabled', false).html('<span class="fa fa-sync"></span> Resend OTP');
+    //                 $.alert({
+    //                     title: 'Otp Error!',
+    //                     content: response.message,
+    //                     closeIcon: true,
+    //                     type: 'red',
+    //                     icon: 'fas fa-key',
+    //                     buttons: {
+    //                         ok: {
+    //                             text: 'Close',
+    //                             btnClass: 'btn-default',
+    //                         }
+    //                     }
+    //                 });
+    //             }
+    //         },
+    //         error: function () {
+    //             resendBtn.prop('disabled', false).html('<span class="fa fa-sync"></span> Resend OTP');
+    //             $.alert({
+    //                 title: 'Otp Error!',
+    //                 content: 'Error resending OTP. Please try again later.',
+    //                 closeIcon: true,
+    //                 type: 'red',
+    //                 icon: 'fas fa-key',
+    //                 buttons: {
+    //                     ok: {
+    //                         text: 'Close',
+    //                         btnClass: 'btn-default',
+    //                     }
+    //                 }
+    //             });
+    //         }
+    //     });
+    // });
 
     inputs.on('input', function (e) {
         const target = $(e.target);

@@ -59,6 +59,7 @@ namespace risk.control.system.Seeds
                 };
                 vendors.Add(await AgencySeed.Seed(ctx, env, apiClient, userManager, input, servicesTypes, fileStorageService));
             }
+
             var agenciesToEmpanel = vendors.Take(vendors.Count / 2).ToList();
             await Insurer.Seed(ctx, agenciesToEmpanel, env, apiClient, userManager, GetInsurer(), fileStorageService);
             await ctx.SaveChangesAsync(null, false);

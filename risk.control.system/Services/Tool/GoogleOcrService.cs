@@ -6,15 +6,15 @@ using Image = Google.Cloud.Vision.V1.Image;
 
 namespace risk.control.system.Services.Tool
 {
-    public interface IGoogleService
+    public interface IGoogleOcrService
     {
         Task<string> DetectTextAsync(string imagePath);
         Task<IReadOnlyList<TextBlock>> DetectText(string imagePath);
     }
 
-    internal class GoogleService(ILogger<GoogleService> logger) : IGoogleService
+    internal class GoogleOcrService(ILogger<GoogleOcrService> logger) : IGoogleOcrService
     {
-        private readonly ILogger<GoogleService> _logger = logger;
+        private readonly ILogger<GoogleOcrService> _logger = logger;
 
         public async Task<IReadOnlyList<TextBlock>> DetectText(string imagePath)
         {
