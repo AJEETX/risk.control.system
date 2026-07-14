@@ -25,15 +25,16 @@ namespace risk.control.system.Services.Report
         IPdfGenerateReportService pdfGenerate,
         IFileStorageService fileStorageService,
         IAgenticService agenticService,
+        IPdfGenerateCaseDetailService caseDetailService,
         ILogger<PdfReportService> logger,
         IPdfGenerateDetailReportService pdfGenerateDetail) : IPdfReportService
     {
         private const string reportFilename = "Agency_Report.pdf";
         private const string zipFilename = "Agency_Report.zip";
         private const string zipFolderName = "Report";
-        private const string ClaimFormName = "Claim_Form.pdf";
-        private const string UnderwritingFormName = "Underwriting_Form.pdf";
-        private const string extension = ".pdf";
+        private const string ClaimFormName = "Claim_Form.jpg";
+        private const string UnderwritingFormName = "Underwriting_Form.jpg";
+        private const string extension = ".jpg";
         private readonly string bucketName = CONSTANTS.S3_BUCKET;
         private readonly ApplicationDbContext _context = context;
         private readonly IWebHostEnvironment _env = env;
@@ -42,6 +43,7 @@ namespace risk.control.system.Services.Report
         private readonly IAgenticService _agenticService = agenticService;
         private readonly IPdfGenerateDetailReportService _pdfGenerateDetail = pdfGenerateDetail;
         private readonly IAmazonS3 _s3Client = s3Client;
+        private readonly IPdfGenerateCaseDetailService _caseDetailService = caseDetailService;
         private readonly ILogger<PdfReportService> _logger = logger;
         [AutomaticRetry(Attempts = 0)]
         public async Task<string> Generate(long investigationTaskId, string userEmail)
@@ -102,6 +104,11 @@ namespace risk.control.system.Services.Report
                     .ThenInclude(c => c!.Country).Include(c => c.PolicyDetail).Include(c => c.InvestigationReport).ThenInclude(c => c!.EnquiryRequest).Include(c => c.InvestigationReport).ThenInclude(c => c!.EnquiryRequests)
                 .FirstOrDefault(c => c.Id == investigationTaskId);
 
+            var customer = _context.CustomerDetail.Include(c => c.District).Include(c => c.State).Include(c => c.Country).Include(c => c.PinCode)
+                    .FirstOrDefault(c => c.InvestigationTaskId == investigationTaskId);
+            var beneficiary = _context.BeneficiaryDetail.Include(b => b.District).Include(b => b.State).Include(b => b.Country).Include(b => b.PinCode).Include(b => b.BeneficiaryRelation)
+                .FirstOrDefault(b => b.InvestigationTaskId == investigationTaskId);
+
             var policy = _context.PolicyDetail.Include(p => p.CaseEnabler).Include(p => p.CostCentre).Include(p => p.InvestigationServiceType)
                 .FirstOrDefault(p => p.PolicyDetailId == investigation!.PolicyDetail!.PolicyDetailId);
 
@@ -118,7 +125,14 @@ namespace risk.control.system.Services.Report
             if (policy!.InsuranceType == InsuranceType.UNDERWRITING)
             {
                 isClaim = false;
+                section = _caseDetailService.BuildUnderwritng(section, investigation!, policy, customer!, beneficiary!);
             }
+            else
+            {
+                section = _caseDetailService.BuildClaim(section, investigation!, policy, customer!, beneficiary!);
+            }
+            section.AddParagraph().SetMarginBottom(10f);
+
             section = await _pdfGenerateDetail.Build(section, investigation!, investigationReport!, vendor!, isClaim);
 
             string agencyReportFilePath = Path.GetFullPath(Path.Combine(_env.ContentRootPath, CONSTANTS.DOCUMENT, CONSTANTS.CASE, policy.ContractNumber, zipFolderName, reportFilename));
