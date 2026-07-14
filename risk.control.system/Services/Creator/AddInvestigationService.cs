@@ -49,7 +49,19 @@ namespace risk.control.system.Services.Creator
                 var reportTemplate = await _cloneService.DeepCloneReportTemplate(currentUser!.ClientCompanyId!.Value, model.PolicyDetailDto.InsuranceType.GetValueOrDefault());
                 _context.ReportTemplates.Add(reportTemplate);
                 await _context.SaveChangesAsync();
-                var (fileName, relativePath) = await _fileStorageService.SaveAsync(model.Document!, CONSTANTS.CASE, model.PolicyDetailDto.ContractNumber);
+
+                var documentName = string.Empty;
+                if (model.PolicyDetailDto.InsuranceType == InsuranceType.CLAIM)
+                {
+                    documentName = "Claim_Form";
+                }
+                else
+                {
+                    documentName = "Underwriting_Form";
+                }
+
+                var extension = Path.GetExtension(model.Document!.FileName);
+                var (fileName, relativePath) = await _fileStorageService.SaveAsync(model.Document!, CONSTANTS.CASE, model.PolicyDetailDto.ContractNumber, null, null, $"{documentName}{extension}");
                 var caseTask = new InvestigationTask
                 {
                     PolicyDetail = new PolicyDetail
@@ -101,7 +113,18 @@ namespace risk.control.system.Services.Creator
                 await _context.SaveChangesAsync();
                 if (model.Document is not null)
                 {
-                    var (fileName, relativePath) = await _fileStorageService.SaveAsync(model.Document, CONSTANTS.CASE, model.PolicyDetailDto.ContractNumber);
+                    var documentName = string.Empty;
+                    if (model.PolicyDetailDto.InsuranceType == InsuranceType.CLAIM)
+                    {
+                        documentName = "Claim_Form";
+                    }
+                    else
+                    {
+                        documentName = "Underwriting_Form";
+                    }
+
+                    var extension = Path.GetExtension(model.Document!.FileName);
+                    var (fileName, relativePath) = await _fileStorageService.SaveAsync(model.Document!, CONSTANTS.CASE, model.PolicyDetailDto.ContractNumber, null, null, $"{documentName}{extension}");
                     existingPolicy.PolicyDetail!.DocumentPath = relativePath;
                     existingPolicy.PolicyDetail.DocumentImageExtension = Path.GetExtension(fileName);
                 }
@@ -136,7 +159,8 @@ namespace risk.control.system.Services.Creator
                 var caseTask = await _context.Investigations.Include(c => c.PolicyDetail).FirstOrDefaultAsync(c => c.Id == customerDetail.InvestigationTaskId);
                 if (customerDetail?.ProfileImage is not null)
                 {
-                    var (fileName, relativePath) = await _fileStorageService.SaveAsync(customerDetail?.ProfileImage!, CONSTANTS.CASE, caseTask!.PolicyDetail!.ContractNumber);
+                    var extension = Path.GetExtension(customerDetail.ProfileImage.FileName);
+                    var (fileName, relativePath) = await _fileStorageService.SaveAsync(customerDetail?.ProfileImage!, CONSTANTS.CASE, caseTask!.PolicyDetail!.ContractNumber, null, null, $"Life-assured{extension}");
                     customerDetail!.ProfilePictureExtension = Path.GetExtension(fileName);
                     customerDetail.ImagePath = relativePath;
                 }
@@ -181,7 +205,8 @@ namespace risk.control.system.Services.Creator
 
                 if (customerDetail?.ProfileImage is not null)
                 {
-                    var (fileName, relativePath) = await _fileStorageService.SaveAsync(customerDetail.ProfileImage, CONSTANTS.CASE, caseTask!.PolicyDetail!.ContractNumber);
+                    var extension = Path.GetExtension(customerDetail.ProfileImage.FileName);
+                    var (fileName, relativePath) = await _fileStorageService.SaveAsync(customerDetail.ProfileImage, CONSTANTS.CASE, caseTask!.PolicyDetail!.ContractNumber, null, null, $"Life-assured{extension}");
                     customerDetail.ProfilePictureExtension = Path.GetExtension(fileName);
                     customerDetail.ImagePath = relativePath;
                 }
@@ -224,7 +249,8 @@ namespace risk.control.system.Services.Creator
             {
                 var caseTask = await _context.Investigations.Include(c => c.PolicyDetail).FirstOrDefaultAsync(m => m.Id == beneficiary.InvestigationTaskId); if (beneficiary?.ProfileImage != null)
                 {
-                    var (fileName, relativePath) = await _fileStorageService.SaveAsync(beneficiary.ProfileImage!, CONSTANTS.CASE, caseTask!.PolicyDetail!.ContractNumber);
+                    var extension = Path.GetExtension(beneficiary.ProfileImage.FileName);
+                    var (fileName, relativePath) = await _fileStorageService.SaveAsync(beneficiary.ProfileImage!, CONSTANTS.CASE, caseTask!.PolicyDetail!.ContractNumber, null, null, $"Beneficiary{extension}");
                     beneficiary.ProfilePictureExtension = Path.GetExtension(fileName);
                     beneficiary.ImagePath = relativePath;
                 }
@@ -278,7 +304,8 @@ namespace risk.control.system.Services.Creator
 
                 if (beneficiary?.ProfileImage != null)
                 {
-                    var (fileName, relativePath) = await _fileStorageService.SaveAsync(beneficiary.ProfileImage!, CONSTANTS.CASE, caseTask!.PolicyDetail!.ContractNumber);
+                    var extension = Path.GetExtension(beneficiary.ProfileImage.FileName);
+                    var (fileName, relativePath) = await _fileStorageService.SaveAsync(beneficiary.ProfileImage!, CONSTANTS.CASE, caseTask!.PolicyDetail!.ContractNumber, null, null, $"Beneficiary{extension}");
                     beneficiary.ProfilePictureExtension = Path.GetExtension(fileName);
                     beneficiary.ImagePath = relativePath;
                 }

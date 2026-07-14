@@ -44,7 +44,9 @@ internal class DocumentIdfyService(ApplicationDbContext context,
         {
             var (lat, lon) = VerificationHelper.ParseCoordinates(data.LocationLatLong);
             var expected = VerificationHelper.GetExpectedCoordinates(claim);
-            var (fileName, relativePath) = await _fileStorageService.SaveAsync(data.Image!, CONSTANTS.CASE, claim.PolicyDetail!.ContractNumber, CONSTANTS.REPORT);
+            var docName = documentReport!.ReportName;
+            var extension = Path.GetExtension(data.Image!.FileName.ToLowerInvariant());
+            var (fileName, relativePath) = await _fileStorageService.SaveAsync(data.Image!, CONSTANTS.CASE, claim.PolicyDetail!.ContractNumber, CONSTANTS.REPORT, null, $"{docName}{extension}");
             documentReport!.FilePath = relativePath;
             documentReport.ImageExtension = Path.GetExtension(fileName);
             byte[] docImage = await VerificationHelper.GetBytesFromIFormFile(data.Image!);

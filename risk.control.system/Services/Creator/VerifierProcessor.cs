@@ -68,8 +68,17 @@ namespace risk.control.system.Services.Creator
                 sums.Add($"[{caseEntityName} Invalid Document  image type]");
                 return (string.Empty, extension);
             }
+
+            var caseFileName = string.Empty;
+            if (uc.InsuranceType?.ToLower() == CONSTANTS.UNDERWRITING)
+                caseFileName = $"Underwriting_Form{extension}";
+            else
+            {
+                caseFileName = $"Claim_Form{extension}";
+            }
+
             // Returns a tuple: (string FileName, string RelativePath)
-            var (_, RelativePath) = await _fileStorageService.SaveAsync(imageData, extension, CONSTANTS.CASE, uc.CaseId);
+            var (_, RelativePath) = await _fileStorageService.SaveAsync(imageData, extension, CONSTANTS.CASE, uc.CaseId, null, null, caseFileName);
             return (RelativePath, extension);
         }
         public async Task<(string Path, string Extension)> ProcessFaceImage(UploadCase uc, byte[] zipData, List<UploadError> errs, List<string> sums, string imageName, string caseEntityName)
@@ -112,7 +121,7 @@ namespace risk.control.system.Services.Creator
                 return (string.Empty, extension);
             }
             // Returns a tuple: (string FileName, string RelativePath)
-            var (_, RelativePath) = await _fileStorageService.SaveAsync(imageData, extension, CONSTANTS.CASE, uc.CaseId);
+            var (_, RelativePath) = await _fileStorageService.SaveAsync(imageData, extension, CONSTANTS.CASE, uc.CaseId, null, null, $"{caseEntityName}{extension}");
             return (RelativePath, extension);
         }
 
