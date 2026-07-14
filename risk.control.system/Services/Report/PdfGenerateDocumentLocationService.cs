@@ -44,8 +44,30 @@ namespace risk.control.system.Services.Report
                              .SetFontColor(Gehtsoft.PDFFlow.Models.Shared.Color.Blue)
                              .SetUnderline();
 
-                    string matchResult = loc.AgentIdReport!.ImageValid == true ? Path.Combine(_env.WebRootPath, "img", "yes.png") : Path.Combine(_env.WebRootPath, "img", "cancel.png");
-                    rowBuilder.AddCell().SetVerticalAlignment(VerticalAlignment.Center).SetHorizontalAlignment(HorizontalAlignment.Center).AddParagraph().AddInlineImage(matchResult).SetWidth(30F);
+                    string imgFileName = doc!.ImageValid == true ? "yes.png" : "cancel.png";
+                    string matchImagePath = Path.Combine(_env.WebRootPath, "img", imgFileName);
+
+                    // 2. Create the separate text string for the match result
+                    string matchText = doc.ImageValid == true ? "YES" : "NO";
+
+                    // 3. Build the cell and paragraph
+                    var matchCell = rowBuilder.AddCell()
+                        .SetVerticalAlignment(VerticalAlignment.Center)
+                        .SetHorizontalAlignment(HorizontalAlignment.Center);
+
+                    var matchParagraph = matchCell.AddParagraph();
+
+                    // 4. Add the image safely if it exists
+                    if (System.IO.File.Exists(matchImagePath))
+                    {
+                        matchParagraph.AddInlineImage(matchImagePath).SetWidth(25F);
+                        matchParagraph.AddText("\r\n"); // Line break to place text below the icon
+                    }
+
+                    // 5. Add the text result below the image
+                    matchParagraph.AddText(matchText)
+                                  .SetFontSize(8F)
+                                  .SetBold();
                 }
                 section.AddParagraph().AddText("");
             }

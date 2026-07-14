@@ -27,8 +27,50 @@ namespace risk.control.system.Services.Report
                 {
                     var rowBuilder = tableBuilder.AddRow();
                     rowBuilder.AddCell().AddParagraph().AddText(face.ReportName!).SetFontSize(9F);
-                    var pngBytes = _imageConverter.ConvertToPngFromPath(_env, face.FilePath!);
-                    rowBuilder.AddCell().SetVerticalAlignment(VerticalAlignment.Center).SetHorizontalAlignment(HorizontalAlignment.Center).AddParagraph().AddInlineImage(pngBytes).SetWidth(140F);
+                    var faceImagePngBytes = _imageConverter.ConvertToPngFromPath(_env, face.FilePath!);
+                    var agentPhotoCell = rowBuilder.AddCell().SetVerticalAlignment(VerticalAlignment.Center).SetHorizontalAlignment(HorizontalAlignment.Center);
+
+                    // 2. Add the Image Paragraph
+                    var imagePara = agentPhotoCell.AddParagraph();
+                    imagePara.AddInlineImage(faceImagePngBytes).SetWidth(120F).SetHeight(120F);
+
+                    if (face.FaceResult!.Faces.Count == 0)
+                    {
+                        var noFacePara = agentPhotoCell.AddParagraph();
+                        noFacePara.AddText("No face detected").SetFontSize(9F).SetBold();
+                    }
+                    else if (face.FaceResult!.Faces.Count > 1)
+                    {
+                        var noFacePara = agentPhotoCell.AddParagraph();
+                        noFacePara.AddText("Multiple faces detected").SetFontSize(9F).SetBold();
+                    }
+                    else
+                    {
+                        var agentFaceResult = face.FaceResult!.Faces.FirstOrDefault();
+                        // 3. Add Line 1 of text (e.g., Bold Label)
+                        var line1 = agentPhotoCell.AddParagraph();
+                        line1.AddText($"Age Range: {face.FaceResult!.Faces.FirstOrDefault()?.AgeRange ?? "N/A"}").SetFontSize(9F).SetBold();
+
+                        // 4. Add Line 2 of text (e.g., Subtext)
+                        var line2 = agentPhotoCell.AddParagraph();
+                        line2.AddText($"Gender: {face.FaceResult!.Faces.FirstOrDefault()?.Gender ?? "N/A"}").SetFontSize(9F).SetBold();
+
+                        var line3 = agentPhotoCell.AddParagraph();
+                        line3.AddText($"Emotion: {face.FaceResult!.Faces.FirstOrDefault()?.PrimaryEmotion ?? "N/A"}").SetFontSize(9F).SetBold();
+
+                        var line4 = agentPhotoCell.AddParagraph();
+                        var smileValue = face.FaceResult!.Faces.FirstOrDefault()!.IsSmiling ? "Yes" : "No";
+                        line4.AddText($"Smiling: {smileValue ?? "N/A"}").SetFontSize(9F).SetBold();
+
+                        var line5 = agentPhotoCell.AddParagraph();
+                        var glassesValue = face.FaceResult!.Faces.FirstOrDefault()!.IsWearingGlasses ? "Yes" : "No";
+                        line5.AddText($"Wearing Glasses: {glassesValue ?? "N/A"}").SetFontSize(9F).SetBold();
+
+                        var line6 = agentPhotoCell.AddParagraph();
+                        var beardValue = face.FaceResult!.Faces.FirstOrDefault()!.HasBeard ? "Yes" : "No";
+                        line6.AddText($"Bearded: {beardValue ?? "N/A"}").SetFontSize(9F).SetBold();
+                    }
+
                     string location = isClaim ? "Beneficiary" : "Life-Assured";
                     var addressData = $"{face.LocationAddress}\r\n\r\nIndicative Distance from {location} Address:{face.Distance}\r\n\r\nCaptured Date & Time:{face.LongLatTime.GetValueOrDefault().ToLocalTime():dd-MMM-yy hh:mm tt}";
                     rowBuilder.AddCell().AddParagraph(addressData).SetFontSize(9F);
@@ -43,8 +85,32 @@ namespace risk.control.system.Services.Report
                     paragraph.AddUrlToParagraph(mapUrl, "View Full Map").SetFontSize(9F)
                              .SetFontColor(Gehtsoft.PDFFlow.Models.Shared.Color.Blue)
                              .SetUnderline();
-                    string matchResult = loc.AgentIdReport!.ImageValid == true ? Path.Combine(_env.WebRootPath, "img", "yes.png") : Path.Combine(_env.WebRootPath, "img", "cancel.png");
-                    rowBuilder.AddCell().SetVerticalAlignment(VerticalAlignment.Center).SetHorizontalAlignment(HorizontalAlignment.Center).AddParagraph().AddInlineImage(matchResult).SetWidth(30F);
+                    string imgFileName = face!.ImageValid == true ? "yes.png" : "cancel.png";
+                    string matchImagePath = Path.Combine(_env.WebRootPath, "img", imgFileName);
+
+                    // 2. Create the separate text string for the match result
+                    string matchText = face.ImageValid == true
+                        ? $"YES\r\n({face.Similarity}% Match)"
+                        : $"NO\r\n({face.Similarity}% No Match)";
+
+                    // 3. Build the cell and paragraph
+                    var matchCell = rowBuilder.AddCell()
+                        .SetVerticalAlignment(VerticalAlignment.Center)
+                        .SetHorizontalAlignment(HorizontalAlignment.Center);
+
+                    var matchParagraph = matchCell.AddParagraph();
+
+                    // 4. Add the image safely if it exists
+                    if (System.IO.File.Exists(matchImagePath))
+                    {
+                        matchParagraph.AddInlineImage(matchImagePath).SetWidth(25F);
+                        matchParagraph.AddText("\r\n"); // Line break to place text below the icon
+                    }
+
+                    // 5. Add the text result below the image
+                    matchParagraph.AddText(matchText)
+                                  .SetFontSize(8F)
+                                  .SetBold();
                 }
             }
             return section;

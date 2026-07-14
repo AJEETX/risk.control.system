@@ -41,16 +41,5 @@ namespace risk.control.system.Models
         public bool IsSmiling { get; set; }
         public bool HasBeard { get; set; }
         public bool IsWearingGlasses { get; set; }
-        //public BoundingBoxModel? Location { get; set; } = default!;
-    }
-
-    public class BoundingBoxModel
-    {
-        [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public long Id { get; set; }
-        public float Top { get; set; }
-        public float Left { get; set; }
-        public float Width { get; set; }
-        public float Height { get; set; }
     }
 }
