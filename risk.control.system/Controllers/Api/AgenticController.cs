@@ -209,7 +209,7 @@ namespace risk.control.system.Controllers.Api
 
             try
             {
-                GetObjectResponse response = await _s3Client.GetObjectAsync(CONSTANTS.S3_BUCKET, s3KeyName);
+                GetObjectResponse response = await _s3Client.GetObjectAsync(EnvHelper.Get(CONSTANTS.S3_BUCKET), s3KeyName);
 
                 return File(response.ResponseStream, "application/zip", $"Report_{contractNumber}.zip");
             }
