@@ -62,6 +62,7 @@ namespace risk.control.system.Controllers.Api
                 return StatusCode(StatusCodes.Status500InternalServerError, new { Success = false, Message = ex.Message });
             }
         }
+
         //Face Existence Endpoint
         [HttpPost("FaceExists")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
@@ -91,7 +92,7 @@ namespace risk.control.system.Controllers.Api
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
-        [HttpPost("zip-and-upload-report/{contractNumber}")]
+        [HttpPost("zip-and-upload-sample-report/{contractNumber}")]
         public async Task<IActionResult> UploadReport(string contractNumber)
         {
             var s3KeyName = $"backups/{contractNumber}/Agency_Report.zip";
@@ -100,7 +101,7 @@ namespace risk.control.system.Controllers.Api
             {
                 byte[] zipBytes = CreateZippedPdfInMemory();
 
-                await UploadBytesToS3Async(zipBytes, CONSTANTS.S3_BUCKET, s3KeyName);
+                await UploadBytesToS3Async(zipBytes, EnvHelper.Get(CONSTANTS.S3_BUCKET)!, s3KeyName);
                 return Ok(new { Success = true, Message = $"Report for contract {contractNumber} uploaded successfully." });
             }
             catch (AmazonS3Exception amazonException)
@@ -219,10 +220,64 @@ namespace risk.control.system.Controllers.Api
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
-        [HttpPost("delete-images-from-aws")]
-        public async Task<IActionResult> DeleteImagesFromAws()
+        [HttpGet("image-collection-ids")]
+        public async Task<IActionResult> Collections()
         {
-            var imageCollection = EnvHelper.Get(CONSTANTS.FaceImageCollection);
+            try
+            {
+                var collectionIds = await _amazonApiService.GetAllFaceCollectionIdsAsync();
+                return Ok(collectionIds);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
+        [HttpGet("images-count-in-aws")]
+        public async Task<IActionResult> ImagesCountInAws(string? imageCollection = null)
+        {
+            imageCollection ??= EnvHelper.Get(CONSTANTS.FaceImageCollection);
+            try
+            {
+                var response = await _amazonApiService.FaceCollectionExistAsync(imageCollection!);
+                return Ok(new
+                {
+                    Success = true,
+                    Message = response
+                });
+            }
+            catch (AmazonS3Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { Success = false, Message = ex.Message });
+            }
+        }
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
+        [HttpGet("get-all-images-from-collection-id")]
+        public async Task<IActionResult> GetAllFacesFromCollection(string? imageCollection = null)
+        {
+            imageCollection ??= EnvHelper.Get(CONSTANTS.FaceImageCollection);
+
+            try
+            {
+                var faces = await _amazonApiService.GetAllFacesFromCollectionAsync(imageCollection!);
+                return Ok(faces);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
+        [HttpPost("delete-images-from-collection-id")]
+        public async Task<IActionResult> DeleteImagesFromAws(string? imageCollection = null)
+        {
+            imageCollection ??= EnvHelper.Get(CONSTANTS.FaceImageCollection);
 
             try
             {
@@ -241,20 +296,47 @@ namespace risk.control.system.Controllers.Api
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
-        [HttpPost("empty-bucket-contents/{bucketName}")]
-        public async Task<IActionResult> EmptyBucketContents(string bucketName = CONSTANTS.S3_BUCKET)
+        [HttpGet("s3-buckets")]
+        public async Task<IActionResult> ListBuckets()
         {
             try
             {
-                bool bucketExists = await AmazonS3Util.DoesS3BucketExistV2Async(_s3Client, bucketName);
-                if (!bucketExists)
+                var bucketsResponse = await _s3Client.ListBucketsAsync();
+                var bucketListTasks = bucketsResponse.Buckets.Select(async b =>
                 {
-                    return NotFound($"Bucket '{bucketName}' does not exist.");
-                }
+                    string regionName = "us-east-1"; // Fallback default
+                    try
+                    {
+                        // Query AWS for this specific bucket's home region
+                        var locationResponse = await _s3Client.GetBucketLocationAsync(new GetBucketLocationRequest
+                        {
+                            BucketName = b.BucketName
+                        });
 
-                await EmptyBucketAsync(bucketName);
+                        string locationConstraint = locationResponse.Location?.Value!;
 
-                return Ok(new { Success = true, Message = $"All contents of bucket '{bucketName}' have been deleted." });
+                        // AWS returns empty string or "US" if the bucket resides in us-east-1
+                        regionName = string.IsNullOrEmpty(locationConstraint) || locationConstraint == "US"
+                            ? "us-east-1"
+                            : locationConstraint;
+                    }
+                    catch (Exception)
+                    {
+                        // Handle cases where you might not have permissions to read a specific bucket's location
+                        regionName = "Unknown/AccessDenied";
+                    }
+
+                    return new
+                    {
+                        Name = b.BucketName,
+                        Region = regionName,
+                        CreatedOn = $"{b.CreationDate:yyyy-MM-dd HH:mm:ss}"
+                    };
+                });
+
+                // Await all the parallel region check tasks cleanly
+                var buckets = (await Task.WhenAll(bucketListTasks)).ToList();
+                return Ok(new { Success = true, Buckets = buckets });
             }
             catch (AmazonS3Exception ex)
             {
@@ -268,25 +350,21 @@ namespace risk.control.system.Controllers.Api
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
-        [HttpPost("delete-bucket/{bucketName}")]
-        public async Task<IActionResult> DeleteBucket(string bucketName = CONSTANTS.S3_BUCKET)
+        [HttpGet("list-bucket-contents")]
+        public async Task<IActionResult> ListBucketContents(string? s3BucketName = null)
         {
+            s3BucketName ??= EnvHelper.Get(CONSTANTS.S3_BUCKET)!;
             try
             {
-                bool bucketExists = await AmazonS3Util.DoesS3BucketExistV2Async(_s3Client, bucketName);
+                bool bucketExists = await AmazonS3Util.DoesS3BucketExistV2Async(_s3Client, s3BucketName);
                 if (!bucketExists)
                 {
-                    return NotFound($"Bucket '{bucketName}' does not exist.");
+                    return NotFound($"Bucket '{s3BucketName}' does not exist.");
                 }
-
-                await EmptyBucketAsync(bucketName);
-
-                await _s3Client.DeleteBucketAsync(new DeleteBucketRequest
-                {
-                    BucketName = bucketName
-                });
-
-                return Ok(new { Success = true, Message = $"Bucket deleted'{bucketName}' have been deleted." });
+                var request = new ListObjectsV2Request { BucketName = s3BucketName };
+                var response = await _s3Client.ListObjectsV2Async(request);
+                var objectKeys = response.S3Objects.Select(obj => obj.Key).ToList();
+                return Ok(new { Success = true, BucketName = s3BucketName, Contents = objectKeys });
             }
             catch (AmazonS3Exception ex)
             {
@@ -298,32 +376,51 @@ namespace risk.control.system.Controllers.Api
                 return StatusCode(StatusCodes.Status500InternalServerError, new { Success = false, Message = ex.Message });
             }
         }
-        private async Task EmptyBucketAsync(string bucketName)
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
+        [HttpPost("empty-bucket-contents")]
+        public async Task<IActionResult> EmptyBucketContents(string? s3BucketName = null)
         {
-            var request = new ListObjectsV2Request { BucketName = bucketName };
-            ListObjectsV2Response response;
-
-            do
+            try
             {
-                response = await _s3Client.ListObjectsV2Async(request);
+                s3BucketName ??= EnvHelper.Get(CONSTANTS.S3_BUCKET)!;
+                var emptyResult = await _amazonApiService.EmptyBucketContents(s3BucketName);
 
-                if (response.S3Objects.Any())
-                {
-                    var keysToDelete = response.S3Objects
-                        .Select(obj => new KeyVersion { Key = obj.Key })
-                        .ToList();
-
-                    await _s3Client.DeleteObjectsAsync(new DeleteObjectsRequest
-                    {
-                        BucketName = bucketName,
-                        Objects = keysToDelete
-                    });
-                }
-
-                request.ContinuationToken = response.NextContinuationToken;
-
-            } while (response.IsTruncated ?? false);
+                return Ok(new { Success = true, Message = emptyResult });
+            }
+            catch (AmazonS3Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { Success = false, Message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"General Error: {ex.Message}");
+                return StatusCode(StatusCodes.Status500InternalServerError, new { Success = false, Message = ex.Message });
+            }
         }
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
+        [HttpPost("delete-bucket")]
+        public async Task<IActionResult> DeleteBucket(string? s3BucketName = null)
+        {
+            try
+            {
+                s3BucketName ??= EnvHelper.Get(CONSTANTS.S3_BUCKET)!;
+                var deleteResult = await _amazonApiService.DeleteBucketAsync(s3BucketName);
+
+                return Ok(new { Success = true, Message = deleteResult });
+            }
+            catch (AmazonS3Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { Success = false, Message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"General Error: {ex.Message}");
+                return StatusCode(StatusCodes.Status500InternalServerError, new { Success = false, Message = ex.Message });
+            }
+        }
+
         //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
         //[HttpPost("convert-image-to-searchable-pdf")]
         //public async Task<IActionResult> ConvertImageToSearchablePdf(IFormFile imageFile)

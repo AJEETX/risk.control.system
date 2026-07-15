@@ -1,5 +1,4 @@
 ﻿using System.Security.Claims;
-using Amazon.Rekognition.Model;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -187,7 +186,7 @@ namespace risk.control.system.Controllers.Api
             return Ok(new { message });
         }
 
-        [AllowAnonymous]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
         [HttpGet("test-sms")]
         public async Task<IActionResult> Sms(string countryCode = "au", string mobile = "61432854196", string message = "Testing")
         {
@@ -198,7 +197,7 @@ namespace risk.control.system.Controllers.Api
             return Ok(new { message = response });
         }
 
-        [AllowAnonymous]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
         [HttpGet("validate-mobile-number")]
         public async Task<IActionResult> ValidatePhoneNumber(string phoneNumber = "+61432854196")
         {
@@ -206,7 +205,7 @@ namespace risk.control.system.Controllers.Api
             return Ok(result);
         }
 
-        [AllowAnonymous]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
         [HttpGet("is-mobile-number")]
         public async Task<IActionResult> IsValidMobileNumber(string phoneNumber = "+61432854196", string country = "61")
         {
@@ -237,7 +236,7 @@ namespace risk.control.system.Controllers.Api
         //    }
         //}
 
-        [AllowAnonymous]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
         [HttpGet("pdf")]
         public async Task<IActionResult> Pdf(long id = 1, string currentUserEmail = "assessor@insurer.com")
         {
@@ -258,57 +257,7 @@ namespace risk.control.system.Controllers.Api
             }
         }
 
-        [AllowAnonymous]
-        [HttpGet("get-all-face-images")]
-        public async Task<IActionResult> GetAllFacesFromCollection()
-        {
-            var imageCollection = EnvHelper.Get(CONSTANTS.FaceImageCollection);
-
-            try
-            {
-                var faces = await _amazonApiService.GetAllFacesFromCollectionAsync(imageCollection!);
-                return Ok(faces);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.StackTrace);
-                return StatusCode(500, "Internal server error");
-            }
-        }
-
-        [AllowAnonymous]
-        [HttpGet("cleanup-agency-user-image-collection")]
-        public async Task<IActionResult> CleanUpAgencyUserCollectionAsync()
-        {
-            var imageCollection = EnvHelper.Get(CONSTANTS.FaceImageCollection);
-            try
-            {
-                var response = await _amazonApiService.DeleteCollectionAsync(imageCollection!);
-
-                if (response.StatusCode == 200)
-                {
-                    Console.WriteLine($"Successfully deleted collection: {imageCollection}");
-                    return Ok($"Successfully deleted collection: {imageCollection}");
-                }
-                else if (response.StatusCode == 400)
-                {
-                    Console.WriteLine($"Collection: {imageCollection} Not Found. Status code: {response.StatusCode}");
-                    return BadRequest($"Collection: {imageCollection} Not Found. Status code: {response.StatusCode}");
-                }
-                else if (response.StatusCode == 500)
-                {
-                    Console.WriteLine($"Server error deleting Collection {imageCollection}. Status code: {response.StatusCode}");
-                    return StatusCode(500, $"Server error deleting Collection {imageCollection}");
-                }
-            }
-            catch (ResourceNotFoundException ex)
-            {
-                Console.WriteLine($"Collection {imageCollection} does not exist. Nothing to delete. {ex.Message}");
-            }
-            return StatusCode(500, $"Server error deleting Collection {imageCollection}");
-        }
-
-        [AllowAnonymous]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
         [HttpPost("watermark-image")]
         public async Task<IActionResult> WatermarkImage(IFormFile file)
         {

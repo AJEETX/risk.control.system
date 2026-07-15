@@ -35,7 +35,7 @@ namespace risk.control.system.Services.Report
         private const string ClaimFormName = "Claim_Form.jpg";
         private const string UnderwritingFormName = "Underwriting_Form.jpg";
         private const string extension = ".jpg";
-        private readonly string bucketName = CONSTANTS.S3_BUCKET;
+        private readonly string bucketName = EnvHelper.Get(CONSTANTS.S3_BUCKET)!;
         private readonly ApplicationDbContext _context = context;
         private readonly IWebHostEnvironment _env = env;
         private readonly IPdfGenerateReportService _pdfGenerate = pdfGenerate;

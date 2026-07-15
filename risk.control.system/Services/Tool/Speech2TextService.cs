@@ -5,6 +5,7 @@ using Amazon.S3.Transfer;
 using Amazon.TranscribeService;
 using Amazon.TranscribeService.Model;
 using risk.control.system.AppConstant;
+using risk.control.system.Helpers;
 using risk.control.system.Models.ViewModel;
 
 namespace risk.control.system.Services.Tool
@@ -16,7 +17,7 @@ namespace risk.control.system.Services.Tool
 
     internal class Speech2TextService(IAmazonS3 s3Client, IAmazonTranscribeService transcribeClient, IHttpClientFactory clientFactory) : ISpeech2TextService
     {
-        private readonly string bucketName = CONSTANTS.S3_BUCKET;
+        private readonly string bucketName = EnvHelper.Get(CONSTANTS.S3_BUCKET)!;
         private readonly IAmazonS3 _s3Client = s3Client;
         private readonly IAmazonTranscribeService _transcribeClient = transcribeClient;
         private readonly IHttpClientFactory _clientFactory = clientFactory;
