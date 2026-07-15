@@ -34,6 +34,8 @@ namespace risk.control.system.Services.Agent
         Task<DetectDocumentTextResponse> ExtractTextAsync(byte[] bytes);
         Task<string> EmptyBucketContents(string s3BucketName);
         Task<string> DeleteBucketAsync(string s3BucketName);
+        Task<string> DeleteS3FolderAsync(string s3BucketName, string folderPath);
+        Task<string> DeleteSingleFileFromBucketAsync(string s3BucketName, string keyName);
     }
 
     public enum CollectionStatus { Existing, Created, Failed }
@@ -346,11 +348,11 @@ namespace risk.control.system.Services.Agent
 
                 var bucketRegion = RegionEndpoint.GetBySystemName(regionName);
 
-                using var regionalClient = new AmazonS3Client(EnvHelper.Get("AWS_ID"), EnvHelper.Get("AWS_SECRET"), bucketRegion);
+                using var regionalS3Client = new AmazonS3Client(EnvHelper.Get("AWS_ID"), EnvHelper.Get("AWS_SECRET"), bucketRegion);
 
-                await EmptyBucketForAnyRegionAsync(s3BucketName, regionalClient);
+                await EmptyBucketForAnyRegionAsync(s3BucketName, regionalS3Client);
 
-                var deletedResponse = await regionalClient.DeleteBucketAsync(s3BucketName);
+                var deletedResponse = await regionalS3Client.DeleteBucketAsync(s3BucketName);
                 return deletedResponse.HttpStatusCode == HttpStatusCode.NoContent ? $"Bucket [{s3BucketName}] deleted successfully." : $"Failed to delete bucket [{s3BucketName}].";
             }
             catch (Exception ex)
@@ -378,23 +380,122 @@ namespace risk.control.system.Services.Agent
                 return $"Failed to empty bucket {s3BucketName}: {ex.Message}";
             }
         }
+        public async Task<string> DeleteSingleFileFromBucketAsync(string s3BucketName, string keyName)
+        {
+            try
+            {
+                bool bucketExists = await AmazonS3Util.DoesS3BucketExistV2Async(_s3Client, s3BucketName);
+                if (!bucketExists)
+                {
+                    return $"Bucket [{s3BucketName}] does not exist.";
+                }
+                var locationRequest = new GetBucketLocationRequest
+                {
+                    BucketName = s3BucketName
+                };
+                GetBucketLocationResponse locationResponse = await _s3Client.GetBucketLocationAsync(locationRequest);
 
-        private async Task EmptyBucketForAnyRegionAsync(string bucketName, IAmazonS3 s3Client)
+                string locationConstraint = locationResponse.Location?.Value!;
+                var regionName = string.IsNullOrEmpty(locationConstraint) || locationConstraint == "US" ? "us-east-1" : locationConstraint;
+
+                var bucketRegion = RegionEndpoint.GetBySystemName(regionName);
+
+                using var regionalClient = new AmazonS3Client(EnvHelper.Get("AWS_ID"), EnvHelper.Get("AWS_SECRET"), bucketRegion);
+                var deleteRequest = new DeleteObjectRequest
+                {
+                    BucketName = s3BucketName,
+                    Key = keyName // Example: "folder/subfolder/my-image.png"
+                };
+
+                await regionalClient.DeleteObjectAsync(deleteRequest);
+                return $"Successfully deleted {keyName} from {s3BucketName}.";
+            }
+            catch (AmazonS3Exception e)
+            {
+                return $"Error encountered on server. Message:'{e.Message}' when deleting an object";
+            }
+            catch (Exception e)
+            {
+                return $"Unknown encounter on server. Message:'{e.Message}' when deleting an object";
+            }
+        }
+
+        public async Task<string> DeleteS3FolderAsync(string s3BucketName, string folderPath)
+        {
+            bool bucketExists = await AmazonS3Util.DoesS3BucketExistV2Async(_s3Client, s3BucketName);
+            if (!bucketExists)
+            {
+                return $"Bucket [{s3BucketName}] does not exist.";
+            }
+            // Ensure the folder path ends with a '/' so you don't accidentally match 
+            // files like "folder-backup" when you want to delete "folder/"
+            if (!folderPath.EndsWith("/"))
+            {
+                folderPath += "/";
+            }
+
+            var listRequest = new ListObjectsV2Request
+            {
+                BucketName = s3BucketName,
+                Prefix = folderPath
+            };
+
+            ListObjectsV2Response listResponse;
+
+            do
+            {
+                // 1. Get the list of objects inside the folder
+                listResponse = await _s3Client.ListObjectsV2Async(listRequest);
+                if (listResponse.S3Objects == null || !listResponse.S3Objects.Any())
+                {
+                    Console.WriteLine($"No objects found in folder '{folderPath}' to delete.");
+                    break;
+                }
+                if (listResponse.S3Objects != null && listResponse.S3Objects.Any())
+                {
+                    // 2. Prepare the list of keys to delete
+                    var keysToDelete = listResponse.S3Objects
+                        .Select(obj => new KeyVersion { Key = obj.Key })
+                        .ToList();
+
+                    // 3. Batch delete the keys
+                    var deleteRequest = new DeleteObjectsRequest
+                    {
+                        BucketName = s3BucketName,
+                        Objects = keysToDelete
+                    };
+
+                    await _s3Client.DeleteObjectsAsync(deleteRequest);
+                    Console.WriteLine($"Deleted batch of {keysToDelete.Count} objects from '{folderPath}'");
+                }
+
+                // Handle pagination in case the folder has more than 1,000 items
+                listRequest.ContinuationToken = listResponse.NextContinuationToken;
+
+            } while (listResponse.IsTruncated ?? false);
+
+            Console.WriteLine($"Folder '{folderPath}' and its contents have been completely removed.");
+            return $"Bucket : [{s3BucketName}], Folder '{folderPath}' and its contents have been completely removed.";
+        }
+        private static async Task EmptyBucketForAnyRegionAsync(string bucketName, Amazon.S3.AmazonS3Client regionalS3Client)
         {
             var request = new ListObjectsV2Request { BucketName = bucketName };
             ListObjectsV2Response response;
 
             do
             {
-                response = await s3Client.ListObjectsV2Async(request);
-
+                response = await regionalS3Client.ListObjectsV2Async(request);
+                if (response.S3Objects == null)
+                {
+                    break;
+                }
                 if (response.S3Objects.Any())
                 {
                     var keysToDelete = response.S3Objects
                         .Select(obj => new KeyVersion { Key = obj.Key })
                         .ToList();
 
-                    await s3Client.DeleteObjectsAsync(new DeleteObjectsRequest
+                    await regionalS3Client.DeleteObjectsAsync(new DeleteObjectsRequest
                     {
                         BucketName = bucketName,
                         Objects = keysToDelete
@@ -413,7 +514,10 @@ namespace risk.control.system.Services.Agent
             do
             {
                 response = await _s3Client.ListObjectsV2Async(request);
-
+                if (response.S3Objects == null)
+                {
+                    break;
+                }
                 if (response.S3Objects.Any())
                 {
                     var keysToDelete = response.S3Objects
