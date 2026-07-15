@@ -421,6 +421,44 @@ namespace risk.control.system.Controllers.Api
             }
         }
 
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
+        [HttpPost("delete-single-file-from-bucket")]
+        public async Task<IActionResult> DeleteSingleFileFromBucket(string s3BucketName, string fileKey)
+        {
+            try
+            {
+                var deleteResult = await _amazonApiService.DeleteSingleFileFromBucketAsync(s3BucketName, fileKey);
+                return Ok(new { Success = true, Message = deleteResult });
+            }
+            catch (AmazonS3Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { Success = false, Message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"General Error: {ex.Message}");
+                return StatusCode(StatusCodes.Status500InternalServerError, new { Success = false, Message = ex.Message });
+            }
+        }
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
+        [HttpPost("delete-folder-from-bucket")]
+        public async Task<IActionResult> DeleteFolderFromBucket(string s3BucketName, string folderKey)
+        {
+            try
+            {
+                var deleteResult = await _amazonApiService.DeleteS3FolderAsync(s3BucketName, folderKey);
+                return Ok(new { Success = true, Message = deleteResult });
+            }
+            catch (AmazonS3Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { Success = false, Message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"General Error: {ex.Message}");
+                return StatusCode(StatusCodes.Status500InternalServerError, new { Success = false, Message = ex.Message });
+            }
+        }
         //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
         //[HttpPost("convert-image-to-searchable-pdf")]
         //public async Task<IActionResult> ConvertImageToSearchablePdf(IFormFile imageFile)
