@@ -12,7 +12,7 @@
         public const string DOCUMENT = "Document";
         public const string CASE = "Case";
         public const string REPORT = "Report";
-        public const string S3_BUCKET = "icheckify-bucket-2026";
+        public const string S3_BUCKET = "S3_BUCKET";
 
         public static class CASE_STATUS
         {

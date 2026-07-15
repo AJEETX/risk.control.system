@@ -1,14 +1,21 @@
 ﻿using System.Net;
+using Amazon;
 using Amazon.Rekognition;
 using Amazon.Rekognition.Model;
+using Amazon.S3;
+using Amazon.S3.Model;
+using Amazon.S3.Util;
 using Amazon.Textract;
 using Amazon.Textract.Model;
+using risk.control.system.Helpers;
 
 namespace risk.control.system.Services.Agent
 {
     public interface IAmazonApiService
     {
         Task<CollectionStatus> EnsureCollectionExistsAsync(string collectionId);
+        Task<List<string>> GetAllFaceCollectionIdsAsync();
+        Task<string> FaceCollectionExistAsync(string collectionId);
         Task<List<Face>> GetAllFacesFromCollectionAsync(string collectionId);
         Task<DeleteCollectionResponse> DeleteCollectionAsync(string collectionId);
 
@@ -25,15 +32,18 @@ namespace risk.control.system.Services.Agent
         Task<CompareFacesResponse> CompareFaceMatch(byte[] originalImage, byte[] targetImage);
 
         Task<DetectDocumentTextResponse> ExtractTextAsync(byte[] bytes);
+        Task<string> EmptyBucketContents(string s3BucketName);
+        Task<string> DeleteBucketAsync(string s3BucketName);
     }
 
     public enum CollectionStatus { Existing, Created, Failed }
 
-    internal class AmazonApiService(IAmazonRekognition rekognitionClient, IAmazonTextract textractClient, ILogger<AmazonApiService> logger) : IAmazonApiService
+    internal class AmazonApiService(IAmazonRekognition rekognitionClient, IAmazonTextract textractClient, IAmazonS3 s3Client, ILogger<AmazonApiService> logger) : IAmazonApiService
     {
         private const float similarityThreshold = 70F;
         private readonly IAmazonRekognition _rekognitionClient = rekognitionClient;
         private readonly IAmazonTextract _textractClient = textractClient;
+        private readonly IAmazonS3 _s3Client = s3Client;
         private readonly ILogger<AmazonApiService> _logger = logger;
 
         public async Task<CollectionStatus> EnsureCollectionExistsAsync(string collectionId)
@@ -103,7 +113,73 @@ namespace risk.control.system.Services.Agent
                 throw; // Or return an empty list/custom response depending on your architecture
             }
         }
+        public async Task<List<string>> GetAllFaceCollectionIdsAsync()
+        {
+            var collectionIds = new List<string>();
 
+            try
+            {
+                // 1. Setup the pagination mechanism for ListCollections
+                var paginator = _rekognitionClient.Paginators.ListCollections(new ListCollectionsRequest
+                {
+                    // You can optionally define MaxResults per page here (e.g., MaxResults = 100)
+                });
+
+                // 2. Stream through all response pages automatically
+                await foreach (var response in paginator.Responses)
+                {
+                    if (response.CollectionIds != null)
+                    {
+                        collectionIds.AddRange(response.CollectionIds);
+                    }
+                }
+
+                _logger.LogInformation($"Successfully retrieved {collectionIds.Count} Rekognition collection ID(s).");
+            }
+            catch (AmazonRekognitionException ex)
+            {
+                _logger.LogError($"AWS Rekognition error listing collections: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"General error listing collections: {ex.Message}");
+            }
+
+            return collectionIds;
+        }
+        public async Task<string> FaceCollectionExistAsync(string collectionId)
+        {
+            try
+            {
+                var sanitizedId = collectionId?.Replace("\n", "").Replace("\r", "");
+
+                var response = await _rekognitionClient.DescribeCollectionAsync(new DescribeCollectionRequest
+                {
+                    CollectionId = sanitizedId
+                });
+
+                if (response.HttpStatusCode == HttpStatusCode.OK && response.FaceCount > 0)
+                {
+                    _logger.LogInformation($"Collection [{sanitizedId}] exists with {response.FaceCount} faces.");
+                    return $"Collection [{sanitizedId}] exists with {response.FaceCount} faces";
+                }
+                else
+                {
+                    _logger.LogInformation($"Collection [{sanitizedId}] does not exist or is empty.");
+                    return $"Collection [{sanitizedId}] does not exist or is empty";
+                }
+            }
+            catch (Amazon.Rekognition.Model.ResourceNotFoundException ex)
+            {
+                _logger.LogError($"Error ensuring collection: {ex.Message}");
+                return $"Collection [{collectionId}] does not exist or is empty";
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error ensuring collection: {ex.Message}");
+                return $"Collection [{collectionId}] does not exist or is empty";
+            }
+        }
         public async Task<DeleteCollectionResponse> DeleteCollectionAsync(string collectionId)
         {
             try
@@ -248,6 +324,112 @@ namespace risk.control.system.Services.Agent
                 _logger.LogError(ex, "Failed to compare faces");
                 return null!;
             }
+        }
+
+        public async Task<string> DeleteBucketAsync(string s3BucketName)
+        {
+            try
+            {
+                bool bucketExists = await AmazonS3Util.DoesS3BucketExistV2Async(_s3Client, s3BucketName);
+                if (!bucketExists)
+                {
+                    return $"Bucket {s3BucketName} does not exist.";
+                }
+                var locationRequest = new GetBucketLocationRequest
+                {
+                    BucketName = s3BucketName
+                };
+                GetBucketLocationResponse locationResponse = await _s3Client.GetBucketLocationAsync(locationRequest);
+
+                string locationConstraint = locationResponse.Location?.Value!;
+                var regionName = string.IsNullOrEmpty(locationConstraint) || locationConstraint == "US" ? "us-east-1" : locationConstraint;
+
+                var bucketRegion = RegionEndpoint.GetBySystemName(regionName);
+
+                using var regionalClient = new AmazonS3Client(EnvHelper.Get("AWS_ID"), EnvHelper.Get("AWS_SECRET"), bucketRegion);
+
+                await EmptyBucketForAnyRegionAsync(s3BucketName, regionalClient);
+
+                var deletedResponse = await regionalClient.DeleteBucketAsync(s3BucketName);
+                return deletedResponse.HttpStatusCode == HttpStatusCode.NoContent ? $"Bucket [{s3BucketName}] deleted successfully." : $"Failed to delete bucket [{s3BucketName}].";
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Failed to delete bucket {s3BucketName}");
+                return $"Failed to delete bucket [{s3BucketName}]: {ex.Message}";
+            }
+        }
+
+        public async Task<string> EmptyBucketContents(string s3BucketName)
+        {
+            try
+            {
+                bool bucketExists = await AmazonS3Util.DoesS3BucketExistV2Async(_s3Client, s3BucketName);
+                if (!bucketExists)
+                {
+                    return $"Bucket [{s3BucketName}] does not exist.";
+                }
+                await EmptyBucketAsync(s3BucketName);
+                return $"Bucket [{s3BucketName}] emptied successfully.";
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Failed to empty bucket {s3BucketName}");
+                return $"Failed to empty bucket {s3BucketName}: {ex.Message}";
+            }
+        }
+
+        private async Task EmptyBucketForAnyRegionAsync(string bucketName, IAmazonS3 s3Client)
+        {
+            var request = new ListObjectsV2Request { BucketName = bucketName };
+            ListObjectsV2Response response;
+
+            do
+            {
+                response = await s3Client.ListObjectsV2Async(request);
+
+                if (response.S3Objects.Any())
+                {
+                    var keysToDelete = response.S3Objects
+                        .Select(obj => new KeyVersion { Key = obj.Key })
+                        .ToList();
+
+                    await s3Client.DeleteObjectsAsync(new DeleteObjectsRequest
+                    {
+                        BucketName = bucketName,
+                        Objects = keysToDelete
+                    });
+                }
+
+                request.ContinuationToken = response.NextContinuationToken;
+
+            } while (response.IsTruncated ?? false);
+        }
+        private async Task EmptyBucketAsync(string bucketName)
+        {
+            var request = new ListObjectsV2Request { BucketName = bucketName };
+            ListObjectsV2Response response;
+
+            do
+            {
+                response = await _s3Client.ListObjectsV2Async(request);
+
+                if (response.S3Objects.Any())
+                {
+                    var keysToDelete = response.S3Objects
+                        .Select(obj => new KeyVersion { Key = obj.Key })
+                        .ToList();
+
+                    await _s3Client.DeleteObjectsAsync(new DeleteObjectsRequest
+                    {
+                        BucketName = bucketName,
+                        Objects = keysToDelete
+                    });
+                }
+
+                request.ContinuationToken = response.NextContinuationToken;
+
+            } while (response.IsTruncated ?? false);
         }
     }
 }
