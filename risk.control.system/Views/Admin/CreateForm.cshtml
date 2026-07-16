@@ -1,0 +1,69 @@
+﻿@model List<FormField>
+
+<h2>Create/Update Policy</h2>
+<hr />
+
+@if (ViewBag.SuccessMessage != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @ViewBag.SuccessMessage
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<form asp-action="CreateForm" method="post">
+    <table class="table" id="fieldsTable">
+        <thead>
+            <tr>
+                <th>Field Label (e.g., First Name)</th>
+                <th>Input Type</th>
+                <th>Dropdown Options (comma-separated)</th>
+                <th>Required?</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="fieldsContainer">
+            @if (Model != null && Model.Any())
+            {
+                for (int i = 0; i < Model.Count; i++)
+                {
+                    <tr id="row_@i">
+                        <td>
+                            <input name="fields[@i].Label" value="@Model[i].Label" class="form-control" placeholder="Label" required />
+                        </td>
+                        <td>
+                            <select name="fields[@i].FieldType" class="form-control field-type-select" data-index="@i">
+                                <!== Match option based on saved type ==>
+                                <option value="text" selected="@(Model[i].FieldType == "text")">Text</option>
+                                <option value="number" selected="@(Model[i].FieldType == "number")">Number</option>
+                                <option value="date" selected="@(Model[i].FieldType == "date")">Date</option>
+                                <option value="file" selected="@(Model[i].FieldType == "file")">File Upload</option>
+                                <option value="dropdown" selected="@(Model[i].FieldType == "dropdown")">Dropdown</option>
+                            </select>
+                        </td>
+                        <td>
+                            <input id="options_@i" name="fields[@i].DropdownOptions" value="@Model[i].DropdownOptions" 
+                                   class="form-control @(Model[i].FieldType == "dropdown" ? "" : "d-none")" 
+                                   placeholder="e.g. Option1, Option2" />
+                        </td>
+                        <td>
+                            <input type="checkbox" name="fields[@i].IsRequired" value="true" class="form-check-input" @(Model[i].IsRequired ? "checked" : "") />
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-danger btn-sm btn-remove-row" data-index="@i">Remove</button>
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+
+    <button type="button" class="btn btn-secondary" id="btnAddField">+ Add Field</button>
+    <button type="submit" class="btn btn-success">Save Form</button>
+</form>
+
+@section Scripts {
+   <script src="/js/portal-admin/form-field.js">
+        
+    </script>
+}

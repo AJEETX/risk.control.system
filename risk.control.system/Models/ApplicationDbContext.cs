@@ -29,6 +29,9 @@ namespace risk.control.system.Models
             }
         }
 
+        public virtual DbSet<FormField> FormFields { get; set; }
+        public virtual DbSet<SubmittedValue> SubmittedValues { get; set; }
+        public virtual DbSet<SubmittedForm> SubmittedForms { get; set; }
         public virtual DbSet<BsbInfo> BsbInfo { get; set; }
         public virtual DbSet<EducationType> EducationType { get; set; }
         public virtual DbSet<OccupationType> OccupationType { get; set; }

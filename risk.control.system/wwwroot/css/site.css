@@ -4550,3 +4550,8 @@ img.mobile-capture-map {
     max-width: 400px;
     overflow-x: auto;
 }
+/* Add to site.css */
+.submissions-thumbnail {
+    max-height: 100px;
+    width: auto;
+}
