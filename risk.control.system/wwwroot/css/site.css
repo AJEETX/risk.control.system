@@ -4544,3 +4544,9 @@ img.mobile-capture-map {
 .margin-top-16{
     margin-top:1em;
 }
+.error-log {
+    white-space: pre-wrap;
+    word-break: break-all;
+    max-width: 400px;
+    overflow-x: auto;
+}

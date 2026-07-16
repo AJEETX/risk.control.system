@@ -1,0 +1,68 @@
+﻿@model ErrorDetailsViewModelList
+
+@{
+    ViewData["Title"] = "Error List";
+    int index = 0;
+}
+
+<section class="content">
+    <div class="card shadow-lg border-1 rounded-lg">
+        <div class="card-header bg-secondary text-white">
+            <h4 class="mb-0">Error List <span class="badge  ms-2">@Model.FileName</span></h4>
+    </div>
+    <div class="card-body">
+        @if (Model?.ErrorDetails == null || !Model.ErrorDetails.Any())
+        {
+            <div class="alert alert-info">No errors found or log file is empty.</div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Timestamp</th>
+                            <th>Message</th>
+                            <th>Request Path</th>
+                            <th>Exception Details</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var error in Model.ErrorDetails)
+                        {
+                                index++;
+                            <tr >
+                                    <td>@error.Timestamp?.ToString("dd-MMM-yyyy HH:mm:ss")</td>
+                                <td>@error.MessageTemplate</td>
+                                <td>@error.ErrorProperties?.RequestPath</td>
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(error.Exception))
+                                        {
+                                            <button class="btn btn-sm btn-outline-danger"
+                                                    type="button"
+                                                    data-toggle="collapse"
+                                                    data-target="#exp-@index"
+                                                    aria-expanded="false">
+                                                View Exception
+                                            </button>
+
+                                            <div class="collapse mt-2" id="exp-@index">
+                                                <pre class="bg-light p-2 text-danger border rounded small error-log"><code>@error.Exception</code></pre>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">None</span>
+                                        }
+                                    </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+        <a href="@Url.Action("ErrorLog", "ErrorLog")" class="btn btn-secondary btn-sm">Back to Logs</a>
+
+    </div>
+</section>
