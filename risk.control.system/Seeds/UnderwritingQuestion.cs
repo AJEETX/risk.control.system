@@ -11,7 +11,7 @@ namespace risk.control.system.Seeds
             var question3 = QuestionSeed.Q("LA Date of Birth ?", "date", true);
             var question4 = QuestionSeed.Q("Tobacco/Alcohol or Smoking/swimming/diving ?", "dropdown", true, "SMOKER, OCCASIONAL DRINKER, DRUG-USER, UNKNOWN");
             var question5 = QuestionSeed.Q("In case LA not healthy –Name of disease/duration/Place of treatment (hospital and Doctor name) ?", "text");
-            var question6 = QuestionSeed.Q("History of medical investigation, surgery or\treatment in past or planned in near future (even if it was a minor or major) ?", "text");
+            var question6 = QuestionSeed.Q("History of medical investigation, surgery or treatment in past or planned in near future (even if it was a minor or major) ?", "text");
             var question7 = QuestionSeed.Q("Policy Details Other Than Current and total life coverage ?", "text");
             var question8 = QuestionSeed.Q("Residence Locality and type ?", "text");
             var question9 = QuestionSeed.Q("Residence Ownership ?", "dropdown", true, "RENTED, OWNED, UNKNOWN");

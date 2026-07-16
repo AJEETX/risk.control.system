@@ -650,3 +650,11 @@ window.addEventListener('offline', checkInternetConnection);
 
 // Initial call
 checkInternetConnection();
+
+$(document).ready(function () {
+    // Target the specific class, ensuring no element conflicts
+    $(".jquery-datepicker").datepicker({
+        maxDate: '0',
+        dateFormat: 'dd-mm-yy' // Standard format for database submissions
+    });
+});
