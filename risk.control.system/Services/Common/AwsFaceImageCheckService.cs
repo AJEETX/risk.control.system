@@ -49,14 +49,14 @@ namespace risk.control.system.Services.Common
             };
 
             var response = await _amazonApiService.SearchFacesByImageAsync(searchRequest);
-            if (response.FaceMatches.Count > 0)
-            {
-                string userId = response.FaceMatches[0].Face.ExternalImageId;
+            //if (response.FaceMatches.Count > 0)
+            //{
+            //    string userId = response.FaceMatches[0].Face.ExternalImageId;
 
-                // Create a local DbContext instance for this scoped operation
-                await using var context = await _contextFactory.CreateDbContextAsync();
-                var matchingUser = await context.Users.FindAsync(Guid.Parse(userId));
-            }
+            //    // Create a local DbContext instance for this scoped operation
+            //    await using var context = await _contextFactory.CreateDbContextAsync();
+            //    var matchingUser = await context.Users.FindAsync(Guid.Parse(userId));
+            //}
 
             var match = response.FaceMatches.Count > 0;
             return match;
