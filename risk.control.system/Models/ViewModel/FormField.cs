@@ -29,12 +29,12 @@
     public class EditSubmissionViewModel
     {
         public int SubmissionId { get; set; }
-        public List<EditFieldViewModel> Fields { get; set; }
+        public List<EditFieldViewModel> Fields { get; set; } = new List<EditFieldViewModel>();
     }
 
     public class EditFieldViewModel
     {
-        public FormField Field { get; set; }
-        public string CurrentValue { get; set; }
+        public FormField Field { get; set; } = default!;
+        public string CurrentValue { get; set; } = default!;
     }
 }

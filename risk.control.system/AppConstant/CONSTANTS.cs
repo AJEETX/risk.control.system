@@ -12,6 +12,7 @@
         public const string DOCUMENT = "Document";
         public const string CASE = "Case";
         public const string REPORT = "Report";
+        public const string TEMP_REPORT = "TempReport";
         public const string S3_BUCKET = "S3_BUCKET";
 
         public static class CASE_STATUS

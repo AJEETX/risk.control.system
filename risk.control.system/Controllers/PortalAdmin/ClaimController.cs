@@ -4,10 +4,12 @@ using Microsoft.EntityFrameworkCore;
 using risk.control.system.AppConstant;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
+using SmartBreadcrumbs.Attributes;
 
 namespace risk.control.system.Controllers.PortalAdmin
 {
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME},{AGENCY_ADMIN.DISPLAY_NAME},{CREATOR.DISPLAY_NAME},{ASSESSOR.DISPLAY_NAME},{MANAGER.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME},{AGENT.DISPLAY_NAME}")]
+    [Breadcrumb("Company Settings ")]
     public class ClaimController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -161,7 +163,7 @@ namespace risk.control.system.Controllers.PortalAdmin
                 Fields = fields.Select(f => new EditFieldViewModel
                 {
                     Field = f,
-                    CurrentValue = submission.Values.FirstOrDefault(v => v.FormFieldId == f.Id)?.Value
+                    CurrentValue = submission.Values.FirstOrDefault(v => v.FormFieldId == f.Id)?.Value!
                 }).ToList()
             };
 
@@ -240,11 +242,11 @@ namespace risk.control.system.Controllers.PortalAdmin
 
                 if (existingValue != null)
                 {
-                    existingValue.Value = newValueStr;
+                    existingValue.Value = newValueStr!;
                 }
                 else
                 {
-                    submission.Values.Add(new SubmittedValue { FormFieldId = field.Id, Value = newValueStr });
+                    submission.Values.Add(new SubmittedValue { FormFieldId = field.Id, Value = newValueStr! });
                 }
             }
 

@@ -5,9 +5,10 @@ namespace risk.control.system.Helpers
 {
     public static class AgentFaceIdfyHelper
     {
-        public static void MapMetadataToReport(AgentIdReport face, LocationReport loc, FaceData data, string path, string name, string lat, string lon)
+        public static void MapMetadataToReport(AgentIdReport face, LocationReport loc, FaceData data, string imagePath, string originalImagepath, string name, string lat, string lon)
         {
-            face.FilePath = path;
+            face.FilePath = imagePath;
+            face.OriginalFilePath = originalImagepath;
             face.ImageExtension = Path.GetExtension(name);
             face.Updated = DateTime.UtcNow;
             face.UpdatedBy = data.Email;

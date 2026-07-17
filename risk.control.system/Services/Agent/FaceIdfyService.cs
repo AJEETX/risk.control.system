@@ -36,7 +36,6 @@ internal class FaceIdfyService(ApplicationDbContext context,
     {
         var caseDetail = await _caseService.GetCaseById(data.CaseId);
         if (caseDetail?.InvestigationReport == null) return null!;
-        var agent = await _context.ApplicationUser.FirstAsync(u => u.Email == data.Email);
         var location = caseDetail.InvestigationReport.ReportTemplate!.LocationReport.First(l => l.LocationName == data.LocationName);
         var locationTemplate = await _context.LocationReport.Include(l => l.FaceIds).FirstAsync(l => l.Id == location.Id);
         var faceIdReport = locationTemplate.FaceIds!.First(c => c.ReportName == data.ReportName);
@@ -48,8 +47,9 @@ internal class FaceIdfyService(ApplicationDbContext context,
             var expected = VerificationHelper.GetExpectedCoordinates(caseDetail);
             var imageName = isCustomer ? "life-assured" : "beneficiary";
             var imageExtension = Path.GetExtension(data.Image!.FileName.ToLowerInvariant());
-            var (fileName, relativePath) = await _fileStorageService.SaveAsync(data.Image!, CONSTANTS.CASE, caseDetail.PolicyDetail!.ContractNumber, CONSTANTS.REPORT, null, $"{imageName}{imageExtension}");
+            var (fileName, relativePath) = await _fileStorageService.SaveAsync(data.Image!, CONSTANTS.CASE, caseDetail.PolicyDetail!.ContractNumber, CONSTANTS.TEMP_REPORT, null, $"{imageName}{imageExtension}");
             var faceBytes = await VerificationHelper.GetBytesFromIFormFile(data.Image!);
+            var (originalFileName, originalRelativePath) = await _fileStorageService.SaveAsync(faceBytes, imageExtension, CONSTANTS.CASE, caseDetail.PolicyDetail!.ContractNumber, CONSTANTS.REPORT, null, $"{imageName}{imageExtension}");
             var regPath = Path.Combine(_env.ContentRootPath, FaceIdfyHelper.GetRegisteredImagePath(caseDetail, isCustomer));
             var registeredImage = await File.ReadAllBytesAsync(regPath);
 
@@ -61,7 +61,7 @@ internal class FaceIdfyService(ApplicationDbContext context,
             var mapTask = _customApiClient.GetMap(expected.lat, expected.lon, double.Parse(lat), double.Parse(lon));
             await Task.WhenAll(faceTask, weatherTask, addressTask, mapTask, faceDetailTask);
 
-            FaceIdfyHelper.MapMetadataToReport(faceIdReport, locationTemplate, data, relativePath, Path.GetExtension(fileName), lat, lon);
+            FaceIdfyHelper.MapMetadataToReport(faceIdReport, locationTemplate, data, relativePath, originalRelativePath, Path.GetExtension(fileName), lat, lon);
             var (conf, compImg, sim) = await faceTask;
             var (dist, distM, dur, durS, mapUrl) = await mapTask;
             faceIdReport.LocationMapUrl = mapUrl;
