@@ -52,7 +52,8 @@ internal class AgentFaceIdfyService(ApplicationDbContext context,
             // 1. Prepare Data & Save Physical File
             var faceBytes = await VerificationHelper.GetBytesFromIFormFile(data.Image!);
             var imageExtension = Path.GetExtension(data.Image!.FileName.ToLowerInvariant());
-            var (faceImageFileName, relativePath) = await _fileStorageService.SaveAsync(data.Image!, CONSTANTS.CASE, claim.PolicyDetail!.ContractNumber, CONSTANTS.REPORT, null, $"agent{imageExtension}");
+            var (faceImageFileName, relativePath) = await _fileStorageService.SaveAsync(data.Image!, CONSTANTS.CASE, claim.PolicyDetail!.ContractNumber, CONSTANTS.TEMP_REPORT, null, $"agent{imageExtension}");
+            var (foriginalFaceImageFileName, originalRelativePath) = await _fileStorageService.SaveAsync(faceBytes, imageExtension, CONSTANTS.CASE, claim.PolicyDetail!.ContractNumber, CONSTANTS.REPORT, null, $"agent{imageExtension}");
 
             // 2. Extract Coordinates
             var (lat, lon) = VerificationHelper.ParseCoordinates(data.LocationLatLong!);
@@ -70,7 +71,7 @@ internal class AgentFaceIdfyService(ApplicationDbContext context,
             await Task.WhenAll(faceTask, weatherTask, addressTask, mapTask, faceDetailTask);
 
             // 4. Update Entities
-            AgentFaceIdfyHelper.MapMetadataToReport(agentIdReport!, locationTemplate, data, relativePath, faceImageFileName, lat, lon);
+            AgentFaceIdfyHelper.MapMetadataToReport(agentIdReport!, locationTemplate, data, relativePath, originalRelativePath, faceImageFileName, lat, lon);
 
             var (conf, agentImage, sim) = await faceTask;
             var (dist, distM, dur, durS, mapUrl) = await mapTask;

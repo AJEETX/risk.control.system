@@ -12,9 +12,10 @@ namespace risk.control.system.Helpers
                 : claim.BeneficiaryDetail!.ImagePath!;
         }
 
-        public static void MapMetadataToReport(FaceIdReport face, LocationReport loc, FaceData data, string path, string ext, string lat, string lon)
+        public static void MapMetadataToReport(FaceIdReport face, LocationReport loc, FaceData data, string imagePath, string originalImagePath, string ext, string lat, string lon)
         {
-            face.FilePath = path;
+            face.FilePath = imagePath;
+            face.OriginalFilePath = originalImagePath;
             face.ImageExtension = ext;
             face.Updated = DateTime.UtcNow;
             face.UpdatedBy = data.Email;

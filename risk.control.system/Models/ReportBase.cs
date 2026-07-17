@@ -11,6 +11,7 @@ namespace risk.control.system.Models
         public bool Selected { get; set; } = false;
         public string? ReportName { get; set; }
         public string? FilePath { get; set; }
+        public string? OriginalFilePath { get; set; }
         public string? ImageExtension { get; set; }
         public string? LocationInfo { get; set; } = "No Info...";
         public string? LocationMapUrl { get; set; }

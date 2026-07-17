@@ -7,7 +7,7 @@ using SmartBreadcrumbs.Attributes;
 
 namespace risk.control.system.Controllers.PortalAdmin
 {
-    [Breadcrumb("Admin Settings ")]
+    [Breadcrumb("Company Settings ")]
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{MANAGER.DISPLAY_NAME}")]
     public class AdminController : Controller
     {

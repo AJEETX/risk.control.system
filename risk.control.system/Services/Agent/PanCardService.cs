@@ -7,6 +7,7 @@ namespace risk.control.system.Services.Agent
     public interface IPanCardService
     {
         Task<DocumentIdReport> Process(byte[] IdImage, IReadOnlyList<TextBlock> imageReadOnly, ClientCompany company, DocumentIdReport doc, string onlyExtension);
+        byte[] MaskPanIfFound(byte[] idImage, IReadOnlyList<TextBlock> imageReadOnly, string allPanText);
     }
 
     internal class PanCardService(IGoogleMaskHelper googleHelper, IProcessImageService processImageService, IHttpClientService httpClientService, IWebHostEnvironment env, ILogger<PanCardService> logger) : IPanCardService
@@ -73,7 +74,7 @@ namespace risk.control.system.Services.Agent
             return (panNumber, docType);
         }
 
-        private byte[] MaskPanIfFound(byte[] idImage, IReadOnlyList<TextBlock> imageReadOnly, string allPanText)
+        public byte[] MaskPanIfFound(byte[] idImage, IReadOnlyList<TextBlock> imageReadOnly, string allPanText)
         {
             if (allPanText.Contains(newPanNumber2Find))
             {

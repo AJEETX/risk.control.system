@@ -46,11 +46,12 @@ internal class DocumentIdfyService(ApplicationDbContext context,
             var expected = VerificationHelper.GetExpectedCoordinates(claim);
             var docName = documentReport!.ReportName;
             var extension = Path.GetExtension(data.Image!.FileName.ToLowerInvariant());
-            var (fileName, relativePath) = await _fileStorageService.SaveAsync(data.Image!, CONSTANTS.CASE, claim.PolicyDetail!.ContractNumber, CONSTANTS.REPORT, null, $"{docName}{extension}");
+            var (fileName, relativePath) = await _fileStorageService.SaveAsync(data.Image!, CONSTANTS.CASE, claim.PolicyDetail!.ContractNumber, CONSTANTS.TEMP_REPORT, null, $"{docName}{extension}");
             documentReport!.FilePath = relativePath;
+
+
             documentReport.ImageExtension = Path.GetExtension(fileName);
-            byte[] docImage = await VerificationHelper.GetBytesFromIFormFile(data.Image!);
-            var googleTask = _googleApi.DetectText(documentReport.FilePath);
+            var googleTask = _googleApi.DetectText(documentReport.OriginalFilePath!);
             //var googleTask = googleApi.DetectTextAsync(documentReport.FilePath);
             var addressTask = _httpClientService.GetRawAddress(lat, lon);
             var mapTask = _customApiCLient.GetMap(expected.lat, expected.lon, double.Parse(lat), double.Parse(lon));
@@ -65,14 +66,23 @@ internal class DocumentIdfyService(ApplicationDbContext context,
             documentReport.LongLat = $"Latitude = {lat}, Longitude = {lon}";
             documentReport.LongLatTime = DateTime.UtcNow;
             var detectedText = await googleTask;
-            await ProcessOcrResults(documentReport, docImage, detectedText, claim);
+
+            byte[] docImageBytes = await VerificationHelper.GetBytesFromIFormFile(data.Image!);
+
+            await ProcessOcrResults(documentReport, docImageBytes, detectedText, claim);
+            string allPanText = detectedText.FirstOrDefault()?.Text ?? string.Empty;
+
+            var maskedDocImage = _panCardService.MaskPanIfFound(docImageBytes, detectedText, allPanText);
+            var (foriginalFaceImageFileName, originalRelativePath) = await _fileStorageService.SaveAsync(maskedDocImage, extension, CONSTANTS.CASE, claim.PolicyDetail!.ContractNumber, CONSTANTS.REPORT, null, $"{docName}{extension}");
+            documentReport.OriginalFilePath = originalRelativePath;
+
             locationTemplate.ValidationExecuted = true;
             locationTemplate.Updated = DateTime.UtcNow;
             locationTemplate.UpdatedBy = data.Email;
             _context.DocumentIdReport.Update(documentReport);
             _context.Investigations.Update(claim);
             await _context.SaveChangesAsync();
-            return MapResponse(claim, documentReport, docImage);
+            return MapResponse(claim, documentReport, docImageBytes);
         }
         catch (Exception ex)
         {

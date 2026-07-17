@@ -137,6 +137,8 @@
 				<li class="nav-item">
 					<a asp-controller="CaseEnabler" asp-action="Profile" is-active-page
 						   class="navlink-border nav-link
+						@Url.MakeActiveClass("Admin", "")
+						@Url.MakeActiveClass("Claim", "")
 						@Url.MakeActiveClass("CaseEnabler", "")
 						@Url.MakeActiveClass("Costcentre", "")
 						@Url.MakeActiveClass("BeneficiaryRelation", "")">
@@ -144,6 +146,22 @@
 						<p class="sidebar-menu-header-label">
 							@Applicationsettings.COMPANY_SETTING
 							<div class="right"> <i class="fas fa-angle-down"></i></div>
+						</p>
+					</a>
+				</li>
+				<li class="nav-item">
+					<a is-active-page asp-controller="Admin" asp-action="CreateForm" class="actual-link nav-link @Url.MakeActiveClass("Admin", "")">
+						<i class="fas fa-sun nav-icon"></i>
+						<p>
+							CLAIM FORM
+						</p>
+					</a>
+				</li>
+				<li class="nav-item">
+					<a is-active-page asp-controller="Claim" asp-action="FillForm" class="actual-link nav-link @Url.MakeActiveClass("Claim", "")">
+						<i class="fas fa-sun nav-icon"></i>
+						<p>
+							CLAIM FORM
 						</p>
 					</a>
 				</li>
