@@ -29,13 +29,6 @@ namespace risk.control.system.Services.Report
         ILogger<PdfReportService> logger,
         IPdfGenerateDetailReportService pdfGenerateDetail) : IPdfReportService
     {
-        private const string reportFilename = "Agency_Report.pdf";
-        private const string zipFilename = "Agency_Report.zip";
-        private const string zipFolderName = "Report";
-        private const string ClaimFormName = "Claim_Form.jpg";
-        private const string UnderwritingFormName = "Underwriting_Form.jpg";
-        private const string extension = ".jpg";
-        private readonly string bucketName = EnvHelper.Get(CONSTANTS.S3_BUCKET)!;
         private readonly ApplicationDbContext _context = context;
         private readonly IWebHostEnvironment _env = env;
         private readonly IPdfGenerateReportService _pdfGenerate = pdfGenerate;
@@ -141,31 +134,31 @@ namespace risk.control.system.Services.Report
 
             section = await _pdfGenerateDetail.Build(section, investigation!, investigationReport!, vendor!, isClaim);
 
-            string agencyReportFilePath = Path.GetFullPath(Path.Combine(_env.ContentRootPath, CONSTANTS.DOCUMENT, CONSTANTS.CASE, policy.ContractNumber, zipFolderName, reportFilename));
+            string agencyReportFilePath = Path.GetFullPath(Path.Combine(_env.ContentRootPath, CONSTANTS.DOCUMENT, CONSTANTS.CASE, policy.ContractNumber, CONSTANTS.REPORT, CONSTANTS.AGENCY_REPORT_FILENAME));
             builder.Build(agencyReportFilePath);
 
             var policyDocument = await File.ReadAllBytesAsync(policy.DocumentPath!);
-            var fileName = isClaim ? ClaimFormName : UnderwritingFormName;
-            var allowedExtensions = new[] { extension };
-            var (_, _) = await _fileStorageService.SaveAsync(policyDocument, extension, CONSTANTS.CASE, policy.ContractNumber, zipFolderName, allowedExtensions, fileName);
+            var fileName = isClaim ? CONSTANTS.CLAIMS_FILENAME : CONSTANTS.UNDERWRITING_FILENAME;
+            var allowedExtensions = new[] { CONSTANTS.JPG_FILE_EXTENSION };
+            var (_, _) = await _fileStorageService.SaveAsync(policyDocument, CONSTANTS.JPG_FILE_EXTENSION, CONSTANTS.CASE, policy.ContractNumber, CONSTANTS.REPORT, allowedExtensions, fileName);
 
-            var sourceFolderPath = Path.GetFullPath(Path.Combine(_env.ContentRootPath, CONSTANTS.DOCUMENT, CONSTANTS.CASE, policy.ContractNumber, zipFolderName));
-            var s3KeyName = $"backups/{policy.ContractNumber}/{zipFilename}";
+            var sourceFolderPath = Path.GetFullPath(Path.Combine(_env.ContentRootPath, CONSTANTS.DOCUMENT, CONSTANTS.CASE, policy.ContractNumber, CONSTANTS.REPORT));
+            var s3KeyName = $"backups/{policy.ContractNumber}/{CONSTANTS.AGENCY_REPORT_ZIP_FILENAME}";
             await ZipAndUploadToS3Async(sourceFolderPath, s3KeyName);
         }
         private async Task<bool> ZipAndUploadToS3Async(string sourceFolder, string s3Key)
         {
             try
             {
-                if (!(await Amazon.S3.Util.AmazonS3Util.DoesS3BucketExistV2Async(_s3Client, bucketName)))
+                if (!(await Amazon.S3.Util.AmazonS3Util.DoesS3BucketExistV2Async(_s3Client, EnvHelper.Get(CONSTANTS.S3_BUCKET))))
                 {
-                    var putBucketRequest = new PutBucketRequest { BucketName = bucketName, UseClientRegion = true };
+                    var putBucketRequest = new PutBucketRequest { BucketName = EnvHelper.Get(CONSTANTS.S3_BUCKET), UseClientRegion = true };
 
                     await _s3Client.PutBucketAsync(putBucketRequest);
 
                     var publicAccessBlockRequest = new PutPublicAccessBlockRequest
                     {
-                        BucketName = bucketName,
+                        BucketName = EnvHelper.Get(CONSTANTS.S3_BUCKET),
                         PublicAccessBlockConfiguration = new PublicAccessBlockConfiguration
                         {
                             BlockPublicAcls = true,
@@ -184,10 +177,10 @@ namespace risk.control.system.Services.Report
 
                 var putRequest = new PutObjectRequest
                 {
-                    BucketName = bucketName,
+                    BucketName = EnvHelper.Get(CONSTANTS.S3_BUCKET),
                     Key = s3Key,
                     InputStream = memoryStream,
-                    ContentType = "application/zip",
+                    ContentType = CONSTANTS.ZIP_CONTENT_TYPE,
                 };
 
                 PutObjectResponse response = await _s3Client.PutObjectAsync(putRequest);
