@@ -51,7 +51,7 @@ internal class DocumentIdfyService(ApplicationDbContext context,
 
 
             documentReport.ImageExtension = Path.GetExtension(fileName);
-            var googleTask = _googleApi.DetectText(documentReport.OriginalFilePath!);
+            var googleTask = _googleApi.DetectText(documentReport.FilePath!);
             //var googleTask = googleApi.DetectTextAsync(documentReport.FilePath);
             var addressTask = _httpClientService.GetRawAddress(lat, lon);
             var mapTask = _customApiCLient.GetMap(expected.lat, expected.lon, double.Parse(lat), double.Parse(lon));

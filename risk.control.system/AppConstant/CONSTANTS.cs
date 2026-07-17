@@ -12,6 +12,12 @@
         public const string DOCUMENT = "Document";
         public const string CASE = "Case";
         public const string REPORT = "Report";
+        public const string AGENCY_REPORT_FILENAME = "Agency_Report.pdf";
+        public const string AGENCY_REPORT_ZIP_FILENAME = "Agency_Report.zip";
+        public const string CLAIMS_FILENAME = "Claim_Form.jpg";
+        public const string UNDERWRITING_FILENAME = "Underwriting_Form.jpg";
+        public const string JPG_FILE_EXTENSION = ".jpg";
+        public const string ZIP_CONTENT_TYPE = "application/zip";
         public const string TEMP_REPORT = "TempReport";
         public const string S3_BUCKET = "S3_BUCKET";
 
