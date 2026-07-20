@@ -4555,3 +4555,62 @@ img.mobile-capture-map {
     max-height: 100px;
     width: auto;
 }
+/* Force the table to respect container constraints */
+#submissionsTable {
+    table-layout: fixed;
+    width: 100% !important;
+    word-wrap: break-word;
+}
+
+    /* Ensure data cells wrap naturally and handle long text strings elegantly */
+    #submissionsTable td,
+    #submissionsTable th {
+        white-space: normal !important;
+        overflow-wrap: break-word;
+        word-break: break-word;
+        vertical-align: middle;
+    }
+
+/* Limit uploaded image sizes to prevent rows from blowing out vertically/horizontally */
+.submissions-thumbnail {
+    max-height: 50px;
+    max-width: 100%;
+    width: auto;
+    object-fit: contain;
+}
+/* Style DataTables default row togglers */
+td.dt-control {
+    cursor: pointer;
+    position: relative;
+}
+
+    td.dt-control::before {
+        content: "📁";
+        font-size: 1.1rem;
+    }
+
+tr.parent-expanded td.dt-control::before {
+    content: "📂";
+}
+
+/* Restrict detailed internal layouts */
+.submissions-panel-thumb {
+    max-height: 45px;
+    max-width: 120px;
+    object-fit: contain;
+}
+
+@media (min-width: 768px) {
+    .border-end-md {
+        border-right: 1px solid #dee2e6 !important;
+    }
+}
+/* Ensure active tab panes override any hidden states */
+#claimFormTabsContent .tab-pane {
+    display: none;
+}
+
+    #claimFormTabsContent .tab-pane.active {
+        display: block !important;
+        opacity: 1 !important;
+    }

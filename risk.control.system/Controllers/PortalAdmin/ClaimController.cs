@@ -8,7 +8,7 @@ using SmartBreadcrumbs.Attributes;
 
 namespace risk.control.system.Controllers.PortalAdmin
 {
-    [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME},{AGENCY_ADMIN.DISPLAY_NAME},{CREATOR.DISPLAY_NAME},{ASSESSOR.DISPLAY_NAME},{MANAGER.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME},{AGENT.DISPLAY_NAME}")]
+    [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME}")]
     [Breadcrumb("Company Settings ")]
     public class ClaimController : Controller
     {
@@ -25,18 +25,66 @@ namespace risk.control.system.Controllers.PortalAdmin
             return View();
         }
         [HttpGet]
-        public IActionResult FillForm()
+        public IActionResult CreateClaimForm(FormType type = FormType.Claim)
         {
-            // Load all the dynamic fields configured by the Admin
-            var fields = _context.FormFields.ToList();
-            return View(fields);
+            // Filter out rows to ONLY load the form layouts intended for the active view target
+            var existingFields = _context.FormFields
+                .Where(f => f.FormType == type)
+                .ToList();
+
+            // Track selected target form type to sync the dropdown element selection on page reload
+            ViewBag.SelectedFormType = type.ToString();
+
+            return View(existingFields);
         }
 
         [HttpPost]
-        public async Task<IActionResult> SubmitForm(IFormCollection form, List<IFormFile> files)
+        public IActionResult CreateClaimForm(FormType targetFormType, List<FormField> fields)
         {
-            var fields = _context.FormFields.ToList();
-            var submission = new SubmittedForm { SubmittedAt = DateTime.UtcNow };
+            // 1. Clear out ONLY the existing layout mapping records for the specific target group
+            var oldFields = _context.FormFields.Where(f => f.FormType == targetFormType).ToList();
+            _context.FormFields.RemoveRange(oldFields);
+            fields = fields.Where(f => !string.IsNullOrWhiteSpace(f.Label)).ToList();
+            if (fields != null && fields.Any())
+            {
+                foreach (var field in fields)
+                {
+                    // 2. Explicitly bind the target form type category context to each field object
+                    field.FormType = targetFormType;
+                }
+
+                _context.FormFields.AddRange(fields);
+            }
+
+            _context.SaveChanges();
+            TempData["SuccessMessage"] = $"{targetFormType} Form structure saved successfully!";
+
+            return RedirectToAction(nameof(CreateClaimForm), new { type = targetFormType });
+        }
+        [HttpGet]
+        public IActionResult FillClaimForm(FormType type = FormType.Claim)
+        {
+            var model = new FillFormViewModel
+            {
+                FormType = type,
+                Fields = _context.FormFields.Where(f => f.FormType == type).ToList()
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SubmitForm(FillFormViewModel postModel, IFormCollection form)
+        {
+            // Access the targeted form type directly from the strongly-typed incoming parameter
+            FormType currentFormType = postModel.FormType;
+
+            var fields = _context.FormFields.Where(f => f.FormType == currentFormType).ToList();
+            var submission = new SubmittedForm
+            {
+                SubmittedAt = DateTime.UtcNow,
+                FormType = currentFormType
+            };
 
             foreach (var field in fields)
             {
@@ -44,12 +92,11 @@ namespace risk.control.system.Controllers.PortalAdmin
 
                 if (field.FieldType == "file")
                 {
-                    // Find file associated with this dynamic field ID
                     var uploadedFile = Request.Form.Files.FirstOrDefault(f => f.Name == $"field_{field.Id}");
                     if (uploadedFile != null && uploadedFile.Length > 0)
                     {
                         string uploadsFolder = Path.Combine(_hostingEnvironment.WebRootPath, "uploads");
-                        Directory.CreateDirectory(uploadsFolder); // Ensure directory exists
+                        Directory.CreateDirectory(uploadsFolder);
                         string uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(uploadedFile.FileName);
                         string filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
@@ -57,35 +104,29 @@ namespace risk.control.system.Controllers.PortalAdmin
                         {
                             await uploadedFile.CopyToAsync(fileStream);
                         }
-                        valueStr = "/uploads/" + uniqueFileName; // Saved file path
+                        valueStr = "/uploads/" + uniqueFileName;
                     }
                 }
                 else if (field.FieldType == "date")
                 {
-                    // 1. Get the raw string submitted by the jQuery Datepicker (e.g., "17-07-2026")
                     string rawDate = form[$"field_{field.Id}"].ToString();
-
                     if (!string.IsNullOrWhiteSpace(rawDate))
                     {
-                        // 2. Parse the custom "dd-mm-yyyy" format safely
                         if (DateTime.TryParseExact(rawDate, "dd-MM-yyyy",
                             System.Globalization.CultureInfo.InvariantCulture,
                             System.Globalization.DateTimeStyles.None,
                             out DateTime parsedDate))
                         {
-                            // 3. Convert it to ISO standard "yyyy-MM-dd" for consistent DB storage
                             valueStr = parsedDate.ToString("yyyy-MM-dd");
                         }
                         else
                         {
-                            // Fallback in case parsing fails (saves raw input)
                             valueStr = rawDate;
                         }
                     }
                 }
                 else
                 {
-                    // Grab the value from the form data using the field ID as the key
                     valueStr = form[$"field_{field.Id}"].ToString();
                 }
 
@@ -99,7 +140,7 @@ namespace risk.control.system.Controllers.PortalAdmin
             _context.SubmittedForms.Add(submission);
             await _context.SaveChangesAsync();
 
-            return RedirectToAction("SubmissionSuccess");
+            return RedirectToAction("ViewClaimSubmissions");
         }
         // Controllers/UserController.cs
         public IActionResult SubmissionSuccess()
@@ -123,10 +164,11 @@ namespace risk.control.system.Controllers.PortalAdmin
                 .Include(sf => sf.Values)
                 .ThenInclude(sv => sv.FormField)
                 .OrderByDescending(sf => sf.SubmittedAt)
+                .Where(f => f.FormType == FormType.Claim) // Filter to only include Claim submissions
                 .Select(sf => new
                 {
                     Id = sf.Id,
-                    SubmittedAt = sf.SubmittedAt.ToString("g"),
+                    SubmittedAt = sf.SubmittedAt.ToString("o"),
                     Fields = sf.Values.Select(v => new
                     {
                         FormFieldId = v.FormFieldId, // Essential for mapping values to the correct column
@@ -141,12 +183,12 @@ namespace risk.control.system.Controllers.PortalAdmin
         }
         // Render the HTML view shell
         [HttpGet]
-        public IActionResult ViewSubmissions()
+        public IActionResult ViewClaimSubmissions()
         {
             return View();
         }
         [HttpGet]
-        public IActionResult EditForm(int id)
+        public IActionResult EditClaimForm(int id)
         {
             var submission = _context.SubmittedForms
                 .Include(sf => sf.Values)
@@ -154,12 +196,16 @@ namespace risk.control.system.Controllers.PortalAdmin
 
             if (submission == null) return NotFound();
 
-            var fields = _context.FormFields.ToList();
+            // 1. Fetch only dynamic fields belonging to this submission's form type context
+            var fields = _context.FormFields
+                .Where(f => f.FormType == submission.FormType)
+                .ToList();
 
-            // Map to our unified, strongly-typed model
+            // 2. Map everything to the strongly-typed view model
             var viewModel = new EditSubmissionViewModel
             {
                 SubmissionId = id,
+                FormType = submission.FormType,
                 Fields = fields.Select(f => new EditFieldViewModel
                 {
                     Field = f,
@@ -170,9 +216,8 @@ namespace risk.control.system.Controllers.PortalAdmin
             return View(viewModel);
         }
 
-        // POST: /Claim/EditForm/5
         [HttpPost]
-        public async Task<IActionResult> EditForm(int id, IFormCollection form, List<IFormFile> files)
+        public async Task<IActionResult> EditClaimForm(int id, EditSubmissionViewModel postModel, IFormCollection form)
         {
             var submission = _context.SubmittedForms
                 .Include(sf => sf.Values)
@@ -180,7 +225,8 @@ namespace risk.control.system.Controllers.PortalAdmin
 
             if (submission == null) return NotFound();
 
-            var fields = _context.FormFields.ToList();
+            // Pull fields specifically bound to this layout type 
+            var fields = _context.FormFields.Where(f => f.FormType == submission.FormType).ToList();
 
             foreach (var field in fields)
             {
@@ -192,7 +238,6 @@ namespace risk.control.system.Controllers.PortalAdmin
                     var uploadedFile = Request.Form.Files.FirstOrDefault(f => f.Name == $"field_{field.Id}");
                     if (uploadedFile != null && uploadedFile.Length > 0)
                     {
-                        // Process and save new file
                         string uploadsFolder = Path.Combine(_hostingEnvironment.WebRootPath, "uploads");
                         Directory.CreateDirectory(uploadsFolder);
                         string uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(uploadedFile.FileName);
@@ -204,7 +249,6 @@ namespace risk.control.system.Controllers.PortalAdmin
                         }
                         newValueStr = "/uploads/" + uniqueFileName;
 
-                        // Optionally delete the old physical file from disk
                         if (existingValue != null && !string.IsNullOrEmpty(existingValue.Value))
                         {
                             var oldFilePath = Path.Combine(_hostingEnvironment.WebRootPath, existingValue.Value.TrimStart('/'));
@@ -216,8 +260,7 @@ namespace risk.control.system.Controllers.PortalAdmin
                     }
                     else
                     {
-                        // No new file uploaded; retain the existing path
-                        newValueStr = existingValue?.Value;
+                        newValueStr = existingValue?.Value ?? "";
                     }
                 }
                 else if (field.FieldType == "date")
@@ -251,15 +294,15 @@ namespace risk.control.system.Controllers.PortalAdmin
             }
 
             await _context.SaveChangesAsync();
-            return RedirectToAction("ViewSubmissions"); // Redirects back to your DataTable list
+            return RedirectToAction("ViewSubmissions");
         }
-
         // POST: /Claim/DeleteSubmission/5
         [HttpPost]
         public IActionResult DeleteSubmission(int id)
         {
             var submission = _context.SubmittedForms
                 .Include(sf => sf.Values)
+                .ThenInclude(sv => sv.FormField)
                 .FirstOrDefault(sf => sf.Id == id);
 
             if (submission == null)

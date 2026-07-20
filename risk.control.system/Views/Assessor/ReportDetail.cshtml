@@ -3,6 +3,7 @@
 @{
 	ViewData["Title"] = "Report ";
 	var locations = Model.InvestigationReport?.ReportTemplate?.LocationReport!;
+	var policyLensUrl = $"http://localhost:5173/policies/{Model.CaseTask?.PolicyDetail?.ContractNumber}?providerId=demo";
 }
 
 <section class="content">
@@ -206,7 +207,7 @@
 					<div class="col-sm-6 d-flex align-items-stretch flex-column">
 						<div class="card bg-light equal-height-card">
 							<div class="card-footer text-muted border-bottom-0">
-								<i class="far fa-file-powerpoint"></i> <strong> Submission type </strong>[<a href="http://localhost:5173/policies/{policyNumber}?providerId=demo" target="_blank">PolicyLenz</a>]
+								<i class="far fa-file-powerpoint"></i> <strong> Submission type </strong>[<a href="@policyLensUrl" target="_blank">PolicyLenz</a>]
 							</div>
 							
 							<div class="card-body scrollable-body">
