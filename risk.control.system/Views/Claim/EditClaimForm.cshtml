@@ -1,0 +1,241 @@
+﻿@model EditSubmissionViewModel
+<section class="content">
+
+    <div class="card shadow-lg border-1 rounded-lg">
+        <div class="card-header bg-secondary text-white text-center">
+            <h3 class="card-title"><i class="fas fa-cog"></i> Edit @Model.FormType.ToString() </h3>
+        </div>
+        <div class="card-body">
+            <div class="submit-progress hidden">
+                <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+            </div>
+
+            <form asp-action="EditClaimForm" asp-route-id="@Model.SubmissionId" method="post" enctype="multipart/form-data">
+
+                <input type="hidden" asp-for="SubmissionId" />
+                <input type="hidden" asp-for="FormType" />
+
+                <!-- ================= TAB HEADERS ================= -->
+                <ul class="nav nav-tabs mb-4" id="claimFormTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active fw-bold text-primary" id="policy-tab" data-bs-toggle="tab" data-bs-target="#policy-pane" type="button" role="tab">
+                            <i class="bi bi-shield-shaded me-2"></i>1. Policy Details
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link fw-bold text-success" id="nominee-tab" data-bs-toggle="tab" data-bs-target="#nominee-pane" type="button" role="tab">
+                            <i class="bi bi-person-badge me-2"></i>2. Nominee Details
+                        </button>
+                    </li>
+
+                    @if (Model.FormType == FormType.Claim)
+                    {
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link fw-bold text-danger" id="claim-tab" data-bs-toggle="tab" data-bs-target="#claim-pane" type="button" role="tab">
+                                <i class="bi bi-exclamation-octagon me-2"></i>3. Claim Details
+                            </button>
+                        </li>
+                    }
+                </ul>
+
+                <!-- ================= TAB PANES ================= -->
+                <div class="tab-content border p-4 bg-white rounded shadow-sm" id="claimFormTabsContent">
+
+                    <!-- PANEL 1: POLICY DETAILS -->
+                    <div class="tab-pane fade show active" id="policy-pane" role="tabpanel">
+                        <div class="row">
+                            @foreach (var item in Model.Fields.Where(f => f.Field.Section == "Policy"))
+                            {
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">
+                                        @item.Field.Label
+                                        @if (item.Field.IsRequired)
+                                        {
+                                            <span class="text-danger">*</span>
+                                        }
+                                    </label>
+
+                                    @if (item.Field.FieldType == "text")
+                                    {
+                                        <input type="text" name="field_@item.Field.Id" value="@item.CurrentValue" class="form-control" @(item.Field.IsRequired && string.IsNullOrEmpty(item.CurrentValue) ? "required" : "") />
+                                    }
+                                    else if (item.Field.FieldType == "number")
+                                    {
+                                        <input type="number" name="field_@item.Field.Id" value="@item.CurrentValue" class="form-control" @(item.Field.IsRequired && string.IsNullOrEmpty(item.CurrentValue) ? "required" : "") />
+                                    }
+                                    else if (item.Field.FieldType == "date")
+                                    {
+                                        string formattedDate = "";
+                                        if (!string.IsNullOrEmpty(item.CurrentValue) && DateTime.TryParse(item.CurrentValue, out DateTime d))
+                                        {
+                                            formattedDate = d.ToString("dd-MM-yyyy");
+                                        }
+                                        <input type="text" name="field_@item.Field.Id" value="@formattedDate" class="form-control jquery-datepicker" placeholder="dd-mm-yyyy" @(item.Field.IsRequired && string.IsNullOrEmpty(item.CurrentValue) ? "required" : "") autocomplete="off" />
+                                    }
+                                    else if (item.Field.FieldType == "file")
+                                    {
+                                        <input type="file" name="field_@item.Field.Id" class="form-control mb-1" />
+                                        @if (!string.IsNullOrEmpty(item.CurrentValue))
+                                        {
+                                            <div class="small text-muted">
+                                                Current file: <a href="@item.CurrentValue" target="_blank" class="text-decoration-underline">View File</a>
+                                            </div>
+                                        }
+                                    }
+                                    else if (item.Field.FieldType == "dropdown")
+                                    {
+                                        <select name="field_@item.Field.Id" class="form-control" @(item.Field.IsRequired && string.IsNullOrEmpty(item.CurrentValue) ? "required" : "")>
+                                            <option value="">-- Select Option --</option>
+                                            @if (!string.IsNullOrEmpty(item.Field.DropdownOptions))
+                                            {
+                                                foreach (var option in item.Field.DropdownOptions.Split(','))
+                                                {
+                                                    var optClean = option.Trim();
+                                                    <option value="@optClean" selected="@(optClean == item.CurrentValue)">@optClean</option>
+                                                }
+                                            }
+                                        </select>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- PANEL 2: NOMINEE DETAILS -->
+                    <div class="tab-pane fade" id="nominee-pane" role="tabpanel">
+                        <div class="row">
+                            @foreach (var item in Model.Fields.Where(f => f.Field.Section == "Nominee"))
+                            {
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">
+                                        @item.Field.Label
+                                        @if (item.Field.IsRequired)
+                                        {
+                                            <span class="text-danger">*</span>
+                                        }
+                                    </label>
+
+                                    @if (item.Field.FieldType == "text")
+                                    {
+                                        <input type="text" name="field_@item.Field.Id" value="@item.CurrentValue" class="form-control" @(item.Field.IsRequired && string.IsNullOrEmpty(item.CurrentValue) ? "required" : "") />
+                                    }
+                                    else if (item.Field.FieldType == "number")
+                                    {
+                                        <input type="number" name="field_@item.Field.Id" value="@item.CurrentValue" class="form-control" @(item.Field.IsRequired && string.IsNullOrEmpty(item.CurrentValue) ? "required" : "") />
+                                    }
+                                    else if (item.Field.FieldType == "date")
+                                    {
+                                        string formattedDate = "";
+                                        if (!string.IsNullOrEmpty(item.CurrentValue) && DateTime.TryParse(item.CurrentValue, out DateTime d))
+                                        {
+                                            formattedDate = d.ToString("dd-MM-yyyy");
+                                        }
+                                        <input type="text" name="field_@item.Field.Id" value="@formattedDate" class="form-control jquery-datepicker" placeholder="dd-mm-yyyy" @(item.Field.IsRequired && string.IsNullOrEmpty(item.CurrentValue) ? "required" : "") autocomplete="off" />
+                                    }
+                                    else if (item.Field.FieldType == "file")
+                                    {
+                                        <input type="file" name="field_@item.Field.Id" class="form-control mb-1" />
+                                        @if (!string.IsNullOrEmpty(item.CurrentValue))
+                                        {
+                                            <div class="small text-muted">
+                                                Current file: <a href="@item.CurrentValue" target="_blank" class="text-decoration-underline">View File</a>
+                                            </div>
+                                        }
+                                    }
+                                    else if (item.Field.FieldType == "dropdown")
+                                    {
+                                        <select name="field_@item.Field.Id" class="form-control" @(item.Field.IsRequired && string.IsNullOrEmpty(item.CurrentValue) ? "required" : "")>
+                                            <option value="">-- Select Option --</option>
+                                            @if (!string.IsNullOrEmpty(item.Field.DropdownOptions))
+                                            {
+                                                foreach (var option in item.Field.DropdownOptions.Split(','))
+                                                {
+                                                    var optClean = option.Trim();
+                                                    <option value="@optClean" selected="@(optClean == item.CurrentValue)">@optClean</option>
+                                                }
+                                            }
+                                        </select>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- PANEL 3: CLAIM DETAILS -->
+                    @if (Model.FormType == FormType.Claim)
+                    {
+                        <div class="tab-pane fade" id="claim-pane" role="tabpanel">
+                            <div class="row">
+                                @foreach (var item in Model.Fields.Where(f => f.Field.Section == "ClaimDetail"))
+                                {
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold">
+                                            @item.Field.Label
+                                            @if (item.Field.IsRequired)
+                                            {
+                                                <span class="text-danger">*</span>
+                                            }
+                                        </label>
+
+                                        @if (item.Field.FieldType == "text")
+                                        {
+                                            <input type="text" name="field_@item.Field.Id" value="@item.CurrentValue" class="form-control" @(item.Field.IsRequired && string.IsNullOrEmpty(item.CurrentValue) ? "required" : "") />
+                                        }
+                                        else if (item.Field.FieldType == "number")
+                                        {
+                                            <input type="number" name="field_@item.Field.Id" value="@item.CurrentValue" class="form-control" @(item.Field.IsRequired && string.IsNullOrEmpty(item.CurrentValue) ? "required" : "") />
+                                        }
+                                        else if (item.Field.FieldType == "date")
+                                        {
+                                            string formattedDate = "";
+                                            if (!string.IsNullOrEmpty(item.CurrentValue) && DateTime.TryParse(item.CurrentValue, out DateTime d))
+                                            {
+                                                formattedDate = d.ToString("dd-MM-yyyy");
+                                            }
+                                            <input type="text" name="field_@item.Field.Id" value="@formattedDate" class="form-control jquery-datepicker" placeholder="dd-mm-yyyy" @(item.Field.IsRequired && string.IsNullOrEmpty(item.CurrentValue) ? "required" : "") autocomplete="off" />
+                                        }
+                                        else if (item.Field.FieldType == "file")
+                                        {
+                                            <input type="file" name="field_@item.Field.Id" class="form-control mb-1" />
+                                            @if (!string.IsNullOrEmpty(item.CurrentValue))
+                                            {
+                                                <div class="small text-muted">
+                                                    Current file: <a href="@item.CurrentValue" target="_blank" class="text-decoration-underline">View File</a>
+                                                </div>
+                                            }
+                                        }
+                                        else if (item.Field.FieldType == "dropdown")
+                                        {
+                                            <select name="field_@item.Field.Id" class="form-control" @(item.Field.IsRequired && string.IsNullOrEmpty(item.CurrentValue) ? "required" : "")>
+                                                <option value="">-- Select Option --</option>
+                                                @if (!string.IsNullOrEmpty(item.Field.DropdownOptions))
+                                                {
+                                                    foreach (var option in item.Field.DropdownOptions.Split(','))
+                                                    {
+                                                        var optClean = option.Trim();
+                                                        <option value="@optClean" selected="@(optClean == item.CurrentValue)">@optClean</option>
+                                                    }
+                                                }
+                                            </select>
+                                        }
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <!-- Actions Footer -->
+                <div class="row mt-4 pt-3 border-top">
+                    <div class="col-12 text-end">
+                        <a asp-action="ViewClaimSubmissions" class="btn btn-outline-secondary px-4 py-2 me-2">Cancel</a>
+                        <button type="submit" class="btn btn-primary btn-lg px-5 shadow-sm">Save Changes</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+@section Scripts {
+    <script src="/js/portal-admin/fill-form.js" asp-append-version="true"></script>
+}

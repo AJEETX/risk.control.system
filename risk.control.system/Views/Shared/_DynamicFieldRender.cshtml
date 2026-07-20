@@ -1,0 +1,31 @@
+﻿@model FormField
+
+@if (Model.FieldType == "text")
+{
+    <input type="text" name="field_@Model.Id" class="form-control" @(Model.IsRequired ? "required" : "") />
+}
+else if (Model.FieldType == "number")
+{
+    <input type="number" name="field_@Model.Id" class="form-control" @(Model.IsRequired ? "required" : "") />
+}
+else if (Model.FieldType == "date")
+{
+    <input type="text" name="field_@Model.Id" class="form-control jquery-datepicker" placeholder="dd-mm-yyyy" @(Model.IsRequired ? "required" : "") autocomplete="off" />
+}
+else if (Model.FieldType == "file")
+{
+    <input type="file" name="field_@Model.Id" class="form-control" @(Model.IsRequired ? "required" : "") />
+}
+else if (Model.FieldType == "dropdown")
+{
+    <select name="field_@Model.Id" class="form-control" @(Model.IsRequired ? "required" : "")>
+        <option value="">-- Select --</option>
+        @if (!string.IsNullOrEmpty(Model.DropdownOptions))
+        {
+            foreach (var option in Model.DropdownOptions.Split(','))
+            {
+                <option value="@option.Trim()">@option.Trim()</option>
+            }
+        }
+    </select>
+}

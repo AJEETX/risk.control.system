@@ -1,0 +1,38 @@
+﻿@{
+    ViewData["Title"] = "Submitted Forms";
+}
+<section class="content">
+    <div class="card shadow-lg border-1 rounded-lg">
+        <div class="card-header bg-secondary text-white text-center">
+            <h3 class="card-title"><i class="fas fa-cog"></i> Submitted Cases</h3>
+        </div>
+        <div class="card-body">
+            <div class="submit-progress hidden">
+                <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+            </div>
+<div class="card shadow border-0 p-4 rounded-3">
+    <div class="table-responsive">
+        <table id="submissionsTable" class="table table-hover table-bordered w-100 m-0">
+            <thead class="table-light">
+                <tr id="tableHeaders">
+                    <th>Detail</th>
+                    <th>Policy Number</th>
+                    <th>Insured Name</th>
+                    <th>Insured Photo</th>
+                    <th>Policy Doc</th>
+                    <th>Claim Doc</th>
+                    <th>Nominee Name</th>
+                    <th>Photo</th>
+                    <th>Date Submitted</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+</div>
+</div>
+</section>
+@section Scripts {
+    <script src="/js/portal-admin/submitted-forms.js" asp-append-version="true"></script>
+}

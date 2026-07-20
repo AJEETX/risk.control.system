@@ -1,0 +1,104 @@
+﻿@model List<FormField>
+
+<section class="content">
+    <form asp-action="CreateClaimForm" method="post" id="designForm">
+        <div class="card shadow-lg border-1 rounded-lg">
+            <div class="card-header bg-secondary text-white text-center">
+                <h3 class="card-title"><i class="fas fa-cog"></i> Create Form</h3>
+            </div>
+            <div class="card-body">
+                <div class="submit-progress hidden">
+                    <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+                </div>
+
+                <!-- Select major form type context -->
+                <div class="mb-4 col-md-4">
+                    <label class="form-label fw-bold">Select Form Type</label>
+                    <select name="TargetFormType" class="form-control" id="formTypeSelector">
+                        <option value="Claim" selected="@(ViewBag.SelectedFormType == "Claim")">Claim Form</option>
+                        <option value="Underwriting" selected="@(ViewBag.SelectedFormType == "Underwriting")">Underwriting Form</option>
+                    </select>
+                </div>
+
+                <!-- ================= SECTION TABS ================= -->
+                <ul class="nav nav-tabs mb-3" id="designerSections" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active fw-bold section-tab-btn" data-section="Policy" type="button" role="tab">
+                            <i class="bi bi-shield-shaded me-2"></i>Policy Details
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link fw-bold section-tab-btn" data-section="Nominee" type="button" role="tab">
+                            <i class="bi bi-person-badge me-2"></i>Nominee Details
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation" id="claimTabHeader" style="display: @(ViewBag.SelectedFormType == "Underwriting" ? "none" : "block");">
+                        <button class="nav-link fw-bold section-tab-btn" data-section="ClaimDetail" type="button" role="tab">
+                            <i class="bi bi-exclamation-octagon me-2"></i>Claim Details
+                        </button>
+                    </li>
+                </ul>
+
+                <!-- Unified Table Structure -->
+                <table class="table align-middle" id="fieldsTable">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Label</th>
+                            <th>Input Type</th>
+                            <th>Dropdown Options</th>
+                            <th>Required?</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="fieldsContainer">
+                        @if (Model != null && Model.Any())
+                        {
+                            for (int i = 0; i < Model.Count; i++)
+                            {
+                                <!-- Data attribute filters visibility dynamically -->
+                                <tr id="row_@i" data-section="@Model[i].Section" class="field-row">
+                                    <td>
+                                        <input type="hidden" name="fields[@i].FormType" value="@Model[i].FormType" />
+                                        <!-- Section is now kept inside a hidden input instead of a dropdown box -->
+                                        <input type="hidden" name="fields[@i].Section" value="@Model[i].Section" class="row-section-input" />
+
+                                        <input name="fields[@i].Label" value="@Model[i].Label" class="form-control" placeholder="Label" required />
+                                    </td>
+                                    <td>
+                                        <select name="fields[@i].FieldType" class="form-control field-type-select" data-index="@i">
+                                            <option value="text" selected="@(Model[i].FieldType == "text")">Text</option>
+                                            <option value="number" selected="@(Model[i].FieldType == "number")">Number</option>
+                                            <option value="date" selected="@(Model[i].FieldType == "date")">Date</option>
+                                            <option value="file" selected="@(Model[i].FieldType == "file")">File Upload</option>
+                                            <option value="dropdown" selected="@(Model[i].FieldType == "dropdown")">Dropdown</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <input id="options_@i" name="fields[@i].DropdownOptions" value="@Model[i].DropdownOptions"
+                                               class="form-control @(Model[i].FieldType == "dropdown" ? "" : "d-none")"
+                                               placeholder="e.g. Option1, Option2" />
+                                    </td>
+                                    <td>
+                                        <input type="checkbox" name="fields[@i].IsRequired" value="true" class="form-check-input" @(Model[i].IsRequired ? "checked" : "") />
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-danger btn-sm btn-remove-row" data-index="@i">Remove</button>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+
+                <div class="mt-3">
+                    <button type="button" class="btn btn-secondary" id="btnAddField">+ Add Field to Active Tab</button>
+                    <button type="submit" class="btn btn-success">Save Form Layout</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</section>
+
+@section Scripts {
+    <script src="/js/portal-admin/form-field.js" asp-append-version="true"></script>
+}
