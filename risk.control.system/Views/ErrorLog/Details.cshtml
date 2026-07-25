@@ -11,6 +11,9 @@
             <h4 class="mb-0">Error List <span class="badge  ms-2">@Model.FileName</span></h4>
     </div>
     <div class="card-body">
+            <div class="submit-progress hidden">
+                <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+            </div>
         @if (Model?.ErrorDetails == null || !Model.ErrorDetails.Any())
         {
             <div class="alert alert-info">No errors found or log file is empty.</div>
@@ -23,6 +26,7 @@
                         <tr>
                             <th>Timestamp</th>
                             <th>Message</th>
+                            <th>Source</th>
                             <th>Request Path</th>
                             <th>Exception Details</th>
                         </tr>
@@ -34,7 +38,8 @@
                             <tr >
                                     <td>@error.Timestamp?.ToString("dd-MMM-yyyy HH:mm:ss")</td>
                                 <td>@error.MessageTemplate</td>
-                                <td>@error.ErrorProperties?.RequestPath</td>
+                                <td>@error.Properties?.RequestPath</td>
+                                    <td>@error.Properties?.SourceContext</td>
                                     <td>
                                         @if (!string.IsNullOrEmpty(error.Exception))
                                         {

@@ -56,43 +56,51 @@ namespace risk.control.system.Controllers.Common
                 return BadRequest("File name is missing.");
             }
 
-            // Combine paths to point to your 'Logs' directory in the application root
-            string logsFolderPath = Path.Combine(_env.ContentRootPath, CONSTANTS.LogsDirectory);
-            string filePath = Path.Combine(logsFolderPath, fileName);
+            // --- SECURITY FIX: Prevent Path Traversal ---
+            // Extract only the base file name (strips path manipulators like '../' or 'c:\')
+            string safeFileName = Path.GetFileName(fileName);
 
-            if (!System.IO.File.Exists(filePath))
+            string logsFolderPath = Path.GetFullPath(Path.Combine(_env.ContentRootPath, CONSTANTS.LogsDirectory));
+            string filePath = Path.GetFullPath(Path.Combine(logsFolderPath, safeFileName));
+
+            // Ensure the resolved full path actually starts inside the intended folder
+            if (!filePath.StartsWith(logsFolderPath, StringComparison.OrdinalIgnoreCase) || !System.IO.File.Exists(filePath))
             {
                 return NotFound("Log file not found.");
             }
+
             var viewModel = new ErrorDetailsViewModelList
             {
                 ErrorDetails = new List<ErrorDetailsViewModel>(),
-                FileName = fileName
+                FileName = safeFileName
             };
 
             try
             {
-                // Read the file line by line for NDJSON / JSON Lines format
-                var lines = System.IO.File.ReadLines(filePath);
                 var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
 
-                foreach (var line in lines)
+                // --- ASYNC & LOCKING FIX: Non-blocking async reading with shared access ---
+                using var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite, bufferSize: 4096, useAsync: true);
+                using var reader = new StreamReader(stream);
+
+                string? line;
+                while ((line = await reader.ReadLineAsync()) != null)
                 {
-                    if (!string.IsNullOrWhiteSpace(line))
+                    if (string.IsNullOrWhiteSpace(line))
+                        continue;
+
+                    try
                     {
-                        try
+                        var errorEntry = JsonSerializer.Deserialize<ErrorDetailsViewModel>(line, options);
+                        if (errorEntry != null)
                         {
-                            var errorEntry = JsonSerializer.Deserialize<ErrorDetailsViewModel>(line, options);
-                            if (errorEntry != null)
-                            {
-                                viewModel.ErrorDetails.Add(errorEntry);
-                            }
+                            viewModel.ErrorDetails.Add(errorEntry);
                         }
-                        catch (JsonException)
-                        {
-                            // Optionally log or skip malformed lines so one corrupted line doesn't crash the whole view
-                            continue;
-                        }
+                    }
+                    catch (JsonException)
+                    {
+                        // Skip malformed individual NDJSON entries
+                        continue;
                     }
                 }
 
@@ -100,7 +108,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (IOException ex)
             {
-                ModelState.AddModelError("", $"Error reading log file: {ex.Message}");
+                ModelState.AddModelError(string.Empty, $"Error reading log file: {ex.Message}");
                 return View(viewModel);
             }
         }

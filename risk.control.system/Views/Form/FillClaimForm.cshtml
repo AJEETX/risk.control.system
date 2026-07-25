@@ -3,7 +3,7 @@
     <div class="card shadow-lg border-1 rounded-lg">
 
         <div class="card-header bg-secondary text-white text-center">
-            <h3 class="card-title"><i class="fas fa-cog"></i> Submit New @Model.FormType.ToString()</h3>
+            <h3 class="card-title"><i class="fas fa-cog"></i> Submit @Model.FormType.ToString()</h3>
         </div>
         <div class="card-body">
             <div class="submit-progress hidden">
@@ -18,15 +18,16 @@
             <button class="nav-link active fw-bold text-primary" id="policy-tab" data-bs-toggle="tab" data-bs-target="#policy-pane" type="button" role="tab" aria-controls="policy-pane" aria-selected="true">
                 <i class="bi bi-shield-shaded me-2"></i>1. Policy Details
             </button>
-        </li>
+        </li
+        @if (Model.FormType == FormType.Claim)
+        {
         <li class="nav-item" role="presentation">
             <button class="nav-link fw-bold text-success" id="nominee-tab" data-bs-toggle="tab" data-bs-target="#nominee-pane" type="button" role="tab" aria-controls="nominee-pane" aria-selected="false">
                 <i class="bi bi-person-badge me-2"></i>2. Nominee Details
             </button>
         </li>
         <!-- Only display the Claims specific tab layout element if the form type is Claim -->
-        @if (Model.FormType == FormType.Claim)
-        {
+        
             <li class="nav-item" role="presentation">
                 <button class="nav-link fw-bold text-danger" id="claim-tab" data-bs-toggle="tab" data-bs-target="#claim-pane" type="button" role="tab">
                     <i class="bi bi-exclamation-octagon me-2"></i>3. Claim Details

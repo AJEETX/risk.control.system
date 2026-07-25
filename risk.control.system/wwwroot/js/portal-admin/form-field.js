@@ -1,11 +1,32 @@
 ﻿let fieldIndex = document.querySelectorAll('#fieldsContainer tr').length;
+// Default to the first visible tab's data-section attribute
 let currentActiveSection = 'Policy';
 
 document.addEventListener('DOMContentLoaded', function () {
     // 1. Form type redirect synchronization
-    document.getElementById('formTypeSelector').addEventListener('change', function () {
-        window.location.href = '?type=' + this.value;
-    });
+    const formTypeSelector = document.getElementById('formTypeSelector');
+    const companySelector = document.getElementById('companySelector');
+
+    function reloadPageWithFilters() {
+        const companyId = companySelector ? companySelector.value : '';
+        const formType = formTypeSelector ? formTypeSelector.value : 'Claim';
+
+        window.location.href = `?companyId=${companyId}&type=${formType}`;
+    }
+
+    if (formTypeSelector) {
+        formTypeSelector.addEventListener('change', reloadPageWithFilters);
+    }
+
+    if (companySelector) {
+        companySelector.addEventListener('change', reloadPageWithFilters);
+    }
+
+    // Determine default active section from the DOM
+    const firstActiveTab = document.querySelector('.section-tab-btn.active');
+    if (firstActiveTab) {
+        currentActiveSection = firstActiveTab.getAttribute('data-section');
+    }
 
     // 2. Tab switcher mechanism
     const tabs = document.querySelectorAll('.section-tab-btn');
@@ -23,7 +44,6 @@ document.addEventListener('DOMContentLoaded', function () {
     // Initial setup rule execution
     filterRowsBySection();
 });
-
 document.getElementById('btnAddField').addEventListener('click', addFieldRow);
 const container = document.getElementById('fieldsContainer');
 

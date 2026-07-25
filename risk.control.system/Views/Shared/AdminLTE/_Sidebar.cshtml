@@ -137,7 +137,7 @@
 				<li class="nav-item">
 					<a asp-controller="CaseEnabler" asp-action="Profile" is-active-page
 						   class="navlink-border nav-link
-						@Url.MakeActiveClass("Claim", "")
+						@Url.MakeActiveClass("Form", "")
 						@Url.MakeActiveClass("CaseEnabler", "")
 						@Url.MakeActiveClass("Costcentre", "")
 						@Url.MakeActiveClass("BeneficiaryRelation", "")">
@@ -149,29 +149,14 @@
 					</a>
 				</li>
 				<li class="nav-item">
-					<a is-active-page asp-controller="Claim" asp-action="CreateClaimForm" class="actual-link nav-link @Url.MakeActiveClass("Claim", "CreateClaimForm")">
+					<a is-active-page asp-controller="Form" asp-action="CreateClaimForm" class="actual-link nav-link @Url.MakeActiveClass("Form", "CreateClaimForm")">
 						<i class="fas fa-edit nav-icon"></i>
 						<p>
 							Create Form
 						</p>
 					</a>
 				</li>
-				<li class="nav-item">
-					<a is-active-page asp-controller="Claim" asp-action="FillClaimForm" class="actual-link nav-link @Url.MakeActiveClass("Claim", "FillClaimForm")">
-						<i class="fas fa-clipboard nav-icon"></i>
-						<p>
-							Submit Claim
-						</p>
-					</a>
-				</li>
-				<li class="nav-item">
-					<a is-active-page asp-controller="Claim" asp-action="ViewClaimSubmissions" class="actual-link nav-link @Url.MakeActiveClass("Claim", "ViewClaimSubmissions") @Url.MakeActiveClass("Claim", "EditClaimForm")">
-						<i class="fas fa-clipboard nav-icon"></i>
-						<p>
-							Submitted Claims
-						</p>
-					</a>
-				</li>
+				
 				<li class="nav-item">
 					<a is-active-page asp-controller="CaseEnabler" asp-action="Profile" class="actual-link nav-link @Url.MakeActiveClass("CaseEnabler", "")">
 						<i class="fas fa-sun nav-icon"></i>

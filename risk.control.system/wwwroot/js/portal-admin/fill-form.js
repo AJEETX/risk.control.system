@@ -1,48 +1,53 @@
 ﻿document.addEventListener('DOMContentLoaded', function () {
-    const tabs = document.querySelectorAll('#claimFormTabs .nav-link');
+    const tabs = document.querySelectorAll('#claimFormTabs button[data-bs-toggle="tab"]');
     const panes = document.querySelectorAll('#claimFormTabsContent .tab-pane');
 
+    // 1. Tab Click Event Handling
     tabs.forEach(tab => {
         tab.addEventListener('click', function (e) {
             e.preventDefault();
 
-            // 1. Remove active state from all tab headers
+            // Deactivate all tabs & panes
             tabs.forEach(t => {
                 t.classList.remove('active');
                 t.setAttribute('aria-selected', 'false');
             });
+            panes.forEach(p => {
+                p.classList.remove('show', 'active');
+            });
 
-            // 2. Add active state to clicked tab header
+            // Activate clicked tab
             this.classList.add('active');
             this.setAttribute('aria-selected', 'true');
 
-            // 3. Find the matching target content pane ID
-            const targetSelector = this.getAttribute('data-bs-target');
-            const targetPane = document.querySelector(targetSelector);
+            // Show target pane using Bootstrap CSS classes (avoiding style.display = 'none')
+            const targetPaneId = this.getAttribute('data-bs-target');
+            const targetPane = document.querySelector(targetPaneId);
 
             if (targetPane) {
-                // 4. Hide all content panes completely
-                panes.forEach(pane => {
-                    pane.classList.remove('show', 'active');
-                    pane.style.display = 'none'; // Hard override to ensure visibility changes
-                });
-
-                // 5. Show the clicked content pane
-                targetPane.style.display = 'block';
-                // Small timeout allows the fade animation to trigger naturally
+                targetPane.classList.add('active');
+                // Brief delay to allow CSS opacity transition
                 setTimeout(() => {
-                    targetPane.classList.add('show', 'active');
-                }, 10);
+                    targetPane.classList.add('show');
+                }, 15);
             }
         });
     });
 
-    // Initialize the very first view state explicitly on load
-    const activeTab = document.querySelector('#claimFormTabs .nav-link.active');
-    if (activeTab) {
-        const initialPane = document.querySelector(activeTab.getAttribute('data-bs-target'));
-        if (initialPane) {
-            initialPane.style.display = 'block';
-        }
+    // 2. Form Validation Handler: Automatically switch tabs if a required field is missing
+    const form = document.querySelector('form');
+    if (form) {
+        form.addEventListener('invalid', function (e) {
+            const invalidField = e.target;
+            const parentPane = invalidField.closest('.tab-pane');
+
+            if (parentPane && !parentPane.classList.contains('active')) {
+                const paneId = parentPane.getAttribute('id');
+                const matchingTab = document.querySelector(`[data-bs-target="#${paneId}"]`);
+                if (matchingTab) {
+                    matchingTab.click(); // Programmatically click the tab to show the error
+                }
+            }
+        }, true);
     }
 });
