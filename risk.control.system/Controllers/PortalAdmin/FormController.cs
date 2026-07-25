@@ -8,14 +8,14 @@ using SmartBreadcrumbs.Attributes;
 
 namespace risk.control.system.Controllers.PortalAdmin
 {
-    [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME}")]
+    [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{CREATOR.DISPLAY_NAME}")]
     [Breadcrumb("Company Settings ")]
-    public class ClaimController : Controller
+    public class FormController : Controller
     {
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment _hostingEnvironment;
 
-        public ClaimController(ApplicationDbContext context, IWebHostEnvironment hostingEnvironment)
+        public FormController(ApplicationDbContext context, IWebHostEnvironment hostingEnvironment)
         {
             _context = context;
             _hostingEnvironment = hostingEnvironment;
@@ -24,32 +24,59 @@ namespace risk.control.system.Controllers.PortalAdmin
         {
             return View();
         }
+        [Breadcrumb("Create Form")]
         [HttpGet]
-        public IActionResult CreateClaimForm(FormType type = FormType.Claim)
+        public IActionResult CreateClaimForm(long? companyId, FormType type = FormType.Claim)
         {
-            // Filter out rows to ONLY load the form layouts intended for the active view target
-            var existingFields = _context.FormFields
-                .Where(f => f.FormType == type)
-                .ToList();
+            var model = new DynamicFormDesignerViewModel
+            {
+                SelectedCompanyId = companyId,
+                TargetFormType = type,
+                Companies = _context.ClientCompany
+                    .Where(c => !c.Deleted && c.Status == CompanyStatus.ACTIVE)
+                    .Select(c => new CompanySelectItem
+                    {
+                        Id = c.ClientCompanyId,
+                        Name = c.Name
+                    })
+                    .ToList()
+            };
 
-            // Track selected target form type to sync the dropdown element selection on page reload
-            ViewBag.SelectedFormType = type.ToString();
+            // Filter fields by FormType (and CompanyId if provided)
+            var query = _context.FormFields.Where(f => f.FormType == type);
 
-            return View(existingFields);
+            if (companyId.HasValue)
+            {
+                query = query.Where(f => f.CompanyId == companyId.Value);
+            }
+
+            model.Fields = query.ToList();
+
+            return View(model);
         }
 
         [HttpPost]
-        public IActionResult CreateClaimForm(FormType targetFormType, List<FormField> fields)
+        public IActionResult CreateClaimForm(long? selectedCompanyId, FormType targetFormType, List<FormField> fields)
         {
-            // 1. Clear out ONLY the existing layout mapping records for the specific target group
-            var oldFields = _context.FormFields.Where(f => f.FormType == targetFormType).ToList();
-            _context.FormFields.RemoveRange(oldFields);
-            fields = fields.Where(f => !string.IsNullOrWhiteSpace(f.Label)).ToList();
-            if (fields != null && fields.Any())
+            // Filter out rows without labels
+            fields = fields?.Where(f => !string.IsNullOrWhiteSpace(f.Label)).ToList() ?? new List<FormField>();
+
+            // 1. Fetch and remove only existing layout records matching BOTH CompanyId and FormType
+            var oldFields = _context.FormFields
+                .Where(f => f.FormType == targetFormType && f.CompanyId == selectedCompanyId)
+                .ToList();
+
+            if (oldFields.Any())
+            {
+                _context.FormFields.RemoveRange(oldFields);
+            }
+
+            // 2. Bind CompanyId and FormType to each incoming field
+            if (fields.Any())
             {
                 foreach (var field in fields)
                 {
-                    // 2. Explicitly bind the target form type category context to each field object
+                    field.CompanyId = selectedCompanyId ?? 0;
                     field.FormType = targetFormType;
                 }
 
@@ -57,38 +84,78 @@ namespace risk.control.system.Controllers.PortalAdmin
             }
 
             _context.SaveChanges();
+
             TempData["SuccessMessage"] = $"{targetFormType} Form structure saved successfully!";
 
-            return RedirectToAction(nameof(CreateClaimForm), new { type = targetFormType });
+            // 3. Redirect preserving both filter parameters
+            return RedirectToAction(nameof(CreateClaimForm), new { companyId = selectedCompanyId, type = targetFormType });
         }
+        [Breadcrumb("Submit Claim")]
         [HttpGet]
         public IActionResult FillClaimForm(FormType type = FormType.Claim)
         {
+            var userEmail = User.Identity?.Name;
+
+            var userCompany = _context.ApplicationUser
+                .FirstOrDefault(c => c.Email == userEmail);
             var model = new FillFormViewModel
             {
                 FormType = type,
-                Fields = _context.FormFields.Where(f => f.FormType == type).ToList()
+                Fields = _context.FormFields.Where(f => f.FormType == type && f.CompanyId == userCompany!.ClientCompanyId).ToList()
             };
 
             return View(model);
         }
 
+        [Breadcrumb("Submit Underwriting")]
+        [HttpGet]
+        public IActionResult FillUnderwritingForm(FormType type = FormType.Underwriting)
+        {
+            var userEmail = User.Identity?.Name;
+
+            var userCompany = _context.ApplicationUser
+                .FirstOrDefault(c => c.Email == userEmail);
+
+            var model = new FillFormViewModel
+            {
+                FormType = type,
+                Fields = _context.FormFields.Where(f => f.FormType == type && f.CompanyId == userCompany!.ClientCompanyId).ToList()
+            };
+
+            return View(model);
+        }
         [HttpPost]
         public async Task<IActionResult> SubmitForm(FillFormViewModel postModel, IFormCollection form)
         {
-            // Access the targeted form type directly from the strongly-typed incoming parameter
             FormType currentFormType = postModel.FormType;
 
-            var fields = _context.FormFields.Where(f => f.FormType == currentFormType).ToList();
+            // 1. Get the current logged-in user's Company ID securely
+            var userEmail = User.Identity?.Name;
+            var userCompany = await _context.ApplicationUser
+                .FirstOrDefaultAsync(c => c.Email == userEmail);
+
+            if (userCompany == null)
+            {
+                return Unauthorized();
+            }
+
+            long companyId = userCompany.ClientCompanyId!.Value;
+
+            // 2. Query fields specific to BOTH FormType and CompanyId
+            var fields = await _context.FormFields
+                .Where(f => f.FormType == currentFormType && f.CompanyId == companyId)
+                .ToListAsync();
+
             var submission = new SubmittedForm
             {
+                CompanyId = companyId,
                 SubmittedAt = DateTime.UtcNow,
                 FormType = currentFormType
             };
 
             foreach (var field in fields)
             {
-                var valueStr = "";
+                string valueStr = string.Empty;
 
                 if (field.FieldType == "file")
                 {
@@ -97,6 +164,7 @@ namespace risk.control.system.Controllers.PortalAdmin
                     {
                         string uploadsFolder = Path.Combine(_hostingEnvironment.WebRootPath, "uploads");
                         Directory.CreateDirectory(uploadsFolder);
+
                         string uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(uploadedFile.FileName);
                         string filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
@@ -139,8 +207,14 @@ namespace risk.control.system.Controllers.PortalAdmin
 
             _context.SubmittedForms.Add(submission);
             await _context.SaveChangesAsync();
-
-            return RedirectToAction("ViewClaimSubmissions");
+            if (currentFormType == FormType.Claim)
+            {
+                return RedirectToAction(nameof(ViewClaimSubmissions));
+            }
+            else
+            {
+                return RedirectToAction(nameof(ViewUnderwritingSubmissions));
+            }
         }
         // Controllers/UserController.cs
         public IActionResult SubmissionSuccess()
@@ -156,38 +230,132 @@ namespace risk.control.system.Controllers.PortalAdmin
             return Json(fields);
         }
 
-        // 2. Ensure your submissions JSON returns the FormFieldId
         [HttpGet]
-        public IActionResult GetSubmissionsJson()
+        public IActionResult GetClaimSubmissionsJson()
         {
-            var submissions = _context.SubmittedForms
-                .Include(sf => sf.Values)
-                .ThenInclude(sv => sv.FormField)
-                .OrderByDescending(sf => sf.SubmittedAt)
-                .Where(f => f.FormType == FormType.Claim) // Filter to only include Claim submissions
-                .Select(sf => new
+            var userEmail = User.Identity?.Name;
+            var userCompany = _context.ApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+
+            if (userCompany == null)
+                return Unauthorized();
+
+            // 1. Fetch form fields for dynamic column headers
+            var formFields = _context.FormFields
+                .Where(f => f.FormType == FormType.Claim && f.CompanyId == userCompany.ClientCompanyId)
+                .OrderBy(f => f.Id)
+                .Select(f => new
                 {
-                    Id = sf.Id,
-                    SubmittedAt = sf.SubmittedAt.ToString("o"),
-                    Fields = sf.Values.Select(v => new
-                    {
-                        FormFieldId = v.FormFieldId, // Essential for mapping values to the correct column
-                        Label = v.FormField.Label,
-                        Value = v.Value,
-                        Type = v.FormField.FieldType
-                    }).ToList()
+                    f.Id,
+                    f.Label,
+                    f.FieldType,
+                    f.Section
                 })
                 .ToList();
 
-            return Json(new { data = submissions });
+            // 2. Query database for raw submissions first (Translates to SQL)
+            var rawSubmissions = _context.SubmittedForms
+                .Include(sf => sf.Values)
+                .ThenInclude(sv => sv.FormField)
+                .Where(f => f.FormType == FormType.Claim && f.CompanyId == userCompany.ClientCompanyId)
+                .OrderByDescending(sf => sf.SubmittedAt)
+                .Select(sf => new
+                {
+                    Id = sf.Id,
+                    SubmittedAt = sf.SubmittedAt,
+                    Values = sf.Values.Select(v => new
+                    {
+                        v.FormFieldId,
+                        Label = v.FormField.Label,
+                        Value = v.Value,
+                        Type = v.FormField.FieldType,
+                        Section = v.FormField.Section
+                    }).ToList()
+                })
+                .ToList(); // Execution happens here (DB query finishes)
+
+            // 3. Project to Dictionary in memory (Client-side evaluation)
+            var submissions = rawSubmissions.Select(sf => new
+            {
+                Id = sf.Id,
+                SubmittedAt = sf.SubmittedAt.ToString("o"),
+                Values = sf.Values.ToDictionary(
+                    v => v.FormFieldId.ToString(),
+                    v => v
+                )
+            }).ToList();
+
+            return Json(new { fields = formFields, data = submissions });
         }
-        // Render the HTML view shell
+        [Breadcrumb("Claims")]
         [HttpGet]
         public IActionResult ViewClaimSubmissions()
         {
             return View();
         }
         [HttpGet]
+        public IActionResult GetUnderwritingSubmissionsJson()
+        {
+            var userEmail = User.Identity?.Name;
+            var userCompany = _context.ApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+
+            if (userCompany == null)
+                return Unauthorized();
+
+            // 1. Fetch form fields for dynamic column headers
+            var formFields = _context.FormFields
+                .Where(f => f.FormType == FormType.Underwriting && f.CompanyId == userCompany.ClientCompanyId)
+                .OrderBy(f => f.Id)
+                .Select(f => new
+                {
+                    f.Id,
+                    f.Label,
+                    f.FieldType,
+                    f.Section
+                })
+                .ToList();
+
+            // 2. Query database for raw submissions first (Translates to SQL)
+            var rawSubmissions = _context.SubmittedForms
+                .Include(sf => sf.Values)
+                .ThenInclude(sv => sv.FormField)
+                .Where(f => f.FormType == FormType.Underwriting && f.CompanyId == userCompany.ClientCompanyId)
+                .OrderByDescending(sf => sf.SubmittedAt)
+                .Select(sf => new
+                {
+                    Id = sf.Id,
+                    SubmittedAt = sf.SubmittedAt,
+                    Values = sf.Values.Select(v => new
+                    {
+                        v.FormFieldId,
+                        Label = v.FormField.Label,
+                        Value = v.Value,
+                        Type = v.FormField.FieldType,
+                        Section = v.FormField.Section
+                    }).ToList()
+                })
+                .ToList(); // Execution happens here (DB query finishes)
+
+            // 3. Project to Dictionary in memory (Client-side evaluation)
+            var submissions = rawSubmissions.Select(sf => new
+            {
+                Id = sf.Id,
+                SubmittedAt = sf.SubmittedAt.ToString("o"),
+                Values = sf.Values.ToDictionary(
+                    v => v.FormFieldId.ToString(),
+                    v => v
+                )
+            }).ToList();
+
+            return Json(new { fields = formFields, data = submissions });
+        }
+        [Breadcrumb("Underwritings")]
+        [HttpGet]
+        public IActionResult ViewUnderwritingSubmissions()
+        {
+            return View();
+        }
+        [HttpGet]
+        [Breadcrumb("Edit Claims", FromAction = nameof(ViewClaimSubmissions))]
         public IActionResult EditClaimForm(int id)
         {
             var submission = _context.SubmittedForms

@@ -12,7 +12,7 @@
         public string? MessageTemplate { get; set; }
         public string? TraceId { get; set; }
         public string? SpanId { get; set; }
-        public ErrorProperties? ErrorProperties { get; set; }
+        public ErrorProperties? Properties { get; set; }
         public string? Exception { get; set; }
     }
     public class EventId

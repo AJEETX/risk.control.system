@@ -206,14 +206,9 @@ namespace risk.control.system.Services.Agent
                     return new DeleteCollectionResponse { StatusCode = (int)HttpStatusCode.NotFound };
                 }
             }
-            catch (Amazon.Rekognition.Model.ResourceNotFoundException ex)
-            {
-                _logger.LogError($"Error ensuring collection: {ex.Message}");
-                return new DeleteCollectionResponse { StatusCode = (int)ex.StatusCode };
-            }
             catch (Exception ex)
             {
-                _logger.LogError($"Error ensuring collection: {ex.Message}");
+                _logger.LogInformation($"Error ensuring collection: {ex.Message}");
                 return new DeleteCollectionResponse { StatusCode = (int)HttpStatusCode.InternalServerError };
             }
         }

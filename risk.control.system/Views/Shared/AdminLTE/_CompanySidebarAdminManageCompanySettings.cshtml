@@ -5,6 +5,7 @@
 		<li class="nav-item">
 			<a is-active-page
 				   class="navlink-border nav-link
+				@Url.MakeActiveClass("Form", "")
 				@Url.MakeActiveClass("Audit", "")
 				@Url.MakeActiveClass("ReportTemplate", "")
 				@Url.MakeActiveClass("CaseEnabler", "")
@@ -20,7 +21,6 @@
 				</p>
 			</a>
 		</li>
-
 		<li class="nav-item">
 			<a is-active-page asp-controller="CaseEnabler" asp-action="Profile" class="actual-link nav-link @Url.MakeActiveClass("CaseEnabler","")">
 				<i class="fas fa-puzzle-piece nav-icon"></i>

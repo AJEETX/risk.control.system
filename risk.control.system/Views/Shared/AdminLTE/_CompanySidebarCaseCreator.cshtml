@@ -54,4 +54,50 @@
 			</p>
 		</a>
 	</li>
+	@if (System.Diagnostics.Debugger.IsAttached)
+	{
+		<li class="nav-item">
+			<a is-active-page
+			   class="navlink-border nav-link
+				@Url.MakeActiveClass("Form", "")">
+				<i class="nav-icon fas fa-cog"></i>
+				<p class="sidebar-menu-header-label">
+					@Applicationsettings.COMPANY_SETTING
+					<div class="right"><i class="fas fa-angle-down"></i></div>
+				</p>
+			</a>
+		</li>
+		<li class="nav-item">
+			<a is-active-page asp-controller="Form" asp-action="FillClaimForm" class="actual-link nav-link @Url.MakeActiveClass("Form", "FillClaimForm")">
+				<i class="fas fa-clipboard nav-icon"></i>
+				<p>
+					Submit Claim
+				</p>
+			</a>
+		</li>
+		<li class="nav-item">
+			<a is-active-page asp-controller="Form" asp-action="ViewClaimSubmissions" class="actual-link nav-link @Url.MakeActiveClass("Form", "ViewClaimSubmissions") @Url.MakeActiveClass("Form", "EditClaimForm")">
+				<i class="fa fa-server nav-icon"></i>
+				<p>
+					Claims
+				</p>
+			</a>
+		</li>
+		<li class="nav-item">
+			<a is-active-page asp-controller="Form" asp-action="FillUnderwritingForm" class="actual-link nav-link @Url.MakeActiveClass("Form", "FillUnderwritingForm")">
+				<i class="fas fa-clipboard nav-icon"></i>
+				<p>
+					Submit Underwriting
+				</p>
+			</a>
+		</li>
+		<li class="nav-item">
+			<a is-active-page asp-controller="Form" asp-action="ViewUnderwritingSubmissions" class="actual-link nav-link @Url.MakeActiveClass("Form", "ViewUnderwritingSubmissions") @Url.MakeActiveClass("Form", "EditUnderwritingForm")">
+				<i class="fa fa-navicon nav-icon"></i>
+				<p>
+					Underwritings
+				</p>
+			</a>
+		</li>
+	}
 }
