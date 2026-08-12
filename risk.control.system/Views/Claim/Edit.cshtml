@@ -1,0 +1,322 @@
+﻿@model EditSubmissionViewModel
+@{
+    ViewData["Title"] = $"Edit {Model.FormType}";
+    var key = Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY") ?? "";
+}
+
+<section class="content">
+    <div id="article" class="card shadow-lg border-1 rounded-lg">
+        <div class="card-header bg-secondary text-white text-center">
+            <h3 class="card-title"><i class="fa fa-server me-2"></i>Edit Claim</h3>
+        </div>
+        <div class="card-body p-4">
+            <div class="submit-progress hidden">
+                <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+            </div>
+
+            <form asp-action="Edit" asp-route-id="@Model.SubmissionId" method="post" enctype="multipart/form-data" id="editClaimForm"
+                  data-confirm-title="Confirm Claim Update"
+                  data-confirm-message="Are you sure you want to save changes to this claim?"
+                  data-submit-text="Save Claim"
+                  data-loading-text="Save Claim"
+                  data-btn-theme="warning"
+                  data-confirm-theme="orange">
+                <input type="hidden" asp-for="SubmissionId" />
+                <input type="hidden" asp-for="FormType" />
+
+                <!-- THREE-COLUMN CARD LAYOUT -->
+                <div class="row g-3">
+
+                    <!-- SECTION 1: POLICY DETAILS -->
+                    <div class="col-md-4">
+                        <div class="card h-100 shadow-sm border-1 bg-light">
+                            <div class="card-header bg-white border-0 pt-3 pb-2 d-flex align-items-center">
+                                <i class="far fa-file-alt text-primary"></i>
+                                <span>&nbsp;&nbsp;</span>
+                                <h6 class="mb-0 fw-bold">Policy Details</h6>
+                            </div>
+                            <div class="bg-success text-white px-2 py-1 small d-flex justify-content-between align-items-center">
+                                <i class="fas fa-bookmark"></i>
+                                <i class="fas fa-file-pdf"></i>
+                            </div>
+
+                            <div class="card-body bg-white">
+                                <div class="row">
+                                    <!-- Left Column: Non-file fields -->
+                                    <div class="col-7">
+                                        @{
+                                            var policyFields = Model.Fields.Where(f => f.Field.Section == "Policy" && f.Field.FieldType != "file").ToList();
+                                        }
+                                        @if (policyFields.Any())
+                                        {
+                                            @foreach (var item in policyFields)
+                                            {
+                                                <div class="mb-2">
+                                                    <label class="form-label fw-semibold text-secondary mb-1 small d-block">
+                                                        @item.Field.Label
+                                                        @if (item.Field.IsRequired)
+                                                        {
+                                                            <span class="text-danger ms-1">*</span>
+                                                        }
+                                                    </label>
+                                                    <partial name="_DynamicEditFieldRender" model="item" />
+                                                </div>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <div class="text-muted fst-italic small">No policy fields configured.</div>
+                                        }
+                                    </div>
+
+                                    <!-- Right Column: Policy Document Upload / Preview -->
+                                    <div class="col-5">
+                                        @{
+                                            var policyDocItem = Model.Fields.FirstOrDefault(f => f.Field.Section == "Policy" && f.Field.FieldType == "file");
+                                            var policyFileUrl = policyDocItem?.CurrentValue ?? policyDocItem?.CurrentValue ?? string.Empty;
+                                            var hasPolicyFile = !string.IsNullOrEmpty(policyFileUrl);
+                                        }
+                                        <div class="border rounded p-2 bg-light text-center d-flex flex-column align-items-center justify-content-center mh-100">
+                                            <i class="fas fa-file-alt fa-3x text-secondary mb-2"></i>
+
+                                            @if (policyDocItem != null)
+                                            {
+                                                <label class="form-label small fw-bold text-secondary mb-1">@policyDocItem.Field.Label</label>
+
+                                                <!-- Custom styled File Input & View File Badge -->
+                                                <div class="w-100">
+                                                    <input type="file" 
+                                                           accept=".pdf,application/pdf"
+                                                           name="field_@policyDocItem.Field.Id"
+                                                           class="form-control form-control-sm mb-2"
+                                                    @(policyDocItem.Field.IsRequired && !hasPolicyFile ? "required" : "") />
+
+                                                    @if (hasPolicyFile)
+                                                    {
+                                                        <a href="@policyFileUrl"
+                                                           target="_blank"
+                                                           rel="noopener noreferrer"
+                                                           class="btn btn-sm btn-outline-primary w-100 d-inline-flex align-items-center justify-content-center gap-1 shadow-sm py-1">
+                                                            <i class="fas fa-external-link-alt"></i>
+                                                            <span>&nbsp;&nbsp;</span>
+                                                            <span class="fw-semibold extra-small"> View Document</span>
+                                                        </a>
+                                                    }
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <span class="btn btn-sm btn-outline-secondary w-100 disabled extra-small">
+                                                    <i class="fas fa-paperclip me-1"></i> Policy Document
+                                                </span>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECTION 2: NOMINEE DETAILS -->
+                    <div class="col-md-4">
+                        <div class="card h-100 shadow-sm border-1 bg-light">
+                            <div class="card-header bg-white border-0 pt-3 pb-2 d-flex align-items-center">
+                                <i class="fas fa-user-plus me-2 text-success"></i>
+                                <span>&nbsp;&nbsp;</span>
+                                <h6 class="mb-0 fw-bold">Nominee Details</h6>
+                            </div>
+                            <div class="bg-success text-white px-2 py-1 small d-flex justify-content-between align-items-center">
+                                <i class="fas fa-bookmark"></i>
+                                <i class="fas fa-user"></i>
+                            </div>
+
+                            <div class="card-body bg-white">
+                                <div class="row">
+                                    <!-- Left Column: Input fields + Map trigger -->
+                                    <div class="col-7">
+                                        @{
+                                            var nomineeFields = Model.Fields.Where(f => f.Field.Section == "Nominee" && f.Field.FieldType != "file").ToList();
+                                        }
+                                        @if (nomineeFields.Any())
+                                        {
+                                            @foreach (var item in nomineeFields)
+                                            {
+                                                var isAddress = item.Field.FieldType == "address" || item.Field.Label.Contains("address", StringComparison.OrdinalIgnoreCase);
+
+                                                <div class="mb-2">
+                                                    <label class="form-label fw-semibold text-secondary mb-1 small d-block">
+                                                        @item.Field.Label
+                                                        @if (item.Field.IsRequired)
+                                                        {
+                                                            <span class="text-danger ms-1">*</span>
+                                                        }
+                                                    </label>
+                                                    <partial name="_DynamicEditFieldRender" model="item" />
+
+                                                    @if (isAddress)
+                                                    {
+                                                        <button type="button"
+                                                                class="btn btn-sm btn-outline-primary py-0 px-2 mt-1 shadow-sm d-inline-flex align-items-center"
+                                                                onclick="var val = document.getElementById('field_@item.Field.Id')?.value; if(val){ window.open('https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(val), '_blank'); }">
+                                                            <i class="fas fa-map-marked-alt me-1"></i>
+                                                            <span>&nbsp;&nbsp;</span>
+                                                            <span class="fw-bold extra-small"> View Map</span>
+                                                        </button>
+                                                    }
+                                                </div>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <div class="text-muted fst-italic small">No nominee fields configured.</div>
+                                        }
+                                    </div>
+
+                                    <div class="col-5">
+                                        @{
+                                            var nomineePhotoItem = Model.Fields.FirstOrDefault(f => f.Field.Section == "Nominee" && f.Field.FieldType == "file");
+                                            var photoUrl = nomineePhotoItem?.CurrentValue ?? nomineePhotoItem?.CurrentValue ?? string.Empty;
+                                            var hasPhoto = !string.IsNullOrEmpty(photoUrl) && (photoUrl.StartsWith("http") || photoUrl.StartsWith("/"));
+                                        }
+                                        <div class="border rounded p-2 bg-light text-center d-flex flex-column align-items-center justify-content-center mh-100">
+
+                                            <!-- Preview Box -->
+                                            <div id="nomineePhotoPreviewContainer" class="border rounded mb-2 overflow-hidden bg-white shadow-sm w-100 ratio ratio-1x1 @(hasPhoto ? "" : "d-none")">
+                                                <a id="nomineePhotoLink" href="@(hasPhoto ? photoUrl : "#")" target="_blank" rel="noopener noreferrer" title="Click to view full photo">
+                                                    <img id="nomineePhotoPreview"
+                                                         src="@(hasPhoto ? photoUrl : "")"
+                                                         data-original-src="@(hasPhoto ? photoUrl : "")"
+                                                         class="img-fluid w-100 h-100 object-fit-cover"
+                                                         alt="Nominee Photo" />
+                                                </a>
+                                            </div>
+
+                                            <!-- Placeholder Icon -->
+                                            <i id="nomineePhotoIcon" class="fas fa-user-circle fa-3x text-secondary mb-2 @(hasPhoto ? "d-none" : "")"></i>
+
+                                            @if (nomineePhotoItem != null)
+                                            {
+                                                <label class="form-label small fw-bold text-secondary mb-1">@nomineePhotoItem.Field.Label</label>
+                                                <input type="file"
+                                                       id="nomineeFileInput"
+                                                       accept="image/*,.jpg,.jpeg,.png,.gif,.webp"
+                                                       name="field_@nomineePhotoItem.Field.Id"
+                                                       class="form-control form-control-sm"
+                                                       accept="image/*"
+                                                @(nomineePhotoItem.Field.IsRequired && !hasPhoto ? "required" : "") />
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECTION 3: CLAIM DETAILS -->
+                    <div class="col-md-4">
+                        <div class="card h-100 shadow-sm border-1 bg-light">
+                            <div class="card-header bg-white border-0 pt-3 pb-2 d-flex align-items-center">
+                                <i class="fas fa-clipboard-list me-2 text-warning"></i>
+                                <span>&nbsp;&nbsp;</span>
+                                <h6 class="mb-0 fw-bold">Claim Details</h6>
+                            </div>
+                            <div class="bg-success text-white px-2 py-1 small d-flex justify-content-between align-items-center">
+                                <i class="fas fa-bookmark"></i>
+                                <i class="fas fa-file-invoice"></i>
+                            </div>
+
+                            <div class="card-body bg-white">
+                                <div class="row">
+                                    <!-- Left Column: Non-file fields -->
+                                    <div class="col-7">
+                                        @{
+                                            var claimFields = Model.Fields.Where(f => f.Field.Section == "ClaimDetail" && f.Field.FieldType != "file").ToList();
+                                        }
+                                        @if (claimFields.Any())
+                                        {
+                                            @foreach (var item in claimFields)
+                                            {
+                                                <div class="mb-2">
+                                                    <label class="form-label fw-semibold text-secondary mb-1 small d-block">
+                                                        @item.Field.Label
+                                                        @if (item.Field.IsRequired)
+                                                        {
+                                                            <span class="text-danger ms-1">*</span>
+                                                        }
+                                                    </label>
+                                                    <partial name="_DynamicEditFieldRender" model="item" />
+                                                </div>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <div class="text-muted fst-italic small">No claim fields configured.</div>
+                                        }
+                                    </div>
+                                    <div class="col-5">
+                                        @{
+                                            var claimDocItem = Model.Fields.FirstOrDefault(f => f.Field.Section == "ClaimDetail" && f.Field.FieldType == "file");
+                                            var claimFileUrl = claimDocItem?.CurrentValue ?? claimDocItem?.CurrentValue ?? string.Empty;
+                                            var hasClaimFile = !string.IsNullOrEmpty(claimFileUrl);
+                                        }
+                                        <div class="border rounded p-2 bg-light text-center d-flex flex-column align-items-center justify-content-center mh-100">
+                                            <i class="fas fa-folder-open fa-3x text-secondary mb-2"></i>
+
+                                            @if (claimDocItem != null)
+                                            {
+                                                <label class="form-label small fw-bold text-secondary mb-1">@claimDocItem.Field.Label</label>
+
+                                                <!-- Custom styled File Input & View File Badge -->
+                                                <div class="w-100">
+                                                    <input type="file"
+                                                           name="field_@claimDocItem.Field.Id"
+                                                           accept=".pdf,application/pdf"
+                                                           class="form-control form-control-sm mb-2"
+                                                    @(claimDocItem.Field.IsRequired && !hasClaimFile ? "required" : "") />
+
+                                                    @if (hasClaimFile)
+                                                    {
+                                                        <a href="@claimFileUrl"
+                                                           target="_blank"
+                                                           rel="noopener noreferrer"
+                                                           class="btn btn-sm btn-outline-primary w-100 d-inline-flex align-items-center justify-content-center gap-1 shadow-sm py-1">
+                                                            <i class="fas fa-external-link-alt"></i>
+                                                            <span>&nbsp;&nbsp;</span>
+                                                            <span class="fw-semibold extra-small">View Document</span>
+                                                        </a>
+                                                    }
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <span class="btn btn-sm btn-outline-secondary w-100 disabled extra-small">
+                                                    <i class="fas fa-paperclip me-1"></i> Claim Document
+                                                </span>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- FORM ACTIONS -->
+                <div class="d-flex justify-content-end align-items-center gap-2 mt-4 pt-3 border-top">
+                    <a id="back" asp-action="Assign" class="btn btn-sm btn-secondary">
+                        <i class="fa fa-window-close me-1"></i> Cancel
+                    </a>
+                    <button type="submit" class="btn btn-sm btn-warning">
+                        <i class="fa fa-check-circle me-2"></i> Save Claim
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script src="https://maps.googleapis.com/maps/api/js?key=@key&libraries=places"></script>
+    <script src="/js/claim/add.js" asp-append-version="true"></script>
+}

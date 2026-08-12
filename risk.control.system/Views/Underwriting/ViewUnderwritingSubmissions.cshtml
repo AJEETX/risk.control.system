@@ -1,0 +1,43 @@
+﻿@{
+    ViewData["Title"] = "Underwritings";
+    var key = Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY") ?? "";
+}
+<section class="content">
+    	<div id="article" class="card shadow-lg border-1 rounded-lg">
+        <div class="card-header bg-secondary text-white text-center">
+            <h3 class="card-title"><i class="fa fa-navicon"></i> Underwritings</h3>
+        </div>
+        <div class="card-body">
+            <div class="submit-progress hidden">
+                <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+            </div>
+            <table id="dataTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
+                <thead class="table-light">
+                    <tr id="tableHeaders">
+                        <!-- DataTables will auto-generate headers dynamically -->
+                    </tr>
+                </thead>
+            </table>
+
+        </div>
+        <div class="card-footer">
+            <div class="row float-right">
+                <div class="col-md-12">
+                    <a class="create-policy btn btn-sm btn-success" asp-controller="Form" asp-action="FillUnderwritingForm"><i class="far fa-edit"></i> Add New</a>
+                    <button disabled id="allocatedcase" type="submit" class="btn btn-sm btn-warning">
+                        <i class="fas fa-random"></i> Assign<sub>auto</sub>
+                    </button>
+                    <button disabled id="deletecase" type="submit" class="btn btn-sm btn-danger">
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+</div>
+</section>
+@section Scripts {
+    <script>
+        window.googleMapsApiKey = "@key";
+    </script>
+    <script src="/js/portal-admin/submitted-underwriting-forms.js" asp-append-version="true"></script>
+}

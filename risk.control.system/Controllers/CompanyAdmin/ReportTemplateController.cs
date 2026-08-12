@@ -98,6 +98,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                     id = t.Id,
                     name = t.Name,
                     insuranceType = t.InsuranceType.GetEnumDisplayName(),
+                    serviceType = t.InvestigationServiceType.Name,
                     isActive = t.IsActive,
                     createdOn = t.Created,
                     locations = t.LocationReport.Count,
@@ -435,7 +436,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             }
 
         }
-        private LocationReport CreateLocationReport(LocationReport original, long reportTemplateId)
+        private static LocationReport CreateLocationReport(LocationReport original, long reportTemplateId)
         {
             var clone = new LocationReport
             {

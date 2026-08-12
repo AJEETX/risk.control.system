@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 
 using risk.control.system.AppConstant;
-using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Services.Common;
 using static risk.control.system.AppConstant.Applicationsettings;
@@ -27,24 +26,24 @@ namespace risk.control.system.Seeds
                     await userManager.CreateAsync(portalAdmin, TestingData);
                     await userManager.AddToRoleAsync(portalAdmin, PORTAL_ADMIN.DISPLAY_NAME);
                 }
-                var adminRole = await roleManager.FindByNameAsync(AppRoles.PORTAL_ADMIN.ToString()) ?? default!;
-                var allClaims = await roleManager.GetClaimsAsync(adminRole);
-                string Claims = "Claims";
-                var moduleList = new List<string> {
-                    nameof(Claims) };
-                var modules = context.PermissionModule.ToList();
-                foreach (var module in moduleList)
-                {
-                    var modulePermissions = Permissions.GeneratePermissionsForModule(module);
+                //var adminRole = await roleManager.FindByNameAsync(AppRoles.PORTAL_ADMIN.ToString()) ?? default!;
+                //var allClaims = await roleManager.GetClaimsAsync(adminRole);
+                //string Claims = "Claims";
+                //var moduleList = new List<string> {
+                //    nameof(Claims) };
+                //var modules = context.PermissionModule.ToList();
+                //foreach (var module in moduleList)
+                //{
+                //    var modulePermissions = Permissions.GeneratePermissionsForModule(module);
 
-                    foreach (var modulePermission in modulePermissions)
-                    {
-                        if (!allClaims.Any(a => a.Type == PERMISSION && a.Value == modulePermission))
-                        {
-                            await roleManager.AddClaimAsync(adminRole, new System.Security.Claims.Claim(PERMISSION, modulePermission));
-                        }
-                    }
-                }
+                //    foreach (var modulePermission in modulePermissions)
+                //    {
+                //        if (!allClaims.Any(a => a.Type == PERMISSION && a.Value == modulePermission))
+                //        {
+                //            await roleManager.AddClaimAsync(adminRole, new System.Security.Claims.Claim(PERMISSION, modulePermission));
+                //        }
+                //    }
+                //}
             }
         }
         private static ApplicationUser GetUserData(PinCode pinCode, string relativePath)

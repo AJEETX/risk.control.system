@@ -12,6 +12,8 @@ namespace risk.control.system.Models
         public long? ClientCompanyId { get; set; }
         public ClientCompany? ClientCompany { get; set; }
         public InsuranceType InsuranceType { get; set; } = InsuranceType.CLAIM;
+        public long InvestigationServiceTypeId { get; set; } = default!;
+        public InvestigationServiceType InvestigationServiceType { get; set; } = default!;
         public List<LocationReport> LocationReport { get; set; } = new List<LocationReport>();
         public bool Basetemplate { get; set; } = false;
         public bool IsActive { get; set; } = false;

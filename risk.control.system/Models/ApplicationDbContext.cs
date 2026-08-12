@@ -29,6 +29,7 @@ namespace risk.control.system.Models
             }
         }
 
+        public virtual DbSet<CaseTimeline> CaseTimeline { get; set; }
         public virtual DbSet<FormField> FormFields { get; set; }
         public virtual DbSet<SubmittedValue> SubmittedValues { get; set; }
         public virtual DbSet<SubmittedForm> SubmittedForms { get; set; }

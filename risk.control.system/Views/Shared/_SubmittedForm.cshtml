@@ -1,0 +1,270 @@
+﻿@using Microsoft.AspNetCore.Html
+@model CaseModelEmpanelledAgency
+
+@{
+    var form = Model?.SubmittedForm;
+    var values = form?.Values ?? new List<SubmittedValue>();
+
+    // 1. Group dynamic submitted values strictly by Section defined in designer
+    var policyValues = values
+        .Where(v => string.Equals(v.FormField?.Section, "Policy", StringComparison.OrdinalIgnoreCase))
+        .ToList();
+
+    var nomineeValues = values
+        .Where(v => string.Equals(v.FormField?.Section, "Nominee", StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(v.FormField?.Section, "LifeAssured", StringComparison.OrdinalIgnoreCase))
+        .ToList();
+
+    var claimValues = values
+        .Where(v => string.Equals(v.FormField?.Section, "ClaimDetail", StringComparison.OrdinalIgnoreCase) ||
+                    (string.IsNullOrEmpty(v.FormField?.Section) &&
+                     !policyValues.Contains(v) && !nomineeValues.Contains(v))) // Unassigned fallbacks
+        .ToList();
+
+    // Local function to render values with dynamic label text
+    IHtmlContent RenderValue(SubmittedValue item, string customLabel = "Attachment")
+    {
+        var val = item?.Value;
+        var buttonText = string.IsNullOrWhiteSpace(customLabel) ? "Attachment" : customLabel;
+
+        if (string.IsNullOrWhiteSpace(val))
+        {
+            return Html.Raw("<span class=\"text-muted fst-italic\">N/A</span>");
+        }
+        else if (item?.FormField?.FieldType == "file" || val.StartsWith("http://") || val.StartsWith("https://") || val.StartsWith("/"))
+        {
+            return Html.Raw($"<a href=\"{Html.Encode(val)}\" target=\"_blank\" class=\"btn btn-sm btn-outline-primary py-0 px-2 mt-1\"><i class=\"fas fa-paperclip me-1\"></i> {Html.Encode(buttonText)}</a>");
+        }
+        else
+        {
+            return Html.Raw($"<span class=\"fw-semibold text-dark\">{Html.Encode(val)}</span>");
+        }
+    }
+}
+
+@if (form == null)
+{
+    <div class="col-12">
+        <div class="alert alert-warning d-flex align-items-center mb-0" role="alert">
+            <i class="fas fa-exclamation-triangle me-2 fa-lg"></i>
+            <div>No submission details available for this case.</div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="row g-3">
+
+        <!-- SECTION 1: POLICY DETAILS -->
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm border-1 bg-light">
+                <div class="card-header bg-white border-0 pt-3 pb-2 d-flex align-items-center">
+                    <i class="far fa-file-alt text-primary"></i>
+                    <span>&nbsp;&nbsp;</span>
+                    <h6 class="mb-0 fw-bold">Policy Details</h6>
+                </div>
+                <div class="bg-success text-white px-2 py-1 small d-flex justify-content-between align-items-center">
+                    <i class="fas fa-bookmark"></i>
+                    <i class="fas fa-file-pdf"></i>
+                </div>
+
+                <div class="card-body bg-white">
+                    <div class="row">
+                        <!-- Left Column: Non-file values -->
+                        <div class="col-7">
+                            <ul class="list-unstyled mb-0 small">
+                                @{
+                                    var nonFilePolicyValues = policyValues.Where(x => x.FormField?.FieldType != "file").ToList();
+                                }
+                                @if (nonFilePolicyValues.Any())
+                                {
+                                    @foreach (var item in nonFilePolicyValues)
+                                    {
+                                        <li class="mb-2 text-break">
+                                            <strong class="text-secondary d-block mb-1">@item.FormField?.Label</strong>
+                                            <div class="d-block mb-1">
+                                                @RenderValue(item)
+                                            </div>
+                                        </li>
+                                    }
+                                }
+                                else
+                                {
+                                    <li class="text-muted fst-italic">No policy details configured.</li>
+                                }
+                            </ul>
+                        </div>
+                        <!-- Right Column: Policy Document File -->
+                        <div class="col-5 text-end">
+                            @{
+                                var policyDoc = policyValues.FirstOrDefault(x => x.FormField?.FieldType == "file");
+                            }
+                            <div class="border rounded p-3 mb-2 bg-light text-center d-flex flex-column align-items-center justify-content-center" style="min-height: 110px;">
+                                <i class="fas fa-file-alt fa-3x text-secondary mb-2"></i>
+                                @if (policyDoc != null && !string.IsNullOrEmpty(policyDoc.Value))
+                                {
+                                    @RenderValue(policyDoc, "Policy Document")
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-footer bg-light border-0 d-flex justify-content-end gap-2 py-2">
+                    <button class="btn btn-sm btn-success"><i class="fas fa-edit"></i></button>
+                    <button class="btn btn-sm btn-info text-white"><i class="fas fa-file-pdf me-1"></i>...</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 2: NOMINEE / LIFE-ASSURED DETAILS -->
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm border-1 bg-light">
+                <div class="card-header bg-white border-0 pt-3 pb-2 d-flex align-items-center">
+                    <i class="fas fa-user-plus me-2 text-success"></i>
+                    <span>&nbsp;&nbsp;</span>
+                    <h6 class="mb-0 fw-bold">
+                        @(Model?.SubmittedForm?.InsuranceType == InsuranceType.UNDERWRITING ? "Life-Assured Details" : "Nominee Details")
+                    </h6>
+                </div>
+                <div class="bg-success text-white px-2 py-1 small d-flex justify-content-between align-items-center">
+                    <i class="fas fa-bookmark"></i>
+                    <i class="fas fa-user"></i>
+                </div>
+
+                <div class="card-body bg-white">
+                    <div class="row">
+                        <!-- Left Column: Field Values + Map icon attached directly below Address -->
+                        <div class="col-7">
+                            <ul class="list-unstyled mb-0 small">
+                                @{
+                                    var nonFileNomineeValues = nomineeValues.Where(x => x.FormField?.FieldType != "file").ToList();
+                                }
+                                @if (nonFileNomineeValues.Any())
+                                {
+                                    @foreach (var item in nonFileNomineeValues)
+                                    {
+                                        var isAddressField = string.Equals(item.FormField?.FieldType, "address", StringComparison.OrdinalIgnoreCase) ||
+                                                             (item.FormField?.Label != null && item.FormField.Label.Contains("address", StringComparison.OrdinalIgnoreCase));
+
+                                        <li class="mb-2 text-break">
+                                            <strong class="text-secondary d-block mb-1">@item.FormField?.Label</strong>
+                                            <div class="d-block mb-1">
+                                                @RenderValue(item)
+                                            </div>
+
+                                            @if (isAddressField && !string.IsNullOrWhiteSpace(item.Value))
+                                            {
+                                                <!-- Clickable Map Icon under Nominee Address -->
+                                                <a href="https://www.google.com/maps/search/?api=1&query=@Uri.EscapeDataString(item.Value)"
+                                                   target="_blank"
+                                                   rel="noopener noreferrer"
+                                                   class="border rounded overflow-hidden text-center bg-light d-inline-block px-3 py-1 mt-1 text-decoration-none shadow-sm"
+                                                   title="Click to view location on Google Maps">
+                                                    <i class="fas fa-map-marked-alt text-primary me-1"></i>
+                                                    <span class="text-primary fw-bold extra-small">View Map</span>
+                                                </a>
+                                            }
+                                        </li>
+                                    }
+                                }
+                                else
+                                {
+                                    <li class="text-muted fst-italic">No nominee details configured.</li>
+                                }
+                            </ul>
+                        </div>
+
+                        <!-- Right Column: Clickable Photo -->
+                        <div class="col-5">
+                            @{
+                                var photoField = nomineeValues.FirstOrDefault(x => x.FormField?.FieldType == "file")?.Value;
+                            }
+
+                            <div class="border rounded mb-2 overflow-hidden text-center bg-light d-flex align-items-center justify-content-center" style="height: 110px;">
+                                @if (!string.IsNullOrEmpty(photoField) && (photoField.StartsWith("http") || photoField.StartsWith("/")))
+                                {
+                                    <a href="@photoField" target="_blank" rel="noopener noreferrer" title="Click to view full photo">
+                                        <img src="@photoField" class="img-fluid h-100 w-100" style="object-fit: cover;" alt="Nominee Photo" />
+                                    </a>
+                                }
+                                else
+                                {
+                                    <i class="fas fa-user-circle fa-3x text-secondary"></i>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-footer bg-light border-0 d-flex justify-content-end gap-2 py-2">
+                    <button class="btn btn-sm btn-success"><i class="fas fa-comment me-1"></i> 0</button>
+                    <button class="btn btn-sm btn-warning text-white"><i class="fas fa-user-plus me-1"></i> ...</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 3: CLAIM DETAILS -->
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm border-1 bg-light">
+                <div class="card-header bg-white border-0 pt-3 pb-2 d-flex align-items-center">
+                    <i class="fas fa-clipboard-list me-4 text-warning"></i>
+                    <span>&nbsp;&nbsp;</span>
+                    <h6 class="mb-0 fw-bold"> Claim Details</h6>
+                </div>
+                <div class="bg-success text-white px-2 py-1 small d-flex justify-content-between align-items-center">
+                    <i class="fas fa-bookmark"></i>
+                    <i class="fas fa-file-invoice"></i>
+                </div>
+
+                <div class="card-body bg-white">
+                    <div class="row">
+                        <!-- Left Column: Non-file values -->
+                        <div class="col-7">
+                            <ul class="list-unstyled mb-0 small">
+                                @{
+                                    var nonFileClaimValues = claimValues.Where(x => x.FormField?.FieldType != "file").ToList();
+                                }
+                                @if (nonFileClaimValues.Any())
+                                {
+                                    @foreach (var item in nonFileClaimValues)
+                                    {
+                                        <li class="mb-2 text-break">
+                                            <strong class="text-secondary d-block mb-1">@item.FormField?.Label</strong>
+                                            <div class="d-block mb-1">
+                                                @RenderValue(item)
+                                            </div>
+                                        </li>
+                                    }
+                                }
+                                else
+                                {
+                                    <li class="text-muted fst-italic">No claim details configured.</li>
+                                }
+                            </ul>
+                        </div>
+                        <!-- Right Column: Claim Document File -->
+                        <div class="col-5">
+                            @{
+                                var claimDoc = claimValues.FirstOrDefault(x => x.FormField?.FieldType == "file");
+                            }
+                            <div class="border rounded p-3 mb-2 bg-light text-center d-flex flex-column align-items-center justify-content-center" style="min-height: 110px;">
+                                <i class="fas fa-folder-open fa-3x text-secondary mb-2"></i>
+                                @if (claimDoc != null && !string.IsNullOrEmpty(claimDoc.Value))
+                                {
+                                    @RenderValue(claimDoc, "Claim Document")
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-footer bg-light border-0 d-flex justify-content-end gap-2 py-2">
+                    <button class="btn btn-sm btn-success"><i class="fas fa-comment me-1"></i> 0</button>
+                    <button class="btn btn-sm btn-success"><i class="fas fa-ellipsis-h"></i></button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+}

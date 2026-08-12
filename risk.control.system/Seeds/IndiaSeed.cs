@@ -61,8 +61,11 @@ namespace risk.control.system.Seeds
             }
 
             var agenciesToEmpanel = vendors.Take(vendors.Count / 2).ToList();
-            await Insurer.Seed(ctx, agenciesToEmpanel, env, apiClient, userManager, GetInsurer(), fileStorageService);
+            var insurer = await Insurer.Seed(ctx, agenciesToEmpanel, env, apiClient, userManager, GetInsurer(), fileStorageService);
             await ctx.SaveChangesAsync(null, false);
+
+            await ClaimFormSeed.Init(ctx, insurer.ClientCompanyId);
+
             return indiaPincodes.FirstOrDefault(p => p.Code == PINCODE)?.Code ?? indiaPincodes.First().Code;
         }
         private static SeedInput GetInsurer()

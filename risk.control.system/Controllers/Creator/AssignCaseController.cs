@@ -105,6 +105,41 @@ namespace risk.control.system.Controllers.Creator
             }
         }
 
+        [ValidateAntiForgeryToken]
+        [HttpPost]
+        public async Task<IActionResult> AllocateSingleClaim2Agency(long selectedcase, long caseId)
+        {
+            var userEmail = HttpContext.User?.Identity?.Name!;
+            try
+            {
+                if (!ModelState.IsValid || selectedcase < 1 || caseId < 1)
+                {
+                    _notifyService.Custom($"Error!!! Try again", 3, "red", "far fa-file-powerpoint");
+                    return RedirectToAction(nameof(AddAssignController.New), ControllerName<AddAssignController>.Name);
+                }
+
+                var (policy, status, agencyName) = await _assignCaseService.AllocateToAgency(userEmail, caseId, selectedcase, false);
+
+                if (string.IsNullOrEmpty(policy) || string.IsNullOrEmpty(status))
+                {
+                    _notifyService.Custom($"Error!!! Try again", 3, "red", "far fa-file-powerpoint");
+                    return RedirectToAction(nameof(AddAssignController.New), ControllerName<AddAssignController>.Name);
+                }
+
+                var jobId = _backgroundJobClient.Enqueue(() => _mailService.NotifyCaseAllocationToAgencyAndManager(userEmail, policy, caseId, selectedcase, _baseUrl));
+
+                _notifyService.Custom($"Case <b>#{policy}</b> <i>{status}</i> to {agencyName}", 3, "green", "far fa-file-powerpoint");
+
+                return RedirectToAction(nameof(ClaimController.Active), ControllerName<ClaimController>.Name);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error assigning case {Id} to {Agency}. {UserEmail}", caseId, selectedcase, userEmail);
+                _notifyService.Error("Error assigning case. Try again.");
+                return RedirectToAction(nameof(ClaimController.Add), ControllerName<ClaimController>.Name);
+            }
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AssignAutoSingle(long caseId)

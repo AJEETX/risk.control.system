@@ -16,6 +16,7 @@ namespace risk.control.system.Services.Api
         Task<object[]> GetAllEmpanelledAgenciesAsync(string userEmail);
 
         Task<object[]> GetEmpanelledAgency(string userEmail, long caseId);
+        Task<object[]> GetEmpanelledAgencyNew(string userEmail, long caseId);
 
         Task<object[]> GetAvailableAgencies(string userEmail);
 
@@ -98,6 +99,12 @@ namespace risk.control.system.Services.Api
         public async Task<object[]> GetEmpanelledAgency(string userEmail, long caseId)
         {
             var empanelledAgenciesForCase = await _empanelledAvailableAgencyService.GetEmpanelledAgency(userEmail, caseId);
+            return empanelledAgenciesForCase;
+        }
+
+        public async Task<object[]> GetEmpanelledAgencyNew(string userEmail, long caseId)
+        {
+            var empanelledAgenciesForCase = await _empanelledAvailableAgencyService.GetEmpanelledAgencyNew(userEmail, caseId);
             return empanelledAgenciesForCase;
         }
 

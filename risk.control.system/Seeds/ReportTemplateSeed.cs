@@ -6,12 +6,15 @@ namespace risk.control.system.Seeds
 {
     public static class ReportTemplateSeed
     {
-        public static ReportTemplate UNDERWRITING(ApplicationDbContext context, ClientCompany company)
+        public static void UNDERWRITING(ApplicationDbContext context, ClientCompany company)
         {
-            var template = CreateBaseTemplate(company, InsuranceType.UNDERWRITING);
-
-            template.LocationReport = new List<LocationReport>
+            var serviceTypes = context.InvestigationServiceType.Where(i => i.InsuranceType == InsuranceType.UNDERWRITING).ToList();
+            foreach (var serviceType in serviceTypes)
             {
+                var template = CreateBaseTemplate(company, InsuranceType.UNDERWRITING, serviceType);
+
+                template.LocationReport = new List<LocationReport>
+                 {
                 new()
                 {
                     LocationName = CONSTANTS.LOCATIONS.LA_ADDRESS,
@@ -31,16 +34,19 @@ namespace risk.control.system.Seeds
                 }
             };
 
-            context.ReportTemplates.Add(template);
-            return template;
+                context.ReportTemplates.Add(template);
+            }
         }
 
-        public static ReportTemplate CLAIM(ApplicationDbContext context, ClientCompany company)
+        public static void CLAIM(ApplicationDbContext context, ClientCompany company)
         {
-            var template = CreateBaseTemplate(company, InsuranceType.CLAIM);
-
-            template.LocationReport = new List<LocationReport>
+            var serviceTypes = context.InvestigationServiceType.Where(i => i.InsuranceType == InsuranceType.CLAIM).ToList();
+            foreach (var serviceType in serviceTypes)
             {
+                var template = CreateBaseTemplate(company, InsuranceType.CLAIM, serviceType);
+
+                template.LocationReport = new List<LocationReport>
+                 {
                 CreateLocation(CONSTANTS.LOCATIONS.BENEFICIARY_ADDRESS, true,
                     ClaimQuestion.QuestionsCLAIM_LA_ADDRESS(),
                     faceIds: new() {
@@ -74,16 +80,17 @@ namespace risk.control.system.Seeds
                     docType: DocumentIdReportType.POLICE_FIR_REPORT)
             };
 
-            context.ReportTemplates.Add(template);
-            return template;
+                context.ReportTemplates.Add(template);
+            }
         }
 
         #region Helpers
 
-        private static ReportTemplate CreateBaseTemplate(ClientCompany company, InsuranceType type) => new()
+        private static ReportTemplate CreateBaseTemplate(ClientCompany company, InsuranceType type, InvestigationServiceType serviceType) => new()
         {
             Name = type.GetEnumDisplayName().ToLower(),
             InsuranceType = type,
+            InvestigationServiceTypeId = serviceType.InvestigationServiceTypeId,
             ClientCompanyId = company.ClientCompanyId,
             IsActive = true,
             Basetemplate = true

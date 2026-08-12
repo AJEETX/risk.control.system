@@ -59,8 +59,10 @@ namespace risk.control.system.Seeds
 
             var agenciesToEmpanel = vendors.Take(vendors.Count / 2).ToList();
 
-            await Insurer.Seed(context, agenciesToEmpanel, env, customApiCLient, userManager, insurerInput, fileStorageService);
+            var insurer = await Insurer.Seed(context, agenciesToEmpanel, env, customApiCLient, userManager, insurerInput, fileStorageService);
             await context.SaveChangesAsync(null, false);
+            await ClaimFormSeed.Init(context, insurer.ClientCompanyId);
+
             return auPincodes.FirstOrDefault(p => p.Code == PINCODE)?.Code ?? auPincodes.First().Code;
         }
         private static SeedInput GetInsurer()

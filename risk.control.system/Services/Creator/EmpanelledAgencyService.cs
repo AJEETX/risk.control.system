@@ -8,11 +8,26 @@ namespace risk.control.system.Services.Creator
     public interface IEmpanelledAgencyService
     {
         Task<CaseTransactionModel> GetEmpanelledVendors(long selectedcase, string userEmail, long vendorId, bool fromEditPage = false);
+        Task<CaseModelEmpanelledAgency> GetEmpanelledAgencies(long caseId, string userEmail);
     }
 
     internal class EmpanelledAgencyService(ApplicationDbContext context) : IEmpanelledAgencyService
     {
         private readonly ApplicationDbContext _context = context;
+
+        public async Task<CaseModelEmpanelledAgency> GetEmpanelledAgencies(long caseId, string userEmail)
+        {
+            var currentUser = await _context.ApplicationUser.AsNoTracking().Include(c => c.ClientCompany).ThenInclude(c => c!.Country).FirstOrDefaultAsync(c => c.Email == userEmail);
+            var submittedForm = await _context.SubmittedForms.Include(f => f.Values).ThenInclude(f => f.FormField).FirstOrDefaultAsync(f => f.Id == caseId && f.CompanyId == currentUser!.ClientCompany!.ClientCompanyId);
+            var policyNumber = submittedForm!.Values.FirstOrDefault(v => v.FormField.Section == "Policy" && v.FormField.FieldType == "policyNumber")?.Value ?? "N/A";
+            var caseModel = new CaseModelEmpanelledAgency
+            {
+                SubmittedForm = submittedForm ?? new SubmittedForm(),
+                PolicyNumber = policyNumber
+            };
+
+            return caseModel;
+        }
 
         public async Task<CaseTransactionModel> GetEmpanelledVendors(long selectedcase, string userEmail, long vendorId, bool fromEditPage = false)
         {

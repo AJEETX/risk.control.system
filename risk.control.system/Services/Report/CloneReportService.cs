@@ -8,7 +8,7 @@ namespace risk.control.system.Services.Report
 {
     public interface ICloneReportService
     {
-        Task<ReportTemplate> DeepCloneReportTemplate(long clientCompanyId, InsuranceType insuranceType);
+        Task<ReportTemplate> DeepCloneReportTemplate(long clientCompanyId, InsuranceType insuranceType, long serviceTypeId);
 
         Task<ReportTemplate> CreateCloneReportTemplate(long templateId, string currentUserEmail);
 
@@ -48,10 +48,10 @@ namespace risk.control.system.Services.Report
             return addedTemplate.Entity;
         }
 
-        public async Task<ReportTemplate> DeepCloneReportTemplate(long clientCompanyId, InsuranceType insuranceType)
+        public async Task<ReportTemplate> DeepCloneReportTemplate(long clientCompanyId, InsuranceType insuranceType, long serviceTypeId)
         {
-            var originalTemplate = await GetReportDefaultTemplateDetails(clientCompanyId, insuranceType);
-            var clone = DeepCloneReportTemplate(originalTemplate!);
+            var originalTemplate = await GetReportDefaultTemplateDetails(clientCompanyId, insuranceType, serviceTypeId);
+            var clone = DeepCloneReportTemplate(originalTemplate!, serviceTypeId);
             return clone;
         }
 
@@ -103,13 +103,14 @@ namespace risk.control.system.Services.Report
             }).ToList();
             return locationTemplate;
         }
-        private ReportTemplate DeepCloneReportTemplate(ReportTemplate originalTemplate)
+        private ReportTemplate DeepCloneReportTemplate(ReportTemplate originalTemplate, long serviceTypeId)
         {
             return new ReportTemplate
             {
                 Name = originalTemplate!.Name,
                 ClientCompanyId = originalTemplate.ClientCompanyId,
                 InsuranceType = originalTemplate.InsuranceType,
+                InvestigationServiceTypeId = serviceTypeId,
                 Basetemplate = false, // Set to false for the cloned template
                 OriginalTemplateId = originalTemplate.Id, // Reference to the original template
                 Created = DateTime.UtcNow,
@@ -232,7 +233,7 @@ namespace risk.control.system.Services.Report
                     .ThenInclude(l => l.Questions)
                 .FirstOrDefaultAsync(r => r.Id == id);
         }
-        private async Task<ReportTemplate?> GetReportDefaultTemplateDetails(long? clientCompanyId, InsuranceType insuranceType)
+        private async Task<ReportTemplate?> GetReportDefaultTemplateDetails(long? clientCompanyId, InsuranceType insuranceType, long serviceTypeId)
         {
             return await _context.ReportTemplates
                 .Include(r => r.LocationReport)
@@ -245,7 +246,7 @@ namespace risk.control.system.Services.Report
                     .ThenInclude(l => l.DocumentIds)
                 .Include(r => r.LocationReport)
                     .ThenInclude(l => l.Questions)
-                .FirstOrDefaultAsync(r => r.ClientCompanyId == clientCompanyId && r.InsuranceType == insuranceType && r.IsActive);
+                .FirstOrDefaultAsync(r => r.ClientCompanyId == clientCompanyId && r.InsuranceType == insuranceType && r.InvestigationServiceTypeId == serviceTypeId && r.IsActive);
         }
     }
 }

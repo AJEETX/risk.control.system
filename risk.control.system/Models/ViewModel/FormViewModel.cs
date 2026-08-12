@@ -3,7 +3,7 @@
     public class DynamicFormDesignerViewModel
     {
         public long? SelectedCompanyId { get; set; }
-        public FormType TargetFormType { get; set; } = FormType.Claim;
+        public InsuranceType? TargetFormType { get; set; }
         public List<FormField> Fields { get; set; } = new List<FormField>();
         public List<CompanySelectItem> Companies { get; set; } = new List<CompanySelectItem>();
     }
@@ -15,14 +15,15 @@
     }
     public class FillFormViewModel
     {
-        public FormType FormType { get; set; }
+        public InsuranceType FormType { get; set; }
         public List<FormField> Fields { get; set; } = new List<FormField>();
         public List<CompanySelectItem> Companies { get; set; } = new List<CompanySelectItem>();
+        public long? SelectedCompanyId { get; set; }
     }
     public class EditSubmissionViewModel
     {
         public int SubmissionId { get; set; }
-        public FormType FormType { get; set; }
+        public InsuranceType FormType { get; set; }
         public List<EditFieldViewModel> Fields { get; set; } = new List<EditFieldViewModel>();
     }
 

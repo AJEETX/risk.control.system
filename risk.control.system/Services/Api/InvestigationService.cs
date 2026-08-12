@@ -16,6 +16,7 @@ namespace risk.control.system.Services.Api
         Task<object> GetAuto(string currentUserEmail, int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc");
 
         Task<object> GetActive(string currentUserEmail, int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc");
+        Task<object> GetActiveClaims(DataTablesRequest request, string currentUserEmail);
 
         Task<FilesDataResponse> GetFilesData(string userEmail, bool isManager, int draw, int start, int length, int orderColumn, string orderDir, int uploadId = 0, string? searchTerm = null);
 
@@ -390,6 +391,105 @@ namespace risk.control.system.Services.Api
                 recordsTotal = totalRecords,
                 recordsFiltered,
                 data
+            };
+        }
+
+        public async Task<object> GetActiveClaims(DataTablesRequest request, string currentUserEmail)
+        {
+            var companyUser = await _context.ApplicationUser.AsNoTracking()
+                .FirstOrDefaultAsync(c => c.Email == currentUserEmail);
+
+            var query = _context.SubmittedForms
+                .AsNoTracking()
+                .Where(a => !a.Deleted
+                         //&& a.CreatedUser == currentUserEmail
+                         && !CONSTANTS.ActiveSubStatuses.Contains(a.Status)
+                         && a.InsuranceType == InsuranceType.CLAIM);
+
+            var formFields = await _context.FormFields
+                .Where(f => f.InsuranceType == InsuranceType.CLAIM && f.CompanyId == companyUser!.ClientCompanyId)
+                .OrderBy(f => f.Id)
+                .Select(f => new { f.Id, f.Label, f.FieldType, f.Section })
+                .ToListAsync();
+
+            int totalRecords = await query.CountAsync();
+
+            // Search
+            if (!string.IsNullOrWhiteSpace(request.Search))
+            {
+                var searchTerm = request.Search.ToLower();
+                query = query.Where(a => a.Values.Any(v => v.Value != null && v.Value.ToLower().Contains(searchTerm)));
+            }
+
+            int recordsFiltered = await query.CountAsync();
+
+            // Sorting Alignment (No Checkbox Column):
+            // Columns 0 to N-1: Dynamic FormFields (Mapped to formFields[orderColumn])
+            // Column N: SubmittedAt Date
+            bool isAsc = string.Equals(request.OrderDir, "asc", StringComparison.OrdinalIgnoreCase);
+            int dynamicFieldCount = formFields.Count;
+
+            if (request.OrderColumn >= 0 && request.OrderColumn < dynamicFieldCount)
+            {
+                int targetFieldId = formFields[request.OrderColumn].Id;
+                query = isAsc
+                    ? query.OrderBy(sf => sf.Values.Where(v => v.FormFieldId == targetFieldId).Select(v => v.Value).FirstOrDefault())
+                    : query.OrderByDescending(sf => sf.Values.Where(v => v.FormFieldId == targetFieldId).Select(v => v.Value).FirstOrDefault());
+            }
+            else
+            {
+                // Default / Explicit SubmittedAt sort
+                query = isAsc ? query.OrderBy(sf => sf.SubmittedAt) : query.OrderByDescending(sf => sf.SubmittedAt);
+            }
+
+            // Step 1: Fetch raw records from DB without calling .ToString() inside SQL
+            var rawClaims = await query
+                .Skip(request.Start)
+                .Take(request.Length)
+                .Select(sf => new
+                {
+                    sf.Id,
+                    sf.SubmittedAt,
+                    sf.Status,
+                    vendorEmail = sf.Vendor!.Email, // added to display vendor email in the response
+                    Values = sf.Values.Select(v => new
+                    {
+                        v.FormFieldId,
+                        v.Value,
+                        Label = v.FormField.Label,
+                        FieldType = v.FormField.FieldType,
+                        Section = v.FormField.Section
+                    }).ToList()
+                })
+                .ToListAsync(); // 👈 SQL Query stops evaluation here safely
+
+            // Step 2: Transform dictionary and date formatting safely in-memory
+            var data = rawClaims.Select(sf => new
+            {
+                id = sf.Id,
+                status = sf.Status,
+                vendorEmail = sf.vendorEmail, // added to display vendor email in the response
+                submittedAt = sf.SubmittedAt.ToString("o"),
+                values = sf.Values.ToDictionary(
+                    v => v.FormFieldId.ToString(), // 👈 Resolved: Runs in C# memory
+                    v => new
+                    {
+                        formFieldId = v.FormFieldId,
+                        label = v.Label,
+                        value = v.Value,
+                        type = v.FieldType,
+                        section = v.Section
+                    }
+                )
+            }).ToList();
+
+            return new
+            {
+                draw = request.Draw,
+                recordsTotal = totalRecords,
+                recordsFiltered = recordsFiltered,
+                data = data,
+                formFields = formFields
             };
         }
 

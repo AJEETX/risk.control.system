@@ -10,6 +10,7 @@ namespace risk.control.system.Services.Api
         Task<object[]> GetAllEmpanelledAgenciesAsync(string userEmail);
 
         Task<object[]> GetEmpanelledAgency(string userEmail, long caseId);
+        Task<object[]> GetEmpanelledAgencyNew(string userEmail, long caseId);
 
         Task<object[]> GetAvailableAgencies(string userEmail);
     }
@@ -138,6 +139,57 @@ namespace risk.control.system.Services.Api
             return awaitedResults;
         }
 
+        public async Task<object[]> GetEmpanelledAgencyNew(string userEmail, long caseId)
+        {
+            await using var _context = await _contextFactory.CreateDbContextAsync();
+            var claimsCases = await _context.SubmittedForms.AsNoTracking().Where(c => c.AssignedToAgency && !c.Deleted && c.VendorId.HasValue && GetValidStatuses().Contains(c.Status)).ToListAsync();
+            var companyUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == userEmail);
+            var company = await _context.ClientCompany.AsNoTracking().Include(c => c.EmpanelledVendors).ThenInclude(v => v.State)
+                .Include(c => c.EmpanelledVendors).ThenInclude(v => v.District).Include(c => c.EmpanelledVendors).ThenInclude(v => v.Country)
+                .Include(c => c.EmpanelledVendors).ThenInclude(v => v.PinCode).Include(c => c.EmpanelledVendors).ThenInclude(v => v.Ratings)
+                .FirstOrDefaultAsync(c => c.ClientCompanyId == companyUser!.ClientCompanyId);
+            if (company == null)
+            {
+                return null!;
+            }
+            var result = company.EmpanelledVendors?.Where(v => !v.Deleted && v.Status == VendorStatus.ACTIVE)
+                .OrderByDescending(u => u.Updated)
+                .ThenBy(u => u.Name)
+                .Select(async u =>
+                {
+                    var hasService = GetPinCodeAndAgencyServiceForTheCase(caseId, u.VendorId);
+                    var document = _base64FileService.GetBase64FileAsync(u.DocumentUrl!, Applicationsettings.NO_IMAGE);
+                    await Task.WhenAll(document, hasService);
+                    return new
+                    {
+                        Id = u.VendorId,
+                        Document = await document,
+                        Domain = u.Email,
+                        Name = u.Name,
+                        Address = $"{u.Addressline}",
+                        District = u.District!.Name,
+                        State = u.State!.Code,
+                        Country = u.Country!.Name,
+                        CountryCode = u.Country.Code,
+                        PinCode = $"{u.PinCode!.Name} - {u.PinCode.Code}",
+                        Flag = $"/flags/{u.Country.Code.ToLower()}.png",
+                        Updated = u.Updated.HasValue ? u.Updated.Value : u.Created,
+                        UpdateBy = u.UpdatedBy,
+                        CaseCount = claimsCases.Count(c => c.VendorId == u.VendorId),
+                        RateCount = u.RateCount,
+                        RateTotal = u.RateTotal,
+                        RawAddress = $"{u.Addressline}, {u.District.Name}, {u.State.Code}, {u.Country.Code}",
+                        IsUpdated = u.IsUpdated,
+                        LastModified = u.Updated,
+                        HasService = await hasService
+                    };
+                });
+            var awaitedResults = await Task.WhenAll(result!);
+            company.EmpanelledVendors?.ToList().ForEach(u => u.IsUpdated = false);
+            await _context.SaveChangesAsync(null, false);
+            return awaitedResults;
+        }
+
         private static string[] GetValidStatuses() => new[]
             {
             CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR,
@@ -146,6 +198,37 @@ namespace risk.control.system.Services.Api
             CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR
             };
 
+        private async Task<bool> GetPinCodeAndAgencyServiceForTheCase(long caseId, long vendorId)
+        {
+            await using var _context = await _contextFactory.CreateDbContextAsync();
+            var selectedCase = await _context.SubmittedForms.AsNoTracking()
+                .FirstOrDefaultAsync(c => c.Id == caseId);
+
+            //long? countryId;
+            //long? stateId;
+            //long? districtId;
+
+            //countryId = selectedCase.BeneficiaryDetail!.CountryId;
+            //stateId = selectedCase.BeneficiaryDetail.StateId;
+            //districtId = selectedCase.BeneficiaryDetail.DistrictId;
+
+            //var vendor = await _context.Vendor.AsNoTracking()
+            //    .Include(v => v.VendorInvestigationServiceTypes)
+            //    .FirstOrDefaultAsync(v => v.VendorId == vendorId);
+
+            //var hasService = vendor!.VendorInvestigationServiceTypes!
+            //    .Any(v => v.InsuranceType == selectedCase!.InsuranceType &&
+            //                (
+            //                v.DistrictId == 0 ||
+            //                v.DistrictId == null ||
+            //                v.DistrictId == districtId
+            //                ) &&
+            //                v.StateId == stateId &&
+            //                v.CountryId == countryId
+            //                );
+            //return hasService;
+            return true;
+        }
         private async Task<bool> GetPinCodeAndServiceForTheCase(long caseId, long vendorId)
         {
             await using var _context = await _contextFactory.CreateDbContextAsync();

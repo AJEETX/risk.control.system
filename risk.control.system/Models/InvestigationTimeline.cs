@@ -19,4 +19,19 @@ namespace risk.control.system.Models
 
         public TimeSpan? Duration { get; set; } // Time spent in the previous status
     }
+    public class CaseTimeline : BaseEntity
+    {
+        [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int Id { get; set; }
+
+        public long InvestigationTaskId { get; set; }
+
+        public string Status { get; set; } = default!;
+
+        public string AssigedTo { get; set; } = default!;// UserName or Id
+
+        public DateTime StatusChangedAt { get; set; }
+
+        public TimeSpan? Duration { get; set; } // Time spent in the previous status
+    }
 }

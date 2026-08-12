@@ -13,6 +13,8 @@ namespace risk.control.system.Services.Common
 
         Task NotifyCaseAllocationToVendorAndManager(string userEmail, string policy, long caseId, long vendorId, string url = "");
 
+        Task NotifyCaseAllocationToAgencyAndManager(string userEmail, string policy, long caseId, long vendorId, string url = "");
+
         Task NotifyCaseAllocationToVendor(string userEmail, string policy, long caseId, long vendorId, string url = "");
 
         Task NotifyCaseAssignmentToAssigner(string senderUserEmail, List<long> autoAllocatedCases, List<long> notAutoAllocatedCases, string url = "");
@@ -20,6 +22,7 @@ namespace risk.control.system.Services.Common
         Task NotifyCaseAssignmentToAssigner(string senderUserEmail, List<long> caseIds, string url = "");
 
         Task NotifyCaseWithdrawlByCompany(string senderUserEmail, string policyNumber, long caseId, long vendorId, string url = "");
+        Task NotifyCaseWithdrawlByCompanyNew(string senderUserEmail, string policyNumber, long caseId, long vendorId, string url = "");
 
         Task NotifyCaseDeclineByAgency(string senderUserEmail, string policyNumber, long caseId, long vendorId, string url = "");
 
@@ -88,6 +91,29 @@ namespace risk.control.system.Services.Common
                 var vendorRecipients = await GetUsersByRoleAsync(companyId: null, vendorId, new[] { agencyAdminRole!.Id, supervisorRole!.Id });
                 await SendNotificationInternal(caseId, userEmail, supervisorRole.Id, null, vendorId, null!, caseTask.SubStatus, $"Case #{caseTask.PolicyDetail?.ContractNumber}", url, vendorRecipients);
                 await SendNotificationInternal(caseId, userEmail, managerRole!.Id, applicationUser.ClientCompanyId, null, BlueSymbol, caseTask.SubStatus, $"Case #{caseTask.PolicyDetail?.ContractNumber}", url, null!);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Allocation Notification Error for Case: {CaseId}", caseId);
+            }
+        }
+
+        public async Task NotifyCaseAllocationToAgencyAndManager(string userEmail, string policy, long caseId, long agencyId, string url = "")
+        {
+            try
+            {
+                await using var _context = await _contextFactory.CreateDbContextAsync();
+                var caseTask = await _context.SubmittedForms.AsNoTracking().Include(i => i.Values).ThenInclude(f => f.FormField).FirstOrDefaultAsync(v => v.Id == caseId);
+                userEmail = userEmail.Replace("\n", "").Replace("\r", "").Trim();
+                var applicationUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == userEmail);
+                if (applicationUser == null || caseTask == null) return;
+                var managerRole = await _roleManager.FindByNameAsync(MANAGER.DISPLAY_NAME);
+                var supervisorRole = await _roleManager.FindByNameAsync(SUPERVISOR.DISPLAY_NAME);
+                var agencyAdminRole = await _roleManager.FindByNameAsync(AGENCY_ADMIN.DISPLAY_NAME);
+                var vendorRecipients = await GetUsersByRoleAsync(companyId: null, agencyId, new[] { agencyAdminRole!.Id, supervisorRole!.Id });
+                var policyNumber = caseTask.Values.FirstOrDefault(v => v.FormField.Label == "policyNumber")?.Value ?? "Unknown Policy";
+                await SendNotificationInternal(caseId, userEmail, supervisorRole.Id, null, agencyId, null!, caseTask.Status, $"Case #{policyNumber}", url, vendorRecipients);
+                await SendNotificationInternal(caseId, userEmail, managerRole!.Id, applicationUser.ClientCompanyId, null, BlueSymbol, caseTask.Status, $"Case #{policyNumber}", url, null!);
             }
             catch (Exception ex)
             {
@@ -176,7 +202,25 @@ namespace risk.control.system.Services.Common
                 _logger.LogError(ex, "Withdrawal Notification Error for Case {CaseId}", caseId);
             }
         }
-
+        public async Task NotifyCaseWithdrawlByCompanyNew(string senderUserEmail, string policyNumber, long caseId, long vendorId, string url = "")
+        {
+            try
+            {
+                await using var _context = await _contextFactory.CreateDbContextAsync();
+                var caseTask = await _context.SubmittedForms.AsNoTracking().FirstOrDefaultAsync(v => v.Id == caseId);
+                var creatorRole = await _roleManager.FindByNameAsync(CREATOR.DISPLAY_NAME);
+                var agencyAdminRole = await _roleManager.FindByNameAsync(AGENCY_ADMIN.DISPLAY_NAME);
+                var recipients = await _context.ApplicationUser.AsNoTracking().Include(u => u.Country).Where(u => u.ClientCompanyId == caseTask!.CompanyId).Where(u => _context.UserRoles.Any(ur => ur.UserId == u.Id && ur.RoleId == creatorRole!.Id)).ToListAsync();
+                senderUserEmail = senderUserEmail.Replace("\n", "").Replace("\r", "").Trim();
+                var agencyAdmin = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(v => v.VendorId == vendorId && v.IsVendorAdmin);
+                await SendNotificationInternal(caseId, senderUserEmail, creatorRole!.Id, caseTask!.CompanyId, null, WarningSymbol, caseTask.Status, $"Case #{policyNumber}", url, recipients);
+                await SendNotificationInternal(caseId, agencyAdmin!.Email!, agencyAdminRole!.Id, null, vendorId, WarningSymbol, caseTask.Status, $"Case #{policyNumber}", url);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Withdrawal Notification Error for Case {CaseId}", caseId);
+            }
+        }
         public async Task NotifyCaseDeclineByAgency(string senderUserEmail, string policyNumber, long caseId, long vendorId, string url = "")
         {
             try

@@ -18,4 +18,10 @@ namespace risk.control.system.Models.ViewModel
         public CultureInfo? Culture { get; set; }
         public long vendorId { get; set; } = 0;
     }
+    public class CaseModelEmpanelledAgency
+    {
+        public SubmittedForm SubmittedForm { get; set; } = default!;
+        public string PolicyNumber { get; set; } = default!;
+
+    }
 }

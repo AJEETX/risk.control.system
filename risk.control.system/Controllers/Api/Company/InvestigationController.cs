@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using risk.control.system.AppConstant;
+using risk.control.system.Models.ViewModel;
 using risk.control.system.Services.Api;
 using ControllerBase = Microsoft.AspNetCore.Mvc.ControllerBase;
 
@@ -50,6 +51,22 @@ namespace risk.control.system.Controllers.Api.Company
             {
                 var response = await service.GetActive(userEmail, draw, start, length, search, caseType, orderColumn, orderDir);
 
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error getting active cases for user {UserEmail}", userEmail);
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+        [Authorize(Roles = $"{CREATOR.DISPLAY_NAME}")]
+        [HttpPost("GetActiveClaims")]
+        public async Task<IActionResult> GetActiveClaims([FromBody] DataTablesRequest request)
+        {
+            var userEmail = HttpContext.User.Identity?.Name!;
+            try
+            {
+                var response = await service.GetActiveClaims(request, userEmail);
                 return Ok(response);
             }
             catch (Exception ex)

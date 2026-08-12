@@ -4555,21 +4555,6 @@ img.mobile-capture-map {
     max-height: 100px;
     width: auto;
 }
-/* Force the table to respect container constraints */
-#submissionsTable {
-    table-layout: fixed;
-    width: 100% !important;
-    word-wrap: break-word;
-}
-
-    /* Ensure data cells wrap naturally and handle long text strings elegantly */
-    #submissionsTable td,
-    #submissionsTable th {
-        white-space: normal !important;
-        overflow-wrap: break-word;
-        word-break: break-word;
-        vertical-align: middle;
-    }
 
 /* Limit uploaded image sizes to prevent rows from blowing out vertically/horizontally */
 .submissions-thumbnail {
@@ -4614,3 +4599,82 @@ tr.parent-expanded td.dt-control::before {
         display: block !important;
         opacity: 1 !important;
     }
+/* Force pointer cursor on the cell and icon */
+td.expand-btn-cell,
+td.expand-btn-cell * {
+    cursor: pointer !important;
+}
+#submissionsTable_wrapper td.expand-btn-cell {
+    width: 10px !important;
+}
+/* Custom UI Polish for Dynamic Forms */
+
+/* Base Tab Link Styles */
+.form-tab-bar .nav-link.policy,
+.form-tab-bar .nav-link.nominee,
+.form-tab-bar .nav-link.claim-detail {
+    color: #6c757d;
+    background-color: #f8f9fa;
+    border-radius: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    transition: all 0.2s ease-in-out;
+}
+
+    .form-tab-bar .nav-link.policy:hover,
+    .form-tab-bar .nav-link.nominee:hover,
+    .form-tab-bar .nav-link.claim-detail:hover {
+        background-color: #f1f3f5;
+        color: #212529;
+    }
+
+    /* Policy Tab (Info / Cyan) */
+    .form-tab-bar .nav-link.policy.active {
+        background-color: #0dcaf0;
+        color: #000000 !important; /* Dark text for contrast on info background */
+        box-shadow: 0 4px 12px rgba(13, 202, 240, 0.3);
+    }
+
+    /* Nominee Tab (Warning / Yellow) */
+    .form-tab-bar .nav-link.nominee.active {
+        background-color: #ffc107;
+        color: #000000 !important; /* Dark text for contrast on warning background */
+        box-shadow: 0 4px 12px rgba(255, 193, 7, 0.35);
+    }
+
+    /* Claim Detail Tab (Success / Green) */
+    .form-tab-bar .nav-link.claim-detail.active {
+        background-color: #198754;
+        color: #ffffff !important;
+        box-shadow: 0 4px 12px rgba(25, 135, 84, 0.3);
+    }
+
+.field-card {
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+    .field-card:focus-within {
+        border-color: #86b7fe;
+    }
+/* Custom utility classes for claim child cards */
+.doc-preview-box {
+    min-width: 110px;
+}
+
+.nominee-photo {
+    width: 130px;
+    height: 150px;
+    object-fit: cover;
+}
+
+.nominee-photo-placeholder {
+    width: 130px;
+    height: 150px;
+}
+
+.card-ribbon-bar {
+    font-size: 0.85rem;
+}
+
+.btn-xs-map {
+    font-size: 0.75rem;
+}

@@ -57,45 +57,78 @@
 	@if (System.Diagnostics.Debugger.IsAttached)
 	{
 		<li class="nav-item">
-			<a is-active-page
-			   class="navlink-border nav-link
-				@Url.MakeActiveClass("Form", "")">
-				<i class="nav-icon fas fa-cog"></i>
+			<a is-active-page class="navlink-border nav-link  
+				@Url.MakeActiveClass("Claim", "")">
+				<i class="nav-icon far fa-money-bill-alt"></i>
 				<p class="sidebar-menu-header-label">
-					@Applicationsettings.COMPANY_SETTING
+					CLAIMS
 					<div class="right"><i class="fas fa-angle-down"></i></div>
 				</p>
 			</a>
 		</li>
 		<li class="nav-item">
-			<a is-active-page asp-controller="Form" asp-action="FillClaimForm" class="actual-link nav-link @Url.MakeActiveClass("Form", "FillClaimForm")">
+			<a is-active-page asp-controller="Claim" asp-action="Add" class="actual-link nav-link @Url.MakeActiveClass("Claim", "Add")">
 				<i class="fas fa-clipboard nav-icon"></i>
 				<p>
-					Submit Claim
+					Add Claim
 				</p>
 			</a>
 		</li>
 		<li class="nav-item">
-			<a is-active-page asp-controller="Form" asp-action="ViewClaimSubmissions" class="actual-link nav-link @Url.MakeActiveClass("Form", "ViewClaimSubmissions") @Url.MakeActiveClass("Form", "EditClaimForm")">
-				<i class="fa fa-server nav-icon"></i>
+			<a is-active-page asp-controller="Claim" asp-action="Assign" class="actual-link nav-link
+				@Url.MakeActiveClass("Claim", "Assign")
+				@Url.MakeActiveClass("Claim", "EmpanelledAgencies")
+				@Url.MakeActiveClass("Claim", "AgencyProfile")
+				@Url.MakeActiveClass("Claim", "Edit")">
+				<i class="fas fa-random nav-icon"></i>
 				<p>
-					Claims
+					Assign
 				</p>
 			</a>
 		</li>
 		<li class="nav-item">
-			<a is-active-page asp-controller="Form" asp-action="FillUnderwritingForm" class="actual-link nav-link @Url.MakeActiveClass("Form", "FillUnderwritingForm")">
+			<a is-active-page asp-controller="Claim" asp-action="Active" class="actual-link nav-link
+				@Url.MakeActiveClass("Claim", "Active")">
+				<i class="fa fa-toggle-on nav-icon"></i>
+				<p>
+					Active
+				</p>
+			</a>
+		</li>
+		<li class="nav-item">
+			<a is-active-page class="navlink-border nav-link  
+				@Url.MakeActiveClass("Underwriting", "")">
+				<i class="nav-icon far fa-money-bill-alt"></i>
+				<p class="sidebar-menu-header-label">
+					UNDERWRITINGS
+					<div class="right"><i class="fas fa-angle-down"></i></div>
+				</p>
+			</a>
+		</li>
+		<li class="nav-item">
+			<a is-active-page asp-controller="Underwriting" asp-action="Add" class="actual-link nav-link @Url.MakeActiveClass("Underwriting", "Add")">
 				<i class="fas fa-clipboard nav-icon"></i>
 				<p>
-					Submit Underwriting
+					Add Underwriting
 				</p>
 			</a>
 		</li>
 		<li class="nav-item">
-			<a is-active-page asp-controller="Form" asp-action="ViewUnderwritingSubmissions" class="actual-link nav-link @Url.MakeActiveClass("Form", "ViewUnderwritingSubmissions") @Url.MakeActiveClass("Form", "EditUnderwritingForm")">
-				<i class="fa fa-navicon nav-icon"></i>
+			<a is-active-page asp-controller="Underwriting" asp-action="Assign" class="actual-link nav-link
+				@Url.MakeActiveClass("Underwriting", "Assign")
+					@Url.MakeActiveClass("Underwriting", "Edit")">
+				<i class="fas fa-random nav-icon"></i>
 				<p>
-					Underwritings
+					Assign
+				</p>
+			</a>
+		</li>
+		<li class="nav-item">
+			<a is-active-page asp-controller="Underwriting" asp-action="Active" class="actual-link nav-link
+				@Url.MakeActiveClass("Underwriting", "Active")">
+				<i class="fa fa-toggle-on nav-icon"></i>
+				<p>
+					Active
 				</p>
 			</a>
 		</li>
