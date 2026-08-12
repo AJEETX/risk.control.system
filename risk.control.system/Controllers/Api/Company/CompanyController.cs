@@ -82,6 +82,27 @@ namespace risk.control.system.Controllers.Api.Company
             }
         }
 
+        [HttpGet("GetEmpanelledAgencyNew/{id}")]
+        public async Task<IActionResult> GetEmpanelledAgencyNew(long id)
+        {
+            if (id <= 0)
+            {
+                return BadRequest("Invalid case ID.");
+            }
+            var userEmail = HttpContext.User?.Identity?.Name!;
+
+            try
+            {
+                var result = await agencyService.GetEmpanelledAgencyNew(userEmail, id);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error getting empanedlled agencies for user {UserEmail}", userEmail ?? "Anonymous");
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
         [HttpGet("AvailableAgency")]
         public async Task<IActionResult> AvailableAgency()
         {

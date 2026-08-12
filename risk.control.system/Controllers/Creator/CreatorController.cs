@@ -93,6 +93,7 @@ namespace risk.control.system.Controllers.Creator
             }
         }
 
+        [HttpGet]
         [Breadcrumb("Details", FromAction = "New", FromController = typeof(AddAssignController))]
         public async Task<IActionResult> Details(long id)
         {

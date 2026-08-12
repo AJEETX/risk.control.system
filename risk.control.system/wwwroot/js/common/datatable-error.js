@@ -29,6 +29,18 @@
             },
             onClose: () => window.location.href = '/Dashboard/Index'
         });
+    }
+    else if (xhr.status === 404) {
+        $.confirm({
+            title: 'Resource Not Found!',
+            content: 'Resource Not Found. You will be redirected to the Dashboard page.',
+            type: 'orange',
+            typeAnimated: true,
+            buttons: {
+                Ok: () => window.location.href = '/Dashboard/Index'
+            },
+            onClose: () => window.location.href = '/Dashboard/Index'
+        });
     } else {
         $.confirm({
             title: 'Server Error!',

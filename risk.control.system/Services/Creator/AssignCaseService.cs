@@ -18,6 +18,7 @@ namespace risk.control.system.Services
         Task<string> ProcessAutoSingleAllocation(long caseId, string userEmail, string url = "");
 
         Task<(string, string, string)> AllocateToVendor(string userEmail, long caseId, long vendorId, bool autoAllocated = true);
+        Task<(string, string, string)> AllocateToAgency(string userEmail, long caseId, long agencyId, bool autoAllocated = true);
     }
 
     internal class AssignCaseService(IDbContextFactory<ApplicationDbContext> contextFactory,
@@ -257,6 +258,48 @@ namespace risk.control.system.Services
                 await context.SaveChangesAsync(null, false);
                 await _timelineService.UpdateTaskStatus(caseTask.Id, currentUser.Email!);
                 return (caseTask.PolicyDetail!.ContractNumber, caseTask.SubStatus, vendor.Name);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred Case {CasId}. {UserEmail}", caseId, userEmail);
+                throw;
+            }
+        }
+        public async Task<(string, string, string)> AllocateToAgency(string userEmail, long caseId, long agencyId, bool autoAllocated = true)
+        {
+            try
+            {
+                await using var context = await _contextFactory.CreateDbContextAsync();
+                var currentUser = await context.ApplicationUser.AsNoTracking().Include(c => c.ClientCompany).FirstOrDefaultAsync(u => u.Email == userEmail);
+                var caseTask = await context.SubmittedForms.Include(c => c.Values).ThenInclude(f => f.FormField).FirstOrDefaultAsync(v => v.Id == caseId);
+                var vendor = await context.Vendor.FindAsync(agencyId);
+                caseTask!.IsAutoAllocated = autoAllocated;
+                caseTask.IsNew = true;
+                caseTask.IsNewAssignedToAgency = true;
+                caseTask.AssignedToAgency = true;
+                caseTask.Updated = DateTime.UtcNow;
+                caseTask.AllocatedToAgencyTime = DateTime.UtcNow;
+                caseTask.UpdatedBy = currentUser!.Email;
+                caseTask.Status = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR;
+                caseTask.VendorId = agencyId;
+                caseTask.CaseOwner = vendor!.Email;
+                caseTask.CreatedUser = currentUser.Email;
+                caseTask.CreatorSla = currentUser.ClientCompany!.CreatorSla;
+                caseTask.AssessorSla = currentUser.ClientCompany!.AssessorSla;
+                caseTask.SupervisorSla = currentUser.ClientCompany!.SupervisorSla;
+                caseTask.AgentSla = currentUser.ClientCompany!.AgentSla;
+                caseTask.UpdateAgentAnswer = currentUser.ClientCompany!.UpdateAgentAnswer;
+                var investigationReport = new InvestigationReport
+                {
+                    ReportTemplateId = caseTask.ReportTemplateId,
+                };
+                context.InvestigationReport.Add(investigationReport);
+                caseTask.InvestigationReport = investigationReport;
+                context.SubmittedForms.Update(caseTask);
+                await context.SaveChangesAsync(null, false);
+                await _timelineService.UpdateCaseStatus(caseTask.Id, currentUser.Email!);
+                var policyNumber = caseTask.Values!.FirstOrDefault(f => f.FormField.FieldType == "policyNumber")?.Value ?? "Unknown Policy Number";
+                return (policyNumber, caseTask!.Status, vendor!.Name);
             }
             catch (Exception ex)
             {

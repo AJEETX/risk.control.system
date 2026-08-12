@@ -15,17 +15,17 @@ namespace risk.control.system.Seeds
     {
         public static async Task MigrateExistingUsersToCollectionAsync(IAmazonApiService _amazonApiService, ApplicationDbContext _context, IBase64FileService base64FileService, IFeatureManager featureManager)
         {
-            //Delete the existing face image collection if it exists
-            var imageCollection = EnvHelper.Get(CONSTANTS.FaceImageCollection);
-            var deletedResponse = await _amazonApiService.DeleteCollectionAsync(imageCollection!);
-
-            //Delete the existing bucket if it exists
-            var s3BucketName = EnvHelper.Get(CONSTANTS.S3_BUCKET)!;
-            await _amazonApiService.DeleteBucketAsync(s3BucketName);
-
             var uploadImage2Aws = await featureManager.IsEnabledAsync(FeatureFlags.FACE_MATCH_CHECK);
             if (uploadImage2Aws)
             {
+                var imageCollection = EnvHelper.Get(CONSTANTS.FaceImageCollection);
+                var deletedResponse = await _amazonApiService.DeleteCollectionAsync(imageCollection!);
+
+                //Delete the existing bucket if it exists
+                var s3BucketName = EnvHelper.Get(CONSTANTS.S3_BUCKET)!;
+                await _amazonApiService.DeleteBucketAsync(s3BucketName);
+
+
                 var ensureCollectionResponse = await _amazonApiService.EnsureCollectionExistsAsync(imageCollection!);
 
                 var portalUsers = _context.Users.AsNoTracking().Where(u => u.AwsFaceId == null && u.ProfilePictureUrl != null).AsAsyncEnumerable();

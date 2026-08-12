@@ -1,0 +1,90 @@
+﻿@model EditFieldViewModel
+
+@{
+    var fieldType = Model.Field.FieldType?.ToLower();
+    var isRequired = Model.Field.IsRequired && string.IsNullOrEmpty(Model.CurrentValue);
+}
+
+@if (fieldType == "text" || fieldType == "policynumber")
+{
+    <input type="text" name="field_@Model.Field.Id" value="@Model.CurrentValue" class="form-control rounded-3" @(isRequired ? "required" : "") />
+}
+else if (fieldType == "number")
+{
+    <input type="number" name="field_@Model.Field.Id" value="@Model.CurrentValue" class="form-control rounded-3" @(isRequired ? "required" : "") />
+}
+else if (fieldType == "date")
+{
+    string formattedDate = "";
+    if (!string.IsNullOrEmpty(Model.CurrentValue) && DateTime.TryParse(Model.CurrentValue, out DateTime d))
+    {
+        formattedDate = d.ToString("dd-MM-yyyy");
+    }
+    <input type="text" name="field_@Model.Field.Id" value="@formattedDate" class="form-control rounded-3 jquery-datepicker" placeholder="dd-mm-yyyy" autocomplete="off" @(isRequired ? "required" : "") />
+}
+else if (fieldType == "file")
+{
+    var isNomineePhoto = string.Equals(Model.Field?.Section, "Nominee", StringComparison.OrdinalIgnoreCase);
+    var isPolicyDoc = string.Equals(Model.Field?.Section, "Policy", StringComparison.OrdinalIgnoreCase);
+    var isClaimDoc = string.Equals(Model.Field?.Section, "ClaimDetail", StringComparison.OrdinalIgnoreCase);
+
+    // Assign dynamic IDs for JavaScript hooks
+    var inputId = isNomineePhoto ? "nomineeFileInput" :
+                  isPolicyDoc ? "policyFileInput" :
+                  isClaimDoc ? "claimFileInput" : $"field_{Model.Field!.Id}";
+
+    // Assign format restrictions
+    var acceptAttribute = isNomineePhoto ? "image/*,.jpg,.jpeg,.png,.gif,.webp" :
+                          (isPolicyDoc || isClaimDoc) ? ".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" : "*/*";
+
+    <input type="file"
+           id="@inputId"
+           name="field_@Model.Field!.Id"
+           class="form-control form-control-sm mb-2"
+           accept="@acceptAttribute"
+    @(Model.Field.IsRequired && string.IsNullOrEmpty(Model.CurrentValue) ? "required" : "") />
+
+    @if (!string.IsNullOrEmpty(Model.CurrentValue))
+    {
+        if (isNomineePhoto)
+        {
+            <!-- Nominee photo preview is handled directly above the input, so no text link needed here -->
+        }
+        else
+        {
+            <!-- Styled View File Button for Policy and Claim Documents -->
+            <a href="@Model.CurrentValue"
+               target="_blank"
+               rel="noopener noreferrer"
+               class="btn btn-sm btn-outline-primary w-100 d-inline-flex align-items-center justify-content-center gap-1 shadow-sm py-1">
+                <i class="fas fa-external-link-alt"></i>
+                <span class="fw-semibold extra-small">View Document</span>
+            </a>
+        }
+    }
+}
+else if (fieldType == "dropdown")
+{
+    <select name="field_@Model.Field.Id" class="form-select rounded-3" @(isRequired ? "required" : "")>
+        <option value="">-- Select Option --</option>
+        @if (!string.IsNullOrEmpty(Model.Field.DropdownOptions))
+        {
+            foreach (var option in Model.Field.DropdownOptions.Split(','))
+            {
+                var optClean = option.Trim();
+                <option value="@optClean" selected="@(optClean == Model.CurrentValue)">@optClean</option>
+            }
+        }
+    </select>
+}
+else if (fieldType == "address")
+{
+    <input type="text"
+           id="field_@Model.Field.Id"
+           name="field_@Model.Field.Id"
+           class="form-control autocomplete-address"
+           placeholder="Start typing an address..."
+           autocomplete="off" 
+           value="@Model.CurrentValue" />
+
+}

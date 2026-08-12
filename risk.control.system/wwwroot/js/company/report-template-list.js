@@ -33,6 +33,12 @@
                 }
             },
             {
+                data: 'serviceType',
+                "mRender": function (data, type, row) {
+                    return '<span title="' + data + '" data-bs-toggle="tooltip">' + data + '</span>';
+                }
+            },
+            {
                 data: 'isActive',
                 render: function (data) {
                     return data

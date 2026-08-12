@@ -249,7 +249,7 @@
                     if (index < Math.floor(av)) {  // Fully filled stars
                         star.attr("src", "/img/FilledStar.jpeg");
                     } else if (index === Math.floor(av) && av % 1 !== 0) {  // Handle half-filled stars
-                        star.attr("src", "/imgHalfStar.jpeg");  // You need a half-star image
+                        star.attr("src", "/img/HalfStar.jpeg");  // You need a half-star image
                     } else {
                         star.attr("src", "/img/StarFade.gif");  // Faded stars
                     }

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using risk.control.system.AppConstant;
 using risk.control.system.Controllers.Common;
 using risk.control.system.Helpers;
+using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services.Creator;
 using SmartBreadcrumbs.Attributes;
@@ -17,6 +18,7 @@ namespace risk.control.system.Controllers.Creator
     [Breadcrumb("Cases")]
     public class CaseActiveController : Controller
     {
+        private readonly ApplicationDbContext _context;
         private readonly ICaseActiveService _caseActiveService;
         private readonly INotyfService _notifyService;
         private readonly ILogger<CaseActiveController> _logger;
@@ -25,9 +27,11 @@ namespace risk.control.system.Controllers.Creator
         public CaseActiveController(
             ICaseActiveService caseActiveService,
             INotyfService notifyService,
+            ApplicationDbContext context,
             ILogger<CaseActiveController> logger,
             IReportTemplateService reportTemplateService)
         {
+            _context = context;
             _caseActiveService = caseActiveService;
             _notifyService = notifyService;
             _logger = logger;

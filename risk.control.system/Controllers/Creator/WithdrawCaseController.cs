@@ -12,6 +12,7 @@ using risk.control.system.Services.Creator;
 namespace risk.control.system.Controllers.Creator
 {
     [Authorize(Roles = $"{CREATOR.DISPLAY_NAME}")]
+    [Route("[controller]")]
     public class WithdrawCaseController : Controller
     {
         private readonly string _baseUrl;
@@ -66,6 +67,21 @@ namespace risk.control.system.Controllers.Creator
                 _notifyService.Error("Error withdrawing case. Try again.");
                 return RedirectToAction(nameof(AddAssignController.New), ControllerName<AddAssignController>.Name);
             }
+        }
+        //[ValidateAntiForgeryToken]
+        [HttpPost("WithdrawClaim/{id}")]
+        public async Task<IActionResult> WithdrawClaim(int id, [FromBody] WithdrawClaimRequest request)
+        {
+            var userEmail = HttpContext.User?.Identity?.Name!;
+            if (string.IsNullOrWhiteSpace(request?.Reason))
+            {
+                return BadRequest(new { message = "Withdrawal reason is required." });
+            }
+            var (policyNumber, vendorId) = await _withdrawCaseService.WithdrawCaseByCompanyNew(userEmail, request);
+
+            _backgroundJobClient.Enqueue(() => _mailboxService.NotifyCaseWithdrawlByCompanyNew(userEmail, policyNumber, request.ClaimId, vendorId, _baseUrl));
+
+            return Ok(new { success = true, policyNumber = policyNumber });
         }
     }
 }

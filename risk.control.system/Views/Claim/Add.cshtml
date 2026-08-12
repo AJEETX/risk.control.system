@@ -1,0 +1,344 @@
+﻿@model FillFormViewModel
+@{
+    ViewData["Title"] = $"Submit {Model.FormType}";
+}
+
+<section class="content">
+    <div id="article" class="card shadow-lg border-1 rounded-lg">
+        <div class="card-header bg-secondary text-white text-center">
+            <h3 class="card-title"><i class="fas fa-clipboard  me-2"></i> Add Claim</h3>
+            @if (Model.SelectedCompanyId.HasValue && Model.FormType == InsuranceType.CLAIM)
+            {
+                <div class="card-tools">
+                <span data-bs-toggle="tooltip" title="Click to download sample File">
+                    <span class="download-file">
+                        <a class="ziplink text-white" asp-action="DownloadSamplePackage" asp-route-companyId="@Model.SelectedCompanyId.Value" asp-route-type="@Model.FormType">
+                            <img src="~/headers/download.gif" alt="download" />  sample file
+                        </a>
+                    </span>
+                </span>
+            </div>
+            }
+        </div>
+        <div class="card-body p-4">
+            <div class="submit-progress hidden">
+                <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+            </div>
+
+            <form asp-action="Add" method="post" enctype="multipart/form-data" id="claimSubmitForm" data-confirm-title="Confirm Claim Submission"
+                  data-confirm-message="Are you sure you want to submit this claim?"
+                  data-submit-text="Add Claim"
+                  data-loading-text="Add Claim"
+                  data-btn-theme="success"
+                  data-confirm-theme="green">
+                <input type="hidden" asp-for="FormType" />
+
+                <!-- THREE-COLUMN CARD LAYOUT -->
+                <div class="row g-3">
+
+                    <!-- SECTION 1: POLICY DETAILS -->
+                    <div class="col-md-4">
+                        <div class="card h-100 shadow-sm border-1 bg-light">
+                            <div class="card-header bg-white border-0 pt-3 pb-2 d-flex align-items-center">
+                                <i class="far fa-file-alt text-primary"></i>
+                                <span>&nbsp;&nbsp;</span>
+                                <h6 class="mb-0 fw-bold">Policy Details</h6>
+                            </div>
+                            <div class="bg-success text-white px-2 py-1 small d-flex justify-content-between align-items-center">
+                                <i class="fas fa-bookmark"></i>
+                                <i class="fas fa-file-pdf"></i>
+                            </div>
+
+                            <div class="card-body bg-white">
+                                <div class="row">
+                                    <!-- Left Column: Input fields (Non-file) -->
+                                    <div class="col-7">
+                                        @{
+                                            var policyFields = Model.Fields.Where(f => f.Section == "Policy" && f.FieldType != "file").ToList();
+                                        }
+                                        @if (policyFields.Any())
+                                        {
+                                            @foreach (var field in policyFields)
+                                            {
+                                                <div class="mb-2">
+                                                    <label class="form-label fw-semibold text-secondary mb-1 small d-block">
+                                                        @field.Label
+                                                        @if (field.IsRequired)
+                                                        {
+                                                            <span class="text-danger ms-1">*</span>
+                                                        }
+                                                    </label>
+                                                    <partial name="_DynamicFieldRender" model="field" />
+                                                </div>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <div class="text-muted fst-italic small">No policy fields configured.</div>
+                                        }
+                                    </div>
+
+                                    <!-- Right Column: Policy Document Upload Field -->
+                                    <div class="col-5">
+                                        @{
+                                            var policyDocField = Model.Fields.FirstOrDefault(f => f.Section == "Policy" && f.FieldType == "file");
+                                        }
+                                        <div class="card h-50 border-2 border-dashed bg-light-subtle text-center upload-dropzone transition-all">
+                                            <div class="card-body p-3 d-flex flex-column align-items-center justify-content-center">
+
+                                                <!-- Styled Icon Badge -->
+                                                <div class="icon-shape icon-md bg-primary bg-opacity-10 text-primary rounded-circle mb-2 d-flex align-items-center justify-content-center">
+                                                    <i class="fas fa-cloud-upload-alt fa-lg"></i>
+                                                </div>
+
+                                                @if (policyDocField != null)
+                                                {
+                                                    <label class="form-label small fw-semibold text-dark mb-1">
+                                                        @policyDocField.Label
+                                                        @if (policyDocField.IsRequired)
+                                                        {
+                                                            <span class="text-danger ms-1">*</span>
+                                                        }
+                                                    </label>
+
+                                                    <!-- Dynamic Render / File Input Wrapper -->
+                                                    <div class="w-100 position-relative mt-1">
+                                                        <!-- If your partial renders a standard <input type="file">, wrap it for custom styling -->
+                                                        <div class="custom-file-upload-wrapper">
+                                                            <partial name="_DynamicFieldRender" model="policyDocField" />
+                                                        </div>
+                                                    </div>
+
+                                                    <small class="text-muted fs-7 mt-2 file-hint">
+                                                        PDF (Max 5MB)
+                                                    </small>
+                                                }
+                                                else
+                                                {
+                                                    <span class="fw-medium text-secondary small mb-1">Policy Document</span>
+                                                    <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle py-1 px-2 mt-1 fw-normal">
+                                                        <i class="fas fa-paperclip me-1"></i> Not Required
+                                                    </span>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECTION 2: NOMINEE DETAILS -->
+                    <div class="col-md-4">
+                        <div class="card h-100 shadow-sm border-1 bg-light">
+                            <div class="card-header bg-white border-0 pt-3 pb-2 d-flex align-items-center">
+                                <i class="fas fa-user-plus me-2 text-success"></i>
+                                <span>&nbsp;&nbsp;</span>
+                                <h6 class="mb-0 fw-bold">Nominee Details</h6>
+                            </div>
+                            <div class="bg-success text-white px-2 py-1 small d-flex justify-content-between align-items-center">
+                                <i class="fas fa-bookmark"></i>
+                                <i class="fas fa-user"></i>
+                            </div>
+
+                            <div class="card-body bg-white">
+                                <div class="row">
+                                    <!-- Left Column: Input fields + Address Map trigger -->
+                                    <div class="col-7">
+                                        @{
+                                            var nomineeFields = Model.Fields.Where(f => f.Section == "Nominee" && f.FieldType != "file").ToList();
+                                        }
+                                        @if (nomineeFields.Any())
+                                        {
+                                            @foreach (var field in nomineeFields)
+                                            {
+                                                var isAddress = field.FieldType == "address" || field.Label.Contains("address", StringComparison.OrdinalIgnoreCase);
+
+                                                <div class="mb-2">
+                                                    <label class="form-label fw-semibold text-secondary mb-1 small d-block">
+                                                        @field.Label
+                                                        @if (field.IsRequired)
+                                                        {
+                                                            <span class="text-danger ms-1">*</span>
+                                                        }
+                                                    </label>
+                                                    <partial name="_DynamicFieldRender" model="field" />
+
+                                                </div>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <div class="text-muted fst-italic small">No nominee fields configured.</div>
+                                        }
+                                    </div>
+                                    <!-- Right Column: Nominee Photo Upload -->
+                                    <div class="col-5">
+                                        @{
+                                            var nomineePhotoField = Model.Fields.FirstOrDefault(f => f.Section == "Nominee" && f.FieldType == "file");
+                                        }
+                                        <div class="card h-100 border-2 border-dashed bg-light-subtle text-center upload-avatar-card transition-all position-relative">
+                                            <div class="card-body p-3 d-flex flex-column align-items-center justify-content-center">
+
+                                                <!-- Circular Avatar Container with Camera Badge -->
+                                                <div class="avatar-upload-wrapper mb-2 position-relative">
+
+                                                    <!-- Live Photo Preview Avatar (Hidden by default) -->
+                                                    <div id="nomineePhotoPreviewContainer" class="avatar-circle shadow-sm border border-2 border-white d-none overflow-hidden">
+                                                        <a id="nomineePhotoLink" href="#" target="_blank" rel="noopener noreferrer" title="Click to view full photo">
+                                                            <img id="nomineePhotoPreview" src="#" class="w-100 h-100 object-fit-cover" alt="Nominee Photo Preview" />
+                                                        </a>
+                                                    </div>
+
+                                                    <!-- Default Placeholder Avatar Icon -->
+                                                    <div id="nomineePhotoIcon" class="img-circle shadow-sm">
+                                                        <i class="fas fa-user-alt fa-3x"></i>
+                                                    </div>
+                                                </div>
+
+                                                @if (nomineePhotoField != null)
+                                                {
+                                                    <label class="form-label small fw-semibold text-dark mb-1">
+                                                        @nomineePhotoField.Label
+                                                        @if (nomineePhotoField.IsRequired)
+                                                        {
+                                                            <span class="text-danger ms-1">*</span>
+                                                        }
+                                                    </label>
+
+                                                    <!-- Input Element -->
+                                                    <div class="w-100 position-relative mt-1">
+                                                        <input type="file"
+                                                               id="nomineeFileInput"
+                                                               name="field_@nomineePhotoField.Id"
+                                                               class="form-control form-control-sm avatar-file-input"
+                                                               accept="image/*"
+                                                        @(nomineePhotoField.IsRequired ? "required" : "") />
+                                                    </div>
+
+                                                    <small id="nomineePhotoHint" class="text-muted fs-7 mt-2">
+                                                        JPG, PNG (Max 5MB)
+                                                    </small>
+                                                }
+                                                else
+                                                {
+                                                    <span class="fw-medium text-secondary small mb-1">Nominee Photo</span>
+                                                    <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle py-1 px-2 mt-1 fw-normal">
+                                                        Not Required
+                                                    </span>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECTION 3: CLAIM DETAILS -->
+                    <div class="col-md-4">
+                        <div class="card h-100 shadow-sm border-1 bg-light">
+                            <div class="card-header bg-white border-0 pt-3 pb-2 d-flex align-items-center">
+                                <i class="fas fa-clipboard-list me-2 text-warning"></i>
+                                <span>&nbsp;&nbsp;</span>
+                                <h6 class="mb-0 fw-bold">Claim Details</h6>
+                            </div>
+                            <div class="bg-success text-white px-2 py-1 small d-flex justify-content-between align-items-center">
+                                <i class="fas fa-bookmark"></i>
+                                <i class="fas fa-file-invoice"></i>
+                            </div>
+
+                            <div class="card-body bg-white">
+                                <div class="row">
+                                    <!-- Left Column: Input fields (Non-file) -->
+                                    <div class="col-7">
+                                        @{
+                                            var claimFields = Model.Fields.Where(f => f.Section == "ClaimDetail" && f.FieldType != "file").ToList();
+                                        }
+                                        @if (claimFields.Any())
+                                        {
+                                            @foreach (var field in claimFields)
+                                            {
+                                                <div class="mb-2">
+                                                    <label class="form-label fw-semibold text-secondary mb-1 small d-block">
+                                                        @field.Label
+                                                        @if (field.IsRequired)
+                                                        {
+                                                            <span class="text-danger ms-1">*</span>
+                                                        }
+                                                    </label>
+                                                    <partial name="_DynamicFieldRender" model="field" />
+                                                </div>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <div class="text-muted fst-italic small">No claim fields configured.</div>
+                                        }
+                                    </div>
+
+                                    <!-- Right Column: Claim Document Upload Field -->
+                                    <div class="col-5">
+                                        @{
+                                            var claimDocField = Model.Fields.FirstOrDefault(f => f.Section == "ClaimDetail" && f.FieldType == "file");
+                                        }
+                                        <div class="card h-100 border-2 border-dashed bg-light-subtle text-center upload-claim-card transition-all">
+                                            <div class="card-body p-3 d-flex flex-column align-items-center justify-content-center">
+
+                                                <!-- Styled Folder Icon Badge -->
+                                                <div class="icon-shape icon-md bg-warning bg-opacity-10 text-warning rounded-circle mb-2 d-flex align-items-center justify-content-center">
+                                                    <i class="fas fa-folder-open fa-lg"></i>
+                                                </div>
+
+                                                @if (claimDocField != null)
+                                                {
+                                                    <label class="form-label small fw-semibold text-dark mb-1">
+                                                        @claimDocField.Label
+                                                        @if (claimDocField.IsRequired)
+                                                        {
+                                                            <span class="text-danger ms-1">*</span>
+                                                        }
+                                                    </label>
+
+                                                    <!-- Dynamic Render / Custom File Input Wrapper -->
+                                                    <div class="w-100 position-relative mt-1">
+                                                        <div class="claim-file-upload-wrapper">
+                                                            <partial name="_DynamicFieldRender" model="claimDocField" />
+                                                        </div>
+                                                    </div>
+
+                                                    <small class="text-muted fs-7 mt-2 claim-file-hint">
+                                                        PDF (Max 5MB)
+                                                    </small>
+                                                }
+                                                else
+                                                {
+                                                    <span class="fw-medium text-secondary small mb-1">Claim Document</span>
+                                                    <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle py-1 px-2 mt-1 fw-normal">
+                                                        <i class="fas fa-paperclip me-1"></i> Not Required
+                                                    </span>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- FORM ACTIONS -->
+                <div class="d-flex justify-content-end align-items-center mt-4 pt-3 border-top">
+                    <button type="submit" class="btn btn-success">
+                        <i class="fa fa-check-circle me-2"></i> Add Claim
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script src="/js/claim/add.js" asp-append-version="true"></script>
+}

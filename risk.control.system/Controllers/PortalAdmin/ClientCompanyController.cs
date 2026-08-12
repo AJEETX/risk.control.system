@@ -1,4 +1,5 @@
-﻿using AspNetCoreHero.ToastNotification.Abstractions;
+﻿using System.Globalization;
+using AspNetCoreHero.ToastNotification.Abstractions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -107,9 +108,10 @@ namespace risk.control.system.Controllers
             clientCompany.AddressLongitude = companyCoordinates.Longitude;
             clientCompany.AddressMapLocation = url;
             var isdCode = (await _context.Country.FirstOrDefaultAsync(c => c.CountryId == clientCompany.SelectedCountryId))?.ISDCode;
-            await smsService.DoSendSmsAsync(pinCode.Country.Code, isdCode + clientCompany.PhoneNumber, "Company account created. \nDomain : " + clientCompany.Email + "\n" + _baseUrl);
+            await smsService.DoSendSmsAsync(pinCode.Country.Code, isdCode + clientCompany.PhoneNumber, "Company profile created. \nDomain : " + clientCompany.Email + "\n" + _baseUrl);
 
-            //clientCompany.Description = "New company added.";
+            var textInfo = CultureInfo.CurrentCulture.TextInfo;
+            clientCompany.Name = textInfo.ToTitleCase(clientCompany.Name.ToLower());
             clientCompany.AgreementDate = DateTime.UtcNow;
             clientCompany.Status = CompanyStatus.ACTIVE;
             clientCompany.PinCodeId = clientCompany.SelectedPincodeId;
@@ -121,8 +123,8 @@ namespace risk.control.system.Controllers
             clientCompany.UpdatedBy = HttpContext.User?.Identity?.Name;
             var addedCompany = _context.Add(clientCompany);
             await _context.SaveChangesAsync();
-            var claimTemplate = ReportTemplateSeed.CLAIM(_context, clientCompany);
-            var underwriting = ReportTemplateSeed.UNDERWRITING(_context, clientCompany);
+            ReportTemplateSeed.CLAIM(_context, clientCompany);
+            ReportTemplateSeed.UNDERWRITING(_context, clientCompany);
             await _context.SaveChangesAsync();
             notifyService.Custom($"Company created successfully.", 3, "green", "fas fa-building");
             return RedirectToAction(nameof(Companies));
@@ -272,6 +274,8 @@ namespace risk.control.system.Controllers
                         clientCompany.DocumentImageExtension = existingCompany.DocumentImageExtension;
                     }
                 }
+                var textInfo = CultureInfo.CurrentCulture.TextInfo;
+                clientCompany.Name = textInfo.ToTitleCase(clientCompany.Name.ToLower());
                 var pinCode = await _context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).FirstOrDefaultAsync(s => s.PinCodeId == clientCompany.SelectedPincodeId);
                 var companyAddress = clientCompany.Addressline + ", " + pinCode!.District!.Name + ", " + pinCode.State!.Name + ", " + pinCode.Country!.Code;
                 var companyCoordinates = await customApiCLient.GetCoordinatesFromAddressAsync(companyAddress);
@@ -288,7 +292,7 @@ namespace risk.control.system.Controllers
                 clientCompany.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.ClientCompany.Update(clientCompany);
                 await _context.SaveChangesAsync();
-                await smsService.DoSendSmsAsync(pinCode.Country.Code, pinCode.Country.ISDCode + clientCompany.PhoneNumber, "Company account edited. \nDomain : " + clientCompany.Email + "\n" + _baseUrl);
+                await smsService.DoSendSmsAsync(pinCode.Country.Code, pinCode.Country.ISDCode + clientCompany.PhoneNumber, "Company profile edited. \nDomain : " + clientCompany.Email + "\n" + _baseUrl);
                 notifyService.Custom($"Company edited successfully.", 3, "orange", "fas fa-building");
                 return RedirectToAction(nameof(ClientCompanyController.Details), "ClientCompany", new { id = clientCompany.ClientCompanyId });
             }

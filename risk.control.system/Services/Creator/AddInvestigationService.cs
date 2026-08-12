@@ -46,7 +46,7 @@ namespace risk.control.system.Services.Creator
             try
             {
                 var currentUser = await _context.ApplicationUser.AsNoTracking().Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == userEmail);
-                var reportTemplate = await _cloneService.DeepCloneReportTemplate(currentUser!.ClientCompanyId!.Value, model.PolicyDetailDto.InsuranceType.GetValueOrDefault());
+                var reportTemplate = await _cloneService.DeepCloneReportTemplate(currentUser!.ClientCompanyId!.Value, model.PolicyDetailDto.InsuranceType.GetValueOrDefault(), model.PolicyDetailDto.InvestigationServiceTypeId);
                 _context.ReportTemplates.Add(reportTemplate);
                 await _context.SaveChangesAsync();
 
@@ -108,7 +108,7 @@ namespace risk.control.system.Services.Creator
             try
             {
                 var existingPolicy = await _context.Investigations.Include(c => c.PolicyDetail).FirstOrDefaultAsync(c => c.Id == model.Id);
-                var reportTemplate = await _cloneService.DeepCloneReportTemplate(existingPolicy!.ClientCompanyId!.Value, model.PolicyDetailDto.InsuranceType.GetValueOrDefault());
+                var reportTemplate = await _cloneService.DeepCloneReportTemplate(existingPolicy!.ClientCompanyId!.Value, model.PolicyDetailDto.InsuranceType.GetValueOrDefault(), model.PolicyDetailDto.InvestigationServiceTypeId);
                 _context.ReportTemplates.Add(reportTemplate);
                 await _context.SaveChangesAsync();
                 if (model.Document is not null)

@@ -1,0 +1,206 @@
+﻿@model FillFormViewModel
+@{
+    ViewData["Title"] = $"Submit {Model.FormType}";
+    var key = Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY") ?? "";
+}
+
+<section class="content">
+    <div id="article" class="card shadow-lg border-1 rounded-lg">
+        <div class="card-header bg-secondary text-white text-center">
+            <h3 class="card-title"><i class="fas fa-clipboard  me-2"></i> Add </h3>
+            @if (Model.SelectedCompanyId.HasValue && Model.FormType == InsuranceType.CLAIM)
+            {
+                <div class="card-tools">
+                <span data-bs-toggle="tooltip" title="Click to download sample File">
+                    <span class="download-file">
+                        <a class="ziplink text-white" asp-action="DownloadSamplePackage" asp-route-companyId="@Model.SelectedCompanyId.Value" asp-route-type="@Model.FormType">
+                            <img src="~/headers/download.gif" alt="download" />  sample file
+                        </a>
+                    </span>
+                </span>
+            </div>
+            }
+        </div>
+        <div class="card-body p-4">
+            <div class="submit-progress hidden">
+                <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+            </div>
+
+            <form asp-action="Add" method="post" enctype="multipart/form-data" id="claimSubmitForm" data-confirm-title="Confirm Claim Submission"
+                  data-confirm-message="Are you sure you want to submit this claim?"
+                  data-submit-text="Add Claim"
+                  data-loading-text="Add Claim"
+                  data-btn-theme="success"
+                  data-confirm-theme="green">
+                <input type="hidden" asp-for="FormType" />
+
+                <!-- THREE-COLUMN CARD LAYOUT -->
+                <div class="row g-3">
+
+                    <!-- SECTION 1: POLICY DETAILS -->
+                    <div class="col-md-6">
+                        <div class="card h-100 shadow-sm border-1 bg-light">
+                            <div class="card-header bg-white border-0 pt-3 pb-2 d-flex align-items-center">
+                                <i class="far fa-file-alt text-primary"></i>
+                                <span>&nbsp;&nbsp;</span>
+                                <h6 class="mb-0 fw-bold">Policy Details</h6>
+                            </div>
+                            <div class="bg-success text-white px-2 py-1 small d-flex justify-content-between align-items-center">
+                                <i class="fas fa-bookmark"></i>
+                                <i class="fas fa-file-pdf"></i>
+                            </div>
+
+                            <div class="card-body bg-white">
+                                <div class="row">
+                                    <!-- Left Column: Input fields (Non-file) -->
+                                    <div class="col-7">
+                                        @{
+                                            var policyFields = Model.Fields.Where(f => f.Section == "Policy" && f.FieldType != "file").ToList();
+                                        }
+                                        @if (policyFields.Any())
+                                        {
+                                            @foreach (var field in policyFields)
+                                            {
+                                                <div class="mb-2">
+                                                    <label class="form-label fw-semibold text-secondary mb-1 small d-block">
+                                                        @field.Label
+                                                        @if (field.IsRequired)
+                                                        {
+                                                            <span class="text-danger ms-1">*</span>
+                                                        }
+                                                    </label>
+                                                    <partial name="_DynamicFieldRender" model="field" />
+                                                </div>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <div class="text-muted fst-italic small">No policy fields configured.</div>
+                                        }
+                                    </div>
+
+                                    <!-- Right Column: Policy Document Upload Field -->
+                                    <div class="col-5">
+                                        @{
+                                            var policyDocField = Model.Fields.FirstOrDefault(f => f.Section == "Policy" && f.FieldType == "file");
+                                        }
+                                        <div class="border rounded p-2 bg-light text-center d-flex flex-column align-items-center justify-content-center h-100">
+                                            <i class="fas fa-file-alt fa-3x text-secondary mb-2"></i>
+                                            @if (policyDocField != null)
+                                            {
+                                                <label class="form-label small fw-bold text-secondary mb-1">@policyDocField.Label</label>
+                                                <partial name="_DynamicFieldRender" model="policyDocField" />
+                                            }
+                                            else
+                                            {
+                                                <span class="btn btn-sm btn-outline-primary py-0 px-2 mt-1 disabled">
+                                                    <i class="fas fa-paperclip me-1"></i> Policy Document
+                                                </span>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECTION 2: NOMINEE DETAILS -->
+                    <div class="col-md-6">
+                        <div class="card h-100 shadow-sm border-1 bg-light">
+                            <div class="card-header bg-white border-0 pt-3 pb-2 d-flex align-items-center">
+                                <i class="fas fa-user-plus me-2 text-success"></i>
+                                <span>&nbsp;&nbsp;</span>
+                                <h6 class="mb-0 fw-bold">LA Details</h6>
+                            </div>
+                            <div class="bg-success text-white px-2 py-1 small d-flex justify-content-between align-items-center">
+                                <i class="fas fa-bookmark"></i>
+                                <i class="fas fa-user"></i>
+                            </div>
+
+                            <div class="card-body bg-white">
+                                <div class="row">
+                                    <!-- Left Column: Input fields + Address Map trigger -->
+                                    <div class="col-7">
+                                        @{
+                                            var nomineeFields = Model.Fields.Where(f => f.Section == "Nominee" && f.FieldType != "file").ToList();
+                                        }
+                                        @if (nomineeFields.Any())
+                                        {
+                                            @foreach (var field in nomineeFields)
+                                            {
+                                                var isAddress = field.FieldType == "address" || field.Label.Contains("address", StringComparison.OrdinalIgnoreCase);
+
+                                                <div class="mb-2">
+                                                    <label class="form-label fw-semibold text-secondary mb-1 small d-block">
+                                                        @field.Label
+                                                        @if (field.IsRequired)
+                                                        {
+                                                            <span class="text-danger ms-1">*</span>
+                                                        }
+                                                    </label>
+                                                    <partial name="_DynamicFieldRender" model="field" />
+
+                                                </div>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <div class="text-muted fst-italic small">No nominee fields configured.</div>
+                                        }
+                                    </div>
+                                    <!-- Right Column: Nominee Photo Upload -->
+                                    <div class="col-5">
+                                        @{
+                                            var nomineePhotoField = Model.Fields.FirstOrDefault(f => f.Section == "Nominee" && f.FieldType == "file");
+                                        }
+                                        <div class="border rounded p-2 bg-light text-center d-flex flex-column align-items-center justify-content-center mh-100">
+
+                                            <!-- Photo Preview Container with Click-to-View Feature (Initially Hidden) -->
+                                            <div id="nomineePhotoPreviewContainer" class="border rounded mb-2 overflow-hidden bg-white shadow-sm w-100 ratio ratio-1x1 d-none">
+                                                <a id="nomineePhotoLink" href="#" target="_blank" rel="noopener noreferrer" title="Click to view full photo">
+                                                    <img id="nomineePhotoPreview" src="#" class="img-fluid w-100 h-100 object-fit-cover" alt="Nominee Photo Preview" />
+                                                </a>
+                                            </div>
+
+                                            <!-- Default Placeholder Icon -->
+                                            <i id="nomineePhotoIcon" class="fas fa-user-circle fa-3x text-secondary mb-2"></i>
+
+                                            @if (nomineePhotoField != null)
+                                            {
+                                                <label class="form-label small fw-bold text-secondary mb-1">@nomineePhotoField.Label</label>
+
+                                                <!-- Custom File Input connected to JavaScript Preview -->
+                                                <input type="file"
+                                                       id="nomineeFileInput"
+                                                       name="field_@nomineePhotoField.Id"
+                                                       class="form-control form-control-sm"
+                                                       accept="image/*"
+                                                @(nomineePhotoField.IsRequired ? "required" : "") />
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted extra-small">Photo Upload</span>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FORM ACTIONS -->
+                <div class="d-flex justify-content-end align-items-center mt-4 pt-3 border-top">
+                    <button type="submit" class="btn btn-success">
+                        <i class="fa fa-check-circle me-2"></i> Add
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script src="https://maps.googleapis.com/maps/api/js?key=@key&libraries=places"></script>
+    <script src="/js/claim/add.js" asp-append-version="true"></script>
+}

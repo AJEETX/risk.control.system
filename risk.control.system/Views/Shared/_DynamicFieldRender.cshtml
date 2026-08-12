@@ -1,6 +1,9 @@
 ﻿@model FormField
-
 @if (Model.FieldType == "text")
+{
+    <input type="text" name="field_@Model.Id" class="form-control" @(Model.IsRequired ? "required" : "") />
+}
+else @if (Model.FieldType == "policyNumber")
 {
     <input type="text" name="field_@Model.Id" class="form-control" @(Model.IsRequired ? "required" : "") />
 }
@@ -12,10 +15,28 @@ else if (Model.FieldType == "date")
 {
     <input type="text" name="field_@Model.Id" class="form-control jquery-datepicker" placeholder="dd-mm-yyyy" @(Model.IsRequired ? "required" : "") autocomplete="off" />
 }
-else if (Model.FieldType == "file")
-{
-    <input type="file" name="field_@Model.Id" class="form-control" @(Model.IsRequired ? "required" : "") />
-}
+    else if (Model.FieldType == "file")
+    {
+        var isNomineePhoto = string.Equals(Model.Section, "Nominee", StringComparison.OrdinalIgnoreCase);
+        var isPolicyDoc = string.Equals(Model.Section, "Policy", StringComparison.OrdinalIgnoreCase);
+        var isClaimDoc = string.Equals(Model.Section, "ClaimDetail", StringComparison.OrdinalIgnoreCase);
+
+        // Assign dynamic ID for JS hook
+        var inputId = isNomineePhoto ? "nomineeFileInput" :
+                      isPolicyDoc ? "policyFileInput" :
+                      isClaimDoc ? "claimFileInput" : $"field_{Model.Id}";
+
+        // Assign specific accept formats
+        var acceptAttribute = isNomineePhoto ? "image/*,.jpg,.jpeg,.png,.gif,.webp" :
+                              (isPolicyDoc || isClaimDoc) ? ".pdf,application/pdf" : "*/*";
+
+        <input type="file"
+               id="@inputId"
+               name="field_@Model.Id"
+               class="form-control form-control-sm"
+               accept="@acceptAttribute"
+        @(Model.IsRequired ? "required" : "") />
+    }
 else if (Model.FieldType == "dropdown")
 {
     <select name="field_@Model.Id" class="form-control" @(Model.IsRequired ? "required" : "")>
@@ -28,4 +49,14 @@ else if (Model.FieldType == "dropdown")
             }
         }
     </select>
+}
+else if (Model.FieldType == "address")
+{
+    <input type="text"
+           id="field_@Model.Id"
+           name="field_@Model.Id"
+           class="form-control autocomplete-address"
+           placeholder="Start typing an address..."
+           autocomplete="off" />
+
 }

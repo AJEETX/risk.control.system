@@ -9,6 +9,7 @@ namespace risk.control.system.Services.Creator
     public interface IWithdrawCaseService
     {
         Task<(string, long)> WithdrawCaseByCompany(string userEmail, CaseTransactionModel model, long caseId);
+        Task<(string, long)> WithdrawCaseByCompanyNew(string userEmail, WithdrawClaimRequest request);
     }
 
     internal class WithdrawCaseService(ApplicationDbContext context, ILogger<WithdrawCaseService> logger, ITimelineService timelineService) : IWithdrawCaseService
@@ -48,6 +49,30 @@ namespace risk.control.system.Services.Creator
                 _logger.LogError(ex, "Error occurred withdraw case {Id}. {UserEmail}", caseId, userEmail);
                 return (null!, 0);
             }
+        }
+
+        public async Task<(string, long)> WithdrawCaseByCompanyNew(string userEmail, WithdrawClaimRequest request)
+        {
+            var currentUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(u => u.Email == userEmail);
+
+            var caseTask = await _context.SubmittedForms.Include(f => f.Values).ThenInclude(f => f.FormField).FirstOrDefaultAsync(f => f.Id == request.ClaimId);
+            var company = await _context.ClientCompany.FirstOrDefaultAsync(c => c.ClientCompanyId == caseTask!.CompanyId);
+            var vendorId = caseTask!.VendorId;
+            caseTask.WithdrawlComments = request.Reason;
+            caseTask!.IsNew = true;
+            caseTask.Updated = DateTime.UtcNow;
+            caseTask.UpdatedBy = currentUser!.Email;
+            caseTask.AssignedToAgency = false;
+            caseTask.CaseOwner = company!.Email;
+            caseTask.VendorId = null;
+            caseTask.Vendor = null;
+            caseTask.Status = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY;
+            _context.SubmittedForms.Update(caseTask);
+            var rows = await _context.SaveChangesAsync(null, false) > 0;
+            await _timelineService.UpdateCaseStatus(caseTask.Id, currentUser.Email!);
+            var policyNumber = caseTask?.Values?.FirstOrDefault(v => v?.FormField?.FieldType == "policyNumber")?.Value ?? string.Empty;
+            return rows ? (policyNumber, vendorId.GetValueOrDefault()!) : (null!, 0);
+
         }
     }
 }
