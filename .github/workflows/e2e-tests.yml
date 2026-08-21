@@ -1,0 +1,80 @@
+# GitHub Actions workflow for E2E tests
+name: E2E Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    # Run nightly at 2 AM UTC
+    - cron: '0 2 * * *'
+
+jobs:
+  e2e-tests:
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '10.0.x'
+    
+    - name: Restore dependencies
+      run: dotnet restore risk.control.system.e2e.tests/risk.control.system.e2e.tests.csproj
+    
+    - name: Install Playwright browsers
+      run: dotnet playwright install
+      working-directory: risk.control.system.e2e.tests
+    
+    - name: Start application (if needed)
+      run: |
+        # Start your application here
+        # dotnet run --project risk.control.system/risk.control.system.csproj &
+        Start-Sleep -Seconds 30
+    
+    - name: Run E2E tests - Smoke
+      run: dotnet test --filter "Category=Smoke" --logger "trx;LogFileName=test-results.trx"
+      working-directory: risk.control.system.e2e.tests
+      continue-on-error: true
+    
+    - name: Run E2E tests - Authentication
+      run: dotnet test --filter "Category=Authentication" --logger "trx;LogFileName=test-results.trx"
+      working-directory: risk.control.system.e2e.tests
+      continue-on-error: true
+    
+    - name: Run E2E tests - Dashboard
+      run: dotnet test --filter "Category=Dashboard" --logger "trx;LogFileName=test-results.trx"
+      working-directory: risk.control.system.e2e.tests
+      continue-on-error: true
+    
+    - name: Run E2E tests - Navigation
+      run: dotnet test --filter "Category=Navigation" --logger "trx;LogFileName=test-results.trx"
+      working-directory: risk.control.system.e2e.tests
+      continue-on-error: true
+    
+    - name: Upload test results
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: test-results
+        path: risk.control.system.e2e.tests/TestResults/
+    
+    - name: Upload artifacts (screenshots/videos)
+      if: failure()
+      uses: actions/upload-artifact@v3
+      with:
+        name: test-artifacts
+        path: risk.control.system.e2e.tests/artifacts/
+    
+    - name: Publish test report
+      if: always()
+      uses: dorny/test-reporter@v1
+      with:
+        name: E2E Test Results
+        path: 'risk.control.system.e2e.tests/TestResults/*.trx'
+        reporter: '.NET TRX'
+        fail-on-error: false

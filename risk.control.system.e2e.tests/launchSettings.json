@@ -1,0 +1,22 @@
+{
+  "profiles": {
+    "E2E Tests": {
+      "commandName": "Executable",
+      "executablePath": "dotnet",
+      "commandLineArgs": "test --logger \"console;verbosity=detailed\"",
+      "workingDirectory": "."
+    },
+    "E2E Tests Headful": {
+      "commandName": "Executable",
+      "executablePath": "dotnet",
+      "commandLineArgs": "test --logger \"console;verbosity=detailed\" -- --headless=false",
+      "workingDirectory": "."
+    },
+    "E2E Tests With Screenshots": {
+      "commandName": "Executable",
+      "executablePath": "dotnet",
+      "commandLineArgs": "test --logger \"console;verbosity=detailed\" -- --capture-screenshots=true",
+      "workingDirectory": "."
+    }
+  }
+}
