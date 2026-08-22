@@ -1,7 +1,4 @@
-using Microsoft.Playwright;
-using NUnit.Framework;
-using risk.control.system.e2e.tests.Configuration;
-
+using System.Diagnostics;
 namespace risk.control.system.e2e.tests.Fixtures;
 
 /// <summary>
@@ -10,12 +7,75 @@ namespace risk.control.system.e2e.tests.Fixtures;
 [TestFixture]
 public abstract class BaseTest
 {
+    private static Process? _webServerProcess;
     protected IPlaywright? Playwright { get; set; }
     protected IBrowser? Browser { get; set; }
     protected IBrowserContext? Context { get; set; }
     protected IPage? Page { get; set; }
     protected TestConfiguration Config { get; set; } = new TestConfiguration();
+    [OneTimeSetUp]
+    public async Task GlobalSetup()
+    {
+        var webAppPath = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../risk.control.system"));
 
+        var startInfo = new ProcessStartInfo
+        {
+            FileName = "dotnet",
+            Arguments = $"run --project \"{webAppPath}\" --urls \"{Config.BaseUrl}\"",
+            UseShellExecute = false,
+            CreateNoWindow = true,
+            WorkingDirectory = webAppPath
+        };
+
+        // Force Development environment so launch profiles load correctly
+        startInfo.EnvironmentVariables["ASPNETCORE_ENVIRONMENT"] = "Development";
+
+        _webServerProcess = Process.Start(startInfo);
+
+        // Bypass SSL certificate validation for local health check
+        var handler = new HttpClientHandler
+        {
+            ServerCertificateCustomValidationCallback = (message, cert, chain, sslPolicyErrors) => true
+        };
+
+        using var httpClient = new HttpClient(handler);
+
+        var serverReady = false;
+        var timeout = TimeSpan.FromSeconds(45);
+        var stopwatch = Stopwatch.StartNew();
+
+        while (stopwatch.Elapsed < timeout)
+        {
+            try
+            {
+                var response = await httpClient.GetAsync(Config.BaseUrl);
+                // Any response (even 404 or 302) means Kestrel server is actively listening
+                serverReady = true;
+                break;
+            }
+            catch
+            {
+                // Server is still initializing
+            }
+
+            await Task.Delay(1000);
+        }
+
+        if (!serverReady)
+        {
+            throw new InvalidOperationException($"Web server failed to start at {Config.BaseUrl} within 45 seconds.");
+        }
+    }
+    [OneTimeTearDown]
+    public void GlobalTeardown()
+    {
+        // Stop the background web application when all tests finish
+        if (_webServerProcess != null && !_webServerProcess.HasExited)
+        {
+            _webServerProcess.Kill(entireProcessTree: true);
+            _webServerProcess.Dispose();
+        }
+    }
     [SetUp]
     public virtual async Task SetUp()
     {
