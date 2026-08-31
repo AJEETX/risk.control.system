@@ -18,7 +18,6 @@ namespace risk.control.system.Controllers.Api
 {
     [Route("api/[controller]")]
     [ApiController]
-    [IgnoreAntiforgeryToken]
     public class SecureController : ControllerBase
     {
         private readonly ITokenService tokenService;
