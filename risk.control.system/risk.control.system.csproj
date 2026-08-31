@@ -10,6 +10,7 @@
 		<UserSecretsId>299a4c5f-79bd-41ce-8521-e846c6c3707c</UserSecretsId>
 		<DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
 		<DockerComposeProjectPath>..\docker-compose.dcproj</DockerComposeProjectPath>
+		<SourceRevisionId>$([System.DateTime]::UtcNow.ToString("yyyy-MM-dd HH:mm:ss"))</SourceRevisionId>
 	</PropertyGroup>
 
 	<ItemGroup>

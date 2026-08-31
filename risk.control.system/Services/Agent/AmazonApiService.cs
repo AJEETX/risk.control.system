@@ -112,7 +112,7 @@ namespace risk.control.system.Services.Agent
             catch (Exception ex)
             {
                 _logger.LogError($"Collection {collectionId} not found: {ex.Message}");
-                throw; // Or return an empty list/custom response depending on your architecture
+                return null!;
             }
         }
         public async Task<List<string>> GetAllFaceCollectionIdsAsync()
