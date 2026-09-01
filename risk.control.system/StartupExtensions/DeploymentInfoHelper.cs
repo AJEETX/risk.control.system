@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Globalization;
+using System.Reflection;
 
 namespace risk.control.system.StartupExtensions;
 
@@ -12,16 +13,15 @@ public static class DeploymentInfoHelper
         if (attribute?.InformationalVersion != null)
         {
             var rawVersion = attribute.InformationalVersion;
-            return rawVersion;
-            //var rawVersion = attribute.InformationalVersion;
-            //int dateIdx = rawVersion.IndexOf('+');
-            //string dateStr = dateIdx != -1 ? rawVersion[(dateIdx + 1)..] : rawVersion;
 
-            //if (DateTime.TryParseExact(dateStr, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out var buildUtc))
-            //{
-            //    // Converts UTC to server local time and formats to 24-Oct-2026 14:30
-            //    return buildUtc.ToLocalTime().ToString("dd-MMM-yyyy HH:mm", CultureInfo.InvariantCulture);
-            //}
+            // Extract the date/time after the '+' symbol
+            var parts = rawVersion.Split('+');
+            if (parts.Length > 1 && DateTime.TryParse(parts[1], CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out DateTime deploymentTime))
+            {
+                TimeSpan duration = DateTime.UtcNow - deploymentTime.ToUniversalTime();
+
+                return $"{duration.Days}d {duration.Hours}h {duration.Minutes}m";
+            }
         }
 
         return "Local Build";
