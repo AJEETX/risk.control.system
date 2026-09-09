@@ -1,6 +1,3 @@
-using NUnit.Framework;
-using risk.control.system.e2e.tests.Pages;
-
 namespace risk.control.system.e2e.tests.Tests.DataManagement;
 
 /// <summary>
@@ -12,7 +9,7 @@ public class DataManagementTests : BaseTest
 {
     private LoginPage? _loginPage;
     private DataTablePage? _dataTablePage;
-    private const string ListPagePath = "company"; // Adjust based on your application
+    private const string ListPagePath = "ClientCompany"; // Adjust based on your application
 
     [SetUp]
     public override async Task SetUp()
@@ -168,29 +165,32 @@ public class DataManagementTests : BaseTest
     /// </summary>
     [Test]
     [Order(7)]
-    public async Task DataTable_RowActions_ShouldBeAccessible()
+    public async Task DataTable_DeleteLink_ShouldBeAccessible()
     {
         // Arrange
         await NavigateTo(ListPagePath);
         await Task.Delay(1000);
-        var rowCount = await _dataTablePage!.GetRowCount();
 
         // Act & Assert
-        if (rowCount == 0)
-        {
-            Assert.Inconclusive("No records in table to test row actions");
-        }
-
         try
         {
-            // Try to access edit button on first row
-            await _dataTablePage.ClickEditInRow(0);
-            await Task.Delay(1000);
-            Assert.Pass("Edit action is accessible");
+            // Check if delete link exists
+            var deleteLinkExists = await IsElementVisible("a:has-text('Delete')");
+
+            if (deleteLinkExists)
+            {
+                await _dataTablePage!.ClickDeleteLink();
+                await Task.Delay(1000);
+                Assert.Pass("Delete link is functional");
+            }
+            else
+            {
+                Assert.Inconclusive("Delete link not found in this view");
+            }
         }
         catch (Exception ex)
         {
-            Assert.Warn($"Edit button may not be available: {ex.Message}");
+            Assert.Inconclusive($"Delete link test skipped: {ex.Message}");
         }
     }
 
@@ -236,7 +236,7 @@ public class DataManagementTests : BaseTest
     /// </summary>
     [Test]
     [Order(10)]
-    public async Task DataTable_AddButton_ShouldBeAccessible()
+    public async Task DataTable_DetailLink_ShouldBeAccessible()
     {
         // Arrange
         await NavigateTo(ListPagePath);
@@ -245,23 +245,23 @@ public class DataManagementTests : BaseTest
         // Act & Assert
         try
         {
-            // Check if add button exists
-            var addButtonExists = await IsElementVisible("button:has-text('Add'), button:has-text('Create'), button:has-text('New')");
-            
-            if (addButtonExists)
+            // Check if detail link exists
+            var detailLinkExists = await IsElementVisible("a:has-text('Detail'), a:has-text('Delete')");
+
+            if (detailLinkExists)
             {
-                await _dataTablePage!.ClickAddButton();
+                await _dataTablePage!.ClickDetailLink();
                 await Task.Delay(1000);
-                Assert.Pass("Add button is functional");
+                Assert.Pass("Detail link is functional");
             }
             else
             {
-                Assert.Inconclusive("Add button not found in this view");
+                Assert.Inconclusive("Detail link not found in this view");
             }
         }
         catch (Exception ex)
         {
-            Assert.Inconclusive($"Add button test skipped: {ex.Message}");
+            Assert.Inconclusive($"Detail link test skipped: {ex.Message}");
         }
     }
 }

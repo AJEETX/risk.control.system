@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.DataProtection;
-using risk.control.system.AppConstant;
+﻿using risk.control.system.AppConstant;
 using risk.control.system.StartupExtensions;
 using Serilog;
 
@@ -10,15 +9,15 @@ var builder = WebApplication.CreateBuilder(args);
 var env = builder.Environment;
 
 // Use a path that exists on Azure Windows or Linux App Service
-var keysPath = env.IsDevelopment()
-    ? "/app/DataProtection-Keys"
-    : Path.Combine(env.ContentRootPath, "DataProtection-Keys");
+//var keysPath = env.IsDevelopment()
+//    ? "/app/DataProtection-Keys"
+//    : Path.Combine(env.ContentRootPath, "DataProtection-Keys");
 
-if (!Directory.Exists(keysPath)) Directory.CreateDirectory(keysPath);
+//if (!Directory.Exists(keysPath)) Directory.CreateDirectory(keysPath);
 
-builder.Services.AddDataProtection()
-    .PersistKeysToFileSystem(new DirectoryInfo(keysPath))
-    .SetApplicationName(Applicationsettings.WEBSITE_NAME);
+//builder.Services.AddDataProtection()
+//    .PersistKeysToFileSystem(new DirectoryInfo(keysPath))
+//    .SetApplicationName(Applicationsettings.WEBSITE_NAME);
 
 builder.Configuration
     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)

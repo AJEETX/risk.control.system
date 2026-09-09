@@ -70,19 +70,34 @@ public class LoginPage
         }
 
         await _page.ClickAsync(LoginButtonSelector);
+        // Wait for navigation or an error message. Use a bounded timeout to avoid hanging.
+        var navTask = _page.WaitForNavigationAsync(new PageWaitForNavigationOptions { WaitUntil = WaitUntilState.NetworkIdle, Timeout = 8000 });
 
-        // Wait for navigation to complete or error to appear
-        try
-        {
-            await _page.WaitForLoadStateAsync(LoadState.NetworkIdle);
-        }
-        catch
-        {
-            // Ignore timeout, we'll check for errors or redirect manually
-        }
+        var errorLocator = _page.Locator(ErrorMessageSelector + ", .error-message a.error");
+        var errorWaitTask = errorLocator.First.WaitForAsync(new LocatorWaitForOptions { Timeout = 5000 });
 
-        // Give the page time to settle after the submission
-        await _page.WaitForTimeoutAsync(1000);
+        // Wait for either navigation or error to appear, up to 8s
+        await Task.WhenAny(navTask, errorWaitTask, Task.Delay(8000));
+
+        // Give the page a small moment to settle
+        await _page.WaitForTimeoutAsync(500);
+
+        // If no visible error was detected, save page HTML to artifacts for debugging
+        var errText = await GetErrorMessage();
+        if (string.IsNullOrWhiteSpace(errText))
+        {
+            try
+            {
+                var html = await _page.ContentAsync();
+                var path = System.IO.Path.Combine(AppContext.BaseDirectory, "artifacts", "last_login_page.html");
+                System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(path) ?? ".");
+                await System.IO.File.WriteAllTextAsync(path, html);
+            }
+            catch
+            {
+                // ignore write failures
+            }
+        }
     }
 
     /// <summary>
@@ -92,7 +107,22 @@ public class LoginPage
     {
         try
         {
-            return await _page.TextContentAsync(ErrorMessageSelector);
+            var locator = _page.Locator(ErrorMessageSelector + ", .error-message a.error");
+            if (await locator.CountAsync() == 0)
+                return null;
+
+            // Wait briefly for the message text to populate
+            try
+            {
+                await locator.First.WaitForAsync(new LocatorWaitForOptions { Timeout = 2000 });
+            }
+            catch
+            {
+                // ignore
+            }
+
+            var text = await locator.First.InnerTextAsync();
+            return string.IsNullOrWhiteSpace(text) ? null : text.Trim();
         }
         catch
         {
@@ -107,9 +137,19 @@ public class LoginPage
     {
         try
         {
-            // Check for error link inside error-message div (a.error)
-            var errorLink = _page.Locator(".error-message a.error");
-            return await errorLink.IsVisibleAsync();
+            // Wait up to a short timeout for error message to appear
+            var locator = _page.Locator(".error-message a.error, .error-message, .alert-danger, .text-danger");
+            try
+            {
+                await locator.First.WaitForAsync(new LocatorWaitForOptions { Timeout = 3000 });
+            }
+            catch
+            {
+                // not visible within timeout
+            }
+
+            var txt = await GetErrorMessage();
+            return !string.IsNullOrWhiteSpace(txt);
         }
         catch
         {

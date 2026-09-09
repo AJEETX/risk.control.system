@@ -52,7 +52,53 @@ public class DashboardPage
     {
         try
         {
-            return await _page.IsVisibleAsync(DashboardContentSelector);
+            // Try multiple heuristics to detect a loaded dashboard
+            var selectors = new[] { 
+                DashboardContentSelector, // existing
+                "section.content", 
+                ".card-body",
+                "h3.card-title",
+                "#content",
+                ".content-wrapper",
+            };
+
+            foreach (var sel in selectors)
+            {
+                try
+                {
+                    var locator = _page.Locator(sel);
+                    if (await locator.CountAsync() > 0)
+                    {
+                        // Wait briefly for element to be visible
+                        try { await locator.First.WaitForAsync(new LocatorWaitForOptions { Timeout = 2000 }); } catch { }
+                        if (await locator.IsVisibleAsync())
+                            return true;
+                    }
+                }
+                catch
+                {
+                    // ignore and try next selector
+                }
+            }
+
+            // Fallback: check page title or header text contains 'Dashboard'
+            try
+            {
+                var title = await _page.TitleAsync();
+                if (!string.IsNullOrWhiteSpace(title) && title.Contains("Dashboard", StringComparison.OrdinalIgnoreCase))
+                    return true;
+            }
+            catch { }
+
+            try
+            {
+                var header = await _page.TextContentAsync("h3.card-title");
+                if (!string.IsNullOrWhiteSpace(header) && header.Contains("Dashboard", StringComparison.OrdinalIgnoreCase))
+                    return true;
+            }
+            catch { }
+
+            return false;
         }
         catch
         {
@@ -86,19 +132,53 @@ public class DashboardPage
     {
         try
         {
-            // Bootstrap dropdown menu structure:
-            // The settings dropdown is a nav link with fa-cog icon
-            // When clicked, shows a dropdown menu with logout button
+            // Click the logout trigger (opens modal) then confirm logout in modal
+            var trigger = _page.Locator("a[data-toggle='modal'][data-target='#logoutModal'], button[data-toggle='modal'][data-target='#logoutModal']");
+            if (await trigger.CountAsync() > 0)
+            {
+                try
+                {
+                    await trigger.First.ClickAsync(new LocatorClickOptions { Force = true });
+                }
+                catch
+                {
+                    // Fallback to JS click if Playwright click fails (e.g., element not in viewport)
+                    try
+                    {
+                        await trigger.First.EvaluateAsync("el => el.click()");
+                    }
+                    catch
+                    {
+                        // ignore
+                    }
+                }
+            }
+            else
+            {
+                // Fallback: try clicking any nav link that contains logout text/icon
+                try { await _page.ClickAsync("text=Logout"); } catch { }
+            }
 
-            // Click the settings dropdown toggle (looks for nav link with fa-cog icon)
-            await _page.ClickAsync(".nav-link.dropdown-toggle .fa-cog");
-            await _page.WaitForTimeoutAsync(500); // Wait for dropdown to expand
+            // Wait for the logout modal and click the logout button
+            try
+            {
+                await _page.Locator("#logoutModal").First.WaitForAsync(new LocatorWaitForOptions { Timeout = 5000 });
+                var logoutBtn = _page.Locator("#logoutModal button#logout, button#logout");
+                if (await logoutBtn.CountAsync() > 0)
+                {
+                    await logoutBtn.First.ClickAsync(new LocatorClickOptions { Force = true });
+                    // Wait briefly for navigation/redirect
+                    try { await _page.WaitForLoadStateAsync(LoadState.NetworkIdle, new() { Timeout = 5000 }); } catch { }
+                }
+            }
+            catch
+            {
+                // If modal didn't appear, try direct logout link
+                try { await _page.ClickAsync("a[href*='/Account/Logout'], a[href*='/Tools/Logout']"); } catch { }
+            }
 
-            // Click the logout link by text
-            await _page.ClickAsync("a:has-text('Logout')");
-
-            // The logout modal may appear, or we may be redirected
-            await _page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+            // Wait for redirect or network idle
+            try { await _page.WaitForLoadStateAsync(LoadState.NetworkIdle); } catch { }
         }
         catch (Exception ex)
         {

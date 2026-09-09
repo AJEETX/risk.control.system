@@ -1,12 +1,12 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
-name: Build and deploy ASP.Net Core app to Azure Web App - icheckify-10
+name: Build and deploy ASP.Net Core app to Azure Web App - policy-intel
 
 on:
   push:
     branches:
-      - Net10-upgrade
+      - policy-intel
   workflow_dispatch:
 
 jobs:
@@ -38,18 +38,28 @@ jobs:
   deploy:
     runs-on: windows-latest
     needs: build
-    
+    permissions:
+      id-token: write #This is required for requesting the JWT
+      contents: read #This is required for actions/checkout
+
     steps:
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
           name: .net-app
       
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_2BEDBF687996449A84D9E2F41A38204D }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_720F2CF4DBD542BB9939E1A18FA04597 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_1A66CF99B9B7420D84891F6FA43834FD }}
+
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'icheckify-10'
+          app-name: 'policy-intel'
           slot-name: 'Production'
           package: .
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_B8230710C65446CFA9F95CAFE779BBB4 }}
+          

@@ -1,5 +1,3 @@
-using Microsoft.Playwright;
-
 namespace risk.control.system.e2e.tests.Pages;
 
 /// <summary>
@@ -13,9 +11,8 @@ public class DataTablePage
     private const string TableSelector = "table, [role='grid'], [role='table']";
     private const string TableRowSelector = "tbody tr, [role='row']";
     private const string SearchInputSelector = "input[type='search'], input[placeholder*='Search'], input[placeholder*='search']";
-    private const string PaginationSelector = ".pagination, [role='navigation']";
-    private const string AddButtonSelector = "button:has-text('Add'), button:has-text('Create'), button:has-text('New')";
-    private const string EditButtonSelector = "button:has-text('Edit'), a:has-text('Edit')";
+    private const string DetailLinkSelector = "a:has-text('Detail')";
+    private const string DeleteLinkSelector = "a:has-text('Delete')";
     private const string DeleteButtonSelector = "button:has-text('Delete'), a:has-text('Delete')";
     private const string FilterSelector = ".filter, [data-testid='filter']";
 
@@ -85,11 +82,11 @@ public class DataTablePage
     /// <summary>
     /// Clicks the Add/Create button
     /// </summary>
-    public async Task ClickAddButton()
+    public async Task ClickDetailLink()
     {
         try
         {
-            await _page.ClickAsync(AddButtonSelector);
+            await _page.ClickAsync(DetailLinkSelector);
             await Task.Delay(1000);
         }
         catch
@@ -99,13 +96,19 @@ public class DataTablePage
     }
 
     /// <summary>
-    /// Clicks Edit on a row by row index
+    /// Clicks Delete on a row by row index
     /// </summary>
-    public async Task ClickEditInRow(int rowIndex)
+    public async Task ClickDeleteLink()
     {
-        var selector = $"{TableRowSelector}:nth-child({rowIndex + 1}) {EditButtonSelector}";
-        await _page.ClickAsync(selector);
-        await Task.Delay(1000);
+        try
+        {
+            await _page.ClickAsync(DeleteLinkSelector);
+            await Task.Delay(1000);
+        }
+        catch
+        {
+            throw new Exception("Delete button not found");
+        }
     }
 
     /// <summary>

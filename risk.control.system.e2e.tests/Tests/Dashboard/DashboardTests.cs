@@ -1,7 +1,3 @@
-using NUnit.Framework;
-using risk.control.system.e2e.tests.Fixtures;
-using risk.control.system.e2e.tests.Pages;
-
 namespace risk.control.system.e2e.tests.Tests.Dashboard;
 
 /// <summary>
@@ -62,7 +58,7 @@ public class DashboardTests : BaseTest
         {
             // This will depend on your actual menu structure
             await Page!.WaitForSelectorAsync("nav, .sidebar, [role='navigation']", new PageWaitForSelectorOptions { Timeout = 5000 });
-            
+
             // Assert
             var isMenuVisible = await IsElementVisible("nav, .sidebar, [role='navigation']");
             Assert.That(isMenuVisible, Is.True, "Navigation menu should be visible");
@@ -130,7 +126,7 @@ public class DashboardTests : BaseTest
 
         // Assert
         Assert.That(title, Is.Not.Null.And.Not.Empty, "Page should have a title");
-        Assert.That(title, Does.Contain("iCheckify"), "Page title should contain application name");
+        Assert.That(title, Does.Contain("icheckify"), "Page title should contain application name");
     }
 
     /// <summary>

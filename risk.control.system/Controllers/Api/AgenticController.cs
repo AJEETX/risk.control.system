@@ -22,7 +22,6 @@ namespace risk.control.system.Controllers.Api
 {
     [Route("api/[controller]")]
     [ApiController]
-    [IgnoreAntiforgeryToken]
     public class AgenticController(IGoogleOcrService googleService, IFileStorageService fileStorageService, IAmazonS3 s3Client, IAgenticService agenticService, IAmazonApiService amazonApiService) : ControllerBase
     {
         private readonly IGoogleOcrService _googleService = googleService;

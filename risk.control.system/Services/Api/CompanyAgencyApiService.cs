@@ -36,7 +36,7 @@ namespace risk.control.system.Services.Api
                 .Include(c => c.EmpanelledVendors).ThenInclude(v => v.Ratings)
                 .FirstOrDefaultAsync(c => c.ClientCompanyId == companyUser!.ClientCompanyId!.Value);
             if (company == null) return Array.Empty<object>();
-            var vendorTasks = company.EmpanelledVendors.Where(v => !v.Deleted).OrderBy(v => v.Name).Select(v => MapVendor(v, companyUser!, claimsCases));
+            var vendorTasks = company.EmpanelledVendors.Where(v => !v.Deleted).OrderByDescending(u => u.Updated).ThenBy(u => u.Name).Select(v => MapVendor(v, companyUser!, claimsCases));
             var result = await Task.WhenAll(vendorTasks);
             ResetVendorUpdateFlags(company.EmpanelledVendors);
             await _context.SaveChangesAsync(null, false);
