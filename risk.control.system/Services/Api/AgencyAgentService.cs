@@ -129,7 +129,7 @@ namespace risk.control.system.Services.Api
                 Photo = await photoTask,
                 Name = $"{agent.FirstName} {agent.LastName}",
                 Phone = $"(+{agent.Country!.ISDCode}) {agent.PhoneNumber}",
-                Addressline = $"{agent.Addressline}, {agent.District!.Name}",
+                Addressline = $"{agent.Addressline},{agent.PinCode.Name}, {agent.District!.Name}",
                 State = agent.State!.Name,
                 Country = agent.Country.Code,
                 Flag = $"/flags/{agent.Country.Code.ToLower()}.png",
