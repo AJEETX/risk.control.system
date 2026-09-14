@@ -36,7 +36,6 @@ public static class BusinessServiceExtension
         services.AddScoped<IImageConverter, ImageConverter>();
         services.AddScoped<ISmsNotificationService, SmsNotificationService>();
         services.AddScoped<IAwsFaceImageCheckService, AwsFaceImageCheckService>();
-        services.AddScoped<IOcrService, OcrService>();
         services.AddScoped<IManageAgencyUserService, ManageAgencyUserService>();
         services.AddScoped<IErrorNotifyService, ErrorNotifyService>();
         services.AddScoped<IManageCompanyUserService, ManageCompanyUserService>();
