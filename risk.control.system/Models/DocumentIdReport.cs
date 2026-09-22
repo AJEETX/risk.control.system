@@ -14,7 +14,7 @@ namespace risk.control.system.Models
         public override string ToString()
         {
             return $"Document Report:\n" +
-                $"Has Back Image:{HasBackImage}\n" +
+                $"Document Has Back Image:{HasBackImage}\n" +
                 $"Report Type:{ReportType.GetEnumDisplayName()}";
         }
     }

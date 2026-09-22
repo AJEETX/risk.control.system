@@ -49,18 +49,18 @@ namespace risk.control.system.Controllers.Agent
             {
                 return BadRequest("Invalid Data.");
             }
-            if (model.Image == null || model.Image.Length == 0)
+            if (model.FaceImage == null || model.FaceImage.Length == 0)
                 return Json(new { success = false, message = "No file provided." });
 
             if (isAgent)
             {
                 var response = await agentFaceIdfyService.CaptureAgentId(model);
-                return Json(new { success = true, image = response.Image });
+                return Json(new { success = true, image = response.ByteImage });
             }
             else
             {
                 var response = await agentIdService.CaptureFaceId(model);
-                return Json(new { success = true, image = response.Image });
+                return Json(new { success = true, image = response.ByteImage });
             }
         }
 
@@ -74,11 +74,11 @@ namespace risk.control.system.Controllers.Agent
             {
                 return BadRequest("Invalid image.");
             }
-            if (model.Image == null || model.Image.Length == 0)
+            if (model.DocumentImage == null || model.DocumentImage.Length == 0)
                 return Json(new { success = false, message = "No file provided." });
 
             var result = await documentIdfyService.CaptureDocumentId(model);
-            return Json(new { success = true, image = result.Image });
+            return Json(new { success = true, image = result.ByteImage });
         }
 
         [HttpPost]
@@ -92,9 +92,9 @@ namespace risk.control.system.Controllers.Agent
             {
                 return BadRequest("Invalid data.");
             }
-            if (model.Image == null || model.Image.Length == 0)
+            if (model.DocumentImage == null || model.DocumentImage.Length == 0)
                 return Json(new { success = false, message = "No file provided." });
-            var extension = Path.GetExtension(model.Image.FileName).ToLower();
+            var extension = Path.GetExtension(model.DocumentImage.FileName).ToLower();
 
             var supportedExtensions = new[] { ".mp4", ".webm", ".mov", ".mp3", ".wav", ".aac" };
             if (!supportedExtensions.Contains(extension))
@@ -105,7 +105,7 @@ namespace risk.control.system.Controllers.Agent
             {
                 success = true,
                 extension = extension.TrimStart('.'),
-                fileData = Convert.ToBase64String(response.Image!)
+                fileData = Convert.ToBase64String(response.ByteImage!)
             });
         }
 

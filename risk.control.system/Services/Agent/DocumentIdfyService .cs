@@ -45,8 +45,8 @@ internal class DocumentIdfyService(ApplicationDbContext context,
             var (lat, lon) = VerificationHelper.ParseCoordinates(data.LocationLatLong);
             var expected = VerificationHelper.GetExpectedCoordinates(claim);
             var docName = documentReport!.ReportName;
-            var extension = Path.GetExtension(data.Image!.FileName.ToLowerInvariant());
-            var (fileName, relativePath) = await _fileStorageService.SaveAsync(data.Image!, CONSTANTS.CASE, claim.PolicyDetail!.ContractNumber, CONSTANTS.TEMP_REPORT, null, $"{docName}{extension}");
+            var extension = Path.GetExtension(data.DocumentImage!.FileName.ToLowerInvariant());
+            var (fileName, relativePath) = await _fileStorageService.SaveAsync(data.DocumentImage!, CONSTANTS.CASE, claim.PolicyDetail!.ContractNumber, CONSTANTS.TEMP_REPORT, null, $"{docName}{extension}");
             documentReport!.FilePath = relativePath;
 
 
@@ -67,7 +67,7 @@ internal class DocumentIdfyService(ApplicationDbContext context,
             documentReport.LongLatTime = DateTime.UtcNow;
             var detectedText = await googleTask;
 
-            byte[] docImageBytes = await VerificationHelper.GetBytesFromIFormFile(data.Image!);
+            byte[] docImageBytes = await VerificationHelper.GetBytesFromIFormFile(data.DocumentImage!);
 
             await ProcessOcrResults(documentReport, docImageBytes, detectedText, claim);
             string allPanText = detectedText.FirstOrDefault()?.Text ?? string.Empty;
@@ -123,7 +123,7 @@ internal class DocumentIdfyService(ApplicationDbContext context,
         return new AppiCheckifyResponse
         {
             BeneficiaryId = claim.BeneficiaryDetail!.BeneficiaryDetailId,
-            Image = image,
+            ByteImage = image,
             OcrImage = doc.FilePath,
             OcrLongLat = doc.LongLat,
             OcrTime = doc.LongLatTime,

@@ -207,7 +207,17 @@
 					<div class="col-sm-6 d-flex align-items-stretch flex-column">
 						<div class="card bg-light equal-height-card">
 							<div class="card-footer text-muted border-bottom-0">
-								<i class="far fa-file-powerpoint"></i> <strong> Submission type </strong>[<a href="@policyLensUrl" target="_blank">PolicyLenz</a>]
+								<i class="far fa-file-powerpoint"></i> <strong> Submission type </strong>
+								[
+								@if(Model.CaseTask.AdjudicationCompleted)
+								{
+								<a href="@policyLensUrl" target="_blank">PolicyLenz</a>
+								}
+								else
+									{
+										<span class="badge blue">AI adjudication in progress ...</span>
+									}
+									]
 							</div>
 							
 							<div class="card-body scrollable-body">
