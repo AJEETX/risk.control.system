@@ -15,7 +15,7 @@ namespace risk.control.system.Models
         {
             return $"AgentIdReport: " +
                    $"Report Type={ReportType}, " +
-                   $"Image Match Confidence={DigitalIdImageMatchConfidence}, " +
+                   $"Agent Image Match Confidence={DigitalIdImageMatchConfidence}, " +
                    $"Similarity={Similarity}, " +
                    $"Has front and back Face={Has2Face}";
         }

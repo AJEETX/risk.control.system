@@ -31,7 +31,7 @@ namespace risk.control.system.Models.ViewModel
 
     public class FaceData
     {
-        public IFormFile? Image { get; set; }
+        public IFormFile? FaceImage { get; set; }
 
         [EmailAddress]
         public string Email { get; set; } = default!;
@@ -45,7 +45,7 @@ namespace risk.control.system.Models.ViewModel
 
     public class DocumentData
     {
-        public IFormFile? Image { get; set; }
+        public IFormFile? DocumentImage { get; set; }
 
         [EmailAddress]
         public string Email { get; set; } = default!;
@@ -65,7 +65,7 @@ namespace risk.control.system.Models.ViewModel
 
     public class VerifyIdRequest
     {
-        public string Image { get; set; } = default!;
+        public string AgentImage { get; set; } = default!;
         public string Uid { get; set; } = default!;
         public bool VerifyId { get; set; } = false;
     }

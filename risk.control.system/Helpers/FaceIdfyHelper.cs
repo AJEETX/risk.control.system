@@ -33,7 +33,7 @@ namespace risk.control.system.Helpers
             return new AppiCheckifyResponse
             {
                 BeneficiaryId = claim.BeneficiaryDetail!.BeneficiaryDetailId,
-                Image = img,
+                ByteImage = img,
                 LocationImage = face.FilePath,
                 LocationLongLat = face.LongLat,
                 LocationTime = face.LongLatTime,

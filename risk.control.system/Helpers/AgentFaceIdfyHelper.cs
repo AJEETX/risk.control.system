@@ -25,7 +25,7 @@ namespace risk.control.system.Helpers
             return new AppiCheckifyResponse
             {
                 BeneficiaryId = claim.BeneficiaryDetail?.BeneficiaryDetailId ?? 0,
-                Image = image,
+                ByteImage = image,
                 LocationImage = face.FilePath,
                 LocationLongLat = face.LongLat,
                 LocationTime = face.LongLatTime,

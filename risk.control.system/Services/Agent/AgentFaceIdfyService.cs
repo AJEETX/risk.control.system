@@ -50,9 +50,9 @@ internal class AgentFaceIdfyService(ApplicationDbContext context,
         try
         {
             // 1. Prepare Data & Save Physical File
-            var faceBytes = await VerificationHelper.GetBytesFromIFormFile(data.Image!);
-            var imageExtension = Path.GetExtension(data.Image!.FileName.ToLowerInvariant());
-            var (faceImageFileName, relativePath) = await _fileStorageService.SaveAsync(data.Image!, CONSTANTS.CASE, claim.PolicyDetail!.ContractNumber, CONSTANTS.TEMP_REPORT, null, $"agent{imageExtension}");
+            var faceBytes = await VerificationHelper.GetBytesFromIFormFile(data.FaceImage!);
+            var imageExtension = Path.GetExtension(data.FaceImage!.FileName.ToLowerInvariant());
+            var (faceImageFileName, relativePath) = await _fileStorageService.SaveAsync(data.FaceImage!, CONSTANTS.CASE, claim.PolicyDetail!.ContractNumber, CONSTANTS.TEMP_REPORT, null, $"agent{imageExtension}");
             var (foriginalFaceImageFileName, originalRelativePath) = await _fileStorageService.SaveAsync(faceBytes, imageExtension, CONSTANTS.CASE, claim.PolicyDetail!.ContractNumber, CONSTANTS.REPORT, null, $"agent{imageExtension}");
 
             // 2. Extract Coordinates
