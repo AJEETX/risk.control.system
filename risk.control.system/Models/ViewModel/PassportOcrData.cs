@@ -12,10 +12,10 @@
         public PassportPosition? position { get; set; }
         public Nation? nation { get; set; }
         public Ocr? ocr { get; set; }
-        public Image? image { get; set; }
+        public PassportImage? image { get; set; }
     }
 
-    public class Image
+    public class PassportImage
     {
         public string? documentFrontSide { get; set; }
     }

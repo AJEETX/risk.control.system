@@ -1,7 +1,10 @@
 ﻿using Amazon.Rekognition;
 using Amazon.Rekognition.Model;
+using Microsoft.EntityFrameworkCore;
 using risk.control.system.AppConstant;
 using risk.control.system.Helpers;
+using risk.control.system.Models;
+using risk.control.system.Models.ViewModel;
 using risk.control.system.Services.Agent;
 
 namespace risk.control.system.Services.Agentic
@@ -9,12 +12,28 @@ namespace risk.control.system.Services.Agentic
     public interface IAgenticService
     {
         Task<(bool, string)> FaceExistsAsync(IFormFile image);
+
+        Task<bool> CaseAdjudicatedAsync(AdjudicationRequest request);
         //byte[] ConvertImageToSearchablePdfBytes(string inputImagePath);
     }
-    internal class AgenticService(IAmazonApiService amazonApiService) : IAgenticService
+    internal class AgenticService(ApplicationDbContext dbContext, IAmazonApiService amazonApiService) : IAgenticService
     {
         //private static string tessDataPath = @"./tessdata"; // Path to your tessdata folder
         private readonly IAmazonApiService _amazonApiService = amazonApiService;
+        private readonly ApplicationDbContext _dbContext = dbContext;
+
+        public async Task<bool> CaseAdjudicatedAsync(AdjudicationRequest request)
+        {
+            var caseTask = await _dbContext.Investigations.Include(c => c.PolicyDetail).FirstOrDefaultAsync(i => i.PolicyDetail!.ContractNumber == request.PolicyNumber.Trim());
+            if (caseTask == null)
+            {
+                throw new InvalidOperationException("Investigation task not found.");
+            }
+            caseTask.AdjudicationCompleted = request.Set;
+            _dbContext.Investigations.Update(caseTask);
+            return await _dbContext.SaveChangesAsync() > 0;
+        }
+
         public async Task<(bool, string)> FaceExistsAsync(IFormFile image)
         {
             var imageCollection = EnvHelper.Get(CONSTANTS.FaceImageCollection);

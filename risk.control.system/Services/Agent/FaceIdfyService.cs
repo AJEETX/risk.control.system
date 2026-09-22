@@ -46,9 +46,9 @@ internal class FaceIdfyService(ApplicationDbContext context,
             var (lat, lon) = VerificationHelper.ParseCoordinates(data.LocationLatLong!);
             var expected = VerificationHelper.GetExpectedCoordinates(caseDetail);
             var imageName = isCustomer ? "life-assured" : "beneficiary";
-            var imageExtension = Path.GetExtension(data.Image!.FileName.ToLowerInvariant());
-            var (fileName, relativePath) = await _fileStorageService.SaveAsync(data.Image!, CONSTANTS.CASE, caseDetail.PolicyDetail!.ContractNumber, CONSTANTS.TEMP_REPORT, null, $"{imageName}{imageExtension}");
-            var faceBytes = await VerificationHelper.GetBytesFromIFormFile(data.Image!);
+            var imageExtension = Path.GetExtension(data.FaceImage!.FileName.ToLowerInvariant());
+            var (fileName, relativePath) = await _fileStorageService.SaveAsync(data.FaceImage!, CONSTANTS.CASE, caseDetail.PolicyDetail!.ContractNumber, CONSTANTS.TEMP_REPORT, null, $"{imageName}{imageExtension}");
+            var faceBytes = await VerificationHelper.GetBytesFromIFormFile(data.FaceImage!);
             var (originalFileName, originalRelativePath) = await _fileStorageService.SaveAsync(faceBytes, imageExtension, CONSTANTS.CASE, caseDetail.PolicyDetail!.ContractNumber, CONSTANTS.REPORT, null, $"{imageName}{imageExtension}");
             var regPath = Path.Combine(_env.ContentRootPath, FaceIdfyHelper.GetRegisteredImagePath(caseDetail, isCustomer));
             var registeredImage = await File.ReadAllBytesAsync(regPath);

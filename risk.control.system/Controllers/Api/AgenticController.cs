@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using risk.control.system.AppConstant;
 using risk.control.system.Helpers;
+using risk.control.system.Models.ViewModel;
 using risk.control.system.Services.Agent;
 using risk.control.system.Services.Agentic;
 using risk.control.system.Services.Common;
@@ -458,6 +459,23 @@ namespace risk.control.system.Controllers.Api
                 return StatusCode(StatusCodes.Status500InternalServerError, new { Success = false, Message = ex.Message });
             }
         }
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
+        [HttpPost("adjudicate")]
+        public async Task<IActionResult> CaseAdjudicated([FromBody] AdjudicationRequest request)
+        {
+            try
+            {
+                var result = await _agenticService.CaseAdjudicatedAsync(request);
+                return Ok(new { Success = result });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in Case Adjudication: {ex.Message}");
+                return StatusCode(StatusCodes.Status500InternalServerError, new { Success = false, Message = ex.Message });
+            }
+        }
+
         //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
         //[HttpPost("convert-image-to-searchable-pdf")]
         //public async Task<IActionResult> ConvertImageToSearchablePdf(IFormFile imageFile)
