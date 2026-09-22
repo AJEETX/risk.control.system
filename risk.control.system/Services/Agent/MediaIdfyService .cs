@@ -44,12 +44,12 @@ internal class MediaIdfyService(ApplicationDbContext context,
             // 1. Prepare Data & Coordinates
             var (lat, lon) = VerificationHelper.ParseCoordinates(data.LocationLatLong);
             var expected = VerificationHelper.GetExpectedCoordinates(claim);
-            byte[] fileBytes = await VerificationHelper.GetBytesFromIFormFile(data.DocumentImage!);
+            byte[] fileBytes = await VerificationHelper.GetBytesFromIFormFile(data.Image!);
 
             // 2. Storage & Metadata
-            var (fileName, relativePath) = await _fileStorageService.SaveMediaAsync(data.DocumentImage!, CONSTANTS.CASE, claim.PolicyDetail!.ContractNumber, CONSTANTS.REPORT);
+            var (fileName, relativePath) = await _fileStorageService.SaveMediaAsync(data.Image!, CONSTANTS.CASE, claim.PolicyDetail!.ContractNumber, CONSTANTS.REPORT);
             MediaIdfyHelper.UpdateMediaMetadata(media!, relativePath, fileName, lat, lon);
-            MediaIdfyHelper.DetermineMediaType(media!, data.DocumentImage!.ContentType);
+            MediaIdfyHelper.DetermineMediaType(media!, data.Image!.ContentType);
 
             // 3. Parallel Service Orchestration
             var weatherTask = _weatherInfoService.GetWeatherAsync(lat, lon);

@@ -32,7 +32,7 @@ namespace risk.control.system.Services.Manager
         Task LoadEditModelAsync(ApplicationUser model);
     }
 
-    public class ManageAgencyUserService(
+    internal class ManageAgencyUserService(
         ApplicationDbContext context,
         IFeatureManager featureManager,
         IAgencyUserCreateEditService agencyUserCreateEditService,

@@ -19,7 +19,7 @@ namespace risk.control.system.Services
         Task<object> GetRejectedCases(string userEmail, int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc");
     }
 
-    public class AssessorService(ApplicationDbContext context, IDbContextFactory<ApplicationDbContext> contextFactory, IBase64FileService base64FileService) : IAssessorService
+    internal class AssessorService(ApplicationDbContext context, IDbContextFactory<ApplicationDbContext> contextFactory, IBase64FileService base64FileService) : IAssessorService
     {
         private readonly ApplicationDbContext _context = context;
         private readonly IDbContextFactory<ApplicationDbContext> _contextFactory = contextFactory;

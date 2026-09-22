@@ -219,7 +219,7 @@ namespace risk.control.system.Controllers.Mobile
                 {
                     return BadRequest("Request body cannot be null or empty.");
                 }
-                if (string.IsNullOrWhiteSpace(request.Uid) || string.IsNullOrWhiteSpace(request.AgentImage))
+                if (string.IsNullOrWhiteSpace(request.Uid) || string.IsNullOrWhiteSpace(request.Image))
                 {
                     return BadRequest("Uid And/Or Image is empty/null");
                 }
@@ -237,7 +237,7 @@ namespace risk.control.system.Controllers.Mobile
                     return Ok(new { Email = mobileUidExist.Email, Pin = mobileUidExist.SecretPin });
                 }
 
-                var image = Convert.FromBase64String(request.AgentImage);
+                var image = Convert.FromBase64String(request.Image);
                 var registeredImage = await System.IO.File.ReadAllBytesAsync(Path.Combine(_env.ContentRootPath, mobileUidExist.ProfilePictureUrl));
                 var matched = await _compareFaces.FaceMatch(registeredImage, image);
                 if (matched.Item1)
@@ -622,7 +622,7 @@ namespace risk.control.system.Controllers.Mobile
                 {
                     return BadRequest("Request body cannot be null or empty.");
                 }
-                if (data.FaceImage == null || string.IsNullOrEmpty(data.LocationLatLong))
+                if (data.Image == null || string.IsNullOrEmpty(data.LocationLatLong))
                 {
                     return BadRequest("All fields (Image, LatLong) are required and must be valid.");
                 }
@@ -671,7 +671,7 @@ namespace risk.control.system.Controllers.Mobile
                 {
                     return BadRequest("Request body cannot be null or empty.");
                 }
-                if (data.DocumentImage == null || string.IsNullOrEmpty(data.LocationLatLong))
+                if (data.Image == null || string.IsNullOrEmpty(data.LocationLatLong))
                 {
                     return BadRequest("All fields (Image, LatLong) are required and must be valid.");
                 }
@@ -710,12 +710,12 @@ namespace risk.control.system.Controllers.Mobile
                 {
                     return BadRequest("Request body cannot be null or empty.");
                 }
-                if (data.DocumentImage == null || string.IsNullOrEmpty(data.LocationLatLong))
+                if (data.Image == null || string.IsNullOrEmpty(data.LocationLatLong))
                 {
                     return BadRequest("All fields (Image, LatLong) are required and must be valid.");
                 }
 
-                var extension = Path.GetExtension(data.DocumentImage.FileName).ToLower();
+                var extension = Path.GetExtension(data.Image.FileName).ToLower();
 
                 var supportedExtensions = new[] { ".mp4", ".webm", ".mov", ".mp3", ".wav", ".aac" };
                 if (!supportedExtensions.Contains(extension))

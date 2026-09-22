@@ -18,6 +18,7 @@ namespace risk.control.system.Seeds
             var uploadImage2Aws = await featureManager.IsEnabledAsync(FeatureFlags.FACE_MATCH_CHECK);
             if (uploadImage2Aws)
             {
+                //Delete the existing collection if it exists
                 var imageCollection = EnvHelper.Get(CONSTANTS.FaceImageCollection);
                 var deletedResponse = await _amazonApiService.DeleteCollectionAsync(imageCollection!);
 
