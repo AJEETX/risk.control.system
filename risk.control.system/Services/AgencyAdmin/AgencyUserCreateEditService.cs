@@ -22,7 +22,7 @@ namespace risk.control.system.Services.AgencyAdmin
         Task<(bool Success, string Message, Dictionary<string, string> Errors)> EditVendorUserAsync(EditVendorUserRequest request, ModelStateDictionary modelState, string portal_base_url);
     }
 
-    public class AgencyUserCreateEditService(
+    internal class AgencyUserCreateEditService(
         IValidateImageService validateImageService,
         UserManager<ApplicationUser> userManager,
         ApplicationDbContext context,

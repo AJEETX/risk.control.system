@@ -11,7 +11,7 @@ namespace risk.control.system.Services.Creator
         Task<(PolicyDetail Policy, List<UploadError> Errors, List<string> Summaries)> ProcessPolicy(UploadCase uc, ApplicationUser user, byte[] zipData);
     }
 
-    public class PolicyProcessor(IDbContextFactory<ApplicationDbContext> contextFactory, IVerifierProcessor verifierProcessor, IDateParserService dateParserService) : IPolicyProcessor
+    internal class PolicyProcessor(IDbContextFactory<ApplicationDbContext> contextFactory, IVerifierProcessor verifierProcessor, IDateParserService dateParserService) : IPolicyProcessor
     {
         private readonly IDbContextFactory<ApplicationDbContext> _contextFactory = contextFactory;
         private readonly IVerifierProcessor _verifierProcessor = verifierProcessor;

@@ -49,7 +49,7 @@ namespace risk.control.system.Controllers.Agent
             {
                 return BadRequest("Invalid Data.");
             }
-            if (model.FaceImage == null || model.FaceImage.Length == 0)
+            if (model.Image == null || model.Image.Length == 0)
                 return Json(new { success = false, message = "No file provided." });
 
             if (isAgent)
@@ -74,7 +74,7 @@ namespace risk.control.system.Controllers.Agent
             {
                 return BadRequest("Invalid image.");
             }
-            if (model.DocumentImage == null || model.DocumentImage.Length == 0)
+            if (model.Image == null || model.Image.Length == 0)
                 return Json(new { success = false, message = "No file provided." });
 
             var result = await documentIdfyService.CaptureDocumentId(model);
@@ -92,9 +92,9 @@ namespace risk.control.system.Controllers.Agent
             {
                 return BadRequest("Invalid data.");
             }
-            if (model.DocumentImage == null || model.DocumentImage.Length == 0)
+            if (model.Image == null || model.Image.Length == 0)
                 return Json(new { success = false, message = "No file provided." });
-            var extension = Path.GetExtension(model.DocumentImage.FileName).ToLower();
+            var extension = Path.GetExtension(model.Image.FileName).ToLower();
 
             var supportedExtensions = new[] { ".mp4", ".webm", ".mov", ".mp3", ".wav", ".aac" };
             if (!supportedExtensions.Contains(extension))
