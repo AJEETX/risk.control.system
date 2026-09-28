@@ -630,12 +630,17 @@ namespace risk.control.system.Services.Api
                 file.TimeTakenSeconds,
                 TimeTaken = file.TimeTakenSeconds > 0 ? $" {file.TimeTakenSeconds} sec" : "<i class='fas fa-sync fa-spin i-grey'></i>",
             }).ToList();
+            var maxCaseReached = false;
+            if (companyUser.ClientCompany.LicenseType == LicenseType.Trial)
+            {
+                maxCaseReached = companyUser.ClientCompany.TotalCreatedClaimAllowed >= totalReadyToAssign;
+            }
             return new FilesDataResponse
             {
                 Draw = draw,
                 RecordsTotal = recordsTotal,
                 RecordsFiltered = recordsFiltered,
-                MaxAssignReadyAllowed = companyUser.ClientCompany.TotalCreatedClaimAllowed >= totalReadyToAssign,
+                MaxAssignReadyAllowed = maxCaseReached,
                 Data = data
             };
         }
