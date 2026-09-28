@@ -103,7 +103,7 @@ namespace risk.control.system.Controllers.Common
                         continue;
                     }
                 }
-
+                viewModel.ErrorDetails = viewModel.ErrorDetails.OrderByDescending(o => o.Timestamp).ToList();
                 return View(viewModel);
             }
             catch (IOException ex)

@@ -16,7 +16,7 @@ public interface IDocumentIdfyService
 internal class DocumentIdfyService(ApplicationDbContext context,
     IAgentCaseDetailService caseService,
     IProcessImageService processImageService,
-    ILogger<FaceIdfyService> logger,
+    ILogger<DocumentIdfyService> logger,
     IFileStorageService fileStorageService,
     IPanCardService panCardService,
     IGoogleOcrService googleApi,
@@ -26,7 +26,7 @@ internal class DocumentIdfyService(ApplicationDbContext context,
     private readonly ApplicationDbContext _context = context;
     private readonly IAgentCaseDetailService _caseService = caseService;
     private readonly IProcessImageService _processImageService = processImageService;
-    private readonly ILogger<FaceIdfyService> _logger = logger;
+    private readonly ILogger<DocumentIdfyService> _logger = logger;
     private readonly IFileStorageService _fileStorageService = fileStorageService;
     private readonly IPanCardService _panCardService = panCardService;
     private readonly IGoogleOcrService _googleApi = googleApi;

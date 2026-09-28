@@ -26,7 +26,7 @@
                 };
             },
             "dataSrc": function (json) {
-                if (uploadId > 0 && !json.maxAssignReadyAllowed) {
+                if (uploadId > 0 && json.maxAssignReadyAllowed) {
                     $("#uploadAssignCheckbox, #postedFile, #UploadFileButton").prop("disabled", true);
                     $.confirm({
                         title: 'Information',
