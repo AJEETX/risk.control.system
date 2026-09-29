@@ -633,7 +633,7 @@ namespace risk.control.system.Services.Api
             var maxCaseReached = false;
             if (companyUser.ClientCompany.LicenseType == LicenseType.Trial)
             {
-                maxCaseReached = companyUser.ClientCompany.TotalCreatedClaimAllowed >= totalReadyToAssign;
+                maxCaseReached = companyUser.ClientCompany.TotalCreatedClaimAllowed <= totalReadyToAssign;
             }
             return new FilesDataResponse
             {
