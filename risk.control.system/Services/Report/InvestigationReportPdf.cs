@@ -20,7 +20,7 @@ namespace risk.control.system.Services.Report
         //InvestigationTask SaveReport(InvestigationTask task, ReportTemplate report);
     }
 
-    public class InvestigationReportPdfService : IInvestigationReportPdfService
+    internal class InvestigationReportPdfService : IInvestigationReportPdfService
     {
         private readonly ApplicationDbContext _context;
 

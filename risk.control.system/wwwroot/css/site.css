@@ -4679,3 +4679,12 @@ td.expand-btn-cell * {
 .btn-xs-map {
     font-size: 0.75rem;
 }
+@keyframes blinker {
+    50% {
+        opacity: 0;
+    }
+}
+
+.blink {
+    animation: blinker 1s linear infinite;
+}

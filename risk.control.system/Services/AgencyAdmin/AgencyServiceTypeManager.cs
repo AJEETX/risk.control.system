@@ -12,7 +12,7 @@ namespace risk.control.system.Services.AgencyAdmin
         Task<ServiceCreateEditResult> EditAsync(VendorInvestigationServiceType service, string currentUserEmail);
     }
 
-    public class AgencyServiceTypeManager(ApplicationDbContext context) : IAgencyServiceTypeManager
+    internal class AgencyServiceTypeManager(ApplicationDbContext context) : IAgencyServiceTypeManager
     {
         private readonly ApplicationDbContext _context = context;
 

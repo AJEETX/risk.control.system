@@ -78,7 +78,11 @@ namespace risk.control.system.Services.Creator
                     return;
                 }
                 var totalReadyToAssign = await _investigationService.GetAutoCount(companyUser.Email!);
-                if (uploadedCases.Count + totalReadyToAssign > companyUser.ClientCompany.TotalToAssignMaxAllowed)
+                if (companyUser.ClientCompany.LicenseType == LicenseType.Standard)
+                {
+
+                }
+                if (companyUser.ClientCompany.LicenseType == LicenseType.Trial && uploadedCases.Count + totalReadyToAssign > companyUser.ClientCompany.TotalToAssignMaxAllowed)
                 {
                     await _uploadFileStatusService.SetFileUploadFailure(uploadFileData, $"Max count of {companyUser.ClientCompany.TotalToAssignMaxAllowed} Assign-Ready Case(s) limit reached.", uploadAndAssign, [.. uploadedCases.Select(c => c!.Id)]);
                     await _caseNotificationService.NotifyFileUpload(companyUser.Email!, uploadFileData, url);

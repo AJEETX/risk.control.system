@@ -23,7 +23,7 @@ namespace risk.control.system.Services.Company
         Task LoadModelAsync(ApplicationUser model, string currentUserEmail);
     }
 
-    public class ManageCompanyUserService(
+    internal class ManageCompanyUserService(
         ApplicationDbContext context,
         RoleManager<ApplicationRole> roleManager,
         ICompanyUserService companyUserService,

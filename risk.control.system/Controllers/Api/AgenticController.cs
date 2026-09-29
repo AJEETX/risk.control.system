@@ -467,7 +467,7 @@ namespace risk.control.system.Controllers.Api
             try
             {
                 var result = await _agenticService.CaseAdjudicatedAsync(request);
-                return Ok(new { Success = result });
+                return Ok(new { Success = result, Message = "Case adjudicated successfully." });
             }
             catch (Exception ex)
             {

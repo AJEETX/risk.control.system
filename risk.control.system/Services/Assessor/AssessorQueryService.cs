@@ -10,7 +10,7 @@ namespace risk.control.system.Services.Assessor
         Task<InvestigationTask> SubmitQueryToAgency(string userEmail, long caseId, EnquiryRequest request, List<EnquiryRequest> requests, IFormFile? document);
     }
 
-    public class AssessorQueryService(ApplicationDbContext context, ILogger<AssessorQueryService> logger, ITimelineService timelineService) : IAssessorQueryService
+    internal class AssessorQueryService(ApplicationDbContext context, ILogger<AssessorQueryService> logger, ITimelineService timelineService) : IAssessorQueryService
     {
         private readonly ApplicationDbContext _context = context;
         private readonly ILogger<AssessorQueryService> _logger = logger;

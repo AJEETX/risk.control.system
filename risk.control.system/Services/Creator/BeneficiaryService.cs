@@ -26,7 +26,7 @@ namespace risk.control.system.Services.Creator
         Task<(bool Success, Dictionary<string, string> Errors)> EditAsync(string userEmail, BeneficiaryDetail model);
     }
 
-    public class BeneficiaryService(
+    internal class BeneficiaryService(
         ApplicationDbContext context,
         IFeatureManager featureManager,
         IAddInvestigationService addInvestigationService,

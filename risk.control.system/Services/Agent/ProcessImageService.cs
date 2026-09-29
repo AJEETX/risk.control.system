@@ -16,7 +16,7 @@ namespace risk.control.system.Services.Agent
         byte[] CompressImage(byte[] imageBytes, int quality = 75, string watermarkText = "VERIFIED");
     }
 
-    public class ProcessImageService(ILogger<ProcessImageService> logger) : IProcessImageService
+    internal class ProcessImageService(ILogger<ProcessImageService> logger) : IProcessImageService
     {
         private const int maxWidth = 1200;
         private readonly ILogger<ProcessImageService> _logger = logger;

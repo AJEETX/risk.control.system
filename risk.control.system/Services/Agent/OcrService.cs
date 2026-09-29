@@ -16,7 +16,7 @@ public interface IOcrService
     Task<byte[]> MaskPanNumber(byte[] imageBytes, BoundingBox box);
 }
 
-public class OcrService(ILogger<OcrService> logger, IAmazonTextract amazonTextract, IProcessImageService processImageService) : IOcrService
+internal class OcrService(ILogger<OcrService> logger, IAmazonTextract amazonTextract, IProcessImageService processImageService) : IOcrService
 {
     private readonly ILogger _logger = logger;
     private readonly IAmazonTextract _amazonTextract = amazonTextract;

@@ -10,7 +10,7 @@ namespace risk.control.system.Services.Creator
         Task<LicenseStatus> GetUploadPermissionsAsync(ApplicationUser user, bool isManager = false);
     }
 
-    public class LicenseService(ApplicationDbContext context, IInvestigationService investigationService) : ILicenseService
+    internal class LicenseService(ApplicationDbContext context, IInvestigationService investigationService) : ILicenseService
     {
         private readonly ApplicationDbContext _context = context;
         private readonly IInvestigationService _investigationService = investigationService;
