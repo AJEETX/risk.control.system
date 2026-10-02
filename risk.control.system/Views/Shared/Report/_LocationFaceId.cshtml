@@ -40,7 +40,7 @@
 								}
 							</div>
 							<div class="p-2 bg-white rounded border d-flex align-items-center justify-content-between shadow-sm" title="Captured Time" data-toggle="tooltip">
-								<span class="badge bg-dark px-2.5 py-1.5 fs-7 fw-medium">
+								<span class="badge bg-light px-2.5 py-1.5 fs-7 fw-medium">
 									<i class="fas fa-clock me-1 text-warning"></i>
 									<span class="local-time-display" data-utc="@(face.LongLatTime.HasValue ? face.LongLatTime.Value.ToString("o") : "")">
 										@(face.LongLatTime.HasValue ? "Loading..." : "--")
@@ -252,7 +252,7 @@
 										<i class="fa fa-minus-circle me-1"></i> Pending
 									</span>
 								}
-								<span class="fw-bold small text-secondary mt-1">@face.Similarity</span>
+								<span class="fw-bold small text-secondary mt-1" title="Match percentage" data-bs-toggle="tooltip">@face.Similarity %</span>
 							</div>
 						</td>
 				</tr>

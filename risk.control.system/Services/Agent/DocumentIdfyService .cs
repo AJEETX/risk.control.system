@@ -15,40 +15,37 @@ public interface IDocumentIdfyService
 
 internal class DocumentIdfyService(ApplicationDbContext context,
     IAgentCaseDetailService caseService,
-    IProcessImageService processImageService,
+    IProcessDocumentService processDocumentService,
     ILogger<DocumentIdfyService> logger,
     IFileStorageService fileStorageService,
-    IPanCardService panCardService,
     IGoogleOcrService googleApi,
     IHttpClientService httpClientService,
     ICustomApiClient customApiCLient) : IDocumentIdfyService
 {
     private readonly ApplicationDbContext _context = context;
     private readonly IAgentCaseDetailService _caseService = caseService;
-    private readonly IProcessImageService _processImageService = processImageService;
+    private readonly IProcessDocumentService _processDocumentService = processDocumentService;
     private readonly ILogger<DocumentIdfyService> _logger = logger;
     private readonly IFileStorageService _fileStorageService = fileStorageService;
-    private readonly IPanCardService _panCardService = panCardService;
     private readonly IGoogleOcrService _googleApi = googleApi;
     private readonly IHttpClientService _httpClientService = httpClientService;
     private readonly ICustomApiClient _customApiCLient = customApiCLient;
 
     public async Task<AppiCheckifyResponse> CaptureDocumentId(DocumentData data)
     {
-        var claim = await _caseService.GetCaseById(data.CaseId);
-        if (claim?.InvestigationReport == null) return null!;
-        var location = claim.InvestigationReport.ReportTemplate!.LocationReport.FirstOrDefault(l => l.LocationName == data.LocationName);
+        var caseDetail = await _caseService.GetCaseById(data.CaseId);
+        if (caseDetail?.InvestigationReport == null) return null!;
+        var location = caseDetail.InvestigationReport.ReportTemplate!.LocationReport.FirstOrDefault(l => l.LocationName == data.LocationName);
         var locationTemplate = await _context.LocationReport.Include(l => l.DocumentIds).FirstOrDefaultAsync(l => l.Id == location!.Id);
         var documentReport = locationTemplate!.DocumentIds!.FirstOrDefault(c => c.ReportName == data.ReportName);
         try
         {
             var (lat, lon) = VerificationHelper.ParseCoordinates(data.LocationLatLong);
-            var expected = VerificationHelper.GetExpectedCoordinates(claim);
+            var expected = VerificationHelper.GetExpectedCoordinates(caseDetail);
             var docName = documentReport!.ReportName;
             var extension = Path.GetExtension(data.Image!.FileName.ToLowerInvariant());
-            var (fileName, relativePath) = await _fileStorageService.SaveAsync(data.Image!, CONSTANTS.CASE, claim.PolicyDetail!.ContractNumber, CONSTANTS.TEMP_REPORT, null, $"{docName}{extension}");
+            var (fileName, relativePath) = await _fileStorageService.SaveAsync(data.Image!, CONSTANTS.CASE, caseDetail.PolicyDetail!.ContractNumber, CONSTANTS.TEMP_REPORT, null, $"{docName}{extension}");
             documentReport!.FilePath = relativePath;
-
 
             documentReport.ImageExtension = Path.GetExtension(fileName);
             var googleTask = _googleApi.DetectText(documentReport.FilePath!);
@@ -69,53 +66,21 @@ internal class DocumentIdfyService(ApplicationDbContext context,
 
             byte[] docImageBytes = await VerificationHelper.GetBytesFromIFormFile(data.Image!);
 
-            await ProcessOcrResults(documentReport, docImageBytes, detectedText, claim);
-            string allPanText = detectedText.FirstOrDefault()?.Text ?? string.Empty;
-
-            var maskedDocImage = _panCardService.MaskPanIfFound(docImageBytes, detectedText, allPanText);
-            var (foriginalFaceImageFileName, originalRelativePath) = await _fileStorageService.SaveAsync(maskedDocImage, extension, CONSTANTS.CASE, claim.PolicyDetail!.ContractNumber, CONSTANTS.REPORT, null, $"{docName}{extension}");
-            documentReport.OriginalFilePath = originalRelativePath;
+            await _processDocumentService.ProcessOcrResults(documentReport, docImageBytes, detectedText, caseDetail, extension);
 
             locationTemplate.ValidationExecuted = true;
             locationTemplate.Updated = DateTime.UtcNow;
             locationTemplate.UpdatedBy = data.Email;
             _context.DocumentIdReport.Update(documentReport);
-            _context.Investigations.Update(claim);
+            _context.Investigations.Update(caseDetail);
             await _context.SaveChangesAsync();
-            return MapResponse(claim, documentReport, docImageBytes);
+            return MapResponse(caseDetail, documentReport, docImageBytes);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed Document file capture/processing for Case {CaseId}. {AgentEmail}", data.CaseId, data.Email?.Replace("\n", "").Replace("\r", "").Trim());
-            return await HandleError(claim, documentReport!);
+            _logger.LogError(ex, "Failed Document file capture for Case {CaseId}. {AgentEmail}", data.CaseId, data.Email?.Replace("\n", "").Replace("\r", "").Trim());
+            return await HandleError(caseDetail, documentReport!);
         }
-    }
-
-    private async Task ProcessOcrResults(DocumentIdReport doc, byte[] docImage, IReadOnlyList<TextBlock> ocrResult, InvestigationTask claim)
-    {
-        if (ocrResult?.Count > 0)
-        {
-            var company = await _context.ClientCompany.FindAsync(claim.ClientCompanyId);
-
-            if (doc.ReportName == DocumentIdReportType.PAN.GetEnumDisplayName())
-            {
-                await _panCardService.Process(docImage, ocrResult, company!, doc, doc.ImageExtension!);
-            }
-            else
-            {
-                var compressed = _processImageService.CompressImage(docImage);
-                await File.WriteAllBytesAsync(doc.FilePath!, compressed);
-                doc.ImageValid = true;
-                doc.LocationInfo = ocrResult.FirstOrDefault()?.Text;
-            }
-        }
-        else
-        {
-            doc.ImageValid = false;
-            doc.LocationInfo = "No OCR data detected";
-            await File.WriteAllBytesAsync(doc.FilePath!, _processImageService.CompressImage(docImage));
-        }
-        doc.ValidationExecuted = true;
     }
 
     private static AppiCheckifyResponse MapResponse(InvestigationTask claim, DocumentIdReport doc, byte[] image)

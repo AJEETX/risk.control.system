@@ -33,13 +33,13 @@ namespace risk.control.system.Models
         [Display(Name = "Passport")]
         PASSPORT,
 
-        [Display(Name = "Voter_Card")]
-        VOTER_CARD,
+        [Display(Name = "Voter_ID")]
+        VOTER_ID,
 
         [Display(Name = "Death_Certificate")]
         DEATH_CERTIFICATE,
 
-        [Display(Name = "Income_Tax_Return_(ITR)")]
+        [Display(Name = "Income_Tax_Return")]
         ITR,
 
         [Display(Name = "P&L_Account_Statement")]
