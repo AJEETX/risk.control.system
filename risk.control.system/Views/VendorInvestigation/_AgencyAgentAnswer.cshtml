@@ -3,7 +3,7 @@
 
 @{
     var questionTime = @Model.InvestigationReport?.AgentRemarksUpdated != null ?
-    @Model.InvestigationReport.AgentRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt") : null;
+    @Model.InvestigationReport.AgentRemarksUpdated.Value.ToLocalTime().ToString("dd-MMM-yy HH:mm") : null;
 }
 <div class="col-md-12">
     <div class="card bg-light border-success">

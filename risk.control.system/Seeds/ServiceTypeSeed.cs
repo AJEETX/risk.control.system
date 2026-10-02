@@ -26,7 +26,7 @@ namespace risk.control.system.Seeds
             var claimNonComprehensiveService = await context.InvestigationServiceType.AddAsync(claimNonComprehensive);
             var underWritingPreVerification = new InvestigationServiceType
             {
-                Name = "PRE-BOARD",
+                Name = "PRE-ISSUANCE",
                 Code = "PRE",
                 InsuranceType = InsuranceType.UNDERWRITING,
                 MasterData = true,
@@ -35,10 +35,11 @@ namespace risk.control.system.Seeds
             var underWritingPreVerificationService = await context.InvestigationServiceType.AddAsync(underWritingPreVerification);
             var underWritingPostVerification = new InvestigationServiceType
             {
-                Name = "POST-BOARD",
+                Name = "POST-ISSUANCE",
                 Code = "POS",
                 InsuranceType = InsuranceType.UNDERWRITING,
-                MasterData = true
+                MasterData = true,
+                Updated = DateTime.UtcNow
             };
             var underWritingPostVerificationService = await context.InvestigationServiceType.AddAsync(underWritingPostVerification);
             await context.SaveChangesAsync(null, false);

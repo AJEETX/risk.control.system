@@ -28,6 +28,7 @@ namespace risk.control.system.Seeds
                     },
                     DocumentIds = new List<DocumentIdReport>
                     {
+                        //CreateDocumentReport(DocumentIdReportType.ADHAAR, true),
                         CreateDocumentReport(DocumentIdReportType.PAN, true)
                     },
                     Questions = UnderwritingQuestion.QuestionsUNDERWRITING_LA_ADDRESS()

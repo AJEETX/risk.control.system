@@ -71,7 +71,7 @@ internal class FaceIdfyService(ApplicationDbContext context,
             faceIdReport.LocationInfo = await weatherTask;
             faceIdReport.LocationAddress = await addressTask;
             faceIdReport.MatchConfidence = conf;
-            faceIdReport.Similarity = sim;
+            faceIdReport.Similarity = MathF.Round((float)sim, 2);
             faceIdReport.ImageValid = sim > 70;
             await File.WriteAllBytesAsync(faceIdReport.FilePath!, compImg);
             await _context.SaveChangesAsync();
