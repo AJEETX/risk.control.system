@@ -41,7 +41,7 @@
                 @if (!string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.InvestigationReport?.AgentRemarks))
                 {
                     var questionTime = @Model.ClaimsInvestigation.InvestigationReport.AgentRemarksUpdated != null ?
-                    @Model.ClaimsInvestigation.InvestigationReport.AgentRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt") : null;
+                    @Model.ClaimsInvestigation.InvestigationReport.AgentRemarksUpdated.Value.ToLocalTime().ToString("dd-MMM-yy HH:mm") : null;
                     <div class="card  border-success">
                         <div class="card-header text-muted border-bottom-0">
                             <h3 class="card-title">
@@ -58,8 +58,7 @@
                             </h3>
                             <div class="card-tools">
                                 <span data-bs-toggle="tooltip" title="Agent report time" class="badge badge-light">
-                                    <i class="nav-icon fas fa-clock"></i>
-                                    @Model.ClaimsInvestigation?.InvestigationReport?.AgentRemarksUpdated!.Value.ToString("dd-MMM-yy hh:mm tt")
+                                    <i class="nav-icon fas fa-clock"></i>@questionTime
                                 </span>
 
                             </div>
@@ -130,7 +129,7 @@
                             </h3>
                             <div class="card-tools">
                                 <span data-bs-toggle="tooltip" title=" Agency:" class="badge badge-light">
-                                    <i class="nav-icon fas fa-clock"></i> @Model?.ClaimsInvestigation.InvestigationReport?.SupervisorRemarksUpdated!.Value.ToString("dd-MMM-yy hh:mm tt")
+                                    <i class="nav-icon fas fa-clock"></i> @Model?.ClaimsInvestigation.InvestigationReport?.SupervisorRemarksUpdated!.Value.ToLocalTime().ToString("dd-MMM-yy HH:mm")
                                 </span>
                             </div>
 
