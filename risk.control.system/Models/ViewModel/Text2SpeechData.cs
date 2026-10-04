@@ -11,4 +11,8 @@ namespace risk.control.system.Models.ViewModel
 
         public int RemainingTries { get; set; } = 5;
     }
+    public class Text2Speech
+    {
+        public string TextData { get; set; } = "this is a test text";
+    }
 }

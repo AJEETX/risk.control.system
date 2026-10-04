@@ -23,13 +23,13 @@ namespace risk.control.system.Seeds
                     MediaReports = CreateDefaultMediaReports(true, false),
                     FaceIds = new List<FaceIdReport>
                     {
-                        CreateFaceReport(DigitalIdReportType.CUSTOMER_FACE, true, true),
-                        CreateFaceReport(DigitalIdReportType.BENEFICIARY_FACE, true, false)
+                        CreateFaceReport(DigitalIdReportType.CUSTOMER_FACE, true, true)
                     },
                     DocumentIds = new List<DocumentIdReport>
                     {
                         CreateDocumentReport(DocumentIdReportType.ADHAAR, true),
-                        CreateDocumentReport(DocumentIdReportType.PAN, true)
+                        CreateDocumentReport(DocumentIdReportType.PAN, false),
+                        CreateDocumentReport(DocumentIdReportType.ITR, false)
                     },
                     Questions = UnderwritingQuestion.QuestionsUNDERWRITING_LA_ADDRESS()
                 }

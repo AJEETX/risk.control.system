@@ -12,4 +12,9 @@ namespace risk.control.system.Models.ViewModel
 
         public int RemainingTries { get; set; } = 5;
     }
+
+    public class Speech2TextRequest
+    {
+        public IFormFile SpeechInputData { get; set; } = default!;
+    }
 }
