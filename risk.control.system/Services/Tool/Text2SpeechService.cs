@@ -24,7 +24,7 @@ namespace risk.control.system.Services.Tool
             {
                 var response = await _client.SynthesizeSpeechAsync(request);
 
-                using (var memoryStream = new MemoryStream())
+                await using (var memoryStream = new MemoryStream())
                 {
                     // Copy the audio stream to a memory stream
                     await response.AudioStream.CopyToAsync(memoryStream);

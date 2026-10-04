@@ -14,6 +14,7 @@ namespace risk.control.system.Services.Tool
     public interface ISpeech2TextService
     {
         Task<string> ConvertSpeech(Speech2TextData input);
+        Task<string> ConvertSpeech2Text(Speech2TextRequest input);
         Task ConvertMediaSpeech(string relativePath, long mediaId);
     }
 
@@ -177,6 +178,85 @@ namespace risk.control.system.Services.Tool
                 do
                 {
                     await Task.Delay(2000); // Wait 2 seconds
+                    var getRequest = new GetTranscriptionJobRequest { TranscriptionJobName = jobName };
+                    var response = await _transcribeClient.GetTranscriptionJobAsync(getRequest);
+                    status = response.TranscriptionJob;
+                } while (status.TranscriptionJobStatus == TranscriptionJobStatus.IN_PROGRESS);
+
+                if (status.TranscriptionJobStatus == TranscriptionJobStatus.COMPLETED)
+                {
+                    var httpClient = _clientFactory.CreateClient();
+                    try
+                    {
+                        var result = await httpClient.GetFromJsonAsync<JsonElement>(status.Transcript.TranscriptFileUri);
+                        transcribedText = result.GetProperty("results").GetProperty("transcripts")[0].GetProperty("transcript").GetString()!;
+                    }
+                    catch (HttpRequestException e)
+                    {
+                        Console.WriteLine($"Request error: {e.Message}");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                transcribedText = "Error during transcription: " + ex.Message;
+            }
+            finally
+            {
+                // 6. Cleanup S3 temporary file to prevent unnecessary storage costs
+                try
+                {
+                    var deleteRequest = new DeleteObjectRequest
+                    {
+                        BucketName = bucketName,
+                        Key = fileName
+                    };
+                    await _s3Client.DeleteObjectAsync(deleteRequest);
+                }
+                catch (Exception s3Ex)
+                {
+                    _logger.LogWarning(s3Ex, "Failed to clean up temporary S3 file {FileName} from bucket {BucketName}", fileName, bucketName);
+                }
+            }
+            return transcribedText;
+        }
+
+        public async Task<string> ConvertSpeech2Text(Speech2TextRequest input)
+        {
+            string fileName = $"{Guid.NewGuid()}_{input.SpeechInputData!.FileName}";
+            string transcribedText = "";
+            try
+            {
+                if (!(await Amazon.S3.Util.AmazonS3Util.DoesS3BucketExistV2Async(_s3Client, bucketName)))
+                {
+                    var putBucketRequest = new PutBucketRequest { BucketName = bucketName, UseClientRegion = true };
+                    await _s3Client.PutBucketAsync(putBucketRequest);
+                    var publicAccessBlockRequest = new PutPublicAccessBlockRequest
+                    {
+                        BucketName = bucketName,
+                        PublicAccessBlockConfiguration = new PublicAccessBlockConfiguration
+                        {
+                            BlockPublicAcls = true,
+                            BlockPublicPolicy = true,
+                            IgnorePublicAcls = true,
+                            RestrictPublicBuckets = true
+                        }
+                    };
+                    await _s3Client.PutPublicAccessBlockAsync(publicAccessBlockRequest);
+                }
+                await using (var stream = input.SpeechInputData.OpenReadStream())
+                {
+                    var uploadRequest = new TransferUtilityUploadRequest { InputStream = stream, Key = fileName, BucketName = bucketName };
+                    var fileTransferUtility = new TransferUtility(_s3Client);
+                    await fileTransferUtility.UploadAsync(uploadRequest);
+                }
+                var jobName = $"Job_{Guid.NewGuid()}";
+                var startRequest = CreateRequest(jobName, fileName);
+                await _transcribeClient.StartTranscriptionJobAsync(startRequest);
+                TranscriptionJob status;
+                do
+                {
+                    await Task.Delay(100); // Wait 100 milli seconds
                     var getRequest = new GetTranscriptionJobRequest { TranscriptionJobName = jobName };
                     var response = await _transcribeClient.GetTranscriptionJobAsync(getRequest);
                     status = response.TranscriptionJob;

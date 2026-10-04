@@ -23,13 +23,22 @@ namespace risk.control.system.Controllers.Api
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AgenticController(IGoogleOcrService googleService, IFileStorageService fileStorageService, IAmazonS3 s3Client, IAgenticService agenticService, IAmazonApiService amazonApiService) : ControllerBase
+    public class AgenticController(
+        IGoogleOcrService googleService,
+        IFileStorageService fileStorageService,
+        IAmazonS3 s3Client,
+        IAgenticService agenticService,
+        IAmazonApiService amazonApiService,
+        ISpeech2TextService speech2TextService,
+        IText2SpeechService text2SpeechService) : ControllerBase
     {
         private readonly IGoogleOcrService _googleService = googleService;
         private readonly IFileStorageService _fileStorageService = fileStorageService;
         private readonly IAmazonS3 _s3Client = s3Client;
         private readonly IAgenticService _agenticService = agenticService;
         private readonly IAmazonApiService _amazonApiService = amazonApiService;
+        private readonly ISpeech2TextService _speech2TextService = speech2TextService;
+        private readonly IText2SpeechService _text2SpeechService = text2SpeechService;
 
         //Ocr Endpoint
         [HttpPost("Ocr")]
@@ -472,6 +481,38 @@ namespace risk.control.system.Controllers.Api
             catch (Exception ex)
             {
                 Console.WriteLine($"Error in Case Adjudication: {ex.Message}");
+                return StatusCode(StatusCodes.Status500InternalServerError, new { Success = false, Message = ex.Message });
+            }
+        }
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
+        [HttpPost("speech-to-text")]
+        public async Task<IActionResult> ConvertSpeechToText(Speech2TextRequest request)
+        {
+            try
+            {
+                var result = await _speech2TextService.ConvertSpeech2Text(request);
+                return Ok(new { Success = result, Message = "Speech converted to text successfully." });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in Speech to Text conversion: {ex.Message}");
+                return StatusCode(StatusCodes.Status500InternalServerError, new { Success = false, Message = ex.Message });
+            }
+        }
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
+        [HttpPost("text-to-speech")]
+        public async Task<IActionResult> ConvertTextToSpeech(Text2Speech request)
+        {
+            try
+            {
+                var result = await _text2SpeechService.Convert(request.TextData);
+                return Ok(new { Success = result, Message = "Text converted to speech successfully." });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in Text to Speech conversion: {ex.Message}");
                 return StatusCode(StatusCodes.Status500InternalServerError, new { Success = false, Message = ex.Message });
             }
         }
