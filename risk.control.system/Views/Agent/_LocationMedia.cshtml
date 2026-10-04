@@ -17,12 +17,11 @@
 					<th scope="col" class="min-vw-25" data-toggle="tooltip" title="Play Media">
 						<i class="fas fa-copy text-muted ms-2" ></i> Play Media
 				</th>
+					<th title="Transcript Data" data-toggle="tooltip"><img class="action-image" src="~/headers/information.gif" />Transcript Data</th>
 				
 					<th scope="col" class="min-vw-25" data-toggle="tooltip" title="Address Info">Address Info</th>
 
-					<th class="col-weather" title="Weather info" data-toggle="tooltip">
-						<img class="action-image" src="~/headers/information.gif" /> Weather info</th>
-					<th scope="col" class="text-center col-1" title="Map View" data-toggle="tooltip">
+					<th scope="col" class="text-center col-1" title="Map View" data-togsgle="tooltip">
 						<img class="action-image me-2" src="~/headers/pincode.gif" alt="Map" />Map View
 					</th>
 					<th title ="Action" data-toggle="tooltip">Action</th>
@@ -41,7 +40,7 @@
 					<td>@doc.ReportName
 						@if (doc.IsRequired)
 						{
-							<span class="required-asterisk" title="Mandatory Location">*</span>
+							<span class="required-asterisk" title="Required">*</span>
 						}
 					</td>
 					
@@ -77,6 +76,11 @@
 						}
 
 					</td>
+							<td>
+								<div class="p-4 bg-white rounded border shadow-sm">
+									<div class="text-dark fs-6 fw-bold ps-1 small">@doc.Transcript</div>
+								</div>
+							</td>
 						<td>
 							<div class="d-flex flex-column gap-2">
 								<!-- Address Card -->
@@ -90,14 +94,19 @@
 								<div class="p-2.5 bg-white rounded border shadow-sm text-center">
 									<div class="text-dark fs-6 fw-bold ps-1 small"> @doc.Distance</div>
 								</div>
+									<div class="card border border-light-subtle shadow-sm bg-white rounded-3 overflow-hidden">
+										<div class="card-header bg-light py-1 px-2 border-bottom border-light-subtle text-center">
+											<small class="text-secondary fw-bold text-uppercase tracking-wider fs-8">
+												<i class="fas fa-cloud-sun me-1 text-info"></i> Weather Info
+											</small>
+										</div>
+										<div class="card-body p-2 bg-white">
+											<div class="text-muted small italic">@doc.LocationInfo</div>
+										</div>
+									</div>
 							</div>
 						</td>
-						<td>
-							<div class="text-start mt-1 p-2 bg-white rounded border text-left">
-								@doc.LocationInfo
-
-							</div>
-						</td>
+						
 						<td class="text-center">
 							@if (doc.ValidationExecuted && doc.LocationMapUrl != null)
 							{

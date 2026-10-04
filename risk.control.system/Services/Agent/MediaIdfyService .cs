@@ -1,9 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Hangfire;
+using Microsoft.EntityFrameworkCore;
 using risk.control.system.AppConstant;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services.Common;
+using risk.control.system.Services.Tool;
 
 namespace risk.control.system.Services.Agent;
 
@@ -17,6 +19,7 @@ internal class MediaIdfyService(ApplicationDbContext context,
     IWeatherInfoService weatherInfoService,
     ILogger<FaceIdfyService> logger,
     IFileStorageService fileStorageService,
+    IBackgroundJobClient backgroundJobClient,
     IHttpClientService httpClientService,
     ICustomApiClient customApiClient) : IMediaIdfyService
 {
@@ -25,31 +28,84 @@ internal class MediaIdfyService(ApplicationDbContext context,
     private readonly IWeatherInfoService _weatherInfoService = weatherInfoService;
     private readonly ILogger<FaceIdfyService> _logger = logger;
     private readonly IFileStorageService _fileStorageService = fileStorageService;
+    private readonly IBackgroundJobClient _backgroundJobClient = backgroundJobClient;
     private readonly IHttpClientService _httpClientService = httpClientService;
     private readonly ICustomApiClient _customApiClient = customApiClient;
 
     public async Task<AppiCheckifyResponse> CaptureMedia(DocumentData data)
     {
-        InvestigationTask claim = await _caseService.GetCaseByIdForMedia(data.CaseId);
-        if (claim?.InvestigationReport == null) return null!;
+        var caseDetail = await _caseService.GetCaseByIdForMedia(data.CaseId);
+        if (caseDetail?.InvestigationReport == null)
+        {
+            _logger.LogError("Case not found for CaseId {CaseId}", data.CaseId);
+            return new AppiCheckifyResponse
+            {
+                BeneficiaryId = caseDetail?.BeneficiaryDetail?.BeneficiaryDetailId ?? 0,
+                Valid = false,
+                LocationLongLat = "No Data",
+                LocationTime = DateTime.UtcNow
+            };
+        }
 
-        var location = claim.InvestigationReport.ReportTemplate!.LocationReport.FirstOrDefault(l => l.LocationName == data.LocationName);
+        var locationRecord = caseDetail.InvestigationReport.ReportTemplate!.LocationReport.FirstOrDefault(l => l.LocationName == data.LocationName);
+        if (locationRecord == null)
+        {
+            _logger.LogError("Location not found for Case {CaseId} and LocationName {LocationName}", data.CaseId, data.LocationName);
+            return new AppiCheckifyResponse
+            {
+                BeneficiaryId = caseDetail?.BeneficiaryDetail?.BeneficiaryDetailId ?? 0,
+                Valid = false,
+                LocationLongLat = "No Data",
+                LocationTime = DateTime.UtcNow
+            };
+        }
 
-        var locationTemplate = await _context.LocationReport.Include(l => l.MediaReports).FirstOrDefaultAsync(l => l.Id == location!.Id);
+        var locationTemplate = await _context.LocationReport.Include(l => l.MediaReports).FirstOrDefaultAsync(l => l.Id == locationRecord!.Id);
+        if (locationTemplate == null)
+        {
+            _logger.LogError("Location template not found for Case {CaseId} and LocationName {LocationName}", data.CaseId, data.LocationName);
+            return new AppiCheckifyResponse
+            {
+                BeneficiaryId = caseDetail?.BeneficiaryDetail?.BeneficiaryDetailId ?? 0,
+                Valid = false,
+                LocationLongLat = "No Data",
+                LocationTime = DateTime.UtcNow
+            };
+        }
 
-        var media = locationTemplate!.MediaReports!.FirstOrDefault(c => c.ReportName == data.ReportName);
+        var mediaReport = locationTemplate!.MediaReports!.FirstOrDefault(c => c.ReportName == data.ReportName);
+        if (mediaReport == null)
+        {
+            _logger.LogError("Media report not found for Case {CaseId}, LocationName {LocationName}, and ReportName {ReportName}", data.CaseId, data.LocationName, data.ReportName);
+            return new AppiCheckifyResponse
+            {
+                BeneficiaryId = caseDetail?.BeneficiaryDetail?.BeneficiaryDetailId ?? 0,
+                Valid = false,
+                LocationLongLat = "No Data",
+                LocationTime = DateTime.UtcNow
+            };
+        }
 
+        if (!string.IsNullOrWhiteSpace(mediaReport!.FilePath))
+        {
+            _fileStorageService.DeleteFile(mediaReport.FilePath);
+        }
+        if (!string.IsNullOrWhiteSpace(mediaReport!.OriginalFilePath))
+        {
+            _fileStorageService.DeleteFile(mediaReport.OriginalFilePath);
+        }
         try
         {
             // 1. Prepare Data & Coordinates
             var (lat, lon) = VerificationHelper.ParseCoordinates(data.LocationLatLong);
-            var expected = VerificationHelper.GetExpectedCoordinates(claim);
+            var expected = VerificationHelper.GetExpectedCoordinates(caseDetail);
             byte[] fileBytes = await VerificationHelper.GetBytesFromIFormFile(data.Image!);
 
             // 2. Storage & Metadata
-            var (fileName, relativePath) = await _fileStorageService.SaveMediaAsync(data.Image!, CONSTANTS.CASE, claim.PolicyDetail!.ContractNumber, CONSTANTS.REPORT);
-            MediaIdfyHelper.UpdateMediaMetadata(media!, relativePath, fileName, lat, lon);
-            MediaIdfyHelper.DetermineMediaType(media!, data.Image!.ContentType);
+            var (fileName, relativePath) = await _fileStorageService.SaveMediaAsync(data.Image!, CONSTANTS.CASE, caseDetail.PolicyDetail!.ContractNumber, CONSTANTS.REPORT);
+            MediaIdfyHelper.UpdateMediaMetadata(mediaReport!, relativePath, fileName, lat, lon);
+            MediaIdfyHelper.DetermineMediaType(mediaReport!, data.Image!.ContentType);
+            _backgroundJobClient.Enqueue<ISpeech2TextService>(service => service.ConvertMediaSpeech(relativePath, mediaReport!.Id));
 
             // 3. Parallel Service Orchestration
             var weatherTask = _weatherInfoService.GetWeatherAsync(lat, lon);
@@ -60,14 +116,13 @@ internal class MediaIdfyService(ApplicationDbContext context,
 
             // 4. Update Results
             var (dist, distM, dur, durS, mapUrl) = await mapTask;
-            media!.LocationMapUrl = mapUrl;
-            media.Duration = dur;
-            media.Distance = dist;
-            media.DistanceInMetres = distM;
-            media.DurationInSeconds = durS;
-            media.LocationAddress = await addressTask;
-            media.LocationInfo = await weatherTask;
-
+            mediaReport!.LocationMapUrl = mapUrl;
+            mediaReport.Duration = dur;
+            mediaReport.Distance = dist;
+            mediaReport.DistanceInMetres = distM;
+            mediaReport.DurationInSeconds = durS;
+            mediaReport.LocationAddress = await addressTask;
+            mediaReport.LocationInfo = await weatherTask;
             locationTemplate.ValidationExecuted = true;
             locationTemplate.Updated = DateTime.UtcNow;
             locationTemplate.UpdatedBy = data.Email;
@@ -79,7 +134,7 @@ internal class MediaIdfyService(ApplicationDbContext context,
         {
             var sanitizedEmail = data.Email?.Replace("\n", "").Replace("\r", "").Trim();
             _logger.LogError(ex, "Failed media file capture for Case {CaseId}. {AgentEmail}", data.CaseId, sanitizedEmail);
-            return await HandleMediaError(claim, media!);
+            return await HandleMediaError(caseDetail, mediaReport!);
         }
     }
 

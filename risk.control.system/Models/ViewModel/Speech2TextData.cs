@@ -8,6 +8,7 @@ namespace risk.control.system.Models.ViewModel
         public IFormFile? SpeechInputData { get; set; }
 
         public string? TextData { get; set; }
+        public long? MediaId { get; set; }
 
         public int RemainingTries { get; set; } = 5;
     }

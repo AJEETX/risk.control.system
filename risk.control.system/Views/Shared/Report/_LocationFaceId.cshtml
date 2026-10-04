@@ -28,7 +28,7 @@
 			</thead>
 
 		<tbody>
-			@foreach (var face in location.FaceIds.Where(f => f.Selected))
+			@foreach (var face in location.FaceIds.Where(f => f.Selected && f.ValidationExecuted))
 			{
 					<tr class="align-middle">
 						<td>

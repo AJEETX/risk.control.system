@@ -17,6 +17,8 @@
 					<th scope="col" class="min-vw-25" data-toggle="tooltip" title="Play Media">
 						<i class="fas fa-copy text-muted ms-2"></i> Play Media
 					</th>
+					<th title="Transcript Data" data-toggle="tooltip"><img class="action-image" src="~/headers/information.gif" />Transcript Data</th>
+
 					<th scope="col" class="min-vw-25" title="Address Info" data-toggle="tooltip"> <i class="fas fa-home"></i>  Address Info</th>
 					
 					<th scope="col" class="text-center col-1" title="Map View" data-toggle="tooltip">
@@ -25,7 +27,7 @@
 				</tr>
 		</thead>
 		<tbody>
-			@foreach (var doc in location.MediaReports.Where(d => d.Selected))
+			@foreach (var doc in location.MediaReports.Where(d => d.Selected && d.ValidationExecuted))
 			{
 					<tr class="align-middle">
 
@@ -82,6 +84,11 @@
 
 						</td>
 						<td>
+							<div class="p-4 bg-white rounded border shadow-sm">
+								<div class="text-dark fs-6 fw-bold ps-1 small">@doc.Transcript</div>
+							</div>
+						</td>
+						<td>
 							<div class="d-flex flex-column gap-2 p-1">
 								<div class="card border border-light-subtle shadow-sm bg-white rounded-3 overflow-hidden">
 									<div class="card-header bg-light py-1 px-2 border-bottom border-light-subtle text-center">
@@ -104,6 +111,16 @@
 										<span class="badge bg-light text-dark border border-secondary-subtle fw-bold fs-7">
 											@doc.Distance
 										</span>
+									</div>
+								</div>
+								<div class="card border border-light-subtle shadow-sm bg-white rounded-3 overflow-hidden">
+									<div class="card-header bg-light py-1 px-2 border-bottom border-light-subtle text-center">
+										<small class="text-secondary fw-bold text-uppercase tracking-wider fs-8">
+											<i class="fas fa-cloud-sun me-1 text-info"></i> Weather Info
+										</small>
+									</div>
+									<div class="card-body p-2 bg-white">
+										<div class="text-muted small italic">@doc.LocationInfo</div>
 									</div>
 								</div>
 							</div>

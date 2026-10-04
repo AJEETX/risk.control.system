@@ -34,10 +34,65 @@ internal class DocumentIdfyService(ApplicationDbContext context,
     public async Task<AppiCheckifyResponse> CaptureDocumentId(DocumentData data)
     {
         var caseDetail = await _caseService.GetCaseById(data.CaseId);
-        if (caseDetail?.InvestigationReport == null) return null!;
-        var location = caseDetail.InvestigationReport.ReportTemplate!.LocationReport.FirstOrDefault(l => l.LocationName == data.LocationName);
-        var locationTemplate = await _context.LocationReport.Include(l => l.DocumentIds).FirstOrDefaultAsync(l => l.Id == location!.Id);
+        if (caseDetail?.InvestigationReport == null)
+        {
+            _logger.LogError("Case not found for CaseId {CaseId}", data.CaseId);
+            return new AppiCheckifyResponse
+            {
+                BeneficiaryId = caseDetail?.BeneficiaryDetail?.BeneficiaryDetailId ?? 0,
+                Valid = false,
+                LocationLongLat = "No Data",
+                LocationTime = DateTime.UtcNow
+            };
+        }
+
+        var locationRecord = caseDetail.InvestigationReport.ReportTemplate!.LocationReport.FirstOrDefault(l => l.LocationName == data.LocationName);
+        if (locationRecord == null)
+        {
+            _logger.LogError("Location not found for Case {CaseId} and LocationName {LocationName}", data.CaseId, data.LocationName);
+            return new AppiCheckifyResponse
+            {
+                BeneficiaryId = caseDetail?.BeneficiaryDetail?.BeneficiaryDetailId ?? 0,
+                Valid = false,
+                LocationLongLat = "No Data",
+                LocationTime = DateTime.UtcNow
+            };
+        }
+
+        var locationTemplate = await _context.LocationReport.Include(l => l.DocumentIds).FirstOrDefaultAsync(l => l.Id == locationRecord!.Id);
+        if (locationTemplate == null)
+        {
+            _logger.LogError("Location template not found for Case {CaseId} and LocationName {LocationName}", data.CaseId, data.LocationName);
+            return new AppiCheckifyResponse
+            {
+                BeneficiaryId = caseDetail?.BeneficiaryDetail?.BeneficiaryDetailId ?? 0,
+                Valid = false,
+                LocationLongLat = "No Data",
+                LocationTime = DateTime.UtcNow
+            };
+        }
+
         var documentReport = locationTemplate!.DocumentIds!.FirstOrDefault(c => c.ReportName == data.ReportName);
+        if (documentReport == null)
+        {
+            _logger.LogError("Document report not found for Case {CaseId}, LocationName {LocationName}, and ReportName {ReportName}", data.CaseId, data.LocationName, data.ReportName);
+            return new AppiCheckifyResponse
+            {
+                BeneficiaryId = caseDetail?.BeneficiaryDetail?.BeneficiaryDetailId ?? 0,
+                Valid = false,
+                LocationLongLat = "No Data",
+                LocationTime = DateTime.UtcNow
+            };
+        }
+
+        if (!string.IsNullOrWhiteSpace(documentReport!.FilePath))
+        {
+            _fileStorageService.DeleteFile(documentReport.FilePath);
+        }
+        if (!string.IsNullOrWhiteSpace(documentReport!.OriginalFilePath))
+        {
+            _fileStorageService.DeleteFile(documentReport.OriginalFilePath);
+        }
         try
         {
             var (lat, lon) = VerificationHelper.ParseCoordinates(data.LocationLatLong);

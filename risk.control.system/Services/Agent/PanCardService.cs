@@ -6,7 +6,7 @@ namespace risk.control.system.Services.Agent
 {
     public interface IPanCardService
     {
-        Task<DocumentIdReport> Process(byte[] IdImage, IReadOnlyList<TextBlock> imageReadOnly, ClientCompany company, DocumentIdReport doc, string onlyExtension);
+        Task<byte[]> Process(byte[] IdImage, IReadOnlyList<TextBlock> imageReadOnly, ClientCompany company, DocumentIdReport doc);
         byte[] MaskPanIfFound(byte[] idImage, IReadOnlyList<TextBlock> imageReadOnly, string allPanText);
     }
 
@@ -25,7 +25,7 @@ namespace risk.control.system.Services.Agent
         private string panNumber = string.Empty;
         private string docyTypePan = string.Empty;
 
-        public async Task<DocumentIdReport> Process(byte[] idImage, IReadOnlyList<TextBlock> imageReadOnly, ClientCompany company, DocumentIdReport doc, string onlyExtension)
+        public async Task<byte[]> Process(byte[] idImage, IReadOnlyList<TextBlock> imageReadOnly, ClientCompany company, DocumentIdReport doc)
         {
             var filePath = Path.Combine(_env.ContentRootPath, doc.FilePath!);
             string allPanText = imageReadOnly.FirstOrDefault()?.Text ?? string.Empty;
@@ -37,7 +37,7 @@ namespace risk.control.system.Services.Agent
 
                 doc.ImageValid = await ValidatePanNumber(panNumber, company);
 
-                await SaveCompressedImage(filePath, idImage);
+                idImage = await SaveCompressedImage(filePath, idImage);
 
                 doc.LocationInfo = FormatLocationInfo(allPanText, panNumber, documentType);
             }
@@ -45,12 +45,12 @@ namespace risk.control.system.Services.Agent
             {
                 _logger.LogError(ex, "Error occurred during PAN document processing.");
 
-                await SaveCompressedImage(filePath, idImage);
+                idImage = await SaveCompressedImage(filePath, idImage);
                 doc.LongLatTime = DateTime.UtcNow;
                 doc.LocationInfo = "no data: ";
             }
 
-            return doc;
+            return idImage;
         }
 
         private (string PanNumber, string DocumentType) ExtractPanAndType(string allPanText)
@@ -105,20 +105,21 @@ namespace risk.control.system.Services.Agent
         {
             if (!string.IsNullOrWhiteSpace(panNumber) && documentType == docyTypePanName)
             {
-                string maskedText = allPanText.Replace(panNumber, "XXXXXXXXXXX");
+                string maskedText = allPanText.Replace(panNumber[..6], "XXXXXXX");
                 return $"{documentType} data: \r\n {maskedText}";
             }
 
             return $"{documentType} data: \r\n {allPanText}";
         }
 
-        private async Task SaveCompressedImage(string filePath, byte[] imageBytes)
+        private async Task<byte[]> SaveCompressedImage(string filePath, byte[] imageBytes)
         {
             byte[] compressed = _processImageService.CompressImage(imageBytes);
             await File.WriteAllBytesAsync(filePath, compressed);
+            return compressed;
         }
 
-        private string SafeSubstring(string text, int startIndex, int length)
+        private static string SafeSubstring(string text, int startIndex, int length)
         {
             if (startIndex < 0 || startIndex >= text.Length) return string.Empty;
             if (startIndex + length > text.Length) return text.Substring(startIndex);

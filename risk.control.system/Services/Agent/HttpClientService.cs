@@ -1,5 +1,6 @@
 ﻿using System.Net.Http.Headers;
-
+using System.Text;
+using System.Text.Json.Serialization;
 using Newtonsoft.Json;
 using risk.control.system.AppConstant;
 using risk.control.system.Models;
@@ -9,6 +10,7 @@ namespace risk.control.system.Services.Agent
 {
     public interface IHttpClientService
     {
+        Task<bool> VerifyAdhar(string adharNumber);
         Task<PanResponse?> VerifyPanNew(string pan, string panUrl, string key, string host);
 
         Task<string> GetRawAddress(string lat, string lon);
@@ -194,5 +196,43 @@ namespace risk.control.system.Services.Agent
                 return requestId!;
             }
         }
+
+        public async Task<bool> VerifyAdhar(string adharNumber)
+        {
+            var request = new HttpRequestMessage(HttpMethod.Post, "https://api.eu.apyhub.com/apyhub/validate-aadhaar-number");
+
+            // Add headers
+            request.Headers.Add("apy-token", "APY0UofXionCnbflcP4Z6lnbZBLj3zRsnaUl5yM0gg1LdCrd6cdhjZ0POIbfdvg4anF1lKEOh5r");
+
+            // Add JSON body
+            string jsonBody = $"{{\"aadhaar\":\"{adharNumber}\"}}";
+            request.Content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
+
+            try
+            {
+                var client = _httpClientFactory.CreateClient();
+                HttpResponseMessage response = await client.SendAsync(request);
+                response.EnsureSuccessStatusCode();
+
+                string jsonResponse = await response.Content.ReadAsStringAsync();
+                var result = JsonConvert.DeserializeObject<AadhaarValidationResponse>(jsonResponse);
+
+                if (result?.IsValid == true)
+                {
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError($"Request error: {e.Message}");
+                return false;
+            }
+        }
+    }
+    public class AadhaarValidationResponse
+    {
+        [JsonPropertyName("data")]
+        public bool IsValid { get; set; }
     }
 }
