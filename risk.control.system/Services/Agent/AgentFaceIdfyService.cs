@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using risk.control.system.AppConstant;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
@@ -33,31 +32,68 @@ internal class AgentFaceIdfyService(ApplicationDbContext context,
     private readonly ICustomApiClient _customApiClient = customApiCLient;
     private readonly IFaceMatchService _faceMatchService = faceMatchService;
 
-    [HttpPost]
     public async Task<AppiCheckifyResponse> CaptureAgentId(FaceData data)
     {
-        InvestigationTask claim = await _caseService.GetCaseById(data.CaseId);
-        if (claim?.InvestigationReport == null) return null!;
+        var caseDetail = await _caseService.GetCaseById(data.CaseId);
+        if (caseDetail?.InvestigationReport == null)
+        {
+            _logger.LogError("Case not found for CaseId {CaseId}", data.CaseId);
+            return new AppiCheckifyResponse
+            {
+                BeneficiaryId = caseDetail?.BeneficiaryDetail?.BeneficiaryDetailId ?? 0,
+                Valid = false,
+                LocationLongLat = "No Data",
+                LocationTime = DateTime.UtcNow
+            };
+        }
 
         var agent = await _context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == data.Email);
-        var locationRecord = claim.InvestigationReport.ReportTemplate!.LocationReport
-            .FirstOrDefault(l => l.LocationName == data.LocationName);
+        var locationRecord = caseDetail.InvestigationReport.ReportTemplate!.LocationReport.FirstOrDefault(l => l.LocationName == data.LocationName);
+        if (locationRecord == null)
+        {
+            _logger.LogError("Location not found for Case {CaseId} and LocationName {LocationName}", data.CaseId, data.LocationName);
+            return new AppiCheckifyResponse
+            {
+                BeneficiaryId = caseDetail?.BeneficiaryDetail?.BeneficiaryDetailId ?? 0,
+                Valid = false,
+                LocationLongLat = "No Data",
+                LocationTime = DateTime.UtcNow
+            };
+        }
 
         var locationTemplate = await _context.LocationReport.Include(l => l.AgentIdReport).FirstOrDefaultAsync(l => l.Id == locationRecord!.Id);
+        if (locationTemplate == null)
+        {
+            _logger.LogError("Location template not found for Case {CaseId} and LocationName {LocationName}", data.CaseId, data.LocationName);
+            return new AppiCheckifyResponse
+            {
+                BeneficiaryId = caseDetail?.BeneficiaryDetail?.BeneficiaryDetailId ?? 0,
+                Valid = false,
+                LocationLongLat = "No Data",
+                LocationTime = DateTime.UtcNow
+            };
+        }
 
         var agentIdReport = locationTemplate!.AgentIdReport;
-
+        if (!string.IsNullOrWhiteSpace(agentIdReport!.FilePath))
+        {
+            _fileStorageService.DeleteFile(agentIdReport.FilePath);
+        }
+        if (!string.IsNullOrWhiteSpace(agentIdReport!.OriginalFilePath))
+        {
+            _fileStorageService.DeleteFile(agentIdReport.OriginalFilePath);
+        }
         try
         {
             // 1. Prepare Data & Save Physical File
             var faceBytes = await VerificationHelper.GetBytesFromIFormFile(data.Image!);
             var imageExtension = Path.GetExtension(data.Image!.FileName.ToLowerInvariant());
-            var (faceImageFileName, relativePath) = await _fileStorageService.SaveAsync(data.Image!, CONSTANTS.CASE, claim.PolicyDetail!.ContractNumber, CONSTANTS.TEMP_REPORT, null, $"agent{imageExtension}");
-            var (foriginalFaceImageFileName, originalRelativePath) = await _fileStorageService.SaveAsync(faceBytes, imageExtension, CONSTANTS.CASE, claim.PolicyDetail!.ContractNumber, CONSTANTS.REPORT, null, $"agent{imageExtension}");
+            var (faceImageFileName, relativePath) = await _fileStorageService.SaveAsync(data.Image!, CONSTANTS.CASE, caseDetail.PolicyDetail!.ContractNumber, CONSTANTS.TEMP_REPORT, null, $"agent{imageExtension}");
+            var (foriginalFaceImageFileName, originalRelativePath) = await _fileStorageService.SaveAsync(faceBytes, imageExtension, CONSTANTS.CASE, caseDetail.PolicyDetail!.ContractNumber, CONSTANTS.REPORT, null, $"agent{imageExtension}");
 
             // 2. Extract Coordinates
             var (lat, lon) = VerificationHelper.ParseCoordinates(data.LocationLatLong!);
-            var expectedCoords = VerificationHelper.GetExpectedCoordinates(claim);
+            var expectedCoords = VerificationHelper.GetExpectedCoordinates(caseDetail);
 
             // 3. Parallel Service Calls (Orchestration)
             var registeredImage = await File.ReadAllBytesAsync(Path.Combine(_env.ContentRootPath, agent!.ProfilePictureUrl!));
@@ -92,13 +128,13 @@ internal class AgentFaceIdfyService(ApplicationDbContext context,
 
             await _context.SaveChangesAsync();
 
-            return AgentFaceIdfyHelper.CreateResponse(claim, agentIdReport, agentImage);
+            return AgentFaceIdfyHelper.CreateResponse(caseDetail, agentIdReport, agentImage);
         }
         catch (Exception ex)
         {
             var sanitizedEmail = data.Email?.Replace("\n", "").Replace("\r", "").Trim();
             _logger.LogError(ex, "Failed Agent face Id match for CaseId {Id}. {AgentEmail}", data.CaseId, sanitizedEmail);
-            return await HandleError(claim, agentIdReport!);
+            return await HandleError(caseDetail, agentIdReport!);
         }
     }
 

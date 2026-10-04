@@ -35,11 +35,65 @@ internal class FaceIdfyService(ApplicationDbContext context,
     public async Task<AppiCheckifyResponse> CaptureFaceId(FaceData data)
     {
         var caseDetail = await _caseService.GetCaseById(data.CaseId);
-        if (caseDetail?.InvestigationReport == null) return null!;
-        var location = caseDetail.InvestigationReport.ReportTemplate!.LocationReport.First(l => l.LocationName == data.LocationName);
-        var locationTemplate = await _context.LocationReport.Include(l => l.FaceIds).FirstAsync(l => l.Id == location.Id);
-        var faceIdReport = locationTemplate.FaceIds!.First(c => c.ReportName == data.ReportName);
+        if (caseDetail?.InvestigationReport == null)
+        {
+            _logger.LogError("Case not found for CaseId {CaseId}", data.CaseId);
+            return new AppiCheckifyResponse
+            {
+                BeneficiaryId = caseDetail?.BeneficiaryDetail?.BeneficiaryDetailId ?? 0,
+                Valid = false,
+                LocationLongLat = "No Data",
+                LocationTime = DateTime.UtcNow
+            };
+        }
 
+        var locationRecord = caseDetail.InvestigationReport.ReportTemplate!.LocationReport.FirstOrDefault(l => l.LocationName == data.LocationName);
+        if (locationRecord == null)
+        {
+            _logger.LogError("Location not found for Case {CaseId} and LocationName {LocationName}", data.CaseId, data.LocationName);
+            return new AppiCheckifyResponse
+            {
+                BeneficiaryId = caseDetail?.BeneficiaryDetail?.BeneficiaryDetailId ?? 0,
+                Valid = false,
+                LocationLongLat = "No Data",
+                LocationTime = DateTime.UtcNow
+            };
+        }
+
+        var locationTemplate = await _context.LocationReport.Include(l => l.FaceIds).FirstAsync(l => l.Id == locationRecord!.Id);
+        if (locationTemplate == null)
+        {
+            _logger.LogError("Location template not found for Case {CaseId} and LocationName {LocationName}", data.CaseId, data.LocationName);
+            return new AppiCheckifyResponse
+            {
+                BeneficiaryId = caseDetail?.BeneficiaryDetail?.BeneficiaryDetailId ?? 0,
+                Valid = false,
+                LocationLongLat = "No Data",
+                LocationTime = DateTime.UtcNow
+            };
+        }
+
+        var faceIdReport = locationTemplate.FaceIds!.First(c => c.ReportName == data.ReportName);
+        if (faceIdReport == null)
+        {
+            _logger.LogError("Face ID report not found for Case {CaseId}, LocationName {LocationName}, and ReportName {ReportName}", data.CaseId, data.LocationName, data.ReportName);
+            return new AppiCheckifyResponse
+            {
+                BeneficiaryId = caseDetail?.BeneficiaryDetail?.BeneficiaryDetailId ?? 0,
+                Valid = false,
+                LocationLongLat = "No Data",
+                LocationTime = DateTime.UtcNow
+            };
+        }
+
+        if (!string.IsNullOrWhiteSpace(faceIdReport!.FilePath))
+        {
+            _fileStorageService.DeleteFile(faceIdReport.FilePath);
+        }
+        if (!string.IsNullOrWhiteSpace(faceIdReport!.OriginalFilePath))
+        {
+            _fileStorageService.DeleteFile(faceIdReport.OriginalFilePath);
+        }
         try
         {
             bool isCustomer = faceIdReport.ReportName == DigitalIdReportType.CUSTOMER_FACE.GetEnumDisplayName();

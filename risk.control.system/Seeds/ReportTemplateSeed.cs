@@ -20,7 +20,7 @@ namespace risk.control.system.Seeds
                     LocationName = CONSTANTS.LOCATIONS.LA_ADDRESS,
                     IsRequired = true,
                     AgentIdReport = CreateDefaultAgentReport(),
-                    MediaReports = CreateDefaultMediaReports(true, true),
+                    MediaReports = CreateDefaultMediaReports(true, false),
                     FaceIds = new List<FaceIdReport>
                     {
                         CreateFaceReport(DigitalIdReportType.CUSTOMER_FACE, true, true),
@@ -28,7 +28,7 @@ namespace risk.control.system.Seeds
                     },
                     DocumentIds = new List<DocumentIdReport>
                     {
-                        //CreateDocumentReport(DocumentIdReportType.ADHAAR, true),
+                        CreateDocumentReport(DocumentIdReportType.ADHAAR, true),
                         CreateDocumentReport(DocumentIdReportType.PAN, true)
                     },
                     Questions = UnderwritingQuestion.QuestionsUNDERWRITING_LA_ADDRESS()
