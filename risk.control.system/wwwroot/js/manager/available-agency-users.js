@@ -76,11 +76,11 @@
                     var onlineStatusIcon = `<i class="${iconClass} ${colorClass}" title="${tooltip}" data-toggle="tooltip"></i>`;
 
                     var img;
-                    if (row.active) {
+                    if (row.agentOnboarded) {
                         img = '<div class="image-container"><img alt="' + row.name + '" title="' + row.name + '" src="' + row.photo + '" class="table-profile-image" data-bs-toggle="tooltip"/>';
                     }
                     else {
-                        img = '<div class="image-container"><img alt="' + row.name + '" title="Inactive !!! ' + row.name + '" src="' + row.photo + '" class="table-profile-image-user-inactive" data-bs-toggle="tooltip"/>';
+                        img = '<div class="image-container"><img alt="' + row.name + '" title="Onboarding incomplete !!! ' + row.name + '" src="' + row.photo + '" class="table-profile-image-agent-onboard" data-bs-toggle="tooltip"/>';
                     }
                     var buttons = "";
                     buttons += '<span class="user-verified">';

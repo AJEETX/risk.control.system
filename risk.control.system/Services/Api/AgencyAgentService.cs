@@ -123,13 +123,14 @@ namespace risk.control.system.Services.Api
             var agentAddress = $"{agent.Addressline}, {agent.District!.Name} {agent.State!.Name} {agent.PinCode!.Code}";
             var personAddressLabel = isUW ? "Customer Address" : "Beneficiary address";
             var mapDetails = isUW ? $"Distance: {dist}; Duration: {dur}" : $"Distance: {dist}; Duration: {dur}";
+            var addressLine = agent.Country!.Code == "AU" ? $"{agent.Addressline},  {agent!.District!.Name}" : $"{agent.Addressline}, {agent!.PinCode!.Name.Trim()}, {agent.District!.Name}";
             return new AgentData
             {
                 Id = agent.Id,
                 Photo = await photoTask,
                 Name = $"{agent.FirstName} {agent.LastName}",
                 Phone = $"(+{agent.Country!.ISDCode}) {agent.PhoneNumber}",
-                Addressline = $"{agent.Addressline},{agent.PinCode.Name}, {agent.District!.Name}",
+                Addressline = addressLine,
                 State = agent.State!.Name,
                 Country = agent.Country.Code,
                 Flag = $"/flags/{agent.Country.Code.ToLower()}.png",
