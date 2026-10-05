@@ -106,6 +106,7 @@ namespace risk.control.system.Services.Api
                     };
                 }
                 var photo = await _base64FileService.GetBase64FileAsync(u.ProfilePictureUrl!, Applicationsettings.GUEST_USER);
+                var addressLine = u.Country!.Code == "AU" ? $"{u.Addressline},  {u.District.Name}" : $"{u.Addressline}, {u.PinCode.Name.Trim()}, {u.District.Name}";
                 return new UserDetailResponse
                 {
                     Id = u.Id,
@@ -114,7 +115,7 @@ namespace risk.control.system.Services.Api
                     RawEmail = u.Email,
                     Name = $"{u.FirstName} {u.LastName}",
                     Phone = $"(+{u.Country.ISDCode}) {u.PhoneNumber}",
-                    Addressline = $"{u.Addressline}, {u.PinCode.Name.Trim()}, {u.District.Name}",
+                    Addressline = addressLine,
                     State = u.State.Code,
                     StateName = u.State.Name,
                     Pincode = u.PinCode.Code,
@@ -188,6 +189,8 @@ namespace risk.control.system.Services.Api
                     };
                 }
                 var photo = await _base64FileService.GetBase64FileAsync(user.ProfilePictureUrl!, Applicationsettings.GUEST_USER);
+                var addressLine = user.Country!.Code == "AU" ? $"{user.Addressline},  {user!.District!.Name}" : $"{user.Addressline}, {user!.PinCode!.Name.Trim()}, {user.District!.Name}";
+
                 activeUsersDetails.Add(new UserDetailResponse
                 {
                     Id = user.Id,
@@ -199,7 +202,7 @@ namespace risk.control.system.Services.Api
                     Phone = $"(+{user.Country!.ISDCode}) {user.PhoneNumber}",
                     Photo = photo,
                     Active = user.Active,
-                    Addressline = $"{user.Addressline}, {user.PinCode!.Name.Trim()}, {user.District!.Name}",
+                    Addressline = addressLine,
                     State = user.State!.Code,
                     StateName = user.State.Name,
                     Pincode = user.PinCode!.Code,

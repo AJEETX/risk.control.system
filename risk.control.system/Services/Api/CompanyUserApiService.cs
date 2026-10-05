@@ -86,6 +86,7 @@ namespace risk.control.system.Services.Api
         private async Task<UserDetailResponse> MapCurrentUser(ApplicationUser user, string status, string statusName, string icon)
         {
             var photo = await _base64FileService.GetBase64FileAsync(user.ProfilePictureUrl!, Applicationsettings.GUEST_USER);
+            var addressLine = user.Country!.Code == "AU" ? $"{user.Addressline},  {user!.District!.Name}" : $"{user.Addressline}, {user!.PinCode!.Name.Trim()}, {user.District!.Name}";
             return new UserDetailResponse
             {
                 Id = user.Id,
@@ -95,7 +96,7 @@ namespace risk.control.system.Services.Api
                 Phone = $"(+{user.Country!.ISDCode}) {user.PhoneNumber}",
                 Photo = photo,
                 Active = user.Active,
-                Addressline = $"{user.Addressline}, {user.PinCode!.Name.Trim()}, {user.District!.Name}",
+                Addressline = addressLine,
                 District = user.District.Name,
                 State = user.State!.Code,
                 StateName = user.State.Name,
@@ -147,6 +148,7 @@ namespace risk.control.system.Services.Api
         private async Task<UserDetailResponse> MapUser(ApplicationUser user, string status, string statusName, string icon, bool loginVerificationEnabled)
         {
             var photo = await _base64FileService.GetBase64FileAsync(user.ProfilePictureUrl!, Applicationsettings.GUEST_USER);
+            var addressLine = user.Country!.Code == "AU" ? $"{user.Addressline},  {user!.District!.Name}" : $"{user.Addressline}, {user!.PinCode!.Name.Trim()}, {user.District!.Name}";
             return new UserDetailResponse
             {
                 Id = user.Id,
@@ -155,7 +157,7 @@ namespace risk.control.system.Services.Api
                 Phone = $"(+{user.Country!.ISDCode}) {user.PhoneNumber}",
                 Photo = photo,
                 Active = user.Active,
-                Addressline = $"{user.Addressline}, {user.PinCode!.Name.Trim()}, {user.District!.Name}",
+                Addressline = addressLine,
                 District = user.District.Name,
                 State = user.State!.Code,
                 StateName = user.State.Name,

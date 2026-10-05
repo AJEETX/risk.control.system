@@ -31,7 +31,7 @@ namespace risk.control.system.Seeds
                 PhoneNumberConfirmed = true,
                 Password = TestingData,
                 VendorId = vendor.VendorId,
-                PhoneNumber = AGENT_MOBILE,
+                PhoneNumber = pincode?.Country.Code == "AU" ? SAMPLE_MOBILE_AUSTRALIA : SAMPLE_MOBILE_INDIA,
                 Addressline = addressLine,
                 Country = pincode?.Country,
                 PinCode = pincode,
