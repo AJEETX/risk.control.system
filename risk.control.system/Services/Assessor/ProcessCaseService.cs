@@ -43,12 +43,13 @@ namespace risk.control.system.Services.Assessor
 
             if (reportUpdateStatus == AssessorRemarkType.OK)
             {
-                return await ApproveCaseReport(userEmail, assessorRemarks, caseId, reportUpdateStatus, reportAiSummary);
+                string approved = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR;
+                return await ProcessReport(userEmail, assessorRemarks, caseId, reportUpdateStatus, approved, reportAiSummary);
             }
             else if (reportUpdateStatus == AssessorRemarkType.REJECT)
             {
-                //PUT th case back in review list :: Assign back to Agent
-                return await RejectCaseReport(userEmail, assessorRemarks, caseId, reportUpdateStatus, reportAiSummary);
+                string rejected = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR;
+                return await ProcessReport(userEmail, assessorRemarks, caseId, reportUpdateStatus, rejected, reportAiSummary);
             }
             else
             {
@@ -56,61 +57,43 @@ namespace risk.control.system.Services.Assessor
             }
         }
 
-        private async Task<(ClientCompany, string)> RejectCaseReport(string userEmail, string assessorRemarks, long caseId, AssessorRemarkType assessorRemarkType, string reportAiSummary)
+
+        public async Task<bool> SubmitCaseReportAsync(SubmitCaseRequest request)
         {
-            var rejected = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR;
-            var finished = CONSTANTS.CASE_STATUS.FINISHED;
-
-            try
+            var remarkType = Enum.Parse<AssessorRemarkType>(request.AssessorRemarkType);
+            if (remarkType == AssessorRemarkType.OK)
             {
-                var caseTask = await _context.Investigations
-                .Include(c => c.ClientCompany)
-                .Include(c => c.PolicyDetail)
-                .Include(r => r.InvestigationReport)
-                .FirstOrDefaultAsync(c => c.Id == caseId);
-
-                caseTask!.InvestigationReport!.AiSummary = reportAiSummary;
-                caseTask.InvestigationReport.AssessorRemarkType = assessorRemarkType;
-                caseTask.InvestigationReport.AssessorRemarks = assessorRemarks;
-                caseTask.InvestigationReport.AssessorRemarksUpdated = DateTime.UtcNow;
-                caseTask.InvestigationReport.AssessorEmail = userEmail;
-
-                caseTask.Status = finished;
-                caseTask.SubStatus = rejected;
-                caseTask.Updated = DateTime.UtcNow;
-                caseTask.UpdatedBy = userEmail;
-                caseTask.ProcessedByAssessorTime = DateTime.UtcNow;
-                caseTask.SubmittedAssessordEmail = userEmail;
-                caseTask.CaseOwner = caseTask.ClientCompany!.Email;
-                _context.Investigations.Update(caseTask);
-
-                var saveCount = await _context.SaveChangesAsync(null, false);
-
-                await _timelineService.UpdateTaskStatus(caseTask.Id, userEmail);
-                _backgroundJobClient.Enqueue(() => _pdfGenerativeService.Generate(caseId, userEmail));
-
-                var currentUser = await _context.ApplicationUser.Include(u => u.ClientCompany).FirstOrDefaultAsync(u => u.Email == userEmail);
-                return saveCount > 0 ? (currentUser!.ClientCompany!, caseTask.PolicyDetail!.ContractNumber) : (null!, string.Empty);
+                string approved = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR;
+                var result = await ProcessCaseAIReport(request.Email, request.AssessorRemarks, request.PolicyNumber, remarkType, approved, string.Empty);
+                if (result.Item1 != null)
+                {
+                    return true;
+                }
             }
-            catch (Exception ex)
+            else if (remarkType == AssessorRemarkType.REJECT)
             {
-                _logger.LogError(ex, "Error occurred Rejecting Case {CaseId}. {UserEmail}", caseId, userEmail);
-                throw;
+                string rejected = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR;
+
+                var result = await ProcessCaseAIReport(request.Email, request.AssessorRemarks, request.PolicyNumber, remarkType, rejected, string.Empty);
+                if (result.Item1 != null)
+                {
+                    return true;
+                }
             }
+            return false;
         }
 
-        private async Task<(ClientCompany, string)> ApproveCaseReport(string userEmail, string assessorRemarks, long caseId, AssessorRemarkType assessorRemarkType, string reportAiSummary)
+        private async Task<(ClientCompany, string)> ProcessCaseAIReport(string userEmail, string assessorRemarks, string contractNumber, AssessorRemarkType assessorRemarkType, string processed, string reportAiSummary)
         {
             try
             {
-                var approved = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR;
                 var finished = CONSTANTS.CASE_STATUS.FINISHED;
 
                 var caseTask = await _context.Investigations
                 .Include(c => c.ClientCompany)
                 .Include(c => c.PolicyDetail)
                 .Include(r => r.InvestigationReport)
-                .FirstOrDefaultAsync(c => c.Id == caseId);
+                .FirstOrDefaultAsync(c => !c.Deleted && c.PolicyDetail!.ContractNumber == contractNumber);
 
                 caseTask!.InvestigationReport!.AiSummary = reportAiSummary;
                 caseTask.InvestigationReport.AssessorRemarkType = assessorRemarkType;
@@ -119,7 +102,46 @@ namespace risk.control.system.Services.Assessor
                 caseTask.InvestigationReport.AssessorEmail = userEmail;
 
                 caseTask.Status = finished;
-                caseTask.SubStatus = approved;
+                caseTask.SubStatus = processed;
+                caseTask.Updated = DateTime.UtcNow;
+                caseTask.UpdatedBy = userEmail;
+                caseTask.CaseOwner = caseTask.ClientCompany!.Email;
+                caseTask.ProcessedByAssessorTime = DateTime.UtcNow;
+                caseTask.SubmittedAssessordEmail = userEmail;
+                _context.Investigations.Update(caseTask);
+
+                var saveCount = await _context.SaveChangesAsync(null, false);
+
+                await _timelineService.UpdateTaskStatus(caseTask.Id, userEmail);
+                _backgroundJobClient.Enqueue(() => _pdfGenerativeService.Generate(caseTask.Id, userEmail));
+
+                return saveCount > 0 ? (caseTask.ClientCompany, caseTask.PolicyDetail!.ContractNumber) : (null!, string.Empty);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred Processing Case {contractNumber}. {UserEmail}", contractNumber, userEmail);
+                throw;
+            }
+        }
+
+        private async Task<(ClientCompany, string)> ProcessReport(string userEmail, string assessorRemarks, long caseId, AssessorRemarkType assessorRemarkType, string subStatus, string reportAiSummary)
+        {
+            try
+            {
+                var caseTask = await _context.Investigations
+                .Include(c => c.ClientCompany)
+                .Include(c => c.PolicyDetail)
+                .Include(r => r.InvestigationReport)
+                .FirstOrDefaultAsync(c => !c.Deleted && c.Id == caseId);
+
+                caseTask!.InvestigationReport!.AiSummary = reportAiSummary;
+                caseTask.InvestigationReport.AssessorRemarkType = assessorRemarkType;
+                caseTask.InvestigationReport.AssessorRemarks = assessorRemarks;
+                caseTask.InvestigationReport.AssessorRemarksUpdated = DateTime.UtcNow;
+                caseTask.InvestigationReport.AssessorEmail = userEmail;
+
+                caseTask.Status = CONSTANTS.CASE_STATUS.FINISHED;
+                caseTask.SubStatus = subStatus;
                 caseTask.Updated = DateTime.UtcNow;
                 caseTask.UpdatedBy = userEmail;
                 caseTask.CaseOwner = caseTask.ClientCompany!.Email;
@@ -139,28 +161,6 @@ namespace risk.control.system.Services.Assessor
                 _logger.LogError(ex, "Error occurred Approving Case {CaseId}. {UserEmail}", caseId, userEmail);
                 throw;
             }
-        }
-
-        public async Task<bool> SubmitCaseReportAsync(SubmitCaseRequest request)
-        {
-            var remarkType = Enum.Parse<AssessorRemarkType>(request.AssessorRemarkType);
-            if (remarkType == AssessorRemarkType.OK)
-            {
-                var result = await ApproveCaseReport(request.Email, request.AssessorRemarks, request.ClaimId, remarkType, string.Empty);
-                if (result.Item1 != null)
-                {
-                    return true;
-                }
-            }
-            else if (remarkType == AssessorRemarkType.REJECT)
-            {
-                var result = await RejectCaseReport(request.Email, request.AssessorRemarks, request.ClaimId, remarkType, string.Empty);
-                if (result.Item1 != null)
-                {
-                    return true;
-                }
-            }
-            return false;
         }
     }
 }
