@@ -414,8 +414,30 @@ $(document).ready(function () {
     $('#enquire-case').on('click', function (e) {
         showenquiry();
     });
+    $('#adjudicate-case').on('click', function (e) {
+        adjudicate();
+    });
 });
 
+function adjudicate() {
+    $("body").addClass("submit-progress-bg");
+    // Wrap in setTimeout so the UI
+    // can update the spinners
+    setTimeout(function () {
+        $(".submit-progress").removeClass("hidden");
+    }, 1);
+
+    $('#adjudicate-case').html("<i class='fas fa-sync fa-spin'></i> Adjudicate");
+    disableAllInteractiveElements();
+
+    var createForm = document.getElementById("create-form");
+    if (createForm) {
+        var nodes = createForm.getElementsByTagName('*');
+        for (var i = 0; i < nodes.length; i++) {
+            nodes[i].disabled = true;
+        }
+    }
+}
 function showenquiry() {
     $("body").addClass("submit-progress-bg");
     // Wrap in setTimeout so the UI

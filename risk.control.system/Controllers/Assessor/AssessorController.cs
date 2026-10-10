@@ -58,7 +58,11 @@ namespace risk.control.system.Controllers.Assessor
                     return RedirectToAction(nameof(Assessor));
                 }
                 var model = await _caseDetailReportService.GetInvestigateReport(userEmail, id);
-
+                if (model.CaseTask!.Status == CONSTANTS.CASE_STATUS.FINISHED)
+                {
+                    _notifyService.Information($"The Case {model.CaseTask.PolicyDetail!.ContractNumber} has been processed");
+                    return RedirectToAction(nameof(AssessorController.Assess), ControllerName<AssessorController>.Name);
+                }
                 return View(model);
             }
             catch (Exception ex)

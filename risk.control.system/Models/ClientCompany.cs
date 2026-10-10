@@ -99,7 +99,7 @@ namespace risk.control.system.Models
 
         public bool Deleted { get; set; } = false;
         public bool HasClaims { get; set; } = false;
-        public bool AiEnabled { get; set; } = false;
+        public bool AiEnabled { get; set; } = true;
 
         public int CreatorSla { get; set; } = 2;
         public int AssessorSla { get; set; } = 4;

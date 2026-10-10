@@ -29,12 +29,21 @@
 								<i class='far fa-hand-point-right'></i> Verify <i class='fas fa-check-circle'></i> Report
 							</li>
 							<li>
-								<i class='far fa-hand-point-right'></i> Verify <i class='fas fa-check-circle'></i> Questionnaire
+								<i class='far fa-hand-point-right'></i> Assessment <i class='fas fa-user-check'></i>
 							</li>
-							<li>
-								<i class='far fa-hand-point-right'></i> Review <i class="far fa-comment"></i> remarks
-							</li>
-							<li>
+							@if (Model.CaseTask!.AiEnabled)
+								{
+								<li>
+									<i class='far fa-hand-point-right'></i> <button class='btn btn-warning btn-xs'><i class="fa fa-edit"></i><b>  ENQUIRE</b> </button>
+								</li>
+								<li>
+									<i class='far fa-thumbs-up'></i> <button class='btn btn-info btn-xs'><i class='fas fa-glasses'></i> <b>Adjudicate</b> </button>
+								</li>
+								}
+								else
+								{
+									
+								<li>
 								<i class='far fa-hand-point-right'></i> Add <i class='fas fa-check-circle'></i> remark
 							</li>
 							<li>
@@ -46,6 +55,8 @@
 							<li>
 								<i class='far fa-thumbs-up'></i> <button class='btn btn-info btn-xs'><i class='fas fa-glasses'></i> <b>SUBMIT</b> </button>
 							</li>
+							}
+
 						</span>
 					</span>
 				</h3>
@@ -65,12 +76,12 @@
 			};
 			<partial name="_EnquiryReport" model="@data" />
 		}
-
+@* 
 		@if (Model.CaseTask.AiEnabled)
 		{
 			<partial name="_AgencyAiReport" model="@Model" />
 		}
-
+ *@
 		<div class="card shadow-lg border-1 rounded-lg">
 			<div class="card-header bg-info text-white text-center">
 				<h3 class="card-title">
@@ -82,7 +93,7 @@
 								<i class='far fa-hand-point-right'></i> Report Summary  <i class="fas fa-newspaper"></i>
 							</li>
 							<li>
-								<i class='far fa-hand-point-right'></i>  Submission type <i class="far fa-file-powerpoint"></i>
+								<i class='far fa-hand-point-right'></i>  Submission  <i class="far fa-file-powerpoint"></i>
 							</li>
 						</span>
 					</span>
@@ -203,81 +214,131 @@
 							</div>
 						</div>
 					</div>
-
-					<div class="col-sm-6 d-flex align-items-stretch flex-column">
-						<div class="card bg-light equal-height-card">
-							<div class="card-footer text-muted border-bottom-0">
-								<i class="far fa-file-powerpoint"></i> <strong> Submission type </strong>
-								[
-								@if(Model.CaseTask.AdjudicationCompleted)
-								{
-								<a href="@policyLensUrl" target="_blank">PolicyLenz</a>
-								}
-								else
-									{
-									<span class="badge blue">
-										AI adjudication in progress <span class="blink">...</span>
-									</span>
-									}
-									]
-							</div>
-							
-							<div class="card-body scrollable-body">
-								<div class="row">
-									<div class="col-md-12">
-										@if (!locations.Where(locations => locations.IsRequired).All(l => l.AgentValidated && l.FaceIdsValidated && l.DocumentsValidated))
-										{
-											<div class="form-group">
-												<div class="form-check form-switch">
-													<input class="form-check-input selected-case" type="radio" name="flexRadioDefault" id="flexRadioDefault1" checked>
-													<label class="form-check-label" for="flexRadioDefault1">
-														<b>  REJECT </b> <span class="process-case"><i class='fa fa-times i-orangered' aria-hidden='true'></i> (System recommendation) </span>
-													</label>
-												</div>
-											</div>
-											<div class="form-group">
-												<div class="form-check form-switch">
-													<input class="form-check-input selected-case" type="radio" name="flexRadioDefault" id="flexRadioDefault3">
-													<label class="form-check-label" for="flexRadioDefault3">
-														<b> APPROVE </b>
-													</label>
-												</div>
-											</div>
-										}
-										else
-										{
-											<div class="form-group">
-												<div class="form-check form-switch">
-													<input class="form-check-input selected-case" type="radio" name="flexRadioDefault" id="flexRadioDefault1">
-													<label class="form-check-label" for="flexRadioDefault1">
-														<b>  REJECT </b> <span class="process-case"> Analyse the report and reject</span>
-													</label>
-												</div>
-											</div>
-											<div class="form-group">
-												<div class="form-check form-switch">
-													<input class="form-check-input selected-case" type="radio" name="flexRadioDefault" id="flexRadioDefault3" checked>
-													<label class="form-check-label" for="flexRadioDefault3">
-														<b> APPROVE </b> <span class="approve-case"> <i class='fas fa-check-circle i-green'></i>  (System recommendation) </span>
-													</label>
-												</div>
-											</div>
-										}
-									</div>
+					@if (Model.CaseTask.AiEnabled)
+						{
+						<div class="col-sm-6 d-flex align-items-stretch flex-column">
+							<div class="card bg-light equal-height-card">
+								<div class="card-footer text-muted border-bottom-0">
+									<i class="far fa-file-powerpoint"></i> <strong> Submission </strong>
 								</div>
 
-								<div class="row">
-									<div class="col-md-12">
-										<div class="col-sm-12">
-											<div class="form-group">
-												<span class="input-group-label"> Remarks :</span>
-												<div class="input-group">
-													<div class="input-group-prepend">
-														<span class="input-group-text" asp-for="ClaimsInvestigation.InvestigationReport.AgentRemarks"><i class="far fa-comment"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
-													</div>
-													<textarea data-bs-toggle="tooltip" title="Enter remarks" required maxlength="1000" name="assessorRemarks" id="assessorRemarks" type="text" class="form-control remarks" autocomplete="off" placeholder="enter remarks to submit"></textarea>
+								<div class="card-body scrollable-body h-100 d-flex justify-content-center align-items-center">
+									<div class="row text-center w-100">
+										<div class="col-md-12 d-flex flex-column justify-content-center align-items-center gap-3">
 
-													<span asp-validation-for="CaseTask.InvestigationReport.SupervisorRemarks" class="text-danger"></span>
+											<!-- Conditional Loading Text Above Buttons -->
+											@if (!Model.CaseTask.AdjudicationCompleted)
+											{
+												<div class="d-inline-flex align-items-center px-3 py-1.5 rounded-2 bg-white border shadow-sm text-secondary small">
+													<span class="spinner-grow spinner-grow-sm text-info me-2" role="status"></span>
+													<span class="fw-medium text-dark">AI adjudication in progress<span class="blink">...</span></span>
+												</div>
+											}
+											else
+											{
+												<div class="d-inline-flex align-items-center px-3 py-1.5 rounded-2 bg-white border shadow-sm text-secondary small">
+													<i class="fas fa-check-circle" aria-hidden="true"></i> <span class="fw-medium text-dark btn-gap"> AI adjudication completed</span>
+												</div>
+											}
+													<br />
+												<!-- Buttons Container -->
+											<div class="d-flex justify-content-center align-items-center gap-2 flex-wrap">
+												<a id="back" asp-controller="Assessor" class="btn btn-sm btn-outline-secondary" asp-action="Assess" data-bs-toggle="tooltip" title="Back to Assess cases">
+													<i class="fas fa-arrow-left" aria-hidden="true"></i> <span class="badge badge-light"> <i class="fas fa-glasses"></i> </span> Back
+												</a>
+												@if (Model.InvestigationReport?.EnquiryRequest == null)
+												{
+													<a id="enquire-case" asp-controller="Assessor" asp-action="SendEnquiry"
+													   asp-route-id="@Model.CaseTask.Id" class="btn btn-sm btn-warning">
+														<i class="fa fa-edit"></i>  Enquire
+													</a>
+												}
+
+												@if (Model.CaseTask.AdjudicationCompleted)
+												{
+													<a id="adjudicate-case" href="@policyLensUrl" class="btn btn-sm btn-success btn-gap">
+														<i class="fas fa-check-circle" aria-hidden="true"></i> View Adjudication
+													</a>
+												}
+												else
+												{
+													<a id="adjudicate-case" href="@policyLensUrl" class="btn btn-sm btn-info btn-gap">
+														<span class="spinner-grow spinner-grow-sm text-white me-2" role="status"></span> Adjudicate
+													</a>
+												}
+											</div>
+
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						}
+						else
+						{
+						<div class="col-sm-6 d-flex align-items-stretch flex-column">
+							<div class="card bg-light equal-height-card">
+								<div class="card-footer text-muted border-bottom-0">
+									<i class="far fa-file-powerpoint"></i> <strong> Submission </strong>
+								</div>
+
+								<div class="card-body scrollable-body">
+									<div class="row">
+										<div class="col-md-12">
+											@if (!locations.Where(locations => locations.IsRequired).All(l => l.AgentValidated && l.FaceIdsValidated && l.DocumentsValidated))
+											{
+												<div class="form-group">
+													<div class="form-check form-switch">
+														<input class="form-check-input selected-case" type="radio" name="flexRadioDefault" id="flexRadioDefault1" checked>
+														<label class="form-check-label" for="flexRadioDefault1">
+															<b>  REJECT </b> <span class="process-case"><i class='fa fa-times i-orangered' aria-hidden='true'></i> (System recommendation) </span>
+														</label>
+													</div>
+												</div>
+												<div class="form-group">
+													<div class="form-check form-switch">
+														<input class="form-check-input selected-case" type="radio" name="flexRadioDefault" id="flexRadioDefault3">
+														<label class="form-check-label" for="flexRadioDefault3">
+															<b> APPROVE </b>
+														</label>
+													</div>
+												</div>
+											}
+											else
+											{
+												<div class="form-group">
+													<div class="form-check form-switch">
+														<input class="form-check-input selected-case" type="radio" name="flexRadioDefault" id="flexRadioDefault1">
+														<label class="form-check-label" for="flexRadioDefault1">
+															<b>  REJECT </b> <span class="process-case"> Analyse the report and reject</span>
+														</label>
+													</div>
+												</div>
+												<div class="form-group">
+													<div class="form-check form-switch">
+														<input class="form-check-input selected-case" type="radio" name="flexRadioDefault" id="flexRadioDefault3" checked>
+														<label class="form-check-label" for="flexRadioDefault3">
+															<b> APPROVE </b> <span class="approve-case"> <i class='fas fa-check-circle i-green'></i>  (System recommendation) </span>
+														</label>
+													</div>
+												</div>
+											}
+										</div>
+									</div>
+
+									<div class="row">
+										<div class="col-md-12">
+											<div class="col-sm-12">
+												<div class="form-group">
+													<span class="input-group-label"> Remarks :</span>
+													<div class="input-group">
+														<div class="input-group-prepend">
+															<span class="input-group-text" asp-for="ClaimsInvestigation.InvestigationReport.AgentRemarks"><i class="far fa-comment"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
+														</div>
+														<textarea data-bs-toggle="tooltip" title="Enter remarks" required maxlength="1000" name="assessorRemarks" id="assessorRemarks" type="text" class="form-control remarks" autocomplete="off" placeholder="enter remarks to submit"></textarea>
+
+														<span asp-validation-for="CaseTask.InvestigationReport.SupervisorRemarks" class="text-danger"></span>
+													</div>
 												</div>
 											</div>
 										</div>
@@ -285,31 +346,34 @@
 								</div>
 							</div>
 						</div>
-					</div>
-				</div>
-			</div>
-
-			<div class="card-footer">
-				<div class="row  float-right">
-					<div class="col-md-12">
-						<a id="back" asp-controller="Assessor" class="btn btn-sm btn-outline-secondary" asp-action="Assess" data-bs-toggle="tooltip" title="Back to Assess cases">
-
-							<i class="fas fa-arrow-left" aria-hidden="true"></i> <span class="badge badge-light"> <i class="fas fa-glasses"></i> </span> Back
-						</a>
-						@if (Model.InvestigationReport?.EnquiryRequest == null)
-						{
-							<a id="enquire-case" asp-controller="Assessor" asp-action="SendEnquiry"
-								   asp-route-id="@Model.CaseTask.Id" class="btn btn-sm btn-warning">
-								<i class="fa fa-edit"></i>  Enquire
-							</a>
 						}
 
-						<button id="approve-case" type="submit" class="btn btn-sm btn-info">
-							<i class="fas fa-glasses" aria-hidden="true"></i> Submit
-						</button>
-					</div>
 				</div>
 			</div>
+			@if (!Model.CaseTask.AiEnabled)
+				{
+					<div class="card-footer">
+						<div class="row  float-right">
+							<div class="col-md-12">
+								<a id="back" asp-controller="Assessor" class="btn btn-sm btn-outline-secondary" asp-action="Assess" data-bs-toggle="tooltip" title="Back to Assess cases">
+
+									<i class="fas fa-arrow-left" aria-hidden="true"></i> <span class="badge badge-light"> <i class="fas fa-glasses"></i> </span> Back
+								</a>
+								@if (Model.InvestigationReport?.EnquiryRequest == null)
+								{
+									<a id="enquire-case" asp-controller="Assessor" asp-action="SendEnquiry"
+									asp-route-id="@Model.CaseTask.Id" class="btn btn-sm btn-warning">
+										<i class="fa fa-edit"></i>  Enquire
+									</a>
+								}
+
+								<button id="approve-case" type="submit" class="btn btn-sm btn-info">
+									<i class="fas fa-glasses" aria-hidden="true"></i> Submit
+								</button>
+							</div>
+						</div>
+					</div>
+				}
 		</div>
 	</form>
 </section>

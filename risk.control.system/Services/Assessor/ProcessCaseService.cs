@@ -4,6 +4,7 @@ using Hangfire;
 using Microsoft.EntityFrameworkCore;
 using risk.control.system.AppConstant;
 using risk.control.system.Models;
+using risk.control.system.Models.ViewModel;
 using risk.control.system.Services.Common;
 using risk.control.system.Services.Report;
 
@@ -12,6 +13,7 @@ namespace risk.control.system.Services.Assessor
     public interface IProcessCaseService
     {
         Task<(ClientCompany, string)> ProcessCaseReport(string userEmail, string assessorRemarks, long caseId, AssessorRemarkType reportUpdateStatus, string reportAiSummary);
+        Task<bool> SubmitCaseReportAsync(SubmitCaseRequest request);
     }
 
     internal class ProcessCaseService : IProcessCaseService
@@ -137,6 +139,28 @@ namespace risk.control.system.Services.Assessor
                 _logger.LogError(ex, "Error occurred Approving Case {CaseId}. {UserEmail}", caseId, userEmail);
                 throw;
             }
+        }
+
+        public async Task<bool> SubmitCaseReportAsync(SubmitCaseRequest request)
+        {
+            var remarkType = Enum.Parse<AssessorRemarkType>(request.AssessorRemarkType);
+            if (remarkType == AssessorRemarkType.OK)
+            {
+                var result = await ApproveCaseReport(request.Email, request.AssessorRemarks, request.ClaimId, remarkType, string.Empty);
+                if (result.Item1 != null)
+                {
+                    return true;
+                }
+            }
+            else if (remarkType == AssessorRemarkType.REJECT)
+            {
+                var result = await RejectCaseReport(request.Email, request.AssessorRemarks, request.ClaimId, remarkType, string.Empty);
+                if (result.Item1 != null)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }
