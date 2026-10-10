@@ -11,5 +11,6 @@ namespace risk.control.system.Models.ViewModel
         public string? ReportAiSummary { get; set; }
         public string? Currency { get; set; }
         public CultureInfo? Culture { get; set; }
+        public string? AssessorEmail { get; set; }
     }
 }

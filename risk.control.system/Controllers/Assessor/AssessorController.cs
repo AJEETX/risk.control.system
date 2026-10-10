@@ -63,6 +63,7 @@ namespace risk.control.system.Controllers.Assessor
                     _notifyService.Information($"The Case {model.CaseTask.PolicyDetail!.ContractNumber} has been processed");
                     return RedirectToAction(nameof(AssessorController.Assess), ControllerName<AssessorController>.Name);
                 }
+                model.AssessorEmail = userEmail;
                 return View(model);
             }
             catch (Exception ex)
