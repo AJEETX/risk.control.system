@@ -6,6 +6,7 @@ using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services.Agent;
+using risk.control.system.Services.Common;
 
 namespace risk.control.system.Services.Agentic
 {
@@ -16,22 +17,36 @@ namespace risk.control.system.Services.Agentic
         Task<bool> CaseAdjudicatedAsync(AdjudicationRequest request);
         //byte[] ConvertImageToSearchablePdfBytes(string inputImagePath);
     }
-    internal class AgenticService(ApplicationDbContext dbContext, IAmazonApiService amazonApiService) : IAgenticService
+    internal class AgenticService(ApplicationDbContext dbContext, IAmazonApiService amazonApiService, ISmsService smsService) : IAgenticService
     {
         //private static string tessDataPath = @"./tessdata"; // Path to your tessdata folder
         private readonly IAmazonApiService _amazonApiService = amazonApiService;
         private readonly ApplicationDbContext _dbContext = dbContext;
+        private readonly ISmsService _smsService = smsService;
 
         public async Task<bool> CaseAdjudicatedAsync(AdjudicationRequest request)
         {
-            var caseTask = await _dbContext.Investigations.Include(c => c.PolicyDetail).FirstOrDefaultAsync(i => i.PolicyDetail!.ContractNumber == request.PolicyNumber.Trim());
+            var caseTask = await _dbContext.Investigations.Include(c => c.PolicyDetail).FirstOrDefaultAsync(i => !i.Deleted && i.AiEnabled && i.PolicyDetail!.ContractNumber == request.PolicyNumber.Trim());
             if (caseTask == null)
             {
                 throw new InvalidOperationException("Investigation task not found.");
             }
             caseTask.AdjudicationCompleted = request.Set;
             _dbContext.Investigations.Update(caseTask);
-            return await _dbContext.SaveChangesAsync() > 0;
+            var result = await _dbContext.SaveChangesAsync() > 0;
+
+            var assessor = await _dbContext.ApplicationUser.Include(a => a.Country).FirstOrDefaultAsync(u => u.Email == request.Email);
+            if (assessor == null)
+            {
+                throw new InvalidOperationException("Assessor not found.");
+            }
+            var message = $"Dear {assessor.Email}\n";
+            message += $"Your case with policy number {caseTask.PolicyDetail!.ContractNumber} has been adjudicated.\n";
+            message += "Please process the case.\n";
+            message += "Thanks \n";
+            await _smsService.SendSmsAsync(assessor.Country!.Code, assessor.Country!.ISDCode.ToString() + assessor.PhoneNumber, message);
+
+            return result;
         }
 
         public async Task<(bool, string)> FaceExistsAsync(IFormFile image)

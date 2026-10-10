@@ -16,6 +16,7 @@ using risk.control.system.Helpers;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services.Agent;
 using risk.control.system.Services.Agentic;
+using risk.control.system.Services.Assessor;
 using risk.control.system.Services.Common;
 using risk.control.system.Services.Tool;
 
@@ -28,6 +29,7 @@ namespace risk.control.system.Controllers.Api
         IFileStorageService fileStorageService,
         IAmazonS3 s3Client,
         IAgenticService agenticService,
+        IProcessCaseService processCaseService,
         IAmazonApiService amazonApiService,
         ISpeech2TextService speech2TextService,
         IText2SpeechService text2SpeechService) : ControllerBase
@@ -36,6 +38,7 @@ namespace risk.control.system.Controllers.Api
         private readonly IFileStorageService _fileStorageService = fileStorageService;
         private readonly IAmazonS3 _s3Client = s3Client;
         private readonly IAgenticService _agenticService = agenticService;
+        private readonly IProcessCaseService _processCaseService = processCaseService;
         private readonly IAmazonApiService _amazonApiService = amazonApiService;
         private readonly ISpeech2TextService _speech2TextService = speech2TextService;
         private readonly IText2SpeechService _text2SpeechService = text2SpeechService;
@@ -471,6 +474,7 @@ namespace risk.control.system.Controllers.Api
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
         [HttpPost("adjudicate")]
+        [Consumes("application/json")]
         public async Task<IActionResult> CaseAdjudicated([FromBody] AdjudicationRequest request)
         {
             try
@@ -484,7 +488,22 @@ namespace risk.control.system.Controllers.Api
                 return StatusCode(StatusCodes.Status500InternalServerError, new { Success = false, Message = ex.Message });
             }
         }
-
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
+        [HttpPost("submit")]
+        [Consumes("application/json")]
+        public async Task<IActionResult> CaseSubmitted(SubmitCaseRequest request)
+        {
+            try
+            {
+                var result = await _processCaseService.SubmitCaseReportAsync(request);
+                return Ok(new { Success = result, Message = "Case submitted successfully." });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in Case Submission: {ex.Message}");
+                return StatusCode(StatusCodes.Status500InternalServerError, new { Success = false, Message = ex.Message });
+            }
+        }
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
         [HttpPost("speech-to-text")]
         public async Task<IActionResult> ConvertSpeechToText(Speech2TextRequest request)

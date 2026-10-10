@@ -4688,3 +4688,6 @@ td.expand-btn-cell * {
 .blink {
     animation: blinker 1s linear infinite;
 }
+.btn-gap {
+    margin-left: 0.5rem;
+}
