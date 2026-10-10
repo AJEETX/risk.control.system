@@ -3,7 +3,7 @@
 @{
 	ViewData["Title"] = "Report ";
 	var locations = Model.InvestigationReport?.ReportTemplate?.LocationReport!;
-	var policyLensUrl = $"http://localhost:5173/policies/{Model.CaseTask?.PolicyDetail?.ContractNumber}?providerId=demo";
+	var policyLensUrl = $"http://localhost:5173/policies/{Model.CaseTask?.PolicyDetail?.ContractNumber}?providerId=demo&email={Model.AssessorEmail}";
 }
 
 <section class="content">
