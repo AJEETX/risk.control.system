@@ -17,7 +17,7 @@ namespace risk.control.system.Models
         public bool VerifyPassport { get; set; } = false;
         public bool EnablePassport { get; set; } = false;
         public bool EnableMedia { get; set; } = false;
-        public bool AiEnabled { get; set; } = false;
+        public bool AiEnabled { get; set; } = true;
 
         public bool UpdateAgentReport { get; set; } = false;
         public bool UpdateAgentAnswer { get; set; } = true;
