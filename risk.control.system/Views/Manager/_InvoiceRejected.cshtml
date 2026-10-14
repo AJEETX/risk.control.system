@@ -14,6 +14,11 @@
                     </span>
                 </span>
             </h3>
+            <div class="card-tools">
+                <span data-bs-toggle="tooltip" title="Billing time" class="badge badge-light">
+                    <i class="nav-icon fas fa-clock"></i> @Model.ClaimsInvestigation?.InvestigationReport?.AssessorRemarksUpdated!.Value.ToLocalTime().ToString("dd-MMM-yy HH:mm")
+                </span>
+            </div>
         </div>
         <div class="card-body pt-0">
             <div class="row">

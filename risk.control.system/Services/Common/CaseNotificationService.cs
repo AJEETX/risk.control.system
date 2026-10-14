@@ -351,12 +351,12 @@ namespace risk.control.system.Services.Common
             try
             {
                 await using var _context = await _contextFactory.CreateDbContextAsync();
-                var caseTask = await _context.Investigations.AsNoTracking().FirstOrDefaultAsync(v => v.Id == caseId);
+                var caseTask = await _context.Investigations.Include(c => c.PolicyDetail).AsNoTracking().FirstOrDefaultAsync(v => v.Id == caseId);
                 var assessorRole = await _roleManager.FindByNameAsync(ASSESSOR.DISPLAY_NAME);
                 var recipients = await _context.ApplicationUser.AsNoTracking().Include(u => u.Country).Where(u => u.ClientCompanyId == caseTask!.ClientCompanyId)
                     .Where(u => _context.UserRoles.Any(ur => ur.UserId == u.Id && ur.RoleId == assessorRole!.Id)).ToListAsync();
                 senderUserEmail = senderUserEmail.Replace("\n", "").Replace("\r", "").Trim();
-                await SendNotificationInternal(caseId, senderUserEmail, assessorRole!.Id, caseTask!.ClientCompanyId, null, BlueSymbol, caseTask.SubStatus, $"Reply Submitted for Case #{caseId}", url, recipients);
+                await SendNotificationInternal(caseId, senderUserEmail, assessorRole!.Id, caseTask!.ClientCompanyId, null, BlueSymbol, caseTask.SubStatus, $"Reply Submitted for Case #{caseTask.PolicyDetail!.ContractNumber}", url, recipients);
             }
             catch (Exception ex)
             {
