@@ -207,75 +207,85 @@
 
         var id = $(this).attr('id');
         var url = '/AvailableAgency/Delete'; // Replace with your actual API URL
+        if (id == undefined) {
+            $.alert({
+                title: 'Error!',
+                content: `Can't delete the Agency.`,
+                type: 'red'
+            });
+            $('#dataTable').DataTable().ajax.reload(null, false);
 
-        $.confirm({
-            title: 'Confirm Deletion',
-            content: 'Are you sure you want to delete this Agency?',
-            type: 'red',
-            icon: 'fas fa-trash',
-            buttons: {
-                confirm: {
-                    text: 'Yes, delete it',
-                    btnClass: 'btn-red',
-                    action: function () {
-                        $spinner.removeClass("hidden");
-                        $btn.prop("disabled", true).html('<i class="fas fa-sync fa-spin"></i> Delete');
+        } else {
+            $.confirm({
+                title: 'Confirm Deletion',
+                content: 'Are you sure you want to delete this Agency?',
+                type: 'red',
+                icon: 'fas fa-trash',
+                buttons: {
+                    confirm: {
+                        text: 'Yes, delete it',
+                        btnClass: 'btn-red',
+                        action: function () {
+                            $spinner.removeClass("hidden");
+                            $btn.prop("disabled", true).html('<i class="fas fa-sync fa-spin"></i> Delete');
 
-                        $.ajax({
-                            url: url,
-                            type: 'POST',
-                            data: {
-                                __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val(),
-                                id: id
-                            },
-                            success: function (response) {
-                                if (response.success) {
-                                    $.alert({
-                                        title: 'Deleted!',
-                                        content: response.message,
-                                        type: 'red',
-                                        icon: 'fas fa-trash'
-                                    });
+                            $.ajax({
+                                url: url,
+                                type: 'POST',
+                                data: {
+                                    __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val(),
+                                    id: id
+                                },
+                                success: function (response) {
+                                    if (response.success) {
+                                        $.alert({
+                                            title: 'Deleted!',
+                                            content: response.message,
+                                            type: 'red',
+                                            icon: 'fas fa-trash'
+                                        });
 
-                                    $('#dataTable').DataTable().ajax.reload(null, false);
-                                } else {
+                                        $('#dataTable').DataTable().ajax.reload(null, false);
+                                    } else {
+                                        $.alert({
+                                            title: 'Error!',
+                                            content: response.message,
+                                            type: 'red'
+                                        });
+                                    }
+                                },
+                                error: function (xhr, status, error) {
+                                    console.error("Delete failed:", xhr.responseText);
                                     $.alert({
                                         title: 'Error!',
-                                        content: response.message,
+                                        content: 'Failed to delete the Agency.',
                                         type: 'red'
                                     });
+                                    if (xhr.status === 401 || xhr.status === 403) {
+                                        window.location.href = '/Account/Login';
+                                    } else {
+                                        $.alert({
+                                            title: 'Error!',
+                                            content: 'Unexpected error occurred.',
+                                            type: 'red'
+                                        });
+                                    }
+                                },
+                                complete: function () {
+                                    $spinner.addClass("hidden");
+                                    // ✅ Re-enable button and restore text
+                                    $btn.prop("disabled", false).html('<i class="fas fa-trash"></i> Delete');
                                 }
-                            },
-                            error: function (xhr, status, error) {
-                                console.error("Delete failed:", xhr.responseText);
-                                $.alert({
-                                    title: 'Error!',
-                                    content: 'Failed to delete the Agency.',
-                                    type: 'red'
-                                });
-                                if (xhr.status === 401 || xhr.status === 403) {
-                                    window.location.href = '/Account/Login';
-                                } else {
-                                    $.alert({
-                                        title: 'Error!',
-                                        content: 'Unexpected error occurred.',
-                                        type: 'red'
-                                    });
-                                }
-                            },
-                            complete: function () {
-                                $spinner.addClass("hidden");
-                                // ✅ Re-enable button and restore text
-                                $btn.prop("disabled", false).html('<i class="fas fa-trash"></i> Delete');
-                            }
-                        });
+                            });
+                        }
+                    },
+                    cancel: function () {
+                        // Do nothing
                     }
-                },
-                cancel: function () {
-                    // Do nothing
                 }
-            }
-        });
+            });
+        }
+
     });
     $('#dataTable').on('draw.dt', function () {
         $('[data-toggle="tooltip"]').tooltip({

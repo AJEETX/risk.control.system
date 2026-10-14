@@ -70,7 +70,7 @@
 					<i class="fas fa-info-circle"></i>
 					<span class="tooltip-text" id="information">
 						<span>
-							<i class='far fa-hand-point-right'></i><b> @Model?.ClaimsInvestigation?.Vendor?.Email</b> report  (@Model?.ClaimsInvestigation?.PolicyDetail?.InsuranceType!.GetEnumDisplayName())<i class="fas fa-print nav-icon"></i>.
+							<i class='far fa-hand-point-right'></i><b> @Model?.ClaimsInvestigation?.Vendor?.Email</b> report <i class="fas fa-print nav-icon"></i>.
 						</span>
 					</span>
 				</span>
@@ -98,7 +98,7 @@
 					@if (!string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.InvestigationReport?.AgentRemarks))
 					{
 						var questionTime = @Model.ClaimsInvestigation.InvestigationReport.AgentRemarksUpdated != null ?
-						@Model.ClaimsInvestigation.InvestigationReport.AgentRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt") : null;
+					@Model.ClaimsInvestigation.InvestigationReport.AgentRemarksUpdated.Value.ToLocalTime().ToString("dd-MMM-yy HH:mm") : null;
 						<div class="card  border-success">
 							<div class="card-header text-muted border-bottom-0">
 								<h3 class="card-title">
@@ -107,7 +107,7 @@
 										<i class="fas fa-info-circle"></i>
 										<span class="tooltip-text" id="information">
 											<span>
-												<i class="far fa-comment"></i><b> remarks (@Model.ClaimsInvestigation?.PolicyDetail?.InsuranceType!.GetEnumDisplayName())</b>
+												<i class="far fa-comment"></i><b> remarks</b>
 											</span>
 										</span>
 									</span>
@@ -115,7 +115,7 @@
 								<div class="card-tools">
 									<span data-bs-toggle="tooltip" title="Agent report time" class="badge badge-light">
 										<i class="nav-icon fas fa-clock"></i>
-										@Model.ClaimsInvestigation?.InvestigationReport?.AgentRemarksUpdated!.Value.ToString("dd-MMM-yy hh:mm tt")
+									@Model.ClaimsInvestigation?.InvestigationReport?.AgentRemarksUpdated!.Value..ToLocalTime().ToString("dd-MMM-yy HH:mm")
 									</span>
 								</div>
 							</div>
@@ -188,7 +188,7 @@
 							</h3>
 							<div class="card-tools">
 								<span data-bs-toggle="tooltip" title=" Supervisor report time" class="badge badge-light">
-									<i class="nav-icon fas fa-clock"></i> @Model?.ClaimsInvestigation.InvestigationReport?.SupervisorRemarksUpdated!.Value.ToString("dd-MMM-yy hh:mm tt")
+									<i class="nav-icon fas fa-clock"></i> @Model?.ClaimsInvestigation.InvestigationReport?.SupervisorRemarksUpdated!.Value.ToLocalTime().ToString("dd-MMM-yy HH:mm")
 								</span>
 							</div>
 						</div>
@@ -278,7 +278,7 @@
 								@if (@Model?.ClaimsInvestigation?.InvestigationReport?.AssessorRemarksUpdated != null)
 								{
 									<i class="nav-icon fas fa-clock"></i>
-									@Model.ClaimsInvestigation.InvestigationReport?.AssessorRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt")
+								@Model.ClaimsInvestigation.InvestigationReport?.AssessorRemarksUpdated.Value.ToLocalTime().ToString("dd-MMM-yy HH:mm")
 								}
 								else
 								{

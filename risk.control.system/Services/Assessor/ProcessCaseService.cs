@@ -60,7 +60,7 @@ namespace risk.control.system.Services.Assessor
 
         public async Task<bool> SubmitCaseReportAsync(SubmitCaseRequest request)
         {
-            var remarkType = Enum.Parse<AssessorRemarkType>(request.AssessorRemarkType);
+            var remarkType = Enum.Parse<AssessorRemarkType>(request.AssessorRemarkType.ToUpper());
             if (remarkType == AssessorRemarkType.OK)
             {
                 string approved = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR;
