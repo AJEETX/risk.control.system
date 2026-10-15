@@ -161,7 +161,8 @@ namespace risk.control.system.Controllers.Mobile
             try
             {
                 var normalizedMobile = request.Mobile.TrimStart('+');
-                var userWithUid = await _context.ApplicationUser.Include(u => u.Country).FirstOrDefaultAsync(v => v.MobileUId == request.Uid);
+                var userWithUid = await _context.ApplicationUser.Include(u => u.Country).FirstOrDefaultAsync(v => !v.Deleted && v.Active && v.MobileUId == request.Uid);
+
                 if (!request.SendSMSForRetry)
                 {
                     if (userWithUid != null)
@@ -169,12 +170,12 @@ namespace risk.control.system.Controllers.Mobile
                         return BadRequest($"UID {request.Uid} already exists.");
                     }
 
-                    var agentRole = await _roleManager.FindByNameAsync(AppRoles.AGENT.ToString());
-                    var matchingUsers = await _context.ApplicationUser.Include(u => u.Country).Where(u => (u.Country!.ISDCode + u.PhoneNumber) == normalizedMobile).ToListAsync();
+                    var agentRole = await _roleManager.FindByNameAsync(AGENT.DISPLAY_NAME);
+                    var matchingUsers = await _context.ApplicationUser.Include(u => u.Country).Where(u => (!u.Deleted && u.Active) && (u.Country!.ISDCode + u.PhoneNumber) == normalizedMobile).ToListAsync();
                     foreach (var user in matchingUsers)
                     {
                         var isAgent = await _userManager.IsInRoleAsync(user, agentRole!.Name!);
-                        if (isAgent && string.IsNullOrWhiteSpace(user.MobileUId) && user.Active)
+                        if (isAgent && string.IsNullOrWhiteSpace(user.MobileUId))
                         {
                             user.MobileUId = request.Uid;
                             int pin = RandomNumberGenerator.GetInt32(0, 10000);
@@ -223,26 +224,33 @@ namespace risk.control.system.Controllers.Mobile
                 {
                     return BadRequest("Uid And/Or Image is empty/null");
                 }
-                var mobileUidExist = await _context.ApplicationUser.FirstOrDefaultAsync(v => v.MobileUId == request.Uid);
-                if (mobileUidExist == null)
+                var userWithUid = await _context.ApplicationUser.FirstOrDefaultAsync(v => !v.Deleted && v.Active && v.MobileUId == request.Uid);
+                if (userWithUid == null)
                 {
                     return BadRequest($"{nameof(request.Uid)} {request.Uid} not exists");
                 }
-                if (mobileUidExist.ProfilePictureUrl == null || string.IsNullOrWhiteSpace(mobileUidExist.ProfilePictureUrl))
+                var agentRole = await _roleManager.FindByNameAsync(AGENT.DISPLAY_NAME);
+                var isAgent = await _userManager.IsInRoleAsync(userWithUid, agentRole!.Name!);
+
+                if (!isAgent)
                 {
-                    return BadRequest($"{mobileUidExist.Email}  {nameof(mobileUidExist.ProfilePictureUrl)}  does not exists");
+                    return BadRequest($"{nameof(request.Uid)} {request.Uid} is not an agent");
+                }
+                if (userWithUid.ProfilePictureUrl == null || string.IsNullOrWhiteSpace(userWithUid.ProfilePictureUrl))
+                {
+                    return BadRequest($"{userWithUid.Email}  {nameof(userWithUid.ProfilePictureUrl)}  does not exists");
                 }
                 if (!request.VerifyId)
                 {
-                    return Ok(new { Email = mobileUidExist.Email, Pin = mobileUidExist.SecretPin });
+                    return Ok(new { Email = userWithUid.Email, Pin = userWithUid.SecretPin });
                 }
 
                 var image = Convert.FromBase64String(request.Image);
-                var registeredImage = await System.IO.File.ReadAllBytesAsync(Path.Combine(_env.ContentRootPath, mobileUidExist.ProfilePictureUrl));
+                var registeredImage = await System.IO.File.ReadAllBytesAsync(Path.Combine(_env.ContentRootPath, userWithUid.ProfilePictureUrl));
                 var matched = await _compareFaces.FaceMatch(registeredImage, image);
                 if (matched.Item1)
                 {
-                    return Ok(new { Email = mobileUidExist.Email, Pin = mobileUidExist.SecretPin });
+                    return Ok(new { Email = userWithUid.Email, Pin = userWithUid.SecretPin });
                 }
 
                 return BadRequest("face mismatch");
@@ -303,7 +311,6 @@ namespace risk.control.system.Controllers.Mobile
         //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
         [HttpGet("agent")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
         public async Task<IActionResult> GetAll(string email)
         {
             try
@@ -312,11 +319,19 @@ namespace risk.control.system.Controllers.Mobile
                 {
                     return BadRequest("Email is empty/null");
                 }
-                var agent = await _context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == email);
+                var agent = await _context.ApplicationUser.FirstOrDefaultAsync(u => !u.Deleted && u.Active && u.Email == email);
 
-                if (agent == null || agent.Role != AppRoles.AGENT || !agent.Active)
+                if (agent == null)
                 {
                     return Unauthorized("Invalid User !!!");
+                }
+
+                var agentRole = await _roleManager.FindByNameAsync(AGENT.DISPLAY_NAME);
+                var isAgent = await _userManager.IsInRoleAsync(agent, agentRole!.Name!);
+
+                if (!isAgent)
+                {
+                    return BadRequest($"{nameof(email)} {email} is not an agent");
                 }
                 if (await _featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED))
                 {
@@ -327,11 +342,6 @@ namespace risk.control.system.Controllers.Mobile
                 }
                 var assignedToAgentStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT;
 
-                var vendorUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == email && c.Role == AppRoles.AGENT);
-                if (vendorUser == null)
-                {
-                    return Unauthorized("Invalid User !!!");
-                }
                 var claims = await _context.Investigations
                 .Include(c => c.PolicyDetail)
                .Include(c => c.BeneficiaryDetail)
@@ -350,16 +360,16 @@ namespace risk.control.system.Controllers.Mobile
                 .ThenInclude(c => c!.Country)
                 .Include(c => c.CustomerDetail)
                 .ThenInclude(c => c!.District)
-                .Where(i => i.VendorId == vendorUser.VendorId &&
+                .Where(i => i.VendorId == agent.VendorId &&
                 i.SubStatus == assignedToAgentStatus &&
-                i.TaskedAgentEmail == vendorUser.Email).ToListAsync();
+                i.TaskedAgentEmail == agent.Email).ToListAsync();
 
                 var claim2Agent = claims
                     .Select(c =>
                     new
                     {
                         claimId = c.Id,
-                        Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId),
+                        Registered = agent.Active && !string.IsNullOrWhiteSpace(agent.MobileUId),
                         claimType = c.PolicyDetail!.InsuranceType == InsuranceType.CLAIM ? ClaimType.DEATH.GetEnumDisplayName() : ClaimType.HEALTH.GetEnumDisplayName(),
                         DocumentPhoto = c.PolicyDetail.DocumentPath != null ?
                         Convert.ToBase64String(System.IO.File.ReadAllBytes(Path.Combine(_env.ContentRootPath, c.PolicyDetail.DocumentPath))) :
@@ -409,11 +419,18 @@ namespace risk.control.system.Controllers.Mobile
                 {
                     return BadRequest("Email is empty/null");
                 }
-                var agent = await _context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == email);
+                var agent = await _context.ApplicationUser.FirstOrDefaultAsync(u => !u.Deleted && u.Active && u.Email == email);
 
-                if (agent == null || agent.Role != AppRoles.AGENT || !agent.Active)
+                if (agent == null)
                 {
                     return Unauthorized("Invalid User !!!");
+                }
+                var agentRole = await _roleManager.FindByNameAsync(AGENT.DISPLAY_NAME);
+                var isAgent = await _userManager.IsInRoleAsync(agent, agentRole!.Name!);
+
+                if (!isAgent)
+                {
+                    return BadRequest($"{nameof(email)} {email} is not an agent");
                 }
                 if (await _featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED))
                 {
@@ -422,11 +439,7 @@ namespace risk.control.system.Controllers.Mobile
                         return StatusCode(401, new { message = "Offboarded Agent." });
                     }
                 }
-                var vendorUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == email && c.Role == AppRoles.AGENT);
-                if (vendorUser == null)
-                {
-                    return Unauthorized("Invalid User !!!");
-                }
+
                 var claims = await _context.Investigations
                     .Include(c => c.PolicyDetail)
                     .Include(c => c.BeneficiaryDetail)
@@ -445,8 +458,8 @@ namespace risk.control.system.Controllers.Mobile
                     .ThenInclude(c => c!.PinCode)
                     .Include(c => c.CustomerDetail)
                     .ThenInclude(c => c!.State)
-                    .Where(i => i.VendorId == vendorUser.VendorId &&
-                    i.TaskedAgentEmail == vendorUser.Email &&
+                    .Where(i => i.VendorId == agent.VendorId &&
+                    i.TaskedAgentEmail == agent.Email &&
                     i.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT).ToListAsync();
 
                 var claim2Agent = claims
@@ -454,7 +467,7 @@ namespace risk.control.system.Controllers.Mobile
                 new
                 {
                     ClaimId = c.Id,
-                    Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId),
+                    Registered = agent.Active && !string.IsNullOrWhiteSpace(agent.MobileUId),
                     Coordinate = new
                     {
                         Lat = c.PolicyDetail!.InsuranceType == InsuranceType.UNDERWRITING ?
@@ -484,11 +497,18 @@ namespace risk.control.system.Controllers.Mobile
                 {
                     return BadRequest("Invalid caseId And/Or Email is empty/null");
                 }
-                var agent = await _context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == email);
+                var agent = await _context.ApplicationUser.FirstOrDefaultAsync(u => !u.Deleted && u.Active && u.Email == email);
 
-                if (agent == null || agent.Role != AppRoles.AGENT || !agent.Active)
+                if (agent == null)
                 {
                     return Unauthorized("Invalid User !!!");
+                }
+                var agentRole = await _roleManager.FindByNameAsync(AGENT.DISPLAY_NAME);
+                var isAgent = await _userManager.IsInRoleAsync(agent, agentRole!.Name!);
+
+                if (!isAgent)
+                {
+                    return BadRequest($"{nameof(email)} {email} is not an agent");
                 }
                 if (await _featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED))
                 {
@@ -519,8 +539,6 @@ namespace risk.control.system.Controllers.Mobile
                     .Include(c => c.State)
                     .Include(c => c.Country)
                     .FirstOrDefaultAsync(c => c.InvestigationTaskId == caseId);
-
-                var vendorUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == email && c.Role == AppRoles.AGENT);
 
                 object locations = null!;
                 if (await _featureManager.IsEnabledAsync(FeatureFlags.ENABLE_REAL_TIME_REPORT_TEMPlATE))
@@ -576,7 +594,7 @@ namespace risk.control.system.Controllers.Mobile
                             locations
                         },
                         Remarks = caseDetail?.InvestigationReport?.AgentRemarks,
-                        Registered = vendorUser!.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId)
+                        Registered = agent!.Active && !string.IsNullOrWhiteSpace(agent.MobileUId)
                     });
             }
             catch (Exception ex)
@@ -596,12 +614,20 @@ namespace risk.control.system.Controllers.Mobile
                 {
                     return BadRequest("Invalid caseId And/Or Email is empty/null");
                 }
-                var agent = await _context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == email);
+                var agent = await _context.ApplicationUser.FirstOrDefaultAsync(u => !u.Deleted && u.Active && u.Email == email);
 
-                if (agent == null || agent.Role != AppRoles.AGENT || !agent.Active)
+                if (agent == null)
                 {
                     return Unauthorized("Invalid User !!!");
                 }
+                var agentRole = await _roleManager.FindByNameAsync(AGENT.DISPLAY_NAME);
+                var isAgent = await _userManager.IsInRoleAsync(agent, agentRole!.Name!);
+
+                if (!isAgent)
+                {
+                    return BadRequest($"{nameof(email)} {email} is not an agent");
+                }
+
                 var locations = await _cloneReportService.GetReportTemplate(caseId, agent.Email!);
                 return Ok(locations);
             }
@@ -627,15 +653,22 @@ namespace risk.control.system.Controllers.Mobile
                     return BadRequest("All fields (Image, LatLong) are required and must be valid.");
                 }
 
-                var vendorUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == data.Email && c.Role == AppRoles.AGENT);
+                var agent = await _context.ApplicationUser.FirstOrDefaultAsync(u => !u.Deleted && u.Active && u.Email == data.Email);
 
-                if (vendorUser == null || vendorUser.Role != AppRoles.AGENT || !vendorUser.Active)
+                if (agent == null)
                 {
                     return Unauthorized("Invalid User !!!");
                 }
+                var agentRole = await _roleManager.FindByNameAsync(AGENT.DISPLAY_NAME);
+                var isAgent = await _userManager.IsInRoleAsync(agent, agentRole!.Name!);
+
+                if (!isAgent)
+                {
+                    return BadRequest($"{nameof(data.Email)} {data.Email} is not an agent");
+                }
                 if (await _featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED))
                 {
-                    if (string.IsNullOrWhiteSpace(vendorUser.MobileUId))
+                    if (string.IsNullOrWhiteSpace(agent.MobileUId))
                     {
                         return StatusCode(401, new { message = "Offboarded Agent." });
                     }
@@ -644,13 +677,13 @@ namespace risk.control.system.Controllers.Mobile
                 if (isAgentReportName)
                 {
                     var response = await _agentFaceIdfyService.CaptureAgentId(data);
-                    response.Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId);
+                    response.Registered = agent.Active && !string.IsNullOrWhiteSpace(agent.MobileUId);
                     return Ok(response);
                 }
                 else
                 {
                     var response = await _agentIdService.CaptureFaceId(data);
-                    response.Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId);
+                    response.Registered = agent.Active && !string.IsNullOrWhiteSpace(agent.MobileUId);
                     return Ok(response);
                 }
             }
@@ -676,21 +709,28 @@ namespace risk.control.system.Controllers.Mobile
                     return BadRequest("All fields (Image, LatLong) are required and must be valid.");
                 }
 
-                var vendorUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == data.Email && c.Role == AppRoles.AGENT);
+                var agent = await _context.ApplicationUser.FirstOrDefaultAsync(u => !u.Deleted && u.Active && u.Email == data.Email);
 
-                if (vendorUser == null || vendorUser.Role != AppRoles.AGENT || !vendorUser.Active)
+                if (agent == null)
                 {
                     return Unauthorized("Invalid User !!!");
                 }
+                var agentRole = await _roleManager.FindByNameAsync(AGENT.DISPLAY_NAME);
+                var isAgent = await _userManager.IsInRoleAsync(agent, agentRole!.Name!);
+
+                if (!isAgent)
+                {
+                    return BadRequest($"{nameof(data.Email)} {data.Email} is not an agent");
+                }
                 if (await _featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED))
                 {
-                    if (string.IsNullOrWhiteSpace(vendorUser.MobileUId))
+                    if (string.IsNullOrWhiteSpace(agent.MobileUId))
                     {
                         return StatusCode(401, new { message = "Offboarded Agent." });
                     }
                 }
                 var response = await _documentIdfyService.CaptureDocumentId(data);
-                response.Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId);
+                response.Registered = agent.Active && !string.IsNullOrWhiteSpace(agent.MobileUId);
                 return Ok(response);
             }
             catch (Exception ex)
@@ -721,21 +761,28 @@ namespace risk.control.system.Controllers.Mobile
                 if (!supportedExtensions.Contains(extension))
                     return BadRequest("Unsupported media format.");
 
-                var vendorUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == data.Email && c.Role == AppRoles.AGENT);
+                var agent = await _context.ApplicationUser.FirstOrDefaultAsync(u => !u.Deleted && u.Active && u.Email == data.Email);
 
-                if (vendorUser == null || vendorUser.Role != AppRoles.AGENT || !vendorUser.Active)
+                if (agent == null)
                 {
                     return Unauthorized("Invalid User !!!");
                 }
+                var agentRole = await _roleManager.FindByNameAsync(AGENT.DISPLAY_NAME);
+                var isAgent = await _userManager.IsInRoleAsync(agent, agentRole!.Name!);
+
+                if (!isAgent)
+                {
+                    return BadRequest($"{nameof(data.Email)} {data.Email} is not an agent");
+                }
                 if (await _featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED))
                 {
-                    if (string.IsNullOrWhiteSpace(vendorUser.MobileUId))
+                    if (string.IsNullOrWhiteSpace(agent.MobileUId))
                     {
                         return StatusCode(401, new { message = "Offboarded Agent." });
                     }
                 }
                 var response = await _mediaIdfyService.CaptureMedia(data);
-                response.Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId);
+                response.Registered = agent.Active && !string.IsNullOrWhiteSpace(agent.MobileUId);
                 return Ok(response);
             }
             catch (Exception ex)
@@ -762,6 +809,19 @@ namespace risk.control.system.Controllers.Mobile
                 if (!ModelState.IsValid)
                 {
                     return BadRequest("Some answers are missing.");
+                }
+                var agent = await _context.ApplicationUser.FirstOrDefaultAsync(u => !u.Deleted && u.Active && u.Email == email);
+
+                if (agent == null)
+                {
+                    return Unauthorized("Invalid User !!!");
+                }
+                var agentRole = await _roleManager.FindByNameAsync(AGENT.DISPLAY_NAME);
+                var isAgent = await _userManager.IsInRoleAsync(agent, agentRole!.Name!);
+
+                if (!isAgent)
+                {
+                    return BadRequest($"{nameof(email)} {email} is not an agent");
                 }
                 var answerSubmitted = await _answerService.CaptureAnswers(email, locationName, caseId, Questions);
                 if (answerSubmitted)
@@ -790,11 +850,18 @@ namespace risk.control.system.Controllers.Mobile
                 {
                     return BadRequest("All fields (Email, Remarks, CaseId) are required and must be valid.");
                 }
-                var agent = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == data.Email && c.Role == AppRoles.AGENT);
+                var agent = await _context.ApplicationUser.FirstOrDefaultAsync(u => !u.Deleted && u.Active && u.Email == data.Email);
 
-                if (agent == null || agent.Role != AppRoles.AGENT || !agent.Active)
+                if (agent == null)
                 {
                     return Unauthorized("Invalid User !!!");
+                }
+                var agentRole = await _roleManager.FindByNameAsync(AGENT.DISPLAY_NAME);
+                var isAgent = await _userManager.IsInRoleAsync(agent, agentRole!.Name!);
+
+                if (!isAgent)
+                {
+                    return BadRequest($"{nameof(data.Email)} {data.Email} is not an agent");
                 }
                 if (await _featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED))
                 {
