@@ -6,7 +6,7 @@ namespace risk.control.system.Seeds
     {
         public static List<Question> QuestionsUNDERWRITING_LA_ADDRESS()
         {
-            var question1 = QuestionSeed.Q("Name Of Person Met (Name & Mobile No.) ?", "text", true);
+            var question1 = QuestionSeed.Q("Name & Mobile No. of Person Met  ?", "text", true);
             var question2 = QuestionSeed.Q("Met Person Relation With LA ?", "dropdown", true, "BROTHER, RELATIVE, COUSIN, FRIEND, UNKNOWN, SELF");
             var question3 = QuestionSeed.Q("LA Date of Birth ?", "date", true);
             var question4 = QuestionSeed.Q("Tobacco/Alcohol or Smoking/swimming/diving ?", "dropdown", true, "SMOKER, OCCASIONAL DRINKER, DRUG-USER, UNKNOWN");

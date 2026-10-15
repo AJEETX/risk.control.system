@@ -37,7 +37,7 @@ namespace risk.control.system.Services.Agent
         {
             var agentRole = await _roleManager.FindByNameAsync(AGENT.DISPLAY_NAME);
 
-            var user2Onboard = await _context.ApplicationUser.FirstOrDefaultAsync(u => u.PhoneNumber == mobile && !string.IsNullOrWhiteSpace(u.MobileUId));
+            var user2Onboard = await _context.ApplicationUser.FirstOrDefaultAsync(u => !u.Deleted && u.Active && u.PhoneNumber == mobile && !string.IsNullOrWhiteSpace(u.MobileUId));
 
             var isAgent = await _userVendorManager.IsInRoleAsync(user2Onboard!, agentRole?.Name!);
             if (isAgent)
@@ -103,7 +103,7 @@ namespace risk.control.system.Services.Agent
         {
             var agentRole = await _roleManager.FindByNameAsync(AGENT.DISPLAY_NAME);
 
-            var user2Onboard = await _context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == agentEmail);
+            var user2Onboard = await _context.ApplicationUser.FirstOrDefaultAsync(u => !u.Deleted && u.Active && u.Email == agentEmail);
 
             var isAgent = await _userVendorManager.IsInRoleAsync(user2Onboard!, agentRole?.Name!);
             if (isAgent)
@@ -167,8 +167,7 @@ namespace risk.control.system.Services.Agent
         {
             var agentRole = await _roleManager.FindByNameAsync(AGENT.DISPLAY_NAME);
 
-            var user2Onboards = _context.ApplicationUser.Include(c => c.Country).Where(
-                u => u.Country!.ISDCode + u.PhoneNumber!.TrimStart('+') == mobile.TrimStart('+') && !string.IsNullOrWhiteSpace(u.MobileUId));
+            var user2Onboards = _context.ApplicationUser.Include(c => c.Country).Where(u => !u.Deleted && u.Active && u.Country!.ISDCode + u.PhoneNumber!.TrimStart('+') == mobile.TrimStart('+') && !string.IsNullOrWhiteSpace(u.MobileUId));
 
             foreach (var user2Onboard in user2Onboards)
             {
