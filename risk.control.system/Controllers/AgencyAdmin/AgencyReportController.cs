@@ -121,11 +121,6 @@ namespace risk.control.system.Controllers.AgencyAdmin
                 }
                 var caseTask = await _processSubmittedReportService.ProcessAgentReport(userEmail, supervisorRemarks, claimId, SupervisorRemarkType.OK, supervisorAttachment, remarks);
 
-                if (caseTask.AiEnabled)
-                {
-                    _backgroundJobClient.Enqueue(() => _agenticService.StartAiProcessAsync(caseTask.PolicyDetail!.ContractNumber));
-                }
-
                 _backgroundJobClient.Enqueue(() => _mailService.NotifyCaseReportSubmitToCompany(userEmail, claimId, _baseUrl));
 
                 _notifyService.Custom($"Case <b> #{caseTask.PolicyDetail!.ContractNumber}</b>  Report submitted to Company", 3, "green", "far fa-file-powerpoint");

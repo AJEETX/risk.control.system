@@ -145,6 +145,10 @@ namespace risk.control.system.Services.Report
             var sourceFolderPath = Path.GetFullPath(Path.Combine(_env.ContentRootPath, CONSTANTS.DOCUMENT, CONSTANTS.CASE, policy.ContractNumber, CONSTANTS.REPORT));
             var s3KeyName = $"backups/{policy.ContractNumber}/{CONSTANTS.AGENCY_REPORT_ZIP_FILENAME}";
             await ZipAndUploadToS3Async(sourceFolderPath, s3KeyName);
+            if (investigation!.AiEnabled)
+            {
+                await _agenticService.StartAiProcessAsync(policy!.ContractNumber);
+            }
         }
         private async Task<bool> ZipAndUploadToS3Async(string sourceFolder, string s3Key)
         {

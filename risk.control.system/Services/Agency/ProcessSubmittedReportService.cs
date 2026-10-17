@@ -29,51 +29,6 @@ namespace risk.control.system.Services.Agency
 
         public async Task<InvestigationTask> ProcessAgentReport(string userEmail, string supervisorRemarks, long caseId, SupervisorRemarkType reportUpdateStatus, IFormFile? document = null, string editRemarks = "")
         {
-
-            return await ApproveAgentReport(userEmail, caseId, supervisorRemarks, reportUpdateStatus, document, editRemarks);
-        }
-
-        public async Task<(Vendor, string)> SubmitToVendorSupervisor(string userEmail, long caseId, string remarks)
-        {
-            try
-            {
-                var agent = await context.ApplicationUser.AsNoTracking().Include(u => u.Vendor).FirstOrDefaultAsync(a => a.Email == userEmail.Trim().ToLower());
-
-                var submitted2Supervisor = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR;
-
-                var caseTask = await GetCases().Include(c => c.InvestigationReport)
-                    .FirstOrDefaultAsync(c => c.Id == caseId);
-
-                caseTask!.Updated = DateTime.UtcNow;
-                caseTask.UpdatedBy = agent!.Email;
-                caseTask.SubStatus = submitted2Supervisor;
-                caseTask.SubmittedToSupervisorTime = DateTime.UtcNow;
-                caseTask.CaseOwner = agent.Vendor!.Email;
-                var claimReport = caseTask.InvestigationReport;
-
-                claimReport!.AgentRemarks = remarks;
-                claimReport.AgentRemarksUpdated = DateTime.UtcNow;
-                claimReport.AgentEmail = userEmail;
-
-                context.Investigations.Update(caseTask);
-
-                var rows = await context.SaveChangesAsync(null, false);
-
-                await timelineService.UpdateTaskStatus(caseTask.Id, userEmail);
-
-                return (agent.Vendor, caseTask.PolicyDetail!.ContractNumber);
-            }
-            catch (Exception ex)
-            {
-                var sanitizedEmail = userEmail?.Replace("\n", "").Replace("\r", "");
-
-                logger.LogError(ex, "Error occurred submit case {Id}. {UserEmail}", caseId, sanitizedEmail);
-                return (null!, string.Empty);
-            }
-        }
-
-        private async Task<InvestigationTask> ApproveAgentReport(string userEmail, long caseId, string supervisorRemarks, SupervisorRemarkType reportUpdateStatus, IFormFile? document = null, string editRemarks = "")
-        {
             try
             {
                 var caseTask = await context.Investigations
@@ -129,6 +84,45 @@ namespace risk.control.system.Services.Agency
             {
                 logger.LogError(ex, "Error occurred Approve case {Id}. {UserEmail}", caseId, userEmail);
                 return null!;
+            }
+        }
+
+        public async Task<(Vendor, string)> SubmitToVendorSupervisor(string userEmail, long caseId, string remarks)
+        {
+            try
+            {
+                var agent = await context.ApplicationUser.AsNoTracking().Include(u => u.Vendor).FirstOrDefaultAsync(a => a.Email == userEmail.Trim().ToLower());
+
+                var submitted2Supervisor = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR;
+
+                var caseTask = await GetCases().Include(c => c.InvestigationReport)
+                    .FirstOrDefaultAsync(c => c.Id == caseId);
+
+                caseTask!.Updated = DateTime.UtcNow;
+                caseTask.UpdatedBy = agent!.Email;
+                caseTask.SubStatus = submitted2Supervisor;
+                caseTask.SubmittedToSupervisorTime = DateTime.UtcNow;
+                caseTask.CaseOwner = agent.Vendor!.Email;
+                var claimReport = caseTask.InvestigationReport;
+
+                claimReport!.AgentRemarks = remarks;
+                claimReport.AgentRemarksUpdated = DateTime.UtcNow;
+                claimReport.AgentEmail = userEmail;
+
+                context.Investigations.Update(caseTask);
+
+                var rows = await context.SaveChangesAsync(null, false);
+
+                await timelineService.UpdateTaskStatus(caseTask.Id, userEmail);
+
+                return (agent.Vendor, caseTask.PolicyDetail!.ContractNumber);
+            }
+            catch (Exception ex)
+            {
+                var sanitizedEmail = userEmail?.Replace("\n", "").Replace("\r", "");
+
+                logger.LogError(ex, "Error occurred submit case {Id}. {UserEmail}", caseId, sanitizedEmail);
+                return (null!, string.Empty);
             }
         }
 
