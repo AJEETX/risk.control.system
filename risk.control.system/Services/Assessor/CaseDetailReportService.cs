@@ -22,7 +22,14 @@ namespace risk.control.system.Services.Assessor
         public async Task<CaseTransactionModel> GetClaimDetailsReport(string currentUserEmail, long id)
         {
             var caseTask = await GetClaimDetailsReport(id);
-
+            if (caseTask.AiEnabled)
+            {
+                var agenticUrl = await _agenticService.GetAgenticUrl(currentUserEmail, caseTask.ClientCompany!.AgenticBaseUrl, caseTask.AgenticUrl!);
+                if (!string.IsNullOrEmpty(agenticUrl))
+                {
+                    caseTask.AgenticUrl = agenticUrl;
+                }
+            }
             if (caseTask!.CustomerDetail != null)
             {
                 caseTask.CustomerDetail.PhoneNumber = new string('*', caseTask.CustomerDetail.PhoneNumber.ToString().Length - 4) + caseTask.CustomerDetail.PhoneNumber.ToString().Substring(caseTask.CustomerDetail.PhoneNumber.ToString().Length - 4);

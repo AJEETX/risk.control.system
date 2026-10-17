@@ -4,16 +4,14 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Drawing;
 using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.Formats.Jpeg;
-using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.Processing;
 
 namespace risk.control.system.Services.Agent
 {
     public interface IProcessImageService
     {
-        byte[] ProcessCompress(byte[] imageByte, string onlyExtension, float cornerRadius = 10, int quality = 99, Amazon.Rekognition.Model.BoundingBox? faceBox = null);
-
-        byte[] CompressImage(byte[] imageBytes, int quality = 75, string watermarkText = "VERIFIED");
+        byte[] CompressImage(byte[] imageBytes, int quality = 80);
+        byte[] CompressAndWaterMarkImage(byte[] imageBytes, int quality = 80, string watermarkText = "VERIFIED");
     }
 
     internal class ProcessImageService(ILogger<ProcessImageService> logger) : IProcessImageService
@@ -21,7 +19,31 @@ namespace risk.control.system.Services.Agent
         private const int maxWidth = 1200;
         private readonly ILogger<ProcessImageService> _logger = logger;
 
-        public byte[] CompressImage(byte[] imageBytes, int quality = 80, string watermarkText = "VERIFIED")
+        public byte[] CompressImage(byte[] imageBytes, int quality = 80)
+        {
+            if (imageBytes == null || imageBytes.Length == 0) return Array.Empty<byte>();
+            try
+            {
+                using var inputStream = new MemoryStream(imageBytes);
+                using var outputStream = new MemoryStream();
+                using (var image = Image.Load(inputStream))
+                {
+                    image.Mutate(x => x.AutoOrient());
+                    if (image.Width > maxWidth)
+                    {
+                        image.Mutate(x => x.Resize(new ResizeOptions { Size = new Size(maxWidth, 0), Mode = ResizeMode.Max }));
+                    }
+                    image.Save(outputStream, new JpegEncoder { Quality = quality });
+                }
+                return outputStream.ToArray();
+            }
+            catch (UnknownImageFormatException ex)
+            {
+                _logger.LogError(ex, "Format Error: Data is not a valid image.");
+                return imageBytes; // Return original on error
+            }
+        }
+        public byte[] CompressAndWaterMarkImage(byte[] imageBytes, int quality = 80, string watermarkText = "VERIFIED")
         {
             if (imageBytes == null || imageBytes.Length == 0) return Array.Empty<byte>();
             try
@@ -81,30 +103,6 @@ namespace risk.control.system.Services.Agent
                 ctx.DrawText(textDrawOptions, watermarkText, mainFont, Color.Black, new PointF(textLocation.X + shadowOffset, textLocation.Y + shadowOffset));
                 ctx.DrawText(textDrawOptions, watermarkText, mainFont, Color.White, textLocation);
             });
-        }
-        public byte[] ProcessCompress(byte[] imageByte, string onlyExtension, float cornerRadius = 10, int quality = 99, Amazon.Rekognition.Model.BoundingBox? faceBox = null)
-        {
-            using var stream = new MemoryStream(imageByte);
-            using var image = Image.Load(stream);
-            using MemoryStream streamOut = new MemoryStream();
-            if (onlyExtension == ".png")
-            {
-                var pngEncoder = new PngEncoder
-                {
-                    CompressionLevel = PngCompressionLevel.BestCompression
-                };
-                image.Save(streamOut, pngEncoder);
-            }
-            else if (onlyExtension == ".jpg" || onlyExtension == ".jpeg")
-            {
-                var jpgEncoder = new JpegEncoder
-                {
-                    Quality = quality, // Adjust this value for desired compression quality
-                };
-                image.Save(streamOut, jpgEncoder);
-            }
-            var imageOutByte = streamOut.ToArray();
-            return imageOutByte;
         }
     }
 }

@@ -65,6 +65,9 @@
                         <i class="fas fa-arrow-left"></i>
                         <span class="badge badge-light"> <i class="fa fa-thumbs-o-down"></i> </span> Back
                     </a>
+                    <a id="adjudicate-case" href="@Model.ClaimsInvestigation?.AgenticUrl" target="_blank" class="btn btn-sm btn-success btn-gap">
+                        <i class="fas fa-check-circle" aria-hidden="true"></i> View Adjudication
+                    </a>
                     <a href="/Report/PrintPdfReport/@Model.ClaimsInvestigation!.Id" class="btn btn-sm btn-danger"><i class="far fa-file-pdf"></i> PDF</a>
                     <a class="btn  btn-sm btn-primary" asp-controller="Assessor" asp-action="RejectedInvoice" asp-route-id="@Model.VendorInvoice?.VendorInvoiceId">
                         <i class="fa fa-print"> Invoice</i>

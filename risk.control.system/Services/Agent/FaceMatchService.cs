@@ -22,12 +22,12 @@ namespace risk.control.system.Services.Agent
             try
             {
                 var matched = await _amazonApiService.FaceMatch(registeredImage, faceImageBytes);
-                return matched.Item1 ? (matched.Item2.ToString(), _processImageService.CompressImage(faceImageBytes), matched.Item2) : ("0", _processImageService.CompressImage(faceImageBytes), 0);
+                return matched.Item1 ? (matched.Item2.ToString(), _processImageService.CompressAndWaterMarkImage(faceImageBytes), matched.Item2) : ("0", _processImageService.CompressAndWaterMarkImage(faceImageBytes), 0);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Failed face match");
-                return ("0", _processImageService.CompressImage(faceImageBytes), 0);
+                return ("0", _processImageService.CompressAndWaterMarkImage(faceImageBytes), 0);
             }
         }
 

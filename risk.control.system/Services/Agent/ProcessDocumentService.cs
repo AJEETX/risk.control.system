@@ -45,7 +45,7 @@ namespace risk.control.system.Services.Agent
                     }
                     else
                     {
-                        var compressed = _processImageService.CompressImage(docImage);
+                        var compressed = _processImageService.CompressAndWaterMarkImage(docImage);
                         await File.WriteAllBytesAsync(doc.FilePath!, compressed);
                         doc.ImageValid = true;
                         doc.LocationInfo = ocrResult.FirstOrDefault()?.Text ?? string.Empty;
@@ -55,7 +55,7 @@ namespace risk.control.system.Services.Agent
                 {
                     doc.ImageValid = false;
                     doc.LocationInfo = "No OCR data detected";
-                    await File.WriteAllBytesAsync(doc.FilePath!, _processImageService.CompressImage(docImage));
+                    await File.WriteAllBytesAsync(doc.FilePath!, _processImageService.CompressAndWaterMarkImage(docImage));
                 }
                 doc.ValidationExecuted = true;
             }
