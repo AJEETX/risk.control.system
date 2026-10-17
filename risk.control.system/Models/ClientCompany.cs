@@ -16,10 +16,6 @@ namespace risk.control.system.Models
         [StringLength(50, MinimumLength = 3, ErrorMessage = "Name must be between 3 and 50 characters.")]
         public string Name { get; set; } = default!;
 
-        [Display(Name = "Phone number")]
-        [StringLength(13, MinimumLength = 9, ErrorMessage = "PhoneNumber must be between 9 and 13 characters.")]
-        public string PhoneNumber { get; set; } = default!;
-
         [StringLength(50, MinimumLength = 3, ErrorMessage = "Email must be between 3 and 30 characters.")]
         public string Email { get; set; } = default!;
 
@@ -49,6 +45,9 @@ namespace risk.control.system.Models
 
         [Display(Name = "District")]
         public District? District { get; set; } = default!;
+        [Display(Name = "Agentic Url")]
+        [StringLength(200, MinimumLength = 10, ErrorMessage = "Agentic Url must be between 10 and 200 characters.")]
+        public string AgenticBaseUrl { get; set; } = "not set";
 
         [StringLength(50, MinimumLength = 3, ErrorMessage = "BankName must be between 3 and 50 characters.")]
         public string? BankName { get; set; } = default!;

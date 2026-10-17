@@ -9,6 +9,8 @@ services:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: https://+:8081
       APP_URL: "https://ickeckify-apk.s3.ap-southeast-2.amazonaws.com/demo/app-release.apk"
+      FACE_IMAGE_COLLECTION: "face-image-collection-local"
+      S3_BUCKET: "icheckify-bucket-local"
       WEBSITE_SITE_URL: "policy-intel.biz"
       WEBSITE_NAME: "policy-intel"
       WEBSITE_SITE_LOGO: "/img/logo.jpeg"
@@ -30,6 +32,8 @@ services:
       - AWS_ID
       - AWS_SECRET
       - GOOGLE_MAP_KEY
+      - AI_LOGIN
+      - AI_DATA
       - GOOGLE_APPLICATION_CREDENTIALS_JSON
       - HUGING_FACE
       - PHONE_API
@@ -79,6 +83,10 @@ volumes:
   pgadmin_data:	
 
 secrets:
+  AI_LOGIN:
+    file: ./secrets/AI_LOGIN.txt
+  AI_DATA:
+    file: ./secrets/AI_DATA.txt
   DEFAULT_CONNECTION:
     file: ./secrets/DEFAULT_CONNECTION.txt
   AZUREAD__CLIENTSECRET:

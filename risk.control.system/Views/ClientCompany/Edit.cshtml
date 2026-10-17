@@ -60,13 +60,13 @@
 									</div>
 
 									<div class="form-group">
-										<label class="input-group-label"> Mobile #: </label>
+										<label class="input-group-label"> Agentic Url: </label>
 										<div class="input-group mb-3">
 											<div class="input-group-prepend">
-												<span class="input-group-text"><i class="fas fa-phone"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+												<span class="input-group-text"><i class="fas fa-globe"></i> <i class="fa fa-asterisk asterik-style"></i></span>
 											</div>
-											<input id="PhoneNumber" type="text" asp-for="PhoneNumber" class="form-control remarks" required maxlength="14" placeholder="Mobile # only (9876543210)" data-bs-toggle="tooltip" />
-											<span asp-validation-for="PhoneNumber" class="text-danger"></span>
+											<input  type="text" asp-for="AgenticBaseUrl" class="form-control remarks" required maxlength="200" placeholder="Agentic Url" data-bs-toggle="tooltip" />
+											<span asp-validation-for="AgenticBaseUrl" class="text-danger"></span>
 										</div>
 									</div>
 
@@ -231,8 +231,7 @@
 			</article>
 			<article>
 				<div class="bb-blog-inner">
-					<div class="card card-light direct-chat-warning expand-card">
-
+					<div class="card card-light direct-chat-warning expanded-card">
 						<div class="card-header">
 							<h3 class="card-title"><i class="fas fa-sitemap"></i> <span class="badge badge-light"> Config Detail</span></h3>
 
@@ -243,7 +242,7 @@
 								</button>
 							</div>
 						</div>
-						<div class="container-fluid py-4">
+						<div class="card-body container-fluid py-4">
 							<div class="row g-4">
 								<div class="col-lg-6">
 									<div class="card h-100 shadow-sm border-primary">

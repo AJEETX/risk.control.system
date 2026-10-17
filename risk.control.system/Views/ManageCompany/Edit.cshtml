@@ -15,9 +15,16 @@
 					<i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
 				</div>
 				<input type="hidden" asp-for="ClientCompanyId" />
+				<input type="hidden" asp-for="CountryId" />
+				<input type="hidden" asp-for="AddressLatitude" />
+				<input type="hidden" asp-for="AddressLongitude" />
+				<input type="hidden" asp-for="AddressMapLocation" />
 				<input type="hidden" id="CountryId" value="@Model?.CountryId" />
 				<input type="hidden" id="Isd" value="@Model?.Country?.ISDCode" />
 				<input type="hidden" id="countryCode" value="@Model?.Country?.Code" />
+				<input type="hidden" asp-for="DocumentUrl" />
+				<input type="hidden" asp-for="Branch" />
+				<input type="hidden" asp-for="AgenticBaseUrl" />
 				<input asp-for="SelectedCountryId" type="hidden" id="SelectedCountryId" name="SelectedCountryId" value="@Model?.CountryId" />
 
 				<div asp-validation-summary="ModelOnly" class="text-danger"></div>
@@ -57,7 +64,7 @@
 						</div>
 						<div class="bg-light p-3 rounded mb-3 border">
 							<h6 class="text-secondary border-bottom pb-2 mb-3">
-								<i class="fas fa-id-card mr-2"></i> Name & Contact #
+								<i class="fas fa-id-card mr-2"></i> Company Name
 							</h6>
 						<div class="form-group">
 								<label class="input-group-label" for="Name"> Name: <span asp-validation-for="Name" class="text-danger"></span></label>
@@ -69,36 +76,11 @@
 								
 							</div>
 						</div>
-							<div class="form-group">
-								<label class="input-group-label" for="PhoneNumber"> Mobile #: <span asp-validation-for="PhoneNumber" class="text-danger"></span></label>
-								<div class="input-group">
-									<div class="input-group-prepend">
-										@{
-											var imgPath = "/flags/" + @Model?.Country?.Code.ToLower() + ".png";
-										}
-										<span class="input-group-text country-code-text" data-bs-toggle="tooltip" title="Country Code :+@Model?.Country?.ISDCode">
-											<img src="@imgPath" class="flag-icon" data-bs-toggle="tooltip" title="@Model?.Country?.Name" alt="flag" />  +@Model?.Country?.ISDCode
-										</span>
-									</div>
-									<input id="PhoneNumber" type="text" asp-for="PhoneNumber" class="form-control remarks" required maxlength="10" placeholder="Mobile # only (e.g., 9876543210)" data-bs-toggle="tooltip" />
-									<span id="phone-spinner" class="text-secondary phone-icon d-none">
-										<i class="fas fa-spinner fa-spin"></i>
-									</span>
-									<span id="phone-valid" class="text-success phone-icon d-none">
-									</span>
-									<span id="phone-invalid" class="text-danger phone-icon d-none">
-										<i class="fas fa-times-circle"></i>
-									</span>
-									
-								</div>
-							</div>
+							
 						</div>
 						
 					</div>
 					<div class="col-md-6">
-						<div class="bg-light p-3 rounded mb-3 border">
-							<i class="fas  fa-lightbulb-o mr-2"></i><span>Active Since:</span> <span class="font-weight-bold"> @Model?.ActivatedDate?.ToString("dd-MMM-yyyy")</span>
-						</div>
 						<div class="bg-light p-3 rounded mb-3 border">
 							<h6 class="text-secondary border-bottom pb-2 mb-3">
 								<i class="fas fa-bank mr-2"></i> Banking Details

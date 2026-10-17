@@ -10,6 +10,7 @@ using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services.Agency;
+using risk.control.system.Services.Agentic;
 using risk.control.system.Services.Common;
 
 namespace risk.control.system.Controllers.AgencyAdmin
@@ -21,7 +22,9 @@ namespace risk.control.system.Controllers.AgencyAdmin
         private const long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
         private static readonly string[] AllowedExt = new[] { ".jpg", ".jpeg", ".png" };
         private static readonly string[] AllowedMime = new[] { "image/jpeg", "image/png" };
-        private IProcessSubmittedReportService _processSubmittedReportService;
+        private readonly IProcessSubmittedReportService _processSubmittedReportService;
+        private readonly IAgenticService _agenticService;
+
         private readonly INotyfService _notifyService;
         private readonly ICaseNotificationService _mailService;
         private readonly ILogger<AgencyReportController> _logger;
@@ -29,17 +32,19 @@ namespace risk.control.system.Controllers.AgencyAdmin
 
         public AgencyReportController(
             IProcessSubmittedReportService processSubmittedReportService,
+            IAgenticService agenticService,
             INotyfService notifyService,
             IBackgroundJobClient backgroundJobClient,
             IHttpContextAccessor httpContextAccessor,
             ICaseNotificationService mailboxService,
             ILogger<AgencyReportController> logger)
         {
-            this._processSubmittedReportService = processSubmittedReportService;
-            this._notifyService = notifyService;
-            this._mailService = mailboxService;
-            this._logger = logger;
-            this._backgroundJobClient = backgroundJobClient;
+            _processSubmittedReportService = processSubmittedReportService;
+            _agenticService = agenticService;
+            _notifyService = notifyService;
+            _mailService = mailboxService;
+            _logger = logger;
+            _backgroundJobClient = backgroundJobClient;
             var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
             var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
             _baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
@@ -114,10 +119,16 @@ namespace risk.control.system.Controllers.AgencyAdmin
                         return RedirectToAction(nameof(VendorInvestigationController.ReportDetail), ControllerName<VendorInvestigationController>.Name, new { selectedcase = claimId });
                     }
                 }
-                var success = await _processSubmittedReportService.ProcessAgentReport(userEmail, supervisorRemarks, claimId, SupervisorRemarkType.OK, supervisorAttachment, remarks);
+                var caseTask = await _processSubmittedReportService.ProcessAgentReport(userEmail, supervisorRemarks, claimId, SupervisorRemarkType.OK, supervisorAttachment, remarks);
+
+                if (caseTask.AiEnabled)
+                {
+                    _backgroundJobClient.Enqueue(() => _agenticService.StartAiProcessAsync(caseTask.PolicyDetail!.ContractNumber));
+                }
+
                 _backgroundJobClient.Enqueue(() => _mailService.NotifyCaseReportSubmitToCompany(userEmail, claimId, _baseUrl));
 
-                _notifyService.Custom($"Case <b> #{success.PolicyDetail!.ContractNumber}</b>  Report submitted to Company", 3, "green", "far fa-file-powerpoint");
+                _notifyService.Custom($"Case <b> #{caseTask.PolicyDetail!.ContractNumber}</b>  Report submitted to Company", 3, "green", "far fa-file-powerpoint");
 
                 return RedirectToAction(nameof(VendorInvestigationController.AgentReport), ControllerName<VendorInvestigationController>.Name);
             }
