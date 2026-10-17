@@ -114,8 +114,9 @@ namespace risk.control.system.Services.Agent
 
         private async Task<byte[]> SaveCompressedImage(string filePath, byte[] imageBytes)
         {
+            var compressedWithWatermark = _processImageService.CompressAndWaterMarkImage(imageBytes);
+            await File.WriteAllBytesAsync(filePath, compressedWithWatermark);
             byte[] compressed = _processImageService.CompressImage(imageBytes);
-            await File.WriteAllBytesAsync(filePath, compressed);
             return compressed;
         }
 
