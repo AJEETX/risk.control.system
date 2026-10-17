@@ -3,7 +3,6 @@
     public class AdjudicationRequest
     {
         public string PolicyNumber { get; set; } = default!;
-        public string Email { get; set; } = default!;
         public bool Set { get; set; } = true;
     }
 

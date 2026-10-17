@@ -88,6 +88,7 @@ namespace risk.control.system.Models
 
         public int? SelectedAgentDrivingDurationInSeconds { get; set; } = default!;
         public ICollection<InvestigationTimeline> InvestigationTimeline { get; set; } = new List<InvestigationTimeline>();
+        public string? AgenticUrl { get; set; }
         public bool AdjudicationCompleted { get; set; } = false;
     }
 }

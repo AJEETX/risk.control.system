@@ -4,6 +4,8 @@ namespace risk.control.system.AppConstant
 {
     public static class Applicationsettings
     {
+        public static readonly string AI_LOGIN = EnvHelper.Get("AI_LOGIN")!;
+        public static readonly string AI_DATA = EnvHelper.Get("AI_DATA")!;
         public const double ACTIVE_USER_TIMESPAN = 10;
         public const string TestingData = "R1$kcontrol!";
         public const string PERMISSION = "Permission";

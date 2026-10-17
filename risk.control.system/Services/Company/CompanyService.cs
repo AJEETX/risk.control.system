@@ -6,7 +6,6 @@ using Microsoft.FeatureManagement;
 using risk.control.system.AppConstant;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
-using risk.control.system.Models.ViewModel;
 using risk.control.system.Services.Common;
 
 namespace risk.control.system.Services.Company
@@ -64,11 +63,11 @@ namespace risk.control.system.Services.Company
                     Domain = u.Email,
                     Name = u.Name,
                     //Code = u.Code,
-                    Phone = "(+" + u.Country!.ISDCode + ") " + u.PhoneNumber,
+                    AgenticBaseUrl = u.AgenticBaseUrl,
                     Address = u.Addressline,
                     District = u.District!.Name,
                     State = u.State!.Code,
-                    CountryCode = u.Country.Code,
+                    CountryCode = u.Country!.Code,
                     Country = u.Country.Name,
                     PinCode = $"{u.PinCode!.Name} - {u.PinCode.Code}",
                     Flag = "/flags/" + u.Country.Code.ToLower() + ".png",
@@ -93,10 +92,6 @@ namespace risk.control.system.Services.Company
                     return (false, errors);
             }
 
-            await ValidatePhoneAsync(model, errors);
-            if (errors.Any())
-                return (false, errors);
-
             var companyUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
 
             if (companyUser == null)
@@ -120,24 +115,7 @@ namespace risk.control.system.Services.Company
             _context.ClientCompany.Update(company);
             await _context.SaveChangesAsync(null, false);
 
-            await SendNotificationAsync(company, model.Email, portal_base_url);
-
             return (true, null!);
-        }
-
-        private async Task ValidatePhoneAsync(ClientCompany model, Dictionary<string, string> errors)
-        {
-            if (!await _featureManager.IsEnabledAsync(FeatureFlags.VALIDATE_PHONE))
-                return;
-
-            var country = await _context.Country.FindAsync(model.SelectedCountryId);
-            if (country == null)
-                return;
-
-            if (!await _phoneService.IsValidMobileNumberAsync(model.PhoneNumber, country.ISDCode.ToString()))
-            {
-                errors[nameof(model.PhoneNumber)] = "Invalid mobile number";
-            }
         }
 
         private async Task UpdateDocumentAsync(ClientCompany company, ClientCompany model)
@@ -154,11 +132,11 @@ namespace risk.control.system.Services.Company
             company.StateId = model.SelectedStateId;
             company.DistrictId = model.SelectedDistrictId;
             company.PinCodeId = model.SelectedPincodeId;
+            company.AgenticBaseUrl = model.AgenticBaseUrl.Trim();
 
             var textInfo = CultureInfo.CurrentCulture.TextInfo;
             company.Name = WebUtility.HtmlEncode(textInfo.ToTitleCase(model.Name.ToLower()));
 
-            company.PhoneNumber = WebUtility.HtmlEncode(model.PhoneNumber.TrimStart('0'));
             company.Branch = WebUtility.HtmlEncode(model.Branch);
             company.BankName = WebUtility.HtmlEncode(model.BankName);
             company.BankAccountNumber = WebUtility.HtmlEncode(model.BankAccountNumber);
@@ -167,13 +145,6 @@ namespace risk.control.system.Services.Company
 
             company.Updated = DateTime.UtcNow;
             company.UpdatedBy = email;
-        }
-
-        private async Task SendNotificationAsync(ClientCompany company, string email, string portal_base_url)
-        {
-            string message = $"Company {company.Email} profile edited.\nDomain :{email}\n{portal_base_url}";
-
-            await _smsService.DoSendSmsAsync(company.Country!.Code, company.Country.ISDCode + company.PhoneNumber, message);
         }
     }
 }

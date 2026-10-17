@@ -53,7 +53,7 @@ namespace risk.control.system.Seeds
                 PinCodeId = companyPinCode.PinCodeId,
                 Email = input.DOMAIN!,
                 DocumentUrl = relativePath,
-                PhoneNumber = input.PHONE!,
+                AgenticBaseUrl = "https://ought-association-hardly-females.trycloudflare.com",
                 EmpanelledVendors = vendors.Where(v => v.CountryId == companyPinCode.CountryId).ToList(),
                 Updated = DateTime.UtcNow,
                 VerifyPan = globalSettings!.VerifyPan,

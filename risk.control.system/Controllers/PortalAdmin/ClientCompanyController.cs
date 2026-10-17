@@ -108,7 +108,6 @@ namespace risk.control.system.Controllers
             clientCompany.AddressLongitude = companyCoordinates.Longitude;
             clientCompany.AddressMapLocation = url;
             var isdCode = (await _context.Country.FirstOrDefaultAsync(c => c.CountryId == clientCompany.SelectedCountryId))?.ISDCode;
-            await smsService.DoSendSmsAsync(pinCode.Country.Code, isdCode + clientCompany.PhoneNumber, "Company profile created. \nDomain : " + clientCompany.Email + "\n" + _baseUrl);
 
             var textInfo = CultureInfo.CurrentCulture.TextInfo;
             clientCompany.Name = textInfo.ToTitleCase(clientCompany.Name.ToLower());
@@ -118,7 +117,7 @@ namespace risk.control.system.Controllers
             clientCompany.DistrictId = clientCompany.SelectedDistrictId;
             clientCompany.StateId = clientCompany.SelectedStateId;
             clientCompany.CountryId = clientCompany.SelectedCountryId;
-            clientCompany.PhoneNumber = clientCompany.PhoneNumber.TrimStart('0');
+            clientCompany.AgenticBaseUrl = clientCompany.AgenticBaseUrl.Trim();
             clientCompany.Updated = DateTime.UtcNow;
             clientCompany.UpdatedBy = HttpContext.User?.Identity?.Name;
             var addedCompany = _context.Add(clientCompany);
@@ -182,8 +181,6 @@ namespace risk.control.system.Controllers
                     _context.ApplicationUser.Update(companyUser);
                 }
                 await _context.SaveChangesAsync();
-
-                await smsService.DoSendSmsAsync(clientCompany.Country!.Code, clientCompany.Country.ISDCode + clientCompany.PhoneNumber, "Company account deleted. \nDomain : " + clientCompany.Email);
 
                 notifyService.Custom($"Company {clientCompany.Email} deleted successfully.", 3, "red", "fas fa-building");
                 return RedirectToAction(nameof(Index));
@@ -287,12 +284,11 @@ namespace risk.control.system.Controllers
                 clientCompany.DistrictId = clientCompany.SelectedDistrictId;
                 clientCompany.StateId = clientCompany.SelectedStateId;
                 clientCompany.CountryId = clientCompany.SelectedCountryId;
-                clientCompany.PhoneNumber = clientCompany.PhoneNumber.TrimStart('0');
+                clientCompany.AgenticBaseUrl = clientCompany.AgenticBaseUrl.Trim();
                 clientCompany.Updated = DateTime.UtcNow;
                 clientCompany.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.ClientCompany.Update(clientCompany);
                 await _context.SaveChangesAsync();
-                await smsService.DoSendSmsAsync(pinCode.Country.Code, pinCode.Country.ISDCode + clientCompany.PhoneNumber, "Company profile edited. \nDomain : " + clientCompany.Email + "\n" + _baseUrl);
                 notifyService.Custom($"Company edited successfully.", 3, "orange", "fas fa-building");
                 return RedirectToAction(nameof(ClientCompanyController.Details), "ClientCompany", new { id = clientCompany.ClientCompanyId });
             }

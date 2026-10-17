@@ -52,9 +52,9 @@
                 }
             },
             {
-                "data": "phone",
+                "data": "agenticBaseUrl",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + data + '" data-toggle="tooltip"> <img alt="' + data + '" title="' + data + '" src="' + row.flag + '" class="flag-icon" data-toggle="tooltip"/>' + data + '</span>'
+                    return '<span title="' + data + '" data-toggle="tooltip">' + data + '</span>'
                 }
             },
             {

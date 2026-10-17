@@ -473,6 +473,23 @@ namespace risk.control.system.Controllers.Api
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
+        [HttpPost("start-adjudication")]
+        [Consumes("application/json")]
+        public async Task<IActionResult> StartAdjudication(string policyNumber)
+        {
+            try
+            {
+                var result = await _agenticService.StartAiProcessAsync(policyNumber);
+                return Ok(new { Success = result, Message = "Adjudication started successfully." });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in Case Adjudication: {ex.Message}");
+                return StatusCode(StatusCodes.Status500InternalServerError, new { Success = false, Message = ex.Message });
+            }
+        }
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
         [HttpPost("adjudicate")]
         [Consumes("application/json")]
         public async Task<IActionResult> CaseAdjudicated([FromBody] AdjudicationRequest request)
@@ -504,6 +521,7 @@ namespace risk.control.system.Controllers.Api
                 return StatusCode(StatusCodes.Status500InternalServerError, new { Success = false, Message = ex.Message });
             }
         }
+
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
         [HttpPost("speech-to-text")]
         public async Task<IActionResult> ConvertSpeechToText(Speech2TextRequest request)

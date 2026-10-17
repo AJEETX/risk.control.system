@@ -3,6 +3,7 @@ using risk.control.system.AppConstant;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
+using risk.control.system.Services.Agentic;
 
 namespace risk.control.system.Services.Assessor
 {
@@ -13,9 +14,10 @@ namespace risk.control.system.Services.Assessor
         Task<CaseAgencyModel> GetInvestigateReport(string userEmail, long selectedcase);
     }
 
-    internal class CaseDetailReportService(ApplicationDbContext context) : ICaseDetailReportService
+    internal class CaseDetailReportService(ApplicationDbContext context, IAgenticService agenticService) : ICaseDetailReportService
     {
         private readonly ApplicationDbContext _context = context;
+        private readonly IAgenticService _agenticService = agenticService;
 
         public async Task<CaseTransactionModel> GetClaimDetailsReport(string currentUserEmail, long id)
         {
@@ -116,6 +118,10 @@ namespace risk.control.system.Services.Assessor
         {
             var caseTask = await GetInvestigateReport(selectedcase);
             if (caseTask is null) return null!;
+            if (caseTask.AiEnabled)
+            {
+                caseTask.AgenticUrl = await _agenticService.GetAgenticUrl(userEmail, caseTask.ClientCompany!.AgenticBaseUrl, caseTask.AgenticUrl!);
+            }
             var beneficiaryDetails = await _context.BeneficiaryDetail.AsNoTracking().Include(c => c.PinCode).Include(c => c.BeneficiaryRelation).Include(c => c.District).Include(c => c.Country).Include(c => c.State).FirstOrDefaultAsync(c => c.BeneficiaryDetailId == caseTask.BeneficiaryDetail!.BeneficiaryDetailId);
             caseTask.CustomerDetail!.PhoneNumber = new string('*', caseTask.CustomerDetail!.PhoneNumber.ToString().Length - 4) + caseTask.CustomerDetail.PhoneNumber.ToString().Substring(caseTask.CustomerDetail.PhoneNumber.ToString().Length - 4);
             var beneficairyContactMasked = new string('*', caseTask.BeneficiaryDetail!.PhoneNumber.ToString().Length - 4) + caseTask.BeneficiaryDetail.PhoneNumber.ToString().Substring(caseTask.BeneficiaryDetail.PhoneNumber.ToString().Length - 4);
