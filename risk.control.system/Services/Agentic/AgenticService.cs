@@ -168,6 +168,16 @@ namespace risk.control.system.Services.Agentic
                         var result = await _dbContext.SaveChangesAsync();
                         return result > 0;
                     }
+                    else
+                    {
+                        var errorContent = await finalResponse.Content.ReadAsStringAsync();
+                        _logger.LogError("Failed to start AI adjudication for policy {PolicyNumber}. Status Code: {StatusCode}, Response: {Response}", policyNumber, finalResponse.StatusCode, errorContent);
+                    }
+                }
+                else
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    _logger.LogError("Failed to authenticate with AI service for policy {PolicyNumber}. Status Code: {StatusCode}, Response: {Response}", policyNumber, response.StatusCode, errorContent);
                 }
                 return false;
             }
