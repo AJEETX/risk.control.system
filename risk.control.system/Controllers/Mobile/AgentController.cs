@@ -174,6 +174,11 @@ namespace risk.control.system.Controllers.Mobile
                     var matchingUsers = await _context.ApplicationUser.Include(u => u.Country).Where(u => (!u.Deleted && u.Active) && (u.Country!.ISDCode + u.PhoneNumber) == normalizedMobile).ToListAsync();
                     foreach (var user in matchingUsers)
                     {
+                        var agency = await _context.Vendor.FirstOrDefaultAsync(a => a.VendorId == user!.VendorId && a.Status == VendorStatus.ACTIVE && !a.Deleted);
+                        if (agency == null)
+                        {
+                            return BadRequest("Agency not Found or Inactive.");
+                        }
                         var isAgent = await _userManager.IsInRoleAsync(user, agentRole!.Name!);
                         if (isAgent && string.IsNullOrWhiteSpace(user.MobileUId))
                         {
@@ -228,6 +233,11 @@ namespace risk.control.system.Controllers.Mobile
                 if (userWithUid == null)
                 {
                     return BadRequest($"{nameof(request.Uid)} {request.Uid} not exists");
+                }
+                var agency = await _context.Vendor.FirstOrDefaultAsync(a => a.VendorId == userWithUid!.VendorId && a.Status == VendorStatus.ACTIVE && !a.Deleted);
+                if (agency == null)
+                {
+                    return BadRequest("Agency not Found or Inactive.");
                 }
                 var agentRole = await _roleManager.FindByNameAsync(AGENT.DISPLAY_NAME);
                 var isAgent = await _userManager.IsInRoleAsync(userWithUid, agentRole!.Name!);
@@ -325,7 +335,11 @@ namespace risk.control.system.Controllers.Mobile
                 {
                     return Unauthorized("Invalid User !!!");
                 }
-
+                var agency = await _context.Vendor.FirstOrDefaultAsync(a => a.VendorId == agent!.VendorId && a.Status == VendorStatus.ACTIVE && !a.Deleted);
+                if (agency == null)
+                {
+                    return BadRequest("Agency not Found or Inactive.");
+                }
                 var agentRole = await _roleManager.FindByNameAsync(AGENT.DISPLAY_NAME);
                 var isAgent = await _userManager.IsInRoleAsync(agent, agentRole!.Name!);
 
@@ -503,6 +517,11 @@ namespace risk.control.system.Controllers.Mobile
                 {
                     return Unauthorized("Invalid User !!!");
                 }
+                var agency = await _context.Vendor.FirstOrDefaultAsync(a => a.VendorId == agent!.VendorId && a.Status == VendorStatus.ACTIVE && !a.Deleted);
+                if (agency == null)
+                {
+                    return BadRequest("Agency not Found or Inactive.");
+                }
                 var agentRole = await _roleManager.FindByNameAsync(AGENT.DISPLAY_NAME);
                 var isAgent = await _userManager.IsInRoleAsync(agent, agentRole!.Name!);
 
@@ -620,6 +639,11 @@ namespace risk.control.system.Controllers.Mobile
                 {
                     return Unauthorized("Invalid User !!!");
                 }
+                var agency = await _context.Vendor.FirstOrDefaultAsync(a => a.VendorId == agent!.VendorId && a.Status == VendorStatus.ACTIVE && !a.Deleted);
+                if (agency == null)
+                {
+                    return BadRequest("Agency not Found or Inactive.");
+                }
                 var agentRole = await _roleManager.FindByNameAsync(AGENT.DISPLAY_NAME);
                 var isAgent = await _userManager.IsInRoleAsync(agent, agentRole!.Name!);
 
@@ -658,6 +682,11 @@ namespace risk.control.system.Controllers.Mobile
                 if (agent == null)
                 {
                     return Unauthorized("Invalid User !!!");
+                }
+                var agency = await _context.Vendor.FirstOrDefaultAsync(a => a.VendorId == agent!.VendorId && a.Status == VendorStatus.ACTIVE && !a.Deleted);
+                if (agency == null)
+                {
+                    return BadRequest("Agency not Found or Inactive.");
                 }
                 var agentRole = await _roleManager.FindByNameAsync(AGENT.DISPLAY_NAME);
                 var isAgent = await _userManager.IsInRoleAsync(agent, agentRole!.Name!);
@@ -715,6 +744,11 @@ namespace risk.control.system.Controllers.Mobile
                 {
                     return Unauthorized("Invalid User !!!");
                 }
+                var agency = await _context.Vendor.FirstOrDefaultAsync(a => a.VendorId == agent!.VendorId && a.Status == VendorStatus.ACTIVE && !a.Deleted);
+                if (agency == null)
+                {
+                    return BadRequest("Agency not Found or Inactive.");
+                }
                 var agentRole = await _roleManager.FindByNameAsync(AGENT.DISPLAY_NAME);
                 var isAgent = await _userManager.IsInRoleAsync(agent, agentRole!.Name!);
 
@@ -767,6 +801,11 @@ namespace risk.control.system.Controllers.Mobile
                 {
                     return Unauthorized("Invalid User !!!");
                 }
+                var agency = await _context.Vendor.FirstOrDefaultAsync(a => a.VendorId == agent!.VendorId && a.Status == VendorStatus.ACTIVE && !a.Deleted);
+                if (agency == null)
+                {
+                    return BadRequest("Agency not Found or Inactive.");
+                }
                 var agentRole = await _roleManager.FindByNameAsync(AGENT.DISPLAY_NAME);
                 var isAgent = await _userManager.IsInRoleAsync(agent, agentRole!.Name!);
 
@@ -816,6 +855,11 @@ namespace risk.control.system.Controllers.Mobile
                 {
                     return Unauthorized("Invalid User !!!");
                 }
+                var agency = await _context.Vendor.FirstOrDefaultAsync(a => a.VendorId == agent!.VendorId && a.Status == VendorStatus.ACTIVE && !a.Deleted);
+                if (agency == null)
+                {
+                    return BadRequest("Agency not Found or Inactive.");
+                }
                 var agentRole = await _roleManager.FindByNameAsync(AGENT.DISPLAY_NAME);
                 var isAgent = await _userManager.IsInRoleAsync(agent, agentRole!.Name!);
 
@@ -855,6 +899,11 @@ namespace risk.control.system.Controllers.Mobile
                 if (agent == null)
                 {
                     return Unauthorized("Invalid User !!!");
+                }
+                var agency = await _context.Vendor.FirstOrDefaultAsync(a => a.VendorId == agent!.VendorId && a.Status == VendorStatus.ACTIVE && !a.Deleted);
+                if (agency == null)
+                {
+                    return BadRequest("Agency not Found or Inactive.");
                 }
                 var agentRole = await _roleManager.FindByNameAsync(AGENT.DISPLAY_NAME);
                 var isAgent = await _userManager.IsInRoleAsync(agent, agentRole!.Name!);
