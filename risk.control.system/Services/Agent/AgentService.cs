@@ -104,7 +104,13 @@ namespace risk.control.system.Services.Agent
             var agentRole = await _roleManager.FindByNameAsync(AGENT.DISPLAY_NAME);
 
             var user2Onboard = await _context.ApplicationUser.FirstOrDefaultAsync(u => !u.Deleted && u.Active && u.Email == agentEmail);
-
+            if (user2Onboard == null)
+                return null!;
+            var agency = await _context.Vendor.FirstOrDefaultAsync(a => a.VendorId == user2Onboard!.VendorId && a.Status == VendorStatus.ACTIVE && !a.Deleted);
+            if (agency == null)
+            {
+                return null!;
+            }
             var isAgent = await _userVendorManager.IsInRoleAsync(user2Onboard!, agentRole?.Name!);
             if (isAgent)
                 return user2Onboard!;
@@ -168,9 +174,16 @@ namespace risk.control.system.Services.Agent
             var agentRole = await _roleManager.FindByNameAsync(AGENT.DISPLAY_NAME);
 
             var user2Onboards = _context.ApplicationUser.Include(c => c.Country).Where(u => !u.Deleted && u.Active && u.Country!.ISDCode + u.PhoneNumber!.TrimStart('+') == mobile.TrimStart('+') && !string.IsNullOrWhiteSpace(u.MobileUId));
+            if (user2Onboards == null)
+                return null!;
 
             foreach (var user2Onboard in user2Onboards)
             {
+                var agency = await _context.Vendor.FirstOrDefaultAsync(a => a.VendorId == user2Onboard!.VendorId && a.Status == VendorStatus.ACTIVE && !a.Deleted);
+                if (agency == null)
+                {
+                    return null!;
+                }
                 var isAgent = await _userVendorManager.IsInRoleAsync(user2Onboard, agentRole!.Name!);
                 if (isAgent)
                 {

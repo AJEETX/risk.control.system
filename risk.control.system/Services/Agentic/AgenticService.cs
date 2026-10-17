@@ -131,9 +131,9 @@ namespace risk.control.system.Services.Agentic
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred while attempting to process AI adjudication.");
-                throw;
+                _logger.LogError(ex, "An error occurred while attempting to get AI adjudication Url.");
             }
+            return string.Empty;
         }
         public async Task<bool> StartAiProcessAsync(string policyNumber)
         {

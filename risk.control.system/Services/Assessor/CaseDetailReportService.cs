@@ -120,7 +120,11 @@ namespace risk.control.system.Services.Assessor
             if (caseTask is null) return null!;
             if (caseTask.AiEnabled)
             {
-                caseTask.AgenticUrl = await _agenticService.GetAgenticUrl(userEmail, caseTask.ClientCompany!.AgenticBaseUrl, caseTask.AgenticUrl!);
+                var agenticUrl = await _agenticService.GetAgenticUrl(userEmail, caseTask.ClientCompany!.AgenticBaseUrl, caseTask.AgenticUrl!);
+                if (!string.IsNullOrEmpty(agenticUrl))
+                {
+                    caseTask.AgenticUrl = agenticUrl;
+                }
             }
             var beneficiaryDetails = await _context.BeneficiaryDetail.AsNoTracking().Include(c => c.PinCode).Include(c => c.BeneficiaryRelation).Include(c => c.District).Include(c => c.Country).Include(c => c.State).FirstOrDefaultAsync(c => c.BeneficiaryDetailId == caseTask.BeneficiaryDetail!.BeneficiaryDetailId);
             caseTask.CustomerDetail!.PhoneNumber = new string('*', caseTask.CustomerDetail!.PhoneNumber.ToString().Length - 4) + caseTask.CustomerDetail.PhoneNumber.ToString().Substring(caseTask.CustomerDetail.PhoneNumber.ToString().Length - 4);

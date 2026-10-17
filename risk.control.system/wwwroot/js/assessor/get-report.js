@@ -414,9 +414,9 @@ $(document).ready(function () {
     $('#enquire-case').on('click', function (e) {
         showenquiry();
     });
-    $('#adjudicate-case').on('click', function (e) {
-        adjudicate();
-    });
+    // $('#adjudicate-case').on('click', function (e) {
+    //     adjudicate();
+    // });
 });
 
 function adjudicate() {
