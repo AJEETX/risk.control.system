@@ -7,7 +7,6 @@ namespace risk.control.system.Services.Agent
     public interface IPanCardService
     {
         Task<byte[]> Process(byte[] IdImage, IReadOnlyList<TextBlock> imageReadOnly, ClientCompany company, DocumentIdReport doc);
-        byte[] MaskPanIfFound(byte[] idImage, IReadOnlyList<TextBlock> imageReadOnly, string allPanText);
     }
 
     internal class PanCardService(IGoogleMaskHelper googleHelper, IProcessImageService processImageService, IHttpClientService httpClientService, IWebHostEnvironment env, ILogger<PanCardService> logger) : IPanCardService
@@ -33,19 +32,23 @@ namespace risk.control.system.Services.Agent
             try
             {
                 var (panNumber, documentType) = ExtractPanAndType(allPanText);
+                var panIsValid = await ValidatePanNumber(panNumber, company);
+                if (!panIsValid)
+                {
+                    doc.ImageValid = false;
+                    doc.LocationInfo = "Invalid PAN number detected";
+                    idImage = await SaveCompressedInValidImage(filePath, idImage);
+                    return idImage;
+                }
+                doc.ImageValid = true;
                 idImage = MaskPanIfFound(idImage, imageReadOnly, allPanText);
-
-                doc.ImageValid = await ValidatePanNumber(panNumber, company);
-
-                idImage = await SaveCompressedImage(filePath, idImage);
-
+                idImage = await SaveCompressedValidImage(filePath, idImage);
                 doc.LocationInfo = FormatLocationInfo(allPanText, panNumber, documentType);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error occurred during PAN document processing.");
-
-                idImage = await SaveCompressedImage(filePath, idImage);
+                idImage = await SaveCompressedInValidImage(filePath, idImage);
                 doc.LongLatTime = DateTime.UtcNow;
                 doc.LocationInfo = "no data: ";
             }
@@ -74,7 +77,7 @@ namespace risk.control.system.Services.Agent
             return (panNumber, docType);
         }
 
-        public byte[] MaskPanIfFound(byte[] idImage, IReadOnlyList<TextBlock> imageReadOnly, string allPanText)
+        private byte[] MaskPanIfFound(byte[] idImage, IReadOnlyList<TextBlock> imageReadOnly, string allPanText)
         {
             if (allPanText.Contains(newPanNumber2Find))
             {
@@ -112,14 +115,20 @@ namespace risk.control.system.Services.Agent
             return $"{documentType} data: \r\n {allPanText}";
         }
 
-        private async Task<byte[]> SaveCompressedImage(string filePath, byte[] imageBytes)
+        private async Task<byte[]> SaveCompressedValidImage(string filePath, byte[] imageBytes)
         {
-            var compressedWithWatermark = _processImageService.CompressAndWaterMarkImage(imageBytes);
+            var compressedWithWatermark = _processImageService.CompressAndWaterMarkImage(imageBytes, 80, "VALID", 0f);
             await File.WriteAllBytesAsync(filePath, compressedWithWatermark);
-            byte[] compressed = _processImageService.CompressImage(imageBytes);
+            byte[] compressed = _processImageService.CompressImage(imageBytes, 80, 0f);
             return compressed;
         }
-
+        private async Task<byte[]> SaveCompressedInValidImage(string filePath, byte[] imageBytes)
+        {
+            var compressedWithWatermark = _processImageService.CompressAndWaterMarkImage(imageBytes, 80, "INVALID", 5f);
+            await File.WriteAllBytesAsync(filePath, compressedWithWatermark);
+            byte[] compressed = _processImageService.CompressImage(imageBytes, 80, 5f);
+            return compressed;
+        }
         private static string SafeSubstring(string text, int startIndex, int length)
         {
             if (startIndex < 0 || startIndex >= text.Length) return string.Empty;

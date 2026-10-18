@@ -15,6 +15,8 @@ namespace risk.control.system.Services.Agent
     IFileStorageService fileStorageService,
     ILogger<ProcessDocumentService> logger,
     IAdharCardService adharCardService,
+    IDeathCertificateService deathCertificateService,
+    IIncomeTaxService incomeTaxService,
     IPanCardService panCardService) : IProcessDocumentService
     {
         private readonly ApplicationDbContext _context = context;
@@ -23,6 +25,8 @@ namespace risk.control.system.Services.Agent
         private readonly ILogger<ProcessDocumentService> _logger = logger;
         private readonly IAdharCardService _adharCardService = adharCardService;
         private readonly IPanCardService _panCardService = panCardService;
+        private readonly IDeathCertificateService _deathCertificateService = deathCertificateService;
+        private readonly IIncomeTaxService _incomeTaxService = incomeTaxService;
         public async Task ProcessOcrResults(DocumentIdReport doc, byte[] docImage, IReadOnlyList<TextBlock> ocrResult, InvestigationTask caseDetail, string extension)
         {
             try
@@ -43,9 +47,21 @@ namespace risk.control.system.Services.Agent
                         var (_, originalRelativePath) = await _fileStorageService.SaveAsync(maskedDocImage, extension, CONSTANTS.CASE, caseDetail.PolicyDetail!.ContractNumber, CONSTANTS.REPORT, null, $"{doc.ReportName}{extension}");
                         doc.OriginalFilePath = originalRelativePath;
                     }
+                    else if (doc.ReportName == DocumentIdReportType.DEATH_CERTIFICATE.GetEnumDisplayName())
+                    {
+                        var maskedDocImage = await _deathCertificateService.Process(docImage, ocrResult, company!, doc);
+                        var (_, originalRelativePath) = await _fileStorageService.SaveAsync(maskedDocImage, extension, CONSTANTS.CASE, caseDetail.PolicyDetail!.ContractNumber, CONSTANTS.REPORT, null, $"{doc.ReportName}{extension}");
+                        doc.OriginalFilePath = originalRelativePath;
+                    }
+                    else if (doc.ReportName == DocumentIdReportType.ITR.GetEnumDisplayName())
+                    {
+                        var maskedDocImage = await _incomeTaxService.Process(docImage, ocrResult, company!, doc);
+                        var (_, originalRelativePath) = await _fileStorageService.SaveAsync(maskedDocImage, extension, CONSTANTS.CASE, caseDetail.PolicyDetail!.ContractNumber, CONSTANTS.REPORT, null, $"{doc.ReportName}{extension}");
+                        doc.OriginalFilePath = originalRelativePath;
+                    }
                     else
                     {
-                        var compressed = _processImageService.CompressAndWaterMarkImage(docImage);
+                        var compressed = _processImageService.CompressAndWaterMarkImage(docImage, 80, "VALID", 0F);
                         await File.WriteAllBytesAsync(doc.FilePath!, compressed);
                         doc.ImageValid = true;
                         doc.LocationInfo = ocrResult.FirstOrDefault()?.Text ?? string.Empty;
@@ -55,7 +71,7 @@ namespace risk.control.system.Services.Agent
                 {
                     doc.ImageValid = false;
                     doc.LocationInfo = "No OCR data detected";
-                    await File.WriteAllBytesAsync(doc.FilePath!, _processImageService.CompressAndWaterMarkImage(docImage));
+                    await File.WriteAllBytesAsync(doc.FilePath!, _processImageService.CompressAndWaterMarkImage(docImage, 80, "UNKNOWN", 2F));
                 }
                 doc.ValidationExecuted = true;
             }

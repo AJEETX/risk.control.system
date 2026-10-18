@@ -32,14 +32,20 @@ namespace risk.control.system.Services.Agent
                     var adharNumber = match.Value.Replace(" ", "").Trim();
                     idImage = MaskAdharIfFound(idImage, imageReadOnly, match.Value);
                     doc.ImageValid = await ValidateAdharNumber(adharNumber, company);
-                    idImage = await SaveCompressedImage(filePath, idImage);
+                    idImage = await SaveCompressedValidImage(filePath, idImage);
                     doc.LocationInfo = FormatLocationInfo(extractedText, match.Value, docyTypeAdharName);
+                }
+                else
+                {
+                    doc.ImageValid = false;
+                    idImage = await SaveCompressedInValidImage(filePath, idImage);
+                    doc.LocationInfo = "No ADHAR number detected";
                 }
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error occurred during ADHAR document processing.");
-                idImage = await SaveCompressedImage(filePath, idImage);
+                idImage = await SaveCompressedInValidImage(filePath, idImage);
                 doc.LongLatTime = DateTime.UtcNow;
                 doc.LocationInfo = "no data: ";
             }
@@ -57,7 +63,7 @@ namespace risk.control.system.Services.Agent
 
             return $"{documentType} data: \r\n {extractedText}";
         }
-        public byte[] MaskAdharIfFound(byte[] idImage, IReadOnlyList<TextBlock> imageReadOnly, string adharNumber)
+        private byte[] MaskAdharIfFound(byte[] idImage, IReadOnlyList<TextBlock> imageReadOnly, string adharNumber)
         {
             return _googleHelper.MaskAdharNumberTextInImage(idImage, imageReadOnly, adharNumber);
         }
@@ -70,11 +76,18 @@ namespace risk.control.system.Services.Agent
 
             return true;
         }
-        private async Task<byte[]> SaveCompressedImage(string filePath, byte[] imageBytes)
+        private async Task<byte[]> SaveCompressedValidImage(string filePath, byte[] imageBytes)
         {
-            var compressedWithWatermark = _processImageService.CompressAndWaterMarkImage(imageBytes);
+            var compressedWithWatermark = _processImageService.CompressAndWaterMarkImage(imageBytes, 80, "VALID", 0f);
             await File.WriteAllBytesAsync(filePath, compressedWithWatermark);
-            byte[] compressed = _processImageService.CompressImage(imageBytes);
+            byte[] compressed = _processImageService.CompressImage(imageBytes, 80, 0f);
+            return compressed;
+        }
+        private async Task<byte[]> SaveCompressedInValidImage(string filePath, byte[] imageBytes)
+        {
+            var compressedWithWatermark = _processImageService.CompressAndWaterMarkImage(imageBytes, 80, "INVALID", 5f);
+            await File.WriteAllBytesAsync(filePath, compressedWithWatermark);
+            byte[] compressed = _processImageService.CompressImage(imageBytes, 80, 5f);
             return compressed;
         }
     }
