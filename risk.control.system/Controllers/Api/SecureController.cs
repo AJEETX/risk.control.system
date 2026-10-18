@@ -267,7 +267,7 @@ namespace risk.control.system.Controllers.Api
                 await using var memoryStream = new MemoryStream();
                 await file.CopyToAsync(memoryStream);
                 var imageBytes = memoryStream.ToArray();
-                var watermarkedBytes = processImageService.CompressAndWaterMarkImage(imageBytes, 80, "VERIFIED");
+                var watermarkedBytes = processImageService.CompressAndWaterMarkImage(imageBytes, 80, "VERIFIED", 0f);
                 return File(watermarkedBytes, "image/*", $"watermarked_{file.FileName}");
             }
             catch (Exception ex)

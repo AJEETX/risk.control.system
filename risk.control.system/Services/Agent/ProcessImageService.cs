@@ -10,8 +10,9 @@ namespace risk.control.system.Services.Agent
 {
     public interface IProcessImageService
     {
-        byte[] CompressImage(byte[] imageBytes, int quality = 80);
-        byte[] CompressAndWaterMarkImage(byte[] imageBytes, int quality = 80, string watermarkText = "VERIFIED");
+        byte[] CompressImage(byte[] imageBytes, int quality = 80, float blurSigma = 5f);
+        byte[] CompressAndWaterMarkFace(byte[] imageBytes, int quality = 80, string watermarkText = "VERIFIED", Color watermarkColor = default);
+        byte[] CompressAndWaterMarkImage(byte[] imageBytes, int quality = 80, string watermarkText = "VERIFIED", float blurSigma = 0f);
     }
 
     internal class ProcessImageService(ILogger<ProcessImageService> logger) : IProcessImageService
@@ -19,7 +20,7 @@ namespace risk.control.system.Services.Agent
         private const int maxWidth = 1200;
         private readonly ILogger<ProcessImageService> _logger = logger;
 
-        public byte[] CompressImage(byte[] imageBytes, int quality = 80)
+        public byte[] CompressImage(byte[] imageBytes, int quality = 80, float blurSigma = 5f)
         {
             if (imageBytes == null || imageBytes.Length == 0) return Array.Empty<byte>();
             try
@@ -33,6 +34,10 @@ namespace risk.control.system.Services.Agent
                     {
                         image.Mutate(x => x.Resize(new ResizeOptions { Size = new Size(maxWidth, 0), Mode = ResizeMode.Max }));
                     }
+                    if (blurSigma > 0)
+                    {
+                        image.Mutate(x => x.GaussianBlur(blurSigma));
+                    }
                     image.Save(outputStream, new JpegEncoder { Quality = quality });
                 }
                 return outputStream.ToArray();
@@ -43,7 +48,8 @@ namespace risk.control.system.Services.Agent
                 return imageBytes; // Return original on error
             }
         }
-        public byte[] CompressAndWaterMarkImage(byte[] imageBytes, int quality = 80, string watermarkText = "VERIFIED")
+
+        public byte[] CompressAndWaterMarkFace(byte[] imageBytes, int quality = 80, string watermarkText = "VERIFIED", Color watermarkColor = default)
         {
             if (imageBytes == null || imageBytes.Length == 0) return Array.Empty<byte>();
             try
@@ -57,7 +63,8 @@ namespace risk.control.system.Services.Agent
                     {
                         image.Mutate(x => x.Resize(new ResizeOptions { Size = new Size(maxWidth, 0), Mode = ResizeMode.Max }));
                     }
-                    ApplyWatermarks(image, watermarkText);
+                    ApplyWatermarks(image, watermarkText, watermarkColor);
+
                     image.Save(outputStream, new JpegEncoder { Quality = quality });
                 }
                 return outputStream.ToArray();
@@ -68,7 +75,41 @@ namespace risk.control.system.Services.Agent
                 return imageBytes; // Return original on error
             }
         }
-        private static void ApplyWatermarks(Image image, string watermarkText)
+
+        public byte[] CompressAndWaterMarkImage(byte[] imageBytes, int quality = 80, string watermarkText = "VERIFIED", float blurSigma = 0f)
+        {
+            if (imageBytes == null || imageBytes.Length == 0) return Array.Empty<byte>();
+            try
+            {
+                using var inputStream = new MemoryStream(imageBytes);
+                using var outputStream = new MemoryStream();
+                using (var image = Image.Load(inputStream))
+                {
+                    image.Mutate(x => x.AutoOrient());
+                    if (image.Width > maxWidth)
+                    {
+                        image.Mutate(x => x.Resize(new ResizeOptions { Size = new Size(maxWidth, 0), Mode = ResizeMode.Max }));
+                    }
+                    if (blurSigma > 0)
+                    {
+                        image.Mutate(x => x.GaussianBlur(blurSigma));
+                        ApplyWatermarks(image, watermarkText, Color.Red);
+                    }
+                    else
+                    {
+                        ApplyWatermarks(image, watermarkText, Color.White);
+                    }
+                    image.Save(outputStream, new JpegEncoder { Quality = quality });
+                }
+                return outputStream.ToArray();
+            }
+            catch (UnknownImageFormatException ex)
+            {
+                _logger.LogError(ex, "Format Error: Data is not a valid image.");
+                return imageBytes; // Return original on error
+            }
+        }
+        private static void ApplyWatermarks(Image image, string watermarkText, Color watermarkColor)
         {
             float baseScale = Math.Min(image.Width, image.Height);
             float mainFontSize = baseScale * 0.12f;
@@ -101,7 +142,7 @@ namespace risk.control.system.Services.Agent
                 ctx.Draw(Color.Silver, borderThickness, slantedRectPath);
                 var textDrawOptions = new DrawingOptions { Transform = rotationMatrix };
                 ctx.DrawText(textDrawOptions, watermarkText, mainFont, Color.Black, new PointF(textLocation.X + shadowOffset, textLocation.Y + shadowOffset));
-                ctx.DrawText(textDrawOptions, watermarkText, mainFont, Color.White, textLocation);
+                ctx.DrawText(textDrawOptions, watermarkText, mainFont, watermarkColor, textLocation);
             });
         }
     }

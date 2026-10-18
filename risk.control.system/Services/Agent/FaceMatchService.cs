@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using Amazon.Rekognition.Model;
 using risk.control.system.Models;
+using SixLabors.ImageSharp;
 
 namespace risk.control.system.Services.Agent
 {
@@ -22,12 +23,14 @@ namespace risk.control.system.Services.Agent
             try
             {
                 var matched = await _amazonApiService.FaceMatch(registeredImage, faceImageBytes);
-                return matched.Item1 ? (matched.Item2.ToString(), _processImageService.CompressAndWaterMarkImage(faceImageBytes), matched.Item2) : ("0", _processImageService.CompressAndWaterMarkImage(faceImageBytes), 0);
+                return (matched.Item1) ?
+                    (matched.Item2.ToString(), _processImageService.CompressAndWaterMarkFace(faceImageBytes, 80, "MATCH", Color.White), matched.Item2) :
+                    ("0", _processImageService.CompressAndWaterMarkFace(faceImageBytes, 80, "NOT-MATCH", Color.Red), 0);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Failed face match");
-                return ("0", _processImageService.CompressAndWaterMarkImage(faceImageBytes), 0);
+                return ("0", _processImageService.CompressAndWaterMarkFace(faceImageBytes, 80, "NOT-MATCH", Color.Red), 0);
             }
         }
 
@@ -39,7 +42,7 @@ namespace risk.control.system.Services.Agent
 
                 var request = new DetectFacesRequest
                 {
-                    Image = new Image { Bytes = ms },
+                    Image = new Amazon.Rekognition.Model.Image { Bytes = ms },
                     Attributes = new List<string> { "ALL" }
                 };
 
