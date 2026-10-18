@@ -59,10 +59,10 @@
         <div class="card-footer">
             <div class="text-right">
                 <a id="back" asp-controller="Assessor" asp-action="Approved" class="btn  btn-sm btn-outline-secondary" data-bs-toggle="tooltip" title="Back to Approved cases">
-                    <i class="fas fa-arrow-left"></i> <span class="badge badge-light"> <i class="fa fa-thumbs-o-up"></i> </span> Back
+                    <i class="fas fa-arrow-left"></i> <i class="fa fa-thumbs-o-up"></i>  Back
                 </a>
-                <a id="adjudicate-case" href="@Model.ClaimsInvestigation?.AgenticUrl" target="_blank" class="btn btn-sm btn-success btn-gap">
-                    <i class="fas fa-check-circle" aria-hidden="true"></i> View Adjudication
+                <a id="adjudicate-case" href="@Model.ClaimsInvestigation?.AgenticUrl" target="_blank" class="btn btn-sm btn-success">
+                    <i class="fas fa-check-circle" aria-hidden="true"></i> AI Adjudication
                 </a>
                 <a href="/Report/PrintPdfReport/@Model.ClaimsInvestigation!.Id" class="btn btn-sm btn-danger"><i class="far fa-file-pdf"></i> PDF</a>
                 <a class="btn  btn-sm btn-primary" asp-controller="Assessor" asp-action="ApprovedInvoice" asp-route-id="@Model.VendorInvoice?.VendorInvoiceId">
