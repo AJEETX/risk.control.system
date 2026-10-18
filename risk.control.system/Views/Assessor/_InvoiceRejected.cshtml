@@ -64,9 +64,12 @@
                     <a id="back" asp-controller="Assessor" asp-action="Rejected" class="btn btn-sm btn-outline-secondary" data-bs-toggle="tooltip" title="Back to Rejected cases">
                         <i class="fas fa-arrow-left"></i> <i class="fa fa-thumbs-o-down"></i>  Back
                     </a>
-                    <a id="adjudicate-case" href="@Model.ClaimsInvestigation?.AgenticUrl" target="_blank" class="btn btn-sm btn-success">
-                        <i class="fas fa-check-circle" aria-hidden="true"></i> AI Adjudication
-                    </a>
+                    @if (Model.ClaimsInvestigation!.AiEnabled)
+                    {
+                        <a id="adjudicate-case" href="@Model.ClaimsInvestigation?.AgenticUrl" target="_blank" class="btn btn-sm btn-success">
+                            <i class="fas fa-check-circle" aria-hidden="true"></i> AI Adjudication
+                        </a>
+                    }
                     <a href="/Report/PrintPdfReport/@Model.ClaimsInvestigation!.Id" class="btn btn-sm btn-danger"><i class="far fa-file-pdf"></i> PDF</a>
                     <a class="btn  btn-sm btn-primary" asp-controller="Assessor" asp-action="RejectedInvoice" asp-route-id="@Model.VendorInvoice?.VendorInvoiceId">
                         <i class="fa fa-print"> Invoice</i>
