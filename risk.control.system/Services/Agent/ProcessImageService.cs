@@ -120,7 +120,7 @@ namespace risk.control.system.Services.Agent
             float shadowOffset = Math.Max(1f, mainFontSize * 0.04f);
             if (!SystemFonts.Collection.TryGet("Arial", out var family)) family = SystemFonts.Collection.Families.First();
             Font mainFont = family.CreateFont(mainFontSize, FontStyle.Bold);
-            Font dateFont = family.CreateFont(dateFontSize, FontStyle.Regular);
+            Font dateFont = family.CreateFont(dateFontSize, FontStyle.Bold);
             string timestamp = DateTime.Now.ToString("dd-MMM-yyyy HH:mm:ss");
             image.Mutate(ctx =>
             {

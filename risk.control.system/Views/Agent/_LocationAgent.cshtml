@@ -61,7 +61,7 @@
 						<div class="position-relative d-inline-block mb-4">
 							<img id="face-img-@agent.Id"
 								 src="/Document/GetAgentDocument/@agent.Id"
-								 class="mobile-capture-info img-thumbnail img-fluid shadow-sm"
+								 class="mobile-capture-info img-thumbnail img-fluid shadow-sm thumbnail preview-image"
 								 title="@location.AgentEmail photo" />
 						</div>
 					}
@@ -117,7 +117,7 @@
 											<!-- Metrics Table/Grid -->
 											<div class="d-flex flex-column gap-2 p-0 mb-2">
 												<!-- Age Range -->
-												<div class="p-2 rounded border d-flex align-items-center justify-content-between bg-light border-secondary-subtle">
+												<div class="p-2 rounded border d-flex align-items-center justify-content-between bg-light border-secondary">
 													<div class="d-flex align-items-center text-muted">
 													<span class="badge"><i class="fas fa-hourglass-half fs-6 me-2">
 													</i>
@@ -128,7 +128,7 @@
 												</div>
 
 												<!-- Gender -->
-												<div class="p-2 rounded border d-flex align-items-center justify-content-between bg-light border-secondary-subtle">
+												<div class="p-2 rounded border d-flex align-items-center justify-content-between bg-light border-secondary">
 													<div class="d-flex align-items-center text-muted">
 														<i class="fas @(face.Gender?.ToLower() == "female" ? "fa-venus" : face.Gender?.ToLower() == "male" ? "fa-mars" : "fa-genderless") fs-6 me-2"></i>
 														<span class="badge fw-semibold">Gender</span>
@@ -140,7 +140,7 @@
 												</div>
 
 												<!-- Primary Emotion -->
-												<div class="p-2 rounded border d-flex align-items-center justify-content-between bg-light border-secondary-subtle">
+												<div class="p-2 rounded border d-flex align-items-center justify-content-between bg-light border-secondary">
 													<div class="d-flex align-items-center text-muted">
 														<i class="fas fa-heart fs-6 me-2"></i>
 														<span class="badge fw-semibold">Emotion</span>
@@ -152,7 +152,7 @@
 											<!-- Features Badges Grid -->
 											<div class="d-flex flex-column gap-2 pt-1 mt-2">
 												<!-- Smile -->
-												<div class="p-2 rounded border d-flex align-items-center justify-content-between @(face.IsSmiling ? "bg-success-subtle text-success border-success" : "bg-light text-muted border-secondary-subtle")">
+												<div class="p-2 rounded border d-flex align-items-center justify-content-between border-secondary @(face.IsSmiling ? "bg-success-subtle text-success" : "bg-light text-muted")">
 													<div class="d-flex align-items-center">
 														<i class="fas @(face.IsSmiling ? "fa-smile" : "fa-meh") fs-5 me-2"></i> <span class="badge  fw-semibold"> Smile </span>
 													</div>
@@ -162,7 +162,7 @@
 												</div>
 
 												<!-- Glasses -->
-												<div class="p-2 rounded border d-flex align-items-center justify-content-between @(face.IsWearingGlasses ? "bg-info-subtle text-info-emphasis border-info" : "bg-light text-muted border-secondary-subtle")">
+												<div class="p-2 rounded border d-flex align-items-center justify-content-between border-secondary @(face.IsWearingGlasses ? "bg-info-subtle text-info-emphasis border-info" : "bg-light text-muted")">
 													<div class="d-flex align-items-center">
 														<i class="fas fa-glasses fs-5 me-2"></i> <span class="badge fw-semibold"> Glasses </span>
 
@@ -173,7 +173,7 @@
 												</div>
 
 												<!-- Beard -->
-												<div class="p-2 rounded border d-flex align-items-center justify-content-between @(face.HasBeard ? "bg-warning-subtle text-warning-emphasis border-success" : "bg-light text-muted border-secondary-subtle")">
+												<div class="p-2 rounded border d-flex align-items-center justify-content-between border-secondary @(face.HasBeard ? "bg-warning-subtle text-warning-emphasis" : "bg-light text-muted")">
 													<div class="d-flex align-items-center">
 														<i class="fas fa-user-tie fs-5 me-2"></i> <span class="badge fw-semibold"> Beard </span>
 

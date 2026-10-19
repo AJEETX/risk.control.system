@@ -8,7 +8,7 @@ namespace risk.control.system.Services.Agent
 {
     public interface IProcessDocumentService
     {
-        Task ProcessOcrResults(DocumentIdReport doc, byte[] docImage, IReadOnlyList<TextBlock> ocrResult, InvestigationTask caseDetail, string extension);
+        Task ProcessOcrResults(DocumentIdReport doc, byte[] docImage, IReadOnlyList<TextBlock> ocrResult, InvestigationTask caseDetail, string extension, string docFullName);
     }
     internal class ProcessDocumentService(ApplicationDbContext context,
     IProcessImageService processImageService,
@@ -17,6 +17,7 @@ namespace risk.control.system.Services.Agent
     IAdharCardService adharCardService,
     IDeathCertificateService deathCertificateService,
     IIncomeTaxService incomeTaxService,
+    IWebHostEnvironment env,
     IPanCardService panCardService) : IProcessDocumentService
     {
         private readonly ApplicationDbContext _context = context;
@@ -27,7 +28,8 @@ namespace risk.control.system.Services.Agent
         private readonly IPanCardService _panCardService = panCardService;
         private readonly IDeathCertificateService _deathCertificateService = deathCertificateService;
         private readonly IIncomeTaxService _incomeTaxService = incomeTaxService;
-        public async Task ProcessOcrResults(DocumentIdReport doc, byte[] docImage, IReadOnlyList<TextBlock> ocrResult, InvestigationTask caseDetail, string extension)
+        private readonly IWebHostEnvironment _env = env;
+        public async Task ProcessOcrResults(DocumentIdReport doc, byte[] docImage, IReadOnlyList<TextBlock> ocrResult, InvestigationTask caseDetail, string extension, string docFullName)
         {
             try
             {
@@ -37,26 +39,36 @@ namespace risk.control.system.Services.Agent
 
                     if (doc.ReportName == DocumentIdReportType.PAN.GetEnumDisplayName())
                     {
-                        var maskedDocImage = await _panCardService.Process(docImage, ocrResult, company!, doc);
-                        var (_, originalRelativePath) = await _fileStorageService.SaveAsync(maskedDocImage, extension, CONSTANTS.CASE, caseDetail.PolicyDetail!.ContractNumber, CONSTANTS.REPORT, null, $"{doc.ReportName}{extension}");
+                        var isUnderwriting = caseDetail.PolicyDetail?.InsuranceType == InsuranceType.UNDERWRITING;
+                        string registeredImagePath = isUnderwriting ? caseDetail.CustomerDetail!.ImagePath! : caseDetail.BeneficiaryDetail!.ImagePath!;
+                        var regPath = Path.Combine(_env.ContentRootPath, FaceIdfyHelper.GetRegisteredImagePath(caseDetail, isUnderwriting));
+                        var registeredImageBytes = await File.ReadAllBytesAsync(regPath);
+
+                        var maskedDocImage = await _panCardService.Process(docImage, registeredImageBytes, ocrResult, company!, doc);
+                        var (_, originalRelativePath) = await _fileStorageService.SaveAsync(maskedDocImage, extension, CONSTANTS.CASE, caseDetail.PolicyDetail!.ContractNumber, CONSTANTS.REPORT, null, $"{docFullName}{extension}");
                         doc.OriginalFilePath = originalRelativePath;
                     }
                     else if (doc.ReportName == DocumentIdReportType.ADHAAR.GetEnumDisplayName())
                     {
-                        var maskedDocImage = await _adharCardService.Process(docImage, ocrResult, company!, doc);
-                        var (_, originalRelativePath) = await _fileStorageService.SaveAsync(maskedDocImage, extension, CONSTANTS.CASE, caseDetail.PolicyDetail!.ContractNumber, CONSTANTS.REPORT, null, $"{doc.ReportName}{extension}");
+                        var isUnderwriting = caseDetail.PolicyDetail?.InsuranceType == InsuranceType.UNDERWRITING;
+                        string registeredImagePath = isUnderwriting ? caseDetail.CustomerDetail!.ImagePath! : caseDetail.BeneficiaryDetail!.ImagePath!;
+                        var regPath = Path.Combine(_env.ContentRootPath, FaceIdfyHelper.GetRegisteredImagePath(caseDetail, isUnderwriting));
+                        var registeredImageBytes = await File.ReadAllBytesAsync(regPath);
+
+                        var maskedDocImage = await _adharCardService.Process(docImage, registeredImageBytes, ocrResult, company!, doc);
+                        var (_, originalRelativePath) = await _fileStorageService.SaveAsync(maskedDocImage, extension, CONSTANTS.CASE, caseDetail.PolicyDetail!.ContractNumber, CONSTANTS.REPORT, null, $"{docFullName}{extension}");
                         doc.OriginalFilePath = originalRelativePath;
                     }
                     else if (doc.ReportName == DocumentIdReportType.DEATH_CERTIFICATE.GetEnumDisplayName())
                     {
                         var maskedDocImage = await _deathCertificateService.Process(docImage, ocrResult, company!, doc);
-                        var (_, originalRelativePath) = await _fileStorageService.SaveAsync(maskedDocImage, extension, CONSTANTS.CASE, caseDetail.PolicyDetail!.ContractNumber, CONSTANTS.REPORT, null, $"{doc.ReportName}{extension}");
+                        var (_, originalRelativePath) = await _fileStorageService.SaveAsync(maskedDocImage, extension, CONSTANTS.CASE, caseDetail.PolicyDetail!.ContractNumber, CONSTANTS.REPORT, null, $"{docFullName}{extension}");
                         doc.OriginalFilePath = originalRelativePath;
                     }
                     else if (doc.ReportName == DocumentIdReportType.ITR.GetEnumDisplayName())
                     {
                         var maskedDocImage = await _incomeTaxService.Process(docImage, ocrResult, company!, doc);
-                        var (_, originalRelativePath) = await _fileStorageService.SaveAsync(maskedDocImage, extension, CONSTANTS.CASE, caseDetail.PolicyDetail!.ContractNumber, CONSTANTS.REPORT, null, $"{doc.ReportName}{extension}");
+                        var (_, originalRelativePath) = await _fileStorageService.SaveAsync(maskedDocImage, extension, CONSTANTS.CASE, caseDetail.PolicyDetail!.ContractNumber, CONSTANTS.REPORT, null, $"{docFullName}{extension}");
                         doc.OriginalFilePath = originalRelativePath;
                     }
                     else

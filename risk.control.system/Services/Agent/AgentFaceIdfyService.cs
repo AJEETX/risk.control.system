@@ -20,6 +20,7 @@ internal class AgentFaceIdfyService(ApplicationDbContext context,
     IWebHostEnvironment env,
     IHttpClientService httpClientService,
     ICustomApiClient customApiCLient,
+        IAwsFaceImageCheckService awsFaceImageCheckService,
     IFaceMatchService faceMatchService) : IAgentFaceIdfyService
 {
     private readonly ApplicationDbContext _context = context;
@@ -31,7 +32,7 @@ internal class AgentFaceIdfyService(ApplicationDbContext context,
     private readonly IHttpClientService _httpClientService = httpClientService;
     private readonly ICustomApiClient _customApiClient = customApiCLient;
     private readonly IFaceMatchService _faceMatchService = faceMatchService;
-
+    private readonly IAwsFaceImageCheckService _awsFaceImageCheckService = awsFaceImageCheckService;
     public async Task<AppiCheckifyResponse> CaptureAgentId(FaceData data)
     {
         var caseDetail = await _caseService.GetCaseById(data.CaseId);
@@ -98,13 +99,14 @@ internal class AgentFaceIdfyService(ApplicationDbContext context,
             // 3. Parallel Service Calls (Orchestration)
             var registeredImage = await File.ReadAllBytesAsync(Path.Combine(_env.ContentRootPath, agent!.ProfilePictureUrl!));
 
-            var faceTask = _faceMatchService.GetFaceMatchAsync(registeredImage, faceBytes, Path.GetExtension(faceImageFileName));
+            var faceTask = _faceMatchService.GetFaceMatchAsync(registeredImage, faceBytes);
             var faceDetailTask = _faceMatchService.GetPersonDetailFromFace(faceBytes);
             var weatherTask = _weatherInfoService.GetWeatherAsync(lat, lon);
             var addressTask = _httpClientService.GetRawAddress(lat, lon);
             var mapTask = _customApiClient.GetMap(expectedCoords.lat, expectedCoords.lon, double.Parse(lat), double.Parse(lon));
+            var hasSingleFaceImageTask = _awsFaceImageCheckService.HasExactlyOneFace(faceBytes);
 
-            await Task.WhenAll(faceTask, weatherTask, addressTask, mapTask, faceDetailTask);
+            await Task.WhenAll(faceTask, weatherTask, addressTask, mapTask, faceDetailTask, hasSingleFaceImageTask);
 
             // 4. Update Entities
             AgentFaceIdfyHelper.MapMetadataToReport(agentIdReport!, locationTemplate, data, relativePath, originalRelativePath, faceImageFileName, lat, lon);
@@ -118,11 +120,15 @@ internal class AgentFaceIdfyService(ApplicationDbContext context,
             agentIdReport.DistanceInMetres = distM;
             agentIdReport.DurationInSeconds = durS;
             agentIdReport.LocationAddress = await addressTask;
-            agentIdReport.FaceResult = await faceDetailTask;
             agentIdReport.LocationInfo = await weatherTask;
             agentIdReport.DigitalIdImageMatchConfidence = conf;
-            agentIdReport.Similarity = sim;
-            agentIdReport.ImageValid = sim > 70;
+            agentIdReport.Similarity = MathF.Round((float)sim, 2);
+            var hasSingleFace = await hasSingleFaceImageTask;
+            agentIdReport.ImageValid = sim > 70 && hasSingleFace.IsValid;
+            if (agentIdReport.ImageValid.Value)
+            {
+                agentIdReport.FaceResult = await faceDetailTask;
+            }
 
             await File.WriteAllBytesAsync(agentIdReport.FilePath!, agentImage);
 
