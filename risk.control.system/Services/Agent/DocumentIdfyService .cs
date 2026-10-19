@@ -99,12 +99,13 @@ internal class DocumentIdfyService(ApplicationDbContext context,
             var expected = VerificationHelper.GetExpectedCoordinates(caseDetail);
             var docName = documentReport!.ReportName;
             var extension = Path.GetExtension(data.Image!.FileName.ToLowerInvariant());
+            var isClaim = caseDetail.PolicyDetail!.InsuranceType == InsuranceType.CLAIM;
+            docName = isClaim ? $"Beneficiary-{docName}" : $"Life-Assured-{docName}";
             var (fileName, relativePath) = await _fileStorageService.SaveAsync(data.Image!, CONSTANTS.CASE, caseDetail.PolicyDetail!.ContractNumber, CONSTANTS.TEMP_REPORT, null, $"{docName}{extension}");
             documentReport!.FilePath = relativePath;
 
             documentReport.ImageExtension = Path.GetExtension(fileName);
             var googleTask = _googleApi.DetectText(documentReport.FilePath!);
-            //var googleTask = googleApi.DetectTextAsync(documentReport.FilePath);
             var addressTask = _httpClientService.GetRawAddress(lat, lon);
             var mapTask = _customApiCLient.GetMap(expected.lat, expected.lon, double.Parse(lat), double.Parse(lon));
             await Task.WhenAll(googleTask, addressTask, mapTask /*, ocrTask*/);
@@ -121,7 +122,7 @@ internal class DocumentIdfyService(ApplicationDbContext context,
 
             byte[] docImageBytes = await VerificationHelper.GetBytesFromIFormFile(data.Image!);
 
-            await _processDocumentService.ProcessOcrResults(documentReport, docImageBytes, detectedText, caseDetail, extension);
+            await _processDocumentService.ProcessOcrResults(documentReport, docImageBytes, detectedText, caseDetail, extension, docName);
 
             locationTemplate.ValidationExecuted = true;
             locationTemplate.Updated = DateTime.UtcNow;

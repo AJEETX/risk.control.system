@@ -1,15 +1,25 @@
 ﻿using System.Text.RegularExpressions;
+using Microsoft.FeatureManagement;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
+using risk.control.system.Services.Common;
 
 namespace risk.control.system.Services.Agent
 {
     public interface IPanCardService
     {
-        Task<byte[]> Process(byte[] IdImage, IReadOnlyList<TextBlock> imageReadOnly, ClientCompany company, DocumentIdReport doc);
+        Task<byte[]> Process(byte[] IdImage, byte[] registeredImage, IReadOnlyList<TextBlock> imageReadOnly, ClientCompany company, DocumentIdReport doc);
     }
 
-    internal class PanCardService(IGoogleMaskHelper googleHelper, IProcessImageService processImageService, IHttpClientService httpClientService, IWebHostEnvironment env, ILogger<PanCardService> logger) : IPanCardService
+    internal class PanCardService(
+        IGoogleMaskHelper googleHelper,
+    IAmazonApiService amazonApiService,
+        IProcessImageService processImageService,
+        IHttpClientService httpClientService,
+        IWebHostEnvironment env,
+        IFeatureManager featureManager,
+        IAwsFaceImageCheckService awsFaceImageCheckService,
+        ILogger<PanCardService> logger) : IPanCardService
     {
         private const string panNumber2Find = "Permanent Account Number";
         private const string newPanNumber2Find = "Permanent Account Number Card";
@@ -17,20 +27,57 @@ namespace risk.control.system.Services.Agent
         private readonly string docyTypeUnknownName = "UNKNOWN";
         private static readonly Regex panRegex = new Regex(@"[A-Z]{5}\d{4}[A-Z]{1}");
         private readonly IGoogleMaskHelper _googleHelper = googleHelper;
+        private readonly IAmazonApiService _amazonApiService = amazonApiService;
         private readonly IProcessImageService _processImageService = processImageService;
+        private readonly IAwsFaceImageCheckService _awsFaceImageCheckService = awsFaceImageCheckService;
         private readonly IHttpClientService _httpClientService = httpClientService;
         private readonly IWebHostEnvironment _env = env;
+        private readonly IFeatureManager _featureManager = featureManager;
         private readonly ILogger<PanCardService> _logger = logger;
         private string panNumber = string.Empty;
         private string docyTypePan = string.Empty;
 
-        public async Task<byte[]> Process(byte[] idImage, IReadOnlyList<TextBlock> imageReadOnly, ClientCompany company, DocumentIdReport doc)
+        public async Task<byte[]> Process(byte[] idImage, byte[] registeredImage, IReadOnlyList<TextBlock> imageReadOnly, ClientCompany company, DocumentIdReport doc)
         {
             var filePath = Path.Combine(_env.ContentRootPath, doc.FilePath!);
             string allPanText = imageReadOnly.FirstOrDefault()?.Text ?? string.Empty;
 
             try
             {
+                var checkDocumentface = await _featureManager.IsEnabledAsync(FeatureFlags.DOCUMENT_FACE_MATCH_CHECK);
+                if (checkDocumentface)
+                {
+                    var hasSingleFaceImageTask = _awsFaceImageCheckService.HasExactlyOneFace(idImage);
+                    var faceCheckResultTask = _awsFaceImageCheckService.HasExactlyOneFace(idImage);
+                    var faceMatchedTask = _awsFaceImageCheckService.FaceMatch(registeredImage, idImage);
+
+                    await Task.WhenAll(hasSingleFaceImageTask, faceCheckResultTask, faceMatchedTask);
+                    var hasSingleFaceImage = await hasSingleFaceImageTask;
+                    if (!hasSingleFaceImage.IsValid)
+                    {
+                        doc.ImageValid = false;
+                        doc.LocationInfo = "Image does not contain exactly one face";
+                        idImage = await SaveCompressedInValidImage(filePath, idImage);
+                        return idImage;
+                    }
+                    var faceCheckResult = await faceCheckResultTask;
+                    if (!faceCheckResult.IsValid)
+                    {
+                        doc.ImageValid = false;
+                        doc.LocationInfo = "Document image does not contain exactly one face";
+                        idImage = await SaveCompressedInValidImage(filePath, idImage);
+                        return idImage;
+                    }
+                    var faceMatched = await faceMatchedTask;
+                    if (!faceMatched)
+                    {
+                        doc.ImageValid = false;
+                        doc.LocationInfo = "Face match failed between registered image and document image";
+                        idImage = await SaveCompressedInValidImage(filePath, idImage);
+                        return idImage;
+                    }
+                }
+
                 var (panNumber, documentType) = ExtractPanAndType(allPanText);
                 var panIsValid = await ValidatePanNumber(panNumber, company);
                 if (!panIsValid)

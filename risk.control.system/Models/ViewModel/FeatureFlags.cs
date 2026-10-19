@@ -11,5 +11,6 @@
         public const string VALIDATE_PHONE = "VALIDATE_PHONE";
         public const string ENABLE_REAL_TIME_REPORT_TEMPlATE = "ENABLE_REAL_TIME_REPORT_TEMPlATE";
         public const string FACE_MATCH_CHECK = "FACE_MATCH_CHECK";
+        public const string DOCUMENT_FACE_MATCH_CHECK = "DOCUMENT_FACE_MATCH_CHECK";
     }
 }

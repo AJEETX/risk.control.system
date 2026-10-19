@@ -19,6 +19,8 @@ namespace risk.control.system.Services.Common
         Task<bool> CheckUploadFaceImageExistAsync(byte[] image);
         Task<FaceMatchResult> HasExactlyOneFace(IFormFile file);
         Task<FaceMatchResult> HasExactlyOneFace(byte[] imageBytes);
+        Task<bool> FaceMatch(byte[] originalImage, byte[] targetImage);
+
     }
 
     internal class AwsFaceImageCheckService(
@@ -240,6 +242,19 @@ namespace risk.control.system.Services.Common
             {
                 beneficiary.AwsFaceId = faceId;
                 beneficiary.FaceIndexedAt = DateTime.UtcNow;
+            }
+        }
+
+        public async Task<bool> FaceMatch(byte[] originalImage, byte[] targetImage)
+        {
+            var facematchResult = await _amazonApiService.FaceMatch(originalImage, targetImage);
+            if (facematchResult.Item1)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
     }

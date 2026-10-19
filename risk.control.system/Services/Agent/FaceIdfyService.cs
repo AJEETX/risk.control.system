@@ -20,6 +20,7 @@ internal class FaceIdfyService(ApplicationDbContext context,
     IWebHostEnvironment env,
     IHttpClientService httpClientService,
     ICustomApiClient customApiClient,
+    IAwsFaceImageCheckService awsFaceImageCheckService,
     IFaceMatchService faceMatchService) : IFaceIdfyService
 {
     private readonly ApplicationDbContext _context = context;
@@ -31,7 +32,7 @@ internal class FaceIdfyService(ApplicationDbContext context,
     private readonly IHttpClientService _httpClientService = httpClientService;
     private readonly ICustomApiClient _customApiClient = customApiClient;
     private readonly IFaceMatchService _faceMatchService = faceMatchService;
-
+    private readonly IAwsFaceImageCheckService _awsFaceImageCheckService = awsFaceImageCheckService;
     public async Task<AppiCheckifyResponse> CaptureFaceId(FaceData data)
     {
         var caseDetail = await _caseService.GetCaseById(data.CaseId);
@@ -107,13 +108,14 @@ internal class FaceIdfyService(ApplicationDbContext context,
             var regPath = Path.Combine(_env.ContentRootPath, FaceIdfyHelper.GetRegisteredImagePath(caseDetail, isCustomer));
             var registeredImage = await File.ReadAllBytesAsync(regPath);
 
-            var faceTask = _faceMatchService.GetFaceMatchAsync(registeredImage, faceBytes, Path.GetExtension(fileName));
+            var faceTask = _faceMatchService.GetFaceMatchAsync(registeredImage, faceBytes);
             var faceDetailTask = _faceMatchService.GetPersonDetailFromFace(faceBytes);
+            var hasSingleFaceImageTask = _awsFaceImageCheckService.HasExactlyOneFace(faceBytes);
 
             var weatherTask = _weatherInfoService.GetWeatherAsync(lat, lon);
             var addressTask = _httpClientService.GetRawAddress(lat, lon);
             var mapTask = _customApiClient.GetMap(expected.lat, expected.lon, double.Parse(lat), double.Parse(lon));
-            await Task.WhenAll(faceTask, weatherTask, addressTask, mapTask, faceDetailTask);
+            await Task.WhenAll(faceTask, weatherTask, addressTask, mapTask, faceDetailTask, hasSingleFaceImageTask);
 
             FaceIdfyHelper.MapMetadataToReport(faceIdReport, locationTemplate, data, relativePath, originalRelativePath, Path.GetExtension(fileName), lat, lon);
             var (conf, compImg, sim) = await faceTask;
@@ -121,12 +123,16 @@ internal class FaceIdfyService(ApplicationDbContext context,
             faceIdReport.LocationMapUrl = mapUrl;
             faceIdReport.Distance = dist;
             faceIdReport.Duration = dur;
-            faceIdReport.FaceResult = await faceDetailTask;
             faceIdReport.LocationInfo = await weatherTask;
             faceIdReport.LocationAddress = await addressTask;
             faceIdReport.MatchConfidence = conf;
             faceIdReport.Similarity = MathF.Round((float)sim, 2);
-            faceIdReport.ImageValid = sim > 70;
+            var hasSingleFace = await hasSingleFaceImageTask;
+            faceIdReport.ImageValid = sim > 70 && hasSingleFace.IsValid;
+            if (faceIdReport.ImageValid.Value)
+            {
+                faceIdReport.FaceResult = await faceDetailTask;
+            }
             await File.WriteAllBytesAsync(faceIdReport.FilePath!, compImg);
             await _context.SaveChangesAsync();
             return FaceIdfyHelper.BuildResponse(caseDetail, faceIdReport, compImg);
