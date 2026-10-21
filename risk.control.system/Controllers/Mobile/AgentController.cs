@@ -791,7 +791,7 @@ namespace risk.control.system.Controllers.Mobile
 
                 var extension = Path.GetExtension(data.Image.FileName).ToLower();
 
-                var supportedExtensions = new[] { ".mp4", ".webm", ".mov", ".mp3", ".wav", ".aac" };
+                var supportedExtensions = new[] { ".mp4", ".webm", ".mov", ".mp3", ".wav", ".aac", ".m4a" };
                 if (!supportedExtensions.Contains(extension))
                     return BadRequest("Unsupported media format.");
 

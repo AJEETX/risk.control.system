@@ -49,8 +49,12 @@
 									}
 									else if (doc.MediaType == MediaType.AUDIO)
 									{
-										<audio class="media-view" controls>
-											<source src="/Document/GetMediaDocument/@doc.Id" type="audio/@doc.MediaExtension" />
+										// Ensure .m4a maps to the browser-compatible audio/mp4 MIME type
+										var mimeType = doc.MediaExtension?.ToLowerInvariant() == "m4a" ? "audio/mp4" : $"audio/{doc.MediaExtension}";
+    
+										<audio controls>
+											<source src="/Document/GetMediaDocument/@doc.Id" type="@mimeType" />
+											Your browser does not support the audio element.
 										</audio>
 									}
 								</div>

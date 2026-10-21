@@ -20,24 +20,23 @@ namespace risk.control.system.Services.Common
         {
             if (file == null || file.Length == 0)
                 throw new ArgumentException("Invalid file");
-
-            // Allowed audio and video MIME types
             string[] allowedTypes =
-            [
-                // Audio
-                "audio/mpeg", "audio/wav", "audio/x-wav",
-                "audio/ogg", "audio/aac", "audio/flac",
+                [
+                    // Audio
+                    "audio/mpeg", "audio/wav", "audio/x-wav",
+                    "audio/ogg", "audio/aac", "audio/flac",
+                    "audio/mp4", "audio/x-m4a", // Added for M4A support
 
-                // Video
-                "video/mp4", "video/mpeg", "video/ogg",
-                "video/webm", "video/quicktime",
-                "video/x-msvideo", "video/x-ms-wmv"
-             ];
+                    // Video
+                    "video/mp4", "video/mpeg", "video/ogg",
+                    "video/webm", "video/quicktime",
+                    "video/x-msvideo", "video/x-ms-wmv"
+                            ];
 
             // Allowed extensions
             string[] allowedExt =
             [
-                ".mp3", ".wav", ".ogg", ".aac", ".flac",
+                ".mp3", ".wav", ".ogg", ".aac", ".flac", ".m4a", // Added .m4a here
                 ".mp4", ".mpeg", ".webm", ".mov", ".avi", ".wmv"
             ];
 
