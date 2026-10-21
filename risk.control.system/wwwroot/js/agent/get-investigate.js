@@ -236,47 +236,49 @@ $(document).ready(function () {
             'audio/mpeg',
             'audio/wav',
             'audio/aac',
+            'audio/x-m4a',
             'audio/mp4',
             'audio/x-aac',
             'audio/vnd.dlna.adts'
         ];
 
         if (!allowedTypes.includes(file.type)) {
-            alert("Unsupported file format. Please upload MP4, WebM, MP3, AAC, or WAV.");
-            return;
-        }
-        console.log("Uploaded file type:", file.type);
+            alert("Unsupported file format. Please upload MP4, WebM, MP3, M4A, or WAV.");
+        } else {
+            console.log("Uploaded file type:", file.type);
 
-        $.ajax({
-            url: '/AgentReport/SubmitMediaFile',
-            type: "POST",
-            data: formData,
-            processData: false,
-            contentType: false,
-            success: function (response) {
-                if (response.success) {
-                    statusDiv.html('<span class="text-success">Upload successful.</span>');
-                    let mediaType = response.extension.includes('mp4') || response.extension.includes('webm') ? 'video' : 'audio';
-                    const mediaTag = `
+            $.ajax({
+                url: '/AgentReport/SubmitMediaFile',
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    if (response.success) {
+                        statusDiv.html('<span class="text-success">Upload successful.</span>');
+                        let mediaType = response.extension.includes('mp4') || response.extension.includes('webm') ? 'video' : 'audio';
+                        const mediaTag = `
                         <${mediaType} controls>
                             <source src="data:${mediaType}/${response.extension};base64,${response.fileData}" type="${mediaType}/${response.extension}">
                             Your browser does not support the ${mediaType} tag.
                         </${mediaType}>
                     `;
-                    docImage.replaceWith(`<div id="doc-img-${docId}">${mediaTag}</div>`);
-                    $(fileInput).val('');
-                } else {
+                        docImage.replaceWith(`<div id="doc-img-${docId}">${mediaTag}</div>`);
+                        $(fileInput).val('');
+                    } else {
+                        statusDiv.html('<span class="text-danger">Upload failed.</span>');
+                    }
+                },
+                error: function (err) {
                     statusDiv.html('<span class="text-danger">Upload failed.</span>');
+                },
+                complete: function () {
+                    button.prop("disabled", false);
+                    setTimeout(() => statusDiv.html(''), 3000);
                 }
-            },
-            error: function (err) {
-                statusDiv.html('<span class="text-danger">Upload failed.</span>');
-            },
-            complete: function () {
-                button.prop("disabled", false);
-                setTimeout(() => statusDiv.html(''), 3000);
-            }
-        });
+            });
+        }
+       
     });
     function toggleSubmitButton() {
         var report = $('#remarks').val().trim();

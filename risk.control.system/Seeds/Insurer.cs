@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using risk.control.system.AppConstant;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
@@ -53,7 +54,7 @@ namespace risk.control.system.Seeds
                 PinCodeId = companyPinCode.PinCodeId,
                 Email = input.DOMAIN!,
                 DocumentUrl = relativePath,
-                AgenticBaseUrl = "https://ought-association-hardly-females.trycloudflare.com",
+                AgenticBaseUrl = Applicationsettings.AGENTIC_BASE_URL,
                 EmpanelledVendors = vendors.Where(v => v.CountryId == companyPinCode.CountryId).ToList(),
                 Updated = DateTime.UtcNow,
                 VerifyPan = globalSettings!.VerifyPan,

@@ -4,6 +4,7 @@ namespace risk.control.system.AppConstant
 {
     public static class Applicationsettings
     {
+        public static readonly string AGENTIC_BASE_URL = "https://alarm-consensus-eye-frontier.trycloudflare.com"!;
         public static readonly string AI_LOGIN = EnvHelper.Get("AI_LOGIN")!;
         public static readonly string AI_DATA = EnvHelper.Get("AI_DATA")!;
         public const double ACTIVE_USER_TIMESPAN = 10;

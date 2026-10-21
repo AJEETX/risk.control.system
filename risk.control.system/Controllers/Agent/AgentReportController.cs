@@ -96,7 +96,7 @@ namespace risk.control.system.Controllers.Agent
                 return Json(new { success = false, message = "No file provided." });
             var extension = Path.GetExtension(model.Image.FileName).ToLower();
 
-            var supportedExtensions = new[] { ".mp4", ".webm", ".mov", ".mp3", ".wav", ".aac" };
+            var supportedExtensions = new[] { ".mp4", ".webm", ".mov", ".mp3", ".wav", ".aac", ".m4a" };
             if (!supportedExtensions.Contains(extension))
                 return Json(new { success = false, message = "Unsupported media format." });
 
