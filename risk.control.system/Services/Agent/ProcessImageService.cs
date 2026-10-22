@@ -121,14 +121,14 @@ namespace risk.control.system.Services.Agent
             if (!SystemFonts.Collection.TryGet("Arial", out var family)) family = SystemFonts.Collection.Families.First();
             Font mainFont = family.CreateFont(mainFontSize, FontStyle.Bold);
             Font dateFont = family.CreateFont(dateFontSize, FontStyle.Bold);
-            string timestamp = DateTime.Now.ToString("dd-MMM-yyyy HH:mm:ss");
+            string timestamp = DateTime.UtcNow.ToLocalTime().ToString("dd-MMM-yyyy HH:mm");
             image.Mutate(ctx =>
             {
                 var dateOptions = new RichTextOptions(dateFont) { HorizontalAlignment = HorizontalAlignment.Right, VerticalAlignment = VerticalAlignment.Top, Origin = new PointF(image.Width - (baseScale * 0.02f), baseScale * 0.02f) };
                 var dateSize = TextMeasurer.MeasureSize(timestamp, dateOptions);
                 var dateRect = new RectangleF(dateOptions.Origin.X - dateSize.Width - 10, dateOptions.Origin.Y - 5, dateSize.Width + 20, dateSize.Height + 10);
-                ctx.Fill(Color.White.WithAlpha(0.5f), dateRect);
-                ctx.Draw(Color.Gray.WithAlpha(0.5f), borderThickness / 2, dateRect);
+                //ctx.Fill(Color.White.WithAlpha(0.5f), dateRect);
+                ctx.Draw(Color.Gray, borderThickness / 2, dateRect);
                 ctx.DrawText(dateOptions, timestamp, Color.Black.WithAlpha(0.8f));
                 var centerPoint = new PointF(image.Width / 2, image.Height * 0.85f);
                 float radians = -20f * (MathF.PI / 180f);
