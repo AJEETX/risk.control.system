@@ -101,9 +101,9 @@ internal class FaceIdfyService(ApplicationDbContext context,
             var (lat, lon) = VerificationHelper.ParseCoordinates(data.LocationLatLong!);
             var expected = VerificationHelper.GetExpectedCoordinates(caseDetail);
             var imageName = isCustomer ? "life-assured" : "beneficiary";
+            var faceBytes = await VerificationHelper.GetBytesFromIFormFile(data.Image!);
             var imageExtension = Path.GetExtension(data.Image!.FileName.ToLowerInvariant());
             var (fileName, relativePath) = await _fileStorageService.SaveAsync(data.Image!, CONSTANTS.CASE, caseDetail.PolicyDetail!.ContractNumber, CONSTANTS.TEMP_REPORT, null, $"{imageName}{imageExtension}");
-            var faceBytes = await VerificationHelper.GetBytesFromIFormFile(data.Image!);
             var (originalFileName, originalRelativePath) = await _fileStorageService.SaveAsync(faceBytes, imageExtension, CONSTANTS.CASE, caseDetail.PolicyDetail!.ContractNumber, CONSTANTS.REPORT, null, $"{imageName}{imageExtension}");
             var regPath = Path.Combine(_env.ContentRootPath, FaceIdfyHelper.GetRegisteredImagePath(caseDetail, isCustomer));
             var registeredImage = await File.ReadAllBytesAsync(regPath);
@@ -128,11 +128,9 @@ internal class FaceIdfyService(ApplicationDbContext context,
             faceIdReport.MatchConfidence = conf;
             faceIdReport.Similarity = MathF.Round((float)sim, 2);
             var hasSingleFace = await hasSingleFaceImageTask;
-            faceIdReport.ImageValid = sim > 70 && hasSingleFace.IsValid;
-            if (faceIdReport.ImageValid.Value)
-            {
-                faceIdReport.FaceResult = await faceDetailTask;
-            }
+            faceIdReport.ImageValid = sim > Applicationsettings.FACE_MATCH_SIMILARITY_THRESHOLD && hasSingleFace.IsValid;
+            faceIdReport.FaceResult = await faceDetailTask;
+
             await File.WriteAllBytesAsync(faceIdReport.FilePath!, compImg);
             await _context.SaveChangesAsync();
             return FaceIdfyHelper.BuildResponse(caseDetail, faceIdReport, compImg);

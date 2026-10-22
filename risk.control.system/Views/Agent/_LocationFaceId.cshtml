@@ -33,15 +33,23 @@
 			@foreach (var face in location.FaceIds.Where(f => f.Selected))
 			{
 					<tr class="align-middle">
-					<td>
-							<div class="text-start mt-1 p-2 bg-white rounded bordertext-left">
-						@face.ReportName
-						@if (face.IsRequired)
-						{
-							<span class="required-asterisk" title="Required">*</span>
-						}
+						<td>
+							<div class="text-start mt-1 p-2 bg-white rounded bordertext-left" data-toggle="tooltip" title="Person Type">
+								@face.ReportName
+								@if (face.IsRequired)
+								{
+									<span class="required-asterisk" title="Mandatory Location" data-toggle="tooltip">*</span>
+								}
 							</div>
-					</td>
+							<div class="p-2 bg-white rounded border d-flex align-items-center justify-content-between shadow-sm" title="Captured Time" data-toggle="tooltip">
+								<span class="badge bg-light px-2.5 py-1.5 fs-7 fw-medium">
+									<i class="fas fa-clock me-1 text-dark"></i>
+									<span class="local-time-display" data-utc="@(face.LongLatTime.HasValue ? face.LongLatTime.Value.ToString("o") : "")">
+										@(face.LongLatTime.HasValue ? "Loading..." : "--")
+									</span>
+								</span>
+							</div>
+						</td>
 						<td class="text-center face-photo-column">
 							@if (face.FaceResult != null && face.FaceResult.TotalFacesDetected > 0)
 							{

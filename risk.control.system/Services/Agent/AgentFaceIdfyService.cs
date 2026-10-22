@@ -124,11 +124,8 @@ internal class AgentFaceIdfyService(ApplicationDbContext context,
             agentIdReport.DigitalIdImageMatchConfidence = conf;
             agentIdReport.Similarity = MathF.Round((float)sim, 2);
             var hasSingleFace = await hasSingleFaceImageTask;
-            agentIdReport.ImageValid = sim > 70 && hasSingleFace.IsValid;
-            if (agentIdReport.ImageValid.Value)
-            {
-                agentIdReport.FaceResult = await faceDetailTask;
-            }
+            agentIdReport.ImageValid = sim > Applicationsettings.FACE_MATCH_SIMILARITY_THRESHOLD && hasSingleFace.IsValid;
+            agentIdReport.FaceResult = await faceDetailTask;
 
             await File.WriteAllBytesAsync(agentIdReport.FilePath!, agentImage);
 

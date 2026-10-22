@@ -33,21 +33,31 @@
 		<tbody>
 			<tr class="align-middle">
 			<td>
-					<div class="text-start mt-1 p-2 bg-white rounded bordertext-left">
-
-				@if (agent!.ValidationExecuted)
-				{
-					@location.AgentEmail
-				}
-				else
-				{
-					<small>@agent.ReportType.GetEnumDisplayName()</small>
-				}
-				@if (agent.IsRequired)
-				{
-					<span class="required-asterisk" title="Required">*</span>
-				}
-				</div>
+					<div class="text-start mt-1 p-2 bg-white rounded bordertext-left" data-toggle="tooltip" title="Agent Email">
+						<small>
+							@if (agent!.ValidationExecuted)
+							{
+								@location.AgentEmail
+							}
+							else
+							{
+								@agent.ReportType.GetEnumDisplayName()
+							}
+							@if (agent.IsRequired)
+							{
+								<span class="required-asterisk" title="Mandatory Location" data-toggle="tooltip">*</span>
+							}
+						</small>
+											
+					</div>
+					<div class="p-2 bg-white rounded border d-flex align-items-center justify-content-between shadow-sm" title="Captured Time" data-toggle="tooltip">
+						<span class="badge bg-light px-2.5 py-1.5 fs-7 fw-medium">
+							<i class="fas fa-clock me-1 text-dark"></i>
+							<span class="local-time-display" data-utc="@(agent.LongLatTime.HasValue ? agent.LongLatTime.Value.ToString("o") : "")">
+								@(agent.LongLatTime.HasValue ? "Loading..." : "--")
+							</span>
+						</span>
+					</div>
 			</td>
 				<td class="text-center face-photo-column">
 					@if (agent.ValidationExecuted)
