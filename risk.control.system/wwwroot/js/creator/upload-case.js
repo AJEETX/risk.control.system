@@ -68,21 +68,27 @@
         },
         "columns": [
             { "data": "id", "bVisible": false },
-            { "data": "sequenceNumber" },
+            {
+                "orderable": false,
+                "data": "sequenceNumber"
+            },
             {
                 "data": "name",
+                "bSortable": false,
                 "mRender": function (data, type, row) {
                     return '<i title="' + data + '" data-bs-toggle="tooltip">' + data + '</i>';
                 }
             },
             {
                 "data": "uploadedBy",
+                "bSortable": false,
                 "mRender": function (data, type, row) {
                     return '<i title="' + data + '" data-bs-toggle="tooltip">' + data + '</i>';
                 }
             },
             {
                 "data": "createdOn",
+                "bSortable": false,
                 "render": function (data, type, row) {
                     if (!data) return '';
                     let date = new Date(data);
@@ -100,12 +106,14 @@
             },
             {
                 "data": "timeTaken",
+                "bSortable": false,
                 "mRender": function (data, type, row) {
                     return `<i  title="${data}" data-bs-toggle="tooltip">${data}</i>`;
                 }
             },
             {
                 "data": "uploadedType",
+                "bSortable": false,
                 "mRender": function (data, type, row) {
                     var title = row.directAssign ? "Assigned" : "Uploaded";
                     return `
@@ -116,12 +124,14 @@
             },
             {
                 "data": "icon",
+                "bSortable": false,
                 "mRender": function (data, type, row) {
                     return '<i class="' + data + '" data-bs-toggle="tooltip"></i>';
                 }
             },
             {
                 data: "message",
+                "bSortable": false,
                 render: function (data, type, row) {
                     if (!data) return "";
                     if (row.completed) {
@@ -174,10 +184,10 @@
                 }
             }
         ],
-        "order": [[1, "desc"]],  // ✅ Sort by 'createdOn' (index 5) in descending order
         "columnDefs": [
             {
                 className: 'max-width-column-claim', // ✅ Apply CSS class
+                orderable: false,
                 targets: 1
             },
             {
