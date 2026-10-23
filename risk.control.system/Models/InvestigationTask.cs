@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using risk.control.system.Models.ViewModel;
 
 namespace risk.control.system.Models
 {
@@ -31,7 +32,7 @@ namespace risk.control.system.Models
 
         public List<CaseNote>? CaseNotes { get; set; } = new();
         public List<CaseMessage>? CaseMessages { get; set; } = new();
-
+        public ScheduleMeeting? ScheduleMeeting { get; set; }
         public ORIGIN ORIGIN { get; set; } = ORIGIN.USER;
         public bool AiEnabled { get; set; } = false;
         public bool Deleted { get; set; } = false;

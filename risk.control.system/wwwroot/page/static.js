@@ -16,3 +16,14 @@ if (websiteName) {
         }
     });
 }
+
+const params = new URLSearchParams(window.location.search);
+const message = params.get('message');
+
+// Display the message or a default fallback
+const messageElement = document.getElementById('message');
+if (message) {
+    messageElement.textContent = message;
+} else {
+    messageElement.textContent = "No status message provided.";
+}

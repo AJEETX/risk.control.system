@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using risk.control.system.AppConstant;
 using risk.control.system.Models.ViewModel;
@@ -9,14 +10,20 @@ namespace risk.control.system.Controllers.Common
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME},{AGENCY_ADMIN.DISPLAY_NAME},{CREATOR.DISPLAY_NAME},{ASSESSOR.DISPLAY_NAME},{MANAGER.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME},{AGENT.DISPLAY_NAME}")]
     public class ConfirmController : Controller
     {
+        private readonly IDataProtector _protector;
         private readonly ISmsNotificationService _notificationService;
         private readonly ICaseNotesService _caseNotesService;
         private readonly ILogger<ConfirmController> _logger;
 
-        public ConfirmController(ISmsNotificationService notificationService, ICaseNotesService caseNotesService, ILogger<ConfirmController> logger)
+        public ConfirmController(
+            ISmsNotificationService notificationService,
+            ICaseNotesService caseNotesService,
+            IDataProtectionProvider provider,
+            ILogger<ConfirmController> logger)
         {
             _notificationService = notificationService;
             _caseNotesService = caseNotesService;
+            _protector = provider.CreateProtector(Applicationsettings.ENCRYPT_URL_QUERYSTRING);
             _logger = logger;
         }
 
@@ -92,6 +99,36 @@ namespace risk.control.system.Controllers.Common
             {
                 _logger.LogError(ex, "Error occurred adding notes for Case {Id} for user {UserEmail}", model.CaseId, userEmail);
                 return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<IActionResult> Schedule([FromQuery] string token)
+        {
+            if (string.IsNullOrEmpty(token))
+            {
+                return BadRequest("Invalid confirmation link.");
+            }
+
+            try
+            {
+                // Decrypt the token back to the string representation of caseId
+                var decryptedCaseIdStr = _protector.Unprotect(token);
+
+                if (!long.TryParse(decryptedCaseIdStr, out var caseId))
+                {
+                    return BadRequest("Invalid confirmation data.");
+                }
+                var schedule = await _notificationService.ResponseSchedule(caseId);
+                var message = schedule ? "Schedule confirmed successfully." : "Failed to confirm schedule. The confirmation link is invalid or has expired or accepted.";
+                var encodedMessage = Uri.EscapeDataString(message);
+                return Redirect($"/page/status.html?message={encodedMessage}");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while confirming schedule with token {Token}", token);
+                return BadRequest("The confirmation link is invalid or has expired.");
             }
         }
     }

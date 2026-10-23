@@ -42,6 +42,7 @@ namespace risk.control.system.Controllers.Mobile
         private readonly IWebHostEnvironment _env;
         private readonly ISmsService _smsService;
         private readonly ICaseNotificationService _mailService;
+        private readonly ISmsNotificationService _smsNotificationService;
         private string _portalBaseUrl = string.Empty;
 
         //test PAN FNLPM8635N
@@ -64,25 +65,27 @@ namespace risk.control.system.Controllers.Mobile
             IBackgroundJobClient backgroundJobClient,
             IWebHostEnvironment webHostEnvironment,
             ISmsService SmsService,
+            ISmsNotificationService smsNotificationService,
             ICaseNotificationService mailboxService)
         {
-            this._context = context;
-            this._processSubmittedReportService = processSubmittedReportService;
-            this._roleManager = roleManager;
-            this._answerService = answerService;
-            this._mediaIdfyService = mediaIdfyService;
-            this._documentIdfyService = documentIdfyService;
-            this._agentFaceIdfyService = agentFaceIdfyService;
-            this._logger = logger;
-            this._cloneReportService = cloneReportService;
-            this._agentIdService = agentIdService;
-            this._compareFaces = compareFaces;
-            this._userManager = userManager;
-            this._agentService = agentService;
-            this._featureManager = featureManager;
-            this._backgroundJobClient = backgroundJobClient;
-            this._env = webHostEnvironment;
+            _context = context;
+            _processSubmittedReportService = processSubmittedReportService;
+            _roleManager = roleManager;
+            _answerService = answerService;
+            _mediaIdfyService = mediaIdfyService;
+            _documentIdfyService = documentIdfyService;
+            _agentFaceIdfyService = agentFaceIdfyService;
+            _logger = logger;
+            _cloneReportService = cloneReportService;
+            _agentIdService = agentIdService;
+            _compareFaces = compareFaces;
+            _userManager = userManager;
+            _agentService = agentService;
+            _featureManager = featureManager;
+            _backgroundJobClient = backgroundJobClient;
+            _env = webHostEnvironment;
             _smsService = SmsService;
+            _smsNotificationService = smsNotificationService;
             this._mailService = mailboxService;
             var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
             var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
@@ -930,6 +933,22 @@ namespace risk.control.system.Controllers.Mobile
                 _logger.LogError(ex, "Error occurred for {Email}.", data.Email);
                 return StatusCode(500);
             }
+        }
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
+        [HttpPost("send-schedule")]
+        public async Task<IActionResult> SendSchedule(ScheduleRequest request)
+        {
+            var result = await _smsNotificationService.RequestSchedule(request, _portalBaseUrl);
+            return Ok(new { message = result ? "Schedule requested successfully." : "Failed to request schedule." });
+        }
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
+        [HttpGet("get-schedule")]
+        public async Task<IActionResult> GetSchedule(long caseId)
+        {
+            var result = await _smsNotificationService.GetSchedule(caseId);
+            return Ok(result);
         }
     }
 }
