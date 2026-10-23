@@ -17,13 +17,17 @@ if (websiteName) {
     });
 }
 
-const params = new URLSearchParams(window.location.search);
-const message = params.get('message');
+document.addEventListener('DOMContentLoaded', function () {
+    const closeBtn = document.getElementById('closeWindowBtn');
 
-// Display the message or a default fallback
-const messageElement = document.getElementById('message');
-if (message) {
-    messageElement.textContent = message;
-} else {
-    messageElement.textContent = "No status message provided.";
-}
+    if (closeBtn) {
+        closeBtn.addEventListener('click', function () {
+            window.close();
+
+            // Fallback notification if browser security restricts programmatic window closing
+            setTimeout(function () {
+                alert("You can now safely close this window or tab.");
+            }, 300);
+        });
+    }
+});

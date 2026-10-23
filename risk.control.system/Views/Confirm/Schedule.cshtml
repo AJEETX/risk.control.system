@@ -1,0 +1,90 @@
+﻿@model ScheduleResponse
+
+@{
+    ViewData["Title"] = "Meeting Scheduled";
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title class="websiteName">Meeting Confirmation</title>
+    <link href="~/page/style.css" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+    <div class="page-wrapper">
+        <div class="info-data">
+            <a href="#" class="logo-link">
+                <img class="login-logo" alt="logo" />™️
+            </a>
+        </div>
+
+        <main class="schedule-container">
+            <div class="schedule-card">
+                
+                <div class="card-header-section">
+                    <div class="success-icon-wrapper">
+                        <span class="success-checkmark">✓</span>
+                    </div>
+                    <h2>Meeting Notification</h2>
+                    <p class="subtitle">An appointment has been successfully arranged.</p>
+                </div>
+
+                <!-- Participants Profile Block (Side-by-Side Photos) -->
+                <div class="participants-section">
+                    <!-- Schedulee Profile -->
+                    <div class="participant-card">
+                        <!-- Update the URL path to match your API endpoint logic -->
+                        @if (Model.IsClaim)
+                        {
+                            <img src="/Document/GetBeneficiaryDocument/@Model?.ScheduleeId" alt="@Model!.ScheduleeName" class="profile-photo" title="Participant: @Model!.ScheduleeName" />
+                        }
+                        else
+                        {
+                            <img src="/Document/GetCustomerDocument/@Model?.ScheduleeId" alt="@Model!.ScheduleeName" class="profile-photo" title="Participant: @Model!.ScheduleeName" />
+                        }
+                        <span class="participant-label">Participant (You)</span>
+                        <h4 class="participant-name">@Model.ScheduleeName</h4>
+                    </div>
+
+                    <div class="profile-divider">🤝</div>
+
+                    <!-- Agent Profile -->
+                    <div class="participant-card">
+                        <img src="/Document/GetUserProfileImage/@Model?.AgentId" alt="@Model!.AgentName" class="profile-photo" title="Agent Name: @Model!.AgentName" />
+                        <span class="participant-label">Assigned Agent</span>
+                        <h4 class="participant-name">@Model.AgentName</h4>
+                    </div>
+                </div>
+
+                <!-- Tabular Details Section -->
+                <table class="schedule-table">
+                    <tbody>
+                        <tr>
+                            <th scope="row">Date</th>
+                            <td>@Model.ScheduledDateTime.ToString("D")</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Time</th>
+                            <td><span class="time-badge">@Model.ScheduledDateTime.ToString("t")</span></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Policy Number</th>
+                            <td><span class="policy-number-tag">@Model.PolicyNumber</span></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Insurance Provider</th>
+                            <td>
+                                <span class="insurer-badge">@Model.InsurerName</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <script src="~/page/static.js"></script>
+</body>
+</html>

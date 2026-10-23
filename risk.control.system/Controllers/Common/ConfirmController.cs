@@ -113,7 +113,6 @@ namespace risk.control.system.Controllers.Common
 
             try
             {
-                // Decrypt the token back to the string representation of caseId
                 var decryptedCaseIdStr = _protector.Unprotect(token);
 
                 if (!long.TryParse(decryptedCaseIdStr, out var caseId))
@@ -121,9 +120,7 @@ namespace risk.control.system.Controllers.Common
                     return BadRequest("Invalid confirmation data.");
                 }
                 var schedule = await _notificationService.ResponseSchedule(caseId);
-                var message = schedule ? "Schedule confirmed successfully." : "Failed to confirm schedule. The confirmation link is invalid or has expired or accepted.";
-                var encodedMessage = Uri.EscapeDataString(message);
-                return Redirect($"/page/status.html?message={encodedMessage}");
+                return View(schedule);
             }
             catch (Exception ex)
             {

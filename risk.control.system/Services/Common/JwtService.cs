@@ -33,7 +33,7 @@ namespace risk.control.system.Services.Common
                     ValidIssuer = _config["Jwt:Issuer"],
                     ValidAudience = _config["Jwt:Audience"],
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Data"]!)),
-                    ClockSkew = TimeSpan.Zero
+                    ClockSkew = TimeSpan.FromMinutes(5) // Allow a 5-minute clock skew for token expiration)
                 };
 
                 tokenHandler.ValidateToken(token, validationParameters, out _);
