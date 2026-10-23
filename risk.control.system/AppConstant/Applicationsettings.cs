@@ -4,6 +4,8 @@ namespace risk.control.system.AppConstant
 {
     public static class Applicationsettings
     {
+        public static readonly string ENCRYPT_URL_QUERYSTRING = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"!;
+
         public static readonly double FACE_MATCH_SIMILARITY_THRESHOLD = 75.0;
         public static readonly string AGENTIC_BASE_URL = "https://alarm-consensus-eye-frontier.trycloudflare.com"!;
         public static readonly string AI_LOGIN = EnvHelper.Get("AI_LOGIN")!;

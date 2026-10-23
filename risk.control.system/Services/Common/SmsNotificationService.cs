@@ -1,44 +1,215 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.DataProtection;
+using Microsoft.EntityFrameworkCore;
 using risk.control.system.AppConstant;
 using risk.control.system.Models;
+using risk.control.system.Models.ViewModel;
 
 namespace risk.control.system.Services.Common
 {
     public interface ISmsNotificationService
     {
-        Task<string> SendSms2Customer(string currentUser, long claimId, string sms);
+        Task<bool> RequestSchedule(ScheduleRequest request, string portalUrl);
+        Task<bool> ResponseSchedule(long caseId);
+        Task<bool> GetSchedule(long caseId);
+        Task<string> SendSms2Customer(string currentUser, long caseId, string sms);
 
-        Task<string> SendSms2Beneficiary(string currentUser, long claimId, string sms);
+        Task<string> SendSms2Beneficiary(string currentUser, long caseId, string sms);
 
         Task<List<CaseMessage>> GetSmsHistory(long caseId, bool isCustomer);
     }
 
     internal class SmsNotificationService(ApplicationDbContext context,
+        ITinyUrlService tinyUrlService,
+        IDataProtectionProvider provider,
+        ILogger<SmsNotificationService> logger,
         ISmsService SmsService) : ISmsNotificationService
     {
+        private readonly IDataProtector _protector = provider.CreateProtector(Applicationsettings.ENCRYPT_URL_QUERYSTRING);
         private readonly ApplicationDbContext _context = context;
         private readonly ISmsService _smsService = SmsService;
+        private readonly ITinyUrlService _tinyUrlService = tinyUrlService;
+        private readonly ILogger<SmsNotificationService> _logger = logger;
         private static readonly string _logo = Applicationsettings.WEBSITE_SITE_URL;
+        public async Task<bool> GetSchedule(long caseId)
+        {
+            var caseDetails = await _context.Investigations
+                .Include(c => c.ScheduleMeeting)
+                .FirstOrDefaultAsync(c => c.Id == caseId);
+            if (caseDetails == null)
+            {
+                throw new Exception("Case details not found for the given case ID.");
+            }
+            return caseDetails.ScheduleMeeting?.ScheduleAccepted ?? false;
+        }
+        public async Task<bool> ResponseSchedule(long caseId)
+        {
+            try
+            {
+                var caseDetails = await _context.Investigations
+                    .Include(c => c.PolicyDetail)
+                    .Include(c => c.ScheduleMeeting)
+                    .FirstOrDefaultAsync(c => c.Id == caseId);
+                if (caseDetails == null)
+                {
+                    throw new Exception("Case details not found for the given case ID.");
+                }
+                if (caseDetails.ScheduleMeeting.ScheduleAccepted)
+                {
+                    return false; // Schedule already accepted
+                }
+                if (caseDetails.ScheduleMeeting!.ScheduleRequestedDateTime.AddHours(48) < DateTime.UtcNow)
+                {
+                    return false; // Schedule request has expired
+                }
+                var isClaim = caseDetails?.PolicyDetail?.InsuranceType == InsuranceType.CLAIM;
+                var agent = await _context.ApplicationUser.Include(a => a.Country).FirstOrDefaultAsync(u => u.Email == caseDetails!.TaskedAgentEmail);
+                if (agent == null)
+                {
+                    throw new Exception("Agent details not found for the given case ID.");
+                }
+                string contactNumberForSchedule = string.Empty;
+                string contactNameForSchedule = string.Empty;
+                string countryCode = string.Empty;
+                if (isClaim)
+                {
+                    var customer = await _context.CustomerDetail
+                        .Include(c => c.Country)
+                        .FirstOrDefaultAsync(c => c.InvestigationTaskId == caseId);
+                    if (customer == null)
+                    {
+                        throw new Exception("Customer details not found for the given case ID.");
+                    }
+                    contactNumberForSchedule = customer.Country!.ISDCode.ToString() + customer?.PhoneNumber ?? string.Empty;
+                    contactNameForSchedule = customer?.Name ?? string.Empty;
+                    countryCode = customer!.Country!.Code;
+                }
+                else
+                {
+                    var beneficiary = await _context.BeneficiaryDetail
+                        .Include(b => b.Country)
+                        .FirstOrDefaultAsync(b => b.InvestigationTaskId == caseId);
+                    if (beneficiary == null)
+                    {
+                        throw new Exception("Beneficiary details not found for the given case ID.");
+                    }
+                    contactNumberForSchedule = beneficiary.Country!.ISDCode.ToString() + beneficiary?.PhoneNumber ?? string.Empty;
+                    contactNameForSchedule = beneficiary?.Name ?? string.Empty;
+                    countryCode = beneficiary!.Country!.Code;
+                }
+                var message = $"Dear {contactNameForSchedule},\n" +
+                              $"Your meeting schedule has been confirmed on {caseDetails!.ScheduleMeeting!.ScheduleDateTime:yyyy-MM-dd} at {caseDetails!.ScheduleMeeting!.ScheduleDateTime:HH:mm}.\n" +
+                              $"Thanks,\n" +
+                              $"{_logo}";
 
-        public async Task<string> SendSms2Customer(string currentUser, long claimId, string sms)
+                var agentMessage = $"Dear {agent?.FirstName} {agent?.LastName},\n" +
+                                   $"The schedule for Case/Policy # {caseDetails!.PolicyDetail!.ContractNumber} has been confirmed by the {contactNameForSchedule}.\n" +
+                                   $"Thanks,\n" +
+                                   $"{_logo}";
+                await _smsService.DoSendSmsAsync(countryCode, contactNumberForSchedule, message);
+                await _smsService.DoSendSmsAsync(agent!.Country!.Code, agent!.Country!.ISDCode.ToString() + agent!.PhoneNumber, agentMessage);
+                caseDetails.ScheduleMeeting!.ScheduleAccepted = true;
+                _context.Investigations.Update(caseDetails);
+                return await _context.SaveChangesAsync() > 0;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while responding to schedule for Case {CaseId}", caseId);
+                return false;
+            }
+        }
+        public async Task<bool> RequestSchedule(ScheduleRequest request, string portalUrl)
+        {
+            try
+            {
+                var caseDetails = await _context.Investigations
+                .Include(c => c.PolicyDetail)
+                .Include(c => c.ScheduleMeeting)
+                .FirstOrDefaultAsync(c => c.Id == request.CaseId);
+                if (caseDetails == null)
+                {
+                    throw new Exception("Case details not found for the given case ID.");
+                }
+
+                var isClaim = caseDetails?.PolicyDetail?.InsuranceType == InsuranceType.CLAIM;
+                var agentName = await _context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == caseDetails!.TaskedAgentEmail);
+                string contactNumberForSchedule = string.Empty;
+                string contactNameForSchedule = string.Empty;
+                string countryCode = string.Empty;
+                if (isClaim)
+                {
+                    var customer = await _context.CustomerDetail
+                        .Include(c => c.Country)
+                        .FirstOrDefaultAsync(c => c.InvestigationTaskId == request.CaseId);
+                    if (customer == null)
+                    {
+                        throw new Exception("Customer details not found for the given case ID.");
+                    }
+                    contactNumberForSchedule = customer.Country!.ISDCode.ToString() + customer?.PhoneNumber ?? string.Empty;
+                    contactNameForSchedule = customer?.Name ?? string.Empty;
+                    countryCode = customer!.Country!.Code;
+                }
+                else
+                {
+                    var beneficiary = await _context.BeneficiaryDetail
+                        .Include(b => b.Country)
+                        .FirstOrDefaultAsync(b => b.InvestigationTaskId == request.CaseId);
+                    if (beneficiary == null)
+                    {
+                        throw new Exception("Beneficiary details not found for the given case ID.");
+                    }
+                    contactNumberForSchedule = beneficiary.Country!.ISDCode.ToString() + beneficiary?.PhoneNumber ?? string.Empty;
+                    contactNameForSchedule = beneficiary?.Name ?? string.Empty;
+                    countryCode = beneficiary!.Country!.Code;
+                }
+
+                var confirmationUrl = GenerateConfirmationUrl(portalUrl, request.CaseId);
+
+                var shortUrl = await _tinyUrlService.ShortenUrlAsync(confirmationUrl);
+                var message = $"Dear {contactNameForSchedule},\n\n" +
+                       $"You have received a request to schedule a meeting with the agent on {request.ScheduleDateTime:dd-MM-yyyy} at {request.ScheduleDateTime:HH:mm}.\n\n" +
+                       $"Reference Policy/Case Number: {caseDetails!.PolicyDetail!.ContractNumber}\n\n" +
+                       $"Please confirm your availability by clicking the link below (valid for 48 hours):\n" +
+                       $"{shortUrl}\n\n" +
+                       $"If you did not request this meeting, please disregard this message.\n\n" +
+                       $"Best regards,\n" +
+                       $"{_logo}";
+
+                await _smsService.DoSendSmsAsync(countryCode, contactNumberForSchedule, message);
+                caseDetails!.ScheduleMeeting = new ScheduleMeeting
+                {
+                    CaseId = request.CaseId,
+                    ScheduleDateTime = request.ScheduleDateTime,
+                    ScheduleRequestedDateTime = DateTime.UtcNow,
+                    ScheduleRequested = true,
+                };
+                _context.Investigations.Update(caseDetails);
+                return await _context.SaveChangesAsync() > 0;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while requesting schedule for Case {CaseId}", request.CaseId);
+                return false;
+            }
+        }
+        public async Task<string> SendSms2Customer(string currentUser, long caseId, string sms)
         {
             var recipient = await _context.CustomerDetail.AsNoTracking()
                 .Include(c => c.Country)
-                .FirstOrDefaultAsync(c => c.InvestigationTaskId == claimId);
+                .FirstOrDefaultAsync(c => c.InvestigationTaskId == caseId);
 
-            return await ProcessSmsSending(recipient?.Name, recipient?.PhoneNumber, recipient?.Country, currentUser, claimId, sms, true);
+            return await ProcessSmsSending(recipient?.Name, recipient?.PhoneNumber, recipient?.Country, currentUser, caseId, sms, true);
         }
 
-        public async Task<string> SendSms2Beneficiary(string currentUser, long claimId, string sms)
+        public async Task<string> SendSms2Beneficiary(string currentUser, long caseId, string sms)
         {
             var recipient = await _context.BeneficiaryDetail.AsNoTracking()
                 .Include(b => b.Country)
-                .FirstOrDefaultAsync(c => c.InvestigationTaskId == claimId);
+                .FirstOrDefaultAsync(c => c.InvestigationTaskId == caseId);
 
-            return await ProcessSmsSending(recipient?.Name, recipient?.PhoneNumber, recipient?.Country, currentUser, claimId, sms, false);
+            return await ProcessSmsSending(recipient?.Name, recipient?.PhoneNumber, recipient?.Country, currentUser, caseId, sms, false);
         }
 
-        private async Task<string> ProcessSmsSending(string? name, string? phone, Country? country, string currentUser, long claimId, string sms, bool isCustomer)
+        private async Task<string> ProcessSmsSending(string? name, string? phone, Country? country, string currentUser, long caseId, string sms, bool isCustomer)
         {
             if (string.IsNullOrEmpty(name) || country == null) return string.Empty;
 
@@ -51,7 +222,7 @@ namespace risk.control.system.Services.Common
             var caseTask = await _context.Investigations
                 .Include(c => c.CaseMessages)
                 .Include(c => c.PolicyDetail)
-                .FirstOrDefaultAsync(c => c.Id == claimId);
+                .FirstOrDefaultAsync(c => c.Id == caseId);
 
             if (caseTask == null) return string.Empty;
 
@@ -67,7 +238,7 @@ namespace risk.control.system.Services.Common
             {
                 Message = sms,
                 IsCustomer = isCustomer,
-                InvestigationTaskId = claimId,
+                InvestigationTaskId = caseId,
                 RecepicientEmail = name,
                 SenderEmail = user.Email,
                 UpdatedBy = user.Email,
@@ -91,6 +262,7 @@ namespace risk.control.system.Services.Common
                 .ToListAsync();
             return messages;
         }
+
         private async Task<string> GetEntityNameAsync(ApplicationUser user)
         {
             if (user.ClientCompanyId > 0)
@@ -109,15 +281,13 @@ namespace risk.control.system.Services.Common
 
             return string.Empty;
         }
-        public override bool Equals(object? obj)
+        private string GenerateConfirmationUrl(string portalUrl, long caseId)
         {
-            return obj is SmsNotificationService service &&
-                   EqualityComparer<ApplicationDbContext>.Default.Equals(_context, service._context);
-        }
+            // Encrypt the caseId into a secure, URL-safe string token
+            var encryptedCaseId = _protector.Protect(caseId.ToString());
 
-        public override int GetHashCode()
-        {
-            return HashCode.Combine(_context);
+            // Construct the URL with the encrypted token
+            return $"{portalUrl}/confirm/schedule?token={Uri.EscapeDataString(encryptedCaseId)}";
         }
     }
 }
