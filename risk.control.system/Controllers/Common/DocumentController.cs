@@ -36,6 +36,7 @@ namespace risk.control.system.Controllers.Common
             return await ServeFileAsync(path, "Policy", id);
         }
 
+        [AllowAnonymous]
         public async Task<IActionResult> GetCustomerDocument(long id)
         {
             var path = await _context.CustomerDetail.AsNoTracking()
@@ -46,6 +47,7 @@ namespace risk.control.system.Controllers.Common
             return await ServeFileAsync(path, "Customer", id);
         }
 
+        [AllowAnonymous]
         public async Task<IActionResult> GetBeneficiaryDocument(long id)
         {
             var path = await _context.BeneficiaryDetail.AsNoTracking()
@@ -86,7 +88,7 @@ namespace risk.control.system.Controllers.Common
 
             return await ServeFileAsync(documentUrl, "Agency", id);
         }
-
+        [AllowAnonymous]
         public async Task<IActionResult> GetUserProfileImage(long id)
         {
             var path = await _context.ApplicationUser.AsNoTracking()
