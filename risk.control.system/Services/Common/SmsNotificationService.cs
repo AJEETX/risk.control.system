@@ -9,7 +9,8 @@ namespace risk.control.system.Services.Common
     public interface ISmsNotificationService
     {
         Task<bool> RequestSchedule(ScheduleRequest request, string portalUrl);
-        Task<ScheduleResponse> ResponseSchedule(long caseId);
+        Task<ScheduleResponse> GetScheduleResponse(long caseId);
+        Task<ScheduleResponse> GetScheduleResponseForReport(long caseId);
         Task<bool> GetSchedule(long caseId);
         Task<string> SendSms2Customer(string currentUser, long caseId, string sms);
 
@@ -43,7 +44,7 @@ namespace risk.control.system.Services.Common
             }
             return caseDetails.ScheduleMeeting?.ScheduleAccepted ?? false;
         }
-        public async Task<ScheduleResponse> ResponseSchedule(long caseId)
+        public async Task<ScheduleResponse> GetScheduleResponseForReport(long caseId)
         {
             try
             {
@@ -57,6 +58,78 @@ namespace risk.control.system.Services.Common
                     throw new Exception("Case details not found for the given case ID.");
                 }
 
+                var isClaim = caseDetails?.PolicyDetail?.InsuranceType == InsuranceType.CLAIM;
+                var agent = await _context.ApplicationUser.Include(a => a.Country).FirstOrDefaultAsync(u => u.Email == caseDetails!.TaskedAgentEmail);
+                if (agent == null)
+                {
+                    throw new Exception("Agent details not found for the given case ID.");
+                }
+                string contactNumberForSchedule = string.Empty;
+                string contactNameForSchedule = string.Empty;
+                string countryCode = string.Empty;
+                long scheduleeId = 0;
+                string insurerName = caseDetails?.ClientCompany?.Name ?? string.Empty;
+                if (isClaim)
+                {
+                    var customer = await _context.CustomerDetail
+                        .Include(c => c.Country)
+                        .FirstOrDefaultAsync(c => c.InvestigationTaskId == caseId);
+                    if (customer == null)
+                    {
+                        throw new Exception("Customer details not found for the given case ID.");
+                    }
+                    contactNumberForSchedule = customer.Country!.ISDCode.ToString() + customer?.PhoneNumber ?? string.Empty;
+                    contactNameForSchedule = customer?.Name ?? string.Empty;
+                    countryCode = customer!.Country!.Code;
+                    scheduleeId = customer.CustomerDetailId;
+                }
+                else
+                {
+                    var beneficiary = await _context.BeneficiaryDetail
+                        .Include(b => b.Country)
+                        .FirstOrDefaultAsync(b => b.InvestigationTaskId == caseId);
+                    if (beneficiary == null)
+                    {
+                        throw new Exception("Beneficiary details not found for the given case ID.");
+                    }
+                    contactNumberForSchedule = beneficiary.Country!.ISDCode.ToString() + beneficiary?.PhoneNumber ?? string.Empty;
+                    contactNameForSchedule = beneficiary?.Name ?? string.Empty;
+                    countryCode = beneficiary!.Country!.Code;
+                    scheduleeId = beneficiary.BeneficiaryDetailId;
+                }
+                var scheduleResponse = new ScheduleResponse
+                {
+                    IsClaim = isClaim,
+                    ScheduledDateTime = caseDetails!.ScheduleMeeting!.ScheduleDateTime,
+                    ScheduleeName = contactNameForSchedule,
+                    AgentName = $"{agent.FirstName} {agent.LastName}",
+                    PolicyNumber = caseDetails.PolicyDetail!.ContractNumber,
+                    AgentId = agent.Id,
+                    ScheduleeId = scheduleeId,
+                    InsurerName = insurerName,
+                    ScheduleRequested = caseDetails.ScheduleMeeting!.ScheduleRequested
+                };
+                return scheduleResponse;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while responding to schedule for Case {CaseId}", caseId);
+                return new ScheduleResponse();
+            }
+        }
+        public async Task<ScheduleResponse> GetScheduleResponse(long caseId)
+        {
+            try
+            {
+                var caseDetails = await _context.Investigations
+                    .Include(c => c.ClientCompany)
+                    .Include(c => c.PolicyDetail)
+                    .Include(c => c.ScheduleMeeting)
+                    .FirstOrDefaultAsync(c => c.Id == caseId);
+                if (caseDetails == null)
+                {
+                    throw new Exception("Case details not found for the given case ID.");
+                }
 
                 var isClaim = caseDetails?.PolicyDetail?.InsuranceType == InsuranceType.CLAIM;
                 var agent = await _context.ApplicationUser.Include(a => a.Country).FirstOrDefaultAsync(u => u.Email == caseDetails!.TaskedAgentEmail);

@@ -32,6 +32,7 @@ namespace risk.control.system.Models
 
         public List<CaseNote>? CaseNotes { get; set; } = new();
         public List<CaseMessage>? CaseMessages { get; set; } = new();
+        public long? ScheduleMeetingId { get; set; }
         public ScheduleMeeting? ScheduleMeeting { get; set; }
         public ORIGIN ORIGIN { get; set; } = ORIGIN.USER;
         public bool AiEnabled { get; set; } = false;

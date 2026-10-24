@@ -20,6 +20,7 @@ namespace risk.control.system.Services.Agency
 
     internal class AgencyInvestigationDetailService(
         ILogger<AgencyInvestigationDetailService> logger,
+        ISmsNotificationService smsNotificationService,
         ApplicationDbContext context,
         ICustomApiClient customApiCLient,
         ITimelineService timelineService) : IAgencyInvestigationDetailService
@@ -28,6 +29,7 @@ namespace risk.control.system.Services.Agency
         private readonly ApplicationDbContext context = context;
         private readonly ICustomApiClient customApiCLient = customApiCLient;
         private readonly ITimelineService timelineService = timelineService;
+        private readonly ISmsNotificationService _smsNotificationService = smsNotificationService;
 
         public async Task<CaseAgencyAgentModel> GetClaimDetails(string currentUserEmail, long caseId)
         {
@@ -189,6 +191,11 @@ namespace risk.control.system.Services.Agency
             caseTask.CustomerDetail.PhoneNumber = maskedCustomerContact;
             var maskedBeneficiaryContact = new string('*', caseTask.BeneficiaryDetail!.PhoneNumber.ToString().Length - 4) + caseTask.BeneficiaryDetail.PhoneNumber.ToString().Substring(caseTask.BeneficiaryDetail.PhoneNumber.ToString().Length - 4);
             caseTask.BeneficiaryDetail.PhoneNumber = maskedBeneficiaryContact;
+            ScheduleResponse? schedulerResponse = null;
+            if (caseTask.ScheduleMeeting != null)
+            {
+                schedulerResponse = await _smsNotificationService.GetScheduleResponseForReport(caseTask.Id);
+            }
             return new CaseTransactionModel
             {
                 ClaimsInvestigation = caseTask,
@@ -198,6 +205,7 @@ namespace risk.control.system.Services.Agency
                 TimeTaken = totalTimeTaken,
                 VendorInvoice = invoice,
                 CanDownload = canDownload,
+                ScheduleResponse = schedulerResponse,
                 Withdrawable = (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR),
                 Currency = CustomExtensions.GetCultureByCountry(caseTask.ClientCompany!.Country!.Code.ToUpper()).NumberFormat.CurrencySymbol,
                 Culture = CustomExtensions.GetCultureByCountry(caseTask.ClientCompany!.Country!.Code.ToUpper())
@@ -225,6 +233,7 @@ namespace risk.control.system.Services.Agency
         private async Task<InvestigationTask?> GetCaseDetailReport(long caseId)
         {
             return await context.Investigations.AsNoTracking()
+                .Include(c => c.ScheduleMeeting)
                 .Include(c => c.CaseMessages)
                 .Include(c => c.CaseNotes)
                 .Include(c => c.InvestigationReport)

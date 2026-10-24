@@ -4,6 +4,7 @@ using risk.control.system.AppConstant;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
+using risk.control.system.Services.Common;
 
 namespace risk.control.system.Services.Agent
 {
@@ -24,9 +25,10 @@ namespace risk.control.system.Services.Agent
         Task<InvestigationTask> GetCaseDetailForAgentDetail(long id);
     }
 
-    internal class AgentCaseDetailService(ApplicationDbContext context, ILogger<AgentCaseDetailService> logger) : IAgentCaseDetailService
+    internal class AgentCaseDetailService(ApplicationDbContext context, ISmsNotificationService smsNotificationService, ILogger<AgentCaseDetailService> logger) : IAgentCaseDetailService
     {
         private readonly ApplicationDbContext _context = context;
+        private readonly ISmsNotificationService _smsNotificationService = smsNotificationService;
         private readonly ILogger<AgentCaseDetailService> _logger = logger;
 
         public async Task<CaseAgencyModel> GetInvestigate(string userEmail, long selectedCaseId, bool uploaded = false)
@@ -69,11 +71,19 @@ namespace risk.control.system.Services.Agent
             }
             _context.Investigations.Update(caseTask);
             var rowsAffected = await _context.SaveChangesAsync();
+
+            ScheduleResponse? schedulerResponse = null!;
+            if (caseTask.ScheduleMeeting != null)
+            {
+                schedulerResponse = await _smsNotificationService.GetScheduleResponseForReport(caseTask.Id);
+            }
+
             var model = new CaseAgencyModel
             {
                 InvestigationReport = caseTask.InvestigationReport,
                 Beneficiary = caseTask.BeneficiaryDetail,
                 CaseTask = caseTask,
+                ScheduleResponse = schedulerResponse,
                 Currency = CustomExtensions.GetCultureByCountry(caseTask.ClientCompany!.Country!.Code.ToUpper()).NumberFormat.CurrencySymbol
             };
             return model;
@@ -81,6 +91,7 @@ namespace risk.control.system.Services.Agent
         private async Task<InvestigationTask?> GetInvestigateTask(long selectedCaseId)
         {
             return await _context.Investigations
+                .Include(c => c.ScheduleMeeting)
                 .Include(c => c.CaseMessages)
                 .Include(c => c.CaseNotes)
                 .Include(c => c.ClientCompany)
