@@ -12,5 +12,6 @@ namespace risk.control.system.Models.ViewModel
         public string? Currency { get; set; }
         public CultureInfo? Culture { get; set; }
         public string? AssessorEmail { get; set; }
+        public ScheduleResponse? ScheduleResponse { get; set; }
     }
 }

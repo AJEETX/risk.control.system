@@ -4691,3 +4691,183 @@ td.expand-btn-cell * {
 .btn-gap {
     margin-left: 0.5rem;
 }
+
+.schedule-card {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    padding: 32px;
+}
+
+/* Header Section */
+.card-header-section {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.success-icon-wrapper {
+    width: 50px;
+    height: 50px;
+    background-color: #e6f4ea;
+    color: #137333;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    margin: 0 auto 12px auto;
+}
+
+.card-header-section h2 {
+    margin: 0 0 4px 0;
+    font-size: 22px;
+    color: #202124;
+}
+
+.subtitle {
+    margin: 0;
+    color: #5f6368;
+    font-size: 14px;
+}
+
+/* Agent Profile Block */
+.agent-profile-block {
+    display: flex;
+    align-items: center;
+    background-color: #f8f9fa;
+    padding: 16px;
+    border-radius: 8px;
+    margin-bottom: 24px;
+}
+
+.schedule-agent-photo {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #ffffff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    margin-right: 16px;
+}
+
+.agent-label {
+    display: block;
+    font-size: 12px;
+    text-transform: uppercase;
+    color: #5f6368;
+    letter-spacing: 0.5px;
+    margin-bottom: 2px;
+}
+
+.agent-name {
+    margin: 0;
+    font-size: 18px;
+    color: #202124;
+}
+
+/* Tabular Details Layout */
+.schedule-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    margin-left: 20%;
+}
+
+    .schedule-table th,
+    .schedule-table td {
+        padding: 12px 16px;
+        border-bottom: 1px solid #e0e0e0;
+        font-size: 15px;
+    }
+
+    .schedule-table tr:last-child th,
+    .schedule-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .schedule-table th {
+        width: 35%;
+        color: #5f6368;
+        font-weight: 600;
+    }
+
+    .schedule-table td {
+        color: #202124;
+    }
+
+.policy-number-tag {
+    background-color: #e8f0fe;
+    color: #1a73e8;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 14px;
+}
+/* Participants Section */
+.participants-section {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #f8f9fa;
+    padding: 16px;
+    border-radius: 8px;
+    margin-bottom: 24px;
+    text-align: center;
+}
+
+.participant-card {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.profile-photo {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #ffffff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    margin-bottom: 8px;
+}
+
+.participant-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    color: #5f6368;
+    letter-spacing: 0.5px;
+    margin-bottom: 2px;
+}
+
+.participant-name {
+    margin: 0;
+    font-size: 15px;
+    color: #202124;
+    font-weight: 600;
+}
+
+.profile-divider {
+    font-size: 18px;
+    color: #9aa0a6;
+    padding: 0 10px;
+}
+/* Insurer Provider Row Styling */
+.insurer-badge {
+    display: inline-block;
+    font-weight: 600;
+    color: #1a73e8;
+    background-color: #f1f3f4;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.time-badge {
+    font-weight: 600;
+    color: #202124;
+    background-color: #f8f9fa;
+    padding: 3px 8px;
+    border-radius: 4px;
+    border: 1px solid #e0e0e0;
+}

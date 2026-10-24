@@ -119,7 +119,7 @@ namespace risk.control.system.Controllers.Common
                 {
                     return BadRequest("Invalid confirmation data.");
                 }
-                var schedule = await _notificationService.ResponseSchedule(caseId);
+                var schedule = await _notificationService.GetScheduleResponse(caseId);
                 return View(schedule);
             }
             catch (Exception ex)

@@ -3,6 +3,7 @@ using risk.control.system.AppConstant;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
+using risk.control.system.Services.Common;
 
 namespace risk.control.system.Services.Manager
 {
@@ -11,9 +12,10 @@ namespace risk.control.system.Services.Manager
         Task<CaseTransactionModel> GetClaimDetailsReport(string currentUserEmail, long id);
     }
 
-    internal class CaseDetailService(ApplicationDbContext context) : ICaseDetailService
+    internal class CaseDetailService(ApplicationDbContext context, ISmsNotificationService smsNotificationService) : ICaseDetailService
     {
         private readonly ApplicationDbContext _context = context;
+        private readonly ISmsNotificationService _smsNotificationService = smsNotificationService;
 
         public async Task<CaseTransactionModel> GetClaimDetailsReport(string currentUserEmail, long id)
         {
@@ -50,6 +52,11 @@ namespace risk.control.system.Services.Manager
             {
                 canDownload = tracker.DownloadCount <= 3;
             }
+            ScheduleResponse? schedulerResponse = null;
+            if (caseTask.ScheduleMeeting != null)
+            {
+                schedulerResponse = await _smsNotificationService.GetScheduleResponseForReport(caseTask.Id);
+            }
             return new CaseTransactionModel
             {
                 ClaimsInvestigation = caseTask,
@@ -59,6 +66,7 @@ namespace risk.control.system.Services.Manager
                 TimeTaken = totalTimeTaken,
                 VendorInvoice = invoice,
                 CanDownload = canDownload,
+                ScheduleResponse = schedulerResponse,
                 Withdrawable = (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR),
                 Currency = CustomExtensions.GetCultureByCountry(companyUser!.ClientCompany!.Country!.Code.ToUpper()).NumberFormat.CurrencySymbol
             };
@@ -66,6 +74,7 @@ namespace risk.control.system.Services.Manager
         private async Task<InvestigationTask?> GetCaseDetail(long caseId)
         {
             return await _context.Investigations.AsNoTracking()
+                .Include(c => c.ScheduleMeeting)
                 .Include(c => c.CaseMessages)
                 .Include(c => c.CaseNotes)
                 .Include(c => c.InvestigationReport)

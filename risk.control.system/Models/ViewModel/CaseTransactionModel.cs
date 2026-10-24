@@ -8,6 +8,7 @@ namespace risk.control.system.Models.ViewModel
         public BeneficiaryDetail? Beneficiary { get; set; }
         public bool FromEditPage { get; set; } = false;
         public VendorInvoice? VendorInvoice { get; set; }
+        public ScheduleResponse? ScheduleResponse { get; set; }
         public string? TimeTaken { get; set; }
         public bool Assigned { get; set; } = false;
         public bool Withdrawable { get; set; }

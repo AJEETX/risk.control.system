@@ -2,6 +2,7 @@
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
+using risk.control.system.Services.Common;
 
 namespace risk.control.system.Services.AgencyAdmin
 {
@@ -10,10 +11,10 @@ namespace risk.control.system.Services.AgencyAdmin
         Task<CaseAgencyModel> GetInvestigateReport(string userEmail, long selectedcase);
     }
 
-    internal class CaseReportService(
-        ApplicationDbContext context) : ICaseReportService
+    internal class CaseReportService(ApplicationDbContext context, ISmsNotificationService smsNotificationService) : ICaseReportService
     {
         private readonly ApplicationDbContext _context = context;
+        private readonly ISmsNotificationService _smsNotificationService = smsNotificationService;
 
         public async Task<CaseAgencyModel> GetInvestigateReport(string userEmail, long selectedcase)
         {
@@ -33,12 +34,17 @@ namespace risk.control.system.Services.AgencyAdmin
             beneficiaryDetails!.PhoneNumber = beneficairyContactMasked;
 
             caseTask.InvestigationReport!.ReportTemplate = await GetReportTemplate(caseTask.ReportTemplateId);
-
+            ScheduleResponse? schedulerResponse = null!;
+            if (caseTask.ScheduleMeeting != null)
+            {
+                schedulerResponse = await _smsNotificationService.GetScheduleResponseForReport(caseTask.Id);
+            }
             return (new CaseAgencyModel
             {
                 InvestigationReport = caseTask.InvestigationReport,
                 Beneficiary = beneficiaryDetails,
                 CaseTask = caseTask,
+                ScheduleResponse = schedulerResponse,
                 Address = caseTask.PolicyDetail!.InsuranceType == Models.InsuranceType.CLAIM ? "Beneficiary" : "Life-Assured",
                 Currency = CustomExtensions.GetCultureByCountry(caseTask.ClientCompany!.Country!.Code.ToUpper()).NumberFormat.CurrencySymbol
             });
@@ -65,6 +71,7 @@ namespace risk.control.system.Services.AgencyAdmin
         private async Task<InvestigationTask?> GetCaseDetail(long caseId)
         {
             return await _context.Investigations.AsNoTracking()
+               .Include(c => c.ScheduleMeeting)
                .Include(c => c.InvestigationTimeline)
                .Include(c => c.InvestigationReport)
                .ThenInclude(c => c!.EnquiryRequest)

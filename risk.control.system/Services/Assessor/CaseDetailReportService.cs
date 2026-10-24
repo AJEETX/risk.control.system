@@ -4,6 +4,7 @@ using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services.Agentic;
+using risk.control.system.Services.Common;
 
 namespace risk.control.system.Services.Assessor
 {
@@ -14,9 +15,10 @@ namespace risk.control.system.Services.Assessor
         Task<CaseAgencyModel> GetInvestigateReport(string userEmail, long selectedcase);
     }
 
-    internal class CaseDetailReportService(ApplicationDbContext context, IAgenticService agenticService) : ICaseDetailReportService
+    internal class CaseDetailReportService(ApplicationDbContext context, ISmsNotificationService smsNotificationService, IAgenticService agenticService) : ICaseDetailReportService
     {
         private readonly ApplicationDbContext _context = context;
+        private readonly ISmsNotificationService _smsNotificationService = smsNotificationService;
         private readonly IAgenticService _agenticService = agenticService;
 
         public async Task<CaseTransactionModel> GetClaimDetailsReport(string currentUserEmail, long id)
@@ -52,6 +54,11 @@ namespace risk.control.system.Services.Assessor
             {
                 canDownload = tracker.DownloadCount <= 3;
             }
+            ScheduleResponse? schedulerResponse = null!;
+            if (caseTask.ScheduleMeeting != null)
+            {
+                schedulerResponse = await _smsNotificationService.GetScheduleResponseForReport(caseTask.Id);
+            }
             return new CaseTransactionModel
             {
                 ClaimsInvestigation = caseTask,
@@ -60,6 +67,7 @@ namespace risk.control.system.Services.Assessor
                 Assigned = caseTask.Status == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER,
                 TimeTaken = totalTimeTaken,
                 VendorInvoice = invoice,
+                ScheduleResponse = schedulerResponse,
                 CanDownload = canDownload,
                 Withdrawable = (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR),
                 Currency = CustomExtensions.GetCultureByCountry(companyUser!.ClientCompany!.Country!.Code.ToUpper()).NumberFormat.CurrencySymbol
@@ -133,6 +141,13 @@ namespace risk.control.system.Services.Assessor
                     caseTask.AgenticUrl = agenticUrl;
                 }
             }
+
+            ScheduleResponse? schedulerResponse = null!;
+            if (caseTask.ScheduleMeeting != null)
+            {
+                schedulerResponse = await _smsNotificationService.GetScheduleResponseForReport(caseTask.Id);
+            }
+
             var beneficiaryDetails = await _context.BeneficiaryDetail.AsNoTracking().Include(c => c.PinCode).Include(c => c.BeneficiaryRelation).Include(c => c.District).Include(c => c.Country).Include(c => c.State).FirstOrDefaultAsync(c => c.BeneficiaryDetailId == caseTask.BeneficiaryDetail!.BeneficiaryDetailId);
             caseTask.CustomerDetail!.PhoneNumber = new string('*', caseTask.CustomerDetail!.PhoneNumber.ToString().Length - 4) + caseTask.CustomerDetail.PhoneNumber.ToString().Substring(caseTask.CustomerDetail.PhoneNumber.ToString().Length - 4);
             var beneficairyContactMasked = new string('*', caseTask.BeneficiaryDetail!.PhoneNumber.ToString().Length - 4) + caseTask.BeneficiaryDetail.PhoneNumber.ToString().Substring(caseTask.BeneficiaryDetail.PhoneNumber.ToString().Length - 4);
@@ -144,6 +159,7 @@ namespace risk.control.system.Services.Assessor
                 InvestigationReport = caseTask.InvestigationReport,
                 Beneficiary = beneficiaryDetails,
                 CaseTask = caseTask,
+                ScheduleResponse = schedulerResponse,
                 Address = caseTask.PolicyDetail!.InsuranceType == Models.InsuranceType.CLAIM ? "Beneficiary" : "Life-Assured",
                 Currency = CustomExtensions.GetCultureByCountry(caseTask.ClientCompany!.Country!.Code.ToUpper()).NumberFormat.CurrencySymbol,
                 Culture = CustomExtensions.GetCultureByCountry(caseTask.ClientCompany!.Country!.Code.ToUpper())
@@ -152,6 +168,7 @@ namespace risk.control.system.Services.Assessor
         private async Task<InvestigationTask?> GetInvestigateReport(long? selectedcase)
         {
             return await _context.Investigations.AsNoTracking()
+               .Include(c => c.ScheduleMeeting)
                .Include(c => c.InvestigationTimeline)
                .Include(c => c.InvestigationReport)
                .ThenInclude(c => c!.EnquiryRequest)

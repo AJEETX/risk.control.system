@@ -17,7 +17,8 @@ namespace risk.control.system.Models.ViewModel
         public string PolicyNumber { get; set; } = string.Empty;
         public long ScheduleeId { get; set; }
         public long AgentId { get; set; }
-        public string InsurerName { get; set; }
+        public string InsurerName { get; set; } = default!;
+        public bool ScheduleRequested { get; set; } = false;
     }
     public class ScheduleMeeting
     {
