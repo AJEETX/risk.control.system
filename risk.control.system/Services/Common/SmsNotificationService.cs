@@ -69,7 +69,7 @@ namespace risk.control.system.Services.Common
                 string countryCode = string.Empty;
                 long scheduleeId = 0;
                 string insurerName = caseDetails?.ClientCompany?.Name ?? string.Empty;
-                if (isClaim)
+                if (!isClaim)
                 {
                     var customer = await _context.CustomerDetail
                         .Include(c => c.Country)
@@ -142,7 +142,7 @@ namespace risk.control.system.Services.Common
                 string countryCode = string.Empty;
                 long scheduleeId = 0;
                 string insurerName = caseDetails?.ClientCompany?.Name ?? string.Empty;
-                if (isClaim)
+                if (!isClaim)
                 {
                     var customer = await _context.CustomerDetail
                         .Include(c => c.Country)
@@ -236,7 +236,7 @@ namespace risk.control.system.Services.Common
                 string contactNumberForSchedule = string.Empty;
                 string contactNameForSchedule = string.Empty;
                 string countryCode = string.Empty;
-                if (isClaim)
+                if (!isClaim)
                 {
                     var customer = await _context.CustomerDetail
                         .Include(c => c.Country)
