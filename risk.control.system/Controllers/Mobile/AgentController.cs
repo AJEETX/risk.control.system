@@ -957,5 +957,12 @@ namespace risk.control.system.Controllers.Mobile
             var (scheduled, scheduledDateTime) = await _smsNotificationService.GetSchedule(caseId);
             return Ok(new { Scheduled = scheduled, ScheduleDate = scheduledDateTime });
         }
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
+        [HttpPost("call")]
+        public async Task<IActionResult> Call(AgentCallRequest agentCallRequest)
+        {
+            var result = await _smsNotificationService.SetAgentCallInfo(agentCallRequest);
+            return Ok(new { Success = result });
+        }
     }
 }

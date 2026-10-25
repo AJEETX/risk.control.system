@@ -11,6 +11,7 @@ namespace risk.control.system.Models.ViewModel
     public class ScheduleResponse
     {
         public bool IsClaim { get; set; }
+        public DateTime ScheduleRequestedDateTime { get; set; }
         public DateTime ScheduledDateTime { get; set; }
         public string ScheduleeName { get; set; } = string.Empty;
         public string AgentName { get; set; } = string.Empty;
