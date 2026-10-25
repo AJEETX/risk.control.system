@@ -40,8 +40,7 @@ namespace risk.control.system.Services.Agent
                 _logger.LogWarning("Investigation case {CaseId} not found", selectedCaseId);
                 return null!;
             }
-            caseTask.CustomerDetail!.PhoneNumber = MaskPhoneNumber(caseTask.CustomerDetail?.PhoneNumber!);
-            caseTask.BeneficiaryDetail!.PhoneNumber = MaskPhoneNumber(caseTask.BeneficiaryDetail?.PhoneNumber!);
+
             caseTask.InvestigationReport!.AgentEmail = userEmail;
             var templates = await _context.ReportTemplates.AsNoTracking()
                     .Include(r => r.LocationReport!)
@@ -71,7 +70,8 @@ namespace risk.control.system.Services.Agent
             }
             _context.Investigations.Update(caseTask);
             var rowsAffected = await _context.SaveChangesAsync();
-
+            caseTask.CustomerDetail!.PhoneNumber = MaskPhoneNumber(caseTask.CustomerDetail?.PhoneNumber!);
+            caseTask.BeneficiaryDetail!.PhoneNumber = MaskPhoneNumber(caseTask.BeneficiaryDetail?.PhoneNumber!);
             ScheduleResponse? schedulerResponse = null!;
             if (caseTask.ScheduleMeeting != null)
             {
