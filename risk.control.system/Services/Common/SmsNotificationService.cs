@@ -14,6 +14,7 @@ namespace risk.control.system.Services.Common
         Task<ScheduleResponse> GetScheduleResponseForReport(long caseId);
         Task<(bool, string?)> GetSchedule(long caseId);
         Task<bool> SetAgentCallInfo(AgentCallRequest agentCallRequest);
+        Task<List<AgentCallRequest>> GetAgentCallInfo(long caseId);
         Task<string> SendSms2Customer(string currentUser, long caseId, string sms);
 
         Task<string> SendSms2Beneficiary(string currentUser, long caseId, string sms);
@@ -22,6 +23,7 @@ namespace risk.control.system.Services.Common
     }
 
     internal class SmsNotificationService(ApplicationDbContext context,
+        IFileStorageService fileStorageService,
         ITinyUrlService tinyUrlService,
         IDataProtectionProvider provider,
         IWebHostEnvironment env,
@@ -32,6 +34,7 @@ namespace risk.control.system.Services.Common
         private readonly ApplicationDbContext _context = context;
         private readonly ISmsService _smsService = SmsService;
         private readonly ITinyUrlService _tinyUrlService = tinyUrlService;
+        private readonly IFileStorageService _fileStorageService = fileStorageService;
         private readonly ILogger<SmsNotificationService> _logger = logger;
         private readonly IWebHostEnvironment _env = env;
         private static readonly string _logo = Applicationsettings.WEBSITE_SITE_URL;
@@ -159,7 +162,7 @@ namespace risk.control.system.Services.Common
                     .Include(c => c.ClientCompany)
                     .Include(c => c.PolicyDetail)
                     .Include(c => c.ScheduleMeeting)
-                    .FirstOrDefaultAsync(c => c.Id == caseId);
+                    .FirstOrDefaultAsync(c => !c.Deleted && c.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT && c.Id == caseId);
                 if (caseDetails == null)
                 {
                     throw new Exception("Case details not found for the given case ID.");
@@ -264,7 +267,7 @@ namespace risk.control.system.Services.Common
                 var caseDetails = await _context.Investigations
                 .Include(c => c.PolicyDetail)
                 .Include(c => c.ScheduleMeeting)
-                .FirstOrDefaultAsync(c => c.Id == request.CaseId);
+                .FirstOrDefaultAsync(c => !c.Deleted && c.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT && c.Id == request.CaseId);
                 if (caseDetails == null)
                 {
                     throw new Exception("Case details not found for the given case ID.");
@@ -333,16 +336,42 @@ namespace risk.control.system.Services.Common
         }
         public async Task<bool> SetAgentCallInfo(AgentCallRequest agentCallRequest)
         {
-            var caseDetail = await _context.Investigations
+            try
+            {
+                agentCallRequest.Id = 0; // Ensure a new record is created
+                var caseDetail = await _context.Investigations
+                .Include(c => c.PolicyDetail)
                 .Include(c => c.AgentCallInfo)
-                .FirstOrDefaultAsync(c => c.Id == agentCallRequest.CaseId);
+                .FirstOrDefaultAsync(c => !c.Deleted && c.Id == agentCallRequest.CaseId && c.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
 
-            if (caseDetail == null) return false;
+                if (caseDetail == null) return false;
 
-            caseDetail.AgentCallInfo = agentCallRequest;
-            await _context.SaveChangesAsync();
+                var (fileName, relativePath) = await _fileStorageService.SaveMediaAsync(agentCallRequest.CallRecording!, CONSTANTS.CASE, caseDetail.PolicyDetail!.ContractNumber, CONSTANTS.REPORT);
+                agentCallRequest.CallRecordingPath = relativePath;
+                caseDetail.AgentCallInfo.Add(agentCallRequest);
+                return await _context.SaveChangesAsync() > 0;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while setting agent call info for Case {CaseId}", agentCallRequest.CaseId);
+                return false;
+            }
+        }
+        public async Task<List<AgentCallRequest>> GetAgentCallInfo(long caseId)
+        {
+            try
+            {
+                var caseDetail = await _context.Investigations
+                .Include(c => c.AgentCallInfo)
+                .FirstOrDefaultAsync(c => !c.Deleted && c.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT && c.Id == caseId);
 
-            return true;
+                return caseDetail?.AgentCallInfo ?? new List<AgentCallRequest>();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while fetching agent call info for Case {CaseId}", caseId);
+                throw;
+            }
         }
         public async Task<string> SendSms2Customer(string currentUser, long caseId, string sms)
         {
@@ -458,5 +487,7 @@ namespace risk.control.system.Services.Common
             // Construct the URL with the encrypted token
             return $"{portalUrl}/confirm/schedule?token={Uri.EscapeDataString(encryptedCaseId)}";
         }
+
+
     }
 }

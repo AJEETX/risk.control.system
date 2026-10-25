@@ -34,7 +34,7 @@ namespace risk.control.system.Models
         public List<CaseMessage>? CaseMessages { get; set; } = new();
         public long? ScheduleMeetingId { get; set; }
         public ScheduleMeeting? ScheduleMeeting { get; set; }
-        public AgentCallRequest? AgentCallInfo { get; set; }
+        public List<AgentCallRequest> AgentCallInfo { get; set; } = new List<AgentCallRequest>();
         public ORIGIN ORIGIN { get; set; } = ORIGIN.USER;
         public bool AiEnabled { get; set; } = false;
         public bool Deleted { get; set; } = false;
