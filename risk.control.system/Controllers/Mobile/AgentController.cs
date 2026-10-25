@@ -964,5 +964,12 @@ namespace risk.control.system.Controllers.Mobile
             var result = await _smsNotificationService.SetAgentCallInfo(agentCallRequest);
             return Ok(new { Success = result });
         }
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
+        [HttpPost("get-call")]
+        public async Task<IActionResult> GetCall(long caseId)
+        {
+            var result = await _smsNotificationService.GetAgentCallInfo(caseId);
+            return Ok(result);
+        }
     }
 }
