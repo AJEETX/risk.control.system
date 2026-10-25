@@ -13,6 +13,7 @@ namespace risk.control.system.Services.Common
         Task<ScheduleResponse> GetScheduleResponse(long caseId);
         Task<ScheduleResponse> GetScheduleResponseForReport(long caseId);
         Task<(bool, string?)> GetSchedule(long caseId);
+        Task<bool> SetAgentCallInfo(AgentCallRequest agentCallRequest);
         Task<string> SendSms2Customer(string currentUser, long caseId, string sms);
 
         Task<string> SendSms2Beneficiary(string currentUser, long caseId, string sms);
@@ -46,7 +47,7 @@ namespace risk.control.system.Services.Common
                     throw new Exception("Case details not found for the given case ID.");
                 }
                 var scheduled = caseDetails.ScheduleMeeting?.ScheduleAccepted ?? false;
-                var scheduleDate = caseDetails.ScheduleMeeting?.ScheduleRequestedDateTime != null ? caseDetails.ScheduleMeeting?.ScheduleRequestedDateTime.ToLocalTime().ToString("dd/MM/yyyy HH:mm") : null;
+                var scheduleDate = caseDetails.ScheduleMeeting?.ScheduleDateTime != null ? caseDetails.ScheduleMeeting?.ScheduleDateTime.ToString("dd/MM/yyyy HH:mm") : null;
                 return (scheduled, scheduleDate);
             }
             catch (Exception ex)
@@ -132,6 +133,7 @@ namespace risk.control.system.Services.Common
                 {
                     IsClaim = isClaim,
                     ScheduledDateTime = caseDetails!.ScheduleMeeting!.ScheduleDateTime,
+                    ScheduleRequestedDateTime = caseDetails!.ScheduleMeeting!.ScheduleRequestedDateTime.ToLocalTime(),
                     ScheduleeName = contactNameForSchedule,
                     AgentName = $"{agent.FirstName} {agent.LastName}",
                     PolicyNumber = caseDetails.PolicyDetail!.ContractNumber,
@@ -208,6 +210,7 @@ namespace risk.control.system.Services.Common
                     {
                         IsClaim = isClaim,
                         ScheduledDateTime = caseDetails.ScheduleMeeting.ScheduleDateTime,
+                        ScheduleRequestedDateTime = caseDetails.ScheduleMeeting.ScheduleRequestedDateTime.ToLocalTime(),
                         ScheduleeName = contactNameForSchedule,
                         AgentName = $"{agent.FirstName} {agent.LastName}",
                         PolicyNumber = caseDetails.PolicyDetail!.ContractNumber,
@@ -219,12 +222,13 @@ namespace risk.control.system.Services.Common
                     return alreadyScheduled;
                 }
                 var message = $"Dear {contactNameForSchedule},\n" +
-                              $"Your meeting schedule has been confirmed on {caseDetails!.ScheduleMeeting!.ScheduleDateTime:yyyy-MM-dd} at {caseDetails!.ScheduleMeeting!.ScheduleDateTime:HH:mm}.\n" +
+                              $"Your meeting schedule has been confirmed on {caseDetails!.ScheduleMeeting!.ScheduleDateTime:dd-MM-yyyy} at {caseDetails!.ScheduleMeeting!.ScheduleDateTime:HH:mm}.\n\n" +
                               $"Thanks,\n" +
                               $"{_logo}";
 
                 var agentMessage = $"Dear {agent?.FirstName} {agent?.LastName},\n" +
                                    $"The schedule for Case/Policy # {caseDetails!.PolicyDetail!.ContractNumber} has been confirmed by the {contactNameForSchedule}.\n" +
+                                    $"The meeting schedule has been confirmed on {caseDetails!.ScheduleMeeting!.ScheduleDateTime:dd-MM-yyyy} at {caseDetails!.ScheduleMeeting!.ScheduleDateTime:HH:mm}.\n\n" +
                                    $"Thanks,\n" +
                                    $"{_logo}";
                 await _smsService.DoSendSmsAsync(countryCode, contactNumberForSchedule, message);
@@ -236,6 +240,7 @@ namespace risk.control.system.Services.Common
                 {
                     IsClaim = isClaim,
                     ScheduledDateTime = caseDetails.ScheduleMeeting.ScheduleDateTime,
+                    ScheduleRequestedDateTime = caseDetails.ScheduleMeeting.ScheduleRequestedDateTime.ToLocalTime(),
                     ScheduleeName = contactNameForSchedule,
                     AgentName = $"{agent.FirstName} {agent.LastName}",
                     PolicyNumber = caseDetails.PolicyDetail!.ContractNumber,
@@ -325,6 +330,19 @@ namespace risk.control.system.Services.Common
                 _logger.LogError(ex, "Error occurred while requesting schedule for Case {CaseId}", request.CaseId);
                 return false;
             }
+        }
+        public async Task<bool> SetAgentCallInfo(AgentCallRequest agentCallRequest)
+        {
+            var caseDetail = await _context.Investigations
+                .Include(c => c.AgentCallInfo)
+                .FirstOrDefaultAsync(c => c.Id == agentCallRequest.CaseId);
+
+            if (caseDetail == null) return false;
+
+            caseDetail.AgentCallInfo = agentCallRequest;
+            await _context.SaveChangesAsync();
+
+            return true;
         }
         public async Task<string> SendSms2Customer(string currentUser, long caseId, string sms)
         {

@@ -77,13 +77,14 @@
                             <table class="schedule-table">
                                 <tbody>
                                     <tr>
-                                        <th scope="row">Date</th>
-                                        <td>@Model.ScheduledDateTime.ToString("D")</td>
+                                        <th scope="row">Requested Date & Time</th>
+                                        <td>@Model.ScheduleRequestedDateTime.ToString("D") <span class="time-badge">@Model.ScheduleRequestedDateTime.ToString("t")</span></td>
                                     </tr>
                                     <tr>
-                                        <th scope="row">Time</th>
-                                        <td><span class="time-badge">@Model.ScheduledDateTime.ToString("t")</span></td>
+                                        <th scope="row">Appointment Date & Time</th>
+                                        <td>@Model.ScheduledDateTime.ToString("D") <span class="time-badge">@Model.ScheduledDateTime.ToString("t")</span></td>
                                     </tr>
+                                    
                                     <tr>
                                         <th scope="row">Policy Number</th>
                                         <td><span class="policy-number-tag">@Model.PolicyNumber</span></td>
