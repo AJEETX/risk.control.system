@@ -9,9 +9,10 @@ namespace risk.control.system.Services.Common
     public interface ISmsNotificationService
     {
         Task<bool> RequestSchedule(ScheduleRequest request, string portalUrl);
+        Task<bool> ClearSchedule(long caseId);
         Task<ScheduleResponse> GetScheduleResponse(long caseId);
         Task<ScheduleResponse> GetScheduleResponseForReport(long caseId);
-        Task<bool> GetSchedule(long caseId);
+        Task<(bool, string?)> GetSchedule(long caseId);
         Task<string> SendSms2Customer(string currentUser, long caseId, string sms);
 
         Task<string> SendSms2Beneficiary(string currentUser, long caseId, string sms);
@@ -33,16 +34,46 @@ namespace risk.control.system.Services.Common
         private readonly ILogger<SmsNotificationService> _logger = logger;
         private readonly IWebHostEnvironment _env = env;
         private static readonly string _logo = Applicationsettings.WEBSITE_SITE_URL;
-        public async Task<bool> GetSchedule(long caseId)
+        public async Task<(bool, string?)> GetSchedule(long caseId)
         {
-            var caseDetails = await _context.Investigations
-                .Include(c => c.ScheduleMeeting)
-                .FirstOrDefaultAsync(c => c.Id == caseId);
-            if (caseDetails == null)
+            try
             {
-                throw new Exception("Case details not found for the given case ID.");
+                var caseDetails = await _context.Investigations
+                                .Include(c => c.ScheduleMeeting)
+                                .FirstOrDefaultAsync(c => c.Id == caseId);
+                if (caseDetails == null)
+                {
+                    throw new Exception("Case details not found for the given case ID.");
+                }
+                var scheduled = caseDetails.ScheduleMeeting?.ScheduleAccepted ?? false;
+                var scheduleDate = caseDetails.ScheduleMeeting?.ScheduleRequestedDateTime != null ? caseDetails.ScheduleMeeting?.ScheduleRequestedDateTime.ToLocalTime().ToString("dd/MM/yyyy HH:mm") : null;
+                return (scheduled, scheduleDate);
             }
-            return caseDetails.ScheduleMeeting?.ScheduleAccepted ?? false;
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while fetching schedule for case ID: {CaseId}", caseId);
+                return (false, null);
+            }
+        }
+        public async Task<bool> ClearSchedule(long caseId)
+        {
+            try
+            {
+                var caseDetails = await _context.Investigations
+                    .Include(c => c.ScheduleMeeting)
+                    .FirstOrDefaultAsync(c => c.Id == caseId);
+                if (caseDetails == null)
+                {
+                    throw new Exception("Case details not found for the given case ID.");
+                }
+                caseDetails.ScheduleMeeting = null;
+                return await _context.SaveChangesAsync() > 0;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while clearing schedule for case ID: {CaseId}", caseId);
+                return false;
+            }
         }
         public async Task<ScheduleResponse> GetScheduleResponseForReport(long caseId)
         {
@@ -107,7 +138,8 @@ namespace risk.control.system.Services.Common
                     AgentId = agent.Id,
                     ScheduleeId = scheduleeId,
                     InsurerName = insurerName,
-                    ScheduleRequested = caseDetails.ScheduleMeeting!.ScheduleRequested
+                    ScheduleRequested = caseDetails.ScheduleMeeting!.ScheduleRequested,
+                    ScheduleAccepted = caseDetails.ScheduleMeeting!.ScheduleAccepted
                 };
                 return scheduleResponse;
             }
@@ -181,7 +213,8 @@ namespace risk.control.system.Services.Common
                         PolicyNumber = caseDetails.PolicyDetail!.ContractNumber,
                         AgentId = agent.Id,
                         ScheduleeId = scheduleeId,
-                        InsurerName = insurerName
+                        InsurerName = insurerName,
+                        ScheduleAccepted = caseDetails!.ScheduleMeeting.ScheduleAccepted
                     };
                     return alreadyScheduled;
                 }
@@ -208,7 +241,8 @@ namespace risk.control.system.Services.Common
                     PolicyNumber = caseDetails.PolicyDetail!.ContractNumber,
                     AgentId = agent.Id,
                     ScheduleeId = scheduleeId,
-                    InsurerName = insurerName
+                    InsurerName = insurerName,
+                    ScheduleAccepted = false
                 };
                 return scheduleResponse;
             }
@@ -294,20 +328,36 @@ namespace risk.control.system.Services.Common
         }
         public async Task<string> SendSms2Customer(string currentUser, long caseId, string sms)
         {
-            var recipient = await _context.CustomerDetail.AsNoTracking()
-                .Include(c => c.Country)
-                .FirstOrDefaultAsync(c => c.InvestigationTaskId == caseId);
+            try
+            {
+                var recipient = await _context.CustomerDetail.AsNoTracking()
+               .Include(c => c.Country)
+               .FirstOrDefaultAsync(c => c.InvestigationTaskId == caseId);
 
-            return await ProcessSmsSending(recipient?.Name, recipient?.PhoneNumber, recipient?.Country, currentUser, caseId, sms, true);
+                return await ProcessSmsSending(recipient?.Name, recipient?.PhoneNumber, recipient?.Country, currentUser, caseId, sms, true);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while sending SMS to Customer for Case {CaseId} by user {UserEmail}", caseId, currentUser);
+                return string.Empty;
+            }
         }
 
         public async Task<string> SendSms2Beneficiary(string currentUser, long caseId, string sms)
         {
-            var recipient = await _context.BeneficiaryDetail.AsNoTracking()
+            try
+            {
+                var recipient = await _context.BeneficiaryDetail.AsNoTracking()
                 .Include(b => b.Country)
                 .FirstOrDefaultAsync(c => c.InvestigationTaskId == caseId);
 
-            return await ProcessSmsSending(recipient?.Name, recipient?.PhoneNumber, recipient?.Country, currentUser, caseId, sms, false);
+                return await ProcessSmsSending(recipient?.Name, recipient?.PhoneNumber, recipient?.Country, currentUser, caseId, sms, false);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while sending SMS to Beneficiary for Case {CaseId} by user {UserEmail}", caseId, currentUser);
+                return string.Empty;
+            }
         }
 
         private async Task<string> ProcessSmsSending(string? name, string? phone, Country? country, string currentUser, long caseId, string sms, bool isCustomer)

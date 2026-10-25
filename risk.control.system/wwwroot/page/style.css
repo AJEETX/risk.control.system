@@ -257,6 +257,7 @@ body {
     width: 100%;
     border-collapse: collapse;
     text-align: left;
+    margin-left:10%;
 }
 
     .schedule-table th,

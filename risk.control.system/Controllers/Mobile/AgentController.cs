@@ -942,13 +942,20 @@ namespace risk.control.system.Controllers.Mobile
             var result = await _smsNotificationService.RequestSchedule(request, _portalBaseUrl);
             return Ok(new { message = result ? "Schedule requested successfully." : "Failed to request schedule." });
         }
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
+        [HttpPost("clear-schedule")]
+        public async Task<IActionResult> ClearSchedule(long caseId)
+        {
+            var result = await _smsNotificationService.ClearSchedule(caseId);
+            return Ok(new { message = result ? "Schedule cleared successfully." : "Failed to clear schedule." });
+        }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
         [HttpGet("get-schedule")]
         public async Task<IActionResult> GetSchedule(long caseId)
         {
-            var result = await _smsNotificationService.GetSchedule(caseId);
-            return Ok(result);
+            var (scheduled, scheduledDateTime) = await _smsNotificationService.GetSchedule(caseId);
+            return Ok(new { Scheduled = scheduled, ScheduleDate = scheduledDateTime });
         }
     }
 }
