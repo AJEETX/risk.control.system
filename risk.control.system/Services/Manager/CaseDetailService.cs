@@ -74,6 +74,7 @@ namespace risk.control.system.Services.Manager
         private async Task<InvestigationTask?> GetCaseDetail(long caseId)
         {
             return await _context.Investigations.AsNoTracking()
+                .Include(c => c.AgentCallInfo)
                 .Include(c => c.ScheduleMeeting)
                 .Include(c => c.CaseMessages)
                 .Include(c => c.CaseNotes)

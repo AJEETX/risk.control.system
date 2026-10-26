@@ -95,6 +95,8 @@ namespace risk.control.system.Services.Assessor
         private async Task<InvestigationTask?> GetClaimDetailsReport(long id)
         {
             return await _context.Investigations.AsNoTracking()
+                .Include(c => c.AgentCallInfo)
+                .Include(c => c.ScheduleMeeting)
                 .Include(c => c.CaseMessages)
                 .Include(c => c.CaseNotes)
                 .Include(c => c.InvestigationReport)
@@ -168,6 +170,7 @@ namespace risk.control.system.Services.Assessor
         private async Task<InvestigationTask?> GetInvestigateReport(long? selectedcase)
         {
             return await _context.Investigations.AsNoTracking()
+               .Include(c => c.AgentCallInfo)
                .Include(c => c.ScheduleMeeting)
                .Include(c => c.InvestigationTimeline)
                .Include(c => c.InvestigationReport)

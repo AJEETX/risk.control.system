@@ -129,6 +129,14 @@ namespace risk.control.system.Controllers.Common
             // ServeFileAsync now handles .mp4, .wav, etc., via the ContentTypeProvider
             return await ServeFileAsync(path, "Media", id);
         }
+        public async Task<IActionResult> GetAudioCall(long id)
+        {
+            var path = await _context.AgentCallRequests.AsNoTracking()
+                .Where(x => x.Id == id).Select(x => x.CallRecordingPath).FirstOrDefaultAsync();
+
+            // ServeFileAsync now handles .mp4, .wav, etc., via the ContentTypeProvider
+            return await ServeFileAsync(path, "Audio", id);
+        }
 
         private async Task<IActionResult> ServeFileAsync(string? relativePath, string entityName, long id, string? defaultPath = null)
         {

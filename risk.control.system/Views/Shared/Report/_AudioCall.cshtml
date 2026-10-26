@@ -1,0 +1,117 @@
+﻿@model List<AgentCallRequest>
+
+<div class="container-fluid py-3">
+    <div class="card shadow-sm border-1 rounded-lg direct-chat-warning collapsed-card">
+        <!-- Card Header -->
+        <div class="card-header bg-light">
+            <h5 class="card-title mb-0">
+                <i class="fas fa-headset text-primary me-2"></i> Audio Call History
+            </h5>
+            <div class="card-tools d-flex align-items-center gap-2">
+                <span class="badge bg-light text-secondary border px-2 py-1 rounded-pill">
+                    <i class="fas fa-phone-alt me-1 text-muted"></i> @(Model?.Count ?? 0) Calls
+                </span>
+                <button type="button" class="btn btn-sm btn-light border" data-card-widget="collapse">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Card Body -->
+        <div class="card-body py-2">
+            @if (Model != null && Model.Count > 0)
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light text-uppercase fs-7 text-muted">
+                            <tr>
+                                <th scope="col" class="py-3"><i class="fas fa-calendar"></i> Start Date & Time</th>
+                                <th scope="col" class="py-3"><i class="fas fa-clock"></i> Received Time</th>
+                                <th scope="col" class="py-3"><i class="far fa-clock text-warning me-1"></i> Duration</th>
+                                <th scope="col" class="py-3"><i class="fas fa-microphone me-1" aria-hidden="true"></i> Recording</th>
+                                <th scope="col" class="py-3"><i class="fas fa-file-alt text-info me-1"></i> Transcript</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var call in Model.OrderByDescending(a=>a.Id))
+                            {
+                                <tr>
+                                    <!-- Start Time -->
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div>
+                                                <span class="fw-semibold text-dark">@call.StartTime.ToString("D")</span>
+                                                <small class="text-muted">@call.StartTime.ToString("hh:mm:ss tt")</small>
+                                            </div>
+                                        </div>
+                                    </td>
+
+                                    <!-- Received Time -->
+                                    <td>
+                                        @if (call.CallReceivedTime.HasValue)
+                                        {
+                                            <div class="d-flex align-items-center text-muted">
+                                                <i class="fas fa-phone-incoming text-success me-2"></i>
+                                                <span>@call.CallReceivedTime.Value.ToString("hh:mm:ss tt")</span>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted fst-italic small">N/A</span>
+                                        }
+                                    </td>
+
+                                    <!-- Duration -->
+                                    <td>
+                                        <span class="badge bg-light text-dark border px-2 py-1">
+                                             @call.Duration sec
+                                        </span>
+                                    </td>
+
+                                    <!-- Audio Player -->
+                                    <td class="call-audio-cell">
+                                        @if (!string.IsNullOrEmpty(call.CallRecordingPath))
+                                        {
+                                            <audio controls class="w-100 call-audio-player">
+                                                <source src="/Document/GetAudioCall/@call.Id" type="audio/mpeg">
+                                                Your browser does not support the audio element.
+                                            </audio>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted small fst-italic">No recording available</span>
+                                        }
+                                    </td>
+
+                                    <!-- Transcript -->
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(call.Transcript))
+                                        {
+                                            <div class="text-truncate call-transcript-preview" title="@call.Transcript">
+                                                 @call.Transcript
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted small fst-italic">No transcript</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5">
+                    <div class="mb-3">
+                        <i class="fas fa-headset fa-3x text-muted opacity-50"></i>
+                    </div>
+                    <h6 class="text-dark fw-semibold">No Audio Calls Recorded</h6>
+                    <p class="text-muted small mb-0">There are no call logs available for this case yet.</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>

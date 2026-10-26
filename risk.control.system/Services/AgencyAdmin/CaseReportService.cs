@@ -72,6 +72,7 @@ namespace risk.control.system.Services.AgencyAdmin
         {
             return await _context.Investigations.AsNoTracking()
                .Include(c => c.ScheduleMeeting)
+               .Include(c => c.AgentCallInfo)
                .Include(c => c.InvestigationTimeline)
                .Include(c => c.InvestigationReport)
                .ThenInclude(c => c!.EnquiryRequest)
