@@ -20,7 +20,7 @@
 					<span data-bs-toggle="tooltip" title="Agent report (@Model.CaseTask?.PolicyDetail?.InsuranceType!.GetEnumDisplayName()): @Model.InvestigationReport?.AgentEmail" class="badge badge-light">
 						<i class='far fa-hand-point-right'></i>
 					</span>
-					<button type="button" class="btn btn-tool" data-card-widget="collapse">
+					<button type="button" class="btn btn-sm btn-light border" data-card-widget="collapse">
 						<i class="fas fa-minus"></i>
 					</button>
 				</div>
@@ -37,6 +37,7 @@
 					}
 					<input type="hidden" id="caseId" value="@Model.CaseTask.Id" />
 					<partial name="Report/_Schedule" model="Model.ScheduleResponse" />
+					<partial name="Report/_AudioCall" model="Model.CaseTask.AgentCallInfo" />
 
 					<partial name="Report/_Location" model="@template" />
 				</div>

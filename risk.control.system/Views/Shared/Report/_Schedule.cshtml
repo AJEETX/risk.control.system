@@ -1,114 +1,116 @@
 ﻿@model ScheduleResponse
 
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-12">
-            <div class="card shadow-lg border-1 rounded-lg direct-chat-warning collapsed-card">
-                <div class="card-header bg-light text-white text-center">
-                    <h3 class="card-title">
-                        <i class="far fa-calendar-check text-primary"></i> Meeting Notification
-                    </h3>
+<div class="container-fluid py-3">
+    <div class="card shadow-sm border-1 rounded-lg direct-chat-warning collapsed-card">
+        <div class="card-header bg-light">
+            <h5 class="card-title mb-0">
+                🤝 Meeting Notification
+            </h5>
+            <div class="card-tools d-flex align-items-center gap-2">
+                <span class="badge bg-light text-secondary border px-2 py-1 rounded-pill" data-bs-toggle="tooltip" title="Meeting Notification">
+                    <i class="far fa-bell"></i>
+                </span>
+                <button type="button" class="btn btn-sm btn-light border" data-card-widget="collapse">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+        </div>
 
-                    <div class="card-tools">
-                        <span data-bs-toggle="tooltip" title="Meeting Notification" class="badge badge-light">
-                            <i class="far fa-bell"></i>
-                        </span>
-                        <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                            <i class="fas fa-plus"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="card-body text-center">
-                        
-                    @if (Model != null)
-                    {
-                        <div class="schedule-card">
-                            <div class="card-header-section">
-                                <div class="success-icon-wrapper">
-                                    @if (Model.ScheduleAccepted)
-                                    {
-                                        <span class="success-checkmark">✓</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="pending-icon">⏳</span>
-                                    }
-                                </div>
-                                @if (Model.ScheduleAccepted)
-                                {
-                                    <h2 class="success-message">Appointment Confirmed</h2>
-                                }
-                                else
-                                {
-                                    <h2 class="pending-message">Appointment Requested</h2>
-                                }
-                            </div>
-
-                            <!-- Participants Profile Block (Side-by-Side Photos) -->
-                            <div class="participants-section">
-                                <!-- Schedulee Profile -->
-                                <div class="participant-card">
-                                    <!-- Update the URL path to match your API endpoint logic -->
+        <div class="card-body py-2">
+            @if (Model != null)
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th scope="col">Requested Date & Time</th>
+                                <th scope="col" class="text-center">Assigned Agent</th>
+                                <th scope="col" class="text-center">
                                     @if (Model.IsClaim)
                                     {
-                                        <img src="/Document/GetBeneficiaryDocument/@Model?.ScheduleeId" alt="@Model!.ScheduleeName" class="profile-photo" title="Participant: @Model!.ScheduleeName" />
-                                        <span class="participant-label">Customer</span>
+                                       <span>Beneficiary</span>
                                     }
                                     else
                                     {
-                                        <img src="/Document/GetCustomerDocument/@Model?.ScheduleeId" alt="@Model!.ScheduleeName" class="profile-photo" title="Participant: @Model!.ScheduleeName" />
-                                        <span class="participant-label">Beneficiary</span>
+                                       <span>Customer</span>
                                     }
-                                    <h4 class="participant-name">@Model.ScheduleeName</h4>
-                                </div>
+                                    </th>
+                                <th scope="col">Scheduled Date</th>
+                                <th scope="col">Scheduled Time</th>
+                                <th scope="col" class="ps-3">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                
+                                <td>
+                                        @Model.ScheduleRequestedDateTime.ToString("D")
+                                         @Model.ScheduleRequestedDateTime.ToString("t") 
+                                </td>
+                                <!-- 2. Assigned Agent (Image on top, Name below) -->
+                                <td class="text-center">
+                                    <div class="d-flex flex-column align-items-center gap-1">
+                                        <img src="/Document/GetUserProfileImage/@Model.AgentId" alt="@Model.AgentName" class="rounded-circle border profile-photo object-fit-cover" width="40" height="40" title="Agent: @Model.AgentName" />
+                                        <strong class="small lh-sm">@Model.AgentName</strong>
+                                    </div>
+                                </td>
 
-                                <div class="profile-divider">🤝</div>
+                                <!-- 3. Participants / Schedulee (Image on top, Name below) -->
+                                <td class="text-center">
+                                    <div class="d-flex flex-column align-items-center gap-1">
+                                        @if (Model.IsClaim)
+                                        {
+                                            <img src="/Document/GetBeneficiaryDocument/@Model.ScheduleeId" alt="@Model.ScheduleeName" class="rounded-circle border profile-photo object-fit-cover" width="40" height="40" title="Customer: @Model.ScheduleeName" />
+                                            <strong class="small lh-sm">@Model.ScheduleeName ></strong>
+                                        }
+                                        else
+                                        {
+                                            <img src="/Document/GetCustomerDocument/@Model.ScheduleeId" alt="@Model.ScheduleeName" class="rounded-circle border profile-photo object-fit-cover" width="40" height="40" title="Beneficiary: @Model.ScheduleeName" />
+                                            <strong class="small lh-sm">@Model.ScheduleeName </strong>
+                                        }
+                                    </div>
+                                </td>
 
-                                <!-- Agent Profile -->
-                                <div class="participant-card">
-                                    <img src="/Document/GetUserProfileImage/@Model?.AgentId" alt="@Model!.AgentName" class="profile-photo" title="Agent Name: @Model!.AgentName" />
-                                    <span class="participant-label">Assigned Agent</span>
-                                    <h4 class="participant-name">@Model.AgentName</h4>
-                                </div>
-                            </div>
-
-                            <!-- Tabular Details Section -->
-                            <table class="schedule-table">
-                                <tbody>
-                                    <tr>
-                                        <th scope="row">Requested Date & Time</th>
-                                        <td>@Model.ScheduleRequestedDateTime.ToString("D") <span class="time-badge">@Model.ScheduleRequestedDateTime.ToString("t")</span></td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row">Appointment Date & Time</th>
-                                        <td>@Model.ScheduledDateTime.ToString("D") <span class="time-badge">@Model.ScheduledDateTime.ToString("t")</span></td>
-                                    </tr>
-                                    
-                                    <tr>
-                                        <th scope="row">Policy Number</th>
-                                        <td><span class="policy-number-tag">@Model.PolicyNumber</span></td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row">Insurance Provider</th>
-                                        <td>
-                                            <span class="insurer-badge">@Model.InsurerName</span>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="no-schedule-message">
-                            <h2>No Appointment Scheduled</h2>
-                            <p class="subtitle">There is no appointment scheduled.</p>
-                        </div>
-                    }
+                                <!-- 4. Requested Date-->
+                                
+                                <td>
+                                    @Model.ScheduledDateTime.ToString("D")
+                                </td>
+                                <!-- 5. Scheduled Time -->
+                                <td>
+                                    <span class="small fw-semibold text-primary">
+                                        <span class="badge bg-primary">@Model.ScheduledDateTime.ToString("t")</span>
+                                    </span>
+                                </td>
+                                <!-- 1. Status Section -->
+                                <td class="ps-3">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="status-icon fs-5 me-1">
+                                            @if (Model.ScheduleAccepted)
+                                            {
+                                                <span class="success-icon-wrapper" title=" Appointment Confirmed">✓ </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="pending-icon-wrapper" title="Pending">⏳</span>
+                                            }
+                                        </div>
+                                        <span class="@(Model.ScheduleAccepted ? "text-success" : "text-warning text-dark")">
+                                            @(Model.ScheduleAccepted ? "Appointment Confirmed" : "Requested")
+                                        </span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
-            </div>
+            }
+            else
+            {
+                <div class="py-2 text-center text-muted">
+                    <span class="small">No appointment scheduled.</span>
+                </div>
+            }
         </div>
     </div>
 </div>
-

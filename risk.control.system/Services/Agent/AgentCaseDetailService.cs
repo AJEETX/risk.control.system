@@ -91,6 +91,7 @@ namespace risk.control.system.Services.Agent
         private async Task<InvestigationTask?> GetInvestigateTask(long selectedCaseId)
         {
             return await _context.Investigations
+                .Include(c => c.AgentCallInfo)
                 .Include(c => c.ScheduleMeeting)
                 .Include(c => c.CaseMessages)
                 .Include(c => c.CaseNotes)

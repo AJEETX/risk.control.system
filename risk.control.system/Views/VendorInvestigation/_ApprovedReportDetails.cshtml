@@ -28,7 +28,7 @@
 			<span data-bs-toggle="tooltip" title="Case detail : @Model.ClaimsInvestigation?.PolicyDetail!.ContractNumber" class="badge badge-light">
 				<i class='far fa-hand-point-right'></i>
 			</span>
-			<button type="button" class="btn btn-tool" data-card-widget="collapse">
+			<button type="button" class="btn btn-sm btn-light border" data-card-widget="collapse">
 				<i class="fas fa-plus"></i>
 			</button>
 		</div>
@@ -79,7 +79,7 @@
 				<span data-bs-toggle="tooltip" title="Agency report: @Model?.ClaimsInvestigation?.PolicyDetail?.InsuranceType?.GetEnumDisplayName()" class="badge badge-light">
 					<i class='far fa-hand-point-right'></i>
 				</span>
-				<button type="button" class="btn btn-tool" data-card-widget="collapse">
+			<button type="button" class="btn btn-sm btn-light border" data-card-widget="collapse">
 					<i class="fas fa-plus"></i>
 				</button>
 			</div>
@@ -92,6 +92,7 @@
 				}
 				<input type="hidden" id="caseId" value="@Model.ClaimsInvestigation.Id" />
 			<partial name="Report/_Schedule" model="Model.ScheduleResponse" />
+			<partial name="Report/_AudioCall" model="Model.ClaimsInvestigation.AgentCallInfo" />
 
 				<partial name="Report/_Location" model="@template" />
 			</div>
@@ -119,7 +120,7 @@
 										<i class="nav-icon fas fa-clock"></i>
 									@Model.ClaimsInvestigation?.InvestigationReport?.AgentRemarksUpdated!.Value.ToLocalTime().ToString("dd-MMM-yy HH:mm")
 									</span>
-								<button type="button" class="btn btn-tool" data-card-widget="collapse">
+								<button type="button" class="btn btn-sm btn-light border" data-card-widget="collapse">
 									<i class="fas fa-plus"></i>
 								</button>
 								</div>
@@ -190,7 +191,7 @@
 								<span data-bs-toggle="tooltip" title="submitted time" class="badge badge-light">
 									<i class="nav-icon fas fa-clock"></i> @Model?.ClaimsInvestigation.InvestigationReport?.SupervisorRemarksUpdated!.Value.ToLocalTime().ToString("dd-MMM-yy HH:mm")
 								</span>
-								<button type="button" class="btn btn-tool" data-card-widget="collapse">
+								<button type="button" class="btn btn-sm btn-light border" data-card-widget="collapse">
 									<i class="fas fa-plus"></i>
 								</button>
 							</div>

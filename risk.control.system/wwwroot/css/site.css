@@ -4871,3 +4871,19 @@ td.expand-btn-cell * {
     border-radius: 4px;
     border: 1px solid #e0e0e0;
 }
+.call-icon-avatar {
+    width: 32px;
+    height: 32px;
+}
+
+.call-audio-cell {
+    min-width: 220px;
+}
+
+.call-audio-player {
+    height: 36px;
+}
+
+.call-transcript-preview {
+    max-width: 250px;
+}

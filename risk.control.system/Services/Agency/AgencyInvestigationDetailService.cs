@@ -233,6 +233,7 @@ namespace risk.control.system.Services.Agency
         private async Task<InvestigationTask?> GetCaseDetailReport(long caseId)
         {
             return await context.Investigations.AsNoTracking()
+                .Include(c => c.AgentCallInfo)
                 .Include(c => c.ScheduleMeeting)
                 .Include(c => c.CaseMessages)
                 .Include(c => c.CaseNotes)
