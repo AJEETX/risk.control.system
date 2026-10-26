@@ -4,7 +4,7 @@
 	var location = Model;
 }
 
-@if (location.MediaReports?.Any(d => d.Selected) == true)
+@if (location.MediaReports?.Any(d => d.ValidationExecuted) == true)
 {
 	<div class="table-responsive mb-4">
 

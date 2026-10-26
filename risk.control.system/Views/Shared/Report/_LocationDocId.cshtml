@@ -3,7 +3,7 @@
 	var location = Model;
 }
 
-@if (location.DocumentIds?.Any(d => d.Selected) == true)
+@if (location.DocumentIds?.Any(d => d.ValidationExecuted) == true)
 {
 	<div class="table-responsive mb-4">
 

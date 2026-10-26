@@ -7,8 +7,14 @@
                 🤝 Meeting Notification
             </h5>
             <div class="card-tools d-flex align-items-center gap-2">
-                <span class="badge bg-light text-secondary border px-2 py-1 rounded-pill" data-bs-toggle="tooltip" title="Meeting Notification">
-                    <i class="far fa-bell"></i>
+                <span class="bg-light text-secondary border px-2 py-1 rounded-pill" data-bs-toggle="tooltip" title="Meeting Notification">
+                    @if (Model != null)
+                    {
+                        <i class="fas fa-bell"></i>
+                    }
+                    else{
+                        <i class="far fa-bell"></i>
+                    }
                 </span>
                 <button type="button" class="btn btn-sm btn-light border" data-card-widget="collapse">
                     <i class="fas fa-plus"></i>
@@ -44,14 +50,14 @@
                             <tr>
                                 
                                 <td>
-                                        @Model.ScheduleRequestedDateTime.ToString("D")
-                                         @Model.ScheduleRequestedDateTime.ToString("t") 
+                                       <span class="bg-light text-dark border px-2 py-1"> @Model.ScheduleRequestedDateTime.ToString("D") </span>
+                                    <span class="bg-light text-dark border px-2 py-1">  @Model.ScheduleRequestedDateTime.ToString("t") </span>
                                 </td>
                                 <!-- 2. Assigned Agent (Image on top, Name below) -->
                                 <td class="text-center">
                                     <div class="d-flex flex-column align-items-center gap-1">
                                         <img src="/Document/GetUserProfileImage/@Model.AgentId" alt="@Model.AgentName" class="rounded-circle border profile-photo object-fit-cover" width="40" height="40" title="Agent: @Model.AgentName" />
-                                        <strong class="small lh-sm">@Model.AgentName</strong>
+                                        <strong class="bg-light text-dark border px-2 py-1">@Model.AgentName</strong>
                                     </div>
                                 </td>
 
@@ -61,12 +67,12 @@
                                         @if (Model.IsClaim)
                                         {
                                             <img src="/Document/GetBeneficiaryDocument/@Model.ScheduleeId" alt="@Model.ScheduleeName" class="rounded-circle border profile-photo object-fit-cover" width="40" height="40" title="Customer: @Model.ScheduleeName" />
-                                            <strong class="small lh-sm">@Model.ScheduleeName ></strong>
+                                            <strong class="bg-light text-dark border px-2 py-1">@Model.ScheduleeName </strong>
                                         }
                                         else
                                         {
                                             <img src="/Document/GetCustomerDocument/@Model.ScheduleeId" alt="@Model.ScheduleeName" class="rounded-circle border profile-photo object-fit-cover" width="40" height="40" title="Beneficiary: @Model.ScheduleeName" />
-                                            <strong class="small lh-sm">@Model.ScheduleeName </strong>
+                                            <strong class="bg-light text-dark border px-2 py-1">@Model.ScheduleeName </strong>
                                         }
                                     </div>
                                 </td>
@@ -74,18 +80,16 @@
                                 <!-- 4. Requested Date-->
                                 
                                 <td>
-                                    @Model.ScheduledDateTime.ToString("D")
+                                    <span class="bg-light text-dark border px-2 py-1">  @Model.ScheduledDateTime.ToString("D") </span>
                                 </td>
                                 <!-- 5. Scheduled Time -->
                                 <td>
-                                    <span class="small fw-semibold text-primary">
-                                        <span class="badge bg-primary">@Model.ScheduledDateTime.ToString("t")</span>
-                                    </span>
+                                    <span class="bg-light text-dark border px-2 py-1">  @Model.ScheduledDateTime.ToString("t") </span>
                                 </td>
                                 <!-- 1. Status Section -->
                                 <td class="ps-3">
                                     <div class="d-flex align-items-center gap-2">
-                                        <div class="status-icon fs-5 me-1">
+                                        <div class="bg-light text-dark border px-2 py-1 status-icon fs-5 me-1">
                                             @if (Model.ScheduleAccepted)
                                             {
                                                 <span class="success-icon-wrapper" title=" Appointment Confirmed">✓ </span>
@@ -95,9 +99,9 @@
                                                 <span class="pending-icon-wrapper" title="Pending">⏳</span>
                                             }
                                         </div>
-                                        <span class="@(Model.ScheduleAccepted ? "text-success" : "text-warning text-dark")">
+                                        <div class="bg-light border px-2 py-1 @(Model.ScheduleAccepted ? "text-success" : "text-warning bg-color")">
                                             @(Model.ScheduleAccepted ? "Appointment Confirmed" : "Requested")
-                                        </span>
+                                        </div>
                                     </div>
                                 </td>
                             </tr>

@@ -15,10 +15,15 @@ namespace risk.control.system.Services.Common
 
         public async Task<string> ShortenUrlAsync(string longUrl)
         {
+            if (string.IsNullOrWhiteSpace(longUrl) || !Uri.IsWellFormedUriString(longUrl, UriKind.Absolute))
+            {
+                throw new ArgumentException("Invalid or missing URL provided for shortening.", nameof(longUrl));
+            }
+
             var request = new
             {
                 url = longUrl,
-                domain = "tiny.one"
+                domain = "tiny.one" // Default to standard domain to avoid tier restrictions
             };
 
             var json = JsonSerializer.Serialize(request);
@@ -30,7 +35,14 @@ namespace risk.control.system.Services.Common
             httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {EnvHelper.Get("TINY_URL_KEY")}");
 
             var response = await httpClient.PostAsync("create", content);
-            response.EnsureSuccessStatusCode();
+
+            if (!response.IsSuccessStatusCode)
+            {
+                // Log warning (quota reached, rate limit, etc.) and fallback
+                var errorResponse = await response.Content.ReadAsStringAsync();
+                // _logger.LogWarning("TinyURL creation failed: {Error}. Falling back to long URL.", errorResponse);
+                return longUrl;
+            }
 
             var result = await response.Content.ReadAsStringAsync();
 
