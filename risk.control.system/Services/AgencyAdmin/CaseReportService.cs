@@ -2,7 +2,7 @@
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
-using risk.control.system.Services.Common;
+using risk.control.system.Services.Agent;
 
 namespace risk.control.system.Services.AgencyAdmin
 {
@@ -11,10 +11,10 @@ namespace risk.control.system.Services.AgencyAdmin
         Task<CaseAgencyModel> GetInvestigateReport(string userEmail, long selectedcase);
     }
 
-    internal class CaseReportService(ApplicationDbContext context, ISmsNotificationService smsNotificationService) : ICaseReportService
+    internal class CaseReportService(ApplicationDbContext context, IAgentMeetingSetupService agentMeetingSetupService) : ICaseReportService
     {
         private readonly ApplicationDbContext _context = context;
-        private readonly ISmsNotificationService _smsNotificationService = smsNotificationService;
+        private readonly IAgentMeetingSetupService _agentMeetingSetupService = agentMeetingSetupService;
 
         public async Task<CaseAgencyModel> GetInvestigateReport(string userEmail, long selectedcase)
         {
@@ -37,7 +37,7 @@ namespace risk.control.system.Services.AgencyAdmin
             ScheduleResponse? schedulerResponse = null!;
             if (caseTask.ScheduleMeeting != null)
             {
-                schedulerResponse = await _smsNotificationService.GetScheduleResponseForReport(caseTask.Id);
+                schedulerResponse = await _agentMeetingSetupService.GetScheduleResponseForReport(caseTask.Id);
             }
             return (new CaseAgencyModel
             {

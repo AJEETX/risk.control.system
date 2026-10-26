@@ -43,6 +43,7 @@ namespace risk.control.system.Controllers.Mobile
         private readonly ISmsService _smsService;
         private readonly ICaseNotificationService _mailService;
         private readonly ISmsNotificationService _smsNotificationService;
+        private readonly IAgentMeetingSetupService _agentMeetingSetupService;
         private string _portalBaseUrl = string.Empty;
 
         //test PAN FNLPM8635N
@@ -66,6 +67,7 @@ namespace risk.control.system.Controllers.Mobile
             IWebHostEnvironment webHostEnvironment,
             ISmsService SmsService,
             ISmsNotificationService smsNotificationService,
+            IAgentMeetingSetupService agentMeetingSetupService,
             ICaseNotificationService mailboxService)
         {
             _context = context;
@@ -86,6 +88,7 @@ namespace risk.control.system.Controllers.Mobile
             _env = webHostEnvironment;
             _smsService = SmsService;
             _smsNotificationService = smsNotificationService;
+            _agentMeetingSetupService = agentMeetingSetupService;
             this._mailService = mailboxService;
             var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
             var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
@@ -939,14 +942,14 @@ namespace risk.control.system.Controllers.Mobile
         [HttpPost("send-schedule")]
         public async Task<IActionResult> SendSchedule(ScheduleRequest request)
         {
-            var result = await _smsNotificationService.RequestSchedule(request, _portalBaseUrl);
+            var result = await _agentMeetingSetupService.RequestSchedule(request, _portalBaseUrl);
             return Ok(new { message = result ? "Schedule requested successfully." : "Failed to request schedule." });
         }
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
         [HttpPost("clear-schedule")]
         public async Task<IActionResult> ClearSchedule(long caseId)
         {
-            var result = await _smsNotificationService.ClearSchedule(caseId);
+            var result = await _agentMeetingSetupService.ClearSchedule(caseId);
             return Ok(new { message = result ? "Schedule cleared successfully." : "Failed to clear schedule." });
         }
 
@@ -954,21 +957,21 @@ namespace risk.control.system.Controllers.Mobile
         [HttpGet("get-schedule")]
         public async Task<IActionResult> GetSchedule(long caseId)
         {
-            var (scheduled, scheduledDateTime) = await _smsNotificationService.GetSchedule(caseId);
+            var (scheduled, scheduledDateTime) = await _agentMeetingSetupService.GetSchedule(caseId);
             return Ok(new { Scheduled = scheduled, ScheduleDate = scheduledDateTime });
         }
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
         [HttpPost("call")]
         public async Task<IActionResult> Call(AgentCallRequest agentCallRequest)
         {
-            var result = await _smsNotificationService.SetAgentCallInfo(agentCallRequest);
+            var result = await _agentMeetingSetupService.SetAgentCallInfo(agentCallRequest);
             return Ok(new { Success = result });
         }
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
         [HttpPost("get-call")]
         public async Task<IActionResult> GetCall(long caseId)
         {
-            var result = await _smsNotificationService.GetAgentCallInfo(caseId);
+            var result = await _agentMeetingSetupService.GetAgentCallInfo(caseId);
             return Ok(result);
         }
     }

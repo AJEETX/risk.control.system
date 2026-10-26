@@ -31,6 +31,7 @@ public static class BusinessServiceExtension
 
         //services.AddHttpClient(Options.DefaultName).AddPolicyHandler(retryPolicy);
         services.AddHttpClient();
+        services.AddScoped<IAgentMeetingSetupService, AgentMeetingSetupService>();
         services.AddScoped<IAdharCardService, AdharCardService>();
         services.AddScoped<IIncomeTaxService, IncomeTaxService>();
         services.AddScoped<IDeathCertificateService, DeathCertificateService>();

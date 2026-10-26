@@ -40,8 +40,8 @@
                                     <td>
                                         <div class="d-flex align-items-center">
                                             <div>
-                                                <span class="fw-semibold text-dark">@call.StartTime.ToString("D")</span>
-                                                <small class="text-muted">@call.StartTime.ToString("hh:mm:ss tt")</small>
+                                                <span class="bg-light text-dark border px-2 py-1">@call.StartTime.ToString("D")</span>
+                                                <span class="bg-light text-dark border px-2 py-1">@call.StartTime.ToString("hh:mm:ss tt")</span>
                                             </div>
                                         </div>
                                     </td>
@@ -51,8 +51,7 @@
                                         @if (call.CallReceivedTime.HasValue)
                                         {
                                             <div class="d-flex align-items-center text-muted">
-                                                <i class="fas fa-phone-incoming text-success me-2"></i>
-                                                <span>@call.CallReceivedTime.Value.ToString("hh:mm:ss tt")</span>
+                                                <span class="bg-light text-dark border px-2 py-1">@call.CallReceivedTime.Value.ToString("hh:mm:ss tt")</span>
                                             </div>
                                         }
                                         else
@@ -82,18 +81,16 @@
                                             <span class="text-muted small fst-italic">No recording available</span>
                                         }
                                     </td>
-
-                                    <!-- Transcript -->
                                     <td>
                                         @if (!string.IsNullOrEmpty(call.Transcript))
                                         {
-                                            <div class="text-truncate call-transcript-preview" title="@call.Transcript">
-                                                 @call.Transcript
+                                            <div class="call-transcript-preview transcript-scroll-box" title="@call.Transcript">
+                                                @call.Transcript
                                             </div>
                                         }
                                         else
                                         {
-                                            <span class="text-muted small fst-italic">No transcript</span>
+                                            <span class="call-transcript-preview transcript-scroll-box">No transcript</span>
                                         }
                                     </td>
                                 </tr>

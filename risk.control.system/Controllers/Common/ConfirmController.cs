@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using risk.control.system.AppConstant;
 using risk.control.system.Models.ViewModel;
+using risk.control.system.Services.Agent;
 using risk.control.system.Services.Common;
 
 namespace risk.control.system.Controllers.Common
@@ -13,16 +14,19 @@ namespace risk.control.system.Controllers.Common
         private readonly IDataProtector _protector;
         private readonly ISmsNotificationService _notificationService;
         private readonly ICaseNotesService _caseNotesService;
+        private readonly IAgentMeetingSetupService _agentMeetingSetupService;
         private readonly ILogger<ConfirmController> _logger;
 
         public ConfirmController(
             ISmsNotificationService notificationService,
             ICaseNotesService caseNotesService,
+            IAgentMeetingSetupService agentMeetingSetupService,
             IDataProtectionProvider provider,
             ILogger<ConfirmController> logger)
         {
             _notificationService = notificationService;
             _caseNotesService = caseNotesService;
+            _agentMeetingSetupService = agentMeetingSetupService;
             _protector = provider.CreateProtector(Applicationsettings.ENCRYPT_URL_QUERYSTRING);
             _logger = logger;
         }
@@ -119,7 +123,7 @@ namespace risk.control.system.Controllers.Common
                 {
                     return BadRequest("Invalid confirmation data.");
                 }
-                var schedule = await _notificationService.GetScheduleResponse(caseId);
+                var schedule = await _agentMeetingSetupService.GetScheduleResponse(caseId);
                 return View(schedule);
             }
             catch (Exception ex)

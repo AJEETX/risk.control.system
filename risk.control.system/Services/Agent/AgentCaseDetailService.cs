@@ -4,7 +4,6 @@ using risk.control.system.AppConstant;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
-using risk.control.system.Services.Common;
 
 namespace risk.control.system.Services.Agent
 {
@@ -25,10 +24,13 @@ namespace risk.control.system.Services.Agent
         Task<InvestigationTask> GetCaseDetailForAgentDetail(long id);
     }
 
-    internal class AgentCaseDetailService(ApplicationDbContext context, ISmsNotificationService smsNotificationService, ILogger<AgentCaseDetailService> logger) : IAgentCaseDetailService
+    internal class AgentCaseDetailService(
+        ApplicationDbContext context,
+        IAgentMeetingSetupService agentMeetingSetupService,
+        ILogger<AgentCaseDetailService> logger) : IAgentCaseDetailService
     {
         private readonly ApplicationDbContext _context = context;
-        private readonly ISmsNotificationService _smsNotificationService = smsNotificationService;
+        private readonly IAgentMeetingSetupService _agentMeetingSetupService = agentMeetingSetupService;
         private readonly ILogger<AgentCaseDetailService> _logger = logger;
 
         public async Task<CaseAgencyModel> GetInvestigate(string userEmail, long selectedCaseId, bool uploaded = false)
@@ -75,7 +77,7 @@ namespace risk.control.system.Services.Agent
             ScheduleResponse? schedulerResponse = null!;
             if (caseTask.ScheduleMeeting != null)
             {
-                schedulerResponse = await _smsNotificationService.GetScheduleResponseForReport(caseTask.Id);
+                schedulerResponse = await _agentMeetingSetupService.GetScheduleResponseForReport(caseTask.Id);
             }
 
             var model = new CaseAgencyModel

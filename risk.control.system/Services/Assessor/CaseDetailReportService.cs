@@ -3,8 +3,8 @@ using risk.control.system.AppConstant;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
+using risk.control.system.Services.Agent;
 using risk.control.system.Services.Agentic;
-using risk.control.system.Services.Common;
 
 namespace risk.control.system.Services.Assessor
 {
@@ -15,10 +15,12 @@ namespace risk.control.system.Services.Assessor
         Task<CaseAgencyModel> GetInvestigateReport(string userEmail, long selectedcase);
     }
 
-    internal class CaseDetailReportService(ApplicationDbContext context, ISmsNotificationService smsNotificationService, IAgenticService agenticService) : ICaseDetailReportService
+    internal class CaseDetailReportService(ApplicationDbContext context,
+        IAgentMeetingSetupService agentMeetingSetupService,
+        IAgenticService agenticService) : ICaseDetailReportService
     {
         private readonly ApplicationDbContext _context = context;
-        private readonly ISmsNotificationService _smsNotificationService = smsNotificationService;
+        private readonly IAgentMeetingSetupService _agentMeetingSetupService = agentMeetingSetupService;
         private readonly IAgenticService _agenticService = agenticService;
 
         public async Task<CaseTransactionModel> GetClaimDetailsReport(string currentUserEmail, long id)
@@ -57,7 +59,7 @@ namespace risk.control.system.Services.Assessor
             ScheduleResponse? schedulerResponse = null!;
             if (caseTask.ScheduleMeeting != null)
             {
-                schedulerResponse = await _smsNotificationService.GetScheduleResponseForReport(caseTask.Id);
+                schedulerResponse = await _agentMeetingSetupService.GetScheduleResponseForReport(caseTask.Id);
             }
             return new CaseTransactionModel
             {
@@ -147,7 +149,7 @@ namespace risk.control.system.Services.Assessor
             ScheduleResponse? schedulerResponse = null!;
             if (caseTask.ScheduleMeeting != null)
             {
-                schedulerResponse = await _smsNotificationService.GetScheduleResponseForReport(caseTask.Id);
+                schedulerResponse = await _agentMeetingSetupService.GetScheduleResponseForReport(caseTask.Id);
             }
 
             var beneficiaryDetails = await _context.BeneficiaryDetail.AsNoTracking().Include(c => c.PinCode).Include(c => c.BeneficiaryRelation).Include(c => c.District).Include(c => c.Country).Include(c => c.State).FirstOrDefaultAsync(c => c.BeneficiaryDetailId == caseTask.BeneficiaryDetail!.BeneficiaryDetailId);

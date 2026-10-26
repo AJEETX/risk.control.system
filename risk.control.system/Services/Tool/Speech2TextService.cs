@@ -16,6 +16,7 @@ namespace risk.control.system.Services.Tool
         Task<string> ConvertSpeech(Speech2TextData input);
         Task<string> ConvertSpeech2Text(Speech2TextRequest input);
         Task ConvertMediaSpeech(string relativePath, long mediaId);
+        Task ConvertAudioCallSpeech(string relativePath, long audioId);
     }
 
     internal class Speech2TextService(IAmazonS3 s3Client, IAmazonTranscribeService transcribeClient, IHttpClientFactory clientFactory, ApplicationDbContext context, ILogger<Speech2TextService> logger) : ISpeech2TextService
@@ -26,7 +27,121 @@ namespace risk.control.system.Services.Tool
         private readonly IHttpClientFactory _clientFactory = clientFactory;
         private readonly ApplicationDbContext _context = context;
         private readonly ILogger<Speech2TextService> _logger = logger;
+        public async Task ConvertAudioCallSpeech(string relativePath, long audioId)
+        {
+            // 1. Validate file existence and extract filename
+            if (string.IsNullOrWhiteSpace(relativePath) || !File.Exists(relativePath))
+            {
+                _logger.LogError("File not found at path: {FilePath} for AudioId: {AudioId}", relativePath, audioId);
+                return;
+            }
 
+            string originalFileName = Path.GetFileName(relativePath);
+            string fileName = $"{Guid.NewGuid()}_{originalFileName}";
+            string transcribedText = "No data available";
+
+            try
+            {
+                // 2. Ensure S3 Bucket Setup
+                if (!(await Amazon.S3.Util.AmazonS3Util.DoesS3BucketExistV2Async(_s3Client, bucketName)))
+                {
+                    var putBucketRequest = new PutBucketRequest { BucketName = bucketName, UseClientRegion = true };
+                    await _s3Client.PutBucketAsync(putBucketRequest);
+
+                    var publicAccessBlockRequest = new PutPublicAccessBlockRequest
+                    {
+                        BucketName = bucketName,
+                        PublicAccessBlockConfiguration = new PublicAccessBlockConfiguration
+                        {
+                            BlockPublicAcls = true,
+                            BlockPublicPolicy = true,
+                            IgnorePublicAcls = true,
+                            RestrictPublicBuckets = true
+                        }
+                    };
+                    await _s3Client.PutPublicAccessBlockAsync(publicAccessBlockRequest);
+                }
+
+                // 3. Upload local file stream to S3
+                await using (var stream = File.OpenRead(relativePath))
+                {
+                    var uploadRequest = new TransferUtilityUploadRequest
+                    {
+                        InputStream = stream,
+                        Key = fileName,
+                        BucketName = bucketName
+                    };
+                    var fileTransferUtility = new TransferUtility(_s3Client);
+                    await fileTransferUtility.UploadAsync(uploadRequest);
+                }
+
+                // 4. Start & Monitor AWS Transcribe Job
+                var jobName = $"Job_{Guid.NewGuid()}";
+                var startRequest = CreateRequest(jobName, fileName);
+                await _transcribeClient.StartTranscriptionJobAsync(startRequest);
+
+                TranscriptionJob status;
+                do
+                {
+                    await Task.Delay(2000); // Poll every 2 seconds
+                    var getRequest = new GetTranscriptionJobRequest { TranscriptionJobName = jobName };
+                    var response = await _transcribeClient.GetTranscriptionJobAsync(getRequest);
+                    status = response.TranscriptionJob;
+                }
+                while (status.TranscriptionJobStatus == TranscriptionJobStatus.IN_PROGRESS
+                    || status.TranscriptionJobStatus == TranscriptionJobStatus.QUEUED);
+
+                // 5. Retrieve Transcript or Handle Failure
+                if (status.TranscriptionJobStatus == TranscriptionJobStatus.COMPLETED)
+                {
+                    var httpClient = _clientFactory.CreateClient();
+                    try
+                    {
+                        var result = await httpClient.GetFromJsonAsync<JsonElement>(status.Transcript.TranscriptFileUri);
+                        transcribedText = result.GetProperty("results").GetProperty("transcripts")[0].GetProperty("transcript").GetString()!;
+                    }
+                    catch (HttpRequestException e)
+                    {
+                        _logger.LogError(e, "Error fetching transcript JSON from AWS S3 for Job {JobName}", jobName);
+                    }
+                }
+                else if (status.TranscriptionJobStatus == TranscriptionJobStatus.FAILED)
+                {
+                    _logger.LogError("Transcription Job {JobName} failed: {FailureReason}", jobName, status.FailureReason);
+                    transcribedText = $"Transcription failed: {status.FailureReason}";
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error processing speech-to-text for AudioId {AudioId}", audioId);
+                transcribedText = "Error during transcription: " + ex.Message;
+            }
+            finally
+            {
+                // 6. Cleanup S3 temporary file to prevent unnecessary storage costs
+                try
+                {
+                    var deleteRequest = new DeleteObjectRequest
+                    {
+                        BucketName = bucketName,
+                        Key = fileName
+                    };
+                    await _s3Client.DeleteObjectAsync(deleteRequest);
+                }
+                catch (Exception s3Ex)
+                {
+                    _logger.LogWarning(s3Ex, "Failed to clean up temporary S3 file {FileName} from bucket {BucketName}", fileName, bucketName);
+                }
+            }
+
+            // 7. Update Database Record
+            var media = await _context.AgentCallRequests.FirstOrDefaultAsync(m => m.Id == audioId);
+            if (media != null)
+            {
+                media.Transcript = transcribedText;
+                await _context.SaveChangesAsync();
+            }
+        }
         public async Task ConvertMediaSpeech(string relativePath, long mediaId)
         {
             // 1. Validate file existence and extract filename
