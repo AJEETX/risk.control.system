@@ -4887,3 +4887,37 @@ td.expand-btn-cell * {
 .call-transcript-preview {
     max-width: 250px;
 }
+.transcript-scroll-box {
+    /* Dimensions & Layout */
+    max-height: 150px;
+    overflow-y: auto;
+    white-space: pre-line;
+    padding: 0 0.8rem;
+    /* Font Styling */
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: #212529;
+    /* Background & Border */
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    /* Smooth Scrollbar Styling (Optional) */
+    scrollbar-width: thin;
+    scrollbar-color: #ced4da #f8f9fa;
+}
+
+    /* Scrollbar for Webkit Browsers (Chrome, Edge, Safari) */
+    .transcript-scroll-box::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .transcript-scroll-box::-webkit-scrollbar-track {
+        background: #f8f9fa;
+        border-radius: 6px;
+    }
+
+    .transcript-scroll-box::-webkit-scrollbar-thumb {
+        background-color: #ced4da;
+        border-radius: 6px;
+    }

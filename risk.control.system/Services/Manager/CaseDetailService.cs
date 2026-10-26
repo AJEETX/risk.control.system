@@ -3,7 +3,7 @@ using risk.control.system.AppConstant;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
-using risk.control.system.Services.Common;
+using risk.control.system.Services.Agent;
 
 namespace risk.control.system.Services.Manager
 {
@@ -12,10 +12,10 @@ namespace risk.control.system.Services.Manager
         Task<CaseTransactionModel> GetClaimDetailsReport(string currentUserEmail, long id);
     }
 
-    internal class CaseDetailService(ApplicationDbContext context, ISmsNotificationService smsNotificationService) : ICaseDetailService
+    internal class CaseDetailService(ApplicationDbContext context, IAgentMeetingSetupService agentMeetingSetupService) : ICaseDetailService
     {
         private readonly ApplicationDbContext _context = context;
-        private readonly ISmsNotificationService _smsNotificationService = smsNotificationService;
+        private readonly IAgentMeetingSetupService _agentMeetingSetupService = agentMeetingSetupService;
 
         public async Task<CaseTransactionModel> GetClaimDetailsReport(string currentUserEmail, long id)
         {
@@ -55,7 +55,7 @@ namespace risk.control.system.Services.Manager
             ScheduleResponse? schedulerResponse = null;
             if (caseTask.ScheduleMeeting != null)
             {
-                schedulerResponse = await _smsNotificationService.GetScheduleResponseForReport(caseTask.Id);
+                schedulerResponse = await _agentMeetingSetupService.GetScheduleResponseForReport(caseTask.Id);
             }
             return new CaseTransactionModel
             {

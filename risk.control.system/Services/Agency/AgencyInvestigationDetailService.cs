@@ -3,6 +3,7 @@ using risk.control.system.AppConstant;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
+using risk.control.system.Services.Agent;
 using risk.control.system.Services.Common;
 
 namespace risk.control.system.Services.Agency
@@ -20,7 +21,7 @@ namespace risk.control.system.Services.Agency
 
     internal class AgencyInvestigationDetailService(
         ILogger<AgencyInvestigationDetailService> logger,
-        ISmsNotificationService smsNotificationService,
+        IAgentMeetingSetupService agentMeetingSetupService,
         ApplicationDbContext context,
         ICustomApiClient customApiCLient,
         ITimelineService timelineService) : IAgencyInvestigationDetailService
@@ -29,7 +30,7 @@ namespace risk.control.system.Services.Agency
         private readonly ApplicationDbContext context = context;
         private readonly ICustomApiClient customApiCLient = customApiCLient;
         private readonly ITimelineService timelineService = timelineService;
-        private readonly ISmsNotificationService _smsNotificationService = smsNotificationService;
+        private readonly IAgentMeetingSetupService _agentMeetingSetupService = agentMeetingSetupService;
 
         public async Task<CaseAgencyAgentModel> GetClaimDetails(string currentUserEmail, long caseId)
         {
@@ -194,7 +195,7 @@ namespace risk.control.system.Services.Agency
             ScheduleResponse? schedulerResponse = null;
             if (caseTask.ScheduleMeeting != null)
             {
-                schedulerResponse = await _smsNotificationService.GetScheduleResponseForReport(caseTask.Id);
+                schedulerResponse = await _agentMeetingSetupService.GetScheduleResponseForReport(caseTask.Id);
             }
             return new CaseTransactionModel
             {

@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
-namespace risk.control.system.Models.ViewModel
+namespace risk.control.system.Models
 {
     public class AgentCallRequest
     {
