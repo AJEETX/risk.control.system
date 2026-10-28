@@ -26,8 +26,10 @@ namespace risk.control.system.Services.Api
         private readonly int _sessionTimeoutinMinutes;
         private readonly int _awayThresholdInMinutes;
         private readonly int _onlineThresholdInMinutes;
+        private readonly IEncryptionService _encryptionService;
 
         public AgencyUserApiService(
+            IEncryptionService encryptionService,
             IConfiguration config,
             IDbContextFactory<ApplicationDbContext> contextFactory,
             IDashboardService dashboardService,
@@ -43,6 +45,7 @@ namespace risk.control.system.Services.Api
             _dashboardService = dashboardService;
             _base64FileService = base64FileService;
             _featureManager = featureManager;
+            _encryptionService = encryptionService;
         }
 
         public async Task<List<UserDetailResponse>> GetAgencyUsers(string userEmail)
@@ -109,7 +112,7 @@ namespace risk.control.system.Services.Api
                 var addressLine = u.Country!.Code == "AU" ? $"{u.Addressline},  {u.District.Name}" : $"{u.Addressline}, {u.PinCode.Name.Trim()}, {u.District.Name}";
                 return new UserDetailResponse
                 {
-                    Id = u.Id,
+                    Id = _encryptionService.ProtectId(u.Id),
                     Photo = photo,
                     Email = $"{u.Email}" + (u.Role == AppRoles.AGENT && string.IsNullOrWhiteSpace(u.MobileUId) ? "<span title=\"Onboarding incomplete !!!\"><i class='fa fa-asterisk asterik-style'></i></span>" : ""),
                     RawEmail = u.Email,
@@ -193,7 +196,7 @@ namespace risk.control.system.Services.Api
 
                 activeUsersDetails.Add(new UserDetailResponse
                 {
-                    Id = user.Id,
+                    Id = _encryptionService.ProtectId(user.Id),
                     Name = $"{user.FirstName} {user.LastName}",
                     Email = (user.Role == AppRoles.AGENT && !string.IsNullOrWhiteSpace(user.MobileUId) || user.Role != AppRoles.AGENT)
                         ? user.Email

@@ -1,5 +1,4 @@
 ﻿using Hangfire;
-using Microsoft.AspNetCore.DataProtection;
 using Microsoft.EntityFrameworkCore;
 using risk.control.system.AppConstant;
 using risk.control.system.Models;
@@ -13,7 +12,7 @@ namespace risk.control.system.Services.Agent
     {
         Task<bool> RequestSchedule(ScheduleRequest request, string portalUrl);
         Task<bool> ClearSchedule(long caseId);
-        Task<ScheduleResponse> GetScheduleResponse(long caseId);
+        Task<ScheduleResponse> SetSchedule(long caseId);
         Task<ScheduleResponse> GetScheduleResponseForReport(long caseId);
         Task<(bool, string?)> GetSchedule(long caseId);
         Task<bool> SetAgentCallInfo(AgentCallRequest agentCallRequest);
@@ -23,11 +22,11 @@ namespace risk.control.system.Services.Agent
         IFileStorageService fileStorageService,
         IBackgroundJobClient backgroundJobClient,
         ITinyUrlService tinyUrlService,
-        IDataProtectionProvider provider,
+        IEncryptionService encryptionService,
         ILogger<AgentMeetingSetupService> logger,
         ISmsService SmsService) : IAgentMeetingSetupService
     {
-        private readonly IDataProtector _protector = provider.CreateProtector(Applicationsettings.ENCRYPT_URL_QUERYSTRING);
+        private readonly IEncryptionService _encryptionService = encryptionService;
         private readonly ApplicationDbContext _context = context;
         private readonly ISmsService _smsService = SmsService;
         private readonly ITinyUrlService _tinyUrlService = tinyUrlService;
@@ -151,7 +150,7 @@ namespace risk.control.system.Services.Agent
                 return new ScheduleResponse();
             }
         }
-        public async Task<ScheduleResponse> GetScheduleResponse(long caseId)
+        public async Task<ScheduleResponse> SetSchedule(long caseId)
         {
             try
             {
@@ -204,7 +203,7 @@ namespace risk.control.system.Services.Agent
                     countryCode = beneficiary!.Country!.Code;
                     scheduleeId = beneficiary.BeneficiaryDetailId;
                 }
-                if (caseDetails!.ScheduleMeeting!.ScheduleAccepted || caseDetails!.ScheduleMeeting!.ScheduleRequestedDateTime.AddHours(48) < DateTime.UtcNow)
+                if (caseDetails!.ScheduleMeeting!.ScheduleAccepted || caseDetails!.ScheduleMeeting!.ScheduleRequestedDateTime.AddHours(48) < DateTime.UtcNow.ToLocalTime())
                 {
                     var alreadyScheduled = new ScheduleResponse
                     {
@@ -261,6 +260,10 @@ namespace risk.control.system.Services.Agent
         {
             try
             {
+                if (request.ScheduleDateTime < DateTime.Now.AddHours(8))
+                {
+                    throw new Exception("Schedule date and time cannot be in the past.");
+                }
                 var caseDetails = await _context.Investigations
                 .Include(c => c.PolicyDetail)
                 .Include(c => c.ScheduleMeeting)
@@ -376,7 +379,7 @@ namespace risk.control.system.Services.Agent
         private string GenerateConfirmationUrl(string portalUrl, long caseId)
         {
             // Encrypt the caseId into a secure, URL-safe string token
-            var encryptedCaseId = _protector.Protect(caseId.ToString());
+            var encryptedCaseId = _encryptionService.ProtectId(caseId);
 
             // Construct the URL with the encrypted token
             return $"{portalUrl}/confirm/schedule?token={Uri.EscapeDataString(encryptedCaseId)}";

@@ -8,7 +8,7 @@
     }
     public class EditVendorUserRequest
     {
-        public string UserId { get; set; } = default!;
+        public long UserId { get; set; } = default!;
         public ApplicationUser Model { get; set; } = default!;
         public string UpdatedBy { get; set; } = default!;
     }

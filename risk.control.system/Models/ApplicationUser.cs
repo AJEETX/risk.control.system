@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 using risk.control.system.AppConstant;
@@ -10,6 +11,8 @@ namespace risk.control.system.Models
 {
     public partial class ApplicationUser : IdentityUser<long>
     {
+        [BindNever] // ⬅️ Tells ASP.NET Core to never try to bind incoming requests to this Id property
+        public override long Id { get; set; }
         public bool IsPasswordChangeRequired { get; set; } = true;
 
         [FileExtensions(Extensions = "jpg,jpeg,png")]

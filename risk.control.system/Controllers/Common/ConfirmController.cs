@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using risk.control.system.AppConstant;
 using risk.control.system.Models.ViewModel;
@@ -9,27 +8,17 @@ using risk.control.system.Services.Common;
 namespace risk.control.system.Controllers.Common
 {
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME},{AGENCY_ADMIN.DISPLAY_NAME},{CREATOR.DISPLAY_NAME},{ASSESSOR.DISPLAY_NAME},{MANAGER.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME},{AGENT.DISPLAY_NAME}")]
-    public class ConfirmController : Controller
-    {
-        private readonly IDataProtector _protector;
-        private readonly ISmsNotificationService _notificationService;
-        private readonly ICaseNotesService _caseNotesService;
-        private readonly IAgentMeetingSetupService _agentMeetingSetupService;
-        private readonly ILogger<ConfirmController> _logger;
-
-        public ConfirmController(
-            ISmsNotificationService notificationService,
+    public class ConfirmController(ISmsNotificationService notificationService,
             ICaseNotesService caseNotesService,
             IAgentMeetingSetupService agentMeetingSetupService,
-            IDataProtectionProvider provider,
-            ILogger<ConfirmController> logger)
-        {
-            _notificationService = notificationService;
-            _caseNotesService = caseNotesService;
-            _agentMeetingSetupService = agentMeetingSetupService;
-            _protector = provider.CreateProtector(Applicationsettings.ENCRYPT_URL_QUERYSTRING);
-            _logger = logger;
-        }
+            IEncryptionService encryptionService,
+            ILogger<ConfirmController> logger) : Controller
+    {
+        private readonly ISmsNotificationService _notificationService = notificationService;
+        private readonly ICaseNotesService _caseNotesService = caseNotesService;
+        private readonly IAgentMeetingSetupService _agentMeetingSetupService = agentMeetingSetupService;
+        private readonly IEncryptionService _encryptionService = encryptionService;
+        private readonly ILogger<ConfirmController> _logger = logger;
 
         [HttpGet]
         public async Task<IActionResult> GetSmsHistory(long caseId, bool isCustomer)
@@ -117,13 +106,12 @@ namespace risk.control.system.Controllers.Common
 
             try
             {
-                var decryptedCaseIdStr = _protector.Unprotect(token);
-
-                if (!long.TryParse(decryptedCaseIdStr, out var caseId))
+                var decryptedCaseId = _encryptionService.UnprotectId(token);
+                if (decryptedCaseId <= 0)
                 {
-                    return BadRequest("Invalid confirmation data.");
+                    return BadRequest("The confirmation link is invalid or has expired.");
                 }
-                var schedule = await _agentMeetingSetupService.GetScheduleResponse(caseId);
+                var schedule = await _agentMeetingSetupService.SetSchedule(decryptedCaseId);
                 return View(schedule);
             }
             catch (Exception ex)

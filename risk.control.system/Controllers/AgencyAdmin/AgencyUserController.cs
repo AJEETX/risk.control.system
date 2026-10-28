@@ -69,102 +69,144 @@ namespace risk.control.system.Controllers.AgencyAdmin
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ApplicationUser model, string emailSuffix)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                _errorNotifyService.ShowErrorNotification(ModelState);
-                await _service.LoadMetadataAsync(model);
-                return View(model);
-            }
-            emailSuffix = emailSuffix.Replace("\n", "").Replace("\r", "").Trim();
-            var userEmail = HttpContext.User?.Identity?.Name!;
-            var result = await _createEditService.CreateVendorUserAsync(new CreateVendorUserRequest
-            {
-                User = model,
-                EmailSuffix = emailSuffix,
-                CreatedBy = userEmail
-            }, ModelState, _baseUrl);
+                if (!ModelState.IsValid)
+                {
+                    _errorNotifyService.ShowErrorNotification(ModelState);
+                    await _service.LoadMetadataAsync(model);
+                    return View(model);
+                }
+                emailSuffix = emailSuffix.Replace("\n", "").Replace("\r", "").Trim();
+                var userEmail = HttpContext.User?.Identity?.Name!;
+                var result = await _createEditService.CreateUserAsync(new CreateVendorUserRequest
+                {
+                    User = model,
+                    EmailSuffix = emailSuffix,
+                    CreatedBy = userEmail
+                }, ModelState, _baseUrl);
 
-            if (!result.Success)
-            {
-                foreach (var error in result.Errors)
-                    ModelState.AddModelError(error.Key, error.Value);
-                _errorNotifyService.ShowErrorNotification(ModelState);
-                await _service.LoadMetadataAsync(model);
-                return View(model);
-            }
+                if (!result.Success)
+                {
+                    foreach (var error in result.Errors)
+                        ModelState.AddModelError(error.Key, error.Value);
+                    _errorNotifyService.ShowErrorNotification(ModelState);
+                    await _service.LoadMetadataAsync(model);
+                    return View(model);
+                }
 
-            return RedirectToAction(nameof(Users));
+                return RedirectToAction(nameof(Users));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating Agency User");
+                return RedirectToAction(nameof(Users));
+            }
         }
 
         [Breadcrumb("Edit User", FromAction = "Users")]
-        public async Task<IActionResult> Edit(long id)
+        public async Task<IActionResult> Edit([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id)
         {
-            var model = await _service.PrepareEditModelAsync(id);
-            if (model == null)
+            try
             {
-                _notifyService.Error("User not found.");
+                var model = await _service.PrepareEditModelAsync(id);
+                if (model == null)
+                {
+                    _notifyService.Error("User not found.");
+                    return RedirectToAction(nameof(Users));
+                }
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error to get Agency user {UserId}", id);
                 return RedirectToAction(nameof(Users));
             }
-            return View(model);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, ApplicationUser model)
+        public async Task<IActionResult> Edit([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id, ApplicationUser model)
         {
-            if (!ModelState.IsValid)
+            try
             {
+                model.Id = id;
+                if (!ModelState.IsValid)
+                {
+                    _errorNotifyService.ShowErrorNotification(ModelState);
+                    await _service.LoadMetadataAsync(model);
+                    return View(model);
+                }
+                var userEmail = HttpContext.User?.Identity?.Name!;
+                var result = await _createEditService.EditUserAsync(new EditVendorUserRequest
+                {
+                    UserId = id,
+                    Model = model,
+                    UpdatedBy = userEmail
+                }, ModelState, _baseUrl);
+
+                if (!result.Success)
+                {
+                    foreach (var error in result.Errors)
+                        ModelState.AddModelError(error.Key, error.Value);
+                    _errorNotifyService.ShowErrorNotification(ModelState);
+                    await _service.LoadMetadataAsync(model);
+                    return View(model);
+                }
+
+                return RedirectToAction(nameof(Users));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error editing user {UserId}", id);
                 _errorNotifyService.ShowErrorNotification(ModelState);
                 await _service.LoadMetadataAsync(model);
                 return View(model);
             }
-            id = id.Replace("\n", "").Replace("\r", "").Trim();
-            var userEmail = HttpContext.User?.Identity?.Name!;
-            var result = await _createEditService.EditVendorUserAsync(new EditVendorUserRequest
-            {
-                UserId = id,
-                Model = model,
-                UpdatedBy = userEmail
-            }, ModelState, _baseUrl);
-
-            if (!result.Success)
-            {
-                foreach (var error in result.Errors)
-                    ModelState.AddModelError(error.Key, error.Value);
-                _errorNotifyService.ShowErrorNotification(ModelState);
-                await _service.LoadMetadataAsync(model);
-                return View(model);
-            }
-
-            return RedirectToAction(nameof(Users));
         }
 
         [Breadcrumb("Delete", FromAction = "Users")]
-        public async Task<IActionResult> Delete(long id)
+        public async Task<IActionResult> Delete([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id)
         {
-            var model = await _service.GetUserForDeleteAsync(id);
-            if (model == null)
+            try
             {
-                _notifyService.Error("User Not Found.");
-                return RedirectToAction(nameof(Users));
+                var model = await _service.GetUserForDeleteAsync(id);
+                if (model == null)
+                {
+                    _notifyService.Error("User Not Found.");
+                    return RedirectToAction(nameof(Users));
+                }
+                return View(model);
             }
-            return View(model);
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting user {UserId}", id);
+                _notifyService.Error($"Error getting user to delete.");
+            }
+            return RedirectToAction(nameof(Users));
         }
 
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(string email)
+        public async Task<IActionResult> DeleteConfirmed([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id)
         {
-            email = email.Replace("\n", "").Replace("\r", "").Trim();
-            var userEmail = HttpContext.User?.Identity?.Name!;
-            var success = await _service.SoftDeleteUserAsync(email, userEmail);
-            if (success)
+            try
             {
-                _notifyService.Custom($"User <b> {email} </b> deleted.", 3, "red", "fas fa-user-minus");
+                var userEmail = HttpContext.User?.Identity?.Name!;
+                var (deleted, username) = await _service.SoftDeleteUserAsync(id, userEmail);
+                if (deleted)
+                {
+                    _notifyService.Custom($"User {username} deleted.", 3, "red", "fas fa-user-minus");
+                }
+                else
+                {
+                    _notifyService.Error($"User {username} delete  failed.");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                _notifyService.Error($"Delete  <b> {email} </b>failed.");
+                _logger.LogError(ex, "Error deleteing user {UserId}", id);
+                _notifyService.Error($"Error deleteing user.");
             }
             return RedirectToAction(nameof(Users));
         }

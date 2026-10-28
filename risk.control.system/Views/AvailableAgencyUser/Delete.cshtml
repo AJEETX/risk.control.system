@@ -5,7 +5,7 @@
 }
 
 <section class="content">
-	<form id="delete-form" asp-action="Delete" method="post" novalidate>
+	<form id="delete-form" asp-action="Delete" asp-route-id="@Model.Id" method="post" novalidate>
 		<input type="hidden" asp-for="VendorId" />
 		<input type="hidden" asp-for="Email" name="email" />
 		<div class="submit-progress hidden">

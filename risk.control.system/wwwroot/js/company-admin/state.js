@@ -124,7 +124,7 @@
                 d.orderDirection = d.order[0]?.dir; // Pass the sorting directio
             }
         },
-        order: [[0, 'asc']],
+        order: [],
         fixedHeader: true,
         processing: true,
         paging: true,

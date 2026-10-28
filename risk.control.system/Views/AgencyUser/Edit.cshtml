@@ -4,9 +4,8 @@
 	ViewData["Title"] = @Applicationsettings.EDIT;
 }
 <section class="content">
-	<form id="edit-form" asp-action="Edit" enctype="multipart/form-data">
+	<form id="edit-form" asp-action="Edit" asp-route-id="@Model.Id" enctype="multipart/form-data">
 		<div asp-validation-summary="ModelOnly" class="text-danger"></div>
-		<input type="hidden" asp-for="Id" />
 		<input type="hidden" id="editby" name="editby" value="agency" />
 		<div class="card shadow-lg border-1 rounded-lg">
 			<div class="card-header bg-secondary text-white text-center">

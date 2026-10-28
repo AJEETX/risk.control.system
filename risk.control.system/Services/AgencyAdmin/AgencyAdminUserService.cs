@@ -21,12 +21,13 @@ namespace risk.control.system.Services.AgencyAdmin
 
         Task<ApplicationUser> GetUserForDeleteAsync(long id);
 
-        Task<bool> SoftDeleteUserAsync(string email, string deletedBy);
+        Task<(bool, string)> SoftDeleteUserAsync(long id, string deletedBy);
     }
 
     internal class AgencyAdminUserService(
         ApplicationDbContext context,
-        IFeatureManager featureManager, IAmazonApiService amazonApiService) : IAgencyAdminUserService
+        IFeatureManager featureManager,
+        IAmazonApiService amazonApiService) : IAgencyAdminUserService
     {
         private readonly ApplicationDbContext _context = context;
         private readonly IFeatureManager _featureManager = featureManager;
@@ -128,10 +129,10 @@ namespace risk.control.system.Services.AgencyAdmin
             return model;
         }
 
-        public async Task<bool> SoftDeleteUserAsync(string email, string deletedBy)
+        public async Task<(bool, string)> SoftDeleteUserAsync(long id, string deletedBy)
         {
-            var user = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == email);
-            if (user == null) return false;
+            var user = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Id == id);
+            if (user == null) return (false, null!);
 
             user.Updated = DateTime.UtcNow;
             user.UpdatedBy = deletedBy;
@@ -150,8 +151,8 @@ namespace risk.control.system.Services.AgencyAdmin
             }
             _context.ApplicationUser.Update(user);
 
-            await _context.SaveChangesAsync();
-            return true;
+            var deleted = await _context.SaveChangesAsync() > 0;
+            return (deleted, $"{user.FirstName} {user.LastName}");
         }
     }
 }

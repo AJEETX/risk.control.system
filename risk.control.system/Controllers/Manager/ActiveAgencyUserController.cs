@@ -113,7 +113,7 @@ namespace risk.control.system.Controllers.Manager
             return RedirectToAction(nameof(Users), ControllerName<ActiveAgencyUserController>.Name, new { id = model.VendorId });
         }
 
-        public async Task<IActionResult> Edit(long id)
+        public async Task<IActionResult> Edit([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             try
@@ -146,12 +146,12 @@ namespace risk.control.system.Controllers.Manager
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, ApplicationUser model)
+        public async Task<IActionResult> Edit([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id, ApplicationUser model)
         {
             var userEmail = HttpContext.User?.Identity?.Name!;
-            var sanitizedId = id.Replace("\n", "").Replace("\r", "");
             try
             {
+                model.Id = id;
                 if (!ModelState.IsValid)
                 {
                     _errorNotifyService.ShowErrorNotification(ModelState);
@@ -159,7 +159,7 @@ namespace risk.control.system.Controllers.Manager
                     return View(model);
                 }
 
-                var result = await _manageAgencyUserService.EditAgencyUserAsync(ModelState, sanitizedId, model, userEmail, _baseUrl);
+                var result = await _manageAgencyUserService.EditAgencyUserAsync(ModelState, id, model, userEmail, _baseUrl);
 
                 if (!result.Success)
                 {
@@ -174,13 +174,13 @@ namespace risk.control.system.Controllers.Manager
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error editing {AgencyId}. {UserEmail}.", sanitizedId, userEmail);
+                _logger.LogError(ex, "Error editing {AgencyId}. {UserEmail}.", id, userEmail);
                 _notifyService.Error("OOPS !!!..Error editing User. Try again.");
             }
             return RedirectToAction(nameof(Users), ControllerName<ActiveAgencyUserController>.Name, new { id = model.VendorId });
         }
 
-        public async Task<IActionResult> Delete(long id)
+        public async Task<IActionResult> Delete([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             try
@@ -198,7 +198,7 @@ namespace risk.control.system.Controllers.Manager
                     return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
                 }
 
-                ViewData["BreadcrumbNode"] = _navigationService.GetAgencyUserActionPath(model.VendorId!.Value, ControllerName<ActiveAgencyController>.Name, "Active Agencies", "Edit User", "Edit");
+                ViewData["BreadcrumbNode"] = _navigationService.GetAgencyUserActionPath(model.VendorId!.Value, ControllerName<ActiveAgencyController>.Name, "Active Agencies", "Delete User", "Edit");
 
                 return View(model);
             }
@@ -212,12 +212,17 @@ namespace risk.control.system.Controllers.Manager
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(string email, long vendorId)
+        public async Task<IActionResult> Delete([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id, long vendorId)
         {
             var userEmail = HttpContext.User?.Identity?.Name!;
+            if (!ModelState.IsValid)
+            {
+                _notifyService.Error("Error occurred. Please Try again later");
+                return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
+            }
             try
             {
-                var (result, message) = await _manageAgencyUserService.SoftDeleteUserAsync(email, userEmail);
+                var (result, message) = await _manageAgencyUserService.SoftDeleteUserAsync(id, userEmail);
 
                 if (result)
                 {
@@ -230,8 +235,7 @@ namespace risk.control.system.Controllers.Manager
             }
             catch (Exception ex)
             {
-                var sanitizedEmail = email.Replace("\n", "").Replace("\r", "");
-                _logger.LogError(ex, "Error deleting {AgencyUser}. {UserEmail}.", sanitizedEmail, userEmail);
+                _logger.LogError(ex, "Error deleting {AgencyUser}. {UserEmail}.", id, userEmail);
                 _notifyService.Error("Error deleting user. Try again");
             }
             return RedirectToAction(nameof(Users), new { id = vendorId });

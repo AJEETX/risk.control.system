@@ -82,7 +82,17 @@ namespace risk.control.system.Controllers.CompanyAdmin
             var lambda = Expression.Lambda<Func<State, object>>(Expression.Convert(propertyExpression, typeof(object)), parameter);
             query = isAscending ? query.OrderBy(lambda) : query.OrderByDescending(lambda);
             var totalRecords = await query.CountAsync();
-            var rawData = await query.Skip(start).Take(length).Select(s => new { s.StateId, s.Name, s.Code, s.UpdatedBy, s.Updated, s.Created, CountryName = s.Country!.Name }).ToListAsync();
+            var rawData = await query.Skip(start).Take(length).Select(s => new
+            {
+                s.StateId,
+                s.Name,
+                s.Code,
+                s.UpdatedBy,
+                s.Updated,
+                s.Created,
+                CountryName = s.Country!.Name
+            }).OrderByDescending(o => o.Updated)
+                .ToListAsync();
             var data = rawData.Select(s => new { s.StateId, s.Name, s.Code, s.UpdatedBy, Updated = s.Updated ?? s.Created, s.CountryName });
             return Json(new { draw = draw, recordsTotal = totalRecords, recordsFiltered = totalRecords, data = data });
         }

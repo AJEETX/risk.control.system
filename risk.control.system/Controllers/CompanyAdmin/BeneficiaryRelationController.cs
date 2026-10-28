@@ -39,9 +39,9 @@ namespace risk.control.system.Controllers.CompanyAdmin
             return View();
         }
 
-        public IActionResult GetBeneficiaryRelations()
+        public async Task<IActionResult> GetBeneficiaryRelations()
         {
-            var data = _context.BeneficiaryRelation
+            var data = await _context.BeneficiaryRelation
                 .Select(c => new
                 {
                     c.BeneficiaryRelationId,
@@ -49,7 +49,8 @@ namespace risk.control.system.Controllers.CompanyAdmin
                     c.Code,
                     Updated = c.Updated ?? c.Created,
                     UpdateBy = c.UpdatedBy
-                }).ToList();
+                }).OrderByDescending(o => o.Updated)
+                .ToListAsync();
 
             return Json(new { data });
         }

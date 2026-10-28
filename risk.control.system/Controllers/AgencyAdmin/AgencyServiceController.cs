@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using risk.control.system.AppConstant;
 using risk.control.system.Models;
 using risk.control.system.Services.AgencyAdmin;
+using risk.control.system.Services.Common;
 using SmartBreadcrumbs.Attributes;
 
 namespace risk.control.system.Controllers.AgencyAdmin
@@ -83,12 +84,14 @@ namespace risk.control.system.Controllers.AgencyAdmin
         }
 
         [Breadcrumb("Edit Service", FromAction = nameof(Service))]
-        public async Task<IActionResult> Edit(long id)
+        public async Task<IActionResult> Edit([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id)
         {
             try
             {
-                if (id <= 0) return RedirectToAction("Index", "Dashboard");
-
+                if (id <= 0)
+                {
+                    return RedirectToAction(nameof(Service));
+                }
                 var model = await _service.PrepareEditViewModelAsync(id);
                 if (model == null)
                 {
@@ -106,12 +109,24 @@ namespace risk.control.system.Controllers.AgencyAdmin
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(VendorInvestigationServiceType serviceModel)
+        public async Task<IActionResult> Edit([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id, VendorInvestigationServiceType model)
         {
             var userEmail = User.Identity?.Name!;
             try
             {
-                var result = await _typeManager.EditAsync(serviceModel, userEmail);
+                model.VendorInvestigationServiceTypeId = id;
+                model.StateId = model.SelectedStateId;
+                model.CountryId = model.SelectedCountryId;
+
+                ModelState.Remove(nameof(model.StateId));
+                ModelState.Remove(nameof(model.CountryId));
+
+                if (!ModelState.IsValid)
+                {
+                    _notifyService.Custom("Unexpected Error. Please try again later", 3, "orange", "fas fa-cog");
+                    return RedirectToAction(nameof(Service));
+                }
+                var result = await _typeManager.EditAsync(model, userEmail);
                 if (!result.Success)
                 {
                     _notifyService.Custom(result.Message, 3, "red", "fas fa-cog");

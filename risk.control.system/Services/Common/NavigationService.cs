@@ -141,7 +141,7 @@ namespace risk.control.system.Services.Common
             };
         }
 
-        private MvcBreadcrumbNode GetAgencyProfileBase(long id, string controller, string listTitle)
+        private static MvcBreadcrumbNode GetAgencyProfileBase(long id, string controller, string listTitle)
         {
             var root = new MvcBreadcrumbNode("Agencies", controller, "Manage Agency");
 
@@ -150,7 +150,7 @@ namespace risk.control.system.Services.Common
                 Parent = root
             };
 
-            return new MvcBreadcrumbNode("Detail", controller, "Agency Profile")
+            return new MvcBreadcrumbNode("Profile", controller, "Agency Profile")
             {
                 Parent = list,
                 RouteValues = new { id }

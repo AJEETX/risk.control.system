@@ -96,7 +96,7 @@ namespace risk.control.system.Controllers.Manager
             return RedirectToAction(nameof(Service), ControllerName<AvailableAgencyServiceController>.Name, new { id = service.VendorId });
         }
 
-        public async Task<IActionResult> Edit(long id)
+        public async Task<IActionResult> Edit([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             try
@@ -122,12 +122,24 @@ namespace risk.control.system.Controllers.Manager
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(VendorInvestigationServiceType service)
+        public async Task<IActionResult> Edit([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id, VendorInvestigationServiceType model)
         {
             var userEmail = HttpContext.User?.Identity?.Name!;
             try
             {
-                var result = await _agencyServiceTypeManager.EditAsync(service, userEmail);
+                model.VendorInvestigationServiceTypeId = id;
+                model.StateId = model.SelectedStateId;
+                model.CountryId = model.SelectedCountryId;
+
+                ModelState.Remove(nameof(model.StateId));
+                ModelState.Remove(nameof(model.CountryId));
+
+                if (!ModelState.IsValid)
+                {
+                    _notifyService.Custom("Unexpected Error. Please try again later", 3, "orange", "fas fa-cog");
+                    return RedirectToAction(nameof(Edit), new { id = id });
+                }
+                var result = await _agencyServiceTypeManager.EditAsync(model, userEmail);
                 if (!result.Success)
                 {
                     _notifyService.Custom(result.Message, 3, "red", "fas fa-cog");
@@ -142,7 +154,7 @@ namespace risk.control.system.Controllers.Manager
                 _logger.LogError(ex, "Error editing Service. {UserEmail}", userEmail);
                 _notifyService.Custom("Error editing service. Try again.", 3, "red", "fas fa-cog");
             }
-            return RedirectToAction(nameof(Service), ControllerName<AvailableAgencyServiceController>.Name, new { id = service.VendorId });
+            return RedirectToAction(nameof(Service), ControllerName<AvailableAgencyServiceController>.Name, new { id = model.VendorId });
         }
 
         [HttpPost]

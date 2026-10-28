@@ -50,16 +50,16 @@ namespace risk.control.system.Controllers.Common
         }
 
         [HttpGet("GetUserEmail")]
-        public async Task<int?> CheckUserEmail(string input)
+        public async Task<bool> CheckUserEmail(string input)
         {
             if (string.IsNullOrWhiteSpace(input))
             {
-                return null;
+                return false;
             }
 
             var userCount = await _userManager.Users.AsNoTracking().CountAsync(u => u.Email == input.ToLower());
 
-            return userCount == 0 ? 0 : 1;
+            return userCount == 0;
         }
 
         [HttpGet("GetInvestigationServicesByInsuranceType")]
@@ -116,11 +116,11 @@ namespace risk.control.system.Controllers.Common
 
         [AllowAnonymous]
         [HttpGet("GetCountryIsdCode")]
-        public IActionResult GetCountryIsdCode(string term = "")
+        public async Task<IActionResult> GetCountryIsdCode(string term = "")
         {
             try
             {
-                var allCountries = _context.Country.AsNoTracking().ToList();
+                var allCountries = await _context.Country.AsNoTracking().ToListAsync();
 
                 if (string.IsNullOrEmpty(term))
                     return Ok(allCountries
@@ -158,11 +158,11 @@ namespace risk.control.system.Controllers.Common
 
         [AllowAnonymous]
         [HttpGet("GetIsdCode")]
-        public IActionResult GetIsdCode(string term = "")
+        public async Task<IActionResult> GetIsdCode(string term = "")
         {
             try
             {
-                var allCountries = _context.Country.AsNoTracking().ToList();
+                var allCountries = await _context.Country.AsNoTracking().ToListAsync();
 
                 if (string.IsNullOrEmpty(term))
                     return Ok(allCountries

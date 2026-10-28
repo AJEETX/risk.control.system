@@ -39,9 +39,9 @@ namespace risk.control.system.Controllers.CompanyAdmin
             return View();
         }
 
-        public IActionResult GetCaseEnablers()
+        public async Task<IActionResult> GetCaseEnablers()
         {
-            var data = _context.CaseEnabler
+            var data = await _context.CaseEnabler
                 .Select(c => new
                 {
                     c.CaseEnablerId,
@@ -49,35 +49,10 @@ namespace risk.control.system.Controllers.CompanyAdmin
                     c.Code,
                     Updated = c.Updated ?? c.Created,
                     UpdateBy = c.UpdatedBy
-                }).ToList();
+                }).OrderByDescending(o => o.Updated)
+                .ToListAsync();
 
             return Json(new { data });
-        }
-
-        [Breadcrumb("Details ")]
-        public async Task<IActionResult> Details(int id)
-        {
-            if (id < 1)
-            {
-                notifyService.Error("Reason Not found!");
-                return RedirectToAction(nameof(Profile));
-            }
-            try
-            {
-                var caseEnabler = await _context.CaseEnabler.FirstOrDefaultAsync(m => m.CaseEnablerId == id);
-                if (caseEnabler == null)
-                {
-                    notifyService.Error("Reason Not found!");
-                    return RedirectToAction(nameof(Profile));
-                }
-                return View(caseEnabler);
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, $"Error occurred.");
-                notifyService.Error("Error to get Reason !");
-                return RedirectToAction(nameof(Profile));
-            }
         }
 
         [Breadcrumb("Add  New", FromAction = nameof(Profile))]

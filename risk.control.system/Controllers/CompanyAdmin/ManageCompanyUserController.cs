@@ -15,32 +15,22 @@ namespace risk.control.system.Controllers.CompanyAdmin
 {
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME}")]
     [Breadcrumb("Manage Company")]
-    public class ManageCompanyUserController : Controller
-    {
-        private readonly INotyfService _notifyService;
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly IManageCompanyUserService _manageCompanyUserService;
-        private readonly IErrorNotifyService _errorNotifyService;
-        private readonly ILogger<ManageCompanyUserController> _logger;
-        private readonly string _baseUrl;
-
-        public ManageCompanyUserController(
+    public class ManageCompanyUserController(
             UserManager<ApplicationUser> userManager,
             IManageCompanyUserService manageCompanyUserService,
             IErrorNotifyService errorNotifyService,
             INotyfService notifyService,
              IHttpContextAccessor httpContextAccessor,
-            ILogger<ManageCompanyUserController> logger)
-        {
-            _userManager = userManager;
-            _manageCompanyUserService = manageCompanyUserService;
-            _errorNotifyService = errorNotifyService;
-            _notifyService = notifyService;
-            _logger = logger;
-            var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
-            var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
-            _baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
-        }
+             IEncryptionService encryptionService,
+            ILogger<ManageCompanyUserController> logger) : Controller
+    {
+        private readonly IEncryptionService _encryptionService = encryptionService;
+        private readonly INotyfService _notifyService = notifyService;
+        private readonly UserManager<ApplicationUser> _userManager = userManager;
+        private readonly IManageCompanyUserService _manageCompanyUserService = manageCompanyUserService;
+        private readonly IErrorNotifyService _errorNotifyService = errorNotifyService;
+        private readonly ILogger<ManageCompanyUserController> _logger = logger;
+        private readonly string _baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent()}{httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent()}";
 
         public IActionResult Index()
         {
@@ -113,13 +103,13 @@ namespace risk.control.system.Controllers.CompanyAdmin
         }
 
         [Breadcrumb("Edit User", FromAction = nameof(Users))]
-        public async Task<IActionResult> Edit(long? id)
+        public async Task<IActionResult> Edit([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id)
         {
-            if (id == null) return RedirectToAction(nameof(Users));
+            if (id <= 0) return RedirectToAction(nameof(Users));
 
             try
             {
-                var model = await _manageCompanyUserService.GetUserForEditAsync(id.Value);
+                var model = await _manageCompanyUserService.GetUserForEditAsync(id);
                 if (model == null)
                 {
                     _notifyService.Error("User not found.");
@@ -137,12 +127,12 @@ namespace risk.control.system.Controllers.CompanyAdmin
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, ApplicationUser model)
+        public async Task<IActionResult> Edit([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id, ApplicationUser model)
         {
             var userEmail = User.Identity?.Name!;
-            id = id.Replace("\n", "").Replace("\r", "").Trim();
             try
             {
+                model.Id = id;
                 if (!ModelState.IsValid)
                 {
                     _errorNotifyService.ShowErrorNotification(ModelState);
@@ -176,16 +166,15 @@ namespace risk.control.system.Controllers.CompanyAdmin
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(string userId)
         {
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                return Json(new { success = false, message = "Invalid user id" });
+            }
             var userEmail = HttpContext.User?.Identity?.Name;
-            userId = userId.Replace("\n", "").Replace("\r", "").Trim();
+            var id = _encryptionService.UnprotectId(userId);
             try
             {
-                if (string.IsNullOrWhiteSpace(userId))
-                {
-                    return Json(new { success = false, message = "Invalid user id" });
-                }
-
-                var user = await _userManager.FindByIdAsync(userId);
+                var user = await _userManager.FindByIdAsync(id.ToString());
                 if (user == null)
                 {
                     return Json(new { success = false, message = "User not found" });
@@ -196,6 +185,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 {
                     return Json(new { success = false, message = "Company Admin cannot be deleted" });
                 }
+                await _manageCompanyUserService.DeleteUserAsync(user);
 
                 var result = await _userManager.DeleteAsync(user);
 
@@ -204,7 +194,6 @@ namespace risk.control.system.Controllers.CompanyAdmin
                     var errors = string.Join(", ", result.Errors.Select(e => e.Description));
                     return Json(new { success = false, message = errors });
                 }
-
                 return Json(new { success = true, message = "User deleted successfully" });
             }
             catch (Exception ex)

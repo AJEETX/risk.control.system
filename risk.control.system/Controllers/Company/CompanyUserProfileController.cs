@@ -78,7 +78,7 @@ namespace risk.control.system.Controllers.Company
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, ApplicationUser model)
+        public async Task<IActionResult> Edit(long id, ApplicationUser model)
         {
             var userEmail = HttpContext.User?.Identity?.Name!;
             try

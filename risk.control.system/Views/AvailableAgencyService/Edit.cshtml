@@ -5,7 +5,7 @@
 }
 
 <section class="content">
-	<form id="edit-form" asp-action="Edit" method="post" enctype="multipart/form-data">
+	<form id="edit-form" asp-action="Edit" method="post" asp-route-id="@Model.VendorInvestigationServiceTypeId"  enctype="multipart/form-data">
 		<div class="card shadow-lg border-1 rounded-lg">
 			<div class="card-header bg-secondary text-white text-center">
 				<h3 class="card-title"><i class="fas fa-cog"></i> Edit Service</h3>

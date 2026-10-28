@@ -40,9 +40,9 @@ namespace risk.control.system.Controllers.CompanyAdmin
             return View();
         }
 
-        public IActionResult GetCostCentres()
+        public async Task<IActionResult> GetCostCentres()
         {
-            var data = _context.CostCentre
+            var data = await _context.CostCentre
                 .Select(c => new
                 {
                     c.CostCentreId,
@@ -50,36 +50,10 @@ namespace risk.control.system.Controllers.CompanyAdmin
                     c.Code,
                     Updated = c.Updated ?? c.Created,
                     UpdateBy = c.UpdatedBy
-                }).ToList();
+                }).OrderByDescending(o => o.Updated)
+                .ToListAsync();
 
             return Json(new { data });
-        }
-
-        // GET: CostCentre/Details/5
-        [Breadcrumb("Details")]
-        public async Task<IActionResult> Details(long id)
-        {
-            if (id < 1 || _context.CostCentre == null)
-            {
-                notifyService.Error("Budget Centre Not found!");
-                return RedirectToAction(nameof(Profile));
-            }
-            try
-            {
-                var costCentre = await _context.CostCentre.FirstOrDefaultAsync(m => m.CostCentreId == id);
-                if (costCentre == null)
-                {
-                    notifyService.Error("Budget Centre Not found!");
-                    return RedirectToAction(nameof(Profile));
-                }
-                return View(costCentre);
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Error to get Budget Centre.");
-                notifyService.Error("Error to get Budget Centre. Try again.");
-                return RedirectToAction(nameof(Profile));
-            }
         }
 
         // GET: CostCentre/Create

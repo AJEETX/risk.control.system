@@ -2,7 +2,7 @@
 {
     public class UserDetailResponse
     {
-        public long Id { get; set; }
+        public string Id { get; set; } = string.Empty;
         public int? Count { get; set; }
         public string? Name { get; set; }
         public string? Email { get; set; }

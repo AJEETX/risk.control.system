@@ -92,7 +92,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                     s.ISDCode,
                     IsUpdated = s.IsUpdated,
                     lastModified = s.Updated
-                })
+                }).OrderByDescending(o => o.lastModified)
                 .ToListAsync();
 
             // Prepare DataTables response

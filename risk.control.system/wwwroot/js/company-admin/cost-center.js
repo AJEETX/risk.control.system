@@ -70,6 +70,7 @@
         fixedHeader: true,
         processing: true,
         paging: true,
+        order: [],
         language: {
             loadingRecords: '&nbsp;',
             processing: '<i class="fas fa-sync fa-spin fa-4x fa-fw"></i><span class="sr-only">Loading...</span>'
