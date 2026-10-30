@@ -8,16 +8,10 @@ namespace risk.control.system.Controllers.Common
 {
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME},{AGENCY_ADMIN.DISPLAY_NAME},{CREATOR.DISPLAY_NAME},{ASSESSOR.DISPLAY_NAME},{MANAGER.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME},{AGENT.DISPLAY_NAME}")]
     [ApiExplorerSettings(IgnoreApi = true)]
-    public class DownloadController : ControllerBase
+    public class DownloadController(ApplicationDbContext context, ILogger<DownloadController> logger) : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
-        private readonly ILogger<DownloadController> _logger;
-
-        public DownloadController(ApplicationDbContext context, ILogger<DownloadController> logger)
-        {
-            this._context = context;
-            this._logger = logger;
-        }
+        private readonly ApplicationDbContext _context = context;
+        private readonly ILogger<DownloadController> _logger = logger;
 
         public async Task<IActionResult> EnquiryFileAttachment(int id)
         {

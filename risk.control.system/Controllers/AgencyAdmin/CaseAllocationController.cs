@@ -12,32 +12,20 @@ using risk.control.system.Services.Common;
 namespace risk.control.system.Controllers.AgencyAdmin
 {
     [Authorize(Roles = $"{AGENCY_ADMIN.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME}")]
-    public class CaseAllocationController : Controller
-    {
-        private readonly string baseUrl;
-        private readonly IAgencyAgentAllocationService _agentAllocationService;
-        private readonly INotyfService _notifyService;
-        private readonly ICaseNotificationService _mailService;
-        private readonly ILogger<CaseAllocationController> _logger;
-        private readonly IBackgroundJobClient _backgroundJobClient;
-
-        public CaseAllocationController(
-            IAgencyAgentAllocationService vendorAgentAllocationService,
+    public class CaseAllocationController(
+            IAgencyAgentAllocationService agencyAgentAllocationService,
             INotyfService notifyService,
             IBackgroundJobClient backgroundJobClient,
             IHttpContextAccessor httpContextAccessor,
-            ICaseNotificationService mailboxService,
-            ILogger<CaseAllocationController> logger)
-        {
-            _agentAllocationService = vendorAgentAllocationService;
-            _notifyService = notifyService;
-            _mailService = mailboxService;
-            _logger = logger;
-            _backgroundJobClient = backgroundJobClient;
-            var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
-            var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
-            baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
-        }
+            ICaseNotificationService notificationService,
+            ILogger<CaseAllocationController> logger) : Controller
+    {
+        private readonly string _baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent()}{httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent()}";
+        private readonly IAgencyAgentAllocationService _agentAllocationService = agencyAgentAllocationService;
+        private readonly INotyfService _notifyService = notifyService;
+        private readonly ICaseNotificationService _notificationService = notificationService;
+        private readonly ILogger<CaseAllocationController> _logger = logger;
+        private readonly IBackgroundJobClient _backgroundJobClient = backgroundJobClient;
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -78,7 +66,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
         private void ProcessSuccess(AllocateVendorAgentResult result, string userEmail, long caseId)
         {
             _backgroundJobClient.Enqueue(() =>
-                _mailService.NotifyCaseAssignmentToVendorAgent(userEmail, caseId, result.VendorAgentEmail!, result.VendorId, baseUrl));
+                _notificationService.NotifyCaseAssignmentToVendorAgent(userEmail, caseId, result.VendorAgentEmail!, result.VendorId, _baseUrl));
 
             _notifyService.Custom($"Case <b>#{result.ContractNumber}</b> Tasked to {result.VendorAgentEmail}", 3, "green", "far fa-file-powerpoint");
         }

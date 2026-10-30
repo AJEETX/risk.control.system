@@ -17,18 +17,11 @@ namespace risk.control.system.Controllers.CompanyAdmin
 {
     [Breadcrumb("General Setup")]
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME}")]
-    public class CountryController : Controller
+    public class CountryController(ApplicationDbContext context, INotyfService notifyService, ILogger<CountryController> logger) : Controller
     {
-        private readonly ApplicationDbContext _context;
-        private readonly INotyfService notifyService;
-        private readonly ILogger<CountryController> logger;
-
-        public CountryController(ApplicationDbContext context, INotyfService notifyService, ILogger<CountryController> logger)
-        {
-            _context = context;
-            this.notifyService = notifyService;
-            this.logger = logger;
-        }
+        private readonly ApplicationDbContext _context = context;
+        private readonly INotyfService _notifyService = notifyService;
+        private readonly ILogger<CountryController> _logger = logger;
 
         // GET: RiskCaseStatus
         public IActionResult Index()
@@ -92,7 +85,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                     s.ISDCode,
                     IsUpdated = s.IsUpdated,
                     lastModified = s.Updated
-                })
+                }).OrderByDescending(o => o.lastModified)
                 .ToListAsync();
 
             // Prepare DataTables response
@@ -113,7 +106,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
         {
             if (id < 1)
             {
-                notifyService.Error("Country not found!");
+                _notifyService.Error("Country not found!");
                 return NotFound();
             }
 
@@ -121,7 +114,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 .FirstOrDefaultAsync(m => m.CountryId == id);
             if (country == null)
             {
-                notifyService.Error("Country not found!");
+                _notifyService.Error("Country not found!");
                 return NotFound();
             }
 
@@ -140,7 +133,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
         {
             if (!ModelState.IsValid)
             {
-                notifyService.Error("Invalid Data!");
+                _notifyService.Error("Invalid Data!");
                 return RedirectToAction(nameof(Create));
             }
             try
@@ -152,12 +145,12 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 country.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Add(country);
                 await _context.SaveChangesAsync(null, false);
-                notifyService.Success("country added successfully!");
+                _notifyService.Success("country added successfully!");
                 return RedirectToAction(nameof(Profile));
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred");
+                _logger.LogError(ex, "Error occurred");
                 return RedirectToAction(nameof(Create));
             }
         }
@@ -168,14 +161,14 @@ namespace risk.control.system.Controllers.CompanyAdmin
         {
             if (id < 1)
             {
-                notifyService.Error("Country not found!");
+                _notifyService.Error("Country not found!");
                 return NotFound();
             }
 
             var country = await _context.Country.FirstOrDefaultAsync(c => c.CountryId == id);
             if (country == null)
             {
-                notifyService.Error("Country not found!");
+                _notifyService.Error("Country not found!");
                 return NotFound();
             }
             return View(country);
@@ -190,7 +183,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
         {
             if (id != country.CountryId)
             {
-                notifyService.Error("Country not found!");
+                _notifyService.Error("Country not found!");
                 return NotFound();
             }
 
@@ -208,13 +201,13 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 }
                 catch (Exception ex)
                 {
-                    logger.LogError(ex, "Error occurred");
+                    _logger.LogError(ex, "Error occurred");
                     return RedirectToAction(nameof(Edit), new { id = id });
                 }
-                notifyService.Success("country edited successfully!");
+                _notifyService.Success("country edited successfully!");
                 return RedirectToAction(nameof(Profile));
             }
-            notifyService.Error("Error to edit country!");
+            _notifyService.Error("Error to edit country!");
             return View(country);
         }
 
@@ -224,7 +217,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
         {
             if (id < 1)
             {
-                notifyService.Error("Country not found!");
+                _notifyService.Error("Country not found!");
                 return NotFound();
             }
 
@@ -232,7 +225,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 .FirstOrDefaultAsync(m => m.CountryId == id);
             if (country == null)
             {
-                notifyService.Error("Country not found!");
+                _notifyService.Error("Country not found!");
                 return NotFound();
             }
 
@@ -246,7 +239,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
         {
             if (id < 1)
             {
-                notifyService.Error("Country not found!");
+                _notifyService.Error("Country not found!");
                 return RedirectToAction(nameof(Profile));
             }
             var country = await _context.Country.FindAsync(id);
@@ -258,7 +251,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             }
 
             await _context.SaveChangesAsync(null, false);
-            notifyService.Success("Country deleted successfully!");
+            _notifyService.Success("Country deleted successfully!");
             return RedirectToAction(nameof(Profile));
         }
     }

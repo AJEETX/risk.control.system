@@ -10,55 +10,61 @@ using risk.control.system.Services.Common;
 namespace risk.control.system.Controllers.Creator
 {
     [Authorize(Roles = $"{CREATOR.DISPLAY_NAME}")]
-    public class AssignCaseController : Controller
-    {
-        private readonly string _baseUrl;
-        private readonly IAssignCaseService _assignCaseService;
-        private readonly ICaseNotificationService _mailService;
-        private readonly INotyfService _notifyService;
-        private readonly ILogger<AssignCaseController> _logger;
-        private readonly IBackgroundJobClient _backgroundJobClient;
-
-        public AssignCaseController(
+    public class AssignCaseController(
             IAssignCaseService assignCaseService,
-            ICaseNotificationService mailboxService,
+            IEncryptionService encryptionService,
+            ICaseNotificationService caseNotificationService,
             INotyfService notifyService,
             IHttpContextAccessor httpContextAccessor,
             ILogger<AssignCaseController> logger,
-            IBackgroundJobClient backgroundJobClient)
-        {
-            _assignCaseService = assignCaseService;
-            _mailService = mailboxService;
-            _notifyService = notifyService;
-            _logger = logger;
-            _backgroundJobClient = backgroundJobClient;
-            var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
-            var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
-            _baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
-        }
+            IBackgroundJobClient backgroundJobClient) : Controller
+    {
+        private readonly string _baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent()}{httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent()}";
+        private readonly IEncryptionService _encryptionService = encryptionService;
+        private readonly IAssignCaseService _assignCaseService = assignCaseService;
+        private readonly ICaseNotificationService _caseNotificationService = caseNotificationService;
+        private readonly INotyfService _notifyService = notifyService;
+        private readonly ILogger<AssignCaseController> _logger = logger;
+        private readonly IBackgroundJobClient _backgroundJobClient = backgroundJobClient;
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AssignAuto(List<long> cases)
+        public async Task<IActionResult> AssignAuto(List<string> caseIds)
         {
             var userEmail = HttpContext.User?.Identity?.Name!;
             try
             {
-                if (!ModelState.IsValid || cases == null || cases.Count == 0)
+                if (!ModelState.IsValid || caseIds == null || caseIds.Count == 0)
                 {
                     _notifyService.Custom($"No Case selected!!!. Please select Case to be assigned.", 3, "red", "far fa-file-powerpoint");
                     return RedirectToAction(nameof(AddAssignController.New), ControllerName<AddAssignController>.Name);
                 }
 
                 // AUTO ALLOCATION COUNT
-                var distinctCases = cases.Distinct().ToList();
-                var affectedRows = await _assignCaseService.UpdateCaseAllocationStatus(userEmail, distinctCases);
+                var distinctCases = caseIds.Distinct().ToList();
+                var decryptedCaseIds = new List<long>();
+
+                foreach (var encryptedId in distinctCases)
+                {
+                    var decryptedId = _encryptionService.UnprotectId(encryptedId);
+                    if (decryptedId > 0)
+                    {
+                        decryptedCaseIds.Add(decryptedId);
+                    }
+                }
+
+                if (decryptedCaseIds.Count == 0)
+                {
+                    _notifyService.Custom($"No valid Case found!!!. Please select Case to be assigned.", 3, "red", "far fa-file-powerpoint");
+                    return RedirectToAction(nameof(AddAssignController.New), ControllerName<AddAssignController>.Name);
+                }
+                var affectedRows = await _assignCaseService.UpdateCaseAllocationStatus(userEmail, decryptedCaseIds);
                 if (affectedRows < distinctCases.Count)
                 {
                     _notifyService.Custom($"Case(s) assignment error", 3, "orange", "far fa-file-powerpoint");
                     return RedirectToAction(nameof(AddAssignController.New), ControllerName<AddAssignController>.Name);
                 }
-                var jobId = _backgroundJobClient.Enqueue(() => _assignCaseService.BackgroundAutoAllocation(distinctCases, userEmail, _baseUrl));
+                var jobId = _backgroundJobClient.Enqueue(() => _assignCaseService.BackgroundAutoAllocation(decryptedCaseIds, userEmail, _baseUrl));
                 _notifyService.Custom($"Assignment of <b> {distinctCases.Count}</b> Case(s) started", 3, "orange", "far fa-file-powerpoint");
                 return RedirectToAction(nameof(CaseActiveController.Active), ControllerName<CaseActiveController>.Name, new { jobId });
             }
@@ -72,7 +78,7 @@ namespace risk.control.system.Controllers.Creator
 
         [ValidateAntiForgeryToken]
         [HttpPost]
-        public async Task<IActionResult> AllocateSingle2Vendor(long selectedcase, long caseId)
+        public async Task<IActionResult> AllocateSingle2Vendor([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long selectedcase, long caseId)
         {
             var userEmail = HttpContext.User?.Identity?.Name!;
             try
@@ -91,7 +97,7 @@ namespace risk.control.system.Controllers.Creator
                     return RedirectToAction(nameof(AddAssignController.New), ControllerName<AddAssignController>.Name);
                 }
 
-                var jobId = _backgroundJobClient.Enqueue(() => _mailService.NotifyCaseAllocationToVendorAndManager(userEmail, policy, caseId, selectedcase, _baseUrl));
+                var jobId = _backgroundJobClient.Enqueue(() => _caseNotificationService.NotifyCaseAllocationToVendorAndManager(userEmail, policy, caseId, selectedcase, _baseUrl));
 
                 _notifyService.Custom($"Case <b>#{policy}</b> <i>{status}</i> to {agencyName}", 3, "green", "far fa-file-powerpoint");
 
@@ -126,9 +132,9 @@ namespace risk.control.system.Controllers.Creator
                     return RedirectToAction(nameof(AddAssignController.New), ControllerName<AddAssignController>.Name);
                 }
 
-                var jobId = _backgroundJobClient.Enqueue(() => _mailService.NotifyCaseAllocationToAgencyAndManager(userEmail, policy, caseId, selectedcase, _baseUrl));
+                var jobId = _backgroundJobClient.Enqueue(() => _caseNotificationService.NotifyCaseAllocationToAgencyAndManager(userEmail, policy, caseId, selectedcase, _baseUrl));
 
-                _notifyService.Custom($"Case <b>#{policy}</b> <i>{status}</i> to {agencyName}", 3, "green", "far fa-file-powerpoint");
+                _notifyService.Custom($"Case <b>#{policy}</b> <i>{status}</i> to {agencyName}", 3, "orange", "far fa-file-powerpoint");
 
                 return RedirectToAction(nameof(ClaimController.Active), ControllerName<ClaimController>.Name);
             }
@@ -159,7 +165,7 @@ namespace risk.control.system.Controllers.Creator
                     _notifyService.Custom($"Case #:{allocatedCaseNumber} Not Assigned", 3, "orange", "far fa-file-powerpoint");
                     return RedirectToAction(nameof(AddAssignController.New), ControllerName<AddAssignController>.Name);
                 }
-                _notifyService.Custom($"Case <b>#:{allocatedCaseNumber}</b> Assigned<sub>auto</b>", 3, "green", "far fa-file-powerpoint");
+                _notifyService.Custom($"Case <b>#:{allocatedCaseNumber}</b> Assigned<sub>auto</b>", 3, "orange", "far fa-file-powerpoint");
             }
             catch (Exception ex)
             {

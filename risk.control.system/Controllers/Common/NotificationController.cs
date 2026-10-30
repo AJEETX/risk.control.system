@@ -12,17 +12,11 @@ namespace risk.control.system.Controllers.Common
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME},{AGENCY_ADMIN.DISPLAY_NAME},{CREATOR.DISPLAY_NAME},{ASSESSOR.DISPLAY_NAME},{MANAGER.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME},{AGENT.DISPLAY_NAME}")]
     [Route("api/[controller]")]
     [ApiController]
-    public class NotificationController : ControllerBase
+    public class NotificationController(INotificationService notificationService, ILogger<NotificationController> logger) : ControllerBase
     {
         private readonly int maxCountReached = 10;
-        private readonly INotificationService _notificationService;
-        private readonly ILogger<NotificationController> _logger;
-
-        public NotificationController(INotificationService notificationService, ILogger<NotificationController> logger)
-        {
-            _notificationService = notificationService;
-            _logger = logger;
-        }
+        private readonly INotificationService _notificationService = notificationService;
+        private readonly ILogger<NotificationController> _logger = logger;
 
         [HttpPost("ClearAll")]
         [ValidateAntiForgeryToken]

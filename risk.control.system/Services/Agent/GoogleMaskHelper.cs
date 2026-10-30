@@ -9,7 +9,6 @@ namespace risk.control.system.Services.Agent
         byte[] MaskPanTextInImage(byte[] inputImage, IReadOnlyList<TextBlock> annotations, string txt2Find);
         byte[] MaskAdharNumberTextInImage(byte[] inputImage, IReadOnlyList<TextBlock> annotations, string adharNumber);
         byte[] MaskPanTextInImage(byte[] inputImage, IReadOnlyList<EntityAnnotation> textAnnotations, string txt2Find);
-
         byte[] MaskPassportTextInImage(byte[] inputImage, IReadOnlyList<EntityAnnotation> textAnnotations, string passportNumber);
     }
 

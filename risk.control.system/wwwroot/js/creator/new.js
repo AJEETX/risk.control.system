@@ -121,7 +121,7 @@
                         return '<i class="fas fa-exclamation-triangle i-orangered" data-bs-toggle="tooltip" title="Incomplete"></i>';
                     }
                     else {
-                        var img = '<input class="vendors" name="cases" type="checkbox" id="' + row.id + '"  value="' + row.id + '"  data-bs-toggle="tooltip" title="Assign <sub>auto</sub> / delete" />';
+                        var img = '<input class="cases" name="caseIds" type="checkbox" id="' + row.id + '"  value="' + row.id + '"  data-bs-toggle="tooltip" title="Assign <sub>auto</sub> / delete" />';
                         return img;
                     }
                 }
@@ -510,7 +510,7 @@
             }
         });
 
-        var checkboxes = $("input[type='checkbox'].vendors");
+        var checkboxes = $("input[type='checkbox'].cases");
         var anyChecked = checkIfAnyChecked(checkboxes);
 
         if (!anyChecked) {
@@ -575,12 +575,12 @@
     $('#deletecase').on('click', function (e) {
         e.preventDefault(); // Prevent form submission
 
-        var selectedCases = [];
-        $("input[type='checkbox'].vendors:checked").each(function () {
-            selectedCases.push($(this).val()); // Get checked case IDs
+        var encryptedCaseIds = [];
+        $("input[type='checkbox'].cases:checked").each(function () {
+            encryptedCaseIds.push($(this).val()); // Get checked case IDs
         });
 
-        if (selectedCases.length === 0) {
+        if (encryptedCaseIds.length === 0) {
             $.alert({
                 title: "Delete !",
                 content: "Please select Case(s) to delete.",
@@ -608,7 +608,7 @@
                     text: "Delete",
                     btnClass: 'btn-danger',
                     action: function () {
-                        deleteSelectedCases(selectedCases);
+                        deleteSelectedCases(encryptedCaseIds);
                     }
                 },
                 cancel: {
@@ -618,11 +618,11 @@
             }
         });
     });
-    function deleteSelectedCases(cases) {
+    function deleteSelectedCases(encryptedCaseIds) {
         $.ajax({
             url: "/DeleteCase/DeleteCases", // Update with your actual delete endpoint
             type: "POST",
-            data: JSON.stringify({ cases: cases }),
+            data: JSON.stringify({ encryptedCaseIds: encryptedCaseIds }),
             headers: {
                 "X-CSRF-TOKEN": $('input[name="__RequestVerificationToken"]').val(),
             },

@@ -2,6 +2,7 @@
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
+using risk.control.system.Services.Common;
 using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Services.Api
@@ -14,10 +15,10 @@ namespace risk.control.system.Services.Api
     }
 
     internal class AgencyInvestigationServiceService(
-        IDbContextFactory<ApplicationDbContext> contextFactory) : IAgencyInvestigationServiceService
+        IDbContextFactory<ApplicationDbContext> contextFactory, IEncryptionService encryptionService) : IAgencyInvestigationServiceService
     {
         private readonly IDbContextFactory<ApplicationDbContext> _contextFactory = contextFactory;
-
+        private readonly IEncryptionService _encryptionService = encryptionService;
         public async Task<List<AgencyServiceResponse>> GetAgencyService(long vendorId)
         {
             await using var _context = await _contextFactory.CreateDbContextAsync();
@@ -34,7 +35,7 @@ namespace risk.control.system.Services.Api
                 return new AgencyServiceResponse
                 {
                     VendorId = service.VendorId,
-                    Id = service.VendorInvestigationServiceTypeId,
+                    Id = _encryptionService.ProtectId(service.Id),
                     CaseType = service.InsuranceType!.GetEnumDisplayName(),
                     ServiceType = service.InvestigationServiceType!.Name,
                     District = districtNames,
@@ -62,8 +63,8 @@ namespace risk.control.system.Services.Api
             var servicesData = await _context.VendorInvestigationServiceType.AsNoTracking().Where(s => s.VendorId == vendorId && !s.Vendor!.Deleted).OrderBy(s => s.InvestigationServiceType!.Name)
                 .Select(s => new
                 {
-                    s.VendorId,
-                    s.VendorInvestigationServiceTypeId,
+                    VendorId = s.VendorId,
+                    Id = _encryptionService.ProtectId(s.Id),
                     s.Price,
                     s.SelectedDistrictIds,
                     s.Updated,
@@ -85,7 +86,7 @@ namespace risk.control.system.Services.Api
                 return new AgencyServiceResponse
                 {
                     VendorId = service.VendorId,
-                    Id = service.VendorInvestigationServiceTypeId,
+                    Id = service.Id,
                     CaseType = service.InsuranceType!.GetEnumDisplayName(),
                     ServiceType = service.ServiceTypeName,
                     District = districtNames,

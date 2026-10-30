@@ -11,21 +11,14 @@ namespace risk.control.system.Controllers.Creator
 {
     [Authorize(Roles = $"{CREATOR.DISPLAY_NAME},{MANAGER.DISPLAY_NAME}")]
     [Breadcrumb("Cases")]
-    public class CaseUploadController : Controller
-    {
-        private readonly ICaseUploadService _caseUploadService;
-        private readonly ILogger<CaseUploadController> _logger;
-        private readonly INotyfService _notifyService;
-
-        public CaseUploadController(
+    public class CaseUploadController(
             ICaseUploadService caseUploadService,
             ILogger<CaseUploadController> logger,
-            INotyfService notifyService)
-        {
-            _caseUploadService = caseUploadService;
-            _logger = logger;
-            _notifyService = notifyService;
-        }
+            INotyfService notifyService) : Controller
+    {
+        private readonly ICaseUploadService _caseUploadService = caseUploadService;
+        private readonly ILogger<CaseUploadController> _logger = logger;
+        private readonly INotyfService _notifyService = notifyService;
 
         public IActionResult Index()
         {

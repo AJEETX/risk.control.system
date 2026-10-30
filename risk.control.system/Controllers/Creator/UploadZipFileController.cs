@@ -10,30 +10,19 @@ using risk.control.system.Services.Creator;
 namespace risk.control.system.Controllers.Creator
 {
     [Authorize(Roles = $"{CREATOR.DISPLAY_NAME}")]
-    public class UploadZipFileController : Controller
-    {
-        private readonly string _baseUrl;
-
-        private readonly IZipFileService _zipFileService;
-        private readonly INotyfService _notifyService;
-        private readonly ILogger<UploadZipFileController> _logger;
-        private readonly IBackgroundJobClient _backgroundJobClient;
-
-        public UploadZipFileController(
+    public class UploadZipFileController(
             IZipFileService zipFileService,
             INotyfService notifyService,
             IHttpContextAccessor httpContextAccessor,
             ILogger<UploadZipFileController> logger,
-            IBackgroundJobClient backgroundJobClient)
-        {
-            _zipFileService = zipFileService;
-            _notifyService = notifyService;
-            _logger = logger;
-            _backgroundJobClient = backgroundJobClient;
-            var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
-            var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
-            _baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
-        }
+            IBackgroundJobClient backgroundJobClient) : Controller
+    {
+        private readonly string _baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent()}{httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent()}";
+
+        private readonly IZipFileService _zipFileService = zipFileService;
+        private readonly INotyfService _notifyService = notifyService;
+        private readonly ILogger<UploadZipFileController> _logger = logger;
+        private readonly IBackgroundJobClient _backgroundJobClient = backgroundJobClient;
 
         [HttpPost]
         [ValidateAntiForgeryToken]

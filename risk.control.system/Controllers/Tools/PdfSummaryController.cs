@@ -20,9 +20,9 @@ public class PdfSummaryController(
     INotyfService notifyService,
     UserManager<ApplicationUser> userManager) : Controller
 {
-    private readonly ILogger<PdfSummaryController> logger = logger;
+    private readonly ILogger<PdfSummaryController> _logger = logger;
     private readonly INotyfService _notifyService = notifyService;
-    private readonly ITextAnalyticsService textAnalyticsService = textAnalyticsService;
+    private readonly ITextAnalyticsService _textAnalyticsService = textAnalyticsService;
     private readonly UserManager<ApplicationUser> _userManager = userManager; // Add UserManager
 
     public async Task<IActionResult> Index()
@@ -63,7 +63,7 @@ public class PdfSummaryController(
             string content = ExtractTextFromPdf(pdfFile);
             if (string.IsNullOrWhiteSpace(content)) return BadRequest(new { errorMessage = "The file content is empty." });
 
-            var summary = await textAnalyticsService.AbstractiveSummarizeAsync(content);
+            var summary = await _textAnalyticsService.AbstractiveSummarizeAsync(content);
 
             user.PdfCount++;
             await _userManager.UpdateAsync(user);
@@ -72,7 +72,7 @@ public class PdfSummaryController(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error processing PDF summary. {UserId}", user.Id);
+            _logger.LogError(ex, "Error processing PDF summary. {UserId}", user.Id);
             return Ok(new { summary = "Error occurred", remaining = 5 - user.PdfCount });
         }
     }

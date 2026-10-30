@@ -23,10 +23,12 @@ namespace risk.control.system.Services.Agent
 
     internal class AgentService(ApplicationDbContext context,
         IBase64FileService base64FileService,
+        IEncryptionService encryptionService,
         RoleManager<ApplicationRole> roleManager,
          ISmsService smsService,
         UserManager<ApplicationUser> userVendorManager) : IAgentService
     {
+        private readonly IEncryptionService _encryptionService = encryptionService;
         private readonly ApplicationDbContext _context = context;
         private readonly IBase64FileService _base64FileService = base64FileService;
         private readonly RoleManager<ApplicationRole> _roleManager = roleManager;
@@ -66,7 +68,7 @@ namespace risk.control.system.Services.Agent
 
                        return new CaseInvestigationAgencyResponse
                        {
-                           Id = a.Id,
+                           Id = _encryptionService.ProtectId(a.Id),
                            PolicyId = a.PolicyDetail!.ContractNumber,
                            Amount = string.Format(culture, "{0:C}", a.PolicyDetail.SumAssuredValue),
                            Company = a.ClientCompany!.Name,
@@ -138,7 +140,7 @@ namespace risk.control.system.Services.Agent
 
                        return new CaseInvestigationAgencyResponse
                        {
-                           Id = a.Id,
+                           Id = _encryptionService.ProtectId(a.Id),
                            PolicyId = a.PolicyDetail.ContractNumber,
                            Amount = string.Format(culture, "{0:C}", a.PolicyDetail.SumAssuredValue),
                            AssignedToAgency = a.AssignedToAgency,

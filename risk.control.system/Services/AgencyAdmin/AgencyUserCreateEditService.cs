@@ -1,30 +1,33 @@
 ﻿using System.Globalization;
 using System.Net;
 using System.Text.RegularExpressions;
-
 using AspNetCoreHero.ToastNotification.Abstractions;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.FeatureManagement;
 using risk.control.system.AppConstant;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
+using risk.control.system.Services.Agent;
 using risk.control.system.Services.Common;
 
 namespace risk.control.system.Services.AgencyAdmin
 {
     public interface IAgencyUserCreateEditService
     {
-        Task<(bool Success, string Message, Dictionary<string, string> Errors)> CreateVendorUserAsync(CreateVendorUserRequest request, ModelStateDictionary modelState, string portal_base_url);
+        Task<(bool Success, string Message, Dictionary<string, string> Errors)> CreateUserAsync(CreateVendorUserRequest request, ModelStateDictionary modelState, string portal_base_url);
 
-        Task<(bool Success, string Message, Dictionary<string, string> Errors)> EditVendorUserAsync(EditVendorUserRequest request, ModelStateDictionary modelState, string portal_base_url);
+        Task<(bool Success, string Message, Dictionary<string, string> Errors)> EditUserAsync(EditVendorUserRequest request, ModelStateDictionary modelState, string portal_base_url);
     }
 
     internal class AgencyUserCreateEditService(
         IValidateImageService validateImageService,
         UserManager<ApplicationUser> userManager,
+        IFeatureManager featureManager,
+        IAmazonApiService amazonApiService,
         ApplicationDbContext context,
         IFileStorageService fileStorage,
         IAwsFaceImageCheckService faceImageCheckService,
@@ -33,6 +36,8 @@ namespace risk.control.system.Services.AgencyAdmin
         ICustomApiClient geoClient,
         ITinyUrlService urlService) : IAgencyUserCreateEditService
     {
+        private readonly IAmazonApiService _amazonApiService = amazonApiService;
+        private readonly IFeatureManager _featureManager = featureManager;
         private readonly IValidateImageService _validateImageService = validateImageService;
         private readonly UserManager<ApplicationUser> _userManager = userManager;
         private readonly ApplicationDbContext _context = context;
@@ -43,7 +48,7 @@ namespace risk.control.system.Services.AgencyAdmin
         private readonly ICustomApiClient _geoClient = geoClient;
         private readonly ITinyUrlService _urlService = urlService;
 
-        public async Task<(bool Success, string Message, Dictionary<string, string> Errors)> CreateVendorUserAsync(CreateVendorUserRequest request, ModelStateDictionary modelState, string portal_base_url)
+        public async Task<(bool Success, string Message, Dictionary<string, string> Errors)> CreateUserAsync(CreateVendorUserRequest request, ModelStateDictionary modelState, string portal_base_url)
         {
             var errors = new Dictionary<string, string>();
 
@@ -88,11 +93,11 @@ namespace risk.control.system.Services.AgencyAdmin
             return userAdded;
         }
 
-        public async Task<(bool Success, string Message, Dictionary<string, string> Errors)> EditVendorUserAsync(EditVendorUserRequest request, ModelStateDictionary modelState, string portal_base_url)
+        public async Task<(bool Success, string Message, Dictionary<string, string> Errors)> EditUserAsync(EditVendorUserRequest request, ModelStateDictionary modelState, string portal_base_url)
         {
             var input = request.Model;
             var errors = new Dictionary<string, string>();
-            var user = await _userManager.FindByIdAsync(request.UserId);
+            var user = await _userManager.FindByIdAsync(request.UserId.ToString());
             if (user == null)
             {
                 errors.Add("Email", "User not found");
@@ -109,6 +114,19 @@ namespace risk.control.system.Services.AgencyAdmin
             if (input.ProfileImage?.Length > 0)
             {
                 var suffix = user.Email!.Split('@').Last();
+
+                if (await _featureManager.IsEnabledAsync(FeatureFlags.FACE_MATCH_CHECK))
+                {
+                    var imageCollection = EnvHelper.Get(CONSTANTS.FaceImageCollection);
+                    if (!string.IsNullOrEmpty(user.AwsFaceId))
+                    {
+                        await _amazonApiService.DeleteFacesAsync(imageCollection!, new List<string> { user.AwsFaceId });
+
+                        // Clear the fields in your DB
+                        user.AwsFaceId = null;
+                        user.FaceIndexedAt = null;
+                    }
+                }
                 await SaveProfileImageAsync(input, suffix, user.Email!);
             }
             UpdateUserFields(input, user, request.UpdatedBy);
@@ -134,6 +152,8 @@ namespace risk.control.system.Services.AgencyAdmin
         {
             var safeFolder = Regex.Replace(suffix, @"[^a-zA-Z0-9\-\.]", "");
             var (fileName, path) = await _fileStorage.SaveAsync(model.ProfileImage!, safeFolder, "user");
+
+
             model.ProfilePictureUrl = path;
             model.ProfilePictureExtension = Path.GetExtension(fileName);
             await _faceImageCheckService.SetUserImageToAws(email);

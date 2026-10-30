@@ -12,16 +12,10 @@ namespace risk.control.system.Controllers.Api.Company
     [Route("api/[controller]")]
     [ApiController]
     [Authorize(Roles = ASSESSOR.DISPLAY_NAME)]
-    public class AssessorController : ControllerBase
+    public class AssessorController(IAssessorService assesorService, ILogger<AssessorController> logger) : ControllerBase
     {
-        private readonly IAssessorService assesorService;
-        private readonly ILogger<AssessorController> logger;
-
-        public AssessorController(IAssessorService assesorService, ILogger<AssessorController> logger)
-        {
-            this.assesorService = assesorService;
-            this.logger = logger;
-        }
+        private readonly IAssessorService _assesorService = assesorService;
+        private readonly ILogger<AssessorController> _logger = logger;
 
         [HttpGet("GetInvestigationReports")]
         public async Task<IActionResult> GetInvestigationReports(int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc")
@@ -30,13 +24,13 @@ namespace risk.control.system.Controllers.Api.Company
 
             try
             {
-                var response = await assesorService.GetInvestigationReports(userEmail, draw, start, length, search, caseType, orderColumn, orderDir);
+                var response = await _assesorService.GetInvestigationReports(userEmail, draw, start, length, search, caseType, orderColumn, orderDir);
 
                 return Ok(response);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred while getting investigations for user {UserEmail}", userEmail ?? "Anonymous");
+                _logger.LogError(ex, "Error occurred while getting investigations for user {UserEmail}", userEmail ?? "Anonymous");
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -48,13 +42,13 @@ namespace risk.control.system.Controllers.Api.Company
 
             try
             {
-                var response = await assesorService.GetReviewCases(userEmail, draw, start, length, search, caseType, orderColumn, orderDir);
+                var response = await _assesorService.GetReviewCases(userEmail, draw, start, length, search, caseType, orderColumn, orderDir);
 
                 return Ok(response);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred while getting review for user {UserEmail}", userEmail ?? "Anonymous");
+                _logger.LogError(ex, "Error occurred while getting review for user {UserEmail}", userEmail ?? "Anonymous");
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -66,12 +60,12 @@ namespace risk.control.system.Controllers.Api.Company
 
             try
             {
-                var response = await assesorService.GetApprovededCases(userEmail, draw, start, length, search, caseType, orderColumn, orderDir);
+                var response = await _assesorService.GetApprovededCases(userEmail, draw, start, length, search, caseType, orderColumn, orderDir);
                 return Ok(response);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred while getting approved cases for user {UserEmail}", userEmail ?? "Anonymous");
+                _logger.LogError(ex, "Error occurred while getting approved cases for user {UserEmail}", userEmail ?? "Anonymous");
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -83,13 +77,13 @@ namespace risk.control.system.Controllers.Api.Company
 
             try
             {
-                var response = await assesorService.GetRejectedCases(userEmail, draw, start, length, search, caseType, orderColumn, orderDir);
+                var response = await _assesorService.GetRejectedCases(userEmail, draw, start, length, search, caseType, orderColumn, orderDir);
 
                 return Ok(response);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred while getting rejected cases for user {UserEmail}", userEmail ?? "Anonymous");
+                _logger.LogError(ex, "Error occurred while getting rejected cases for user {UserEmail}", userEmail ?? "Anonymous");
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }

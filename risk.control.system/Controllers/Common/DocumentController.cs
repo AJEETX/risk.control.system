@@ -11,20 +11,13 @@ namespace risk.control.system.Controllers.Common
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME},{AGENCY_ADMIN.DISPLAY_NAME},{CREATOR.DISPLAY_NAME},{ASSESSOR.DISPLAY_NAME},{MANAGER.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME},{AGENT.DISPLAY_NAME}")]
     [Breadcrumb("Cases")]
     [ApiExplorerSettings(IgnoreApi = true)]
-    public class DocumentController : Controller
-    {
-        private readonly ILogger<CreatorController> _logger;
-        private readonly ApplicationDbContext _context;
-        private readonly IWebHostEnvironment _env;
-
-        public DocumentController(ILogger<CreatorController> logger,
+    public class DocumentController(ILogger<CreatorController> logger,
             ApplicationDbContext context,
-            IWebHostEnvironment env)
-        {
-            _logger = logger;
-            _context = context;
-            _env = env;
-        }
+            IWebHostEnvironment env) : Controller
+    {
+        private readonly ILogger<CreatorController> _logger = logger;
+        private readonly ApplicationDbContext _context = context;
+        private readonly IWebHostEnvironment _env = env;
 
         public async Task<IActionResult> GetPolicyDocument(long id)
         {

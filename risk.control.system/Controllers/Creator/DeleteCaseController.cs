@@ -5,30 +5,26 @@ using risk.control.system.AppConstant;
 using risk.control.system.Controllers.Common;
 using risk.control.system.Helpers;
 using risk.control.system.Models.ViewModel;
+using risk.control.system.Services.Common;
 using risk.control.system.Services.Creator;
 
 namespace risk.control.system.Controllers.Creator
 {
     [Authorize(Roles = $"{CREATOR.DISPLAY_NAME},{MANAGER.DISPLAY_NAME}")]
-    public class DeleteCaseController : Controller
-    {
-        private readonly IDeleteCaseService _deleteService;
-        private readonly INotyfService _notifyService;
-        private readonly ILogger<DeleteCaseController> _logger;
-
-        public DeleteCaseController(
+    public class DeleteCaseController(
             IDeleteCaseService deleteService,
+            IEncryptionService encryptionService,
             INotyfService notifyService,
-            ILogger<DeleteCaseController> logger)
-        {
-            _deleteService = deleteService;
-            _notifyService = notifyService;
-            _logger = logger;
-        }
+            ILogger<DeleteCaseController> logger) : Controller
+    {
+        private readonly IEncryptionService _encryptionService = encryptionService;
+        private readonly IDeleteCaseService _deleteService = deleteService;
+        private readonly INotyfService _notifyService = notifyService;
+        private readonly ILogger<DeleteCaseController> _logger = logger;
 
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteAutoConfirmed(long id)
+        public async Task<IActionResult> DeleteAutoConfirmed([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id)
         {
             var userEmail = User.Identity?.Name!;
             try
@@ -56,12 +52,31 @@ namespace risk.control.system.Controllers.Creator
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteCases([FromBody] DeleteRequestModel request)
         {
-            if (!ModelState.IsValid) return Json(new { success = false, message = "Invalid request." });
+            if (!ModelState.IsValid || request.EncryptedCaseIds == null || !request.EncryptedCaseIds.Any())
+            {
+                return Json(new { success = false, message = "Invalid request." });
+            }
 
             var userEmail = User.Identity?.Name!;
             try
             {
-                var (success, message) = await _deleteService.SoftDeleteBulkCasesAsync(request.cases, userEmail);
+                var decryptedCaseIds = new List<long>();
+
+                foreach (var encryptedId in request.EncryptedCaseIds)
+                {
+                    var decryptedId = _encryptionService.UnprotectId(encryptedId);
+                    if (decryptedId > 0)
+                    {
+                        decryptedCaseIds.Add(decryptedId);
+                    }
+                }
+
+                if (decryptedCaseIds.Count == 0)
+                {
+                    return Json(new { success = false, message = "No valid Cases found." });
+                }
+
+                var (success, message) = await _deleteService.SoftDeleteBulkCasesAsync(decryptedCaseIds, userEmail);
 
                 if (!success) return Json(new { success = false, message });
 

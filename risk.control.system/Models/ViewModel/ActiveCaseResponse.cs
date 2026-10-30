@@ -2,7 +2,8 @@
 {
     public class ActiveCaseResponse
     {
-        public long Id { get; set; }
+        public long RawId { get; set; }
+        public string Id { get; set; } = default!;
         public string? PolicyNum { get; set; }
         public bool AutoAllocated { get; set; }
         public bool AssignedToAgency { get; set; }

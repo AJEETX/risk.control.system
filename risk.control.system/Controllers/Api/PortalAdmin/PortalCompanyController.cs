@@ -10,22 +10,15 @@ namespace risk.control.system.Controllers.Api.PortalAdmin
     [Route("api/[controller]")]
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME}")]
     [ApiController]
-    public class PortalCompanyController : ControllerBase
-    {
-        private readonly ILogger<PortalCompanyController> logger;
-        private readonly ICompanyUserApiService companyUserApiService;
-        private readonly ICompanyService companyService;
-
-        public PortalCompanyController(
+    public class PortalCompanyController(
             ILogger<PortalCompanyController> logger,
             ICompanyUserApiService companyUserApiService,
             ICompanyService companyService
-            )
-        {
-            this.logger = logger;
-            this.companyUserApiService = companyUserApiService;
-            this.companyService = companyService;
-        }
+            ) : ControllerBase
+    {
+        private readonly ILogger<PortalCompanyController> _logger = logger;
+        private readonly ICompanyUserApiService _companyUserApiService = companyUserApiService;
+        private readonly ICompanyService _companyService = companyService;
 
         [HttpGet("AllCompanies")]
         public async Task<IActionResult> AllCompanies()
@@ -38,12 +31,12 @@ namespace risk.control.system.Controllers.Api.PortalAdmin
             }
             try
             {
-                var result = await companyService.GetCompanies();
+                var result = await _companyService.GetCompanies();
                 return Ok(result);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting companies for user {UserEmail}", userEmail ?? "Anonymous");
+                _logger.LogError(ex, "Error getting companies for user {UserEmail}", userEmail ?? "Anonymous");
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -63,13 +56,13 @@ namespace risk.control.system.Controllers.Api.PortalAdmin
             }
             try
             {
-                var result = await companyUserApiService.GetCompanyUsers(userEmail, id);
+                var result = await _companyUserApiService.GetCompanyUsers(userEmail, id);
 
                 return Ok(result);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting company users for user {UserEmail}", userEmail ?? "Anonymous");
+                _logger.LogError(ex, "Error getting company users for user {UserEmail}", userEmail ?? "Anonymous");
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }

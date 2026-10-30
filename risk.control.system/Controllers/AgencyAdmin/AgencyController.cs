@@ -11,29 +11,18 @@ namespace risk.control.system.Controllers.AgencyAdmin
 {
     [Breadcrumb("Admin Settings ")]
     [Authorize(Roles = $"{AGENCY_ADMIN.DISPLAY_NAME}")]
-    public class AgencyController : Controller
-    {
-        private readonly IAgencyProfileService _profileService;
-        private readonly IManageAgencyService _editService;
-        private readonly INotyfService _notifyService;
-        private readonly ILogger<AgencyController> _logger;
-        private readonly string _portalBaseUrl;
-
-        public AgencyController(
+    public class AgencyController(
             IAgencyProfileService profileService,
             IManageAgencyService editService,
             INotyfService notifyService,
             IHttpContextAccessor httpContextAccessor,
-            ILogger<AgencyController> logger)
-        {
-            _profileService = profileService;
-            _editService = editService;
-            _notifyService = notifyService;
-            _logger = logger;
-
-            var request = httpContextAccessor?.HttpContext?.Request;
-            _portalBaseUrl = $"{request?.Scheme}://{request?.Host.ToUriComponent()}{request?.PathBase.ToUriComponent()}";
-        }
+            ILogger<AgencyController> logger) : Controller
+    {
+        private readonly IAgencyProfileService _profileService = profileService;
+        private readonly IManageAgencyService _editService = editService;
+        private readonly INotyfService _notifyService = notifyService;
+        private readonly ILogger<AgencyController> _logger = logger;
+        private readonly string _portalBaseUrl = $"{httpContextAccessor?.HttpContext?.Request?.Scheme}://{httpContextAccessor?.HttpContext?.Request?.Host.ToUriComponent()}{httpContextAccessor?.HttpContext?.Request?.PathBase.ToUriComponent()}";
 
         public IActionResult Index() => RedirectToAction(nameof(Profile));
 

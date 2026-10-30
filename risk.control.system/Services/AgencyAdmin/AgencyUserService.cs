@@ -3,9 +3,12 @@ using System.Net;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.FeatureManagement;
+using risk.control.system.AppConstant;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
+using risk.control.system.Services.Agent;
 using risk.control.system.Services.Common;
 
 namespace risk.control.system.Services.AgencyAdmin
@@ -23,6 +26,10 @@ namespace risk.control.system.Services.AgencyAdmin
 
     internal class AgencyUserService(
         UserManager<ApplicationUser> userManager,
+        IAwsFaceImageCheckService userFaceCheckService,
+        IAmazonApiService amazonApiService,
+        IAwsFaceImageCheckService faceImageCheckService,
+        IFeatureManager featureManager,
         IFileStorageService fileStorageService,
         ApplicationDbContext context,
         ISmsService smsService) : IAgencyUserService
@@ -30,6 +37,10 @@ namespace risk.control.system.Services.AgencyAdmin
         private const long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
         private static readonly string[] AllowedExt = new[] { ".jpg", ".jpeg", ".png" };
         private static readonly string[] AllowedMime = new[] { "image/jpeg", "image/png" };
+        private readonly IAwsFaceImageCheckService _faceImageCheckService = faceImageCheckService;
+        private readonly IAmazonApiService _amazonApiService = amazonApiService;
+        private readonly IFeatureManager _featureManager = featureManager;
+        private readonly IAwsFaceImageCheckService _userFaceCheckService = userFaceCheckService;
         private readonly UserManager<ApplicationUser> _userManager = userManager;
         private readonly IFileStorageService _fileStorageService = fileStorageService;
         private readonly ApplicationDbContext _context = context;
@@ -48,7 +59,7 @@ namespace risk.control.system.Services.AgencyAdmin
 
             if (model.ProfileImage != null)
             {
-                var imageValidation = ValidateProfileImage(model.ProfileImage);
+                var imageValidation = await ValidateProfileImage(model);
                 if (!imageValidation.Success)
                     return imageValidation;
 
@@ -101,25 +112,49 @@ namespace risk.control.system.Services.AgencyAdmin
             return agencyUser!;
         }
 
-        private static ServiceResult ValidateProfileImage(IFormFile file)
+        private async Task<ServiceResult> ValidateProfileImage(ApplicationUser user)
         {
-            if (file.Length > MAX_FILE_SIZE)
+            if (user.ProfileImage!.Length > MAX_FILE_SIZE)
                 return Error(nameof(ApplicationUser.ProfileImage),
                     "Document image size exceeds the maximum limit (5MB).");
 
-            var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
+            var ext = Path.GetExtension(user.ProfileImage!.FileName).ToLowerInvariant();
             if (!AllowedExt.Contains(ext))
                 return Error(nameof(ApplicationUser.ProfileImage),
                     "Invalid document image type.");
 
-            if (!AllowedMime.Contains(file.ContentType))
+            if (!AllowedMime.Contains(user.ProfileImage!.ContentType))
                 return Error(nameof(ApplicationUser.ProfileImage),
                     "Invalid document image content type.");
 
-            if (!ImageSignatureValidator.HasValidSignature(file))
+            if (!ImageSignatureValidator.HasValidSignature(user.ProfileImage!))
                 return Error(nameof(ApplicationUser.ProfileImage),
                     "Invalid or corrupted document image.");
+            var singleFaceResult = await _userFaceCheckService.HasExactlyOneFace(user.ProfileImage!);
+            if (!singleFaceResult.IsValid)
+            {
+                return new ServiceResult { Success = false };
+            }
+            else
+            {
+                var matchedFace = await _userFaceCheckService.CheckFaceImageExistAsync(user.ProfileImage!);
+                if (matchedFace)
+                {
+                    return new ServiceResult { Success = false };
+                }
+            }
+            if (await _featureManager.IsEnabledAsync(FeatureFlags.FACE_MATCH_CHECK))
+            {
+                var imageCollection = EnvHelper.Get(CONSTANTS.FaceImageCollection);
+                if (!string.IsNullOrEmpty(user.AwsFaceId))
+                {
+                    await _amazonApiService.DeleteFacesAsync(imageCollection!, new List<string> { user.AwsFaceId });
 
+                    // Clear the fields in your DB
+                    user.AwsFaceId = null;
+                    user.FaceIndexedAt = null;
+                }
+            }
             return new ServiceResult { Success = true };
         }
 
@@ -130,6 +165,7 @@ namespace risk.control.system.Services.AgencyAdmin
 
             model.ProfilePictureUrl = relativePath;
             model.ProfilePictureExtension = Path.GetExtension(fileName);
+            await _faceImageCheckService.SetUserImageToAws(model.Email);
         }
 
         private static void MapUserFields(ApplicationUser user, ApplicationUser model, string updatedBy)

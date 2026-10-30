@@ -2,6 +2,6 @@
 {
     public class DeleteRequestModel
     {
-        public List<long> cases { get; set; } = default!;
+        public List<string> EncryptedCaseIds { get; set; } = default!;
     }
 }

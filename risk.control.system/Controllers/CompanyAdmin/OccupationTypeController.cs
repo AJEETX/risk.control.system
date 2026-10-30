@@ -10,18 +10,11 @@ namespace risk.control.system.Controllers.CompanyAdmin
 {
     [Breadcrumb("Company Settings ")]
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME}")]
-    public class OccupationTypeController : Controller
+    public class OccupationTypeController(ApplicationDbContext context, INotyfService notifyService, ILogger<OccupationTypeController> logger) : Controller
     {
-        private readonly ApplicationDbContext _context;
-        private readonly INotyfService notifyService;
-        private readonly ILogger<OccupationTypeController> logger;
-
-        public OccupationTypeController(ApplicationDbContext context, INotyfService notifyService, ILogger<OccupationTypeController> logger)
-        {
-            _context = context;
-            this.notifyService = notifyService;
-            this.logger = logger;
-        }
+        private readonly ApplicationDbContext _context = context;
+        private readonly INotyfService _notifyService = notifyService;
+        private readonly ILogger<OccupationTypeController> _logger = logger;
 
         public IActionResult Index()
         {
@@ -53,7 +46,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
         {
             if (id < 1)
             {
-                notifyService.Error("Occupation Type Not found!");
+                _notifyService.Error("Occupation Type Not found!");
                 return RedirectToAction(nameof(Profile));
             }
 
@@ -61,7 +54,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (income == null)
             {
-                notifyService.Error("Occupation Type Not found!");
+                _notifyService.Error("Occupation Type Not found!");
                 return RedirectToAction(nameof(Profile));
             }
 
@@ -84,7 +77,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 occupation.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.OccupationType.Add(occupation);
                 await _context.SaveChangesAsync();
-                notifyService.Success("Occupation Type created successfully!");
+                _notifyService.Success("Occupation Type created successfully!");
                 return RedirectToAction(nameof(Profile));
             }
             return View(occupation);
@@ -95,14 +88,14 @@ namespace risk.control.system.Controllers.CompanyAdmin
         {
             if (id < 1)
             {
-                notifyService.Error("Occupation Type Not found!");
+                _notifyService.Error("Occupation Type Not found!");
                 return RedirectToAction(nameof(Profile));
             }
 
             var occupation = await _context.OccupationType.FindAsync(id);
             if (occupation == null)
             {
-                notifyService.Error("Occupation Type Not found!");
+                _notifyService.Error("Occupation Type Not found!");
                 return RedirectToAction(nameof(Profile));
             }
             return View(occupation);
@@ -114,7 +107,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
         {
             if (id != occupation.Id)
             {
-                notifyService.Error("Occupation Type Not found!");
+                _notifyService.Error("Occupation Type Not found!");
                 return RedirectToAction(nameof(Profile));
             }
             try
@@ -123,13 +116,13 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 occupation.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.OccupationType.Update(occupation);
                 await _context.SaveChangesAsync();
-                notifyService.Warning("Occupation Type edited successfully!");
+                _notifyService.Warning("Occupation Type edited successfully!");
                 return RedirectToAction(nameof(Profile));
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error editing Occupation Type");
-                notifyService.Error("Error editing Occupation Type. Try again.");
+                _logger.LogError(ex, "Error editing Occupation Type");
+                _notifyService.Error("Error editing Occupation Type. Try again.");
                 return RedirectToAction(nameof(Profile));
             }
         }

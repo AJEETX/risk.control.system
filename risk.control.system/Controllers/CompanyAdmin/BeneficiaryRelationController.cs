@@ -14,18 +14,12 @@ namespace risk.control.system.Controllers.CompanyAdmin
 {
     [Breadcrumb("Company Settings ")]
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME}")]
-    public class BeneficiaryRelationController : Controller
+    public class BeneficiaryRelationController(ApplicationDbContext context, INotyfService notifyService, ILogger<BeneficiaryRelationController> logger) : Controller
     {
-        private readonly ApplicationDbContext _context;
-        private readonly INotyfService notifyService;
-        private readonly ILogger<BeneficiaryRelationController> logger;
+        private readonly ApplicationDbContext _context = context;
+        private readonly INotyfService _notifyService = notifyService;
+        private readonly ILogger<BeneficiaryRelationController> _logger = logger;
 
-        public BeneficiaryRelationController(ApplicationDbContext context, INotyfService notifyService, ILogger<BeneficiaryRelationController> logger)
-        {
-            _context = context;
-            this.notifyService = notifyService;
-            this.logger = logger;
-        }
 
         // GET: BeneficiaryRelation
         public IActionResult Index()
@@ -39,9 +33,9 @@ namespace risk.control.system.Controllers.CompanyAdmin
             return View();
         }
 
-        public IActionResult GetBeneficiaryRelations()
+        public async Task<IActionResult> GetBeneficiaryRelations()
         {
-            var data = _context.BeneficiaryRelation
+            var data = await _context.BeneficiaryRelation
                 .Select(c => new
                 {
                     c.BeneficiaryRelationId,
@@ -49,7 +43,8 @@ namespace risk.control.system.Controllers.CompanyAdmin
                     c.Code,
                     Updated = c.Updated ?? c.Created,
                     UpdateBy = c.UpdatedBy
-                }).ToList();
+                }).OrderByDescending(o => o.Updated)
+                .ToListAsync();
 
             return Json(new { data });
         }
@@ -60,7 +55,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
         {
             if (id < 1)
             {
-                notifyService.Error("Beneficiary Relation Not found!");
+                _notifyService.Error("Beneficiary Relation Not found!");
                 return RedirectToAction(nameof(Profile));
             }
             try
@@ -68,15 +63,15 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 var beneficiaryRelation = await _context.BeneficiaryRelation.FirstOrDefaultAsync(m => m.BeneficiaryRelationId == id);
                 if (beneficiaryRelation == null)
                 {
-                    notifyService.Error("Beneficiary Relation Not found!");
+                    _notifyService.Error("Beneficiary Relation Not found!");
                     return RedirectToAction(nameof(Profile));
                 }
                 return View(beneficiaryRelation);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, $"Error occurred.");
-                notifyService.Error("Error to get Beneficiary Relation !");
+                _logger.LogError(ex, $"Error occurred.");
+                _notifyService.Error("Error to get Beneficiary Relation !");
                 return RedirectToAction(nameof(Profile));
             }
         }
@@ -97,7 +92,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
         {
             if (!ModelState.IsValid)
             {
-                notifyService.Error("Beneficiary Relation Empty!");
+                _notifyService.Error("Beneficiary Relation Empty!");
                 return RedirectToAction(nameof(Profile));
             }
             try
@@ -109,7 +104,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 if (exists)
                 {
                     ModelState.AddModelError("Code", "Beneficiary Relation Code already exists.");
-                    notifyService.Error("Beneficiary Relation Code already exists!");
+                    _notifyService.Error("Beneficiary Relation Code already exists!");
                     return View(beneficiaryRelation);
                 }
                 var textInfo = CultureInfo.CurrentCulture.TextInfo;
@@ -119,13 +114,13 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 beneficiaryRelation.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Add(beneficiaryRelation);
                 await _context.SaveChangesAsync();
-                notifyService.Success($"Beneficiary Relation Code <b>{beneficiaryRelation.Code}</b> created successfully!");
+                _notifyService.Success($"Beneficiary Relation Code <b>{beneficiaryRelation.Code}</b> created successfully!");
                 return RedirectToAction(nameof(Profile));
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, $"Error occurred.");
-                notifyService.Error("Error to create Beneficiary Relation !");
+                _logger.LogError(ex, $"Error occurred.");
+                _notifyService.Error("Error to create Beneficiary Relation !");
                 return RedirectToAction(nameof(Profile));
             }
         }
@@ -148,14 +143,14 @@ namespace risk.control.system.Controllers.CompanyAdmin
         {
             if (id < 1)
             {
-                notifyService.Error("Beneficiary relation Not found!");
+                _notifyService.Error("Beneficiary relation Not found!");
                 return RedirectToAction(nameof(Profile));
             }
 
             var beneficiaryRelation = await _context.BeneficiaryRelation.FindAsync(id);
             if (beneficiaryRelation == null)
             {
-                notifyService.Error("Beneficiary Relation Not found!");
+                _notifyService.Error("Beneficiary Relation Not found!");
                 return RedirectToAction(nameof(Profile));
             }
             return View(beneficiaryRelation);
@@ -170,7 +165,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
         {
             if (id < 1 || !ModelState.IsValid)
             {
-                notifyService.Error("Beneficiary Relation Null!");
+                _notifyService.Error("Beneficiary Relation Null!");
                 return RedirectToAction(nameof(Profile));
             }
             try
@@ -182,7 +177,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 if (exists)
                 {
                     ModelState.AddModelError("Code", "Beneficiary Relation Code already exists.");
-                    notifyService.Error("Beneficiary Relation Code already exists!");
+                    _notifyService.Error("Beneficiary Relation Code already exists!");
                     return View(beneficiaryRelation);
                 }
                 var textInfo = CultureInfo.CurrentCulture.TextInfo;
@@ -191,13 +186,13 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 beneficiaryRelation.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Update(beneficiaryRelation);
                 await _context.SaveChangesAsync();
-                notifyService.Custom($"Beneficiary Relation Code <b>{beneficiaryRelation.Code}</b> edited successfully!", 3, "orange", "far fa-edit");
+                _notifyService.Custom($"Beneficiary Relation Code <b>{beneficiaryRelation.Code}</b> edited successfully!", 3, "orange", "far fa-edit");
                 return RedirectToAction(nameof(Profile));
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, $"Error occurred.");
-                notifyService.Error("Error editing Beneficiary Relation!");
+                _logger.LogError(ex, $"Error occurred.");
+                _notifyService.Error("Error editing Beneficiary Relation!");
                 return RedirectToAction(nameof(Profile));
             }
         }
@@ -226,8 +221,8 @@ namespace risk.control.system.Controllers.CompanyAdmin
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, $"Error occurred.");
-                notifyService.Error("Error deleting Beneficiary Relation !");
+                _logger.LogError(ex, $"Error occurred.");
+                _notifyService.Error("Error deleting Beneficiary Relation !");
                 return RedirectToAction(nameof(Profile));
             }
         }

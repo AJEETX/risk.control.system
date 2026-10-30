@@ -25,9 +25,11 @@ namespace risk.control.system.Services.Api
 
     internal class InvestigationService(ApplicationDbContext context,
         IDbContextFactory<ApplicationDbContext> contextFactory,
+        IEncryptionService encryptionService,
         IBase64FileService base64FileService,
         IWebHostEnvironment env) : IInvestigationService
     {
+        private readonly IEncryptionService _encryptionService = encryptionService;
         private readonly ApplicationDbContext _context = context;
         private readonly IDbContextFactory<ApplicationDbContext> _contextFactory = contextFactory;
         private readonly IBase64FileService _base64FileService = base64FileService;
@@ -100,7 +102,8 @@ namespace risk.control.system.Services.Api
                 .Select(a => new
                 {
                     investigation = a,
-                    a.Id,
+                    RawId = a.Id,
+                    Id = _encryptionService.ProtectId(a.Id),
                     policyId = a.PolicyDetail!.ContractNumber,
                     PolicyNum = a.GetPolicyNum(a.PolicyDetail.ContractNumber),
                     InsuranceType = a.PolicyDetail.InsuranceType,
@@ -166,6 +169,7 @@ namespace risk.control.system.Services.Api
                 return new CaseAutoAllocationResponse
                 {
                     Id = i.Id,
+                    RawId = i.RawId,
                     IsNew = i.IsNew,
                     Amount = amount,
                     PolicyId = policyId,
@@ -197,7 +201,7 @@ namespace risk.control.system.Services.Api
             var finalData = (await Task.WhenAll(finalDataTasks));
 
             // 7. Bulk Update "IsNew" (Fastest way)
-            var idsToUpdate = finalData.Where(x => x.IsNew).Select(x => x.Id).ToList();
+            var idsToUpdate = finalData.Where(x => x.IsNew).Select(x => x.RawId).ToList();
 
             if (idsToUpdate.Any())
             {
@@ -280,7 +284,7 @@ namespace risk.control.system.Services.Api
                 .Select(a => new
                 {
                     investigation = a,
-                    a.Id,
+                    Id = a.Id,
                     policyId = a.PolicyDetail!.ContractNumber,
                     PolicyNum = a.GetPolicyNum(a.PolicyDetail.ContractNumber),
                     InsuranceType = a.PolicyDetail.InsuranceType,
@@ -345,7 +349,8 @@ namespace risk.control.system.Services.Api
                 {
                     PolicyNum = policyNumber,
                     AutoAllocated = a.IsAutoAllocated,
-                    Id = a.Id,
+                    RawId = a.Id,
+                    Id = _encryptionService.ProtectId(a.Id),
                     IsNew = a.IsNew,
                     PolicyId = a.policyId,
                     Amount = string.Format(culture, "{0:c}", a.SumAssuredValue),
@@ -377,7 +382,7 @@ namespace risk.control.system.Services.Api
             var data = await Task.WhenAll(finalTasks);
 
             // 7. Bulk Update Viewed Status
-            var idsToUpdate = data.Where(x => x.IsNew).Select(x => x.Id).ToList();
+            var idsToUpdate = data.Where(x => x.IsNew).Select(x => x.RawId).ToList();
             if (idsToUpdate.Any())
             {
                 await _context.Investigations.AsNoTracking()
@@ -423,9 +428,6 @@ namespace risk.control.system.Services.Api
 
             int recordsFiltered = await query.CountAsync();
 
-            // Sorting Alignment (No Checkbox Column):
-            // Columns 0 to N-1: Dynamic FormFields (Mapped to formFields[orderColumn])
-            // Column N: SubmittedAt Date
             bool isAsc = string.Equals(request.OrderDir, "asc", StringComparison.OrdinalIgnoreCase);
             int dynamicFieldCount = formFields.Count;
 

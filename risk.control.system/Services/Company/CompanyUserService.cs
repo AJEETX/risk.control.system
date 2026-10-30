@@ -2,10 +2,12 @@
 using System.Net;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.FeatureManagement;
 using risk.control.system.AppConstant;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
+using risk.control.system.Services.Agent;
 using risk.control.system.Services.Common;
 
 namespace risk.control.system.Services.Company
@@ -18,13 +20,15 @@ namespace risk.control.system.Services.Company
 
         Task<ServiceResult> CreateAsync(ApplicationUser model, string emailSuffix, string performedBy, string portal_base_url);
 
-        Task<ServiceResult> UpdateAsync(string id, ApplicationUser model, string performedBy, string portal_base_url);
+        Task<ServiceResult> UpdateAsync(long id, ApplicationUser model, string performedBy, string portal_base_url);
 
         Task LoadModel(ApplicationUser model, string currentUserEmail);
     }
 
-    public sealed class CompanyUserService(
+    internal sealed class CompanyUserService(
         IValidateImageService validateFaceService,
+        IFeatureManager featureManager,
+        IAmazonApiService amazonApiService,
         UserManager<ApplicationUser> userManager,
         IAwsFaceImageCheckService faceImageCheckService,
         ApplicationDbContext context,
@@ -35,7 +39,8 @@ namespace risk.control.system.Services.Company
         private const long MAX_FILE_SIZE = 5 * 1024 * 1024;
         private static readonly HashSet<string> AllowedExt = new() { ".jpg", ".jpeg", ".png" };
         private static readonly HashSet<string> AllowedMime = new() { "image/jpeg", "image/png" };
-
+        private readonly IFeatureManager _featureManager = featureManager;
+        private readonly IAmazonApiService _amazonApiService = amazonApiService;
         private readonly IValidateImageService _validateFaceService = validateFaceService;
         private readonly UserManager<ApplicationUser> _userManager = userManager;
         private readonly ApplicationDbContext _context = context;
@@ -98,11 +103,11 @@ namespace risk.control.system.Services.Company
             }
         }
 
-        public async Task<ServiceResult> UpdateAsync(string id, ApplicationUser model, string performedBy, string portal_base_url)
+        public async Task<ServiceResult> UpdateAsync(long id, ApplicationUser model, string performedBy, string portal_base_url)
         {
             try
             {
-                var user = await _userManager.FindByIdAsync(id);
+                var user = await _userManager.FindByIdAsync(id.ToString());
                 if (user == null) return Fail("User not found.");
                 var result = new ServiceResult();
                 if (model.ProfileImage != null)
@@ -112,6 +117,20 @@ namespace risk.control.system.Services.Company
                     {
                         return result;
                     }
+                    if (await _featureManager.IsEnabledAsync(FeatureFlags.FACE_MATCH_CHECK))
+                    {
+                        if (!string.IsNullOrEmpty(user.AwsFaceId))
+                        {
+                            var imageCollection = EnvHelper.Get(CONSTANTS.FaceImageCollection);
+                            await _amazonApiService.DeleteFacesAsync(imageCollection!, new List<string> { user.AwsFaceId });
+
+                            // Clear the fields in your DB
+                            user.AwsFaceId = null;
+                            user.FaceIndexedAt = null;
+                        }
+                    }
+                    _context.ApplicationUser.Update(user);
+                    await _context.SaveChangesAsync();
                     await SetProfileImageAsync(user, model.ProfileImage, user.Email!.Split('@')[1], user.Email);
                 }
                 UpdateUserFields(user, model, performedBy);

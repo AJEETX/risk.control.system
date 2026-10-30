@@ -8,24 +8,17 @@ using risk.control.system.Models.ViewModel;
 
 namespace risk.control.system.Controllers.Company
 {
-    public class SessionController : Controller
-    {
-        private readonly ApplicationDbContext _context;
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly SignInManager<ApplicationUser> _signInManager;
-        private readonly ILogger<RatingController> _logger;
-
-        public SessionController(
+    public class SessionController(
             ApplicationDbContext context,
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
-            ILogger<RatingController> logger)
-        {
-            _context = context;
-            _userManager = userManager;
-            _signInManager = signInManager;
-            _logger = logger;
-        }
+            ILogger<RatingController> logger) : Controller
+    {
+        private readonly ApplicationDbContext _context = context;
+        private readonly UserManager<ApplicationUser> _userManager = userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager = signInManager;
+        private readonly ILogger<RatingController> _logger = logger;
+
 
         [ValidateAntiForgeryToken]
         [HttpPost]

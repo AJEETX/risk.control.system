@@ -11,39 +11,27 @@ using risk.control.system.Services.Common;
 namespace risk.control.system.Controllers.AgencyAdmin
 {
     [Authorize(Roles = $"{AGENCY_ADMIN.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME}")]
-    public class DeclineCaseController : Controller
-    {
-        private readonly string _baseUrl;
-        private const long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
-        private static readonly string[] AllowedExt = new[] { ".jpg", ".jpeg", ".png" };
-        private static readonly string[] AllowedMime = new[] { "image/jpeg", "image/png" };
-        private IDeclineCaseService _declineCaseService;
-        private readonly INotyfService _notifyService;
-        private readonly ICaseNotificationService _mailService;
-        private readonly ILogger<DeclineCaseController> _logger;
-        private readonly IBackgroundJobClient _backgroundJobClient;
-
-        public DeclineCaseController(
+    public class DeclineCaseController(
             IDeclineCaseService declineCaseService,
             INotyfService notifyService,
             IBackgroundJobClient backgroundJobClient,
             IHttpContextAccessor httpContextAccessor,
-            ICaseNotificationService mailService,
-            ILogger<DeclineCaseController> logger)
-        {
-            _declineCaseService = declineCaseService;
-            _notifyService = notifyService;
-            _mailService = mailService;
-            _logger = logger;
-            _backgroundJobClient = backgroundJobClient;
-            var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
-            var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
-            _baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
-        }
+            ICaseNotificationService notificationService,
+            ILogger<DeclineCaseController> logger) : Controller
+    {
+        private const long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+        private static readonly string[] AllowedExt = new[] { ".jpg", ".jpeg", ".png" };
+        private static readonly string[] AllowedMime = new[] { "image/jpeg", "image/png" };
+        private readonly string _baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent()}{httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent()}";
+        private IDeclineCaseService _declineCaseService = declineCaseService;
+        private readonly INotyfService _notifyService = notifyService;
+        private readonly ICaseNotificationService _notificationService = notificationService;
+        private readonly ILogger<DeclineCaseController> _logger = logger;
+        private readonly IBackgroundJobClient _backgroundJobClient = backgroundJobClient;
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Decline(CaseTransactionModel model, long claimId, string policyNumber)
+        public async Task<IActionResult> Decline(CaseTransactionModel model, long caseId, string policyNumber)
         {
             string userEmail = HttpContext?.User?.Identity?.Name!;
             if (!ModelState.IsValid)
@@ -53,17 +41,17 @@ namespace risk.control.system.Controllers.AgencyAdmin
             }
             try
             {
-                var agency = await _declineCaseService.DeclineCaseByAgency(userEmail, model, claimId);
+                var agency = await _declineCaseService.DeclineCaseByAgency(userEmail, model, caseId);
 
-                _backgroundJobClient.Enqueue(() => _mailService.NotifyCaseDeclineByAgency(userEmail, policyNumber, claimId, agency.VendorId, _baseUrl));
+                _backgroundJobClient.Enqueue(() => _notificationService.NotifyCaseDeclineByAgency(userEmail, policyNumber, caseId, agency.VendorId, _baseUrl));
 
-                _notifyService.Custom($"Case <b> #{policyNumber}</b> Declined successfully", 3, "red", "far fa-file-powerpoint");
+                _notifyService.Custom($"Case <b> #{policyNumber}</b> Declined successfully", 3, "white", "far fa-file-powerpoint");
 
                 return RedirectToAction(nameof(VendorInvestigationController.Allocate), ControllerName<VendorInvestigationController>.Name);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred for Case {Id}. {UserEmail}.", claimId, userEmail ?? "Anonymous");
+                _logger.LogError(ex, "Error occurred for Case {Id}. {UserEmail}.", caseId, userEmail ?? "Anonymous");
                 _notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(VendorInvestigationController.Allocate), ControllerName<VendorInvestigationController>.Name);
             }
@@ -84,9 +72,9 @@ namespace risk.control.system.Controllers.AgencyAdmin
             {
                 var agency = await _declineCaseService.WithdrawCaseFromAgent(userEmail, model, caseId);
 
-                var jobId = _backgroundJobClient.Enqueue(() => _mailService.NotifyCaseWithdrawlFromAgent(userEmail, caseId, agency.VendorId, _baseUrl));
+                var jobId = _backgroundJobClient.Enqueue(() => _notificationService.NotifyCaseWithdrawlFromAgent(userEmail, caseId, agency.VendorId, _baseUrl));
 
-                _notifyService.Custom($"Case <b> #{policyNumber}</b> Withdrawn from Agent successfully", 3, "green", "far fa-file-powerpoint");
+                _notifyService.Custom($"Case <b> #{policyNumber}</b> Withdrawn from Agent successfully", 3, "white", "far fa-file-powerpoint");
 
                 return RedirectToAction(nameof(VendorInvestigationController.Allocate), ControllerName<VendorInvestigationController>.Name);
             }

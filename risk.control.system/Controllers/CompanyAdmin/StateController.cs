@@ -14,18 +14,11 @@ namespace risk.control.system.Controllers.CompanyAdmin
 {
     [Breadcrumb("General Setup")]
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME}")]
-    public class StateController : Controller
+    public class StateController(ApplicationDbContext context, INotyfService notifyService, ILogger<StateController> logger) : Controller
     {
-        private readonly ApplicationDbContext _context;
-        private readonly INotyfService notifyService;
-        private readonly ILogger<StateController> logger;
-
-        public StateController(ApplicationDbContext context, INotyfService notifyService, ILogger<StateController> logger)
-        {
-            _context = context;
-            this.notifyService = notifyService;
-            this.logger = logger;
-        }
+        private readonly ApplicationDbContext _context = context;
+        private readonly INotyfService _notifyService = notifyService;
+        private readonly ILogger<StateController> _logger = logger;
 
         public IActionResult Index()
         {
@@ -82,7 +75,17 @@ namespace risk.control.system.Controllers.CompanyAdmin
             var lambda = Expression.Lambda<Func<State, object>>(Expression.Convert(propertyExpression, typeof(object)), parameter);
             query = isAscending ? query.OrderBy(lambda) : query.OrderByDescending(lambda);
             var totalRecords = await query.CountAsync();
-            var rawData = await query.Skip(start).Take(length).Select(s => new { s.StateId, s.Name, s.Code, s.UpdatedBy, s.Updated, s.Created, CountryName = s.Country!.Name }).ToListAsync();
+            var rawData = await query.Skip(start).Take(length).Select(s => new
+            {
+                s.StateId,
+                s.Name,
+                s.Code,
+                s.UpdatedBy,
+                s.Updated,
+                s.Created,
+                CountryName = s.Country!.Name
+            }).OrderByDescending(o => o.Updated)
+                .ToListAsync();
             var data = rawData.Select(s => new { s.StateId, s.Name, s.Code, s.UpdatedBy, Updated = s.Updated ?? s.Created, s.CountryName });
             return Json(new { draw = draw, recordsTotal = totalRecords, recordsFiltered = totalRecords, data = data });
         }
@@ -122,7 +125,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             var user = await _context.ApplicationUser.Include(u => u.Country).FirstOrDefaultAsync(u => u.Email == userEmail);
             if (!ModelState.IsValid)
             {
-                notifyService.Custom($"Invalid State data!", 3, "red", "fas fa-map-marker-alt");
+                _notifyService.Custom($"Invalid State data!", 3, "red", "fas fa-map-marker-alt");
 
                 // This is the magic line that clears the cached input values
                 ModelState.Clear();
@@ -139,7 +142,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 bool exists = await _context.State.AnyAsync(x => x.Code == state.Code && x.CountryId == state.SelectedCountryId);
                 if (exists)
                 {
-                    notifyService.Custom($"State Code <b>{state.Code}</b> already exists!", 3, "red", "fas fa-map-marker-alt");
+                    _notifyService.Custom($"State Code <b>{state.Code}</b> already exists!", 3, "red", "fas fa-map-marker-alt");
 
                     // Clear ModelState here as well
                     ModelState.Clear();
@@ -159,13 +162,13 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 state.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.State.Add(state);
                 await _context.SaveChangesAsync(null, false);
-                notifyService.Custom($"State <b>{state.Name}</b> created successfully!", 3, "green", "fas fa-map-marker-alt");
+                _notifyService.Custom($"State <b>{state.Name}</b> created successfully!", 3, "green", "fas fa-map-marker-alt");
                 return RedirectToAction(nameof(Profile));
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred.");
-                notifyService.Custom($"An error occurred while creating the State!!", 3, "red", "fas fa-map-marker-alt");
+                _logger.LogError(ex, "Error occurred.");
+                _notifyService.Custom($"An error occurred while creating the State!!", 3, "red", "fas fa-map-marker-alt");
                 return RedirectToAction(nameof(Profile));
             }
         }
@@ -175,14 +178,14 @@ namespace risk.control.system.Controllers.CompanyAdmin
         {
             if (id < 1)
             {
-                notifyService.Custom($"State Not Found!", 3, "red", "fas fa-map-marker-alt");
+                _notifyService.Custom($"State Not Found!", 3, "red", "fas fa-map-marker-alt");
                 return RedirectToAction(nameof(Profile));
             }
 
             var state = await _context.State.Include(s => s.Country).FirstOrDefaultAsync(c => c.StateId == id);
             if (state == null)
             {
-                notifyService.Custom($"State Not Found!", 3, "red", "fas fa-map-marker-alt");
+                _notifyService.Custom($"State Not Found!", 3, "red", "fas fa-map-marker-alt");
                 return RedirectToAction(nameof(Profile));
             }
 
@@ -195,7 +198,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
         {
             if (!ModelState.IsValid)
             {
-                notifyService.Custom($"Invalid State data!", 3, "red", "fas fa-map-marker-alt");
+                _notifyService.Custom($"Invalid State data!", 3, "red", "fas fa-map-marker-alt");
                 var currentState = await _context.State.Include(s => s.Country).FirstOrDefaultAsync(c => c.StateId == id);
                 return View(currentState);
             }
@@ -204,13 +207,13 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 var existingState = await _context.State.FindAsync(id);
                 if (existingState == null)
                 {
-                    notifyService.Custom($"State Not Found!", 3, "red", "fas fa-map-marker-alt");
+                    _notifyService.Custom($"State Not Found!", 3, "red", "fas fa-map-marker-alt");
                     return RedirectToAction(nameof(Profile));
                 }
                 bool exists = await _context.State.AnyAsync(x => x.Code == state.Code && x.CountryId == state.SelectedCountryId && x.StateId != id);
                 if (exists)
                 {
-                    notifyService.Custom($"State Code <b>{state.Code}</b> already exists!", 3, "red", "fas fa-map-marker-alt");
+                    _notifyService.Custom($"State Code <b>{state.Code}</b> already exists!", 3, "red", "fas fa-map-marker-alt");
                     ModelState.Remove("Name");
                     ModelState.Remove("Code");
                     var currentState = await _context.State.Include(s => s.Country).FirstOrDefaultAsync(c => c.StateId == id);
@@ -226,13 +229,13 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 existingState.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Update(existingState);
                 await _context.SaveChangesAsync(null, false);
-                notifyService.Custom($"State <b>{existingState.Name}</b> edited successfully!", 3, "orange", "fas fa-map-marker-alt");
+                _notifyService.Custom($"State <b>{existingState.Name}</b> edited successfully!", 3, "orange", "fas fa-map-marker-alt");
                 return RedirectToAction(nameof(Profile));
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred.");
-                notifyService.Custom($"An error occurred while editing the State!!", 3, "red", "fas fa-map-marker-alt");
+                _logger.LogError(ex, "Error occurred.");
+                _notifyService.Custom($"An error occurred while editing the State!!", 3, "red", "fas fa-map-marker-alt");
                 return RedirectToAction(nameof(Profile));
             }
         }
@@ -265,7 +268,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred.");
+                _logger.LogError(ex, "Error occurred.");
                 return Json(new { success = false, message = $"An error occurred while deleting the State!" });
             }
         }

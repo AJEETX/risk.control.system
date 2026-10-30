@@ -5,30 +5,23 @@ using Microsoft.AspNetCore.Mvc;
 using risk.control.system.AppConstant;
 using risk.control.system.Models;
 using risk.control.system.Services.AgencyAdmin;
+using risk.control.system.Services.Common;
 using SmartBreadcrumbs.Attributes;
 
 namespace risk.control.system.Controllers.AgencyAdmin
 {
     [Breadcrumb("Admin Settings ")]
     [Authorize(Roles = $"{AGENCY_ADMIN.DISPLAY_NAME}")]
-    public class AgencyServiceController : Controller
-    {
-        private readonly IAgencyServiceService _service;
-        private readonly IAgencyServiceTypeManager _typeManager;
-        private readonly INotyfService _notifyService;
-        private readonly ILogger<AgencyServiceController> _logger;
-
-        public AgencyServiceController(
+    public class AgencyServiceController(
             IAgencyServiceService service,
             IAgencyServiceTypeManager typeManager,
             INotyfService notifyService,
-            ILogger<AgencyServiceController> logger)
-        {
-            _service = service;
-            _typeManager = typeManager;
-            _notifyService = notifyService;
-            _logger = logger;
-        }
+            ILogger<AgencyServiceController> logger) : Controller
+    {
+        private readonly IAgencyServiceService _service = service;
+        private readonly IAgencyServiceTypeManager _typeManager = typeManager;
+        private readonly INotyfService _notifyService = notifyService;
+        private readonly ILogger<AgencyServiceController> _logger = logger;
 
         public IActionResult Index() => RedirectToAction(nameof(Service));
 
@@ -83,12 +76,14 @@ namespace risk.control.system.Controllers.AgencyAdmin
         }
 
         [Breadcrumb("Edit Service", FromAction = nameof(Service))]
-        public async Task<IActionResult> Edit(long id)
+        public async Task<IActionResult> Edit([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id)
         {
             try
             {
-                if (id <= 0) return RedirectToAction("Index", "Dashboard");
-
+                if (id <= 0)
+                {
+                    return RedirectToAction(nameof(Service));
+                }
                 var model = await _service.PrepareEditViewModelAsync(id);
                 if (model == null)
                 {
@@ -106,12 +101,25 @@ namespace risk.control.system.Controllers.AgencyAdmin
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(VendorInvestigationServiceType serviceModel)
+        public async Task<IActionResult> Edit([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id, VendorInvestigationServiceType model)
         {
             var userEmail = User.Identity?.Name!;
             try
             {
-                var result = await _typeManager.EditAsync(serviceModel, userEmail);
+                model.Id = id;
+                model.StateId = model.SelectedStateId;
+                model.CountryId = model.SelectedCountryId;
+
+                ModelState.Remove(nameof(model.Id));
+                ModelState.Remove(nameof(model.StateId));
+                ModelState.Remove(nameof(model.CountryId));
+
+                if (!ModelState.IsValid)
+                {
+                    _notifyService.Custom("Unexpected Error. Please try again later", 3, "orange", "fas fa-cog");
+                    return RedirectToAction(nameof(Service));
+                }
+                var result = await _typeManager.EditAsync(model, userEmail);
                 if (!result.Success)
                 {
                     _notifyService.Custom(result.Message, 3, "red", "fas fa-cog");
@@ -131,7 +139,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(long id)
+        public async Task<IActionResult> Delete([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id)
         {
             try
             {

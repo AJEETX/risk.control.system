@@ -24,8 +24,10 @@ namespace risk.control.system.Services.Api
         private readonly int _onlineThresholdInMinutes;
         private readonly DateTime _cutoffTime;
         private readonly IFeatureManager _featureManager;
+        private readonly IEncryptionService _encryptionService;
 
         public UserService(IConfiguration config,
+                IEncryptionService encryptionService,
             ApplicationDbContext context,
             IBase64FileService base64FileService,
             UserManager<ApplicationUser> userManager,
@@ -40,6 +42,7 @@ namespace risk.control.system.Services.Api
             _base64FileService = base64FileService;
             _userManager = userManager;
             _featureManager = featureManager;
+            _encryptionService = encryptionService;
         }
 
         public async Task<List<UserDetailResponse>> GetUsers(string userEmail)
@@ -85,7 +88,7 @@ namespace risk.control.system.Services.Api
         {
             return new UserDetailResponse
             {
-                Id = user.Id,
+                Id = _encryptionService.ProtectId(user.Id),
                 Name = $"{user.FirstName} {user.LastName}",
                 Email = $"<a>{user.Email}</a>",
                 RawEmail = user.Email,

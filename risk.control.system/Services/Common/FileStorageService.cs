@@ -14,7 +14,7 @@ namespace risk.control.system.Services.Common
 
     internal class FileStorageService(IWebHostEnvironment env) : IFileStorageService
     {
-        private readonly IWebHostEnvironment env = env;
+        private readonly IWebHostEnvironment _env = env;
 
         public async Task<(string FileName, string RelativePath)> SaveMediaAsync(IFormFile file, string category, string? subFolder = null, string? subSubFolder = null)
         {
@@ -115,7 +115,7 @@ namespace risk.control.system.Services.Common
 
         private string GetOrCreateFolder(string category, string? subFolder, string? subSubFolder)
         {
-            string rootPath = Path.GetFullPath(Path.Combine(env.ContentRootPath, CONSTANTS.DOCUMENT));
+            string rootPath = Path.GetFullPath(Path.Combine(_env.ContentRootPath, CONSTANTS.DOCUMENT));
             string combined = Path.Combine(rootPath, Sanitize(category), Sanitize(subFolder), Sanitize(subSubFolder));
             string finalPath = Path.GetFullPath(combined);
             string rootWithSeparator = rootPath.EndsWith(Path.DirectorySeparatorChar.ToString()) ? rootPath : rootPath + Path.DirectorySeparatorChar;
@@ -145,7 +145,7 @@ namespace risk.control.system.Services.Common
 
         public void DeleteFile(string filePath)
         {
-            var fullPath = Path.GetFullPath(Path.Combine(env.ContentRootPath, filePath));
+            var fullPath = Path.GetFullPath(Path.Combine(_env.ContentRootPath, filePath));
             if (File.Exists(fullPath))
             {
                 File.Delete(fullPath);

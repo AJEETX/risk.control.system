@@ -9,14 +9,9 @@ namespace risk.control.system.Controllers.Api.PortalAdmin
         Task<DashboardData> GetSuperAdminCount(string userEmail, string role);
     }
 
-    internal class AdminDashBoardService : IAdminDashBoardService
+    internal class AdminDashBoardService(ApplicationDbContext context) : IAdminDashBoardService
     {
-        private readonly ApplicationDbContext _context;
-
-        public AdminDashBoardService(ApplicationDbContext context)
-        {
-            _context = context;
-        }
+        private readonly ApplicationDbContext _context = context;
 
         public async Task<DashboardData> GetSuperAdminCount(string userEmail, string role)
         {

@@ -16,9 +16,11 @@ namespace risk.control.system.Services.Api
     }
 
     internal class CompanyAgencyApiService(
+        IEncryptionService encryptionService,
         IDbContextFactory<ApplicationDbContext> contextFactory,
         IBase64FileService base64FileService) : ICompanyAgencyApiService
     {
+        private readonly IEncryptionService _encryptionService = encryptionService;
         private readonly IDbContextFactory<ApplicationDbContext> _contextFactory = contextFactory;
         private readonly IBase64FileService _base64FileService = base64FileService;
 
@@ -59,7 +61,7 @@ namespace risk.control.system.Services.Api
                     var documentImage = await _base64FileService.GetBase64FileAsync(u.DocumentUrl!, Applicationsettings.NO_IMAGE);
                     return new
                     {
-                        Id = u.VendorId,
+                        Id = _encryptionService.ProtectId(u.VendorId),
                         Document = documentImage,
                         Domain = u.Email,
                         Name = u.Name,
@@ -111,7 +113,7 @@ namespace risk.control.system.Services.Api
                     await Task.WhenAll(document, hasService);
                     return new
                     {
-                        Id = u.VendorId,
+                        Id = _encryptionService.ProtectId(u.VendorId),
                         Document = await document,
                         Domain = u.Email,
                         Name = u.Name,
@@ -280,7 +282,7 @@ namespace risk.control.system.Services.Api
             var document = await _base64FileService.GetBase64FileAsync(u.DocumentUrl!, Applicationsettings.NO_IMAGE);
             return new
             {
-                Id = u.VendorId,
+                Id = _encryptionService.ProtectId(u.VendorId),
                 Document = document,
                 Domain = GetDomain(u, companyUser),
                 Name = u.Name,

@@ -12,18 +12,10 @@ namespace risk.control.system.Controllers.Common
     [Route("api/[controller]")]
     [ApiController]
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME},{AGENCY_ADMIN.DISPLAY_NAME},{CREATOR.DISPLAY_NAME},{ASSESSOR.DISPLAY_NAME},{MANAGER.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME},{AGENT.DISPLAY_NAME}")]
-    public class MasterDataController : ControllerBase
+    public class MasterDataController(ApplicationDbContext context, ILogger<MasterDataController> logger) : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
-        private readonly ILogger<MasterDataController> _logger;
-
-        public MasterDataController(
-            ApplicationDbContext context,
-            ILogger<MasterDataController> logger)
-        {
-            _context = context;
-            _logger = logger;
-        }
+        private readonly ApplicationDbContext _context = context;
+        private readonly ILogger<MasterDataController> _logger = logger;
 
         [HttpGet("SearchCountry")]
         public async Task<IActionResult> SearchCountry(string term = "")

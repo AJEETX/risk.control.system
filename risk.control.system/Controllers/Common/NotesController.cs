@@ -7,16 +7,10 @@ using risk.control.system.Services.Common;
 namespace risk.control.system.Controllers.Common
 {
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME},{AGENCY_ADMIN.DISPLAY_NAME},{CREATOR.DISPLAY_NAME},{ASSESSOR.DISPLAY_NAME},{MANAGER.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME},{AGENT.DISPLAY_NAME}")]
-    public class NotesController : Controller
+    public class NotesController(ICaseNotesService caseNotesService, ILogger<NotesController> logger) : Controller
     {
-        private readonly ICaseNotesService _caseNotesService;
-        private readonly ILogger<NotesController> _logger;
-
-        public NotesController(ICaseNotesService caseNotesService, ILogger<NotesController> logger)
-        {
-            _caseNotesService = caseNotesService;
-            _logger = logger;
-        }
+        private readonly ICaseNotesService _caseNotesService = caseNotesService;
+        private readonly ILogger<NotesController> _logger = logger;
 
         [HttpPost]
         [ValidateAntiForgeryToken]

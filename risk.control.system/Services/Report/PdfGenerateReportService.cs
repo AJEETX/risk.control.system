@@ -9,25 +9,18 @@ namespace risk.control.system.Services.Report
     {
         Task<string> BuildInvestigationPdfReport(InvestigationTask investigation, PolicyDetail policy, CustomerDetail customer, BeneficiaryDetail beneficiary, ReportTemplate investigationReport, Vendor vendor);
     }
-    internal class PdfGenerateReportService : IPdfGenerateReportService
-    {
-        private const string reportFilename = "report.pdf";
-        private readonly IWebHostEnvironment _env;
-        private readonly IPdfGenerateCaseDetailService _caseDetailService;
-        private readonly IPdfGenerateDetailReportService _detailReportService;
-
-        public PdfGenerateReportService(
+    internal class PdfGenerateReportService(
             IWebHostEnvironment env,
             IPdfGenerateCaseDetailService caseDetailService,
-            IPdfGenerateDetailReportService detailReportService)
-        {
-            _env = env;
-            _caseDetailService = caseDetailService;
-            _detailReportService = detailReportService;
-        }
+            IPdfGenerateDetailReportService detailReportService) : IPdfGenerateReportService
+    {
+        private readonly IWebHostEnvironment _env = env;
+        private readonly IPdfGenerateCaseDetailService _caseDetailService = caseDetailService;
+        private readonly IPdfGenerateDetailReportService _detailReportService = detailReportService;
+
         public async Task<string> BuildInvestigationPdfReport(InvestigationTask investigation, PolicyDetail policy, CustomerDetail customer, BeneficiaryDetail beneficiary, ReportTemplate investigationReport, Vendor vendor)
         {
-            string ReportFilePath = Path.GetFullPath(Path.Combine(_env.ContentRootPath, CONSTANTS.DOCUMENT, CONSTANTS.CASE, policy.ContractNumber, reportFilename));
+            string ReportFilePath = Path.GetFullPath(Path.Combine(_env.ContentRootPath, CONSTANTS.DOCUMENT, CONSTANTS.CASE, policy.ContractNumber, CONSTANTS.REPORT_FILENAME));
             DocumentBuilder builder = DocumentBuilder.New();
             SectionBuilder section = builder.AddSection();
             section.SetOrientation(PageOrientation.Landscape);
@@ -52,7 +45,7 @@ namespace risk.control.system.Services.Report
             builder.Build(ReportFilePath);
             investigation.InvestigationReport.PdfReportFilePath = ReportFilePath;
 
-            return reportFilename;
+            return CONSTANTS.REPORT_FILENAME;
         }
 
         private static SectionBuilder AddRemarks(SectionBuilder section, string title, string content)

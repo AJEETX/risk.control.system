@@ -16,25 +16,17 @@ namespace risk.control.system.Services.Assessor
         Task<bool> SubmitCaseReportAsync(SubmitCaseRequest request);
     }
 
-    internal class ProcessCaseService : IProcessCaseService
-    {
-        private readonly ApplicationDbContext _context;
-        private readonly ILogger<ProcessCaseService> _logger;
-        private readonly IPdfReportService _pdfGenerativeService;
-        private readonly ITimelineService _timelineService;
-        private readonly IBackgroundJobClient _backgroundJobClient;
-        public ProcessCaseService(ApplicationDbContext context,
+    internal class ProcessCaseService(ApplicationDbContext context,
             ILogger<ProcessCaseService> logger,
             IPdfReportService pdfGenerativeService,
             ITimelineService timelineService,
-            IBackgroundJobClient backgroundJobClient)
-        {
-            this._context = context;
-            this._logger = logger;
-            this._pdfGenerativeService = pdfGenerativeService;
-            this._timelineService = timelineService;
-            this._backgroundJobClient = backgroundJobClient;
-        }
+            IBackgroundJobClient backgroundJobClient) : IProcessCaseService
+    {
+        private readonly ApplicationDbContext _context = context;
+        private readonly ILogger<ProcessCaseService> _logger = logger;
+        private readonly IPdfReportService _pdfGenerativeService = pdfGenerativeService;
+        private readonly ITimelineService _timelineService = timelineService;
+        private readonly IBackgroundJobClient _backgroundJobClient = backgroundJobClient;
 
         public async Task<(ClientCompany, string)> ProcessCaseReport(string userEmail, string assessorRemarks, long caseId, AssessorRemarkType reportUpdateStatus, string reportAiSummary)
         {
@@ -61,34 +53,19 @@ namespace risk.control.system.Services.Assessor
         public async Task<bool> SubmitCaseReportAsync(SubmitCaseRequest request)
         {
             var remarkType = Enum.Parse<AssessorRemarkType>(request.AssessorRemarkType.ToUpper());
-            if (remarkType == AssessorRemarkType.OK)
-            {
-                string approved = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR;
-                var result = await ProcessCaseAIReport(request.Email, request.AssessorRemarks, request.PolicyNumber, remarkType, approved, string.Empty);
-                if (result.Item1 != null)
-                {
-                    return true;
-                }
-            }
-            else if (remarkType == AssessorRemarkType.REJECT)
-            {
-                string rejected = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR;
+            string approved = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR;
+            string rejected = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR;
 
-                var result = await ProcessCaseAIReport(request.Email, request.AssessorRemarks, request.PolicyNumber, remarkType, rejected, string.Empty);
-                if (result.Item1 != null)
-                {
-                    return true;
-                }
-            }
-            return false;
+            var status = remarkType == AssessorRemarkType.OK ? approved : rejected;
+
+            var result = await ProcessCaseAIReport(request.Email, request.AssessorRemarks, request.PolicyNumber, remarkType, status, string.Empty);
+            return (result.Item1 != null);
         }
 
         private async Task<(ClientCompany, string)> ProcessCaseAIReport(string userEmail, string assessorRemarks, string contractNumber, AssessorRemarkType assessorRemarkType, string processed, string reportAiSummary)
         {
             try
             {
-                var finished = CONSTANTS.CASE_STATUS.FINISHED;
-
                 var caseTask = await _context.Investigations
                 .Include(c => c.ClientCompany)
                 .Include(c => c.PolicyDetail)
@@ -101,7 +78,7 @@ namespace risk.control.system.Services.Assessor
                 caseTask.InvestigationReport.AssessorRemarksUpdated = DateTime.UtcNow;
                 caseTask.InvestigationReport.AssessorEmail = userEmail;
 
-                caseTask.Status = finished;
+                caseTask.Status = CONSTANTS.CASE_STATUS.FINISHED;
                 caseTask.SubStatus = processed;
                 caseTask.Updated = DateTime.UtcNow;
                 caseTask.UpdatedBy = userEmail;

@@ -5,9 +5,11 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.FeatureManagement;
 using risk.control.system.AppConstant;
+using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services.AgencyAdmin;
+using risk.control.system.Services.Agent;
 
 namespace risk.control.system.Services.Manager
 {
@@ -21,11 +23,11 @@ namespace risk.control.system.Services.Manager
 
         Task<ApplicationUser> GetUserForEditAsync(long id);
 
-        Task<(bool Success, string Message, Dictionary<string, string> Errors)> EditAgencyUserAsync(ModelStateDictionary ModelState, string id, ApplicationUser model, string currentUserEmail, string baseUrl);
+        Task<(bool Success, string Message, Dictionary<string, string> Errors)> EditAgencyUserAsync(ModelStateDictionary ModelState, long id, ApplicationUser model, string currentUserEmail, string baseUrl);
 
         Task<ApplicationUser> GetUserForDeleteAsync(long id);
 
-        Task<(bool, string)> SoftDeleteUserAsync(string email, string currentUserEmail);
+        Task<(bool, string)> SoftDeleteUserAsync(long id, string currentUserEmail);
 
         Task LoadModelAsync(ApplicationUser model);
 
@@ -34,11 +36,13 @@ namespace risk.control.system.Services.Manager
 
     internal class ManageAgencyUserService(
         ApplicationDbContext context,
+        IAmazonApiService amazonApiService,
         IFeatureManager featureManager,
         IAgencyUserCreateEditService agencyUserCreateEditService,
         ILogger<ManageAgencyUserService> logger) : IManageAgencyUserService
     {
         private readonly ApplicationDbContext _context = context;
+        private readonly IAmazonApiService _amazonApiService = amazonApiService;
         private readonly IFeatureManager _featureManager = featureManager;
         private readonly IAgencyUserCreateEditService _agencyUserCreateEditService = agencyUserCreateEditService;
         private readonly ILogger<ManageAgencyUserService> _logger = logger;
@@ -92,7 +96,7 @@ namespace risk.control.system.Services.Manager
             };
 
             // Note: Pass an empty/new ModelStateDictionary if the service requires it for internal validation
-            return await _agencyUserCreateEditService.CreateVendorUserAsync(vendorUserModel, ModelState, baseUrl);
+            return await _agencyUserCreateEditService.CreateUserAsync(vendorUserModel, ModelState, baseUrl);
         }
 
         public async Task LoadModelAsync(ApplicationUser model)
@@ -181,7 +185,7 @@ namespace risk.control.system.Services.Manager
             return agencyUser;
         }
 
-        public async Task<(bool Success, string Message, Dictionary<string, string> Errors)> EditAgencyUserAsync(ModelStateDictionary ModelState, string id, ApplicationUser model, string currentUserEmail, string baseUrl)
+        public async Task<(bool Success, string Message, Dictionary<string, string> Errors)> EditAgencyUserAsync(ModelStateDictionary ModelState, long id, ApplicationUser model, string currentUserEmail, string baseUrl)
         {
             var editRequest = new EditVendorUserRequest
             {
@@ -191,7 +195,7 @@ namespace risk.control.system.Services.Manager
             };
 
             // Pass an empty ModelState if the underlying service uses it for internal tracking
-            return await _agencyUserCreateEditService.EditVendorUserAsync(editRequest, ModelState, baseUrl);
+            return await _agencyUserCreateEditService.EditUserAsync(editRequest, ModelState, baseUrl);
         }
 
         public async Task<ApplicationUser> GetUserForDeleteAsync(long id)
@@ -221,9 +225,9 @@ namespace risk.control.system.Services.Manager
             return model;
         }
 
-        public async Task<(bool, string)> SoftDeleteUserAsync(string email, string currentUserEmail)
+        public async Task<(bool, string)> SoftDeleteUserAsync(long id, string currentUserEmail)
         {
-            var user = await _context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == email);
+            var user = await _context.ApplicationUser.FirstOrDefaultAsync(u => u.Id == id);
             if (user == null) return new(false, "User not found.");
 
             try
@@ -231,7 +235,18 @@ namespace risk.control.system.Services.Manager
                 user.Updated = DateTime.UtcNow;
                 user.UpdatedBy = currentUserEmail;
                 user.Deleted = true; // Soft delete
+                if (await _featureManager.IsEnabledAsync(FeatureFlags.FACE_MATCH_CHECK))
+                {
+                    if (!string.IsNullOrEmpty(user.AwsFaceId))
+                    {
+                        var imageCollection = EnvHelper.Get(CONSTANTS.FaceImageCollection);
+                        await _amazonApiService.DeleteFacesAsync(imageCollection!, new List<string> { user.AwsFaceId });
 
+                        // Clear the fields in your DB
+                        user.AwsFaceId = null;
+                        user.FaceIndexedAt = null;
+                    }
+                }
                 _context.ApplicationUser.Update(user);
                 await _context.SaveChangesAsync();
 
@@ -239,7 +254,7 @@ namespace risk.control.system.Services.Manager
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to soft delete user {Email}", email);
+                _logger.LogError(ex, "Failed to soft delete user {UserId}", id);
                 return (false, "An error occurred while deleting the user.");
             }
         }
@@ -283,7 +298,7 @@ namespace risk.control.system.Services.Manager
             return (allRoles, role, status);
         }
 
-        private List<SelectListItem> GetAgencyRoles()
+        private static List<SelectListItem> GetAgencyRoles()
         {
             return RoleGroups.AgencyAppRoles
                 .Where(r => r != AppRoles.AGENCY_ADMIN)

@@ -31,6 +31,7 @@ public static class BusinessServiceExtension
 
         //services.AddHttpClient(Options.DefaultName).AddPolicyHandler(retryPolicy);
         services.AddHttpClient();
+        services.AddScoped<IEncryptionService, EncryptionService>();
         services.AddScoped<IAgentMeetingSetupService, AgentMeetingSetupService>();
         services.AddScoped<IAdharCardService, AdharCardService>();
         services.AddScoped<IIncomeTaxService, IncomeTaxService>();
@@ -170,7 +171,7 @@ public static class BusinessServiceExtension
         services.AddScoped<IHttpClientService, HttpClientService>();
         services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
         services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
-
+        services.AddHttpContextAccessor();
         return services;
     }
 }

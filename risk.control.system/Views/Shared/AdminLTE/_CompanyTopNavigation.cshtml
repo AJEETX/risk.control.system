@@ -90,7 +90,7 @@
 					{
 						<div class="text-center profile-inner-section">
 
-							<a href="/CompanyUserProfile/Edit/@Model.UserId" class="btn btn-sm btn-outline-warning">
+							<a asp-controller="CompanyUserProfile" asp-action="Edit" asp-route-id="@Model.UserId" class="btn btn-sm btn-outline-warning">
 								<i class="fas fa-user-edit"></i> Edit Profile
 							</a>
 						</div>

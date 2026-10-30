@@ -5,8 +5,10 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.FeatureManagement;
 using risk.control.system.AppConstant;
+using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
+using risk.control.system.Services.Agent;
 
 namespace risk.control.system.Services.Company
 {
@@ -18,18 +20,22 @@ namespace risk.control.system.Services.Company
 
         Task<ServiceResult> CreateUserAsync(ApplicationUser model, string emailSuffix, string currentUserEmail, string baseUrl);
 
-        Task<ServiceResult> UpdateUserAsync(string userId, ApplicationUser model, string currentUserEmail, string baseUrl);
+        Task<ServiceResult> UpdateUserAsync(long userId, ApplicationUser model, string currentUserEmail, string baseUrl);
+
+        Task DeleteUserAsync(ApplicationUser user);
 
         Task LoadModelAsync(ApplicationUser model, string currentUserEmail);
     }
 
     internal class ManageCompanyUserService(
         ApplicationDbContext context,
+        IAmazonApiService amazonApiService,
         RoleManager<ApplicationRole> roleManager,
         ICompanyUserService companyUserService,
         IFeatureManager featureManager) : IManageCompanyUserService
     {
         private readonly ApplicationDbContext _context = context;
+        private readonly IAmazonApiService _amazonApiService = amazonApiService;
         private readonly RoleManager<ApplicationRole> _roleManager = roleManager;
         private readonly ICompanyUserService _companyUserService = companyUserService;
         private readonly IFeatureManager _featureManager = featureManager;
@@ -69,7 +75,7 @@ namespace risk.control.system.Services.Company
             return companyUser;
         }
 
-        public async Task<ServiceResult> UpdateUserAsync(string id, ApplicationUser model, string currentUserEmail, string baseUrl)
+        public async Task<ServiceResult> UpdateUserAsync(long id, ApplicationUser model, string currentUserEmail, string baseUrl)
         {
             // This calls your existing lower-level logic service
             var result = await _companyUserService.UpdateAsync(id, model, currentUserEmail, baseUrl);
@@ -125,6 +131,24 @@ namespace risk.control.system.Services.Company
             var result = await _companyUserService.CreateAsync(model, emailSuffix, currentUserEmail, baseUrl);
 
             return result;
+        }
+
+        public async Task DeleteUserAsync(ApplicationUser user)
+        {
+            if (await _featureManager.IsEnabledAsync(FeatureFlags.FACE_MATCH_CHECK))
+            {
+                if (!string.IsNullOrEmpty(user.AwsFaceId))
+                {
+                    var imageCollection = EnvHelper.Get(CONSTANTS.FaceImageCollection);
+                    await _amazonApiService.DeleteFacesAsync(imageCollection!, new List<string> { user.AwsFaceId });
+
+                    // Clear the fields in your DB
+                    user.AwsFaceId = null;
+                    user.FaceIndexedAt = null;
+                    _context.ApplicationUser.Update(user);
+                    await _context.SaveChangesAsync();
+                }
+            }
         }
     }
 }

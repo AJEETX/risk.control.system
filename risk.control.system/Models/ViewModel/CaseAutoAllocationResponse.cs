@@ -2,7 +2,8 @@
 {
     public class CaseAutoAllocationResponse
     {
-        public long Id { get; set; }
+        public long RawId { get; set; }
+        public string Id { get; set; } = default!;
         public bool IsNew { get; set; }
         public string Amount { get; set; } = default!;
         public string PolicyId { get; set; } = default!;

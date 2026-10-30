@@ -19,48 +19,33 @@ namespace risk.control.system.Controllers
 {
     [Breadcrumb("Admin Settings ")]
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{MANAGER.DISPLAY_NAME}")]
-    public class ClientCompanyController : Controller
-    {
-        private readonly string _baseUrl = string.Empty;
-        private const string vendorMapSize = "800x800";
-        private readonly ILogger<ClientCompanyController> logger;
-        private readonly IManageAgencyService agencyCreateEditService;
-        private readonly IAgencyCaseLoadService service;
-        private readonly ApplicationDbContext _context;
-        private readonly IFileStorageService fileStorageService;
-        private readonly INotyfService notifyService;
-        private readonly RoleManager<ApplicationRole> roleManager;
-        private readonly ICustomApiClient customApiCLient;
-        private readonly ISmsService smsService;
-        private readonly UserManager<ApplicationUser> userManager;
-
-        public ClientCompanyController(
+    public class ClientCompanyController(
             ILogger<ClientCompanyController> logger,
+            IEncryptionService encryptionService,
             IManageAgencyService agencyCreateEditService,
              IHttpContextAccessor httpContextAccessor,
-             IAgencyCaseLoadService service,
+             IAgencyCaseLoadService agencyCaseLoadService,
             ApplicationDbContext context,
             IFileStorageService fileStorageService,
             INotyfService notifyService,
             RoleManager<ApplicationRole> roleManager,
             ICustomApiClient customApiCLient,
-            ISmsService SmsService,
-            UserManager<ApplicationUser> userManager)
-        {
-            this.logger = logger;
-            this.agencyCreateEditService = agencyCreateEditService;
-            this.service = service;
-            _context = context;
-            this.fileStorageService = fileStorageService;
-            this.notifyService = notifyService;
-            this.roleManager = roleManager;
-            this.customApiCLient = customApiCLient;
-            smsService = SmsService;
-            this.userManager = userManager;
-            var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
-            var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
-            _baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
-        }
+            ISmsService smsService,
+            UserManager<ApplicationUser> userManager) : Controller
+    {
+        private readonly string _baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent()}{httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent()}";
+        private const string _vendorMapSize = "800x800";
+        private readonly ILogger<ClientCompanyController> _logger = logger;
+        private readonly IEncryptionService _encryptionService = encryptionService;
+        private readonly IManageAgencyService _agencyCreateEditService = agencyCreateEditService;
+        private readonly IAgencyCaseLoadService _agencyCaseLoadService = agencyCaseLoadService;
+        private readonly ApplicationDbContext _context = context;
+        private readonly IFileStorageService _fileStorageService = fileStorageService;
+        private readonly INotyfService _notifyService = notifyService;
+        private readonly RoleManager<ApplicationRole> _roleManager = roleManager;
+        private readonly ICustomApiClient _customApiCLient = customApiCLient;
+        private readonly ISmsService _smsService = smsService;
+        private readonly UserManager<ApplicationUser> _userManager = userManager;
 
         // GET: ClientCompanies/Create
         [Breadcrumb("Add Company")]
@@ -80,12 +65,12 @@ namespace risk.control.system.Controllers
         {
             if (clientCompany is null || clientCompany.SelectedCountryId < 1 || clientCompany.SelectedStateId < 1 || clientCompany.SelectedDistrictId < 1 || clientCompany.SelectedPincodeId < 1)
             {
-                notifyService.Custom($"Please check input fields.", 3, "red", "fas fa-building");
+                _notifyService.Custom($"Please check input fields.", 3, "red", "fas fa-building");
                 return RedirectToAction(nameof(Create));
             }
             if (!ModelState.IsValid)
             {
-                notifyService.Custom($"Please check input fields.", 3, "red", "fas fa-building");
+                _notifyService.Custom($"Please check input fields.", 3, "red", "fas fa-building");
                 return RedirectToAction(nameof(Create));
             }
             Domain domainData = (Domain)Enum.Parse(typeof(Domain), domainAddress, true);
@@ -93,7 +78,7 @@ namespace risk.control.system.Controllers
             clientCompany.Email = clientCompany.Email.ToLower() + domainData.GetEnumDisplayName();
             if (clientCompany.Document is not null)
             {
-                var (fileName, relativePath) = await fileStorageService.SaveAsync(clientCompany.Document, clientCompany.Email, "company");
+                var (fileName, relativePath) = await _fileStorageService.SaveAsync(clientCompany.Document, clientCompany.Email, "company");
                 clientCompany.DocumentUrl = relativePath;
                 clientCompany.DocumentImageExtension = Path.GetExtension(fileName);
             }
@@ -101,9 +86,9 @@ namespace risk.control.system.Controllers
             var pinCode = await _context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).FirstOrDefaultAsync(s => s.PinCodeId == clientCompany.SelectedPincodeId);
 
             var companyAddress = clientCompany.Addressline + ", " + pinCode!.District!.Name + ", " + pinCode.State!.Name + ", " + pinCode.Country!.Code;
-            var companyCoordinates = await customApiCLient.GetCoordinatesFromAddressAsync(companyAddress);
+            var companyCoordinates = await _customApiCLient.GetCoordinatesFromAddressAsync(companyAddress);
             var companyLatLong = companyCoordinates.Latitude + "," + companyCoordinates.Longitude;
-            var url = $"https://maps.googleapis.com/maps/api/staticmap?center={companyLatLong}&zoom=14&size={vendorMapSize}&maptype=roadmap&markers=color:red%7Clabel:S%7C{companyLatLong}&key={EnvHelper.Get("GOOGLE_MAP_KEY")}";
+            var url = $"https://maps.googleapis.com/maps/api/staticmap?center={companyLatLong}&zoom=14&size={_vendorMapSize}&maptype=roadmap&markers=color:red%7Clabel:S%7C{companyLatLong}&key={EnvHelper.Get("GOOGLE_MAP_KEY")}";
             clientCompany.AddressLatitude = companyCoordinates.Latitude;
             clientCompany.AddressLongitude = companyCoordinates.Longitude;
             clientCompany.AddressMapLocation = url;
@@ -125,7 +110,7 @@ namespace risk.control.system.Controllers
             ReportTemplateSeed.CLAIM(_context, clientCompany);
             ReportTemplateSeed.UNDERWRITING(_context, clientCompany);
             await _context.SaveChangesAsync();
-            notifyService.Custom($"Company created successfully.", 3, "green", "fas fa-building");
+            _notifyService.Custom($"Company created successfully.", 3, "green", "fas fa-building");
             return RedirectToAction(nameof(Companies));
         }
 
@@ -135,7 +120,7 @@ namespace risk.control.system.Controllers
         {
             if (id < 1 || _context.ClientCompany == null)
             {
-                notifyService.Error("Company not found!");
+                _notifyService.Error("Company not found!");
                 return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
             }
 
@@ -146,7 +131,7 @@ namespace risk.control.system.Controllers
                 .FirstOrDefaultAsync(m => m.ClientCompanyId == id);
             if (clientCompany == null)
             {
-                notifyService.Error("Company not found!");
+                _notifyService.Error("Company not found!");
                 return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
             }
             var hasClaims = await _context.Investigations.AnyAsync(c => c.ClientCompanyId == id && !c.Deleted);
@@ -161,7 +146,7 @@ namespace risk.control.system.Controllers
         {
             if (ClientCompanyId <= 0)
             {
-                notifyService.Error("Company not found!");
+                _notifyService.Error("Company not found!");
                 return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
             }
             var clientCompany = await _context.ClientCompany.Include(c => c.Country).FirstOrDefaultAsync(c => c.ClientCompanyId == ClientCompanyId);
@@ -182,21 +167,21 @@ namespace risk.control.system.Controllers
                 }
                 await _context.SaveChangesAsync();
 
-                notifyService.Custom($"Company {clientCompany.Email} deleted successfully.", 3, "red", "fas fa-building");
+                _notifyService.Custom($"Company {clientCompany.Email} deleted successfully.", 3, "red", "fas fa-building");
                 return RedirectToAction(nameof(Index));
             }
 
-            notifyService.Error("Company not found!");
+            _notifyService.Error("Company not found!");
             return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
         }
 
         // GET: ClientCompanies/Details/5
         [Breadcrumb("Company Profile", FromAction = nameof(Companies))]
-        public async Task<IActionResult> Details(long id)
+        public async Task<IActionResult> Details([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id)
         {
             if (id < 1 || _context.ClientCompany == null)
             {
-                notifyService.Error("Company not found!");
+                _notifyService.Error("Company not found!");
                 return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
             }
 
@@ -208,7 +193,7 @@ namespace risk.control.system.Controllers
                 .FirstOrDefaultAsync(m => m.ClientCompanyId == id);
             if (clientCompany == null)
             {
-                notifyService.Error("Company not found!");
+                _notifyService.Error("Company not found!");
                 return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
             }
             var userCount = await _context.ApplicationUser.CountAsync(c => c.ClientCompanyId == clientCompany.ClientCompanyId && !c.Deleted);
@@ -218,18 +203,18 @@ namespace risk.control.system.Controllers
 
         // GET: ClientCompanies/Edit/5
         [Breadcrumb(title: "Edit Company", FromAction = "Details")]
-        public async Task<IActionResult> Edit(long id)
+        public async Task<IActionResult> Edit([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id)
         {
             if (id <= 0)
             {
-                notifyService.Error("Company not found!");
+                _notifyService.Error("Company not found!");
                 return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
             }
 
             var clientCompany = await _context.ClientCompany.Include(c => c.Country).FirstOrDefaultAsync(c => c.ClientCompanyId == id);
             if (clientCompany == null)
             {
-                notifyService.Error("Company not found!");
+                _notifyService.Error("Company not found!");
                 return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
             }
 
@@ -251,14 +236,14 @@ namespace risk.control.system.Controllers
         {
             if (clientCompany is null || clientCompany.SelectedCountryId < 1 || clientCompany.SelectedStateId < 1 || clientCompany.SelectedDistrictId < 1 || clientCompany.SelectedPincodeId < 1)
             {
-                notifyService.Custom($"Please check input fields.", 3, "red", "fas fa-building");
-                return RedirectToAction(nameof(Edit), "ClientCompany", new { id = clientCompany!.ClientCompanyId });
+                _notifyService.Custom($"Please check input fields.", 3, "red", "fas fa-building");
+                return RedirectToAction(nameof(Edit), ControllerName<ClientCompanyController>.Name, new { id = clientCompany!.ClientCompanyId });
             }
             try
             {
                 if (clientCompany.Document is not null)
                 {
-                    var (fileName, relativePath) = await fileStorageService.SaveAsync(clientCompany.Document, clientCompany.Email, "company");
+                    var (fileName, relativePath) = await _fileStorageService.SaveAsync(clientCompany.Document, clientCompany.Email, "company");
                     clientCompany.DocumentUrl = relativePath;
                     clientCompany.DocumentImageExtension = Path.GetExtension(fileName);
                 }
@@ -275,11 +260,11 @@ namespace risk.control.system.Controllers
                 clientCompany.Name = textInfo.ToTitleCase(clientCompany.Name.ToLower());
                 var pinCode = await _context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).FirstOrDefaultAsync(s => s.PinCodeId == clientCompany.SelectedPincodeId);
                 var companyAddress = clientCompany.Addressline + ", " + pinCode!.District!.Name + ", " + pinCode.State!.Name + ", " + pinCode.Country!.Code;
-                var companyCoordinates = await customApiCLient.GetCoordinatesFromAddressAsync(companyAddress);
+                var companyCoordinates = await _customApiCLient.GetCoordinatesFromAddressAsync(companyAddress);
                 var companyLatLong = companyCoordinates.Latitude + "," + companyCoordinates.Longitude;
                 clientCompany.AddressLatitude = companyCoordinates.Latitude;
                 clientCompany.AddressLongitude = companyCoordinates.Longitude;
-                clientCompany.AddressMapLocation = $"https://maps.googleapis.com/maps/api/staticmap?center={companyLatLong}&zoom=14&size={vendorMapSize}&maptype=roadmap&markers=color:red%7Clabel:S%7C{companyLatLong}&key={EnvHelper.Get("GOOGLE_MAP_KEY")}";
+                clientCompany.AddressMapLocation = $"https://maps.googleapis.com/maps/api/staticmap?center={companyLatLong}&zoom=14&size={_vendorMapSize}&maptype=roadmap&markers=color:red%7Clabel:S%7C{companyLatLong}&key={EnvHelper.Get("GOOGLE_MAP_KEY")}";
                 clientCompany.PinCodeId = clientCompany.SelectedPincodeId;
                 clientCompany.DistrictId = clientCompany.SelectedDistrictId;
                 clientCompany.StateId = clientCompany.SelectedStateId;
@@ -289,14 +274,16 @@ namespace risk.control.system.Controllers
                 clientCompany.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.ClientCompany.Update(clientCompany);
                 await _context.SaveChangesAsync();
-                notifyService.Custom($"Company edited successfully.", 3, "orange", "fas fa-building");
-                return RedirectToAction(nameof(ClientCompanyController.Details), "ClientCompany", new { id = clientCompany.ClientCompanyId });
+                _notifyService.Custom($"Company edited successfully.", 3, "orange", "fas fa-building");
+                var encryptedId = _encryptionService.ProtectId(clientCompany.ClientCompanyId);
+                return RedirectToAction(nameof(ClientCompanyController.Details), ControllerName<ClientCompanyController>.Name, new { id = encryptedId });
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred.");
-                notifyService.Custom($"Error editing company.", 3, "red", "fas fa-building");
-                return RedirectToAction(nameof(Edit), "ClientCompany", new { id = clientCompany.ClientCompanyId });
+                _logger.LogError(ex, "Error occurred.");
+                _notifyService.Custom($"Error editing company.", 3, "red", "fas fa-building");
+                var encryptedId = _encryptionService.ProtectId(clientCompany.ClientCompanyId);
+                return RedirectToAction(nameof(Edit), ControllerName<ClientCompanyController>.Name, new { id = encryptedId });
             }
         }
 
@@ -325,7 +312,7 @@ namespace risk.control.system.Controllers
             {
                 if (id <= 0)
                 {
-                    notifyService.Error("Error getting Agency");
+                    _notifyService.Error("Error getting Agency");
                     return RedirectToAction("AvailableVendors", "Vendors");
                 }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
@@ -340,7 +327,7 @@ namespace risk.control.system.Controllers
                     .FirstOrDefaultAsync(m => m.VendorId == id);
                 if (vendor == null)
                 {
-                    notifyService.Error("Error getting Agency");
+                    _notifyService.Error("Error getting Agency");
                     return RedirectToAction("AvailableVendors", "Vendors");
                 }
                 var approvedStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR;
@@ -353,7 +340,7 @@ namespace risk.control.system.Controllers
                 var vendorUserCount = await _context.ApplicationUser.CountAsync(c => c.VendorId == vendor.VendorId && !c.Deleted);
 
                 // HACKY
-                var currentCases = await service.GetAgencyIdsLoad(new List<long> { vendor.VendorId });
+                var currentCases = await _agencyCaseLoadService.GetAgencyIdsLoad(new List<long> { vendor.VendorId });
                 vendor.SelectedCountryId = vendorUserCount;
                 vendor.SelectedStateId = currentCases.FirstOrDefault()!.CaseCount;
                 vendor.SelectedDistrictId = vendorAllCasesCount;
@@ -367,8 +354,8 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting {AgencyId} by {UserName}.", id, HttpContext.User.Identity?.Name);
-                notifyService.Error("Error getting Agency. Try again.");
+                _logger.LogError(ex, "Error getting {AgencyId} by {UserName}.", id, HttpContext.User.Identity?.Name);
+                _notifyService.Error("Error getting Agency. Try again.");
                 return RedirectToAction("AvailableVendors", "Vendors");
             }
         }
@@ -381,14 +368,14 @@ namespace risk.control.system.Controllers
             {
                 if (!ModelState.IsValid)
                 {
-                    notifyService.Error("Error getting User. Try again.");
+                    _notifyService.Error("Error getting User. Try again.");
                     return RedirectToAction(nameof(AgencyDetails), "ClientCompany", new { id = id });
                 }
 
                 var vendor = await _context.Vendor.Include(v => v.Country).FirstOrDefaultAsync(v => v.VendorId == id);
                 if (vendor == null)
                 {
-                    notifyService.Error("Error getting User. Try again.");
+                    _notifyService.Error("Error getting User. Try again.");
                     return RedirectToAction(nameof(AgencyDetails), "ClientCompany", new { id = id });
                 }
                 vendor.SelectedByCompany = await _context.ApplicationUser.AnyAsync(u => u.Email == userEmail && u.IsSuperAdmin);
@@ -396,8 +383,8 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting Agency {Id}. {UserEmail}", id, userEmail);
-                notifyService.Error("Error getting User. Try again.");
+                _logger.LogError(ex, "Error getting Agency {Id}. {UserEmail}", id, userEmail);
+                _notifyService.Error("Error getting User. Try again.");
                 return RedirectToAction(nameof(AgencyDetails), "ClientCompany", new { id = id });
             }
         }
@@ -409,29 +396,29 @@ namespace risk.control.system.Controllers
             var userEmail = HttpContext.User?.Identity?.Name!;
             if (!ModelState.IsValid)
             {
-                notifyService.Error("Please correct the errors");
+                _notifyService.Error("Please correct the errors");
                 await LoadModel(model);
                 return View(model);
             }
 
             try
             {
-                var result = await agencyCreateEditService.EditAsync(userEmail, model, _baseUrl);
+                var result = await _agencyCreateEditService.EditAsync(userEmail, model, _baseUrl);
                 if (!result.Success)
                 {
                     foreach (var error in result.Errors)
                         ModelState.AddModelError(error.Key, error.Value);
 
-                    notifyService.Error("Please fix validation errors");
+                    _notifyService.Error("Please fix validation errors");
                     await LoadModel(model);
                     return View(model);
                 }
-                notifyService.Custom($"Agency <b>{model.Email}</b> edited successfully.", 3, "orange", "fas fa-building");
+                _notifyService.Custom($"Agency <b>{model.Email}</b> edited successfully.", 3, "orange", "fas fa-building");
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error editing {AgencyId}. {UserEmail}.", vendorId, userEmail);
-                notifyService.Error("Error editing Agency. Try again.");
+                _logger.LogError(ex, "Error editing {AgencyId}. {UserEmail}.", vendorId, userEmail);
+                _notifyService.Error("Error editing Agency. Try again.");
             }
             return RedirectToAction(nameof(AgencyDetails), "ClientCompany", new { id = vendorId });
         }

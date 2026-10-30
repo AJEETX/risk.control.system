@@ -8,16 +8,10 @@ using SmartBreadcrumbs.Attributes;
 namespace risk.control.system.Controllers.Common
 {
     [Breadcrumb("General Setup")]
-    public class ErrorLogController : Controller
+    public class ErrorLogController(IWebHostEnvironment env, ILogger<ErrorLogController> logger) : Controller
     {
-        private readonly IWebHostEnvironment _env;
-        private readonly ILogger<ErrorLogController> _logger;
-
-        public ErrorLogController(IWebHostEnvironment env, ILogger<ErrorLogController> logger)
-        {
-            _env = env;
-            _logger = logger;
-        }
+        private readonly IWebHostEnvironment _env = env;
+        private readonly ILogger<ErrorLogController> _logger = logger;
 
         public IActionResult Index()
         {

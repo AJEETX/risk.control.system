@@ -15,18 +15,11 @@ namespace risk.control.system.Controllers.CompanyAdmin
 {
     [Breadcrumb("Company Settings ")]
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME}")]
-    public class CostCentreController : Controller
+    public class CostCentreController(ApplicationDbContext context, INotyfService notifyService, ILogger<CostCentreController> logger) : Controller
     {
-        private readonly ApplicationDbContext _context;
-        private readonly INotyfService notifyService;
-        private readonly ILogger<CostCentreController> logger;
-
-        public CostCentreController(ApplicationDbContext context, INotyfService notifyService, ILogger<CostCentreController> logger)
-        {
-            _context = context;
-            this.notifyService = notifyService;
-            this.logger = logger;
-        }
+        private readonly ApplicationDbContext _context = context;
+        private readonly INotyfService _notifyService = notifyService;
+        private readonly ILogger<CostCentreController> _logger = logger;
 
         // GET: CostCentre
         public IActionResult Index()
@@ -40,9 +33,9 @@ namespace risk.control.system.Controllers.CompanyAdmin
             return View();
         }
 
-        public IActionResult GetCostCentres()
+        public async Task<IActionResult> GetCostCentres()
         {
-            var data = _context.CostCentre
+            var data = await _context.CostCentre
                 .Select(c => new
                 {
                     c.CostCentreId,
@@ -50,36 +43,10 @@ namespace risk.control.system.Controllers.CompanyAdmin
                     c.Code,
                     Updated = c.Updated ?? c.Created,
                     UpdateBy = c.UpdatedBy
-                }).ToList();
+                }).OrderByDescending(o => o.Updated)
+                .ToListAsync();
 
             return Json(new { data });
-        }
-
-        // GET: CostCentre/Details/5
-        [Breadcrumb("Details")]
-        public async Task<IActionResult> Details(long id)
-        {
-            if (id < 1 || _context.CostCentre == null)
-            {
-                notifyService.Error("Budget Centre Not found!");
-                return RedirectToAction(nameof(Profile));
-            }
-            try
-            {
-                var costCentre = await _context.CostCentre.FirstOrDefaultAsync(m => m.CostCentreId == id);
-                if (costCentre == null)
-                {
-                    notifyService.Error("Budget Centre Not found!");
-                    return RedirectToAction(nameof(Profile));
-                }
-                return View(costCentre);
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Error to get Budget Centre.");
-                notifyService.Error("Error to get Budget Centre. Try again.");
-                return RedirectToAction(nameof(Profile));
-            }
         }
 
         // GET: CostCentre/Create
@@ -95,7 +62,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
         {
             if (!ModelState.IsValid)
             {
-                notifyService.Error("Budget Centre  Empty!");
+                _notifyService.Error("Budget Centre  Empty!");
                 return RedirectToAction(nameof(Profile));
             }
             try
@@ -108,7 +75,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 if (exists)
                 {
                     ModelState.AddModelError("Code", "Budget Centre Code already exists.");
-                    notifyService.Error("Budget Centre Code already exists!");
+                    _notifyService.Error("Budget Centre Code already exists!");
                     return View(costCentre);
                 }
                 var textInfo = CultureInfo.CurrentCulture.TextInfo;
@@ -118,13 +85,13 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 costCentre.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Add(costCentre);
                 await _context.SaveChangesAsync(null, false);
-                notifyService.Success($"Budget Centre Code <b>{costCentre.Code}</b> created successfully!");
+                _notifyService.Success($"Budget Centre Code <b>{costCentre.Code}</b> created successfully!");
                 return RedirectToAction(nameof(Profile));
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error creating Budget Centre.");
-                notifyService.Error("Error creating Budget Centre. Try again.");
+                _logger.LogError(ex, "Error creating Budget Centre.");
+                _notifyService.Error("Error creating Budget Centre. Try again.");
                 return RedirectToAction(nameof(Profile));
             }
         }
@@ -147,14 +114,14 @@ namespace risk.control.system.Controllers.CompanyAdmin
         {
             if (id <= 0)
             {
-                notifyService.Error("Budget Centre Not found!");
+                _notifyService.Error("Budget Centre Not found!");
                 return RedirectToAction(nameof(Profile));
             }
 
             var costCentre = await _context.CostCentre.FindAsync(id);
             if (costCentre == null)
             {
-                notifyService.Error("Budget Centre Not found!");
+                _notifyService.Error("Budget Centre Not found!");
                 return RedirectToAction(nameof(Profile));
             }
             return View(costCentre);
@@ -169,7 +136,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
         {
             if (id < 1 || !ModelState.IsValid)
             {
-                notifyService.Error("Budget Centre Null!");
+                _notifyService.Error("Budget Centre Null!");
                 return RedirectToAction(nameof(Profile));
             }
             try
@@ -182,7 +149,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 if (exists)
                 {
                     ModelState.AddModelError("Code", "Budget Centre Code already exists.");
-                    notifyService.Error("Budget Centre Code already exists!");
+                    _notifyService.Error("Budget Centre Code already exists!");
                     return View(costCentre);
                 }
 
@@ -193,13 +160,13 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 costCentre.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Update(costCentre);
                 await _context.SaveChangesAsync(null, false);
-                notifyService.Custom($"Budget Centre Code <b>{costCentre.Code}</b> edited successfully!", 3, "orange", "far fa-edit");
+                _notifyService.Custom($"Budget Centre Code <b>{costCentre.Code}</b> edited successfully!", 3, "orange", "far fa-edit");
                 return RedirectToAction(nameof(Profile));
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error editing Budget Centre.");
-                notifyService.Error("Error editing Budget Centre. Try again.");
+                _logger.LogError(ex, "Error editing Budget Centre.");
+                _notifyService.Error("Error editing Budget Centre. Try again.");
                 return RedirectToAction(nameof(Profile));
             }
         }
@@ -228,8 +195,8 @@ namespace risk.control.system.Controllers.CompanyAdmin
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error deleting Budget Centre. ");
-                notifyService.Error("Error deleting Budget Centre. Try again.");
+                _logger.LogError(ex, "Error deleting Budget Centre. ");
+                _notifyService.Error("Error deleting Budget Centre. Try again.");
                 return RedirectToAction(nameof(Profile));
             }
         }

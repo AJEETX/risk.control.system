@@ -2,8 +2,8 @@
 {
     public class AgencyServiceResponse
     {
-        public long VendorId { get; set; }
-        public long Id { get; set; }
+        public long VendorId { get; set; } = default!;
+        public string Id { get; set; } = default!;
         public string CaseType { get; set; } = default!;
         public string ServiceType { get; set; } = default!;
         public string District { get; set; } = default!;

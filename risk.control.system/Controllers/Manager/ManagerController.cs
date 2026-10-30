@@ -14,26 +14,17 @@ namespace risk.control.system.Controllers.Manager
 {
     [Breadcrumb("Cases")]
     [Authorize(Roles = MANAGER.DISPLAY_NAME)]
-    public class ManagerController : Controller
-    {
-        private readonly INotyfService _notifyService;
-        private readonly IInvoiceService _invoiceService;
-        private readonly INavigationService _navigationService;
-        private readonly ILogger<ManagerController> _logger;
-        private readonly ICaseDetailService _caseDetailService;
-
-        public ManagerController(INotyfService notifyService,
+    public class ManagerController(INotyfService notifyService,
             IInvoiceService invoiceService,
             INavigationService navigationService,
             ILogger<ManagerController> logger,
-            ICaseDetailService caseDetailService)
-        {
-            _notifyService = notifyService;
-            _invoiceService = invoiceService;
-            _navigationService = navigationService;
-            _logger = logger;
-            _caseDetailService = caseDetailService;
-        }
+            ICaseDetailService caseDetailService) : Controller
+    {
+        private readonly INotyfService _notifyService = notifyService;
+        private readonly IInvoiceService _invoiceService = invoiceService;
+        private readonly INavigationService _navigationService = navigationService;
+        private readonly ILogger<ManagerController> _logger = logger;
+        private readonly ICaseDetailService _caseDetailService = caseDetailService;
 
         public IActionResult Index()
         {
@@ -47,7 +38,7 @@ namespace risk.control.system.Controllers.Manager
         }
 
         [Breadcrumb(title: "Details", FromAction = nameof(Active))]
-        public async Task<IActionResult> ActiveDetail(long id)
+        public async Task<IActionResult> ActiveDetail([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id)
         {
             if (!ModelState.IsValid || id <= 0)
             {
@@ -78,7 +69,7 @@ namespace risk.control.system.Controllers.Manager
         }
 
         [Breadcrumb(title: "Details", FromAction = nameof(Approved))]
-        public async Task<IActionResult> ApprovedDetail(long id)
+        public async Task<IActionResult> ApprovedDetail([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id)
         {
             if (!ModelState.IsValid || id < 1)
             {
@@ -109,7 +100,7 @@ namespace risk.control.system.Controllers.Manager
         }
 
         [Breadcrumb("Details", FromAction = nameof(Rejected))]
-        public async Task<IActionResult> RejectedDetail(long id)
+        public async Task<IActionResult> RejectedDetail([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name!;
 
@@ -133,8 +124,7 @@ namespace risk.control.system.Controllers.Manager
                 return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
             }
         }
-
-        public async Task<IActionResult> ApprovedInvoice(long id)
+        public async Task<IActionResult> ApprovedInvoice([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 
@@ -159,7 +149,7 @@ namespace risk.control.system.Controllers.Manager
                 return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
             }
         }
-        public async Task<IActionResult> RejectedInvoice(long id)
+        public async Task<IActionResult> RejectedInvoice([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 
@@ -184,7 +174,7 @@ namespace risk.control.system.Controllers.Manager
                 return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
             }
         }
-        public async Task<IActionResult> PrintInvoice(long id)
+        public async Task<IActionResult> PrintInvoice([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 

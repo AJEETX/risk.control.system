@@ -13,7 +13,7 @@
             },
             error: DataTableErrorHandler
         },
-        order: [[4, 'desc'], [2, 'desc']],
+        order: [],
         fixedHeader: true,
         processing: true,
         paging: true,

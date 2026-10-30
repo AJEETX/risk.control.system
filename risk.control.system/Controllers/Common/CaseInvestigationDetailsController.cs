@@ -15,23 +15,15 @@ namespace risk.control.system.Controllers.Common
     [Route("api/[controller]")]
     [ApiController]
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME},{AGENCY_ADMIN.DISPLAY_NAME},{CREATOR.DISPLAY_NAME},{ASSESSOR.DISPLAY_NAME},{MANAGER.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME},{AGENT.DISPLAY_NAME}")]
-    public class CaseInvestigationDetailsController : ControllerBase
-    {
-        private readonly ApplicationDbContext _context;
-        private readonly ILogger<CaseInvestigationDetailsController> _logger;
-        private readonly IAgentCaseDetailService _caseService;
-        private readonly IWeatherInfoService _weatherInfoService;
-
-        public CaseInvestigationDetailsController(ApplicationDbContext context,
+    public class CaseInvestigationDetailsController(ApplicationDbContext context,
             ILogger<CaseInvestigationDetailsController> logger,
             IAgentCaseDetailService caseService,
-            IWeatherInfoService weatherInfoService)
-        {
-            _context = context;
-            _logger = logger;
-            _caseService = caseService;
-            _weatherInfoService = weatherInfoService;
-        }
+            IWeatherInfoService weatherInfoService) : ControllerBase
+    {
+        private readonly ApplicationDbContext _context = context;
+        private readonly ILogger<CaseInvestigationDetailsController> _logger = logger;
+        private readonly IAgentCaseDetailService _caseService = caseService;
+        private readonly IWeatherInfoService _weatherInfoService = weatherInfoService;
 
         [HttpGet("GetPolicyDetail")]
         public async Task<IActionResult> GetPolicyDetail(long id)

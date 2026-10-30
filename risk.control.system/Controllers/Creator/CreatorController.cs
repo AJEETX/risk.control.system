@@ -13,32 +13,23 @@ namespace risk.control.system.Controllers.Creator
 {
     [Breadcrumb("Cases")]
     [Authorize(Roles = CREATOR.DISPLAY_NAME)]
-    public class CreatorController : Controller
-    {
-        private readonly ILogger<CreatorController> _logger;
-        private readonly IAgencyDetailService _agencyDetailService;
-        private readonly IReportTemplateService _reportTemplateService;
-        private readonly INotyfService _notifyService;
-        private readonly INavigationService _navigationService;
-        private readonly ICaseActiveService _caseActiveService;
-        private readonly IEmpanelledAgencyService _empanelledAgencyService;
-
-        public CreatorController(ILogger<CreatorController> logger,
+    public class CreatorController(ILogger<CreatorController> logger,
             IAgencyDetailService agencyDetailService,
+            IEncryptionService encryptionService,
             IReportTemplateService reportTemplateService,
             INotyfService notifyService,
             INavigationService navigationService,
             ICaseActiveService caseActiveService,
-            IEmpanelledAgencyService empanelledAgencyService)
-        {
-            _logger = logger;
-            _agencyDetailService = agencyDetailService;
-            _reportTemplateService = reportTemplateService;
-            _notifyService = notifyService;
-            _navigationService = navigationService;
-            _caseActiveService = caseActiveService;
-            _empanelledAgencyService = empanelledAgencyService;
-        }
+            IEmpanelledAgencyService empanelledAgencyService) : Controller
+    {
+        private readonly IEncryptionService _encryptionService = encryptionService;
+        private readonly ILogger<CreatorController> _logger = logger;
+        private readonly IAgencyDetailService _agencyDetailService = agencyDetailService;
+        private readonly IReportTemplateService _reportTemplateService = reportTemplateService;
+        private readonly INotyfService _notifyService = notifyService;
+        private readonly INavigationService _navigationService = navigationService;
+        private readonly ICaseActiveService _caseActiveService = caseActiveService;
+        private readonly IEmpanelledAgencyService _empanelledAgencyService = empanelledAgencyService;
 
         [HttpGet]
         public async Task<IActionResult> GetReportTemplate(long caseId)
@@ -68,7 +59,7 @@ namespace risk.control.system.Controllers.Creator
         }
 
         [HttpGet]
-        public async Task<IActionResult> EmpanelledAgencies(long id, long vendorId = 0, bool fromEditPage = false)
+        public async Task<IActionResult> EmpanelledAgencies([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id, [ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long vendorId = 0, bool fromEditPage = false)
         {
             var userEmail = HttpContext.User?.Identity?.Name!;
             try
@@ -81,7 +72,8 @@ namespace risk.control.system.Controllers.Creator
 
                 var model = await _empanelledAgencyService.GetEmpanelledVendors(id, userEmail, vendorId, fromEditPage);
 
-                ViewData["BreadcrumbNode"] = _navigationService.GetEmpanelledVendorsPath(id, vendorId, fromEditPage);
+                var encryptedId = _encryptionService.ProtectId(id);
+                ViewData["BreadcrumbNode"] = _navigationService.GetEmpanelledVendorsPath(encryptedId, vendorId, fromEditPage);
 
                 return View(model);
             }
@@ -95,7 +87,7 @@ namespace risk.control.system.Controllers.Creator
 
         [HttpGet]
         [Breadcrumb("Details", FromAction = "New", FromController = typeof(AddAssignController))]
-        public async Task<IActionResult> Details(long id)
+        public async Task<IActionResult> Details([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name!;
             if (!ModelState.IsValid || id < 1)
@@ -116,7 +108,7 @@ namespace risk.control.system.Controllers.Creator
             }
         }
 
-        public async Task<IActionResult> AgencyProfile(long id, long selectedcase)
+        public async Task<IActionResult> AgencyProfile([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id, long selectedcase)
         {
             if (id <= 0 || selectedcase <= 0)
             {
@@ -129,14 +121,16 @@ namespace risk.control.system.Controllers.Creator
             try
             {
                 var vendor = await _agencyDetailService.GetVendorDetailAsync(id, selectedcase);
-
                 if (vendor == null)
                 {
-                    _notifyService.Error("Agency not found.");
-                    return RedirectToAction(nameof(EmpanelledAgencies), ControllerName<CreatorController>.Name, new { id = selectedcase });
+                    return NotFound("Agency not found.");
                 }
 
-                ViewData["BreadcrumbNode"] = _navigationService.GetVendorDetailPath(selectedcase, id);
+                // If requested via AJAX, return a partial view so it fits neatly inside the modal box
+                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                {
+                    return PartialView("_AgencyProfileModalPartial", vendor);
+                }
 
                 return View(vendor);
             }

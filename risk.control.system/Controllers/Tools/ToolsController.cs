@@ -11,32 +11,20 @@ using risk.control.system.Services.Common;
 
 namespace risk.control.system.Controllers.Tools
 {
-    public class ToolsController : Controller
-    {
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly ILoginService loginService;
-        private readonly SignInManager<ApplicationUser> _signInManager;
-        private readonly ILogger<ToolsController> _logger;
-        private readonly INotyfService notifyService;
-        private readonly string BaseUrl;
-
-        public ToolsController(
+    public class ToolsController(
             UserManager<ApplicationUser> userManager,
             ILoginService loginService,
             SignInManager<ApplicationUser> signInManager,
              IHttpContextAccessor httpContextAccessor,
             ILogger<ToolsController> logger,
-            INotyfService notifyService)
-        {
-            _userManager = userManager ?? throw new ArgumentNullException();
-            this.loginService = loginService;
-            _signInManager = signInManager ?? throw new ArgumentNullException();
-            _logger = logger;
-            this.notifyService = notifyService;
-            var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
-            var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
-            BaseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
-        }
+            INotyfService notifyService) : Controller
+    {
+        private readonly string _baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent()}{httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent()}";
+        private readonly UserManager<ApplicationUser> _userManager = userManager;
+        private readonly ILoginService _loginService = loginService;
+        private readonly SignInManager<ApplicationUser> _signInManager = signInManager;
+        private readonly ILogger<ToolsController> _logger = logger;
+        private readonly INotyfService _notifyService = notifyService;
 
         [Authorize(Roles = GUEST.DISPLAY_NAME)]
         public async Task<IActionResult> Index()
@@ -90,19 +78,19 @@ namespace risk.control.system.Controllers.Tools
             {
                 CountryIsd = model.CountryIsd,
                 MobileNumber = model.MobileNumber,
-                BaseUrl = this.BaseUrl // From the Controller's property
+                BaseUrl = this._baseUrl // From the Controller's property
             };
 
-            var success = await loginService.SendOtpAsync(otpRequest);
+            var success = await _loginService.SendOtpAsync(otpRequest);
             if (!success)
             {
-                notifyService.Warning($"Error to send Otp to Mobile <b>{model.CountryIsd}</b> <b>{model.MobileNumber} </b>. Try again.");
+                _notifyService.Warning($"Error to send Otp to Mobile <b>{model.CountryIsd}</b> <b>{model.MobileNumber} </b>. Try again.");
                 return RedirectToAction(nameof(Try));
             }
             else
             {
                 ModelState.Clear();
-                notifyService.Success($"Otp sent to Mobile <b>{model.CountryIsd}</b> <b>{model.MobileNumber} </b>. Please verify.");
+                _notifyService.Success($"Otp sent to Mobile <b>{model.CountryIsd}</b> <b>{model.MobileNumber} </b>. Please verify.");
                 return View("VerifyOtp", model);
             }
         }
@@ -118,11 +106,11 @@ namespace risk.control.system.Controllers.Tools
                 ModelState.AddModelError(string.Empty, "Bad Request");
                 return View(model);
             }
-            var result = await loginService.VerifyAndLoginAsync(model);
+            var result = await _loginService.VerifyAndLoginAsync(model);
 
             if (result.Success)
             {
-                notifyService.Success($"Welcome <b>{GUEST.DISPLAY_NAME}</b>, {result.Message}");
+                _notifyService.Success($"Welcome <b>{GUEST.DISPLAY_NAME}</b>, {result.Message}");
                 return RedirectToAction(nameof(Index));
             }
 
@@ -145,19 +133,19 @@ namespace risk.control.system.Controllers.Tools
             {
                 CountryIsd = model.CountryIsd,
                 MobileNumber = model.MobileNumber,
-                BaseUrl = this.BaseUrl // From the Controller's property
+                BaseUrl = this._baseUrl // From the Controller's property
             };
             // Call service logic
-            var result = await loginService.ResendOtpAsync(otpRequest);
+            var result = await _loginService.ResendOtpAsync(otpRequest);
 
             if (result.Success)
             {
-                notifyService.Success($"Otp resent to Mobile <b>{model.CountryIsd}</b> <b>{model.MobileNumber} </b>. Please verify.");
+                _notifyService.Success($"Otp resent to Mobile <b>{model.CountryIsd}</b> <b>{model.MobileNumber} </b>. Please verify.");
                 return Json(new { success = true, message = result.Message });
             }
             else
             {
-                notifyService.Error($"Error to resend Otp to Mobile <b>{model.CountryIsd}</b> <b>{model.MobileNumber} </b>. Try again.");
+                _notifyService.Error($"Error to resend Otp to Mobile <b>{model.CountryIsd}</b> <b>{model.MobileNumber} </b>. Try again.");
                 return Json(new { success = false, message = result.Message });
             }
         }

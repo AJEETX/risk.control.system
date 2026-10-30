@@ -8,21 +8,11 @@ using risk.control.system.Services.Report;
 namespace risk.control.system.Controllers.Common
 {
     [Authorize(Roles = $"{AGENCY_ADMIN.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME},{ASSESSOR.DISPLAY_NAME},{MANAGER.DISPLAY_NAME}")]
-    public class ReportController : Controller
+    public class ReportController(INotyfService notifyService, ILogger<ReportController> logger, IInvestigationReportPdfService reportPdfService) : Controller
     {
-        private readonly INotyfService _notifyService;
-        private readonly ILogger<ReportController> _logger;
-        private readonly IInvestigationReportPdfService _reportPdfService;
-
-        public ReportController(INotyfService notifyService,
-            ILogger<ReportController> logger,
-            IInvestigationReportPdfService reportPdfService
-            )
-        {
-            _notifyService = notifyService;
-            _logger = logger;
-            _reportPdfService = reportPdfService;
-        }
+        private readonly INotyfService _notifyService = notifyService;
+        private readonly ILogger<ReportController> _logger = logger;
+        private readonly IInvestigationReportPdfService _reportPdfService = reportPdfService;
 
         [HttpGet]
         public async Task<IActionResult> PrintPdfReport(long id)

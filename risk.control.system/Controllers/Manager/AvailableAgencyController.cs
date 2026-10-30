@@ -1,7 +1,6 @@
 ﻿using AspNetCoreHero.ToastNotification.Abstractions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.FeatureManagement;
 using risk.control.system.AppConstant;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
@@ -14,36 +13,24 @@ namespace risk.control.system.Controllers.Manager
 {
     [Breadcrumb("Manage Agency")]
     [Authorize(Roles = $"{MANAGER.DISPLAY_NAME}")]
-    public class AvailableAgencyController : Controller
-    {
-        private readonly IManageAgencyService _manageAgencyService;
-        private readonly IErrorNotifyService _errorNotifyService;
-        private readonly INavigationService _navigationService;
-        private readonly INotyfService _notifyService;
-        private readonly ICompanyAgencyService _companyAgencyService;
-        private readonly ILogger<AvailableAgencyController> _logger;
-        private readonly string _baseUrl;
-
-        public AvailableAgencyController(
+    public class AvailableAgencyController(
             IManageAgencyService manageAgencyService,
+            IEncryptionService encryptionService,
             IErrorNotifyService errorNotifyService,
             INavigationService navigationService,
             INotyfService notifyService,
             ICompanyAgencyService companyAgencyService,
-            IFeatureManager featureManager,
              IHttpContextAccessor httpContextAccessor,
-            ILogger<AvailableAgencyController> logger)
-        {
-            _manageAgencyService = manageAgencyService;
-            this._errorNotifyService = errorNotifyService;
-            _navigationService = navigationService;
-            _notifyService = notifyService;
-            _companyAgencyService = companyAgencyService;
-            _logger = logger;
-            var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
-            var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
-            _baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
-        }
+            ILogger<AvailableAgencyController> logger) : Controller
+    {
+        private readonly IEncryptionService _encryptionService = encryptionService;
+        private readonly IManageAgencyService _manageAgencyService = manageAgencyService;
+        private readonly IErrorNotifyService _errorNotifyService = errorNotifyService;
+        private readonly INavigationService _navigationService = navigationService;
+        private readonly INotyfService _notifyService = notifyService;
+        private readonly ICompanyAgencyService _companyAgencyService = companyAgencyService;
+        private readonly ILogger<AvailableAgencyController> _logger = logger;
+        private readonly string _baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent()}{httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent()}";
 
         public IActionResult Index()
         {
@@ -69,21 +56,49 @@ namespace risk.control.system.Controllers.Manager
                 return RedirectToAction(nameof(Agencies));
             }
 
-            var result = await _companyAgencyService.EmpanelAgenciesAsync(userEmail, vendors);
+            var (Success, Message) = await _companyAgencyService.EmpanelAgenciesAsync(userEmail, vendors);
 
-            if (result.Success)
+            if (Success)
             {
-                _notifyService.Custom(result.Message, 3, "green", "fas fa-thumbs-up");
+                _notifyService.Custom(Message, 3, "green", "fas fa-thumbs-up");
             }
             else
             {
-                _notifyService.Error(result.Message);
+                _notifyService.Error(Message);
             }
 
             return RedirectToAction(nameof(Agencies));
         }
 
-        public async Task<IActionResult> Edit(long id)
+        [Breadcrumb("Agency Profile", FromAction = nameof(Agencies))]
+        public async Task<IActionResult> Profile([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id)
+        {
+            var userEmail = HttpContext.User?.Identity?.Name;
+            try
+            {
+                if (id <= 0)
+                {
+                    _notifyService.Error("Error getting Agency");
+                    return RedirectToAction(nameof(Agencies));
+                }
+
+                var vendor = await _manageAgencyService.GetVendorDetailAsync(id);
+                if (vendor == null)
+                {
+                    _notifyService.Error("Error getting Agency");
+                    return RedirectToAction(nameof(Agencies));
+                }
+
+                return View(vendor);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting {AgencyId}. {UserEmail}.", id, userEmail);
+                _notifyService.Error("Error getting Agency. Try again.");
+                return RedirectToAction(nameof(Agencies));
+            }
+        }
+        public async Task<IActionResult> Edit([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name!;
             try
@@ -100,8 +115,9 @@ namespace risk.control.system.Controllers.Manager
                     _notifyService.Error("Error getting Agency. Try again.");
                     return RedirectToAction(nameof(Agencies));
                 }
+                var encryptedId = _encryptionService.ProtectId(id);
 
-                ViewData["BreadcrumbNode"] = _navigationService.GetAgencyActionPath(id, ControllerName<AvailableAgencyController>.Name, "Available Agencies", "Edit Agency", nameof(Edit));
+                ViewData["BreadcrumbNode"] = _navigationService.GetAgencyActionPath(encryptedId, ControllerName<AvailableAgencyController>.Name, "Available Agencies", "Edit Agency", nameof(Edit));
 
                 return View(vendor);
             }
@@ -145,37 +161,10 @@ namespace risk.control.system.Controllers.Manager
                 _logger.LogError(ex, "Error editing {AgencyId}. {UserEmail}.", vendorId, User?.Identity?.Name);
                 _notifyService.Error("Error editing Agency. Try again.");
             }
-            return RedirectToAction(nameof(Profile), ControllerName<AvailableAgencyController>.Name, new { id = vendorId });
+            var encryptedId = _encryptionService.ProtectId(vendorId);
+            return RedirectToAction(nameof(Profile), ControllerName<AvailableAgencyController>.Name, new { id = encryptedId });
         }
 
-        [Breadcrumb("Agency Profile", FromAction = nameof(Agencies))]
-        public async Task<IActionResult> Profile(long id)
-        {
-            var userEmail = HttpContext.User?.Identity?.Name;
-            try
-            {
-                if (id <= 0)
-                {
-                    _notifyService.Error("Error getting Agency");
-                    return RedirectToAction(nameof(Agencies));
-                }
-
-                var vendor = await _manageAgencyService.GetVendorDetailAsync(id);
-                if (vendor == null)
-                {
-                    _notifyService.Error("Error getting Agency");
-                    return RedirectToAction(nameof(Agencies));
-                }
-
-                return View(vendor);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error getting {AgencyId}. {UserEmail}.", id, userEmail);
-                _notifyService.Error("Error getting Agency. Try again.");
-                return RedirectToAction(nameof(Agencies));
-            }
-        }
 
         [HttpPost]
         [ValidateAntiForgeryToken]

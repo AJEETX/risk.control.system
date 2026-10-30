@@ -167,9 +167,8 @@ function loadStateData(countryId) {
  * Loads district data based on the preloaded Country and State IDs.
  */
 function loadDistrictData(countryId, stateId) {
-    const VendorInvestigationServiceTypeId = $("#VendorInvestigationServiceTypeId").val();
     const $checkbox = $('#allDistrictsCheckbox');
-    if ($checkbox.is(':checked') && VendorInvestigationServiceTypeId != undefined) {
+    if ($checkbox.is(':checked') ) {
         return;
     }
     const vendorId = $("#vendorId").val();

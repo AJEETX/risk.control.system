@@ -14,35 +14,24 @@ using risk.control.system.Services.Common;
 namespace risk.control.system.Controllers.Assessor
 {
     [Authorize(Roles = ASSESSOR.DISPLAY_NAME)]
-    public class EnquiryController : Controller
-    {
-        private const long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
-        private static readonly string[] AllowedExt = new[] { ".jpg", ".jpeg", ".png" };
-        private static readonly string[] AllowedMime = new[] { "image/jpeg", "image/png" };
-        private readonly ILogger<EnquiryController> _logger;
-        private readonly INotyfService _notifyService;
-        private readonly IAssessorQueryService _assessorQueryService;
-        private readonly string _baseUrl;
-        private readonly IBackgroundJobClient _backgroundJobClient;
-        private readonly ICaseNotificationService _mailService;
-
-        public EnquiryController(
+    public class EnquiryController(
             ILogger<EnquiryController> logger,
             INotyfService notifyService,
             IAssessorQueryService assessorQueryService,
             IHttpContextAccessor httpContextAccessor,
             IBackgroundJobClient backgroundJobClient,
-            ICaseNotificationService mailService)
-        {
-            _logger = logger;
-            _notifyService = notifyService;
-            _assessorQueryService = assessorQueryService;
-            _backgroundJobClient = backgroundJobClient;
-            _mailService = mailService;
-            var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
-            var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
-            _baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
-        }
+            ICaseNotificationService caseNotificationService) : Controller
+    {
+        private const long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+        private static readonly string[] AllowedExt = new[] { ".jpg", ".jpeg", ".png" };
+        private static readonly string[] AllowedMime = new[] { "image/jpeg", "image/png" };
+        private readonly string _baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent()}{httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent()}";
+        private readonly ILogger<EnquiryController> _logger = logger;
+        private readonly INotyfService _notifyService = notifyService;
+        private readonly IAssessorQueryService _assessorQueryService = assessorQueryService;
+        private readonly IBackgroundJobClient _backgroundJobClient = backgroundJobClient;
+        private readonly ICaseNotificationService _caseNotificationService = caseNotificationService;
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -69,7 +58,7 @@ namespace risk.control.system.Controllers.Assessor
                 var model = await _assessorQueryService.SubmitQueryToAgency(userEmail, claimId, request.InvestigationReport.EnquiryRequest, request.InvestigationReport.EnquiryRequests, document);
                 if (model != null)
                 {
-                    _backgroundJobClient.Enqueue(() => _mailService.NotifySubmitQueryToAgency(userEmail, claimId, _baseUrl));
+                    _backgroundJobClient.Enqueue(() => _caseNotificationService.NotifySubmitQueryToAgency(userEmail, claimId, _baseUrl));
                     _notifyService.Success("Enquiry Sent to Agency");
                     return RedirectToAction(nameof(AssessorController.Assess), ControllerName<AssessorController>.Name);
                 }

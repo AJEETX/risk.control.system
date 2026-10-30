@@ -11,38 +11,25 @@ using risk.control.system.Services.Common;
 namespace risk.control.system.Controllers.Assessor
 {
     [Authorize(Roles = ASSESSOR.DISPLAY_NAME)]
-    public class CaseActionController : Controller
-    {
-        private readonly string _baseUrl;
-        private const long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
-        private static readonly string[] AllowedExt = new[] { ".jpg", ".jpeg", ".png" };
-        private static readonly string[] AllowedMime = new[] { "image/jpeg", "image/png" };
-        private readonly IProcessCaseService _processCaseService;
-        private readonly IAssessorQueryService _assessorQueryService;
-        private readonly ICaseNotificationService _mailService;
-        private readonly INotyfService _notifyService;
-        private readonly ILogger<CaseActionController> _logger;
-        private readonly IBackgroundJobClient backgroundJobClient;
-
-        public CaseActionController(
+    public class CaseActionController(
             IProcessCaseService processCaseService,
             IAssessorQueryService assessorQueryService,
-            ICaseNotificationService mailboxService,
+            ICaseNotificationService caseNotificationService,
             INotyfService notifyService,
             IHttpContextAccessor httpContextAccessor,
             ILogger<CaseActionController> logger,
-            IBackgroundJobClient backgroundJobClient)
-        {
-            _processCaseService = processCaseService;
-            _assessorQueryService = assessorQueryService;
-            _mailService = mailboxService;
-            _notifyService = notifyService;
-            _logger = logger;
-            this.backgroundJobClient = backgroundJobClient;
-            var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
-            var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
-            _baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
-        }
+            IBackgroundJobClient backgroundJobClient) : Controller
+    {
+        private const long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+        private static readonly string[] AllowedExt = new[] { ".jpg", ".jpeg", ".png" };
+        private static readonly string[] AllowedMime = new[] { "image/jpeg", "image/png" };
+        private readonly string _baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent()}{httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent()}";
+        private readonly IProcessCaseService _processCaseService = processCaseService;
+        private readonly IAssessorQueryService _assessorQueryService = assessorQueryService;
+        private readonly ICaseNotificationService _caseNotificationService = caseNotificationService;
+        private readonly INotyfService _notifyService = notifyService;
+        private readonly ILogger<CaseActionController> _logger = logger;
+        private readonly IBackgroundJobClient backgroundJobClient = backgroundJobClient;
 
         [ValidateAntiForgeryToken]
         [HttpPost]
@@ -64,7 +51,7 @@ namespace risk.control.system.Controllers.Assessor
 
                 var (company, contract) = await _processCaseService.ProcessCaseReport(userEmail, assessorRemarks, claimId, reportUpdateStatus, reportAiSummary);
 
-                backgroundJobClient.Enqueue(() => _mailService.NotifyCaseReportProcess(userEmail, claimId, _baseUrl));
+                backgroundJobClient.Enqueue(() => _caseNotificationService.NotifyCaseReportProcess(userEmail, claimId, _baseUrl));
                 if (reportUpdateStatus == AssessorRemarkType.OK)
                 {
                     _notifyService.Custom($"Case <b> #{contract}</b> Approved", 3, "green", "far fa-file-powerpoint");

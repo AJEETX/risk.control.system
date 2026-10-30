@@ -198,7 +198,7 @@ function checkUserEmail() {
         $('#result').fadeOut(1000); // 1.5 seconds
         $('#result').fadeOut('slow'); // 1.5 seconds
         $.get(url, { input: name + '@' + emailSuffix }, function (data) {
-            if (data === 0) { //available
+            if (data) { //available
                 $('#mailAddress').val($('#emailAddress').val());
                 $("#result").html("<span class='available' data-toggle='tooltip' title='Available' data-toggle='tooltip'> <i class='fas fa-check'></i></span>");
                 $('#result').addClass('result-padding');
@@ -207,7 +207,7 @@ function checkUserEmail() {
                 $('#result').fadeIn('slow'); // 1.5 seconds
                 $detailsFieldset.prop('disabled', false);
             }
-            else if (data === 1) { //domain exists
+            else{
                 $('#mailAddress').val('');
                 $("#result").html("<span class='unavailable' data-toggle='tooltip' title='Email exists' data-toggle='tooltip'><i class='fa fa-times-circle'></i></span>");
                 $('#result').addClass('result-padding');
@@ -215,12 +215,6 @@ function checkUserEmail() {
                 $('#result').fadeIn(1000); // 1.5 seconds
                 $('#result').fadeIn('slow'); // 1.5 seconds
                 $detailsFieldset.prop('disabled', true);
-            }
-
-            else if (data = null || data == undefined) {
-                $('#mailAddress').val('');
-                $detailsFieldset.prop('disabled', true);
-                $("#result").empty();
             }
         });
     }

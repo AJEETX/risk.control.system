@@ -13,16 +13,10 @@ namespace risk.control.system.Controllers.PortalAdmin
 {
     [Breadcrumb("Roles")]
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME}")]
-    public class RolesController : Controller
+    public class RolesController(RoleManager<ApplicationRole> roleManager, INotyfService notifyService) : Controller
     {
-        private readonly RoleManager<ApplicationRole> _roleManager;
-        private readonly INotyfService notifyService;
-
-        public RolesController(RoleManager<ApplicationRole> roleManager, INotyfService notifyService)
-        {
-            _roleManager = roleManager;
-            this.notifyService = notifyService;
-        }
+        private readonly RoleManager<ApplicationRole> _roleManager = roleManager;
+        private readonly INotyfService _notifyService = notifyService;
 
         public async Task<IActionResult> Index(string? id = null)
         {

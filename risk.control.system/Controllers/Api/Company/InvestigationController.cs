@@ -11,16 +11,10 @@ namespace risk.control.system.Controllers.Api.Company
     [Route("api/[controller]")]
     [ApiController]
     [Authorize(Roles = $"{CREATOR.DISPLAY_NAME},{MANAGER.DISPLAY_NAME}")]
-    public class InvestigationController : ControllerBase
+    public class InvestigationController(IInvestigationService investigationService, ILogger<InvestigationController> logger) : ControllerBase
     {
-        private readonly IInvestigationService service;
-        private readonly ILogger<InvestigationController> logger;
-
-        public InvestigationController(IInvestigationService service, ILogger<InvestigationController> logger)
-        {
-            this.service = service;
-            this.logger = logger;
-        }
+        private readonly IInvestigationService _investigationService = investigationService;
+        private readonly ILogger<InvestigationController> _logger = logger;
 
         [Authorize(Roles = CREATOR.DISPLAY_NAME)]
         [HttpGet("GetAuto")]
@@ -30,13 +24,13 @@ namespace risk.control.system.Controllers.Api.Company
 
             try
             {
-                var response = await service.GetAuto(userEmail, draw, start, length, search, caseType, orderColumn, orderDir);
+                var response = await _investigationService.GetAuto(userEmail, draw, start, length, search, caseType, orderColumn, orderDir);
 
                 return Ok(response);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting draft cases for user {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error getting draft cases for user {UserEmail}", userEmail);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -49,13 +43,13 @@ namespace risk.control.system.Controllers.Api.Company
 
             try
             {
-                var response = await service.GetActive(userEmail, draw, start, length, search, caseType, orderColumn, orderDir);
+                var response = await _investigationService.GetActive(userEmail, draw, start, length, search, caseType, orderColumn, orderDir);
 
                 return Ok(response);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting active cases for user {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error getting active cases for user {UserEmail}", userEmail);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -66,12 +60,12 @@ namespace risk.control.system.Controllers.Api.Company
             var userEmail = HttpContext.User.Identity?.Name!;
             try
             {
-                var response = await service.GetActiveClaims(request, userEmail);
+                var response = await _investigationService.GetActiveClaims(request, userEmail);
                 return Ok(response);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting active cases for user {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error getting active cases for user {UserEmail}", userEmail);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -84,7 +78,7 @@ namespace risk.control.system.Controllers.Api.Company
             try
             {
                 var isManager = HttpContext?.User?.IsInRole(MANAGER.DISPLAY_NAME) ?? false;
-                var result = await service.GetFilesData(userEmail, isManager, draw, start, length, orderColumn, orderDir, uploadId, searchTerm);
+                var result = await _investigationService.GetFilesData(userEmail, isManager, draw, start, length, orderColumn, orderDir, uploadId, searchTerm);
                 return Ok(new
                 {
                     draw = result.Draw,
@@ -97,7 +91,7 @@ namespace risk.control.system.Controllers.Api.Company
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting uploaded cases for user {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error getting uploaded cases for user {UserEmail}", userEmail);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -114,7 +108,7 @@ namespace risk.control.system.Controllers.Api.Company
             try
             {
                 var isManager = HttpContext?.User?.IsInRole(MANAGER.DISPLAY_NAME) ?? false;
-                var result = await service.GetFileById(userEmail, isManager, uploadId);
+                var result = await _investigationService.GetFileById(userEmail, isManager, uploadId);
 
                 return Ok(new
                 {
@@ -124,7 +118,7 @@ namespace risk.control.system.Controllers.Api.Company
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting uploaded case by {UploadId} for user {UserEmail}", uploadId, userEmail);
+                _logger.LogError(ex, "Error getting uploaded case by {UploadId} for user {UserEmail}", uploadId, userEmail);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }

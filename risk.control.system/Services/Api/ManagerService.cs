@@ -18,9 +18,14 @@ namespace risk.control.system.Services.Api
         Task<object> GetRejectedCases(string userEmail, int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc");
     }
 
-    internal class ManagerService(IDbContextFactory<ApplicationDbContext> contextFactory, IWebHostEnvironment env, IBase64FileService base64FileService) : IManagerService
+    internal class ManagerService(
+        IDbContextFactory<ApplicationDbContext> contextFactory,
+        IWebHostEnvironment env,
+        IEncryptionService encryptionService,
+        IBase64FileService base64FileService) : IManagerService
     {
         private readonly IDbContextFactory<ApplicationDbContext> _contextFactory = contextFactory;
+        private readonly IEncryptionService _encryptionService = encryptionService;
         private readonly IWebHostEnvironment _env = env;
         private readonly IBase64FileService _base64FileService = base64FileService;
 
@@ -155,7 +160,8 @@ namespace risk.control.system.Services.Api
                 await Task.WhenAll(docTask, custTask, beneTask, ownerImageTask, ownerDetailTask);
                 return new
                 {
-                    Id = a.Id,
+                    Id = _encryptionService.ProtectId(a.Id),
+                    RawId = a.Id,
                     AutoAllocated = a.IsAutoAllocated,
                     CustomerFullName = a.CustomerName ?? string.Empty,
                     BeneficiaryFullName = a.BeneficiaryName ?? string.Empty,
@@ -190,7 +196,7 @@ namespace risk.control.system.Services.Api
             var data = await Task.WhenAll(transformedData);
 
             // Prepare Response
-            var idsToMarkViewed = data.Where(x => x.IsNewAssigned).Select(x => x.Id).ToList();
+            var idsToMarkViewed = data.Where(x => x.IsNewAssigned).Select(x => x.RawId).ToList();
 
             if (idsToMarkViewed.Any())
             {
@@ -354,7 +360,8 @@ namespace risk.control.system.Services.Api
                 return new CaseInvestigationResponse
                 {
                     PolicyNum = a.PolicyNum,
-                    Id = a.Id,
+                    Id = _encryptionService.ProtectId(a.Id),
+                    RawId = a.Id,
                     AutoAllocated = a.IsAutoAllocated,
                     PolicyId = a.ContractNumber,
                     Amount = string.Format(culture, "{0:C}", a.SumAssuredValue),

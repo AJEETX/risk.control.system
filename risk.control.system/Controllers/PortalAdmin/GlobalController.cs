@@ -14,20 +14,12 @@ namespace risk.control.system.Controllers.PortalAdmin
 {
     [Breadcrumb("General Setup")]
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME}")]
-    public class GlobalController : Controller
+    public class GlobalController(ApplicationDbContext context, INotyfService notifyService, IFeatureManager featureManager, ILogger<GlobalController> logger) : Controller
     {
-        private readonly ApplicationDbContext _context;
-        private readonly INotyfService notifyService;
-        private readonly IFeatureManager manager;
-        private readonly ILogger<GlobalController> logger;
-
-        public GlobalController(ApplicationDbContext context, INotyfService notifyService, IFeatureManager manager, ILogger<GlobalController> logger)
-        {
-            _context = context;
-            this.notifyService = notifyService;
-            this.manager = manager;
-            this.logger = logger;
-        }
+        private readonly ApplicationDbContext _context = context;
+        private readonly INotyfService _notifyService = notifyService;
+        private readonly IFeatureManager _featureManager = featureManager;
+        private readonly ILogger<GlobalController> _logger = logger;
 
         // GET: RiskCaseStatus
         public IActionResult Index()
@@ -50,16 +42,16 @@ namespace risk.control.system.Controllers.PortalAdmin
         {
             if (id < 1)
             {
-                notifyService.Error("Global-settings not found!");
+                _notifyService.Error("Global-settings not found!");
                 return NotFound();
             }
-            await manager.IsEnabledAsync(nameof(FeatureFlags.SMS4ADMIN));
+            await _featureManager.IsEnabledAsync(nameof(FeatureFlags.SMS4ADMIN));
             if (ModelState.IsValid)
             {
                 try
                 {
                     var globalSettings = await _context.GlobalSettings.FirstOrDefaultAsync(x => x.GlobalSettingsId == id);
-                    globalSettings!.SendSMS = await manager.IsEnabledAsync(nameof(FeatureFlags.SMS4ADMIN));
+                    globalSettings!.SendSMS = await _featureManager.IsEnabledAsync(nameof(FeatureFlags.SMS4ADMIN));
                     globalSettings.CanChangePassword = settings.CanChangePassword;
                     globalSettings.ShowTimer = settings.ShowTimer;
                     globalSettings.ShowDetailFooter = settings.ShowDetailFooter;
@@ -78,14 +70,14 @@ namespace risk.control.system.Controllers.PortalAdmin
                 }
                 catch (Exception ex)
                 {
-                    logger.LogError(ex, "Error occurred.");
-                    notifyService.Error("Error to edit Global-settings!");
+                    _logger.LogError(ex, "Error occurred.");
+                    _notifyService.Error("Error to edit Global-settings!");
                     return View(settings);
                 }
-                notifyService.Success("Global-settings edited successfully!");
+                _notifyService.Success("Global-settings edited successfully!");
                 return RedirectToAction(nameof(Index));
             }
-            notifyService.Error("Error to edit Global-settings!");
+            _notifyService.Error("Error to edit Global-settings!");
             return View(settings);
         }
     }

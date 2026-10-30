@@ -16,24 +16,16 @@ namespace risk.control.system.Controllers.Common
     [Route("api/[controller]")]
     [ApiController]
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME},{AGENCY_ADMIN.DISPLAY_NAME},{CREATOR.DISPLAY_NAME},{ASSESSOR.DISPLAY_NAME},{MANAGER.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME},{AGENT.DISPLAY_NAME}")]
-    public class VerifyEntityController : ControllerBase
-    {
-        private readonly ApplicationDbContext _context;
-        private readonly IPhoneService _phoneService;
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly ILogger<VerifyEntityController> _logger;
-
-        public VerifyEntityController(
+    public class VerifyEntityController(
             ApplicationDbContext context,
             IPhoneService phoneService,
             UserManager<ApplicationUser> userManager,
-            ILogger<VerifyEntityController> logger)
-        {
-            _context = context;
-            _phoneService = phoneService;
-            _userManager = userManager;
-            _logger = logger;
-        }
+            ILogger<VerifyEntityController> logger) : ControllerBase
+    {
+        private readonly ApplicationDbContext _context = context;
+        private readonly IPhoneService _phoneService = phoneService;
+        private readonly UserManager<ApplicationUser> _userManager = userManager;
+        private readonly ILogger<VerifyEntityController> _logger = logger;
 
         [HttpGet("GetAgencyName")]
         public async Task<int?> GetAgencyName(string input, string domain)
@@ -50,16 +42,16 @@ namespace risk.control.system.Controllers.Common
         }
 
         [HttpGet("GetUserEmail")]
-        public async Task<int?> CheckUserEmail(string input)
+        public async Task<bool> CheckUserEmail(string input)
         {
             if (string.IsNullOrWhiteSpace(input))
             {
-                return null;
+                return false;
             }
 
             var userCount = await _userManager.Users.AsNoTracking().CountAsync(u => u.Email == input.ToLower());
 
-            return userCount == 0 ? 0 : 1;
+            return userCount == 0;
         }
 
         [HttpGet("GetInvestigationServicesByInsuranceType")]
@@ -116,11 +108,11 @@ namespace risk.control.system.Controllers.Common
 
         [AllowAnonymous]
         [HttpGet("GetCountryIsdCode")]
-        public IActionResult GetCountryIsdCode(string term = "")
+        public async Task<IActionResult> GetCountryIsdCode(string term = "")
         {
             try
             {
-                var allCountries = _context.Country.AsNoTracking().ToList();
+                var allCountries = await _context.Country.AsNoTracking().ToListAsync();
 
                 if (string.IsNullOrEmpty(term))
                     return Ok(allCountries
@@ -158,11 +150,11 @@ namespace risk.control.system.Controllers.Common
 
         [AllowAnonymous]
         [HttpGet("GetIsdCode")]
-        public IActionResult GetIsdCode(string term = "")
+        public async Task<IActionResult> GetIsdCode(string term = "")
         {
             try
             {
-                var allCountries = _context.Country.AsNoTracking().ToList();
+                var allCountries = await _context.Country.AsNoTracking().ToListAsync();
 
                 if (string.IsNullOrEmpty(term))
                     return Ok(allCountries

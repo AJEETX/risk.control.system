@@ -15,29 +15,19 @@ namespace risk.control.system.Controllers.AgencyAdmin
 {
     [Breadcrumb("Cases")]
     [Authorize(Roles = $"{AGENCY_ADMIN.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME}")]
-    public class VendorInvestigationController : Controller
-    {
-        private readonly INotyfService _notifyService;
-        private readonly IInvoiceService _invoiceService;
-        private readonly INavigationService _navigationService;
-        private readonly IAgencyInvestigationDetailService _agencyInvestigationDetailService;
-        private readonly ILogger<VendorInvestigationController> _logger;
-        private readonly ICaseReportService _caseReportService;
-
-        public VendorInvestigationController(INotyfService notifyService,
+    public class VendorInvestigationController(INotyfService notifyService,
             IInvoiceService invoiceService,
             INavigationService navigationService,
             IAgencyInvestigationDetailService agencyInvestigationDetailService,
             ILogger<VendorInvestigationController> logger,
-            ICaseReportService vendorService)
-        {
-            _notifyService = notifyService;
-            _invoiceService = invoiceService;
-            _navigationService = navigationService;
-            _agencyInvestigationDetailService = agencyInvestigationDetailService;
-            _logger = logger;
-            _caseReportService = vendorService;
-        }
+            ICaseReportService caseReportService) : Controller
+    {
+        private readonly INotyfService _notifyService = notifyService;
+        private readonly IInvoiceService _invoiceService = invoiceService;
+        private readonly INavigationService _navigationService = navigationService;
+        private readonly IAgencyInvestigationDetailService _agencyInvestigationDetailService = agencyInvestigationDetailService;
+        private readonly ILogger<VendorInvestigationController> _logger = logger;
+        private readonly ICaseReportService _caseReportService = caseReportService;
 
         public IActionResult Index()
         {
@@ -52,7 +42,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
 
         [HttpGet]
         [Breadcrumb("Agents", FromAction = nameof(Allocate))]
-        public async Task<IActionResult> SelectAgent(long id, bool route = true)
+        public async Task<IActionResult> SelectAgent([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id, bool routeData = true)
         {
             var userEmail = HttpContext.User?.Identity?.Name!;
             try
@@ -64,7 +54,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
                 }
 
                 var model = await _agencyInvestigationDetailService.SelectVendorAgent(userEmail, id);
-                model.Route = route;
+                model.Route = routeData;
                 return View(model);
             }
             catch (Exception ex)
@@ -77,7 +67,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
 
         [HttpGet]
         [Breadcrumb("Re-Allocate", FromAction = nameof(AgentReport))]
-        public async Task<IActionResult> ReSelectAgent(long id)
+        public async Task<IActionResult> ReSelectAgent([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name!;
             try
@@ -107,7 +97,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
         }
 
         [Breadcrumb("Submit", FromAction = nameof(AgentReport))]
-        public async Task<IActionResult> ReportDetail(long id)
+        public async Task<IActionResult> ReportDetail([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name!;
             try
@@ -137,7 +127,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
         }
 
         [Breadcrumb(title: "Details", FromAction = nameof(Allocate))]
-        public async Task<IActionResult> CaseDetail(long id)
+        public async Task<IActionResult> CaseDetail([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name!;
             try
@@ -160,7 +150,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
         }
 
         [Breadcrumb(title: "Details", FromAction = nameof(Active))]
-        public async Task<IActionResult> ActiveDetail(long id)
+        public async Task<IActionResult> ActiveDetail([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name!;
             try
@@ -189,7 +179,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
         }
 
         [Breadcrumb("Details", FromAction = nameof(Completed))]
-        public async Task<IActionResult> CompletedDetail(long id)
+        public async Task<IActionResult> CompletedDetail([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name!;
             if (!ModelState.IsValid || id < 1)
@@ -212,7 +202,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
         }
 
         [Breadcrumb("Reply Enquiry", FromAction = nameof(Allocate))]
-        public async Task<IActionResult> ReplyEnquiry(long id)
+        public async Task<IActionResult> ReplyEnquiry([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name!;
 
@@ -226,7 +216,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
             return View(model);
         }
 
-        public async Task<IActionResult> Invoice(long id)
+        public async Task<IActionResult> Invoice([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             try
@@ -250,7 +240,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
             }
         }
 
-        public async Task<IActionResult> PrintInvoice(long id)
+        public async Task<IActionResult> PrintInvoice([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             try

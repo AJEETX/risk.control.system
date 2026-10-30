@@ -84,7 +84,7 @@ namespace risk.control.system.Services.AgencyAdmin
                     v.InvestigationServiceTypeId == service.InvestigationServiceTypeId &&
                     v.CountryId == service.SelectedCountryId &&
                     v.StateId == service.SelectedStateId &&
-                    v.VendorInvestigationServiceTypeId != service.VendorInvestigationServiceTypeId)
+                    v.Id != service.Id)
                 .ToListAsync();
 
             if (IsDuplicate(existingServices, service.SelectedDistrictIds, isAllDistricts))

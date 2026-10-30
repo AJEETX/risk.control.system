@@ -25,8 +25,10 @@ namespace risk.control.system.Services.Api
         private readonly int _onlineThresholdInMinutes;
         private readonly DateTime _cutoffTime;
         private readonly IFeatureManager _featureManager;
+        private readonly IEncryptionService _encryptionService;
 
         public CompanyUserApiService(
+            IEncryptionService encryptionService,
             IConfiguration config,
             ApplicationDbContext context,
             IBase64FileService base64FileService,
@@ -40,6 +42,7 @@ namespace risk.control.system.Services.Api
             _context = context;
             _base64FileService = base64FileService;
             _featureManager = featureManager;
+            _encryptionService = encryptionService;
         }
 
         public async Task<List<UserDetailResponse>> GetCompanyUsers(string userEmail)
@@ -89,9 +92,9 @@ namespace risk.control.system.Services.Api
             var addressLine = user.Country!.Code == "AU" ? $"{user.Addressline},  {user!.District!.Name}" : $"{user.Addressline}, {user!.PinCode!.Name.Trim()}, {user.District!.Name}";
             return new UserDetailResponse
             {
-                Id = user.Id,
+                Id = _encryptionService.ProtectId(user.Id),
                 Name = $"{user.FirstName} {user.LastName}",
-                Email = $"<a href=/Company/EditUser?userId={user.Id}>{user.Email}</a>",
+                Email = $"<a href=/Company/EditUser?userId={_encryptionService.ProtectId(user.Id)}>{user.Email}</a>",
                 RawEmail = user.Email,
                 Phone = $"(+{user.Country!.ISDCode}) {user.PhoneNumber}",
                 Photo = photo,
@@ -151,7 +154,7 @@ namespace risk.control.system.Services.Api
             var addressLine = user.Country!.Code == "AU" ? $"{user.Addressline},  {user!.District!.Name}" : $"{user.Addressline}, {user!.PinCode!.Name.Trim()}, {user.District!.Name}";
             return new UserDetailResponse
             {
-                Id = user.Id,
+                Id = _encryptionService.ProtectId(user.Id),
                 Name = $"{user.FirstName} {user.LastName}",
                 Email = $"{user.Email}",
                 Phone = $"(+{user.Country!.ISDCode}) {user.PhoneNumber}",

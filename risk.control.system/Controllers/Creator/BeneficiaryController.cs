@@ -13,28 +13,21 @@ namespace risk.control.system.Controllers.Creator
 {
     [Breadcrumb("Cases")]
     [Authorize(Roles = CREATOR.DISPLAY_NAME)]
-    public class BeneficiaryController : Controller
-    {
-        private readonly ILogger<BeneficiaryController> _logger;
-        private readonly IBeneficiaryService _beneficiaryService;
-        private readonly IErrorNotifyService _errorNotifyService;
-        private readonly INavigationService _navigationService;
-        private readonly INotyfService _notifyService;
-
-        public BeneficiaryController(ILogger<BeneficiaryController> logger,
+    public class BeneficiaryController(ILogger<BeneficiaryController> logger,
             IBeneficiaryService beneficiaryService,
+            IEncryptionService encryptionService,
             IErrorNotifyService errorNotifyService,
             INavigationService navigationService,
-            INotyfService notifyService)
-        {
-            _logger = logger;
-            _beneficiaryService = beneficiaryService;
-            this._errorNotifyService = errorNotifyService;
-            _navigationService = navigationService;
-            _notifyService = notifyService;
-        }
+            INotyfService notifyService) : Controller
+    {
+        private readonly IEncryptionService _encryptionService = encryptionService;
+        private readonly ILogger<BeneficiaryController> _logger = logger;
+        private readonly IBeneficiaryService _beneficiaryService = beneficiaryService;
+        private readonly IErrorNotifyService _errorNotifyService = errorNotifyService;
+        private readonly INavigationService _navigationService = navigationService;
+        private readonly INotyfService _notifyService = notifyService;
 
-        public async Task<IActionResult> Create(long id)
+        public async Task<IActionResult> Create([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name!;
             try
@@ -45,7 +38,8 @@ namespace risk.control.system.Controllers.Creator
                     return RedirectToAction(nameof(AddAssignController.New), ControllerName<AddAssignController>.Name);
                 }
 
-                ViewData["BreadcrumbNode"] = _navigationService.GetInvestigationPath(id, "Add Beneficiary", nameof(Create), ControllerName<BeneficiaryController>.Name);
+                var encryptedId = _encryptionService.ProtectId(id);
+                ViewData["BreadcrumbNode"] = _navigationService.GetInvestigationPath(encryptedId, "Add Beneficiary", nameof(Create), ControllerName<BeneficiaryController>.Name);
 
                 var model = await _beneficiaryService.GetViewModelAsync(id, userEmail);
 
@@ -55,7 +49,8 @@ namespace risk.control.system.Controllers.Creator
             {
                 _logger.LogError(ex, "Error getting case {Id}. {UserEmail}", id, userEmail);
                 _notifyService.Error("Error creating beneficiary. Try again.");
-                return RedirectToAction(nameof(CreatorController.Details), ControllerName<CreatorController>.Name, new { id = id });
+                var encryptedId = _encryptionService.ProtectId(id);
+                return RedirectToAction(nameof(CreatorController.Details), ControllerName<CreatorController>.Name, new { id = encryptedId });
             }
         }
 
@@ -84,17 +79,17 @@ namespace risk.control.system.Controllers.Creator
                     return View(model);
                 }
                 _notifyService.Custom($"Beneficiary <b>{model.Name}</b> added successfully", 3, "green", "fas fa-user-tie");
-                return RedirectToAction(nameof(CreatorController.Details), ControllerName<CreatorController>.Name, new { id = model.InvestigationTaskId });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error creating Beneficiary for Case {Id}. {UserEmail}", model.InvestigationTaskId, userEmail);
                 _notifyService.Warning("Error creating Beneficiary. Try again. ");
-                return RedirectToAction(nameof(CreatorController.Details), ControllerName<CreatorController>.Name, new { id = model.InvestigationTaskId });
             }
+            var encryptedId = _encryptionService.ProtectId(model.InvestigationTaskId!.Value);
+            return RedirectToAction(nameof(CreatorController.Details), ControllerName<CreatorController>.Name, new { id = encryptedId });
         }
 
-        public async Task<IActionResult> Edit(long id)
+        public async Task<IActionResult> Edit([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name!;
             try
@@ -106,7 +101,8 @@ namespace risk.control.system.Controllers.Creator
                 }
                 var model = await _beneficiaryService.GetEditViewModelAsync(id, userEmail);
 
-                ViewData["BreadcrumbNode"] = _navigationService.GetInvestigationPath(id, "Edit Beneficiary", nameof(Edit), ControllerName<BeneficiaryController>.Name);
+                var encryptedId = _encryptionService.ProtectId(id);
+                ViewData["BreadcrumbNode"] = _navigationService.GetInvestigationPath(encryptedId, "Edit Beneficiary", nameof(Edit), ControllerName<BeneficiaryController>.Name);
 
                 return View(model);
             }
@@ -114,13 +110,14 @@ namespace risk.control.system.Controllers.Creator
             {
                 _logger.LogError(ex, "Error getting Beneficiary {Id}. {UserEmail}", id, userEmail);
                 _notifyService.Error("Error editing Beneficiary. Try again.");
-                return RedirectToAction(nameof(CreatorController.Details), ControllerName<CreatorController>.Name, new { id = id });
+                var encryptedId = _encryptionService.ProtectId(id);
+                return RedirectToAction(nameof(CreatorController.Details), ControllerName<CreatorController>.Name, new { id = encryptedId });
             }
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(BeneficiaryDetail model)
+        public async Task<IActionResult> Edit([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id, BeneficiaryDetail model)
         {
             var userEmail = HttpContext.User?.Identity?.Name!;
             try
@@ -132,11 +129,11 @@ namespace risk.control.system.Controllers.Creator
                     return View(model);
                 }
 
-                var result = await _beneficiaryService.EditAsync(userEmail, model);
+                var (Success, Errors) = await _beneficiaryService.EditAsync(userEmail, model);
 
-                if (!result.Success)
+                if (!Success)
                 {
-                    foreach (var error in result.Errors)
+                    foreach (var error in Errors)
                         ModelState.AddModelError(error.Key, error.Value);
 
                     _errorNotifyService.ShowErrorNotification(ModelState);
@@ -150,7 +147,8 @@ namespace risk.control.system.Controllers.Creator
                 _logger.LogError(ex, "Error editing Beneficiary Case {Id}. {UserEmail}", model.InvestigationTaskId, userEmail);
                 _notifyService.Error("Error editing Beneficiary. Try again.");
             }
-            return RedirectToAction(nameof(CreatorController.Details), ControllerName<CreatorController>.Name, new { id = model.InvestigationTaskId });
+            var encryptedId = _encryptionService.ProtectId(id);
+            return RedirectToAction(nameof(CreatorController.Details), ControllerName<CreatorController>.Name, new { id = encryptedId });
         }
     }
 }
