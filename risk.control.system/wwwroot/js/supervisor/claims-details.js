@@ -18,15 +18,15 @@
                 nodes[i].disabled = true;
             }
         }
-        // Find the checked radio button
-        var id = $("#claimId").val();
+        // // Find the checked radio button
+        // var id = $("#claimId").val();
 
-        if (id) {
-            // Redirect to the clean URL
-            window.location.href = '/VendorInvestigation/SelectAgent/' + id+'?route=false';
-        } else {
-            $.alert("Please select a case.");
-        }
+        // if (id) {
+        //     // Redirect to the clean URL
+        //     window.location.href = '/VendorInvestigation/SelectAgent/' + id+'?route=false';
+        // } else {
+        //     $.alert("Please select a case.");
+        // }
     });
 
     var askConfirmation = true;

@@ -9,21 +9,14 @@ namespace risk.control.system.Controllers.Api.Company
     [Route("api/[controller]")]
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME},{AGENCY_ADMIN.DISPLAY_NAME},{CREATOR.DISPLAY_NAME},{ASSESSOR.DISPLAY_NAME},{MANAGER.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME},{AGENT.DISPLAY_NAME}")]
     [ApiController]
-    public class CompanyController : ControllerBase
-    {
-        private readonly ILogger<CompanyController> logger;
-        private readonly ICompanyUserApiService companyUserApiService;
-        private readonly IAgencyApiService agencyService;
-
-        public CompanyController(ILogger<CompanyController> logger,
+    public class CompanyController(ILogger<CompanyController> logger,
             ICompanyUserApiService companyUserApiService,
             IAgencyApiService agencyService
-            )
-        {
-            this.logger = logger;
-            this.companyUserApiService = companyUserApiService;
-            this.agencyService = agencyService;
-        }
+            ) : ControllerBase
+    {
+        private readonly ILogger<CompanyController> _logger = logger;
+        private readonly ICompanyUserApiService _companyUserApiService = companyUserApiService;
+        private readonly IAgencyApiService _agencyService = agencyService;
 
         [HttpGet("Users")]
         public async Task<IActionResult> Users()
@@ -32,13 +25,13 @@ namespace risk.control.system.Controllers.Api.Company
 
             try
             {
-                var result = await companyUserApiService.GetCompanyUsers(userEmail);
+                var result = await _companyUserApiService.GetCompanyUsers(userEmail);
 
                 return Ok(result);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting company users for user {UserEmail}", userEmail ?? "Anonymous");
+                _logger.LogError(ex, "Error getting company users for user {UserEmail}", userEmail ?? "Anonymous");
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -50,13 +43,13 @@ namespace risk.control.system.Controllers.Api.Company
 
             try
             {
-                var vendors = await agencyService.GetAllEmpanelledAgenciesAsync(userEmail);
+                var vendors = await _agencyService.GetAllEmpanelledAgenciesAsync(userEmail);
 
                 return Ok(vendors);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting empanedlled agencies for user {UserEmail}", userEmail ?? "Anonymous");
+                _logger.LogError(ex, "Error getting empanedlled agencies for user {UserEmail}", userEmail ?? "Anonymous");
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -72,12 +65,12 @@ namespace risk.control.system.Controllers.Api.Company
 
             try
             {
-                var result = await agencyService.GetEmpanelledAgency(userEmail, id);
+                var result = await _agencyService.GetEmpanelledAgency(userEmail, id);
                 return Ok(result);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting empanedlled agencies for user {UserEmail}", userEmail ?? "Anonymous");
+                _logger.LogError(ex, "Error getting empanedlled agencies for user {UserEmail}", userEmail ?? "Anonymous");
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -93,12 +86,12 @@ namespace risk.control.system.Controllers.Api.Company
 
             try
             {
-                var result = await agencyService.GetEmpanelledAgencyNew(userEmail, id);
+                var result = await _agencyService.GetEmpanelledAgencyNew(userEmail, id);
                 return Ok(result);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting empanedlled agencies for user {UserEmail}", userEmail ?? "Anonymous");
+                _logger.LogError(ex, "Error getting empanedlled agencies for user {UserEmail}", userEmail ?? "Anonymous");
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -110,12 +103,12 @@ namespace risk.control.system.Controllers.Api.Company
 
             try
             {
-                var result = await agencyService.GetAvailableAgencies(userEmail);
+                var result = await _agencyService.GetAvailableAgencies(userEmail);
                 return Ok(result);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting available agencies for user {UserEmail}", userEmail ?? "Anonymous");
+                _logger.LogError(ex, "Error getting available agencies for user {UserEmail}", userEmail ?? "Anonymous");
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -127,12 +120,12 @@ namespace risk.control.system.Controllers.Api.Company
 
             try
             {
-                var result = await agencyService.GetAgencyService(id);
+                var result = await _agencyService.GetAgencyService(id);
                 return Ok(result);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error getting agency services for user {UserEmail}", userEmail ?? "Anonymous");
+                _logger.LogError(ex, "Error getting agency services for user {UserEmail}", userEmail ?? "Anonymous");
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }

@@ -14,35 +14,27 @@ namespace risk.control.system.Controllers.Manager
 {
     [Authorize(Roles = $"{MANAGER.DISPLAY_NAME}")]
     [Breadcrumb("Manage Agency")]
-    public class ActiveAgencyServiceController : Controller
-    {
-        private readonly INotyfService _notifyService;
-        private readonly INavigationService _navigationService;
-        private readonly IAgencyServiceTypeManager _agencyServiceTypeManager;
-        private readonly ILogger<ActiveAgencyServiceController> _logger;
-        private readonly IAgencyServiceService _agencyService;
-
-        public ActiveAgencyServiceController(
+    public class ActiveAgencyServiceController(
             INavigationService navigationService,
+            IEncryptionService encryptionService,
             IAgencyServiceTypeManager agencyServiceTypeManager,
             INotyfService notifyService,
             IAgencyServiceService agencyService,
-             IHttpContextAccessor httpContextAccessor,
-            ILogger<ActiveAgencyServiceController> logger)
-        {
-            _navigationService = navigationService;
-            _agencyServiceTypeManager = agencyServiceTypeManager;
-            _notifyService = notifyService;
-            _agencyService = agencyService;
-            _logger = logger;
-        }
+            ILogger<ActiveAgencyServiceController> logger) : Controller
+    {
+        private readonly IEncryptionService _encryptionService = encryptionService;
+        private readonly INotyfService _notifyService = notifyService;
+        private readonly INavigationService _navigationService = navigationService;
+        private readonly IAgencyServiceTypeManager _agencyServiceTypeManager = agencyServiceTypeManager;
+        private readonly ILogger<ActiveAgencyServiceController> _logger = logger;
+        private readonly IAgencyServiceService _agencyService = agencyService;
 
         public IActionResult Index()
         {
             return View();
         }
 
-        public IActionResult Service(long id)
+        public IActionResult Service([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id)
         {
             if (id <= 0)
             {
@@ -51,17 +43,18 @@ namespace risk.control.system.Controllers.Manager
             }
 
             var model = new ServiceModel { Id = id };
-
-            ViewData["BreadcrumbNode"] = _navigationService.GetAgencyServiceManagerPath(id, ControllerName<ActiveAgencyController>.Name, "Active Agencies");
+            var encryptedId = _encryptionService.ProtectId(id);
+            ViewData["BreadcrumbNode"] = _navigationService.GetAgencyServiceManagerPath(encryptedId, ControllerName<ActiveAgencyController>.Name, "Active Agencies");
             return View(model);
         }
 
-        public async Task<IActionResult> Create(long id)
+        public async Task<IActionResult> Create([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id)
         {
             try
             {
                 var model = await _agencyService.PrepareCreateAsync(id);
-                ViewData["BreadcrumbNode"] = _navigationService.GetAgencyServiceActionPath(id, ControllerName<ActiveAgencyController>.Name, "Active Agencies", "Add Service", "Create");
+                var encryptedId = _encryptionService.ProtectId(id);
+                ViewData["BreadcrumbNode"] = _navigationService.GetAgencyServiceActionPath(encryptedId, ControllerName<ActiveAgencyController>.Name, "Active Agencies", "Add Service", "Create");
                 return View(model);
             }
             catch (Exception ex)
@@ -74,12 +67,11 @@ namespace risk.control.system.Controllers.Manager
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(VendorInvestigationServiceType service, long VendorId)
+        public async Task<IActionResult> Create(VendorInvestigationServiceType service)
         {
             var userEmail = HttpContext.User?.Identity?.Name!;
             try
             {
-
                 var result = await _agencyServiceTypeManager.CreateAsync(service, userEmail);
 
                 if (!result.Success)
@@ -93,10 +85,11 @@ namespace risk.control.system.Controllers.Manager
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred creating Service for {AgencyId} . {UserEmail}", VendorId, userEmail);
+                _logger.LogError(ex, "Error occurred creating Service . {UserEmail}", userEmail);
                 _notifyService.Error("Error creating agency service. Try again.");
             }
-            return RedirectToAction(nameof(Service), ControllerName<ActiveAgencyServiceController>.Name, new { id = service.VendorId });
+            var encryptedId = _encryptionService.ProtectId(service.VendorId);
+            return RedirectToAction(nameof(Service), ControllerName<ActiveAgencyServiceController>.Name, new { id = encryptedId });
         }
 
         public async Task<IActionResult> Edit([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id)
@@ -106,12 +99,14 @@ namespace risk.control.system.Controllers.Manager
             {
                 if (id <= 0)
                 {
-                    _notifyService.Error("OOPs !!!..Agency Id Not Found");
+                    _notifyService.Custom("Unexpected Error. Please try again later", 3, "orange", "fas fa-cog");
+
                     return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
                 }
                 var serviceType = await _agencyService.PrepareEditViewModelAsync(id);
+                var encryptedId = _encryptionService.ProtectId(serviceType.VendorId);
 
-                ViewData["BreadcrumbNode"] = _navigationService.GetAgencyServiceActionPath(serviceType.VendorId, ControllerName<ActiveAgencyController>.Name, "Active Agencies", "Edit Service", "Edit");
+                ViewData["BreadcrumbNode"] = _navigationService.GetAgencyServiceActionPath(encryptedId, ControllerName<ActiveAgencyController>.Name, "Active Agencies", "Edit Service", "Edit");
 
                 return View(serviceType);
             }
@@ -130,10 +125,11 @@ namespace risk.control.system.Controllers.Manager
             var userEmail = HttpContext.User?.Identity?.Name!;
             try
             {
-                model.VendorInvestigationServiceTypeId = id;
+                model.Id = id;
                 model.StateId = model.SelectedStateId;
                 model.CountryId = model.SelectedCountryId;
 
+                ModelState.Remove(nameof(model.Id));
                 ModelState.Remove(nameof(model.StateId));
                 ModelState.Remove(nameof(model.CountryId));
 
@@ -157,12 +153,13 @@ namespace risk.control.system.Controllers.Manager
                 _logger.LogError(ex, "Error occurred editing Service. {UserEmail}", userEmail);
                 _notifyService.Error("Error editing agency service. Try again.");
             }
-            return RedirectToAction(nameof(Service), ControllerName<ActiveAgencyServiceController>.Name, new { id = model.VendorId });
+            var encryptedId = _encryptionService.ProtectId(model.VendorId);
+            return RedirectToAction(nameof(Service), ControllerName<ActiveAgencyServiceController>.Name, new { id = encryptedId });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteService(long id)
+        public async Task<IActionResult> DeleteService([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id)
         {
             try
             {

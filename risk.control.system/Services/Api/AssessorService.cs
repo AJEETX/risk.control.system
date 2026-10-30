@@ -19,8 +19,13 @@ namespace risk.control.system.Services
         Task<object> GetRejectedCases(string userEmail, int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc");
     }
 
-    internal class AssessorService(ApplicationDbContext context, IDbContextFactory<ApplicationDbContext> contextFactory, IBase64FileService base64FileService) : IAssessorService
+    internal class AssessorService(
+        ApplicationDbContext context,
+        IEncryptionService encryptionService,
+        IDbContextFactory<ApplicationDbContext> contextFactory,
+        IBase64FileService base64FileService) : IAssessorService
     {
+        private readonly IEncryptionService _encryptionService = encryptionService;
         private readonly ApplicationDbContext _context = context;
         private readonly IDbContextFactory<ApplicationDbContext> _contextFactory = contextFactory;
         private readonly IBase64FileService _base64FileService = base64FileService;
@@ -157,7 +162,8 @@ namespace risk.control.system.Services
                 await Task.WhenAll(documentTask, customerTask, beneficiaryTask, ownerDetailTask);
                 return new CaseInvestigationResponse
                 {
-                    Id = a.Id,
+                    Id = _encryptionService.ProtectId(a.Id),
+                    RawId = a.Id,
                     AutoAllocated = a.IsAutoAllocated,
                     PolicyId = a.ContractNumber,
                     PolicyNum = a.PolicyNum,
@@ -198,7 +204,7 @@ namespace risk.control.system.Services
 
             var finalData = (await Task.WhenAll(finalDataTasks));
 
-            var idsToUpdate = finalData.Where(x => x.IsNewSubmittedToCompany).Select(x => x.Id).ToList();
+            var idsToUpdate = finalData.Where(x => x.IsNewSubmittedToCompany).Select(x => x.RawId).ToList();
             if (idsToUpdate.Any())
             {
                 await _context.Investigations
@@ -351,7 +357,8 @@ namespace risk.control.system.Services
 
                     return new CaseInvestigationResponse
                     {
-                        Id = a.Id,
+                        Id = _encryptionService.ProtectId(a.Id),
+                        RawId = a.Id,
                         AutoAllocated = a.IsAutoAllocated,
                         CustomerFullName = a.CustomerName,
                         BeneficiaryFullName = a.BeneficiaryName ?? "",
@@ -541,7 +548,8 @@ namespace risk.control.system.Services
                 await Task.WhenAll(documentTask, customerTask, beneficiaryTask, ownerDetailTask);
                 return new CaseInvestigationResponse
                 {
-                    Id = a.Id,
+                    Id = _encryptionService.ProtectId(a.Id),
+                    RawId = a.Id,
                     AutoAllocated = a.IsAutoAllocated,
                     PolicyNum = a.PolicyNum,
                     PolicyId = a.ContractNumber,

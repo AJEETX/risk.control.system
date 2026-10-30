@@ -4,7 +4,7 @@
 	ViewData["Title"] = "Edit";
 }
 <section class="content">
-	<form id="edit-form" method="post" asp-action="Edit" enctype="multipart/form-data">
+	<form id="edit-form" method="post" asp-action="Edit" asp-route-id="@Model.Id" enctype="multipart/form-data">
 		<partial name="_EditCase" model="Model" />
 	</form>
 </section>

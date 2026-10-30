@@ -2,6 +2,7 @@
 {
     public class CaseInvestigationResponse
     {
+        public long RawId { get; set; }
         public object Id { get; set; } = default!;
         public bool AssignedToAgency { get; set; }
         public string? Agent { get; set; }

@@ -1,10 +1,12 @@
 ﻿using System.Globalization;
 using System.Net;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.FeatureManagement;
 using risk.control.system.AppConstant;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
+using risk.control.system.Services.Agent;
 using risk.control.system.Services.Common;
 using risk.control.system.Services.Report;
 
@@ -27,12 +29,18 @@ namespace risk.control.system.Services.Creator
 
     internal class AddInvestigationService(ApplicationDbContext context,
         ILogger<AddInvestigationService> logger,
+        IFeatureManager featureManager,
+        IAmazonApiService amazonApiService,
+        IAwsFaceImageCheckService faceUploadToAws,
         IFileStorageService fileStorageService,
         INumberSequenceService numberService,
         ICloneReportService cloneService,
         ITimelineService timelineService,
         ICustomApiClient customApiClient) : IAddInvestigationService
     {
+        private readonly IFeatureManager _featureManager = featureManager;
+        private readonly IAmazonApiService _amazonApiService = amazonApiService;
+        private readonly IAwsFaceImageCheckService _faceUploadToAws = faceUploadToAws;
         private readonly ApplicationDbContext _context = context;
         private readonly ILogger<AddInvestigationService> _logger = logger;
         private readonly IFileStorageService _fileStorageService = fileStorageService;
@@ -163,6 +171,7 @@ namespace risk.control.system.Services.Creator
                     var (fileName, relativePath) = await _fileStorageService.SaveAsync(customerDetail?.ProfileImage!, CONSTANTS.CASE, caseTask!.PolicyDetail!.ContractNumber, null, null, $"Life-assured{extension}");
                     customerDetail!.ProfilePictureExtension = Path.GetExtension(fileName);
                     customerDetail.ImagePath = relativePath;
+                    await _faceUploadToAws.SetCaseImagesToAws(customerDetail.InvestigationTaskId!.Value);
                 }
                 caseTask!.UpdatedBy = userEmail;
                 caseTask.IsNew = true;
@@ -209,6 +218,14 @@ namespace risk.control.system.Services.Creator
                     var (fileName, relativePath) = await _fileStorageService.SaveAsync(customerDetail.ProfileImage, CONSTANTS.CASE, caseTask!.PolicyDetail!.ContractNumber, null, null, $"Life-assured{extension}");
                     customerDetail.ProfilePictureExtension = Path.GetExtension(fileName);
                     customerDetail.ImagePath = relativePath;
+                    if (await _featureManager.IsEnabledAsync(FeatureFlags.FACE_MATCH_CHECK))
+                    {
+                        var imageCollection = EnvHelper.Get(CONSTANTS.FaceImageCollection);
+                        //delete image from collection
+                        await _amazonApiService.DeleteFacesAsync(imageCollection!, new List<string> { customerDetail.AwsFaceId! });
+                    }
+                    await _faceUploadToAws.SetCaseImagesToAws(customerDetail.InvestigationTaskId!.Value);
+
                 }
                 else
                 {
@@ -253,6 +270,7 @@ namespace risk.control.system.Services.Creator
                     var (fileName, relativePath) = await _fileStorageService.SaveAsync(beneficiary.ProfileImage!, CONSTANTS.CASE, caseTask!.PolicyDetail!.ContractNumber, null, null, $"Beneficiary{extension}");
                     beneficiary.ProfilePictureExtension = Path.GetExtension(fileName);
                     beneficiary.ImagePath = relativePath;
+                    await _faceUploadToAws.SetCaseImagesToAws(beneficiary.InvestigationTaskId!.Value);
                 }
 
                 caseTask!.UpdatedBy = userEmail;
@@ -308,6 +326,14 @@ namespace risk.control.system.Services.Creator
                     var (fileName, relativePath) = await _fileStorageService.SaveAsync(beneficiary.ProfileImage!, CONSTANTS.CASE, caseTask!.PolicyDetail!.ContractNumber, null, null, $"Beneficiary{extension}");
                     beneficiary.ProfilePictureExtension = Path.GetExtension(fileName);
                     beneficiary.ImagePath = relativePath;
+                    //delete image from collection
+                    if (await _featureManager.IsEnabledAsync(FeatureFlags.FACE_MATCH_CHECK))
+                    {
+                        var imageCollection = EnvHelper.Get(CONSTANTS.FaceImageCollection);
+                        await _amazonApiService.DeleteFacesAsync(imageCollection!, new List<string> { beneficiary.AwsFaceId! });
+                    }
+
+                    await _faceUploadToAws.SetCaseImagesToAws(beneficiary.InvestigationTaskId!.Value);
                 }
                 else
                 {

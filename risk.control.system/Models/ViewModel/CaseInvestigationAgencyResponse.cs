@@ -2,7 +2,8 @@
 {
     public class CaseInvestigationAgencyResponse
     {
-        public object Id { get; set; } = default!;
+        public long RawId { get; set; } = default!;
+        public string Id { get; set; } = default!;
         public bool AssignedToAgency { get; set; }
         public string Pincode { get; set; } = default!;
         public string? PincodeName { get; set; }

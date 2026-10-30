@@ -12,24 +12,16 @@ namespace risk.control.system.Controllers.AgencyAdmin
 {
     [Breadcrumb("Admin Settings ")]
     [Authorize(Roles = $"{AGENCY_ADMIN.DISPLAY_NAME}")]
-    public class AgencyServiceController : Controller
-    {
-        private readonly IAgencyServiceService _service;
-        private readonly IAgencyServiceTypeManager _typeManager;
-        private readonly INotyfService _notifyService;
-        private readonly ILogger<AgencyServiceController> _logger;
-
-        public AgencyServiceController(
+    public class AgencyServiceController(
             IAgencyServiceService service,
             IAgencyServiceTypeManager typeManager,
             INotyfService notifyService,
-            ILogger<AgencyServiceController> logger)
-        {
-            _service = service;
-            _typeManager = typeManager;
-            _notifyService = notifyService;
-            _logger = logger;
-        }
+            ILogger<AgencyServiceController> logger) : Controller
+    {
+        private readonly IAgencyServiceService _service = service;
+        private readonly IAgencyServiceTypeManager _typeManager = typeManager;
+        private readonly INotyfService _notifyService = notifyService;
+        private readonly ILogger<AgencyServiceController> _logger = logger;
 
         public IActionResult Index() => RedirectToAction(nameof(Service));
 
@@ -114,10 +106,11 @@ namespace risk.control.system.Controllers.AgencyAdmin
             var userEmail = User.Identity?.Name!;
             try
             {
-                model.VendorInvestigationServiceTypeId = id;
+                model.Id = id;
                 model.StateId = model.SelectedStateId;
                 model.CountryId = model.SelectedCountryId;
 
+                ModelState.Remove(nameof(model.Id));
                 ModelState.Remove(nameof(model.StateId));
                 ModelState.Remove(nameof(model.CountryId));
 
@@ -146,7 +139,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(long id)
+        public async Task<IActionResult> Delete([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id)
         {
             try
             {

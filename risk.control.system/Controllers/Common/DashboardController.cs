@@ -14,30 +14,20 @@ namespace risk.control.system.Controllers.Common
 {
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME},{AGENCY_ADMIN.DISPLAY_NAME},{CREATOR.DISPLAY_NAME},{ASSESSOR.DISPLAY_NAME},{MANAGER.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME},{AGENT.DISPLAY_NAME}")]
     [DefaultBreadcrumb("Home")]
-    public class DashboardController : Controller
-    {
-        private readonly ILogger<DashboardController> _logger;
-        private readonly IAgencyDashboardService _agencyDashboardService;
-        private readonly IAdminDashBoardService _adminDashBoardService;
-        private readonly ICompanyDashboardService _companyDashboardService;
-        private readonly SignInManager<ApplicationUser> _signInManager;
-        private readonly INotyfService _notifyService;
-
-        public DashboardController(ILogger<DashboardController> logger,
+    public class DashboardController(ILogger<DashboardController> logger,
             IAgencyDashboardService agencyDashboardService,
             IAdminDashBoardService adminDashBoardService,
             ICompanyDashboardService companyDashboardService,
             SignInManager<ApplicationUser> signInManager,
             INotyfService notifyService
-            )
-        {
-            _logger = logger;
-            _agencyDashboardService = agencyDashboardService;
-            _adminDashBoardService = adminDashBoardService;
-            _companyDashboardService = companyDashboardService;
-            _signInManager = signInManager;
-            _notifyService = notifyService;
-        }
+            ) : Controller
+    {
+        private readonly ILogger<DashboardController> _logger = logger;
+        private readonly IAgencyDashboardService _agencyDashboardService = agencyDashboardService;
+        private readonly IAdminDashBoardService _adminDashBoardService = adminDashBoardService;
+        private readonly ICompanyDashboardService _companyDashboardService = companyDashboardService;
+        private readonly SignInManager<ApplicationUser> _signInManager = signInManager;
+        private readonly INotyfService _notifyService = notifyService;
 
         public async Task<IActionResult> Index()
         {

@@ -20,14 +20,9 @@ namespace risk.control.system.Services.Report
         //InvestigationTask SaveReport(InvestigationTask task, ReportTemplate report);
     }
 
-    internal class InvestigationReportPdfService : IInvestigationReportPdfService
+    internal class InvestigationReportPdfService(ApplicationDbContext context) : IInvestigationReportPdfService
     {
-        private readonly ApplicationDbContext _context;
-
-        public InvestigationReportPdfService(ApplicationDbContext context)
-        {
-            _context = context;
-        }
+        private readonly ApplicationDbContext _context = context;
 
         public async Task<CaseTransactionModel> GetClaimPdfReport(string currentUserEmail, long id)
         {

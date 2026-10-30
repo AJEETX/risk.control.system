@@ -13,26 +13,17 @@ namespace risk.control.system.Controllers.Assessor
 {
     [Breadcrumb("Cases")]
     [Authorize(Roles = ASSESSOR.DISPLAY_NAME)]
-    public class AssessorController : Controller
-    {
-        private readonly INotyfService _notifyService;
-        private readonly INavigationService _navigationService;
-        private readonly IInvoiceService _invoiceService;
-        private readonly ICaseDetailReportService _caseDetailReportService;
-        private readonly ILogger<AssessorController> _logger;
-
-        public AssessorController(INotyfService notifyService,
+    public class AssessorController(INotyfService notifyService,
             INavigationService navigationService,
             IInvoiceService invoiceService,
             ICaseDetailReportService caseDetailReportService,
-            ILogger<AssessorController> logger)
-        {
-            _notifyService = notifyService;
-            _navigationService = navigationService;
-            _invoiceService = invoiceService;
-            _caseDetailReportService = caseDetailReportService;
-            _logger = logger;
-        }
+            ILogger<AssessorController> logger) : Controller
+    {
+        private readonly INotyfService _notifyService = notifyService;
+        private readonly INavigationService _navigationService = navigationService;
+        private readonly IInvoiceService _invoiceService = invoiceService;
+        private readonly ICaseDetailReportService _caseDetailReportService = caseDetailReportService;
+        private readonly ILogger<AssessorController> _logger = logger;
 
         public IActionResult Index()
         {
@@ -46,7 +37,7 @@ namespace risk.control.system.Controllers.Assessor
         }
 
         [Breadcrumb(title: "Report", FromAction = nameof(Assess))]
-        public async Task<IActionResult> ReportDetail(long id)
+        public async Task<IActionResult> ReportDetail([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name!;
 
@@ -55,7 +46,7 @@ namespace risk.control.system.Controllers.Assessor
                 if (!ModelState.IsValid || id < 1)
                 {
                     _notifyService.Error("OOPS !!! Case Not Found !!!..");
-                    return RedirectToAction(nameof(Assessor));
+                    return RedirectToAction(nameof(Assess));
                 }
                 var model = await _caseDetailReportService.GetInvestigateReport(userEmail, id);
                 if (model.CaseTask!.Status == CONSTANTS.CASE_STATUS.FINISHED)
@@ -74,7 +65,7 @@ namespace risk.control.system.Controllers.Assessor
             }
         }
 
-        public async Task<IActionResult> SendEnquiry(long id)
+        public async Task<IActionResult> SendEnquiry([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name!;
 
@@ -83,7 +74,7 @@ namespace risk.control.system.Controllers.Assessor
                 if (!ModelState.IsValid || id < 1)
                 {
                     _notifyService.Error("OOPS !!! Case Not Found !!!..");
-                    return RedirectToAction(nameof(Assessor));
+                    return RedirectToAction(nameof(Review));
                 }
                 var model = await _caseDetailReportService.GetInvestigateReport(userEmail, id);
 
@@ -106,7 +97,7 @@ namespace risk.control.system.Controllers.Assessor
         }
 
         [Breadcrumb(title: "Details", FromAction = nameof(Review))]
-        public async Task<IActionResult> ReviewDetail(long id)
+        public async Task<IActionResult> ReviewDetail([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name!;
 
@@ -137,7 +128,7 @@ namespace risk.control.system.Controllers.Assessor
         }
 
         [Breadcrumb("Details", FromAction = nameof(Approved))]
-        public async Task<IActionResult> ApprovedDetail(long id)
+        public async Task<IActionResult> ApprovedDetail([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name!;
 
@@ -171,7 +162,7 @@ namespace risk.control.system.Controllers.Assessor
         }
 
         [Breadcrumb("Details", FromAction = nameof(Rejected))]
-        public async Task<IActionResult> RejectedDetail(long id)
+        public async Task<IActionResult> RejectedDetail([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name!;
 
@@ -193,7 +184,7 @@ namespace risk.control.system.Controllers.Assessor
             }
         }
 
-        public async Task<IActionResult> ApprovedInvoice(long id)
+        public async Task<IActionResult> ApprovedInvoice([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 
@@ -216,7 +207,7 @@ namespace risk.control.system.Controllers.Assessor
                 return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
             }
         }
-        public async Task<IActionResult> RejectedInvoice(long id)
+        public async Task<IActionResult> RejectedInvoice([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 
@@ -239,7 +230,7 @@ namespace risk.control.system.Controllers.Assessor
                 return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
             }
         }
-        public async Task<IActionResult> PrintInvoice(long id)
+        public async Task<IActionResult> PrintInvoice([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 

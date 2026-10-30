@@ -6,24 +6,18 @@ using risk.control.system.AppConstant;
 using risk.control.system.Controllers.Common;
 using risk.control.system.Helpers;
 using risk.control.system.Services.Agent;
+using risk.control.system.Services.Common;
 using SmartBreadcrumbs.Attributes;
 
 namespace risk.control.system.Controllers.Agent
 {
     [Breadcrumb("Cases")]
     [Authorize(Roles = AGENT.DISPLAY_NAME)]
-    public class AgentController : Controller
+    public class AgentController(INotyfService notifyService, IAgentCaseDetailService agentCaseDetailService, ILogger<AgentController> logger) : Controller
     {
-        private readonly INotyfService notifyService;
-        private readonly IAgentCaseDetailService agentCaseDetailService;
-        private readonly ILogger<AgentController> logger;
-
-        public AgentController(INotyfService notifyService, IAgentCaseDetailService agentCaseDetailService, ILogger<AgentController> logger)
-        {
-            this.notifyService = notifyService;
-            this.agentCaseDetailService = agentCaseDetailService;
-            this.logger = logger;
-        }
+        private readonly INotyfService _notifyService = notifyService;
+        private readonly IAgentCaseDetailService _agentCaseDetailService = agentCaseDetailService;
+        private readonly ILogger<AgentController> _logger = logger;
 
         public IActionResult Index()
         {
@@ -37,25 +31,25 @@ namespace risk.control.system.Controllers.Agent
         }
 
         [Breadcrumb("Submit", FromAction = nameof(Agent))]
-        public async Task<IActionResult> GetInvestigate(long id, bool uploaded = false)
+        public async Task<IActionResult> GetInvestigate([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id, bool uploaded = false)
         {
             var userEmail = HttpContext.User?.Identity?.Name!;
             try
             {
                 if (!ModelState.IsValid || id < 1)
                 {
-                    notifyService.Error("No case selected!!!. Please select case to be investigate.");
+                    _notifyService.Error("No case selected!!!. Please select case to be investigate.");
                     return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
                 }
 
-                var model = await agentCaseDetailService.GetInvestigate(userEmail, id, uploaded);
+                var model = await _agentCaseDetailService.GetInvestigate(userEmail, id, uploaded);
 
                 return View(model);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred for case {Id}. {UserEmail}.", id, userEmail ?? "Anonymous");
-                notifyService.Error("OOPs !!!..Contact Admin");
+                _logger.LogError(ex, "Error occurred for case {Id}. {UserEmail}.", id, userEmail ?? "Anonymous");
+                _notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
             }
         }
@@ -67,24 +61,24 @@ namespace risk.control.system.Controllers.Agent
         }
 
         [Breadcrumb(title: "Detail", FromAction = nameof(Submitted))]
-        public async Task<IActionResult> SubmittedDetail(long id)
+        public async Task<IActionResult> SubmittedDetail([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name!;
             if (!ModelState.IsValid || id == 0)
             {
-                notifyService.Error("NOT FOUND !!!..");
+                _notifyService.Error("NOT FOUND !!!..");
                 return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
             }
             try
             {
-                var model = await agentCaseDetailService.GetInvestigatedForAgent(userEmail, id);
+                var model = await _agentCaseDetailService.GetInvestigatedForAgent(userEmail, id);
 
                 return View(model);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred for case {Id}. {UserEmail}.", id, userEmail ?? "Anonymous");
-                notifyService.Error("OOPs !!!..Contact Admin");
+                _logger.LogError(ex, "Error occurred for case {Id}. {UserEmail}.", id, userEmail ?? "Anonymous");
+                _notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
             }
         }

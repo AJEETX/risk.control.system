@@ -13,38 +13,26 @@ namespace risk.control.system.Controllers.Manager
 {
     [Breadcrumb("Manage Agency")]
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{MANAGER.DISPLAY_NAME}")]
-    public class ActiveAgencyController : Controller
-    {
-        private readonly IManageAgencyService _manageAgencyService;
-        private readonly IErrorNotifyService _errorNotifyService;
-        private readonly IManageAgencyService _agencyCreateEditService;
-        private readonly INavigationService _navigationService;
-        private readonly INotyfService _notifyService;
-        private readonly ILogger<ActiveAgencyController> _logger;
-        private readonly string _baseUrl;
-        private readonly ICompanyAgencyService _companyAgencyService;
-
-        public ActiveAgencyController(
+    public class ActiveAgencyController(
             IManageAgencyService manageAgencyService,
+            IEncryptionService encryptionService,
             IErrorNotifyService errorNotifyService,
             IManageAgencyService agencyCreateEditService,
             ICompanyAgencyService companyAgencyService,
             INavigationService navigationService,
             INotyfService notifyService,
              IHttpContextAccessor httpContextAccessor,
-            ILogger<ActiveAgencyController> logger)
-        {
-            _manageAgencyService = manageAgencyService;
-            this._errorNotifyService = errorNotifyService;
-            _companyAgencyService = companyAgencyService;
-            _agencyCreateEditService = agencyCreateEditService;
-            _navigationService = navigationService;
-            _notifyService = notifyService;
-            _logger = logger;
-            var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
-            var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
-            _baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
-        }
+            ILogger<ActiveAgencyController> logger) : Controller
+    {
+        private readonly IEncryptionService _encryptionService = encryptionService;
+        private readonly IManageAgencyService _manageAgencyService = manageAgencyService;
+        private readonly IErrorNotifyService _errorNotifyService = errorNotifyService;
+        private readonly IManageAgencyService _agencyCreateEditService = agencyCreateEditService;
+        private readonly INavigationService _navigationService = navigationService;
+        private readonly INotyfService _notifyService = notifyService;
+        private readonly ILogger<ActiveAgencyController> _logger = logger;
+        private readonly ICompanyAgencyService _companyAgencyService = companyAgencyService;
+        private readonly string _baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent()}{httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent()}";
 
         public IActionResult Index()
         {
@@ -70,22 +58,22 @@ namespace risk.control.system.Controllers.Manager
                 return RedirectToAction(nameof(Agencies));
             }
 
-            var result = await _companyAgencyService.DepanelAgenciesAsync(userEmail, vendors);
+            var (Success, Message) = await _companyAgencyService.DepanelAgenciesAsync(userEmail, vendors);
 
-            if (result.Success)
+            if (Success)
             {
-                _notifyService.Custom(result.Message, 3, "orange", "far fa-hand-pointer");
+                _notifyService.Custom(Message, 3, "orange", "far fa-hand-pointer");
             }
             else
             {
-                _notifyService.Error(result.Message);
+                _notifyService.Error(Message);
             }
 
             return RedirectToAction(nameof(Agencies));
         }
 
         [Breadcrumb("Agency Profile", FromAction = nameof(Agencies))]
-        public async Task<IActionResult> Profile(long id)
+        public async Task<IActionResult> Profile([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id)
         {
             try
             {
@@ -111,7 +99,7 @@ namespace risk.control.system.Controllers.Manager
             }
         }
 
-        public async Task<IActionResult> Edit(long id)
+        public async Task<IActionResult> Edit([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name!;
             try
@@ -128,7 +116,8 @@ namespace risk.control.system.Controllers.Manager
                     _notifyService.Error("Error getting Agency. Try again.");
                     return RedirectToAction(nameof(Agencies));
                 }
-                ViewData["BreadcrumbNode"] = _navigationService.GetAgencyActionPath(id, ControllerName<ActiveAgencyController>.Name, "Active Agencies", "Edit Agency", nameof(Edit));
+                var encryptedId = _encryptionService.ProtectId(id);
+                ViewData["BreadcrumbNode"] = _navigationService.GetAgencyActionPath(encryptedId, ControllerName<ActiveAgencyController>.Name, "Active Agencies", "Edit Agency", nameof(Edit));
                 return View(vendor);
             }
             catch (Exception ex)
@@ -153,10 +142,10 @@ namespace risk.control.system.Controllers.Manager
                     return View(model);
                 }
 
-                var result = await _agencyCreateEditService.EditAsync(userEmail, model, _baseUrl);
-                if (!result.Success)
+                var (Success, Errors) = await _agencyCreateEditService.EditAsync(userEmail, model, _baseUrl);
+                if (!Success)
                 {
-                    foreach (var error in result.Errors)
+                    foreach (var error in Errors)
                         ModelState.AddModelError(error.Key, error.Value);
 
                     _errorNotifyService.ShowErrorNotification(ModelState); ;
@@ -170,7 +159,8 @@ namespace risk.control.system.Controllers.Manager
                 _logger.LogError(ex, "Error editing {AgencyId} for {UserEmail}.", vendorId, userEmail);
                 _notifyService.Error("Error editing agency. Try again.");
             }
-            return RedirectToAction(nameof(Profile), ControllerName<ActiveAgencyController>.Name, new { id = vendorId });
+            var encryptedId = _encryptionService.ProtectId(vendorId);
+            return RedirectToAction(nameof(Profile), ControllerName<ActiveAgencyController>.Name, new { id = encryptedId });
         }
     }
 }

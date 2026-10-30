@@ -16,35 +16,23 @@ using risk.control.system.Services.Common;
 namespace risk.control.system.Controllers.AgencyAdmin
 {
     [Authorize(Roles = $"{AGENCY_ADMIN.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME}")]
-    public class AgencyQueryController : Controller
-    {
-        private readonly string _baseUrl;
-        private const long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
-        private static readonly string[] AllowedExt = new[] { ".jpg", ".jpeg", ".png" };
-        private static readonly string[] AllowedMime = new[] { "image/jpeg", "image/png" };
-        private readonly IAgencyQueryReplyService _agencyQueryReplyService;
-        private readonly INotyfService _notifyService;
-        private readonly ICaseNotificationService _mailService;
-        private readonly ILogger<AgencyQueryController> _logger;
-        private readonly IBackgroundJobClient _backgroundJobClient;
-
-        public AgencyQueryController(
+    public class AgencyQueryController(
             IAgencyQueryReplyService agencyQueryReplyService,
             INotyfService notifyService,
             IBackgroundJobClient backgroundJobClient,
             IHttpContextAccessor httpContextAccessor,
             ICaseNotificationService mailService,
-            ILogger<AgencyQueryController> logger)
-        {
-            _agencyQueryReplyService = agencyQueryReplyService;
-            _notifyService = notifyService;
-            _mailService = mailService;
-            _logger = logger;
-            _backgroundJobClient = backgroundJobClient;
-            var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
-            var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
-            _baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
-        }
+            ILogger<AgencyQueryController> logger) : Controller
+    {
+        private const long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+        private static readonly string[] AllowedExt = new[] { ".jpg", ".jpeg", ".png" };
+        private static readonly string[] AllowedMime = new[] { "image/jpeg", "image/png" };
+        private readonly string _baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent()}{httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent()}";
+        private readonly IAgencyQueryReplyService _agencyQueryReplyService = agencyQueryReplyService;
+        private readonly INotyfService _notifyService = notifyService;
+        private readonly ICaseNotificationService _mailService = mailService;
+        private readonly ILogger<AgencyQueryController> _logger = logger;
+        private readonly IBackgroundJobClient _backgroundJobClient = backgroundJobClient;
 
         [HttpPost]
         [ValidateAntiForgeryToken]

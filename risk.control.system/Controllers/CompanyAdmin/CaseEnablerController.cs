@@ -15,19 +15,11 @@ namespace risk.control.system.Controllers.CompanyAdmin
 {
     [Breadcrumb("Company Settings ")]
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME}")]
-    public class CaseEnablerController : Controller
+    public class CaseEnablerController(ApplicationDbContext context, INotyfService notifyService, ILogger<CaseEnablerController> logger) : Controller
     {
-        private readonly ApplicationDbContext _context;
-        private readonly INotyfService notifyService;
-        private readonly ILogger<CaseEnablerController> logger;
-
-        public CaseEnablerController(ApplicationDbContext context, INotyfService notifyService, ILogger<CaseEnablerController> logger)
-        {
-            _context = context;
-            this.notifyService = notifyService;
-            this.logger = logger;
-        }
-
+        private readonly ApplicationDbContext _context = context;
+        private readonly INotyfService _notifyService = notifyService;
+        private readonly ILogger<CaseEnablerController> _logger = logger;
         public IActionResult Index()
         {
             return RedirectToAction(nameof(Profile));
@@ -67,7 +59,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
         {
             if (!ModelState.IsValid)
             {
-                notifyService.Error("Reason Empty!");
+                _notifyService.Error("Reason Empty!");
                 return RedirectToAction(nameof(Profile));
             }
             try
@@ -77,7 +69,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 if (exists)
                 {
                     ModelState.AddModelError("Code", "Reason Code already exists.");
-                    notifyService.Error("Reason Code already exists!");
+                    _notifyService.Error("Reason Code already exists!");
                     return View(caseEnabler);
                 }
                 var textInfo = CultureInfo.CurrentCulture.TextInfo;
@@ -87,13 +79,13 @@ namespace risk.control.system.Controllers.CompanyAdmin
 
                 _context.Add(caseEnabler);
                 await _context.SaveChangesAsync(null, false);
-                notifyService.Success($"Reason Code <b>{caseEnabler.Code}</b> created successfully!");
+                _notifyService.Success($"Reason Code <b>{caseEnabler.Code}</b> created successfully!");
                 return RedirectToAction(nameof(Profile));
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, $"Error occurred.");
-                notifyService.Error("Error to create Reason!");
+                _logger.LogError(ex, $"Error occurred.");
+                _notifyService.Error("Error to create Reason!");
                 return RedirectToAction(nameof(Profile));
             }
         }
@@ -118,7 +110,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
         {
             if (id < 1)
             {
-                notifyService.Error("Reason Not found!");
+                _notifyService.Error("Reason Not found!");
                 return RedirectToAction(nameof(Profile));
             }
             try
@@ -126,15 +118,15 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 var caseEnabler = await _context.CaseEnabler.FindAsync(id);
                 if (caseEnabler == null)
                 {
-                    notifyService.Error("Reason Not found!");
+                    _notifyService.Error("Reason Not found!");
                     return RedirectToAction(nameof(Profile));
                 }
                 return View(caseEnabler);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, $"Error occurred.");
-                notifyService.Error("Error in REASON!");
+                _logger.LogError(ex, $"Error occurred.");
+                _notifyService.Error("Error in REASON!");
                 return RedirectToAction(nameof(Profile));
             }
         }
@@ -145,7 +137,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
         {
             if (id < 1 || !ModelState.IsValid)
             {
-                notifyService.Error("Reason Null!");
+                _notifyService.Error("Reason Null!");
                 return RedirectToAction(nameof(Profile));
             }
             try
@@ -158,7 +150,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 if (exists)
                 {
                     ModelState.AddModelError("Code", "Reason Code already exists.");
-                    notifyService.Error("Reason Code already exists!");
+                    _notifyService.Error("Reason Code already exists!");
                     return View(caseEnabler);
                 }
                 var textInfo = CultureInfo.CurrentCulture.TextInfo;
@@ -168,13 +160,13 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 caseEnabler.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Update(caseEnabler);
                 await _context.SaveChangesAsync(null, false);
-                notifyService.Custom($"Reason Code <b>{caseEnabler.Code}</b> edited successfully!", 3, "orange", "fas fa-puzzle-piece");
+                _notifyService.Custom($"Reason Code <b>{caseEnabler.Code}</b> edited successfully!", 3, "orange", "fas fa-puzzle-piece");
                 return RedirectToAction(nameof(Profile));
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, $"Error occurred.");
-                notifyService.Error("Error editing Reason!");
+                _logger.LogError(ex, $"Error occurred.");
+                _notifyService.Error("Error editing Reason!");
                 return RedirectToAction(nameof(Profile));
             }
         }
@@ -203,8 +195,8 @@ namespace risk.control.system.Controllers.CompanyAdmin
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, $"Error occurred.");
-                notifyService.Error("Error deleting REASON!");
+                _logger.LogError(ex, $"Error occurred.");
+                _notifyService.Error("Error deleting REASON!");
                 return RedirectToAction(nameof(Profile));
             }
         }

@@ -7,18 +7,12 @@ using risk.control.system.Models;
 namespace risk.control.system.Controllers.Creator
 {
     [Authorize(Roles = $"{CREATOR.DISPLAY_NAME},{MANAGER.DISPLAY_NAME}")]
-    public class RatingController : Controller
-    {
-        private readonly ApplicationDbContext context;
-        private readonly ILogger<RatingController> logger;
-
-        public RatingController(
+    public class RatingController(
             ApplicationDbContext context,
-            ILogger<RatingController> logger)
-        {
-            this.context = context;
-            this.logger = logger;
-        }
+            ILogger<RatingController> logger) : Controller
+    {
+        private readonly ApplicationDbContext _context = context;
+        private readonly ILogger<RatingController> _logger = logger;
 
         public async Task<JsonResult> PostRating(int rating, long mid)
         {
@@ -26,13 +20,13 @@ namespace risk.control.system.Controllers.Creator
 
             try
             {
-                var existingRating = await context.Ratings.FirstOrDefaultAsync(r => r.VendorId == mid && r.UserEmail == userEmail);
+                var existingRating = await _context.Ratings.FirstOrDefaultAsync(r => r.VendorId == mid && r.UserEmail == userEmail);
 
                 if (existingRating != null)
                 {
                     existingRating.Rate = rating;
-                    context.Ratings.Update(existingRating);
-                    await context.SaveChangesAsync();
+                    _context.Ratings.Update(existingRating);
+                    await _context.SaveChangesAsync();
 
                     return Json($"You rated again {rating} star(s)");
                 }
@@ -45,14 +39,14 @@ namespace risk.control.system.Controllers.Creator
                     UserEmail = userEmail
                 };
 
-                context.Ratings.Add(rt);
-                await context.SaveChangesAsync();
+                _context.Ratings.Add(rt);
+                await _context.SaveChangesAsync();
 
                 return Json($"You rated this {rating} star(s)");
             }
             catch (Exception ex)
             {
-                logger.LogError(ex,
+                _logger.LogError(ex,
                     "Error while posting rating. VendorId={VendorId}, Rating={Rating}, User={UserEmail}",
                     mid, rating, userEmail);
 
@@ -86,7 +80,7 @@ namespace risk.control.system.Controllers.Creator
             }
             catch (Exception ex)
             {
-                logger.LogError(ex,
+                _logger.LogError(ex,
                     "Error while posting detailed rating. VendorId={VendorId}, Rating={Rating}, User={UserEmail}",
                     vendorId, rating, currentUserEmail);
 
@@ -99,7 +93,7 @@ namespace risk.control.system.Controllers.Creator
         }
         private async Task<double> SaveRatingAndGetAverageAsync(int rating, long vendorId, string userEmail)
         {
-            var existingRating = await context.Ratings
+            var existingRating = await _context.Ratings
                 .FirstOrDefaultAsync(r => r.VendorId == vendorId && r.UserEmail == userEmail);
 
             if (existingRating != null)
@@ -108,7 +102,7 @@ namespace risk.control.system.Controllers.Creator
             }
             else
             {
-                context.Ratings.Add(new AgencyRating
+                _context.Ratings.Add(new AgencyRating
                 {
                     VendorId = vendorId,
                     Rate = rating,
@@ -117,10 +111,10 @@ namespace risk.control.system.Controllers.Creator
                 });
             }
 
-            await context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
 
             // Simplified average calculation
-            return await context.Ratings
+            return await _context.Ratings
                 .Where(r => r.VendorId == vendorId)
                 .Select(r => (double?)r.Rate)
                 .AverageAsync() ?? 0.0;

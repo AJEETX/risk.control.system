@@ -14,18 +14,11 @@ namespace risk.control.system.Controllers.CompanyAdmin
 {
     [Breadcrumb("General Setup")]
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME}")]
-    public class DistrictController : Controller
+    public class DistrictController(ApplicationDbContext context, INotyfService notifyService, ILogger<DistrictController> logger) : Controller
     {
-        private readonly ApplicationDbContext _context;
-        private readonly INotyfService notifyService;
-        private readonly ILogger<DistrictController> logger;
-
-        public DistrictController(ApplicationDbContext context, INotyfService notifyService, ILogger<DistrictController> logger)
-        {
-            _context = context;
-            this.notifyService = notifyService;
-            this.logger = logger;
-        }
+        private readonly ApplicationDbContext _context = context;
+        private readonly INotyfService _notifyService = notifyService;
+        private readonly ILogger<DistrictController> _logger = logger;
 
         public IActionResult Index()
         {
@@ -141,7 +134,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
         {
             if (!ModelState.IsValid)
             {
-                notifyService.Custom($"Invalid District data!", 3, "red", "fas fa-city");
+                _notifyService.Custom($"Invalid District data!", 3, "red", "fas fa-city");
                 var userEmail = HttpContext.User.Identity?.Name;
                 var user = await _context.ApplicationUser.Include(a => a.Country).FirstOrDefaultAsync(u => u.Email == userEmail);
                 return View(new District { IsUpdated = !user!.IsSuperAdmin, Country = user.Country, CountryId = user.CountryId.GetValueOrDefault(), SelectedCountryId = user.CountryId.GetValueOrDefault() });
@@ -151,7 +144,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 bool exists = await _context.District.AnyAsync(x => x.Code == district.Code && x.CountryId == district.SelectedCountryId);
                 if (exists)
                 {
-                    notifyService.Custom($"Disitrict Code <b>{district.Code}</b> already exists!", 3, "red", "fas fa-city");
+                    _notifyService.Custom($"Disitrict Code <b>{district.Code}</b> already exists!", 3, "red", "fas fa-city");
                     ModelState.Clear();
                     var userEmail = HttpContext.User.Identity?.Name;
                     var user = await _context.ApplicationUser.Include(a => a.Country).FirstOrDefaultAsync(u => u.Email == userEmail);
@@ -173,13 +166,13 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 district.CountryId = district.SelectedCountryId;
                 _context.District.Add(district);
                 await _context.SaveChangesAsync(null, false);
-                notifyService.Custom($"District <b>{district.Name}</b> created successfully!", 3, "green", "fas fa-city");
+                _notifyService.Custom($"District <b>{district.Name}</b> created successfully!", 3, "green", "fas fa-city");
                 return RedirectToAction(nameof(Profile));
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred.");
-                notifyService.Custom($"An error occurred while creating the District!", 3, "red", "fas fa-city");
+                _logger.LogError(ex, "Error occurred.");
+                _notifyService.Custom($"An error occurred while creating the District!", 3, "red", "fas fa-city");
                 return RedirectToAction(nameof(Profile));
             }
         }
@@ -189,14 +182,14 @@ namespace risk.control.system.Controllers.CompanyAdmin
         {
             if (id < 1)
             {
-                notifyService.Custom("District Not Found!", 3, "red", "fas fa-city");
+                _notifyService.Custom("District Not Found!", 3, "red", "fas fa-city");
                 return RedirectToAction(nameof(Profile));
             }
 
             var district = await _context.District.Include(d => d.Country).Include(d => d.State).FirstOrDefaultAsync(d => d.DistrictId == id);
             if (district == null)
             {
-                notifyService.Custom("District Not Found!", 3, "red", "fas fa-city");
+                _notifyService.Custom("District Not Found!", 3, "red", "fas fa-city");
                 return RedirectToAction(nameof(Profile));
             }
 
@@ -211,19 +204,19 @@ namespace risk.control.system.Controllers.CompanyAdmin
             {
                 if (!ModelState.IsValid)
                 {
-                    notifyService.Custom($"Invalid District data!", 3, "red", "fas fa-city");
+                    _notifyService.Custom($"Invalid District data!", 3, "red", "fas fa-city");
                     return RedirectToAction(nameof(Profile));
                 }
                 var existingdistrict = await _context.District.FindAsync(id);
                 if (existingdistrict == null)
                 {
-                    notifyService.Custom("District Not Found!", 3, "red", "fas fa-city");
+                    _notifyService.Custom("District Not Found!", 3, "red", "fas fa-city");
                     return RedirectToAction(nameof(Profile));
                 }
                 bool exists = await _context.District.AnyAsync(x => x.Code == district.Code && x.CountryId == district.SelectedCountryId && x.StateId == district.StateId && x.DistrictId != district.DistrictId);
                 if (exists)
                 {
-                    notifyService.Custom($"Disitrict Code <b>{district.Code}</b> already exists!", 3, "red", "fas fa-city");
+                    _notifyService.Custom($"Disitrict Code <b>{district.Code}</b> already exists!", 3, "red", "fas fa-city");
                     ModelState.Remove("Name");
                     ModelState.Remove("Code");
                     var currentDistrict = await _context.District.Include(d => d.Country).Include(d => d.State).FirstOrDefaultAsync(d => d.DistrictId == id);
@@ -240,13 +233,13 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 existingdistrict.StateId = district.StateId;
                 _context.Update(existingdistrict);
                 await _context.SaveChangesAsync(null, false);
-                notifyService.Custom($"District <b>{existingdistrict.Name}</b> edited successfully!", 3, "orange", "fas fa-city");
+                _notifyService.Custom($"District <b>{existingdistrict.Name}</b> edited successfully!", 3, "orange", "fas fa-city");
                 return RedirectToAction(nameof(Profile));
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred.");
-                notifyService.Custom($"An error occurred while editing the District!", 3, "red", "fas fa-city");
+                _logger.LogError(ex, "Error occurred.");
+                _notifyService.Custom($"An error occurred while editing the District!", 3, "red", "fas fa-city");
                 return RedirectToAction(nameof(Profile));
             }
         }
@@ -280,7 +273,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred.");
+                _logger.LogError(ex, "Error occurred.");
                 return Json(new { success = false, message = "An error occurred while deleting the District!" });
             }
         }

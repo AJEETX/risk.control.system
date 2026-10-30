@@ -18,49 +18,31 @@ namespace risk.control.system.Controllers.Api
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class SecureController : ControllerBase
-    {
-        private readonly ITokenService tokenService;
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly IProcessImageService processImageService;
-        private readonly IAmazonApiService _amazonApiService;
-        private readonly IWebHostEnvironment webHostEnvironment;
-        private readonly IPdfReportService pdfGenerativeService;
-        private readonly IPhoneService phoneService;
-        private readonly SignInManager<ApplicationUser> _signInManager;
-        private readonly IFeatureManager featureManager;
-        private readonly ISmsService smsService;
-        private readonly ApplicationDbContext _context;
-        private readonly string baseUrl;
-
-        public SecureController(UserManager<ApplicationUser> userManager,
+    public class SecureController(UserManager<ApplicationUser> userManager,
             IProcessImageService processImageService,
             IAmazonApiService amazonApiService,
             IWebHostEnvironment webHostEnvironment,
-            IPdfReportService generateService,
+            IPdfReportService pdfReportService,
             IPhoneService phoneService,
             SignInManager<ApplicationUser> signInManager,
              IHttpContextAccessor httpContextAccessor,
             IFeatureManager featureManager,
-            ISmsService SmsService,
+            ISmsService smsService,
             ApplicationDbContext context,
-            ITokenService tokenService)
-        {
-            _userManager = userManager ?? throw new ArgumentNullException();
-            this.processImageService = processImageService;
-            _amazonApiService = amazonApiService;
-            this.webHostEnvironment = webHostEnvironment;
-            this.pdfGenerativeService = generateService;
-            this.phoneService = phoneService;
-            _signInManager = signInManager ?? throw new ArgumentNullException();
-            this._context = context;
-            this.featureManager = featureManager;
-            smsService = SmsService;
-            this.tokenService = tokenService;
-            var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
-            var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
-            baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
-        }
+            ITokenService tokenService) : ControllerBase
+    {
+        private readonly string _baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent()}{httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent()}";
+        private readonly ITokenService _tokenService = tokenService;
+        private readonly UserManager<ApplicationUser> _userManager = userManager;
+        private readonly IProcessImageService _processImageService = processImageService;
+        private readonly IAmazonApiService _amazonApiService = amazonApiService;
+        private readonly IWebHostEnvironment _env = webHostEnvironment;
+        private readonly IPdfReportService _pdfReportService = pdfReportService;
+        private readonly IPhoneService _phoneService = phoneService;
+        private readonly SignInManager<ApplicationUser> _signInManager = signInManager;
+        private readonly IFeatureManager _featureManager = featureManager;
+        private readonly ISmsService _smsService = smsService;
+        private readonly ApplicationDbContext _context = context;
 
         [AllowAnonymous]
         [HttpPost("agent-login")]
@@ -99,7 +81,7 @@ namespace risk.control.system.Controllers.Api
             }
             bool vendorIsActive = false;
             vendorIsActive = await _context.Vendor.AnyAsync(c => c.VendorId == vendorUser.VendorId && c.Status == Models.VendorStatus.ACTIVE);
-            if (await featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED) && vendorIsActive)
+            if (await _featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED) && vendorIsActive)
             {
                 vendorIsActive = !string.IsNullOrWhiteSpace(user.MobileUId);
             }
@@ -107,8 +89,8 @@ namespace risk.control.system.Controllers.Api
             {
                 return BadRequest("Invalid login attempt.");
             }
-            var token = tokenService.GenerateJwtToken(user);
-            var refreshToken = await tokenService.GenerateRefreshTokenAsync(user.Email!);
+            var token = _tokenService.GenerateJwtToken(user);
+            var refreshToken = await _tokenService.GenerateRefreshTokenAsync(user.Email!);
             return Ok(new TokenResponse { AccessToken = token, RefreshToken = refreshToken.Token, ExpiresAt = DateTime.UtcNow.AddMinutes(15) });
         }
 
@@ -170,7 +152,7 @@ namespace risk.control.system.Controllers.Api
                 return BadRequest("Invalid login attempt.");
             }
 
-            var token = tokenService.GenerateJwtToken(user);
+            var token = _tokenService.GenerateJwtToken(user);
             return Ok(new { token });
         }
 
@@ -191,8 +173,8 @@ namespace risk.control.system.Controllers.Api
         {
             string msg = $"Dear {mobile} user,\n\n" +
                              $"{message}\n\n" +
-                             $"Thanks\n{baseUrl}";
-            var response = await smsService.SendSmsAsync(countryCode, mobile, msg);
+                             $"Thanks\n{_baseUrl}";
+            var response = await _smsService.SendSmsAsync(countryCode, mobile, msg);
             return Ok(new { message = response });
         }
 
@@ -200,7 +182,7 @@ namespace risk.control.system.Controllers.Api
         [HttpGet("validate-mobile-number")]
         public async Task<IActionResult> ValidatePhoneNumber(string phoneNumber = "+61432854196")
         {
-            var result = await phoneService.ValidateAsync(phoneNumber);
+            var result = await _phoneService.ValidateAsync(phoneNumber);
             return Ok(result);
         }
 
@@ -208,7 +190,7 @@ namespace risk.control.system.Controllers.Api
         [HttpGet("is-mobile-number")]
         public async Task<IActionResult> IsValidMobileNumber(string phoneNumber = "+61432854196", string country = "61")
         {
-            var result = await phoneService.IsValidMobileNumberAsync(phoneNumber, country);
+            var result = await _phoneService.IsValidMobileNumberAsync(phoneNumber, country);
             return Ok(result);
         }
 
@@ -236,18 +218,40 @@ namespace risk.control.system.Controllers.Api
         //}
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
-        [HttpGet("pdf")]
-        public async Task<IActionResult> Pdf(long id = 1, string currentUserEmail = "assessor@insurer.com")
+        [HttpGet("assessor-report")]
+        public async Task<IActionResult> AssessorReport(long id = 1, string currentUserEmail = "assessor@insurer.com")
         {
             try
             {
-                var caseNumber = await pdfGenerativeService.Generate(id, currentUserEmail);
-                var ReportFilePath = Path.Combine(webHostEnvironment.ContentRootPath, CONSTANTS.DOCUMENT, CONSTANTS.CASE, caseNumber, "report.pdf");
+                var caseNumber = await _pdfReportService.Generate(id, currentUserEmail);
+                string ReportFilePath = Path.GetFullPath(Path.Combine(_env.ContentRootPath, CONSTANTS.DOCUMENT, CONSTANTS.CASE, caseNumber, CONSTANTS.REPORT_FILENAME));
                 var memory = new MemoryStream();
                 using var stream = new FileStream(ReportFilePath, FileMode.Open);
                 await stream.CopyToAsync(memory);
                 memory.Position = 0;
-                return File(memory, "application/pdf", "report.pdf");
+                return File(memory, "application/pdf", CONSTANTS.REPORT_FILENAME);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
+        [AllowAnonymous]
+        [HttpGet("agency-report")]
+        public async Task<IActionResult> AgencyReport(long id = 1)
+        {
+            try
+            {
+                var caseNumber = await _pdfReportService.GenerateAgencyReport(id);
+                string agencyReportFilePath = Path.GetFullPath(Path.Combine(_env.ContentRootPath, CONSTANTS.DOCUMENT, CONSTANTS.CASE, caseNumber, CONSTANTS.REPORT, CONSTANTS.AGENCY_REPORT_FILENAME));
+                var memory = new MemoryStream();
+                await using var stream = new FileStream(agencyReportFilePath, FileMode.Open);
+                await stream.CopyToAsync(memory);
+                memory.Position = 0;
+                return File(memory, "application/pdf", CONSTANTS.AGENCY_REPORT_FILENAME);
             }
             catch (Exception ex)
             {
@@ -267,7 +271,7 @@ namespace risk.control.system.Controllers.Api
                 await using var memoryStream = new MemoryStream();
                 await file.CopyToAsync(memoryStream);
                 var imageBytes = memoryStream.ToArray();
-                var watermarkedBytes = processImageService.CompressAndWaterMarkImage(imageBytes, 80, "VERIFIED", 0f);
+                var watermarkedBytes = _processImageService.CompressAndWaterMarkImage(imageBytes, 80, "VERIFIED", 0f);
                 return File(watermarkedBytes, "image/*", $"watermarked_{file.FileName}");
             }
             catch (Exception ex)

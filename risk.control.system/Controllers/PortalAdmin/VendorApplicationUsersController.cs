@@ -19,37 +19,23 @@ namespace risk.control.system.Controllers.PortalAdmin
 {
     [Breadcrumb("Agencies")]
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME},{MANAGER.DISPLAY_NAME}")]
-    public class VendorApplicationUsersController : Controller
-    {
-        private readonly ApplicationDbContext _context;
-        private readonly IFileStorageService fileStorageService;
-        private readonly ILogger<VendorApplicationUsersController> logger;
-        private readonly UserManager<ApplicationUser> userManager;
-        private readonly INotyfService notifyService;
-        private readonly ISmsService smsService;
-        private readonly IFeatureManager featureManager;
-        private readonly string portal_base_url = string.Empty;
-
-        public VendorApplicationUsersController(ApplicationDbContext context,
+    public class VendorApplicationUsersController(ApplicationDbContext context,
             IFileStorageService fileStorageService,
             ILogger<VendorApplicationUsersController> logger,
             UserManager<ApplicationUser> userManager,
             INotyfService notifyService,
             IFeatureManager featureManager,
              IHttpContextAccessor httpContextAccessor,
-            ISmsService SmsService)
-        {
-            _context = context;
-            this.fileStorageService = fileStorageService;
-            this.logger = logger;
-            this.userManager = userManager;
-            this.notifyService = notifyService;
-            smsService = SmsService;
-            this.featureManager = featureManager;
-            var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
-            var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
-            portal_base_url = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
-        }
+            ISmsService smsService) : Controller
+    {
+        private readonly string _baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent()}{httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent()}";
+        private readonly ApplicationDbContext _context = context;
+        private readonly IFileStorageService _fileStorageService = fileStorageService;
+        private readonly ILogger<VendorApplicationUsersController> _logger = logger;
+        private readonly UserManager<ApplicationUser> _userManager = userManager;
+        private readonly INotyfService _notifyService = notifyService;
+        private readonly ISmsService _smsService = smsService;
+        private readonly IFeatureManager _featureManager = featureManager;
 
         public async Task<IActionResult> Index()
         {
@@ -63,7 +49,7 @@ namespace risk.control.system.Controllers.PortalAdmin
             {
                 if (id == null || id == 0 || _context.ApplicationUser == null)
                 {
-                    notifyService.Error("OOPs !!!..Id Not Found");
+                    _notifyService.Error("OOPs !!!..Id Not Found");
                     return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
                 }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
@@ -77,7 +63,7 @@ namespace risk.control.system.Controllers.PortalAdmin
                     .FirstOrDefaultAsync(m => m.Id == id);
                 if (vendorApplicationUser == null)
                 {
-                    notifyService.Error($"Error: User Not Found", 3);
+                    _notifyService.Error($"Error: User Not Found", 3);
                     return RedirectToAction(nameof(Details), new { id = id });
                 }
                 var agencysPage = new MvcBreadcrumbNode("Index", "Vendors", "Agencies");
@@ -90,8 +76,8 @@ namespace risk.control.system.Controllers.PortalAdmin
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred.");
-                notifyService.Error("OOPs !!!..Contact Admin");
+                _logger.LogError(ex, "Error occurred.");
+                _notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
             }
         }
@@ -102,7 +88,7 @@ namespace risk.control.system.Controllers.PortalAdmin
             {
                 if (id == 0 || _context.ApplicationUser == null)
                 {
-                    notifyService.Error("OOPs !!!..Id Not Found");
+                    _notifyService.Error("OOPs !!!..Id Not Found");
                     return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
                 }
 
@@ -120,8 +106,8 @@ namespace risk.control.system.Controllers.PortalAdmin
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred.");
-                notifyService.Error("OOPs !!!..Contact Admin");
+                _logger.LogError(ex, "Error occurred.");
+                _notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
             }
         }
@@ -134,17 +120,17 @@ namespace risk.control.system.Controllers.PortalAdmin
             {
                 if (user == null)
                 {
-                    notifyService.Error("OOPs !!!..User not found");
+                    _notifyService.Error("OOPs !!!..User not found");
                     return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
                 }
                 if (string.IsNullOrWhiteSpace(emailSuffix))
                 {
-                    notifyService.Error("OOPs !!!..Email suffix not found");
+                    _notifyService.Error("OOPs !!!..Email suffix not found");
                     return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
                 }
                 if (user.ProfileImage?.Length > 0)
                 {
-                    var (fileName, relativePath) = await fileStorageService.SaveAsync(user.ProfileImage, emailSuffix, "user");
+                    var (fileName, relativePath) = await _fileStorageService.SaveAsync(user.ProfileImage, emailSuffix, "user");
                     user.ProfilePictureUrl = relativePath;
                     user.ProfilePictureExtension = Path.GetExtension(fileName);
                 }
@@ -156,10 +142,10 @@ namespace risk.control.system.Controllers.PortalAdmin
                 user.UserName = HttpContext.User?.Identity?.Name;
                 user.Updated = DateTime.UtcNow;
                 user.UpdatedBy = HttpContext.User?.Identity?.Name;
-                IdentityResult result = await userManager.CreateAsync(user, user.Password);
+                IdentityResult result = await _userManager.CreateAsync(user, user.Password);
                 if (!result.Succeeded)
                 {
-                    notifyService.Error("Error to create user!");
+                    _notifyService.Error("Error to create user!");
                     foreach (IdentityError error in result.Errors)
                         ModelState.AddModelError("", error.Description);
                     return View(user);
@@ -167,27 +153,27 @@ namespace risk.control.system.Controllers.PortalAdmin
                 var country = await _context.Country.FirstOrDefaultAsync(c => c.CountryId == user.CountryId);
                 if (!user.Active)
                 {
-                    var createdUser = await userManager.FindByEmailAsync(user.Email);
-                    var lockUser = await userManager.SetLockoutEnabledAsync(createdUser!, true);
-                    var lockDate = await userManager.SetLockoutEndDateAsync(createdUser!, DateTime.MaxValue);
+                    var createdUser = await _userManager.FindByEmailAsync(user.Email);
+                    var lockUser = await _userManager.SetLockoutEnabledAsync(createdUser!, true);
+                    var lockDate = await _userManager.SetLockoutEndDateAsync(createdUser!, DateTime.MaxValue);
                     if (lockUser.Succeeded && lockDate.Succeeded)
                     {
-                        await smsService.DoSendSmsAsync(country!.Code, country.ISDCode + user.PhoneNumber, "Agency user created and locked. \nEmail : " + user.Email + "\n" + portal_base_url);
-                        notifyService.Custom($"User edited and locked.", 3, "orange", "fas fa-user-lock");
+                        await _smsService.DoSendSmsAsync(country!.Code, country.ISDCode + user.PhoneNumber, "Agency user created and locked. \nEmail : " + user.Email + "\n" + _baseUrl);
+                        _notifyService.Custom($"User edited and locked.", 3, "orange", "fas fa-user-lock");
                     }
                 }
                 else
                 {
-                    await smsService.DoSendSmsAsync(country!.Code, country.ISDCode + user.PhoneNumber, "Agency user created. \nEmail : " + user.Email);
-                    notifyService.Custom($"User created successfully.", 3, "green", "fas fa-user-plus");
+                    await _smsService.DoSendSmsAsync(country!.Code, country.ISDCode + user.PhoneNumber, "Agency user created. \nEmail : " + user.Email);
+                    _notifyService.Custom($"User created successfully.", 3, "green", "fas fa-user-plus");
                 }
                 return RedirectToAction(nameof(VendorUserController.Index), "VendorUser", new { id = user.VendorId });
 
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred.");
-                notifyService.Error("OOPs !!!..Contact Admin");
+                _logger.LogError(ex, "Error occurred.");
+                _notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
             }
         }
@@ -198,14 +184,14 @@ namespace risk.control.system.Controllers.PortalAdmin
             {
                 if (userId == null || _context.ApplicationUser == null)
                 {
-                    notifyService.Error("OOPs !!!..Id Not found");
+                    _notifyService.Error("OOPs !!!..Id Not found");
                     return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
                 }
 
                 var vendorApplicationUser = await _context.ApplicationUser.Include(v => v.Vendor).Include(v => v.Country).FirstOrDefaultAsync(v => v.Id == userId);
                 if (vendorApplicationUser == null)
                 {
-                    notifyService.Error("OOPs !!!..User Not found");
+                    _notifyService.Error("OOPs !!!..User Not found");
                     return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
                 }
 
@@ -214,14 +200,14 @@ namespace risk.control.system.Controllers.PortalAdmin
                 var usersPage = new MvcBreadcrumbNode("Index", "VendorUser", $"Manage Users") { Parent = agencyPage, RouteValues = new { id = vendorApplicationUser.Vendor.VendorId } };
                 var editPage = new MvcBreadcrumbNode("Edit", "VendorApplicationUsers", $"Edit User") { Parent = usersPage, RouteValues = new { id = userId } };
                 ViewData["BreadcrumbNode"] = editPage;
-                vendorApplicationUser.IsPasswordChangeRequired = await featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION) ? !vendorApplicationUser.IsPasswordChangeRequired : true;
+                vendorApplicationUser.IsPasswordChangeRequired = await _featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION) ? !vendorApplicationUser.IsPasswordChangeRequired : true;
 
                 return View(vendorApplicationUser);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred.");
-                notifyService.Error("OOPs !!!..Contact Admin");
+                _logger.LogError(ex, "Error occurred.");
+                _notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
             }
         }
@@ -232,16 +218,16 @@ namespace risk.control.system.Controllers.PortalAdmin
         {
             try
             {
-                var user = await userManager.FindByIdAsync(id);
+                var user = await _userManager.FindByIdAsync(id);
                 if (user == null)
                 {
-                    notifyService.Error("OOPs !!!..User Not found");
+                    _notifyService.Error("OOPs !!!..User Not found");
                     return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
                 }
                 if (applicationUser?.ProfileImage != null && applicationUser.ProfileImage.Length > 0)
                 {
                     var domain = user!.Email!.Split('@')[1];
-                    var (fileName, relativePath) = await fileStorageService.SaveAsync(user.ProfileImage!, domain, "user");
+                    var (fileName, relativePath) = await _fileStorageService.SaveAsync(user.ProfileImage!, domain, "user");
                     user.ProfilePictureUrl = relativePath;
                     user.ProfilePictureExtension = Path.GetExtension(fileName);
                 }
@@ -262,10 +248,10 @@ namespace risk.control.system.Controllers.PortalAdmin
                 user.PhoneNumber = applicationUser.PhoneNumber!.TrimStart('0');
                 user.UpdatedBy = HttpContext.User?.Identity?.Name;
                 user.SecurityStamp = DateTime.UtcNow.ToString();
-                var result = await userManager.UpdateAsync(user);
+                var result = await _userManager.UpdateAsync(user);
                 if (!result.Succeeded)
                 {
-                    notifyService.Error("Error to edit user!");
+                    _notifyService.Error("Error to edit user!");
                     foreach (IdentityError error in result.Errors)
                         ModelState.AddModelError("", error.Description);
                     return View(applicationUser);
@@ -273,34 +259,34 @@ namespace risk.control.system.Controllers.PortalAdmin
                 var country = await _context.Country.FirstOrDefaultAsync(c => c.CountryId == user.CountryId);
                 if (!user.Active)
                 {
-                    var createdUser = await userManager.FindByEmailAsync(user.Email!);
-                    var lockUser = await userManager.SetLockoutEnabledAsync(createdUser!, true);
-                    var lockDate = await userManager.SetLockoutEndDateAsync(createdUser!, DateTime.MaxValue);
+                    var createdUser = await _userManager.FindByEmailAsync(user.Email!);
+                    var lockUser = await _userManager.SetLockoutEnabledAsync(createdUser!, true);
+                    var lockDate = await _userManager.SetLockoutEndDateAsync(createdUser!, DateTime.MaxValue);
 
                     if (lockUser.Succeeded && lockDate.Succeeded)
                     {
-                        await smsService.DoSendSmsAsync(country!.Code, country.ISDCode + user.PhoneNumber, "Agency user edited and locked. \nEmail : " + user.Email + "\n" + portal_base_url);
-                        notifyService.Custom($"User edited and locked.", 3, "orange", "fas fa-user-lock");
+                        await _smsService.DoSendSmsAsync(country!.Code, country.ISDCode + user.PhoneNumber, "Agency user edited and locked. \nEmail : " + user.Email + "\n" + _baseUrl);
+                        _notifyService.Custom($"User edited and locked.", 3, "orange", "fas fa-user-lock");
                     }
                 }
                 else
                 {
-                    var createdUser = await userManager.FindByEmailAsync(user.Email!);
-                    var lockUser = await userManager.SetLockoutEnabledAsync(createdUser!, true);
-                    var lockDate = await userManager.SetLockoutEndDateAsync(createdUser!, DateTime.UtcNow);
+                    var createdUser = await _userManager.FindByEmailAsync(user.Email!);
+                    var lockUser = await _userManager.SetLockoutEnabledAsync(createdUser!, true);
+                    var lockDate = await _userManager.SetLockoutEndDateAsync(createdUser!, DateTime.UtcNow);
 
                     if (lockUser.Succeeded && lockDate.Succeeded)
                     {
-                        await smsService.DoSendSmsAsync(country!.Code, country.ISDCode + user.PhoneNumber, "Agency user edited and unlocked. \nEmail : " + user.Email);
-                        notifyService.Custom($"User edited.", 3, "green", "fas fa-user-check");
+                        await _smsService.DoSendSmsAsync(country!.Code, country.ISDCode + user.PhoneNumber, "Agency user edited and unlocked. \nEmail : " + user.Email);
+                        _notifyService.Custom($"User edited.", 3, "green", "fas fa-user-check");
                     }
                 }
                 return RedirectToAction(nameof(VendorUserController.Index), "VendorUser", new { id = applicationUser.VendorId });
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred.");
-                notifyService.Error("OOPs !!!..Contact Admin");
+                _logger.LogError(ex, "Error occurred.");
+                _notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
             }
         }
@@ -344,20 +330,20 @@ namespace risk.control.system.Controllers.PortalAdmin
                 var vendorApplicationUser = await _context.ApplicationUser.FindAsync(id);
                 if (vendorApplicationUser == null)
                 {
-                    notifyService.Error($"Err User delete. Try again", 3);
+                    _notifyService.Error($"Err User delete. Try again", 3);
                     return RedirectToAction(nameof(Index));
                 }
                 vendorApplicationUser.Updated = DateTime.UtcNow;
                 vendorApplicationUser.UpdatedBy = currentUserEmail;
                 _context.ApplicationUser.Remove(vendorApplicationUser);
-                notifyService.Error($"User deleted successfully.", 3);
+                _notifyService.Error($"User deleted successfully.", 3);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred.");
-                notifyService.Error("OOPs !!!..Contact Admin");
+                _logger.LogError(ex, "Error occurred.");
+                _notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
             }
         }

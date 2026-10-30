@@ -7,14 +7,10 @@ using risk.control.system.Models.ViewModel;
 namespace risk.control.system.Controllers.PortalAdmin
 {
 
-    public class VendorInvoiceController : Controller
+    public class VendorInvoiceController(ApplicationDbContext context) : Controller
     {
-        private readonly ApplicationDbContext _context; // Replace with your actual DbContext name
+        private readonly ApplicationDbContext _context = context; // Replace with your actual DbContext name
 
-        public VendorInvoiceController(ApplicationDbContext context)
-        {
-            _context = context;
-        }
         public async Task<IActionResult> Index()
         {
             // Build the strongly-typed ViewModel instead of using ViewBag

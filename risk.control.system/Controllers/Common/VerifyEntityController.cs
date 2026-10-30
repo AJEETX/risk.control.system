@@ -16,24 +16,16 @@ namespace risk.control.system.Controllers.Common
     [Route("api/[controller]")]
     [ApiController]
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME},{AGENCY_ADMIN.DISPLAY_NAME},{CREATOR.DISPLAY_NAME},{ASSESSOR.DISPLAY_NAME},{MANAGER.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME},{AGENT.DISPLAY_NAME}")]
-    public class VerifyEntityController : ControllerBase
-    {
-        private readonly ApplicationDbContext _context;
-        private readonly IPhoneService _phoneService;
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly ILogger<VerifyEntityController> _logger;
-
-        public VerifyEntityController(
+    public class VerifyEntityController(
             ApplicationDbContext context,
             IPhoneService phoneService,
             UserManager<ApplicationUser> userManager,
-            ILogger<VerifyEntityController> logger)
-        {
-            _context = context;
-            _phoneService = phoneService;
-            _userManager = userManager;
-            _logger = logger;
-        }
+            ILogger<VerifyEntityController> logger) : ControllerBase
+    {
+        private readonly ApplicationDbContext _context = context;
+        private readonly IPhoneService _phoneService = phoneService;
+        private readonly UserManager<ApplicationUser> _userManager = userManager;
+        private readonly ILogger<VerifyEntityController> _logger = logger;
 
         [HttpGet("GetAgencyName")]
         public async Task<int?> GetAgencyName(string input, string domain)

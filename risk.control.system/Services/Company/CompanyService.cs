@@ -17,32 +17,24 @@ namespace risk.control.system.Services.Company
         Task<(bool Success, Dictionary<string, string> Errors)> EditAsync(string userEmail, ClientCompany model, string portal_base_url);
     }
 
-    internal class CompanyService : ICompanyService
-    {
-        private readonly IWebHostEnvironment _env;
-        private readonly ISmsService _smsService;
-        private readonly ApplicationDbContext _context;
-        private readonly IValidateImageService _validateImageService;
-        private readonly IPhoneService _phoneService;
-        private readonly IFeatureManager _featureManager;
-        private readonly IFileStorageService _fileStorageService;
-        public CompanyService(
+    internal class CompanyService(
             IWebHostEnvironment env,
             ISmsService smsService,
+            IEncryptionService encryptionService,
             ApplicationDbContext context,
             IValidateImageService validateImageService,
             IPhoneService phoneService,
             IFeatureManager featureManager,
-            IFileStorageService fileStorageService)
-        {
-            this._env = env;
-            this._smsService = smsService;
-            this._context = context;
-            this._validateImageService = validateImageService;
-            this._phoneService = phoneService;
-            this._featureManager = featureManager;
-            this._fileStorageService = fileStorageService;
-        }
+            IFileStorageService fileStorageService) : ICompanyService
+    {
+        private readonly IEncryptionService _encryptionService = encryptionService;
+        private readonly IWebHostEnvironment _env = env;
+        private readonly ISmsService _smsService = smsService;
+        private readonly ApplicationDbContext _context = context;
+        private readonly IValidateImageService _validateImageService = validateImageService;
+        private readonly IPhoneService _phoneService = phoneService;
+        private readonly IFeatureManager _featureManager = featureManager;
+        private readonly IFileStorageService _fileStorageService = fileStorageService;
 
         public async Task<object[]> GetCompanies()
         {
@@ -57,7 +49,7 @@ namespace risk.control.system.Services.Company
                 companies.Select(u =>
                 new
                 {
-                    Id = u.ClientCompanyId,
+                    Id = _encryptionService.ProtectId(u.ClientCompanyId),
                     Document = string.IsNullOrWhiteSpace(u.DocumentUrl) ? Applicationsettings.NO_IMAGE : string.Format("data:image/*;base64,{0}", Convert.ToBase64String(System.IO.File.ReadAllBytes(
                     Path.Combine(_env.ContentRootPath, u.DocumentUrl)))),
                     Domain = u.Email,

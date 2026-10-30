@@ -9,6 +9,7 @@ using risk.control.system.Controllers.Common;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
+using risk.control.system.Services.Common;
 using risk.control.system.Services.Creator;
 using SmartBreadcrumbs.Attributes;
 
@@ -16,27 +17,18 @@ namespace risk.control.system.Controllers.Creator
 {
     [Authorize(Roles = $"{CREATOR.DISPLAY_NAME}")]
     [Breadcrumb("Cases")]
-    public class CaseActiveController : Controller
-    {
-        private readonly ApplicationDbContext _context;
-        private readonly ICaseActiveService _caseActiveService;
-        private readonly INotyfService _notifyService;
-        private readonly ILogger<CaseActiveController> _logger;
-        private readonly IReportTemplateService _reportTemplateService;
-
-        public CaseActiveController(
+    public class CaseActiveController(
             ICaseActiveService caseActiveService,
             INotyfService notifyService,
             ApplicationDbContext context,
             ILogger<CaseActiveController> logger,
-            IReportTemplateService reportTemplateService)
-        {
-            _context = context;
-            _caseActiveService = caseActiveService;
-            _notifyService = notifyService;
-            _logger = logger;
-            _reportTemplateService = reportTemplateService;
-        }
+            IReportTemplateService reportTemplateService) : Controller
+    {
+        private readonly ApplicationDbContext _context = context;
+        private readonly ICaseActiveService _caseActiveService = caseActiveService;
+        private readonly INotyfService _notifyService = notifyService;
+        private readonly ILogger<CaseActiveController> _logger = logger;
+        private readonly IReportTemplateService _reportTemplateService = reportTemplateService;
 
         public IActionResult Index()
         {
@@ -80,7 +72,7 @@ namespace risk.control.system.Controllers.Creator
         }
 
         [Breadcrumb(title: " Details", FromAction = nameof(Active))]
-        public async Task<IActionResult> ActiveDetail(long id)
+        public async Task<IActionResult> ActiveDetail([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name!;
             if (!ModelState.IsValid || id <= 0)

@@ -9,7 +9,7 @@ namespace risk.control.system.Models
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public long VendorInvestigationServiceTypeId { get; set; }
+        public long Id { get; set; }
 
         [Display(Name = "Investigation service type")]
         public long InvestigationServiceTypeId { get; set; } = default!;

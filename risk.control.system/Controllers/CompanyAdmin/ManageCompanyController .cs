@@ -1,10 +1,8 @@
 ﻿using AspNetCoreHero.ToastNotification.Abstractions;
 
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.FeatureManagement;
 using risk.control.system.AppConstant;
 using risk.control.system.Controllers.Common;
 using risk.control.system.Helpers;
@@ -15,37 +13,17 @@ using SmartBreadcrumbs.Attributes;
 namespace risk.control.system.Controllers.CompanyAdmin
 {
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME}")]
-    public class ManageCompanyController : Controller
-    {
-        private readonly INotyfService notifyService;
-        private readonly ApplicationDbContext _context;
-        private readonly UserManager<ApplicationUser> userManager;
-        private readonly ICompanyService companyService;
-        private readonly ICompanyUserService companyUserService;
-        private readonly IFeatureManager featureManager;
-        private readonly ILogger<ManageCompanyController> logger;
-        private readonly string portal_base_url;
-
-        public ManageCompanyController(ApplicationDbContext context,
-            UserManager<ApplicationUser> userManager,
+    public class ManageCompanyController(ApplicationDbContext context,
             ICompanyService companyService,
-            ICompanyUserService companyUserService,
             INotyfService notifyService,
-            IFeatureManager featureManager,
              IHttpContextAccessor httpContextAccessor,
-            ILogger<ManageCompanyController> logger)
-        {
-            this._context = context;
-            this.userManager = userManager;
-            this.companyService = companyService;
-            this.companyUserService = companyUserService;
-            this.notifyService = notifyService;
-            this.featureManager = featureManager;
-            this.logger = logger;
-            var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
-            var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
-            portal_base_url = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
-        }
+            ILogger<ManageCompanyController> logger) : Controller
+    {
+        private readonly string portal_base_url = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent()}{httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent()}";
+        private readonly INotyfService _notifyService = notifyService;
+        private readonly ApplicationDbContext _context = context;
+        private readonly ICompanyService _companyService = companyService;
+        private readonly ILogger<ManageCompanyController> logger = logger;
 
         [Breadcrumb("Manage Company")]
         public IActionResult Index()
@@ -62,7 +40,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 var companyUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == userEmail);
                 if (companyUser is null)
                 {
-                    notifyService.Error("OOPs !!!..User Not Found");
+                    _notifyService.Error("OOPs !!!..User Not Found");
                     return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
                 }
                 var clientCompany = await _context.ClientCompany.AsNoTracking()
@@ -73,7 +51,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                     .FirstOrDefaultAsync(m => m.ClientCompanyId == companyUser.ClientCompanyId);
                 if (clientCompany == null)
                 {
-                    notifyService.Error("OOPs !!!..Company Not Found");
+                    _notifyService.Error("OOPs !!!..Company Not Found");
                     return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
                 }
 
@@ -82,7 +60,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error getting Company for {UserEmail}.", userEmail);
-                notifyService.Error("Error getting Company. Try again");
+                _notifyService.Error("Error getting Company. Try again");
                 return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
             }
         }
@@ -96,7 +74,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 var companyUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(c => c.Email == userEmail);
                 if (companyUser is null)
                 {
-                    notifyService.Error("OOPs !!!..User Not Found");
+                    _notifyService.Error("OOPs !!!..User Not Found");
                     return RedirectToAction(nameof(CompanyProfile));
                 }
                 var clientCompany = await _context.ClientCompany.AsNoTracking()
@@ -107,7 +85,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                     .FirstOrDefaultAsync(m => m.ClientCompanyId == companyUser.ClientCompanyId);
                 if (clientCompany == null)
                 {
-                    notifyService.Error("OOPs !!!..Company Not Found");
+                    _notifyService.Error("OOPs !!!..Company Not Found");
                     return RedirectToAction(nameof(CompanyProfile));
                 }
 
@@ -116,7 +94,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error getting Company for {UserEmail}.", HttpContext.User?.Identity?.Name);
-                notifyService.Error("Error getting Company. Try again");
+                _notifyService.Error("Error getting Company. Try again");
                 return RedirectToAction(nameof(CompanyProfile));
             }
         }
@@ -129,28 +107,28 @@ namespace risk.control.system.Controllers.CompanyAdmin
             {
                 if (!ModelState.IsValid)
                 {
-                    notifyService.Custom($"OOPs !!!..Invalid Data.", 3, "red", "fas fa-building");
+                    _notifyService.Custom($"OOPs !!!..Invalid Data.", 3, "red", "fas fa-building");
                     await Load(model);
                     return View(model);
                 }
                 var userEmail = HttpContext.User?.Identity?.Name!;
 
-                var result = await companyService.EditAsync(userEmail, model, portal_base_url);
+                var result = await _companyService.EditAsync(userEmail, model, portal_base_url);
                 if (!result.Success)
                 {
                     foreach (var error in result.Errors)
                         ModelState.AddModelError(error.Key, error.Value);
 
-                    notifyService.Error("Please fix validation errors");
+                    _notifyService.Error("Please fix validation errors");
                     await Load(model);
                     return View(model);
                 }
-                notifyService.Custom($"Company <b>{model.Email}</b> profile edited successfully.", 3, "orange", "fas fa-building");
+                _notifyService.Custom($"Company <b>{model.Email}</b> profile edited successfully.", 3, "orange", "fas fa-building");
             }
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error editing {CompanyId} for {UserEmail}.", model.ClientCompanyId, HttpContext.User?.Identity?.Name);
-                notifyService.Error("Error editing Company. Try again.");
+                _notifyService.Error("Error editing Company. Try again.");
                 return RedirectToAction(nameof(CompanyProfile));
             }
             return RedirectToAction(nameof(CompanyProfile), "ManageCompany");

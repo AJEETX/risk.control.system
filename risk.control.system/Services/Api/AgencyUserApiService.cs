@@ -15,38 +15,24 @@ namespace risk.control.system.Services.Api
         Task<List<UserDetailResponse>> GetAgencyUsers(string userEmail);
     }
 
-    internal class AgencyUserApiService : IAgencyUserApiService
-    {
-        private readonly IDbContextFactory<ApplicationDbContext> _contextFactory;
-        private readonly IDashboardService _dashboardService;
-        private readonly IBase64FileService _base64FileService;
-        private readonly DateTime _cutoffTime;
-        private readonly IFeatureManager _featureManager;
-        private readonly int _sessionTimeoutInSeconds;
-        private readonly int _sessionTimeoutinMinutes;
-        private readonly int _awayThresholdInMinutes;
-        private readonly int _onlineThresholdInMinutes;
-        private readonly IEncryptionService _encryptionService;
-
-        public AgencyUserApiService(
+    internal class AgencyUserApiService(
             IEncryptionService encryptionService,
             IConfiguration config,
             IDbContextFactory<ApplicationDbContext> contextFactory,
             IDashboardService dashboardService,
             IBase64FileService base64FileService,
-            IFeatureManager featureManager)
-        {
-            _awayThresholdInMinutes = int.Parse(config["LOGIN_SESSION_INACTIVE_MIN"]!);
-            _onlineThresholdInMinutes = int.Parse(config["LOGIN_SESSION_ACTIVE_MIN"]!);
-            _sessionTimeoutInSeconds = int.Parse(config["SESSION_TIMEOUT_SEC"]!);
-            _sessionTimeoutinMinutes = _sessionTimeoutInSeconds / 60;
-            _cutoffTime = DateTime.UtcNow.AddSeconds(-_sessionTimeoutInSeconds);
-            _contextFactory = contextFactory;
-            _dashboardService = dashboardService;
-            _base64FileService = base64FileService;
-            _featureManager = featureManager;
-            _encryptionService = encryptionService;
-        }
+            IFeatureManager featureManager) : IAgencyUserApiService
+    {
+        private readonly int _sessionTimeoutInSeconds = int.Parse(config["SESSION_TIMEOUT_SEC"]!);
+        private readonly int _sessionTimeoutinMinutes = int.Parse(config["SESSION_TIMEOUT_SEC"]!) / 60;
+        private readonly int _awayThresholdInMinutes = int.Parse(config["LOGIN_SESSION_INACTIVE_MIN"]!);
+        private readonly int _onlineThresholdInMinutes = int.Parse(config["LOGIN_SESSION_ACTIVE_MIN"]!);
+        private readonly DateTime _cutoffTime = DateTime.UtcNow.AddSeconds(-int.Parse(config["SESSION_TIMEOUT_SEC"]!));
+        private readonly IDbContextFactory<ApplicationDbContext> _contextFactory = contextFactory;
+        private readonly IDashboardService _dashboardService = dashboardService;
+        private readonly IBase64FileService _base64FileService = base64FileService;
+        private readonly IFeatureManager _featureManager = featureManager;
+        private readonly IEncryptionService _encryptionService = encryptionService;
 
         public async Task<List<UserDetailResponse>> GetAgencyUsers(string userEmail)
         {

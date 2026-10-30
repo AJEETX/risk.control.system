@@ -10,16 +10,10 @@ namespace risk.control.system.Services.Api
         Task<DashboardData> GetManagerCount(string userEmail, string role);
     }
 
-    internal class ManagerDashboardService : IManagerDashboardService
+    internal class ManagerDashboardService(IDbContextFactory<ApplicationDbContext> contextFactory, ILogger<ManagerDashboardService> logger) : IManagerDashboardService
     {
-        private readonly IDbContextFactory<ApplicationDbContext> _contextFactory;
-        private readonly ILogger<ManagerDashboardService> _logger;
-
-        public ManagerDashboardService(IDbContextFactory<ApplicationDbContext> contextFactory, ILogger<ManagerDashboardService> logger)
-        {
-            _contextFactory = contextFactory;
-            _logger = logger;
-        }
+        private readonly IDbContextFactory<ApplicationDbContext> _contextFactory = contextFactory;
+        private readonly ILogger<ManagerDashboardService> _logger = logger;
 
         public async Task<DashboardData> GetManagerCount(string userEmail, string role)
         {

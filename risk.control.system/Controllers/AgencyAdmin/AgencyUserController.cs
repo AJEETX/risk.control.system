@@ -12,32 +12,20 @@ namespace risk.control.system.Controllers.AgencyAdmin
 {
     [Breadcrumb("Admin Settings ")]
     [Authorize(Roles = $"{AGENCY_ADMIN.DISPLAY_NAME}")]
-    public class AgencyUserController : Controller
-    {
-        private readonly IAgencyAdminUserService _service;
-        private readonly IAgencyUserCreateEditService _createEditService;
-        private readonly IErrorNotifyService _errorNotifyService;
-        private readonly INotyfService _notifyService;
-        private readonly ILogger<AgencyUserController> _logger;
-        private readonly string _baseUrl;
-
-        public AgencyUserController(
-            IAgencyAdminUserService service,
+    public class AgencyUserController(
+            IAgencyAdminUserService adminService,
             IAgencyUserCreateEditService createEditService,
             IErrorNotifyService errorNotifyService,
             INotyfService notifyService,
             IHttpContextAccessor httpContextAccessor,
-            ILogger<AgencyUserController> logger)
-        {
-            _service = service;
-            _createEditService = createEditService;
-            _notifyService = notifyService;
-            _logger = logger;
-            _errorNotifyService = errorNotifyService;
-
-            var req = httpContextAccessor?.HttpContext?.Request;
-            _baseUrl = $"{req?.Scheme}://{req?.Host.ToUriComponent()}{req?.PathBase.ToUriComponent()}";
-        }
+            ILogger<AgencyUserController> logger) : Controller
+    {
+        private readonly string _baseUrl = $"{httpContextAccessor?.HttpContext?.Request?.Scheme}://{httpContextAccessor?.HttpContext?.Request?.Host.ToUriComponent()}{httpContextAccessor?.HttpContext?.Request?.PathBase.ToUriComponent()}";
+        private readonly IAgencyAdminUserService _adminService = adminService;
+        private readonly IAgencyUserCreateEditService _createEditService = createEditService;
+        private readonly IErrorNotifyService _errorNotifyService = errorNotifyService;
+        private readonly INotyfService _notifyService = notifyService;
+        private readonly ILogger<AgencyUserController> _logger = logger;
 
         public IActionResult Index() => RedirectToAction(nameof(Users));
 
@@ -50,7 +38,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
             var userEmail = HttpContext.User?.Identity?.Name!;
             try
             {
-                var model = await _service.PrepareCreateModelAsync(userEmail);
+                var model = await _adminService.PrepareCreateModelAsync(userEmail);
                 if (model == null)
                 {
                     _notifyService.Error("User or Agency not found.");
@@ -74,7 +62,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
                 if (!ModelState.IsValid)
                 {
                     _errorNotifyService.ShowErrorNotification(ModelState);
-                    await _service.LoadMetadataAsync(model);
+                    await _adminService.LoadMetadataAsync(model);
                     return View(model);
                 }
                 emailSuffix = emailSuffix.Replace("\n", "").Replace("\r", "").Trim();
@@ -91,7 +79,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
                     foreach (var error in result.Errors)
                         ModelState.AddModelError(error.Key, error.Value);
                     _errorNotifyService.ShowErrorNotification(ModelState);
-                    await _service.LoadMetadataAsync(model);
+                    await _adminService.LoadMetadataAsync(model);
                     return View(model);
                 }
 
@@ -109,7 +97,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
         {
             try
             {
-                var model = await _service.PrepareEditModelAsync(id);
+                var model = await _adminService.PrepareEditModelAsync(id);
                 if (model == null)
                 {
                     _notifyService.Error("User not found.");
@@ -134,7 +122,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
                 if (!ModelState.IsValid)
                 {
                     _errorNotifyService.ShowErrorNotification(ModelState);
-                    await _service.LoadMetadataAsync(model);
+                    await _adminService.LoadMetadataAsync(model);
                     return View(model);
                 }
                 var userEmail = HttpContext.User?.Identity?.Name!;
@@ -150,7 +138,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
                     foreach (var error in result.Errors)
                         ModelState.AddModelError(error.Key, error.Value);
                     _errorNotifyService.ShowErrorNotification(ModelState);
-                    await _service.LoadMetadataAsync(model);
+                    await _adminService.LoadMetadataAsync(model);
                     return View(model);
                 }
 
@@ -160,7 +148,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
             {
                 _logger.LogError(ex, "Error editing user {UserId}", id);
                 _errorNotifyService.ShowErrorNotification(ModelState);
-                await _service.LoadMetadataAsync(model);
+                await _adminService.LoadMetadataAsync(model);
                 return View(model);
             }
         }
@@ -170,7 +158,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
         {
             try
             {
-                var model = await _service.GetUserForDeleteAsync(id);
+                var model = await _adminService.GetUserForDeleteAsync(id);
                 if (model == null)
                 {
                     _notifyService.Error("User Not Found.");
@@ -193,7 +181,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
             try
             {
                 var userEmail = HttpContext.User?.Identity?.Name!;
-                var (deleted, username) = await _service.SoftDeleteUserAsync(id, userEmail);
+                var (deleted, username) = await _adminService.SoftDeleteUserAsync(id, userEmail);
                 if (deleted)
                 {
                     _notifyService.Custom($"User {username} deleted.", 3, "red", "fas fa-user-minus");

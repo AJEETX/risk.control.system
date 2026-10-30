@@ -40,7 +40,7 @@ namespace risk.control.system.Services.Creator
             var costCentre = await costCentreTask;
 
             // 4. Image Processing
-            var (imgPath, ext) = await _verifierProcessor.ProcessDocumentImage(uc, zipData, errs, sums, POLICY_IMAGE, "CaseDetail");
+            var (imgPath, ext) = await _verifierProcessor.ProcessDocumentImage(uc.CaseId!, zipData, errs, sums, POLICY_IMAGE, "CaseDetail", uc.InsuranceType);
 
             var policy = new PolicyDetail
             {

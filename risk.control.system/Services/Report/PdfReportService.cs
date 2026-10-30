@@ -15,7 +15,7 @@ namespace risk.control.system.Services.Report
     public interface IPdfReportService
     {
         Task<string> Generate(long investigationTaskId, string userEmail);
-        Task GenerateAgencyReport(long investigationTaskId);
+        Task<string> GenerateAgencyReport(long investigationTaskId);
     }
 
     internal class PdfReportService(
@@ -94,60 +94,69 @@ namespace risk.control.system.Services.Report
         }
 
         [AutomaticRetry(Attempts = 0)]
-        public async Task GenerateAgencyReport(long investigationTaskId)
+        public async Task<string> GenerateAgencyReport(long investigationTaskId)
         {
-            var investigation = _context.Investigations.Include(c => c.CustomerDetail).Include(c => c.BeneficiaryDetail).Include(c => c.ClientCompany)
-                    .ThenInclude(c => c!.Country).Include(c => c.PolicyDetail).Include(c => c.InvestigationReport).ThenInclude(c => c!.EnquiryRequest).Include(c => c.InvestigationReport).ThenInclude(c => c!.EnquiryRequests)
-                .FirstOrDefault(c => c.Id == investigationTaskId);
-
-            var customer = _context.CustomerDetail.Include(c => c.District).Include(c => c.State).Include(c => c.Country).Include(c => c.PinCode)
-                    .FirstOrDefault(c => c.InvestigationTaskId == investigationTaskId);
-            var beneficiary = _context.BeneficiaryDetail.Include(b => b.District).Include(b => b.State).Include(b => b.Country).Include(b => b.PinCode).Include(b => b.BeneficiaryRelation)
-                .FirstOrDefault(b => b.InvestigationTaskId == investigationTaskId);
-
-            var policy = _context.PolicyDetail.Include(p => p.CaseEnabler).Include(p => p.CostCentre).Include(p => p.InvestigationServiceType)
-                .FirstOrDefault(p => p.PolicyDetailId == investigation!.PolicyDetail!.PolicyDetailId);
-
-            var investigationReport = await _context.ReportTemplates
-                    .Include(r => r.LocationReport).ThenInclude(l => l.AgentIdReport).ThenInclude(l => l!.FaceResult).ThenInclude(l => l!.Faces)
-                   .Include(r => r.LocationReport).ThenInclude(l => l.FaceIds!).ThenInclude(l => l.FaceResult).ThenInclude(l => l!.Faces)
-                   .Include(r => r.LocationReport).ThenInclude(l => l.DocumentIds)
-                   .Include(r => r.LocationReport).ThenInclude(l => l.Questions)
-                   .FirstOrDefaultAsync(q => q.Id == investigation!.ReportTemplateId);
-
-            var vendor = _context.Vendor.Include(s => s.District).Include(s => s.State).Include(s => s.Country).Include(s => s.PinCode).Include(s => s.VendorInvestigationServiceTypes).FirstOrDefault(v => v.VendorId == investigation!.VendorId);
-
-            DocumentBuilder builder = DocumentBuilder.New();
-            SectionBuilder section = builder.AddSection();
-            section.SetOrientation(PageOrientation.Landscape);
-            bool isClaim = true;
-            if (policy!.InsuranceType == InsuranceType.UNDERWRITING)
+            try
             {
-                isClaim = false;
-                section = _caseDetailService.BuildUnderwritng(section, investigation!, policy, customer!, beneficiary!);
+                var investigation = _context.Investigations.Include(c => c.CustomerDetail).Include(c => c.BeneficiaryDetail).Include(c => c.ClientCompany)
+                        .ThenInclude(c => c!.Country).Include(c => c.PolicyDetail).Include(c => c.InvestigationReport).ThenInclude(c => c!.EnquiryRequest).Include(c => c.InvestigationReport).ThenInclude(c => c!.EnquiryRequests)
+                    .FirstOrDefault(c => c.Id == investigationTaskId);
+
+                var customer = _context.CustomerDetail.Include(c => c.District).Include(c => c.State).Include(c => c.Country).Include(c => c.PinCode)
+                        .FirstOrDefault(c => c.InvestigationTaskId == investigationTaskId);
+                var beneficiary = _context.BeneficiaryDetail.Include(b => b.District).Include(b => b.State).Include(b => b.Country).Include(b => b.PinCode).Include(b => b.BeneficiaryRelation)
+                    .FirstOrDefault(b => b.InvestigationTaskId == investigationTaskId);
+
+                var policy = _context.PolicyDetail.Include(p => p.CaseEnabler).Include(p => p.CostCentre).Include(p => p.InvestigationServiceType)
+                    .FirstOrDefault(p => p.PolicyDetailId == investigation!.PolicyDetail!.PolicyDetailId);
+
+                var investigationReport = await _context.ReportTemplates
+                        .Include(r => r.LocationReport).ThenInclude(l => l.AgentIdReport).ThenInclude(l => l!.FaceResult).ThenInclude(l => l!.Faces)
+                       .Include(r => r.LocationReport).ThenInclude(l => l.FaceIds!).ThenInclude(l => l.FaceResult).ThenInclude(l => l!.Faces)
+                       .Include(r => r.LocationReport).ThenInclude(l => l.DocumentIds)
+                       .Include(r => r.LocationReport).ThenInclude(l => l.Questions)
+                       .FirstOrDefaultAsync(q => q.Id == investigation!.ReportTemplateId);
+
+                var vendor = _context.Vendor.Include(s => s.District).Include(s => s.State).Include(s => s.Country).Include(s => s.PinCode).Include(s => s.VendorInvestigationServiceTypes).FirstOrDefault(v => v.VendorId == investigation!.VendorId);
+
+                DocumentBuilder builder = DocumentBuilder.New();
+                SectionBuilder section = builder.AddSection();
+                section.SetOrientation(PageOrientation.Landscape);
+                bool isClaim = true;
+                if (policy!.InsuranceType == InsuranceType.UNDERWRITING)
+                {
+                    isClaim = false;
+                    section = _caseDetailService.BuildUnderwritng(section, investigation!, policy, customer!, beneficiary!);
+                }
+                else
+                {
+                    section = _caseDetailService.BuildClaim(section, investigation!, policy, customer!, beneficiary!);
+                }
+                section.AddParagraph().SetMarginBottom(10f);
+
+                section = await _pdfGenerateDetail.Build(section, investigation!, investigationReport!, vendor!, isClaim);
+
+                string agencyReportFilePath = Path.GetFullPath(Path.Combine(_env.ContentRootPath, CONSTANTS.DOCUMENT, CONSTANTS.CASE, policy.ContractNumber, CONSTANTS.REPORT, CONSTANTS.AGENCY_REPORT_FILENAME));
+                builder.Build(agencyReportFilePath);
+
+                var policyDocument = await File.ReadAllBytesAsync(policy.DocumentPath!);
+                var fileName = isClaim ? CONSTANTS.CLAIMS_FILENAME : CONSTANTS.UNDERWRITING_FILENAME;
+                var allowedExtensions = new[] { CONSTANTS.JPG_FILE_EXTENSION };
+                var (_, _) = await _fileStorageService.SaveAsync(policyDocument, CONSTANTS.JPG_FILE_EXTENSION, CONSTANTS.CASE, policy.ContractNumber, CONSTANTS.REPORT, allowedExtensions, fileName);
+                if (investigation!.AiEnabled)
+                {
+                    var sourceFolderPath = Path.GetFullPath(Path.Combine(_env.ContentRootPath, CONSTANTS.DOCUMENT, CONSTANTS.CASE, policy.ContractNumber, CONSTANTS.REPORT));
+                    var s3KeyName = $"backups/{policy.ContractNumber}/{CONSTANTS.AGENCY_REPORT_ZIP_FILENAME}";
+                    await ZipAndUploadToS3Async(sourceFolderPath, s3KeyName);
+
+                    await _agenticService.StartAiProcessAsync(policy!.ContractNumber);
+                }
+                return policy.ContractNumber;
             }
-            else
+            catch (Exception ex)
             {
-                section = _caseDetailService.BuildClaim(section, investigation!, policy, customer!, beneficiary!);
-            }
-            section.AddParagraph().SetMarginBottom(10f);
-
-            section = await _pdfGenerateDetail.Build(section, investigation!, investigationReport!, vendor!, isClaim);
-
-            string agencyReportFilePath = Path.GetFullPath(Path.Combine(_env.ContentRootPath, CONSTANTS.DOCUMENT, CONSTANTS.CASE, policy.ContractNumber, CONSTANTS.REPORT, CONSTANTS.AGENCY_REPORT_FILENAME));
-            builder.Build(agencyReportFilePath);
-
-            var policyDocument = await File.ReadAllBytesAsync(policy.DocumentPath!);
-            var fileName = isClaim ? CONSTANTS.CLAIMS_FILENAME : CONSTANTS.UNDERWRITING_FILENAME;
-            var allowedExtensions = new[] { CONSTANTS.JPG_FILE_EXTENSION };
-            var (_, _) = await _fileStorageService.SaveAsync(policyDocument, CONSTANTS.JPG_FILE_EXTENSION, CONSTANTS.CASE, policy.ContractNumber, CONSTANTS.REPORT, allowedExtensions, fileName);
-
-            var sourceFolderPath = Path.GetFullPath(Path.Combine(_env.ContentRootPath, CONSTANTS.DOCUMENT, CONSTANTS.CASE, policy.ContractNumber, CONSTANTS.REPORT));
-            var s3KeyName = $"backups/{policy.ContractNumber}/{CONSTANTS.AGENCY_REPORT_ZIP_FILENAME}";
-            await ZipAndUploadToS3Async(sourceFolderPath, s3KeyName);
-            if (investigation!.AiEnabled)
-            {
-                await _agenticService.StartAiProcessAsync(policy!.ContractNumber);
+                _logger.LogError(ex, "Error occurred  while generating PDF report for InvestigationTaskId: {InvestigationTaskId}", investigationTaskId);
+                throw; // Rethrow the exception to be handled by Hangfire or the calling method
             }
         }
         private async Task<bool> ZipAndUploadToS3Async(string sourceFolder, string s3Key)

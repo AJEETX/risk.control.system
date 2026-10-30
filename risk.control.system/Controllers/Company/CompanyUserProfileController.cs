@@ -15,32 +15,21 @@ namespace risk.control.system.Controllers.Company
 {
     [Breadcrumb("User Profile")]
     [Authorize(Roles = $"{COMPANY_ADMIN.DISPLAY_NAME},{CREATOR.DISPLAY_NAME},{ASSESSOR.DISPLAY_NAME},{MANAGER.DISPLAY_NAME}")]
-    public class CompanyUserProfileController : Controller
-    {
-        private readonly INotyfService _notifyService;
-        private readonly ICompanyUserService _companyUserService;
-        private readonly IAccountService _accountService;
-        private readonly IErrorNotifyService _errorNotifyService;
-        private readonly ILogger<CompanyUserProfileController> _logger;
-        private readonly string _baseUrl;
-
-        public CompanyUserProfileController(
+    public class CompanyUserProfileController(
             ICompanyUserService companyUserService,
             IAccountService accountService,
             IErrorNotifyService errorNotifyService,
             INotyfService notifyService,
              IHttpContextAccessor httpContextAccessor,
-            ILogger<CompanyUserProfileController> logger)
-        {
-            _companyUserService = companyUserService;
-            this._accountService = accountService;
-            _errorNotifyService = errorNotifyService;
-            _notifyService = notifyService;
-            _logger = logger;
-            var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
-            var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
-            _baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
-        }
+            ILogger<CompanyUserProfileController> logger) : Controller
+    {
+        private readonly string _baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent()}{httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent()}";
+        private readonly INotyfService _notifyService = notifyService;
+        private readonly ICompanyUserService _companyUserService = companyUserService;
+        private readonly IAccountService _accountService = accountService;
+        private readonly IErrorNotifyService _errorNotifyService = errorNotifyService;
+        private readonly ILogger<CompanyUserProfileController> _logger = logger;
+
 
         public async Task<IActionResult> Index()
         {
@@ -48,7 +37,7 @@ namespace risk.control.system.Controllers.Company
         }
 
         [Breadcrumb("Edit Profile", FromAction = nameof(DashboardController.Index), FromController = typeof(DashboardController))]
-        public async Task<IActionResult> Edit(long id)
+        public async Task<IActionResult> Edit([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             try
@@ -102,7 +91,7 @@ namespace risk.control.system.Controllers.Company
                     await _companyUserService.LoadModel(model, userEmail);
                     return View(model); // 🔥 fields now highlight
                 }
-                _notifyService.Success(result.Message);
+                _notifyService.Custom(result.Message, 3, "orange", "fas fa-user");
             }
             catch (Exception ex)
             {

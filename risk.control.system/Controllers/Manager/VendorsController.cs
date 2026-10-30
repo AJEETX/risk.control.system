@@ -13,29 +13,18 @@ using SmartBreadcrumbs.Attributes;
 namespace risk.control.system.Controllers.Manager
 {
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{MANAGER.DISPLAY_NAME}")]
-    public class VendorsController : Controller
-    {
-        private readonly IManageAgencyService _agencyCreateEditService;
-        private readonly INotyfService _notifyService;
-        private readonly IErrorNotifyService _errorNotifyService;
-        private readonly ILogger<VendorsController> _logger;
-        private readonly string _baseurl;
-
-        public VendorsController(
+    public class VendorsController(
             IManageAgencyService agencyCreateEditService,
             INotyfService notifyService,
             IErrorNotifyService errorNotifyService,
              IHttpContextAccessor httpContextAccessor,
-            ILogger<VendorsController> logger)
-        {
-            _agencyCreateEditService = agencyCreateEditService;
-            _notifyService = notifyService;
-            _errorNotifyService = errorNotifyService;
-            _logger = logger;
-            var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
-            var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
-            _baseurl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
-        }
+            ILogger<VendorsController> logger) : Controller
+    {
+        private readonly string _baseurl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent()}{httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent()}";
+        private readonly IManageAgencyService _agencyCreateEditService = agencyCreateEditService;
+        private readonly INotyfService _notifyService = notifyService;
+        private readonly IErrorNotifyService _errorNotifyService = errorNotifyService;
+        private readonly ILogger<VendorsController> _logger = logger;
 
         [Breadcrumb("Manage Agency")]
         public IActionResult Index()

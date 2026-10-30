@@ -17,18 +17,11 @@ namespace risk.control.system.Controllers.CompanyAdmin
 {
     [Breadcrumb("General Setup")]
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME}")]
-    public class PinCodesController : Controller
+    public class PinCodesController(ApplicationDbContext context, INotyfService notifyService, ILogger<PinCodesController> logger) : Controller
     {
-        private readonly ApplicationDbContext _context;
-        private readonly INotyfService notifyService;
-        private readonly ILogger<PinCodesController> logger;
-
-        public PinCodesController(ApplicationDbContext context, INotyfService notifyService, ILogger<PinCodesController> logger)
-        {
-            _context = context;
-            this.notifyService = notifyService;
-            this.logger = logger;
-        }
+        private readonly ApplicationDbContext _context = context;
+        private readonly INotyfService _notifyService = notifyService;
+        private readonly ILogger<PinCodesController> _logger = logger;
 
         // GET: PinCodes
         public IActionResult Index()
@@ -147,7 +140,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
         {
             if (!ModelState.IsValid)
             {
-                notifyService.Custom("Invalid Pincode data!", 3, "red", "fas fa-map-pin");
+                _notifyService.Custom("Invalid Pincode data!", 3, "red", "fas fa-map-pin");
                 return RedirectToAction(nameof(Profile));
             }
             try
@@ -155,7 +148,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 var pinCodeExist = await _context.PinCode.AnyAsync(p => p.Code == pinCode.Code && p.CountryId == pinCode.SelectedCountryId);
                 if (pinCodeExist)
                 {
-                    notifyService.Custom($"Pincode <b>{pinCode.Code}</b> already exist in Country!", 3, "red", "fas fa-map-pin");
+                    _notifyService.Custom($"Pincode <b>{pinCode.Code}</b> already exist in Country!", 3, "red", "fas fa-map-pin");
                     ModelState.Clear();
 
                     var userEmail = HttpContext.User.Identity?.Name!;
@@ -180,13 +173,13 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 pinCode.CountryId = pinCode.SelectedCountryId;
                 _context.Add(pinCode);
                 await _context.SaveChangesAsync(null, false);
-                notifyService.Custom($"Pincode <b>{pinCode.Name} ({pinCode.Code})</b> created successfully!", 3, "green", "fas fa-map-pin");
+                _notifyService.Custom($"Pincode <b>{pinCode.Name} ({pinCode.Code})</b> created successfully!", 3, "green", "fas fa-map-pin");
                 return RedirectToAction(nameof(Profile));
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred.");
-                notifyService.Custom("An error occurred while creating the Pincode!", 3, "red", "fas fa-map-pin");
+                _logger.LogError(ex, "Error occurred.");
+                _notifyService.Custom("An error occurred while creating the Pincode!", 3, "red", "fas fa-map-pin");
                 return RedirectToAction(nameof(Profile));
             }
         }
@@ -196,14 +189,14 @@ namespace risk.control.system.Controllers.CompanyAdmin
         {
             if (id <= 0)
             {
-                notifyService.Custom("Pincode Not Found!", 3, "red", "fas fa-map-pin");
+                _notifyService.Custom("Pincode Not Found!", 3, "red", "fas fa-map-pin");
                 return RedirectToAction(nameof(Profile));
             }
 
             var pinCode = await _context.PinCode.Include(d => d.Country).Include(d => d.State).Include(d => d.District).FirstOrDefaultAsync(p => p.PinCodeId == id);
             if (pinCode == null)
             {
-                notifyService.Custom("Pincode Not Found!", 3, "red", "fas fa-map-pin");
+                _notifyService.Custom("Pincode Not Found!", 3, "red", "fas fa-map-pin");
                 return RedirectToAction(nameof(Profile));
             }
 
@@ -218,19 +211,19 @@ namespace risk.control.system.Controllers.CompanyAdmin
             {
                 if (!ModelState.IsValid)
                 {
-                    notifyService.Custom("Invalid Pincode data!", 3, "red", "fas fa-map-pin");
+                    _notifyService.Custom("Invalid Pincode data!", 3, "red", "fas fa-map-pin");
                     return RedirectToAction(nameof(Profile));
                 }
                 var existingPincode = await _context.PinCode.FindAsync(id);
                 if (existingPincode == null)
                 {
-                    notifyService.Custom("Pincode Not Found!", 3, "red", "fas fa-map-pin");
+                    _notifyService.Custom("Pincode Not Found!", 3, "red", "fas fa-map-pin");
                     return RedirectToAction(nameof(Profile));
                 }
                 var pinCodeExist = await _context.PinCode.AnyAsync(p => p.Code == pinCode.Code && p.CountryId == pinCode.SelectedCountryId && p.PinCodeId != pinCode.PinCodeId);
                 if (pinCodeExist)
                 {
-                    notifyService.Custom($"Pincode <b>{pinCode.Code}</b> already exist in Country!", 3, "red", "fas fa-map-pin");
+                    _notifyService.Custom($"Pincode <b>{pinCode.Code}</b> already exist in Country!", 3, "red", "fas fa-map-pin");
                     var currentPinCode = await _context.PinCode.Include(d => d.Country).Include(d => d.State).Include(d => d.District).FirstOrDefaultAsync(p => p.PinCodeId == id);
 
                     return View(currentPinCode);
@@ -244,13 +237,13 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 existingPincode.StateId = pinCode.SelectedStateId;
                 _context.Update(existingPincode);
                 await _context.SaveChangesAsync(null, false);
-                notifyService.Custom($"Pincode <b>{existingPincode.Name} ({existingPincode.Code})</b> edited successfully!", 3, "orange", "fas fa-map-pin");
+                _notifyService.Custom($"Pincode <b>{existingPincode.Name} ({existingPincode.Code})</b> edited successfully!", 3, "orange", "fas fa-map-pin");
                 return RedirectToAction(nameof(Profile));
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred.");
-                notifyService.Custom("An error occurred while updating the Pincode!", 3, "red", "fas fa-map-pin");
+                _logger.LogError(ex, "Error occurred.");
+                _notifyService.Custom("An error occurred while updating the Pincode!", 3, "red", "fas fa-map-pin");
                 return RedirectToAction(nameof(Profile));
             }
         }
@@ -278,7 +271,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred.");
+                _logger.LogError(ex, "Error occurred.");
                 return Json(new { success = false, message = "An error occurred while updating the Pincode!" });
             }
         }

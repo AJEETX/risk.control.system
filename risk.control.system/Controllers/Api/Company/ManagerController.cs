@@ -11,17 +11,10 @@ namespace risk.control.system.Controllers.Api.Company
     [Route("api/[controller]")]
     [ApiController]
     [Authorize(Roles = MANAGER.DISPLAY_NAME)]
-    public class ManagerController : ControllerBase
+    public class ManagerController(ILogger<ManagerController> logger, IManagerService managerService) : ControllerBase
     {
-        private readonly ILogger<ManagerController> logger;
-        private readonly IManagerService managerService;
-
-        public ManagerController(ILogger<ManagerController> logger,
-            IManagerService managerService)
-        {
-            this.logger = logger;
-            this.managerService = managerService;
-        }
+        private readonly ILogger<ManagerController> _logger = logger;
+        private readonly IManagerService _managerService = managerService;
 
         [HttpGet("GetActiveCases")]
         public async Task<IActionResult> GetActiveCases(int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc")
@@ -30,13 +23,13 @@ namespace risk.control.system.Controllers.Api.Company
 
             try
             {
-                var response = await managerService.GetActiveCases(userEmail, draw, start, length, search, caseType, orderColumn, orderDir);
+                var response = await _managerService.GetActiveCases(userEmail, draw, start, length, search, caseType, orderColumn, orderDir);
 
                 return Ok(response);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred while getting active cases for user {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error occurred while getting active cases for user {UserEmail}", userEmail);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -48,13 +41,13 @@ namespace risk.control.system.Controllers.Api.Company
 
             try
             {
-                var response = await managerService.GetApprovedCases(userEmail, draw, start, length, search, caseType, orderColumn, orderDir);
+                var response = await _managerService.GetApprovedCases(userEmail, draw, start, length, search, caseType, orderColumn, orderDir);
 
                 return Ok(response);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred while getting approved cases for user {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error occurred while getting approved cases for user {UserEmail}", userEmail);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -66,12 +59,12 @@ namespace risk.control.system.Controllers.Api.Company
 
             try
             {
-                var response = await managerService.GetRejectedCases(userEmail, draw, start, length, search, caseType, orderColumn, orderDir);
+                var response = await _managerService.GetRejectedCases(userEmail, draw, start, length, search, caseType, orderColumn, orderDir);
                 return Ok(response);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred while getting rejected cases for user {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error occurred while getting rejected cases for user {UserEmail}", userEmail);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }

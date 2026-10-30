@@ -22,32 +22,7 @@ namespace risk.control.system.Controllers.Mobile
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AgentController : ControllerBase
-    {
-        private readonly ApplicationDbContext _context;
-        private readonly IProcessSubmittedReportService _processSubmittedReportService;
-        private readonly RoleManager<ApplicationRole> _roleManager;
-        private readonly IAgentAnswerService _answerService;
-        private readonly IMediaIdfyService _mediaIdfyService;
-        private readonly IDocumentIdfyService _documentIdfyService;
-        private readonly IAgentFaceIdfyService _agentFaceIdfyService;
-        private readonly ILogger<AgentController> _logger;
-        private readonly ICloneReportService _cloneReportService;
-        private readonly IFaceIdfyService _agentIdService;
-        private readonly IAmazonApiService _compareFaces;
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly IAgentService _agentService;
-        private readonly IFeatureManager _featureManager;
-        private readonly IBackgroundJobClient _backgroundJobClient;
-        private readonly IWebHostEnvironment _env;
-        private readonly ISmsService _smsService;
-        private readonly ICaseNotificationService _mailService;
-        private readonly ISmsNotificationService _smsNotificationService;
-        private readonly IAgentMeetingSetupService _agentMeetingSetupService;
-        private string _portalBaseUrl = string.Empty;
-
-        //test PAN FNLPM8635N
-        public AgentController(ApplicationDbContext context,
+    public class AgentController(ApplicationDbContext context,
             IProcessSubmittedReportService processSubmittedReportService,
             RoleManager<ApplicationRole> roleManager,
             IAgentAnswerService answerService,
@@ -56,7 +31,6 @@ namespace risk.control.system.Controllers.Mobile
             IAgentFaceIdfyService agentFaceIdfyService,
             ILogger<AgentController> logger,
             ICloneReportService cloneReportService,
-            IConfiguration configuration,
             IFaceIdfyService agentIdService,
             IAmazonApiService compareFaces,
             UserManager<ApplicationUser> userManager,
@@ -64,36 +38,33 @@ namespace risk.control.system.Controllers.Mobile
             IAgentService agentService,
             IFeatureManager featureManager,
             IBackgroundJobClient backgroundJobClient,
-            IWebHostEnvironment webHostEnvironment,
-            ISmsService SmsService,
+            IWebHostEnvironment env,
+            ISmsService smsService,
             ISmsNotificationService smsNotificationService,
             IAgentMeetingSetupService agentMeetingSetupService,
-            ICaseNotificationService mailboxService)
-        {
-            _context = context;
-            _processSubmittedReportService = processSubmittedReportService;
-            _roleManager = roleManager;
-            _answerService = answerService;
-            _mediaIdfyService = mediaIdfyService;
-            _documentIdfyService = documentIdfyService;
-            _agentFaceIdfyService = agentFaceIdfyService;
-            _logger = logger;
-            _cloneReportService = cloneReportService;
-            _agentIdService = agentIdService;
-            _compareFaces = compareFaces;
-            _userManager = userManager;
-            _agentService = agentService;
-            _featureManager = featureManager;
-            _backgroundJobClient = backgroundJobClient;
-            _env = webHostEnvironment;
-            _smsService = SmsService;
-            _smsNotificationService = smsNotificationService;
-            _agentMeetingSetupService = agentMeetingSetupService;
-            this._mailService = mailboxService;
-            var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
-            var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
-            _portalBaseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
-        }
+            ICaseNotificationService mailboxService) : ControllerBase
+    {
+        private readonly string _baseurl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent()}{httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent()}";
+        private readonly ApplicationDbContext _context = context;
+        private readonly IProcessSubmittedReportService _processSubmittedReportService = processSubmittedReportService;
+        private readonly RoleManager<ApplicationRole> _roleManager = roleManager;
+        private readonly IAgentAnswerService _answerService = answerService;
+        private readonly IMediaIdfyService _mediaIdfyService = mediaIdfyService;
+        private readonly IDocumentIdfyService _documentIdfyService = documentIdfyService;
+        private readonly IAgentFaceIdfyService _agentFaceIdfyService = agentFaceIdfyService;
+        private readonly ILogger<AgentController> _logger = logger;
+        private readonly ICloneReportService _cloneReportService = cloneReportService;
+        private readonly IFaceIdfyService _agentIdService = agentIdService;
+        private readonly IAmazonApiService _compareFaces = compareFaces;
+        private readonly UserManager<ApplicationUser> _userManager = userManager;
+        private readonly IAgentService _agentService = agentService;
+        private readonly IFeatureManager _featureManager = featureManager;
+        private readonly IBackgroundJobClient _backgroundJobClient = backgroundJobClient;
+        private readonly IWebHostEnvironment _env = env;
+        private readonly ISmsService _smsService = smsService;
+        private readonly ICaseNotificationService _mailService = mailboxService;
+        private readonly ISmsNotificationService _smsNotificationService = smsNotificationService;
+        private readonly IAgentMeetingSetupService _agentMeetingSetupService = agentMeetingSetupService;
 
         [HttpPost("pin")]
         [AllowAnonymous]
@@ -105,7 +76,7 @@ namespace risk.control.system.Controllers.Mobile
                 {
                     return BadRequest($"Empty email");
                 }
-                var user2Onboard = await _agentService.GetPin(agentEmail, _portalBaseUrl);
+                var user2Onboard = await _agentService.GetPin(agentEmail, _baseurl);
 
                 if (user2Onboard == null)
                 {
@@ -136,7 +107,7 @@ namespace risk.control.system.Controllers.Mobile
                 {
                     return BadRequest($"Empty mobile number");
                 }
-                var user2Onboard = await _agentService.ResetUid(mobile.TrimStart('+'), _portalBaseUrl, sendSMS);
+                var user2Onboard = await _agentService.ResetUid(mobile.TrimStart('+'), _baseurl, sendSMS);
 
                 if (user2Onboard == null)
                 {
@@ -217,7 +188,7 @@ namespace risk.control.system.Controllers.Mobile
         {
             string message = $"Dear {email},\n\n" +
                              $"App PIN: {pin}\n\n" +
-                             $"{_portalBaseUrl}";
+                             $"{_baseurl}";
             await _smsService.DoSendSmsAsync(countryCode, mobile, message);
         }
 
@@ -927,7 +898,7 @@ namespace risk.control.system.Controllers.Mobile
                 }
                 var (vendor, contract) = await _processSubmittedReportService.SubmitToVendorSupervisor(data.Email, data.CaseId, data.Remarks);
 
-                _backgroundJobClient.Enqueue(() => _mailService.NotifyCaseReportSubmitToVendorSupervisor(data.Email, data.CaseId, _portalBaseUrl));
+                _backgroundJobClient.Enqueue(() => _mailService.NotifyCaseReportSubmitToVendorSupervisor(data.Email, data.CaseId, _baseurl));
 
                 return Ok(new { data, Registered = agent.Active && !string.IsNullOrWhiteSpace(agent.MobileUId) });
             }
@@ -942,7 +913,7 @@ namespace risk.control.system.Controllers.Mobile
         [HttpPost("send-schedule")]
         public async Task<IActionResult> SendSchedule(ScheduleRequest request)
         {
-            var result = await _agentMeetingSetupService.RequestSchedule(request, _portalBaseUrl);
+            var result = await _agentMeetingSetupService.RequestSchedule(request, _baseurl);
             return Ok(new { message = result ? "Schedule requested successfully." : "Failed to request schedule." });
         }
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]

@@ -114,7 +114,6 @@ namespace risk.control.system.Services.AgencyAdmin
             if (input.ProfileImage?.Length > 0)
             {
                 var suffix = user.Email!.Split('@').Last();
-                await SaveProfileImageAsync(input, suffix, user.Email!);
 
                 if (await _featureManager.IsEnabledAsync(FeatureFlags.FACE_MATCH_CHECK))
                 {
@@ -128,6 +127,7 @@ namespace risk.control.system.Services.AgencyAdmin
                         user.FaceIndexedAt = null;
                     }
                 }
+                await SaveProfileImageAsync(input, suffix, user.Email!);
             }
             UpdateUserFields(input, user, request.UpdatedBy);
             await UpdateGeoLocationAsync(user);

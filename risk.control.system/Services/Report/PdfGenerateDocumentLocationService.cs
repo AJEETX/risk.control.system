@@ -9,9 +9,9 @@ namespace risk.control.system.Services.Report
     {
         Task<SectionBuilder> Build(SectionBuilder section, LocationReport loc, bool isClaim = true);
     }
-    internal class PdfGenerateDocumentLocationService(IWebHostEnvironment webHostEnvironment, IHttpClientFactory httpClientFactory, IImageConverter imageConverter) : IPdfGenerateDocumentLocationService
+    internal class PdfGenerateDocumentLocationService(IWebHostEnvironment env, IHttpClientFactory httpClientFactory, IImageConverter imageConverter) : IPdfGenerateDocumentLocationService
     {
-        private readonly IWebHostEnvironment _env = webHostEnvironment;
+        private readonly IWebHostEnvironment _env = env;
         private readonly IHttpClientFactory _httpClientFactory = httpClientFactory;
         private readonly IImageConverter _imageConverter = imageConverter;
 

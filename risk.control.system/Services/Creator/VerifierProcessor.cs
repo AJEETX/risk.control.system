@@ -9,8 +9,8 @@ namespace risk.control.system.Services.Creator
 {
     public interface IVerifierProcessor
     {
-        Task<(string Path, string Extension)> ProcessDocumentImage(UploadCase uc, byte[] zipData, List<UploadError> errs, List<string> sums, string imageName, string caseEntityName);
-        Task<(string Path, string Extension)> ProcessFaceImage(UploadCase uc, byte[] zipData, List<UploadError> errs, List<string> sums, string imageName, string caseEntityName);
+        Task<(string Path, string Extension)> ProcessDocumentImage(string caseId, byte[] zipData, List<UploadError> errs, List<string> sums, string imageName, string caseEntityName, string InsuranceType);
+        Task<(string Path, string Extension)> ProcessFaceImage(string caseId, byte[] zipData, List<UploadError> errs, List<string> sums, string imageName, string caseEntityName);
 
         Task<bool> ValidatePhone(ApplicationUser user, string contactNumber, List<UploadError> errs, List<string> sums);
 
@@ -45,10 +45,10 @@ namespace risk.control.system.Services.Creator
             sums.Add($"[Location={pinCode}/{districtName} not found]");
         }
 
-        public async Task<(string Path, string Extension)> ProcessDocumentImage(UploadCase uc, byte[] zipData, List<UploadError> errs, List<string> sums, string imageName, string caseEntityName)
+        public async Task<(string Path, string Extension)> ProcessDocumentImage(string CaseId, byte[] zipData, List<UploadError> errs, List<string> sums, string imageName, string caseEntityName, string InsuranceType)
         {
             var extension = Path.GetExtension(imageName).ToLower();
-            var imageData = await _caseImageCreationService.GetImagesWithDataInSubfolder(zipData, uc.CaseId?.ToLower()!, imageName);
+            var imageData = await _caseImageCreationService.GetImagesWithDataInSubfolder(zipData, CaseId?.ToLower()!, imageName);
 
             if (imageData == null)
             {
@@ -70,7 +70,7 @@ namespace risk.control.system.Services.Creator
             }
 
             var caseFileName = string.Empty;
-            if (uc.InsuranceType?.ToLower() == CONSTANTS.UNDERWRITING)
+            if (InsuranceType.ToLower() == CONSTANTS.UNDERWRITING)
                 caseFileName = $"Underwriting_Form{extension}";
             else
             {
@@ -78,13 +78,13 @@ namespace risk.control.system.Services.Creator
             }
 
             // Returns a tuple: (string FileName, string RelativePath)
-            var (_, RelativePath) = await _fileStorageService.SaveAsync(imageData, extension, CONSTANTS.CASE, uc.CaseId, null, null, caseFileName);
+            var (_, RelativePath) = await _fileStorageService.SaveAsync(imageData, extension, CONSTANTS.CASE, CaseId, null, null, caseFileName);
             return (RelativePath, extension);
         }
-        public async Task<(string Path, string Extension)> ProcessFaceImage(UploadCase uc, byte[] zipData, List<UploadError> errs, List<string> sums, string imageName, string caseEntityName)
+        public async Task<(string Path, string Extension)> ProcessFaceImage(string CaseId, byte[] zipData, List<UploadError> errs, List<string> sums, string imageName, string caseEntityName)
         {
             var extension = Path.GetExtension(imageName).ToLower();
-            var imageData = await _caseImageCreationService.GetImagesWithDataInSubfolder(zipData, uc.CaseId?.ToLower()!, imageName);
+            var imageData = await _caseImageCreationService.GetImagesWithDataInSubfolder(zipData, CaseId?.ToLower()!, imageName);
 
             if (imageData == null)
             {
@@ -121,7 +121,7 @@ namespace risk.control.system.Services.Creator
                 return (string.Empty, extension);
             }
             // Returns a tuple: (string FileName, string RelativePath)
-            var (_, RelativePath) = await _fileStorageService.SaveAsync(imageData, extension, CONSTANTS.CASE, uc.CaseId, null, null, $"{caseEntityName}{extension}");
+            var (_, RelativePath) = await _fileStorageService.SaveAsync(imageData, extension, CONSTANTS.CASE, CaseId, null, null, $"{caseEntityName}{extension}");
             return (RelativePath, extension);
         }
 

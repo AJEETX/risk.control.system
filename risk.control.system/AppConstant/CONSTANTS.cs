@@ -12,6 +12,7 @@
         public const string DOCUMENT = "Document";
         public const string CASE = "Case";
         public const string REPORT = "Report";
+        public const string REPORT_FILENAME = "Report.pdf";
         public const string AGENCY_REPORT_FILENAME = "Agency_Report.pdf";
         public const string AGENCY_REPORT_ZIP_FILENAME = "Agency_Report.zip";
         public const string CLAIMS_FILENAME = "Claim_Form.jpg";

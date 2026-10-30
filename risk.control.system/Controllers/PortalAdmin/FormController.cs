@@ -11,20 +11,13 @@ namespace risk.control.system.Controllers.PortalAdmin
 {
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{CREATOR.DISPLAY_NAME}")]
     [Breadcrumb("Cases ")]
-    public class FormController : Controller
+    public class FormController(ApplicationDbContext context, IWebHostEnvironment env, ITimelineService timelineService, INotyfService notifyService) : Controller
     {
-        private readonly ApplicationDbContext _context;
-        private readonly IWebHostEnvironment _hostingEnvironment;
-        private readonly INotyfService _notifyService;
-        private readonly ITimelineService _timelineService;
+        private readonly ApplicationDbContext _context = context;
+        private readonly IWebHostEnvironment _env = env;
+        private readonly INotyfService _notifyService = notifyService;
+        private readonly ITimelineService _timelineService = timelineService;
 
-        public FormController(ApplicationDbContext context, IWebHostEnvironment hostingEnvironment, ITimelineService timelineService, INotyfService notifyService)
-        {
-            _context = context;
-            _hostingEnvironment = hostingEnvironment;
-            _timelineService = timelineService;
-            _notifyService = notifyService;
-        }
         public IActionResult Index()
         {
             return View();

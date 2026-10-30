@@ -20,16 +20,16 @@ namespace risk.control.system.Services.Common
     }
 
     internal class AccountService(ApplicationDbContext context,
-        ISmsService SmsService,
+        ISmsService smsService,
         UserManager<ApplicationUser> userManager,
         SignInManager<ApplicationUser> signInManager,
-        IWebHostEnvironment webHostEnvironment,
+        IWebHostEnvironment env,
          IHttpContextAccessor httpContextAccessor
             ) : IAccountService
     {
         private readonly ApplicationDbContext _context = context;
-        private readonly ISmsService _smsService = SmsService;
-        private readonly IWebHostEnvironment _env = webHostEnvironment;
+        private readonly ISmsService _smsService = smsService;
+        private readonly IWebHostEnvironment _env = env;
         private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
         private readonly UserManager<ApplicationUser> _userManager = userManager;
         private readonly SignInManager<ApplicationUser> _signInManager = signInManager;

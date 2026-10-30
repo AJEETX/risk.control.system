@@ -35,7 +35,7 @@ namespace risk.control.system.Services.Api
                 return new AgencyServiceResponse
                 {
                     VendorId = service.VendorId,
-                    Id = _encryptionService.ProtectId(service.VendorInvestigationServiceTypeId),
+                    Id = _encryptionService.ProtectId(service.Id),
                     CaseType = service.InsuranceType!.GetEnumDisplayName(),
                     ServiceType = service.InvestigationServiceType!.Name,
                     District = districtNames,
@@ -64,7 +64,7 @@ namespace risk.control.system.Services.Api
                 .Select(s => new
                 {
                     VendorId = s.VendorId,
-                    VendorInvestigationServiceTypeId = _encryptionService.ProtectId(s.VendorInvestigationServiceTypeId),
+                    Id = _encryptionService.ProtectId(s.Id),
                     s.Price,
                     s.SelectedDistrictIds,
                     s.Updated,
@@ -86,7 +86,7 @@ namespace risk.control.system.Services.Api
                 return new AgencyServiceResponse
                 {
                     VendorId = service.VendorId,
-                    Id = service.VendorInvestigationServiceTypeId,
+                    Id = service.Id,
                     CaseType = service.InsuranceType!.GetEnumDisplayName(),
                     ServiceType = service.ServiceTypeName,
                     District = districtNames,

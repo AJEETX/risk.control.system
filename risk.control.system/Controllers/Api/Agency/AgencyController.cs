@@ -10,21 +10,14 @@ namespace risk.control.system.Controllers.Api.Agency
     [Route("api/[controller]")]
     [ApiController]
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME},{MANAGER.DISPLAY_NAME},{AGENCY_ADMIN.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME}")]
-    public class AgencyController : ControllerBase
-    {
-        private readonly ILogger<AgencyController> logger;
-        private readonly IAgencyUserApiService agencyUserApiService;
-        private readonly IAgencyApiService agencyService;
-
-        public AgencyController(
+    public class AgencyController(
             ILogger<AgencyController> logger,
             IAgencyUserApiService agencyUserApiService,
-            IAgencyApiService agencyService)
-        {
-            this.logger = logger;
-            this.agencyUserApiService = agencyUserApiService;
-            this.agencyService = agencyService;
-        }
+            IAgencyApiService agencyService) : ControllerBase
+    {
+        private readonly ILogger<AgencyController> _logger = logger;
+        private readonly IAgencyUserApiService _agencyUserApiService = agencyUserApiService;
+        private readonly IAgencyApiService _agencyService = agencyService;
 
         [HttpGet("AllAgencies")]
         public async Task<IActionResult> AllAgencies()
@@ -33,13 +26,13 @@ namespace risk.control.system.Controllers.Api.Agency
 
             try
             {
-                var response = await agencyService.AllAgencies();
+                var response = await _agencyService.AllAgencies();
 
                 return Ok(response);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred while getting agencies for user {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error occurred while getting agencies for user {UserEmail}", userEmail);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -51,12 +44,12 @@ namespace risk.control.system.Controllers.Api.Agency
 
             try
             {
-                var response = await agencyService.AllServices(userEmail);
+                var response = await _agencyService.AllServices(userEmail);
                 return Ok(response);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred while getting agency service for user {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error occurred while getting agency service for user {UserEmail}", userEmail);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -72,13 +65,13 @@ namespace risk.control.system.Controllers.Api.Agency
 
             try
             {
-                var result = await agencyUserApiService.GetCompanyAgencyUsers(userEmail, id);
+                var result = await _agencyUserApiService.GetCompanyAgencyUsers(userEmail, id);
 
                 return Ok(result);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred while getting agency users for user {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error occurred while getting agency users for user {UserEmail}", userEmail);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -90,12 +83,12 @@ namespace risk.control.system.Controllers.Api.Agency
 
             try
             {
-                var agentWithLoad = await agencyUserApiService.GetAgencyUsers(userEmail);
+                var agentWithLoad = await _agencyUserApiService.GetAgencyUsers(userEmail);
                 return Ok(agentWithLoad);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred while getting agency users for user {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error occurred while getting agency users for user {UserEmail}", userEmail);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -111,12 +104,12 @@ namespace risk.control.system.Controllers.Api.Agency
 
             try
             {
-                var agentList = await agencyService.GetAgentWithCases(userEmail, id);
+                var agentList = await _agencyService.GetAgentWithCases(userEmail, id);
                 return Ok(agentList);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred while getting agency users for user {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error occurred while getting agency users for user {UserEmail}", userEmail);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }

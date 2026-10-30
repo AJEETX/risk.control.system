@@ -13,18 +13,7 @@ using risk.control.system.Services.Common;
 
 namespace risk.control.system.Controllers.Common
 {
-    public class AccountController : Controller
-    {
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly IFeatureManager _featureManager;
-        private readonly ILoginService _loginService;
-        private readonly SignInManager<ApplicationUser> _signInManager;
-        private readonly IAccountService _accountService;
-        private readonly ILogger<AccountController> _logger;
-        private readonly INotyfService _notifyService;
-        private readonly string _baseUrl;
-
-        public AccountController(
+    public class AccountController(
             UserManager<ApplicationUser> userManager,
             IFeatureManager featureManager,
             ILoginService loginService,
@@ -32,19 +21,16 @@ namespace risk.control.system.Controllers.Common
              IHttpContextAccessor httpContextAccessor,
             IAccountService accountService,
             ILogger<AccountController> logger,
-            INotyfService notifyService)
-        {
-            _userManager = userManager ?? throw new ArgumentNullException();
-            this._featureManager = featureManager;
-            this._loginService = loginService;
-            _signInManager = signInManager ?? throw new ArgumentNullException();
-            this._accountService = accountService;
-            _logger = logger;
-            this._notifyService = notifyService;
-            var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
-            var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
-            _baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
-        }
+            INotyfService notifyService) : Controller
+    {
+        private readonly string _baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent()}{httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent()}";
+        private readonly UserManager<ApplicationUser> _userManager = userManager;
+        private readonly IFeatureManager _featureManager = featureManager;
+        private readonly ILoginService _loginService = loginService;
+        private readonly SignInManager<ApplicationUser> _signInManager = signInManager;
+        private readonly IAccountService _accountService = accountService;
+        private readonly ILogger<AccountController> _logger = logger;
+        private readonly INotyfService _notifyService = notifyService;
 
         [HttpGet]
         [AllowAnonymous]

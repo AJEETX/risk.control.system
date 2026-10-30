@@ -13,20 +13,13 @@ namespace risk.control.system.Controllers.CompanyAdmin
 {
     [Breadcrumb("Company Settings")]
     [Authorize(Roles = $"{CREATOR.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME}")]
-    public class ReportTemplateController : Controller
+    public class ReportTemplateController(ApplicationDbContext context, ICloneReportService cloneService, INotyfService notifyService, ILogger<ReportTemplateController> logger) : Controller
     {
-        private readonly ApplicationDbContext context;
-        private readonly ICloneReportService cloneService;
-        private readonly INotyfService notifyService;
-        private readonly ILogger<ReportTemplateController> logger;
+        private readonly ApplicationDbContext _context = context;
+        private readonly ICloneReportService _cloneService = cloneService;
+        private readonly INotyfService _notifyService = notifyService;
+        private readonly ILogger<ReportTemplateController> _logger = logger;
 
-        public ReportTemplateController(ApplicationDbContext context, ICloneReportService cloneService, INotyfService notifyService, ILogger<ReportTemplateController> logger)
-        {
-            this.context = context;
-            this.cloneService = cloneService;
-            this.notifyService = notifyService;
-            this.logger = logger;
-        }
         public IActionResult Index()
         {
             return RedirectToAction(nameof(Profile));
@@ -53,8 +46,8 @@ namespace risk.control.system.Controllers.CompanyAdmin
             int pageSize = length != null ? Convert.ToInt32(length) : 10;
             int skip = start != null ? Convert.ToInt32(start) : 0;
             var currentUserEmail = HttpContext.User?.Identity?.Name;
-            var companyUser = context.ApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == currentUserEmail);
-            var query = context.ReportTemplates.Include(r => r.LocationReport).ThenInclude(l => l.FaceIds).Include(r => r.LocationReport).ThenInclude(l => l.DocumentIds).Include(r => r.LocationReport).ThenInclude(l => l.MediaReports).Include(r => r.LocationReport).ThenInclude(l => l.Questions)
+            var companyUser = _context.ApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == currentUserEmail);
+            var query = _context.ReportTemplates.Include(r => r.LocationReport).ThenInclude(l => l.FaceIds).Include(r => r.LocationReport).ThenInclude(l => l.DocumentIds).Include(r => r.LocationReport).ThenInclude(l => l.MediaReports).Include(r => r.LocationReport).ThenInclude(l => l.Questions)
                 .Where(q => q.ClientCompanyId == companyUser!.ClientCompanyId && !q.IsDeleted && q.UpdatedBy != "system").AsQueryable();
             if (!string.IsNullOrEmpty(insuranceType))
             {
@@ -129,7 +122,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
         [Breadcrumb(" Detail", FromAction = nameof(Profile))]
         public async Task<IActionResult> Details(long id)
         {
-            var template = await context.ReportTemplates.Include(r => r.LocationReport).ThenInclude(l => l.AgentIdReport).Include(r => r.LocationReport).ThenInclude(l => l.MediaReports).Include(r => r.LocationReport).ThenInclude(l => l.FaceIds)
+            var template = await _context.ReportTemplates.Include(r => r.LocationReport).ThenInclude(l => l.AgentIdReport).Include(r => r.LocationReport).ThenInclude(l => l.MediaReports).Include(r => r.LocationReport).ThenInclude(l => l.FaceIds)
                 .Include(r => r.LocationReport).ThenInclude(l => l.DocumentIds).Include(r => r.LocationReport).ThenInclude(l => l.Questions).FirstOrDefaultAsync(r => r.Id == id);
             if (template == null)
             {
@@ -149,7 +142,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name!;
-                var newTemplate = await cloneService.CreateCloneReportTemplate(templateId, currentUserEmail);
+                var newTemplate = await _cloneService.CreateCloneReportTemplate(templateId, currentUserEmail);
                 if (newTemplate != null)
                 {
                     return Json(new { success = true, message = "Report cloned  successfully!" });
@@ -161,8 +154,8 @@ namespace risk.control.system.Controllers.CompanyAdmin
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Issue cloning {TemplateId} . {UserEmail}", templateId, HttpContext.User?.Identity?.Name);
-                notifyService.Error($"Issue cloning Report. Try again.");
+                _logger.LogError(ex, "Issue cloning {TemplateId} . {UserEmail}", templateId, HttpContext.User?.Identity?.Name);
+                _notifyService.Error($"Issue cloning Report. Try again.");
                 return RedirectToAction(nameof(Profile));
             }
         }
@@ -178,7 +171,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                var activated = await cloneService.Activate(id);
+                var activated = await _cloneService.Activate(id);
                 if (activated)
                 {
                     return Json(new { success = true, message = "Report activated successfully!" });
@@ -190,7 +183,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Report activation failed for {TemplateId}. {UserEmail}.", id, HttpContext.User?.Identity?.Name);
+                _logger.LogError(ex, "Report activation failed for {TemplateId}. {UserEmail}.", id, HttpContext.User?.Identity?.Name);
                 return Json(new { success = false, message = "Report activation failed! Try again" });
             }
         }
@@ -205,7 +198,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             }
             try
             {
-                var template = await context.ReportTemplates.FindAsync(id);
+                var template = await _context.ReportTemplates.FindAsync(id);
                 if (template == null)
                 {
                     return Json(new { success = false, message = "Template not found." });
@@ -215,8 +208,8 @@ namespace risk.control.system.Controllers.CompanyAdmin
                     return Json(new { success = false, message = "Active templates cannot be deleted." });
                 }
                 template.IsDeleted = true;
-                context.ReportTemplates.Update(template);
-                var affected = await context.SaveChangesAsync(null, false) > 0;
+                _context.ReportTemplates.Update(template);
+                var affected = await _context.SaveChangesAsync(null, false) > 0;
                 if (affected)
                 {
                     return Json(new { success = true, message = "Template deleted successfully." });
@@ -228,7 +221,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Exception to delete for {TemplateId}. {UserEmail}.", id, HttpContext.User?.Identity?.Name);
+                _logger.LogError(ex, "Exception to delete for {TemplateId}. {UserEmail}.", id, HttpContext.User?.Identity?.Name);
                 return Json(new { success = false, message = "Exception to delete Template" });
             }
         }
@@ -240,7 +233,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             {
                 return Json(new { success = false, message = "Invalid data." });
             }
-            var question = await context.Questions.FirstOrDefaultAsync(q => q.Id == questionId);
+            var question = await _context.Questions.FirstOrDefaultAsync(q => q.Id == questionId);
 
             if (question == null)
             {
@@ -259,7 +252,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             }
             try
             {
-                var location = await context.LocationReport.Include(q => q.Questions).FirstOrDefaultAsync(q => q.Id == locationId);
+                var location = await _context.LocationReport.Include(q => q.Questions).FirstOrDefaultAsync(q => q.Id == locationId);
                 if (location == null)
                 {
                     return Json(new { success = false, message = "Location not found." });
@@ -272,12 +265,12 @@ namespace risk.control.system.Controllers.CompanyAdmin
                     IsRequired = isRequired
                 };
                 location.Questions!.Add(question);
-                await context.SaveChangesAsync(null, false);
+                await _context.SaveChangesAsync(null, false);
                 return Json(new { success = true, updatedQuestion = question });
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Add Question Error for {LocationId}. {UserEmail}.", locationId, HttpContext.User?.Identity?.Name);
+                _logger.LogError(ex, "Add Question Error for {LocationId}. {UserEmail}.", locationId, HttpContext.User?.Identity?.Name);
                 return Json(new { success = false, message = "Add Question Error." });
             }
         }
@@ -292,26 +285,26 @@ namespace risk.control.system.Controllers.CompanyAdmin
             }
             try
             {
-                var question = await context.Questions.FirstOrDefaultAsync(q => q.Id == id);
+                var question = await _context.Questions.FirstOrDefaultAsync(q => q.Id == id);
                 if (question == null)
                 {
                     return Json(new { success = false, message = "Question not found." });
                 }
-                var location = await context.LocationReport
+                var location = await _context.LocationReport
                     .Include(l => l.Questions)
                     .FirstOrDefaultAsync(l => l.Id == locationId);
 
                 if (location!.Questions!.Count > 1)
                 {
-                    context.Questions.Remove(question);
-                    await context.SaveChangesAsync(null, false);
+                    _context.Questions.Remove(question);
+                    await _context.SaveChangesAsync(null, false);
                     return Json(new { success = true, Id = id });
                 }
                 return Json(new { success = false, message = "Single Question not deleted." });
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error Question Delete for {QueationId} {LocationId}. {UserEmail}.", id, locationId, HttpContext.User?.Identity?.Name);
+                _logger.LogError(ex, "Error Question Delete for {QueationId} {LocationId}. {UserEmail}.", id, locationId, HttpContext.User?.Identity?.Name);
                 return Json(new { success = false, message = "Error Question Delete." });
             }
         }
@@ -330,24 +323,24 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 {
                     return Json(new { success = false, message = "Single Location not DELETED." });
                 }
-                var location = await context.LocationReport.Include(l => l.Questions).Include(l => l.AgentIdReport).Include(l => l.FaceIds).Include(l => l.DocumentIds).Include(l => l.MediaReports)
+                var location = await _context.LocationReport.Include(l => l.Questions).Include(l => l.AgentIdReport).Include(l => l.FaceIds).Include(l => l.DocumentIds).Include(l => l.MediaReports)
                     .FirstOrDefaultAsync(l => l.Id == id);
                 if (location == null)
                 {
                     return Json(new { success = false, message = "Location not found." });
                 }
-                context.Questions.RemoveRange(location.Questions!);
-                context.AgentIdReport.Remove(location.AgentIdReport!);
-                context.DigitalIdReport.RemoveRange(location.FaceIds!);
-                context.DocumentIdReport.RemoveRange(location.DocumentIds!);
-                context.MediaReport.RemoveRange(location.MediaReports!);
-                context.LocationReport.Remove(location);
-                await context.SaveChangesAsync(null, false);
+                _context.Questions.RemoveRange(location.Questions!);
+                _context.AgentIdReport.Remove(location.AgentIdReport!);
+                _context.DigitalIdReport.RemoveRange(location.FaceIds!);
+                _context.DocumentIdReport.RemoveRange(location.DocumentIds!);
+                _context.MediaReport.RemoveRange(location.MediaReports!);
+                _context.LocationReport.Remove(location);
+                await _context.SaveChangesAsync(null, false);
                 return Json(new { success = true, Id = id });
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error Location Delete for {LocationId}. {UserEmail}.", id, HttpContext.User.Identity?.Name);
+                _logger.LogError(ex, "Error Location Delete for {LocationId}. {UserEmail}.", id, HttpContext.User.Identity?.Name);
                 return Json(new { success = false, message = "Error Location Delete." });
             }
         }
@@ -362,10 +355,10 @@ namespace risk.control.system.Controllers.CompanyAdmin
             }
             try
             {
-                var location = await context.LocationReport.Include(l => l.AgentIdReport).Include(l => l.FaceIds).Include(l => l.DocumentIds).Include(l => l.MediaReports).FirstOrDefaultAsync(l => l.Id == model.LocationId);
+                var location = await _context.LocationReport.Include(l => l.AgentIdReport).Include(l => l.FaceIds).Include(l => l.DocumentIds).Include(l => l.MediaReports).FirstOrDefaultAsync(l => l.Id == model.LocationId);
                 if (location == null)
                     return Json(new { success = false, message = "Location not found." });
-                var reportTemplate = await context.ReportTemplates.Include(r => r.LocationReport).FirstOrDefaultAsync(r => r.Id == model.TemplateId);
+                var reportTemplate = await _context.ReportTemplates.Include(r => r.LocationReport).FirstOrDefaultAsync(r => r.Id == model.TemplateId);
                 var hasAnyLocationName = reportTemplate!.LocationReport.Any(l => l.Id != model.LocationId && l.LocationName!.Trim().Equals(model.LocationName!.Trim(), StringComparison.CurrentCultureIgnoreCase));
                 if (hasAnyLocationName)
                 {
@@ -393,12 +386,12 @@ namespace risk.control.system.Controllers.CompanyAdmin
                     if (media != null)
                         media.Selected = m.Selected;
                 }
-                await context.SaveChangesAsync(null, false);
+                await _context.SaveChangesAsync(null, false);
                 return Json(new { success = true, message = "Location saved successfully!" });
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error Location Ssave for {LocationId}. {UserEmail}.", model.LocationId, HttpContext.User.Identity!.Name);
+                _logger.LogError(ex, "Error Location Ssave for {LocationId}. {UserEmail}.", model.LocationId, HttpContext.User.Identity!.Name);
                 return Json(new { success = false, message = "Error Location Save." });
             }
         }
@@ -409,11 +402,11 @@ namespace risk.control.system.Controllers.CompanyAdmin
         {
             try
             {
-                var original = await context.LocationReport.Include(l => l.AgentIdReport).Include(l => l.FaceIds).Include(l => l.DocumentIds).Include(l => l.MediaReports).Include(l => l.Questions).FirstOrDefaultAsync(l => l.Id == locationId);
+                var original = await _context.LocationReport.Include(l => l.AgentIdReport).Include(l => l.FaceIds).Include(l => l.DocumentIds).Include(l => l.MediaReports).Include(l => l.Questions).FirstOrDefaultAsync(l => l.Id == locationId);
                 if (original == null)
                     return Json(new { success = false, message = "Original location not found." });
                 var locationName = original.LocationName + " (Copy)";
-                var reportTemplate = await context.ReportTemplates.Include(r => r.LocationReport).FirstOrDefaultAsync(r => r.Id == reportTemplateId);
+                var reportTemplate = await _context.ReportTemplates.Include(r => r.LocationReport).FirstOrDefaultAsync(r => r.Id == reportTemplateId);
                 if (reportTemplate == null)
                 {
                     return Json(new { success = false, message = "Report Template not found." });
@@ -424,14 +417,14 @@ namespace risk.control.system.Controllers.CompanyAdmin
                     return Json(new { success = false, message = $"Location name {locationName} exists." });
                 }
                 var clone = CreateLocationReport(original, reportTemplateId);
-                context.LocationReport.Add(clone);
-                await context.SaveChangesAsync(null, false);
+                _context.LocationReport.Add(clone);
+                await _context.SaveChangesAsync(null, false);
                 var html = await this.RenderViewAsync("_LocationCardPartial", clone, true);
                 return Json(new { success = true, html });
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error Location Clone for {ReportTemplateId} {LocationId}. {UserEmail}.", reportTemplateId, locationId, HttpContext.User.Identity?.Name);
+                _logger.LogError(ex, "Error Location Clone for {ReportTemplateId} {LocationId}. {UserEmail}.", reportTemplateId, locationId, HttpContext.User.Identity?.Name);
                 return Json(new { success = false, message = ex.Message });
             }
 

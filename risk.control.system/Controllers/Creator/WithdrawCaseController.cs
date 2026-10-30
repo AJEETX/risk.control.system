@@ -13,32 +13,20 @@ namespace risk.control.system.Controllers.Creator
 {
     [Authorize(Roles = $"{CREATOR.DISPLAY_NAME}")]
     [Route("[controller]")]
-    public class WithdrawCaseController : Controller
-    {
-        private readonly string _baseUrl;
-        private readonly IWithdrawCaseService _withdrawCaseService;
-        private readonly ICaseNotificationService _mailboxService;
-        private readonly INotyfService _notifyService;
-        private readonly ILogger<WithdrawCaseController> _logger;
-        private readonly IBackgroundJobClient _backgroundJobClient;
-
-        public WithdrawCaseController(
+    public class WithdrawCaseController(
             IWithdrawCaseService withdrawCaseService,
-            ICaseNotificationService mailboxService,
+            ICaseNotificationService caseNotificationService,
             INotyfService notifyService,
             IHttpContextAccessor httpContextAccessor,
             ILogger<WithdrawCaseController> logger,
-            IBackgroundJobClient backgroundJobClient)
-        {
-            _withdrawCaseService = withdrawCaseService;
-            _mailboxService = mailboxService;
-            _notifyService = notifyService;
-            _logger = logger;
-            _backgroundJobClient = backgroundJobClient;
-            var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
-            var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
-            _baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
-        }
+            IBackgroundJobClient backgroundJobClient) : Controller
+    {
+        private readonly string _baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent()}{httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent()}";
+        private readonly IWithdrawCaseService _withdrawCaseService = withdrawCaseService;
+        private readonly ICaseNotificationService _caseNotificationService = caseNotificationService;
+        private readonly INotyfService _notifyService = notifyService;
+        private readonly ILogger<WithdrawCaseController> _logger = logger;
+        private readonly IBackgroundJobClient _backgroundJobClient = backgroundJobClient;
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -55,9 +43,9 @@ namespace risk.control.system.Controllers.Creator
 
                 var (policyNumber, vendorId) = await _withdrawCaseService.WithdrawCaseByCompany(userEmail, model, caseId);
 
-                _backgroundJobClient.Enqueue(() => _mailboxService.NotifyCaseWithdrawlByCompany(userEmail, policyNumber, caseId, vendorId, _baseUrl));
+                _backgroundJobClient.Enqueue(() => _caseNotificationService.NotifyCaseWithdrawlByCompany(userEmail, policyNumber, caseId, vendorId, _baseUrl));
 
-                _notifyService.Custom($"Case <b> #{policyNumber}</b>  withdrawn successfully", 3, "red", "far fa-file-powerpoint");
+                _notifyService.Custom($"Case <b> #{policyNumber}</b>  withdrawn successfully", 3, "white", "far fa-file-powerpoint");
 
                 return RedirectToAction(nameof(AddAssignController.New), ControllerName<AddAssignController>.Name);
             }
@@ -79,7 +67,7 @@ namespace risk.control.system.Controllers.Creator
             }
             var (policyNumber, vendorId) = await _withdrawCaseService.WithdrawCaseByCompanyNew(userEmail, request);
 
-            _backgroundJobClient.Enqueue(() => _mailboxService.NotifyCaseWithdrawlByCompanyNew(userEmail, policyNumber, request.ClaimId, vendorId, _baseUrl));
+            _backgroundJobClient.Enqueue(() => _caseNotificationService.NotifyCaseWithdrawlByCompanyNew(userEmail, policyNumber, request.ClaimId, vendorId, _baseUrl));
 
             return Ok(new { success = true, policyNumber = policyNumber });
         }

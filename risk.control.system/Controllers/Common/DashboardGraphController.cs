@@ -8,18 +8,12 @@ namespace risk.control.system.Controllers.Common
 {
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME},{AGENCY_ADMIN.DISPLAY_NAME},{CREATOR.DISPLAY_NAME},{ASSESSOR.DISPLAY_NAME},{MANAGER.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME},{AGENT.DISPLAY_NAME}")]
     [ApiExplorerSettings(IgnoreApi = true)]
-    public class DashboardGraphController : Controller
-    {
-        private readonly IDashboardService _dashboardService;
-        private readonly ILogger<DashboardGraphController> _logger;
-
-        public DashboardGraphController(IDashboardService dashboardService,
+    public class DashboardGraphController(IDashboardService dashboardService,
             ILogger<DashboardGraphController> logger
-            )
-        {
-            _dashboardService = dashboardService;
-            _logger = logger;
-        }
+            ) : Controller
+    {
+        private readonly IDashboardService _dashboardService = dashboardService;
+        private readonly ILogger<DashboardGraphController> _logger = logger;
 
         public async Task<JsonResult> GetAgentClaim()
         {

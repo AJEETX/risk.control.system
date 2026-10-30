@@ -19,41 +19,27 @@ namespace risk.control.system.Controllers.Creator
 {
     [Breadcrumb("Claims")]
     [Authorize(Roles = CREATOR.DISPLAY_NAME)]
-    public class ClaimController : Controller
-    {
-        private readonly ILogger<ClaimController> _logger;
-        private readonly ApplicationDbContext _context;
-        private readonly IWebHostEnvironment _hostingEnvironment;
-        private readonly ITimelineService _timelineService;
-        private readonly IAgencyDetailService _agencyDetailService;
-        private readonly IErrorNotifyService _errorNotifyService;
-        private readonly ICaseCreateEditService _caseCreateEditService;
-        private readonly INavigationService _navigationService;
-        private readonly INotyfService _notifyService;
-        private readonly IEmpanelledAgencyService _empanelledAgencyService;
-
-        public ClaimController(ILogger<ClaimController> logger,
+    public class ClaimController(ILogger<ClaimController> logger,
             ApplicationDbContext context,
             IAgencyDetailService agencyDetailService,
             ITimelineService timelineService,
-            IWebHostEnvironment hostingEnvironment,
+            IWebHostEnvironment env,
             IErrorNotifyService errorNotifyService,
-            ICaseCreateEditService createCreateEditService,
+            ICaseCreateEditService caseCreateEditService,
             INavigationService navigationService,
             IEmpanelledAgencyService empanelledAgencyService,
-            INotyfService notifyService)
-        {
-            _agencyDetailService = agencyDetailService;
-            _logger = logger;
-            _context = context;
-            _hostingEnvironment = hostingEnvironment;
-            _errorNotifyService = errorNotifyService;
-            _caseCreateEditService = createCreateEditService;
-            _timelineService = timelineService;
-            _navigationService = navigationService;
-            _notifyService = notifyService;
-            _empanelledAgencyService = empanelledAgencyService;
-        }
+            INotyfService notifyService) : Controller
+    {
+        private readonly ILogger<ClaimController> _logger = logger;
+        private readonly ApplicationDbContext _context = context;
+        private readonly IWebHostEnvironment _env = env;
+        private readonly ITimelineService _timelineService = timelineService;
+        private readonly IAgencyDetailService _agencyDetailService = agencyDetailService;
+        private readonly IErrorNotifyService _errorNotifyService = errorNotifyService;
+        private readonly ICaseCreateEditService _caseCreateEditService = caseCreateEditService;
+        private readonly INavigationService _navigationService = navigationService;
+        private readonly INotyfService _notifyService = notifyService;
+        private readonly IEmpanelledAgencyService _empanelledAgencyService = empanelledAgencyService;
 
         public IActionResult Index()
         {
@@ -117,7 +103,7 @@ namespace risk.control.system.Controllers.Creator
                     var uploadedFile = Request.Form.Files.FirstOrDefault(f => f.Name == $"field_{field.Id}");
                     if (uploadedFile != null && uploadedFile.Length > 0)
                     {
-                        string uploadsFolder = Path.Combine(_hostingEnvironment.WebRootPath, "uploads");
+                        string uploadsFolder = Path.Combine(_env.WebRootPath, "uploads");
                         Directory.CreateDirectory(uploadsFolder);
 
                         string uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(uploadedFile.FileName);
@@ -291,7 +277,7 @@ namespace risk.control.system.Controllers.Creator
                     var uploadedFile = Request.Form.Files.FirstOrDefault(f => f.Name == $"field_{field.Id}");
                     if (uploadedFile != null && uploadedFile.Length > 0)
                     {
-                        string uploadsFolder = Path.Combine(_hostingEnvironment.WebRootPath, "uploads");
+                        string uploadsFolder = Path.Combine(_env.WebRootPath, "uploads");
                         Directory.CreateDirectory(uploadsFolder);
                         string uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(uploadedFile.FileName);
                         string filePath = Path.Combine(uploadsFolder, uniqueFileName);
@@ -304,7 +290,7 @@ namespace risk.control.system.Controllers.Creator
 
                         if (existingValue != null && !string.IsNullOrEmpty(existingValue.Value))
                         {
-                            var oldFilePath = Path.Combine(_hostingEnvironment.WebRootPath, existingValue.Value.TrimStart('/'));
+                            var oldFilePath = Path.Combine(_env.WebRootPath, existingValue.Value.TrimStart('/'));
                             if (System.IO.File.Exists(oldFilePath))
                             {
                                 System.IO.File.Delete(oldFilePath);
@@ -392,7 +378,7 @@ namespace risk.control.system.Controllers.Creator
             {
                 if (val.FormField.FieldType == "file" && !string.IsNullOrEmpty(val.Value))
                 {
-                    var filePath = Path.Combine(_hostingEnvironment.WebRootPath, val.Value.TrimStart('/'));
+                    var filePath = Path.Combine(_env.WebRootPath, val.Value.TrimStart('/'));
                     if (System.IO.File.Exists(filePath))
                     {
                         System.IO.File.Delete(filePath);

@@ -25,7 +25,7 @@ namespace risk.control.system.Services.Company
         Task LoadModel(ApplicationUser model, string currentUserEmail);
     }
 
-    public sealed class CompanyUserService(
+    internal sealed class CompanyUserService(
         IValidateImageService validateFaceService,
         IFeatureManager featureManager,
         IAmazonApiService amazonApiService,

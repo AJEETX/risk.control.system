@@ -49,7 +49,7 @@ namespace risk.control.system.Services.AgencyAdmin
                 .Include(v => v.District)
                 .Include(v => v.State)
                 .Include(v => v.Vendor)
-                .FirstOrDefaultAsync(v => v.VendorInvestigationServiceTypeId == id);
+                .FirstOrDefaultAsync(v => v.Id == id);
 
             if (serviceType == null) return null!;
 
@@ -71,7 +71,7 @@ namespace risk.control.system.Services.AgencyAdmin
         public async Task<bool> DeleteServiceAsync(long id)
         {
             var service = await _context.VendorInvestigationServiceType
-                .FirstOrDefaultAsync(x => x.VendorInvestigationServiceTypeId == id);
+                .FirstOrDefaultAsync(x => x.Id == id);
 
             if (service == null) return false;
 

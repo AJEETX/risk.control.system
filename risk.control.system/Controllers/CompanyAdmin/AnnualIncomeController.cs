@@ -12,18 +12,11 @@ namespace risk.control.system.Controllers.CompanyAdmin
 {
     [Breadcrumb("Company Settings ")]
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME}")]
-    public class AnnualIncomeController : Controller
+    public class AnnualIncomeController(ApplicationDbContext context, INotyfService notifyService, ILogger<AnnualIncomeController> logger) : Controller
     {
-        private readonly ApplicationDbContext _context;
-        private readonly INotyfService notifyService;
-        private readonly ILogger<AnnualIncomeController> logger;
-
-        public AnnualIncomeController(ApplicationDbContext context, INotyfService notifyService, ILogger<AnnualIncomeController> logger)
-        {
-            _context = context;
-            this.notifyService = notifyService;
-            this.logger = logger;
-        }
+        private readonly ApplicationDbContext _context = context;
+        private readonly INotyfService _notifyService = notifyService;
+        private readonly ILogger<AnnualIncomeController> _logger = logger;
 
         public IActionResult Index()
         {
@@ -55,7 +48,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
         {
             if (id < 1)
             {
-                notifyService.Error("Income Type Not found!");
+                _notifyService.Error("Income Type Not found!");
                 return RedirectToAction(nameof(Profile));
             }
 
@@ -63,7 +56,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (income == null)
             {
-                notifyService.Error("Income Type Not found!");
+                _notifyService.Error("Income Type Not found!");
                 return RedirectToAction(nameof(Profile));
             }
 
@@ -86,7 +79,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 income.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Add(income);
                 await _context.SaveChangesAsync();
-                notifyService.Success("Income Type created successfully!");
+                _notifyService.Success("Income Type created successfully!");
                 return RedirectToAction(nameof(Profile));
             }
             return View(income);
@@ -97,14 +90,14 @@ namespace risk.control.system.Controllers.CompanyAdmin
         {
             if (id < 1)
             {
-                notifyService.Error("Income Type Not found!");
+                _notifyService.Error("Income Type Not found!");
                 return RedirectToAction(nameof(Profile));
             }
 
             var income = await _context.AnnualIncome.FindAsync(id);
             if (income == null)
             {
-                notifyService.Error("Income Type Not found!");
+                _notifyService.Error("Income Type Not found!");
                 return RedirectToAction(nameof(Profile));
             }
             return View(income);
@@ -116,7 +109,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
         {
             if (id != income.Id)
             {
-                notifyService.Error("Income Type Not found!");
+                _notifyService.Error("Income Type Not found!");
                 return RedirectToAction(nameof(Profile));
             }
             try
@@ -125,13 +118,13 @@ namespace risk.control.system.Controllers.CompanyAdmin
                 income.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Update(income);
                 await _context.SaveChangesAsync();
-                notifyService.Warning("Income Type edited successfully!");
+                _notifyService.Warning("Income Type edited successfully!");
                 return RedirectToAction(nameof(Profile));
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, $"Error occurred.");
-                notifyService.Error("Error editing Income Type!");
+                _logger.LogError(ex, $"Error occurred.");
+                _notifyService.Error("Error editing Income Type!");
                 return RedirectToAction(nameof(Profile));
             }
         }

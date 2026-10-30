@@ -20,7 +20,8 @@ namespace risk.control.system.Services.Common
         Task<FaceMatchResult> HasExactlyOneFace(IFormFile file);
         Task<FaceMatchResult> HasExactlyOneFace(byte[] imageBytes);
         Task<bool> FaceMatch(byte[] originalImage, byte[] targetImage);
-
+        Task SetCaseCustomerImageToAws(long caseId);
+        Task SetCaseBeneficiaryImageToAws(long caseId);
     }
 
     internal class AwsFaceImageCheckService(
@@ -191,57 +192,67 @@ namespace risk.control.system.Services.Common
             {
                 await using var context = await _contextFactory.CreateDbContextAsync();
 
-                await SetCaseCustomerImageToAws(caseId, context);
-                await SetCaseBeneficiaryImageToAws(caseId, context);
+                var customerImageTask = SetCaseCustomerImageToAws(caseId);
+                var beneficiaryImageTask = SetCaseBeneficiaryImageToAws(caseId);
+                await Task.WhenAll(customerImageTask, beneficiaryImageTask);
                 await context.SaveChangesAsync();
             }
         }
 
-        private async Task SetCaseCustomerImageToAws(long caseId, ApplicationDbContext context)
+        public async Task SetCaseCustomerImageToAws(long caseId)
         {
-            var customer = await context.CustomerDetail.FirstOrDefaultAsync(i => i.InvestigationTaskId == caseId);
-            if (customer == null) return;
-
-            var customerImageBytes = await _base64FileService.GetByteFileAsync(customer.ImagePath!);
-            var indexRequest = new IndexFacesRequest
+            if (await _featureManager.IsEnabledAsync(FeatureFlags.FACE_MATCH_CHECK))
             {
-                CollectionId = EnvHelper.Get(CONSTANTS.FaceImageCollection),
-                Image = new Image { Bytes = new MemoryStream(customerImageBytes) },
-                ExternalImageId = customer.CustomerDetailId.ToString(),
-                MaxFaces = 1,
-                QualityFilter = QualityFilter.AUTO
-            };
+                await using var context = await _contextFactory.CreateDbContextAsync();
 
-            var response = await _amazonApiService.IndexFacesAsync(indexRequest);
-            var faceId = response.FaceRecords.FirstOrDefault()?.Face.FaceId;
-            if (faceId != null)
-            {
-                customer.AwsFaceId = faceId;
-                customer.FaceIndexedAt = DateTime.UtcNow;
+                var customer = await context.CustomerDetail.FirstOrDefaultAsync(i => i.InvestigationTaskId == caseId);
+                if (customer == null) return;
+
+                var customerImageBytes = await _base64FileService.GetByteFileAsync(customer.ImagePath!);
+                var indexRequest = new IndexFacesRequest
+                {
+                    CollectionId = EnvHelper.Get(CONSTANTS.FaceImageCollection),
+                    Image = new Image { Bytes = new MemoryStream(customerImageBytes) },
+                    ExternalImageId = customer.CustomerDetailId.ToString(),
+                    MaxFaces = 1,
+                    QualityFilter = QualityFilter.AUTO
+                };
+
+                var response = await _amazonApiService.IndexFacesAsync(indexRequest);
+                var faceId = response.FaceRecords.FirstOrDefault()?.Face.FaceId;
+                if (faceId != null)
+                {
+                    customer.AwsFaceId = faceId;
+                    customer.FaceIndexedAt = DateTime.UtcNow;
+                }
             }
         }
 
-        private async Task SetCaseBeneficiaryImageToAws(long caseId, ApplicationDbContext context)
+        public async Task SetCaseBeneficiaryImageToAws(long caseId)
         {
-            var beneficiary = await context.BeneficiaryDetail.FirstOrDefaultAsync(i => i.InvestigationTaskId == caseId);
-            if (beneficiary == null) return;
-
-            var beneficiaryImageBytes = await _base64FileService.GetByteFileAsync(beneficiary.ImagePath!);
-            var indexRequest = new IndexFacesRequest
+            if (await _featureManager.IsEnabledAsync(FeatureFlags.FACE_MATCH_CHECK))
             {
-                CollectionId = EnvHelper.Get(CONSTANTS.FaceImageCollection),
-                Image = new Image { Bytes = new MemoryStream(beneficiaryImageBytes) },
-                ExternalImageId = beneficiary.BeneficiaryDetailId.ToString(),
-                MaxFaces = 1,
-                QualityFilter = QualityFilter.AUTO
-            };
+                await using var context = await _contextFactory.CreateDbContextAsync();
+                var beneficiary = await context.BeneficiaryDetail.FirstOrDefaultAsync(i => i.InvestigationTaskId == caseId);
+                if (beneficiary == null) return;
 
-            var response = await _amazonApiService.IndexFacesAsync(indexRequest);
-            var faceId = response.FaceRecords.FirstOrDefault()?.Face.FaceId;
-            if (faceId != null)
-            {
-                beneficiary.AwsFaceId = faceId;
-                beneficiary.FaceIndexedAt = DateTime.UtcNow;
+                var beneficiaryImageBytes = await _base64FileService.GetByteFileAsync(beneficiary.ImagePath!);
+                var indexRequest = new IndexFacesRequest
+                {
+                    CollectionId = EnvHelper.Get(CONSTANTS.FaceImageCollection),
+                    Image = new Image { Bytes = new MemoryStream(beneficiaryImageBytes) },
+                    ExternalImageId = beneficiary.BeneficiaryDetailId.ToString(),
+                    MaxFaces = 1,
+                    QualityFilter = QualityFilter.AUTO
+                };
+
+                var response = await _amazonApiService.IndexFacesAsync(indexRequest);
+                var faceId = response.FaceRecords.FirstOrDefault()?.Face.FaceId;
+                if (faceId != null)
+                {
+                    beneficiary.AwsFaceId = faceId;
+                    beneficiary.FaceIndexedAt = DateTime.UtcNow;
+                }
             }
         }
 

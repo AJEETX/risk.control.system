@@ -39,7 +39,7 @@ namespace risk.control.system.Services.Report
 
                 // 2. Add the Image Paragraph
                 var imagePara = agentPhotoCell.AddParagraph();
-                imagePara.AddInlineImage(agentImagePngBytes).SetWidth(120F).SetHeight(120F);
+                imagePara.AddInlineImage(agentImagePngBytes).SetWidth(100F).SetHeight(120F);
                 if (loc.AgentIdReport.FaceResult?.Faces.Count == 0)
                 {
                     var noFacePara = agentPhotoCell.AddParagraph();

@@ -154,7 +154,12 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    buttons += `<a data-id="${row.id}" class="btn btn-xs btn-info"><i class="fas fa-search"></i> Agency Profile</a>`
+                    // buttons += `<a data-id="${row.id}" class="btn btn-xs btn-info"><i class="fas fa-search"></i> Agency Profile</a>`
+                    buttons = `<button type="button" class="btn btn-info btn-xs view-agency-profile" 
+                                        data-vendor-id="${row.id}" 
+                                        data-case-id="${claimId}">
+                                    <span class="badge badge-info"><i class='fas fa-search'></i></span> Agency Profile
+                                </button>`
                     return buttons;
                 }
             }],
@@ -185,12 +190,51 @@
             });
         }
     });
-
-    $('body').on('click', 'a.btn.btn-xs.btn-info', function (e) {
+    $(document).on('click', '.view-agency-profile', function (e) {
         e.preventDefault();
-        const id = $(this).data('id');
-        showagencydetail(id, this);
+
+        var $btn = $(this);
+        var encryptedVendorId = $btn.data('vendor-id');
+        var encryptedCaseId = $btn.data('case-id');
+
+        if (!encryptedVendorId || !encryptedCaseId) {
+            toastr.error("Invalid agency or case reference.");
+            return;
+        }
+
+        var url = '/Creator/AgencyProfile?id=' + encodeURIComponent(encryptedVendorId) + '&selectedcase=' + encodeURIComponent(encryptedCaseId);
+
+        // 1. Save original button HTML/icon and show spinner inside the button
+        var originalContent = $btn.html();
+        $btn.prop('disabled', true);
+        $btn.html('<i class="fas fa-sync fa-spin"></i> Agency Profile');
+
+        // Also show global page spinner if you have one
+        $('.submit-progress').removeClass('hidden');
+
+        // 2. Perform AJAX request
+        $.get(url, function (data) {
+            $('#agencyModalContent').html(data);
+
+            // Hide global spinner and open modal
+            $('.submit-progress').addClass('hidden');
+            $('#agencyModal').modal('show');
+        })
+            .fail(function () {
+                $('.submit-progress').addClass('hidden');
+                toastr.error("Error loading agency profile. Try again.");
+            })
+            .always(function () {
+                // 3. Restore button back to its original state when finished
+                $btn.prop('disabled', false);
+                $btn.html(originalContent);
+            });
     });
+    // $('body').on('click', 'a.btn.btn-xs.btn-info', function (e) {
+    //     e.preventDefault();
+    //     const id = $(this).data('id');
+    //     showagencydetail(id, this);
+    // });
     function showagencydetail(id, element) {
         id = String(id).replace(/[^a-zA-Z0-9_-]/g, "");
         $("body").addClass("submit-progress-bg");

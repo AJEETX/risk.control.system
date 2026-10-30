@@ -6,23 +6,23 @@ namespace risk.control.system.Services.Common
 {
     public interface INavigationService
     {
-        MvcBreadcrumbNode GetEditCasePath(long id);
+        MvcBreadcrumbNode GetEditCasePath(string id);
 
-        MvcBreadcrumbNode GetEmpanelledVendorsPath(long id, long vendorId, bool fromEditPage = false);
+        MvcBreadcrumbNode GetEmpanelledVendorsPath(string id, long vendorId, bool fromEditPage = false);
 
-        MvcBreadcrumbNode GetVendorDetailPath(long caseId, long vendorId);
+        MvcBreadcrumbNode GetVendorDetailPath(string caseId, long vendorId);
 
-        MvcBreadcrumbNode GetInvestigationPath(long id, string title, string action, string controller);
+        MvcBreadcrumbNode GetInvestigationPath(string id, string title, string action, string controller);
 
-        MvcBreadcrumbNode GetAgencyActionPath(long id, string controller, string listTitle, string actionTitle, string actionName);
+        MvcBreadcrumbNode GetAgencyActionPath(string id, string controller, string listTitle, string actionTitle, string actionName);
 
-        MvcBreadcrumbNode GetAgencyServiceManagerPath(long id, string controller, string listTitle);
+        MvcBreadcrumbNode GetAgencyServiceManagerPath(string id, string controller, string listTitle);
 
-        MvcBreadcrumbNode GetAgencyServiceActionPath(long id, string controller, string listTitle, string actionTitle, string actionName);
+        MvcBreadcrumbNode GetAgencyServiceActionPath(string id, string controller, string listTitle, string actionTitle, string actionName);
 
-        MvcBreadcrumbNode GetAgencyUserManagerPath(long id, string agencyController, string listTitle);
+        MvcBreadcrumbNode GetAgencyUserManagerPath(string id, string agencyController, string listTitle);
 
-        MvcBreadcrumbNode GetAgencyUserActionPath(long id, string agencyController, string listTitle, string actionTitle, string actionName);
+        MvcBreadcrumbNode GetAgencyUserActionPath(string id, string agencyController, string listTitle, string actionTitle, string actionName);
 
         MvcBreadcrumbNode GetInvoiceBreadcrumb(long invoiceId, long caseId, string controller, string rootAction, string rootTitle, string listAction, string listTitle, string detailAction);
 
@@ -31,14 +31,14 @@ namespace risk.control.system.Services.Common
 
     internal class NavigationService : INavigationService
     {
-        private MvcBreadcrumbNode GetCaseBasePath(long id)
+        private MvcBreadcrumbNode GetCaseBasePath(string id)
         {
             var cases = new MvcBreadcrumbNode(nameof(AddAssignController.New), ControllerName<AddAssignController>.Name, "Cases");
 
             return new MvcBreadcrumbNode(nameof(AddAssignController.New), ControllerName<AddAssignController>.Name, "Add/Assign") { Parent = cases };
         }
 
-        private MvcBreadcrumbNode GetCaseDetailsBase(long id)
+        private MvcBreadcrumbNode GetCaseDetailsBase(string id)
         {
             return new MvcBreadcrumbNode(nameof(CreatorController.Details), ControllerName<CreatorController>.Name, "Details")
             {
@@ -47,7 +47,7 @@ namespace risk.control.system.Services.Common
             };
         }
 
-        public MvcBreadcrumbNode GetInvestigationPath(long id, string title, string action, string controller)
+        public MvcBreadcrumbNode GetInvestigationPath(string id, string title, string action, string controller)
         {
             if (action == nameof(CreatorController.Details))
             {
@@ -61,7 +61,7 @@ namespace risk.control.system.Services.Common
             };
         }
 
-        public MvcBreadcrumbNode GetEditCasePath(long id)
+        public MvcBreadcrumbNode GetEditCasePath(string id)
         {
             return new MvcBreadcrumbNode(nameof(AddAssignController.Edit),
                 ControllerName<AddAssignController>.Name, "Edit Case")
@@ -71,7 +71,7 @@ namespace risk.control.system.Services.Common
             };
         }
 
-        public MvcBreadcrumbNode GetEmpanelledVendorsPath(long id, long vendorId, bool fromEditPage = false)
+        public MvcBreadcrumbNode GetEmpanelledVendorsPath(string id, long vendorId, bool fromEditPage = false)
         {
             return new MvcBreadcrumbNode(nameof(CreatorController.EmpanelledAgencies), ControllerName<CreatorController>.Name, "Empanelled Agencies")
             {
@@ -80,7 +80,7 @@ namespace risk.control.system.Services.Common
             };
         }
 
-        public MvcBreadcrumbNode GetVendorDetailPath(long caseId, long vendorId)
+        public MvcBreadcrumbNode GetVendorDetailPath(string caseId, long vendorId)
         {
             return new MvcBreadcrumbNode(nameof(CreatorController.AgencyProfile), ControllerName<CreatorController>.Name, "Agency Profile")
             {
@@ -89,7 +89,7 @@ namespace risk.control.system.Services.Common
             };
         }
 
-        public MvcBreadcrumbNode GetAgencyActionPath(long id, string controller, string listTitle, string actionTitle, string actionName)
+        public MvcBreadcrumbNode GetAgencyActionPath(string id, string controller, string listTitle, string actionTitle, string actionName)
         {
             return new MvcBreadcrumbNode(actionName, controller, actionTitle)
             {
@@ -98,7 +98,7 @@ namespace risk.control.system.Services.Common
             };
         }
 
-        public MvcBreadcrumbNode GetAgencyServiceManagerPath(long id, string controller, string listTitle)
+        public MvcBreadcrumbNode GetAgencyServiceManagerPath(string id, string controller, string listTitle)
         {
             return new MvcBreadcrumbNode("Service", $"{controller}Service", "Manage Service")
             {
@@ -107,7 +107,7 @@ namespace risk.control.system.Services.Common
             };
         }
 
-        public MvcBreadcrumbNode GetAgencyServiceActionPath(long id, string controller, string listTitle, string actionTitle, string actionName)
+        public MvcBreadcrumbNode GetAgencyServiceActionPath(string id, string controller, string listTitle, string actionTitle, string actionName)
         {
             // Reuse the 4-level "Manage Service" path as the parent
             var serviceManagerNode = GetAgencyServiceManagerPath(id, controller, listTitle);
@@ -119,7 +119,7 @@ namespace risk.control.system.Services.Common
             };
         }
 
-        public MvcBreadcrumbNode GetAgencyUserManagerPath(long id, string agencyController, string listTitle)
+        public MvcBreadcrumbNode GetAgencyUserManagerPath(string id, string agencyController, string listTitle)
         {
             var profileNode = GetAgencyProfileBase(id, agencyController, listTitle);
 
@@ -130,7 +130,7 @@ namespace risk.control.system.Services.Common
             };
         }
 
-        public MvcBreadcrumbNode GetAgencyUserActionPath(long id, string agencyController, string listTitle, string actionTitle, string actionName)
+        public MvcBreadcrumbNode GetAgencyUserActionPath(string id, string agencyController, string listTitle, string actionTitle, string actionName)
         {
             var userManagerNode = GetAgencyUserManagerPath(id, agencyController, listTitle);
 
@@ -141,7 +141,7 @@ namespace risk.control.system.Services.Common
             };
         }
 
-        private static MvcBreadcrumbNode GetAgencyProfileBase(long id, string controller, string listTitle)
+        private static MvcBreadcrumbNode GetAgencyProfileBase(string id, string controller, string listTitle)
         {
             var root = new MvcBreadcrumbNode("Agencies", controller, "Manage Agency");
 

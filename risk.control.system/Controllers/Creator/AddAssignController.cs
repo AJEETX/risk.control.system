@@ -12,26 +12,19 @@ namespace risk.control.system.Controllers.Creator
 {
     [Breadcrumb("Cases")]
     [Authorize(Roles = CREATOR.DISPLAY_NAME)]
-    public class AddAssignController : Controller
-    {
-        private readonly ILogger<AddAssignController> _logger;
-        private readonly IErrorNotifyService _errorNotifyService;
-        private readonly ICaseCreateEditService _caseCreateEditService;
-        private readonly INavigationService _navigationService;
-        private readonly INotyfService _notifyService;
-
-        public AddAssignController(ILogger<AddAssignController> logger,
+    public class AddAssignController(ILogger<AddAssignController> logger,
             IErrorNotifyService errorNotifyService,
-            ICaseCreateEditService createCreateEditService,
+            IEncryptionService encryptionService,
+            ICaseCreateEditService caseCreateEditService,
             INavigationService navigationService,
-            INotyfService notifyService)
-        {
-            _logger = logger;
-            _errorNotifyService = errorNotifyService;
-            _caseCreateEditService = createCreateEditService;
-            _navigationService = navigationService;
-            _notifyService = notifyService;
-        }
+            INotyfService notifyService) : Controller
+    {
+        private readonly IEncryptionService _encryptionService = encryptionService;
+        private readonly ILogger<AddAssignController> _logger = logger;
+        private readonly IErrorNotifyService _errorNotifyService = errorNotifyService;
+        private readonly ICaseCreateEditService _caseCreateEditService = caseCreateEditService;
+        private readonly INavigationService _navigationService = navigationService;
+        private readonly INotyfService _notifyService = notifyService;
 
         public IActionResult Index()
         {
@@ -147,7 +140,8 @@ namespace risk.control.system.Controllers.Creator
                     return View(model);
                 }
                 _notifyService.Success($"Policy #{result.CaseId} created successfully");
-                return RedirectToAction(nameof(CreatorController.Details), ControllerName<CreatorController>.Name, new { id = result.Id });
+                var encryptedId = _encryptionService.ProtectId(result.Id!.Value);
+                return RedirectToAction(nameof(CreatorController.Details), ControllerName<CreatorController>.Name, new { id = encryptedId });
             }
             catch (Exception ex)
             {
@@ -157,7 +151,7 @@ namespace risk.control.system.Controllers.Creator
             }
         }
 
-        public async Task<IActionResult> Edit(long id)
+        public async Task<IActionResult> Edit([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name!;
             try
@@ -176,7 +170,8 @@ namespace risk.control.system.Controllers.Creator
                 }
                 await _caseCreateEditService.LoadDropDowns(model.PolicyDetailDto, userEmail);
 
-                ViewData["BreadcrumbNode"] = _navigationService.GetEditCasePath(id);
+                var encryptedId = _encryptionService.ProtectId(id);
+                ViewData["BreadcrumbNode"] = _navigationService.GetEditCasePath(encryptedId);
 
                 return View(model);
             }
@@ -190,11 +185,13 @@ namespace risk.control.system.Controllers.Creator
 
         [ValidateAntiForgeryToken]
         [HttpPost]
-        public async Task<IActionResult> Edit(EditPolicyDto model)
+        public async Task<IActionResult> Edit([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id, EditPolicyDto model)
         {
             var userEmail = HttpContext.User?.Identity?.Name!;
             try
             {
+                model.Id = id;
+                ModelState.Remove(nameof(model.Id));
                 if (!ModelState.IsValid)
                 {
                     _errorNotifyService.ShowErrorNotification(ModelState);
@@ -221,12 +218,14 @@ namespace risk.control.system.Controllers.Creator
                     return View(model);
                 }
                 _notifyService.Custom($"Policy <b>#{result.CaseId}</b> edited successfully", 3, "orange", "far fa-file-powerpoint");
-                return RedirectToAction(nameof(CreatorController.Details), ControllerName<CreatorController>.Name, new { id = model.Id });
+                var encryptedId = _encryptionService.ProtectId(model.Id);
+                return RedirectToAction(nameof(CreatorController.Details), ControllerName<CreatorController>.Name, new { id = encryptedId });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error occurred to edit case {Id}. {UserEmail} ", model.Id, userEmail);
                 _notifyService.Error("OOPs !!!..Error editing Case detail. Try again.");
+                var encryptedId = _encryptionService.ProtectId(model.Id);
                 return RedirectToAction(nameof(CreatorController.Details), ControllerName<CreatorController>.Name, new { id = model.Id });
             }
         }

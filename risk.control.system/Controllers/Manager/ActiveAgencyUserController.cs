@@ -15,54 +15,41 @@ namespace risk.control.system.Controllers.Manager
 {
     [Breadcrumb("Manage Agency")]
     [Authorize(Roles = $"{MANAGER.DISPLAY_NAME}")]
-    public class ActiveAgencyUserController : Controller
-    {
-        private readonly IManageAgencyUserService _manageAgencyUserService;
-        private readonly IErrorNotifyService _errorNotifyService;
-        private readonly INotyfService _notifyService;
-        private readonly INavigationService _navigationService;
-        private readonly IFeatureManager _featureManager;
-        private readonly ILogger<ActiveAgencyUserController> _logger;
-        private readonly string _baseUrl;
-
-        public ActiveAgencyUserController(
-            IManageAgencyUserService manageAgencyUserService,
+    public class ActiveAgencyUserController(IManageAgencyUserService manageAgencyUserService,
             IErrorNotifyService errorNotifyService,
             INavigationService navigationService,
             INotyfService notifyService,
             IFeatureManager featureManager,
              IHttpContextAccessor httpContextAccessor,
-            ILogger<ActiveAgencyUserController> logger,
-            ISmsService SmsService)
-        {
-            this._manageAgencyUserService = manageAgencyUserService;
-            this._errorNotifyService = errorNotifyService;
-            this._navigationService = navigationService;
-            this._notifyService = notifyService;
-            this._featureManager = featureManager;
-            this._logger = logger;
-            var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
-            var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
-            _baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
-        }
+             IEncryptionService encryptionService,
+            ILogger<ActiveAgencyUserController> logger) : Controller
+    {
+        private readonly IEncryptionService _encryptionService = encryptionService;
+        private readonly IManageAgencyUserService _manageAgencyUserService = manageAgencyUserService;
+        private readonly IErrorNotifyService _errorNotifyService = errorNotifyService;
+        private readonly INotyfService _notifyService = notifyService;
+        private readonly INavigationService _navigationService = navigationService;
+        private readonly IFeatureManager _featureManager = featureManager;
+        private readonly ILogger<ActiveAgencyUserController> _logger = logger;
+        private readonly string _baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent()}{httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent()}";
 
         public IActionResult Index()
         {
             return View();
         }
 
-        public IActionResult Users(long id)
+        public IActionResult Users([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id)
         {
             var model = new ServiceModel
             {
                 Id = id
             };
-
-            ViewData["BreadcrumbNode"] = _navigationService.GetAgencyUserManagerPath(id, ControllerName<ActiveAgencyController>.Name, "Active Agencies");
+            var encryptedId = _encryptionService.ProtectId(id);
+            ViewData["BreadcrumbNode"] = _navigationService.GetAgencyUserManagerPath(encryptedId, ControllerName<ActiveAgencyController>.Name, "Active Agencies");
             return View(model);
         }
 
-        public async Task<IActionResult> Create(long id)
+        public async Task<IActionResult> Create([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id)
         {
             if (id <= 0)
             {
@@ -70,12 +57,13 @@ namespace risk.control.system.Controllers.Manager
                 return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
             }
             var model = await _manageAgencyUserService.GetUserCreationModelAsync(id);
+            var encryptedId = _encryptionService.ProtectId(id);
             if (model == null)
             {
                 _notifyService.Error("OOPS !!!..Agency Not Found. Try again.");
-                return RedirectToAction(nameof(Users), new { id = id });
+                return RedirectToAction(nameof(Users), new { id = encryptedId });
             }
-            ViewData["BreadcrumbNode"] = _navigationService.GetAgencyUserActionPath(id, ControllerName<ActiveAgencyController>.Name, "Active Agencies", "Add User", "Create");
+            ViewData["BreadcrumbNode"] = _navigationService.GetAgencyUserActionPath(encryptedId, ControllerName<ActiveAgencyController>.Name, "Active Agencies", "Add User", "Create");
             return View(model);
         }
 
@@ -93,11 +81,11 @@ namespace risk.control.system.Controllers.Manager
                     return View(model);
                 }
 
-                var result = await _manageAgencyUserService.CreateAgencyUserAsync(ModelState, model, emailSuffix, userEmail, _baseUrl);
+                var (Success, Message, Errors) = await _manageAgencyUserService.CreateAgencyUserAsync(ModelState, model, emailSuffix, userEmail, _baseUrl);
 
-                if (!result.Success)
+                if (!Success)
                 {
-                    foreach (var error in result.Errors)
+                    foreach (var error in Errors)
                         ModelState.AddModelError(error.Key, error.Value);
                     _errorNotifyService.ShowErrorNotification(ModelState);
 
@@ -110,6 +98,8 @@ namespace risk.control.system.Controllers.Manager
                 _logger.LogError(ex, "Error Creating AgencyUser {Id}. {UserEmail}.", model.Id, userEmail);
                 _notifyService.Error("OOPS !!!..Error Creating User. Try again.");
             }
+
+            var encryptedId = _encryptionService.ProtectId(model.VendorId!.Value);
             return RedirectToAction(nameof(Users), ControllerName<ActiveAgencyUserController>.Name, new { id = model.VendorId });
         }
 
@@ -132,7 +122,8 @@ namespace risk.control.system.Controllers.Manager
                     return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
                 }
 
-                ViewData["BreadcrumbNode"] = _navigationService.GetAgencyUserActionPath(agencyUser.VendorId!.Value, ControllerName<ActiveAgencyController>.Name, "Active Agencies", "Edit User", "Edit");
+                var encryptedId = _encryptionService.ProtectId(agencyUser.VendorId!.Value);
+                ViewData["BreadcrumbNode"] = _navigationService.GetAgencyUserActionPath(encryptedId, ControllerName<ActiveAgencyController>.Name, "Active Agencies", "Edit User", "Edit");
 
                 return View(agencyUser);
             }
@@ -177,7 +168,8 @@ namespace risk.control.system.Controllers.Manager
                 _logger.LogError(ex, "Error editing {AgencyId}. {UserEmail}.", id, userEmail);
                 _notifyService.Error("OOPS !!!..Error editing User. Try again.");
             }
-            return RedirectToAction(nameof(Users), ControllerName<ActiveAgencyUserController>.Name, new { id = model.VendorId });
+            var encryptedId = _encryptionService.ProtectId(model.VendorId!.Value);
+            return RedirectToAction(nameof(Users), ControllerName<ActiveAgencyUserController>.Name, new { id = encryptedId });
         }
 
         public async Task<IActionResult> Delete([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id)
@@ -198,7 +190,8 @@ namespace risk.control.system.Controllers.Manager
                     return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
                 }
 
-                ViewData["BreadcrumbNode"] = _navigationService.GetAgencyUserActionPath(model.VendorId!.Value, ControllerName<ActiveAgencyController>.Name, "Active Agencies", "Delete User", "Edit");
+                var encryptedId = _encryptionService.ProtectId(model.VendorId!.Value);
+                ViewData["BreadcrumbNode"] = _navigationService.GetAgencyUserActionPath(encryptedId, ControllerName<ActiveAgencyController>.Name, "Active Agencies", "Delete User", "Edit");
 
                 return View(model);
             }
@@ -238,7 +231,9 @@ namespace risk.control.system.Controllers.Manager
                 _logger.LogError(ex, "Error deleting {AgencyUser}. {UserEmail}.", id, userEmail);
                 _notifyService.Error("Error deleting user. Try again");
             }
-            return RedirectToAction(nameof(Users), new { id = vendorId });
+
+            var encryptedId = _encryptionService.ProtectId(vendorId);
+            return RedirectToAction(nameof(Users), new { id = encryptedId });
         }
     }
 }

@@ -14,34 +14,21 @@ namespace risk.control.system.Controllers.Agency
 {
     [Breadcrumb("User Profile ")]
     [Authorize(Roles = $"{AGENCY_ADMIN.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME}, {AGENT.DISPLAY_NAME}")]
-    public class AgencyUserProfileController : Controller
-    {
-        private readonly ApplicationDbContext _context;
-        private readonly IAgencyUserService _agencyUserService;
-        private readonly IErrorNotifyService _errorNotifyService;
-        private readonly IAccountService _accountService;
-        private readonly INotyfService _notifyService;
-        private readonly ILogger<AgencyUserProfileController> _logger;
-        private readonly string _baseUrl;
-
-        public AgencyUserProfileController(ApplicationDbContext context,
+    public class AgencyUserProfileController(ApplicationDbContext context,
             IAgencyUserService agencyUserService,
             IErrorNotifyService errorNotifyService,
             IAccountService accountService,
              IHttpContextAccessor httpContextAccessor,
             INotyfService notifyService,
-            ILogger<AgencyUserProfileController> logger)
-        {
-            _context = context;
-            _agencyUserService = agencyUserService;
-            _errorNotifyService = errorNotifyService;
-            _accountService = accountService;
-            _notifyService = notifyService;
-            _logger = logger;
-            var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
-            var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
-            _baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
-        }
+            ILogger<AgencyUserProfileController> logger) : Controller
+    {
+        private readonly ApplicationDbContext _context = context;
+        private readonly IAgencyUserService _agencyUserService = agencyUserService;
+        private readonly IErrorNotifyService _errorNotifyService = errorNotifyService;
+        private readonly IAccountService _accountService = accountService;
+        private readonly INotyfService _notifyService = notifyService;
+        private readonly ILogger<AgencyUserProfileController> _logger = logger;
+        private readonly string _baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent()}{httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent()}";
 
         public async Task<IActionResult> Index()
         {
@@ -49,7 +36,7 @@ namespace risk.control.system.Controllers.Agency
         }
 
         [Breadcrumb("Edit Profile", FromAction = nameof(DashboardController.Index), FromController = typeof(DashboardController))]
-        public async Task<IActionResult> Edit(long id)
+        public async Task<IActionResult> Edit([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id)
         {
             try
             {
@@ -90,11 +77,7 @@ namespace risk.control.system.Controllers.Agency
                     await _agencyUserService.LoadModel(model, userEmail);
                     return View(model);
                 }
-                if (sanitisedId != model.Id.ToString())
-                {
-                    _notifyService.Error("OOPS !!!..Contact Admin");
-                    return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
-                }
+
                 var result = await _agencyUserService.UpdateUserAsync(sanitisedId, model, userEmail, _baseUrl);
 
                 if (!result.Success)
@@ -108,7 +91,7 @@ namespace risk.control.system.Controllers.Agency
 
                     return View(model);
                 }
-                _notifyService.Custom($"User profile edited successfully.", 3, "orange", "fas fa-user");
+                _notifyService.Custom($"User <b>{model.Email}</b> updated successfully.", 3, "orange", "fas fa-user");
             }
             catch (Exception ex)
             {

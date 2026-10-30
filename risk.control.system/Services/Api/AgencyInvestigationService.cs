@@ -20,10 +20,12 @@ namespace risk.control.system.Services.Api
 
     internal class AgencyInvestigationService(ApplicationDbContext context,
         IDbContextFactory<ApplicationDbContext> contextFactory,
+        IEncryptionService encryptionService,
         IBase64FileService base64FileService,
         IWeatherInfoService weatherInfoService,
         IWebHostEnvironment env) : IAgencyInvestigationService
     {
+        private readonly IEncryptionService _encryptionService = encryptionService;
         private readonly ApplicationDbContext _context = context;
         private readonly IDbContextFactory<ApplicationDbContext> _contextFactory = contextFactory;
         private readonly IBase64FileService _base64FileService = base64FileService;
@@ -216,7 +218,8 @@ namespace risk.control.system.Services.Api
 
                 return new CaseInvestigationAgencyResponse
                 {
-                    Id = a.Id,
+                    Id = _encryptionService.ProtectId(a.Id),
+                    RawId = a.Id,
                     PolicyId = a.policyId,
                     PolicyNum = a.PolicyNum,
                     Amount = string.Format(culture, "{0:C}", a.SumAssuredValue),
@@ -246,7 +249,7 @@ namespace risk.control.system.Services.Api
             // -----------------------------
             // MARK VIEWED (BULK UPDATE)
             // -----------------------------
-            var newIds = finalData.Where(x => x.IsNewAssigned.HasValue).Select(x => x.Id).ToList();
+            var newIds = finalData.Where(x => x.IsNewAssigned.HasValue).Select(x => x.RawId).ToList();
 
             if (newIds.Any())
             {
@@ -452,7 +455,8 @@ namespace risk.control.system.Services.Api
                 await Task.WhenAll(documentTask, customerPhotoTask, ownerImageTask, ownerEmailTask);
                 return new CaseInvestigationResponse
                 {
-                    Id = a.Id,
+                    Id = _encryptionService.ProtectId(a.Id),
+                    RawId = a.Id,
                     AssignedToAgency = a.IsNewSubmittedToAgent,
                     PolicyId = a.policyId,
                     PolicyNum = a.policyId,
@@ -488,7 +492,7 @@ namespace risk.control.system.Services.Api
             // -------------------------
             var idsToMarkViewed = finalData
                 .Where(x => x.AssignedToAgency)
-                .Select(x => x.Id)
+                .Select(x => x.RawId)
                 .ToList();
 
             if (idsToMarkViewed.Any())
@@ -680,7 +684,7 @@ namespace risk.control.system.Services.Api
 
                 return new CaseInvestigationAgencyResponse
                 {
-                    Id = a.Id,
+                    Id = _encryptionService.ProtectId(a.Id),
                     PolicyId = a.policyId,
                     Amount = string.Format(culture, "{0:C}", a.SumAssuredValue),
                     Company = a.ClientCompanyName,
@@ -877,7 +881,8 @@ namespace risk.control.system.Services.Api
 
                 return new CaseInvestigationAgencyResponse
                 {
-                    Id = a.Id,
+                    Id = _encryptionService.ProtectId(a.Id),
+                    RawId = a.Id,
                     PolicyId = a.policyId,
                     Amount = string.Format(culture, "{0:C}", a.SumAssuredValue),
                     Company = a.ClientCompanyName,
@@ -912,7 +917,7 @@ namespace risk.control.system.Services.Api
             // -----------------------------
             // MARK VIEWED (BULK UPDATE)
             // -----------------------------
-            var newIds = data.Where(x => x.IsNewAssigned.HasValue).Select(x => x.Id).ToList();
+            var newIds = data.Where(x => x.IsNewAssigned.HasValue).Select(x => x.RawId).ToList();
 
             if (newIds.Any())
             {

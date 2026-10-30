@@ -13,29 +13,22 @@ namespace risk.control.system.Controllers.Creator
 {
     [Breadcrumb("Cases")]
     [Authorize(Roles = CREATOR.DISPLAY_NAME)]
-    public class CustomerController : Controller
-    {
-        private readonly ILogger<CustomerController> _logger;
-        private readonly IErrorNotifyService _errorNotifyService;
-        private readonly INavigationService _navigationService;
-        private readonly ICustomerService _customerService;
-        private readonly INotyfService _notifyService;
-
-        public CustomerController(ILogger<CustomerController> logger,
+    public class CustomerController(ILogger<CustomerController> logger,
             IErrorNotifyService errorNotifyService,
+            IEncryptionService encryptionService,
             INavigationService navigationService,
             ICustomerService customerService,
-            INotyfService notifyService)
-        {
-            _logger = logger;
-            _errorNotifyService = errorNotifyService;
-            _navigationService = navigationService;
-            _customerService = customerService;
-            _notifyService = notifyService;
-        }
+            INotyfService notifyService) : Controller
+    {
+        private readonly IEncryptionService _encryptionService = encryptionService;
+        private readonly ILogger<CustomerController> _logger = logger;
+        private readonly IErrorNotifyService _errorNotifyService = errorNotifyService;
+        private readonly INavigationService _navigationService = navigationService;
+        private readonly ICustomerService _customerService = customerService;
+        private readonly INotyfService _notifyService = notifyService;
 
         [HttpGet]
-        public async Task<IActionResult> Create(long id)
+        public async Task<IActionResult> Create([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name!;
             try
@@ -45,7 +38,8 @@ namespace risk.control.system.Controllers.Creator
                     _errorNotifyService.ShowErrorNotification(ModelState, "OOPS!!!.Case Not Found.Try Again");
                     return RedirectToAction(nameof(AddAssignController.Create), ControllerName<AddAssignController>.Name);
                 }
-                ViewData["BreadcrumbNode"] = _navigationService.GetInvestigationPath(id, "Add Customer", nameof(Create), ControllerName<CustomerController>.Name);
+                var encryptedId = _encryptionService.ProtectId(id);
+                ViewData["BreadcrumbNode"] = _navigationService.GetInvestigationPath(encryptedId, "Add Customer", nameof(Create), ControllerName<CustomerController>.Name);
 
                 var model = await _customerService.GetCreateViewModelAsync(id, userEmail);
                 return View(model);
@@ -54,7 +48,8 @@ namespace risk.control.system.Controllers.Creator
             {
                 _logger.LogError(ex, "Error creating customer {Id}. {UserEmail}", id, userEmail);
                 _notifyService.Error("Error creating customer. Try Again");
-                return RedirectToAction(nameof(CreatorController.Details), ControllerName<CreatorController>.Name, new { id = id });
+                var encryptedId = _encryptionService.ProtectId(id);
+                return RedirectToAction(nameof(CreatorController.Details), ControllerName<CreatorController>.Name, new { id = encryptedId });
             }
         }
 
@@ -85,17 +80,17 @@ namespace risk.control.system.Controllers.Creator
                 }
 
                 _notifyService.Custom($"Customer <b>{model.Name}</b> added successfully", 3, "green", "fas fa-user-plus");
-                return RedirectToAction(nameof(CreatorController.Details), ControllerName<CreatorController>.Name, new { id = model.InvestigationTaskId });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error creating customer {Id}. {UserEmail}", model.CustomerDetailId, userEmail);
                 _notifyService.Error("Error creating customer.Try Again");
-                return RedirectToAction(nameof(CreatorController.Details), ControllerName<CreatorController>.Name, new { id = model.InvestigationTaskId });
             }
+            var encryptedId = _encryptionService.ProtectId(model.InvestigationTaskId!.Value);
+            return RedirectToAction(nameof(CreatorController.Details), ControllerName<CreatorController>.Name, new { id = encryptedId });
         }
 
-        public async Task<IActionResult> Edit(long id)
+        public async Task<IActionResult> Edit([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name!;
             try
@@ -108,7 +103,8 @@ namespace risk.control.system.Controllers.Creator
 
                 var model = await _customerService.GetEditViewModelAsync(id, userEmail);
 
-                ViewData["BreadcrumbNode"] = _navigationService.GetInvestigationPath(id, "Edit Customer", nameof(Edit), ControllerName<CustomerController>.Name); ;
+                var encryptedId = _encryptionService.ProtectId(id);
+                ViewData["BreadcrumbNode"] = _navigationService.GetInvestigationPath(encryptedId, "Edit Customer", nameof(Edit), ControllerName<CustomerController>.Name); ;
 
                 return View(model);
             }
@@ -116,13 +112,14 @@ namespace risk.control.system.Controllers.Creator
             {
                 _logger.LogError(ex, "Error getting customer {Id}. {UserEmail}", id, userEmail);
                 _notifyService.Error("Error editing Customer.Try Again");
+                var encryptedId = _encryptionService.ProtectId(id);
                 return RedirectToAction(nameof(CreatorController.Details), ControllerName<CreatorController>.Name, new { id = id });
             }
         }
 
         [ValidateAntiForgeryToken]
         [HttpPost]
-        public async Task<IActionResult> Edit(CustomerDetail model)
+        public async Task<IActionResult> Edit([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id, CustomerDetail model)
         {
             var userEmail = HttpContext.User?.Identity?.Name!;
             try
@@ -133,11 +130,11 @@ namespace risk.control.system.Controllers.Creator
                     await _customerService.PrepareMetadataAsync(model, userEmail);
                     return View(model);
                 }
-                var result = await _customerService.EditAsync(userEmail, model);
+                var (Success, Errors) = await _customerService.EditAsync(userEmail, model);
 
-                if (!result.Success)
+                if (!Success)
                 {
-                    foreach (var error in result.Errors)
+                    foreach (var error in Errors)
                         ModelState.AddModelError(error.Key, error.Value);
 
                     _errorNotifyService.ShowErrorNotification(ModelState);
@@ -146,14 +143,14 @@ namespace risk.control.system.Controllers.Creator
                 }
 
                 _notifyService.Custom($"Customer <b>{model.Name}</b> edited successfully", 3, "orange", "fas fa-user-plus");
-                return RedirectToAction(nameof(CreatorController.Details), ControllerName<CreatorController>.Name, new { id = model.InvestigationTaskId });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error editing customer {Id}. {UserEmail}", model.CustomerDetailId, userEmail);
                 _notifyService.Error("Error edting customer. Try again.");
-                return RedirectToAction(nameof(CreatorController.Details), ControllerName<CreatorController>.Name, new { id = model.InvestigationTaskId });
             }
+            var encryptedId = _encryptionService.ProtectId(id);
+            return RedirectToAction(nameof(CreatorController.Details), ControllerName<CreatorController>.Name, new { id = encryptedId });
         }
     }
 }

@@ -18,30 +18,20 @@ namespace risk.control.system.Controllers.PortalAdmin
 {
     [Breadcrumb(" Users")]
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME}")]
-    public class UserController : Controller
-    {
-        private readonly UserManager<ApplicationUser> userManager;
-        private readonly IFileStorageService fileStorageService;
-        private readonly INotyfService notifyService;
-        private readonly ISmsService smsService;
-        private readonly ApplicationDbContext context;
-        private readonly IFeatureManager featureManager;
-
-        public UserController(UserManager<ApplicationUser> userManager,
+    public class UserController(UserManager<ApplicationUser> userManager,
 
             IFileStorageService fileStorageService,
             INotyfService notifyService,
             IFeatureManager featureManager,
-            ISmsService SmsService,
-            ApplicationDbContext context)
-        {
-            this.userManager = userManager;
-            this.fileStorageService = fileStorageService;
-            this.notifyService = notifyService;
-            smsService = SmsService;
-            this.featureManager = featureManager;
-            this.context = context;
-        }
+            ISmsService smsService,
+            ApplicationDbContext context) : Controller
+    {
+        private readonly UserManager<ApplicationUser> _userManager = userManager;
+        private readonly IFileStorageService _fileStorageService = fileStorageService;
+        private readonly INotyfService _notifyService = notifyService;
+        private readonly ISmsService _smsService = smsService;
+        private readonly ApplicationDbContext _context = context;
+        private readonly IFeatureManager _featureManager = featureManager;
 
         public IActionResult Index()
         {
@@ -51,7 +41,7 @@ namespace risk.control.system.Controllers.PortalAdmin
         [Breadcrumb(" Create")]
         public IActionResult Create()
         {
-            ViewData["CountryId"] = new SelectList(context.Country, "CountryId", "Name");
+            ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
             return View();
         }
 
@@ -61,7 +51,7 @@ namespace risk.control.system.Controllers.PortalAdmin
         {
             if (user.ProfileImage != null && user.ProfileImage.Length > 0)
             {
-                var (fileName, relativePath) = await fileStorageService.SaveAsync(user.ProfileImage, "admin", "user");
+                var (fileName, relativePath) = await _fileStorageService.SaveAsync(user.ProfileImage, "admin", "user");
                 user.ProfilePictureUrl = relativePath;
                 user.ProfilePictureExtension = Path.GetExtension(fileName);
             }
@@ -75,20 +65,20 @@ namespace risk.control.system.Controllers.PortalAdmin
             user.StateId = user.SelectedStateId;
             user.DistrictId = user.SelectedDistrictId;
             user.CountryId = user.SelectedCountryId;
-            IdentityResult result = await userManager.CreateAsync(user, user.Password!);
+            IdentityResult result = await _userManager.CreateAsync(user, user.Password!);
             if (!result.Succeeded)
             {
-                notifyService.Error("Error to create user!");
+                _notifyService.Error("Error to create user!");
                 foreach (IdentityError error in result.Errors)
                     ModelState.AddModelError("", error.Description);
                 return View(user);
             }
-            var roles = await userManager.GetRolesAsync(user);
-            var roleResult = await userManager.RemoveFromRolesAsync(user, roles);
-            await userManager.AddToRoleAsync(user, user.Role.ToString()!);
-            notifyService.Custom($"User created successfully.", 3, "green", "fas fa-user-plus");
-            var country = await context.Country.FirstOrDefaultAsync(c => c.CountryId == user.CountryId);
-            await smsService.DoSendSmsAsync(country!.Code, country.ISDCode + user.PhoneNumber, "User created. \nEmail : " + user.Email);
+            var roles = await _userManager.GetRolesAsync(user);
+            var roleResult = await _userManager.RemoveFromRolesAsync(user, roles);
+            await _userManager.AddToRoleAsync(user, user.Role.ToString()!);
+            _notifyService.Custom($"User created successfully.", 3, "green", "fas fa-user-plus");
+            var country = await _context.Country.FirstOrDefaultAsync(c => c.CountryId == user.CountryId);
+            await _smsService.DoSendSmsAsync(country!.Code, country.ISDCode + user.PhoneNumber, "User created. \nEmail : " + user.Email);
             return RedirectToAction(nameof(Index));
         }
 
@@ -99,10 +89,10 @@ namespace risk.control.system.Controllers.PortalAdmin
             {
                 return NotFound();
             }
-            var applicationUser = await context.ApplicationUser.AsNoTracking()
+            var applicationUser = await _context.ApplicationUser.AsNoTracking()
                 .Include(u => u.Country)
                 .FirstOrDefaultAsync(c => c.Id == id);
-            applicationUser!.IsPasswordChangeRequired = await featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION) ? !applicationUser.IsPasswordChangeRequired : true;
+            applicationUser!.IsPasswordChangeRequired = await _featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION) ? !applicationUser.IsPasswordChangeRequired : true;
             return View(applicationUser);
         }
 
@@ -110,17 +100,17 @@ namespace risk.control.system.Controllers.PortalAdmin
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteImage(string id)
         {
-            var user = await context.ApplicationUser.FirstOrDefaultAsync(a => a.Id.ToString() == id);
+            var user = await _context.ApplicationUser.FirstOrDefaultAsync(a => a.Id.ToString() == id);
             if (user is not null)
             {
                 user.Updated = DateTime.UtcNow;
                 user.UpdatedBy = HttpContext.User?.Identity?.Name;
                 user.ProfilePictureUrl = null;
-                await context.SaveChangesAsync();
-                notifyService.Success($"Image deleted successfully.", 3);
+                await _context.SaveChangesAsync();
+                _notifyService.Success($"Image deleted successfully.", 3);
                 return Ok(new { message = "succes", succeeded = true });
             }
-            notifyService.Error("image not found!");
+            _notifyService.Error("image not found!");
             return NotFound("failed");
         }
 
@@ -130,41 +120,41 @@ namespace risk.control.system.Controllers.PortalAdmin
         {
             if (id != applicationUser.Id.ToString())
             {
-                notifyService.Error("user not found!");
+                _notifyService.Error("user not found!");
                 return NotFound();
             }
             try
             {
-                var user = await userManager.FindByIdAsync(id);
+                var user = await _userManager.FindByIdAsync(id);
                 if (user == null)
                 {
-                    notifyService.Error("user not found!");
+                    _notifyService.Error("user not found!");
                     return NotFound();
                 }
                 if (applicationUser?.ProfileImage != null && applicationUser.ProfileImage.Length > 0)
                 {
-                    var (fileName, relativePath) = await fileStorageService.SaveAsync(user.ProfileImage!, "admin", "user");
+                    var (fileName, relativePath) = await _fileStorageService.SaveAsync(user.ProfileImage!, "admin", "user");
                     user.ProfilePictureUrl = relativePath;
                     user.ProfilePictureExtension = Path.GetExtension(fileName);
                 }
                 UpdateUser(user, applicationUser!);
-                var result = await userManager.UpdateAsync(user);
+                var result = await _userManager.UpdateAsync(user);
                 if (!result.Succeeded)
                 {
-                    notifyService.Error("user not found!");
+                    _notifyService.Error("user not found!");
                     return NotFound();
                 }
-                var roles = await userManager.GetRolesAsync(user);
-                var roleResult = await userManager.RemoveFromRolesAsync(user, roles);
-                await userManager.AddToRoleAsync(user, user.Role.ToString()!);
-                var country = await context.Country.FirstOrDefaultAsync(c => c.CountryId == user.CountryId);
-                await smsService.DoSendSmsAsync(country!.Code, country.ISDCode + user.PhoneNumber, "User edited. \nEmail : " + user.Email);
-                notifyService.Custom($"User edited successfully.", 3, "orange", "fas fa-user-check");
+                var roles = await _userManager.GetRolesAsync(user);
+                var roleResult = await _userManager.RemoveFromRolesAsync(user, roles);
+                await _userManager.AddToRoleAsync(user, user.Role.ToString()!);
+                var country = await _context.Country.FirstOrDefaultAsync(c => c.CountryId == user.CountryId);
+                await _smsService.DoSendSmsAsync(country!.Code, country.ISDCode + user.PhoneNumber, "User edited. \nEmail : " + user.Email);
+                _notifyService.Custom($"User edited successfully.", 3, "orange", "fas fa-user-check");
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception)
             {
-                notifyService.Error("Error !!. The user con't be edited!");
+                _notifyService.Error("Error !!. The user con't be edited!");
                 return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
             }
         }
@@ -197,18 +187,18 @@ namespace risk.control.system.Controllers.PortalAdmin
 
                 if (id <= 0)
                 {
-                    notifyService.Error("Not Found!!!..Contact Admin");
+                    _notifyService.Error("Not Found!!!..Contact Admin");
                     return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
                 }
-                var appUser = await context.ApplicationUser.FindAsync(id);
-                context.ApplicationUser.Remove(appUser!);
+                var appUser = await _context.ApplicationUser.FindAsync(id);
+                _context.ApplicationUser.Remove(appUser!);
 
-                await context.SaveChangesAsync();
+                await _context.SaveChangesAsync();
                 return Json(new { success = true, message = "User deleted successfully!" });
             }
             catch (Exception)
             {
-                notifyService.Error("Error deleting user. Try again.");
+                _notifyService.Error("Error deleting user. Try again.");
                 return Json(new { success = false, message = "Error deleting user. Try again." });
             }
         }
