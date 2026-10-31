@@ -172,7 +172,6 @@ public static class BusinessServiceExtension
         services.AddScoped<IHttpClientService, HttpClientService>();
         services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
         services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
-        services.AddHttpContextAccessor();
         return services;
     }
 }
