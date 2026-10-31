@@ -5,15 +5,20 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using risk.control.system.AppConstant;
 using risk.control.system.Models;
+using risk.control.system.Services.Common;
 using SmartBreadcrumbs.Attributes;
 
 namespace risk.control.system.Controllers.CompanyAdmin
 {
     [Breadcrumb("Company Settings ")]
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME}")]
-    public class AuditController(ApplicationDbContext context) : Controller
+    public class AuditController(
+        ApplicationDbContext context,
+        IEncryptionService encryptionService
+        ) : Controller
     {
         private readonly ApplicationDbContext _context = context;
+        private readonly IEncryptionService _encryptionService = encryptionService;
 
         // GET: Audit
         public IActionResult Index()
@@ -67,16 +72,31 @@ namespace risk.control.system.Controllers.CompanyAdmin
             var lambda = Expression.Lambda<Func<Audit, object>>(Expression.Convert(propertyExpression, typeof(object)), parameter);
             query = isAscending ? query.OrderBy(lambda) : query.OrderByDescending(lambda);
             int totalRecords = await query.CountAsync();
-            var rawData = await query.Skip(start).Take(length).Select(p => new { p.Id, p.UserId, p.TableName, p.Type, p.DateTime, p.OldValues, p.NewValues }).ToListAsync();
-            var data = rawData.Select(p => new { p.Id, p.UserId, p.TableName, p.Type, DateTime = p.DateTime, OldValues = p.OldValues ?? "", p.NewValues }).ToList();
-            return Json(new { draw = draw, recordsTotal = totalRecords, recordsFiltered = totalRecords, data = data });
+            var data = await query.Skip(start).Take(length).Select(p => new
+            {
+                Id = _encryptionService.ProtectId(p.Id),
+                p.UserId,
+                p.TableName,
+                p.Type,
+                DateTime = p.DateTime,
+                OldValues = p.OldValues ?? "",
+                p.NewValues
+            }).ToListAsync();
+
+            return Json(new
+            {
+                draw = draw,
+                recordsTotal = totalRecords,
+                recordsFiltered = totalRecords,
+                data = data
+            });
         }
 
         // GET: Audit/Details/5
         [Breadcrumb("Detail ", FromAction = nameof(Profile))]
-        public async Task<IActionResult> Detail(int? id)
+        public async Task<IActionResult> Detail([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] int id)
         {
-            if (id == null || _context.AuditLogs == null)
+            if (id <= 0)
             {
                 return NotFound();
             }
@@ -89,121 +109,6 @@ namespace risk.control.system.Controllers.CompanyAdmin
             }
 
             return View(audit);
-        }
-
-        // GET: Audit/Create
-        public IActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: Audit/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,UserId,Type,TableName,DateTime,OldValues,NewValues,AffectedColumns,PrimaryKey")] Audit audit)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Add(audit);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(audit);
-        }
-
-        // GET: Audit/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null || _context.AuditLogs == null)
-            {
-                return NotFound();
-            }
-
-            var audit = await _context.AuditLogs.FindAsync(id);
-            if (audit == null)
-            {
-                return NotFound();
-            }
-            return View(audit);
-        }
-
-        // POST: Audit/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(long id, [Bind("Id,UserId,Type,TableName,DateTime,OldValues,NewValues,AffectedColumns,PrimaryKey")] Audit audit)
-        {
-            if (id != audit.Id)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(audit);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!AuditExists(audit.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(audit);
-        }
-
-        // GET: Audit/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null || _context.AuditLogs == null)
-            {
-                return NotFound();
-            }
-
-            var audit = await _context.AuditLogs
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (audit == null)
-            {
-                return NotFound();
-            }
-
-            return View(audit);
-        }
-
-        // POST: Audit/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            if (_context.AuditLogs == null)
-            {
-                return Problem("Entity set 'ApplicationDbContext.AuditLogs'  is null.");
-            }
-            var audit = await _context.AuditLogs.FindAsync(id);
-            if (audit != null)
-            {
-                _context.AuditLogs.Remove(audit);
-            }
-
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        private bool AuditExists(long id)
-        {
-            return (_context.AuditLogs?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }

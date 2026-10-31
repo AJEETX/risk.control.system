@@ -72,7 +72,7 @@ namespace risk.control.system.Middleware
             await _next(context);
         }
 
-        private string ExtractJwtToken(HttpContext context)
+        private static string ExtractJwtToken(HttpContext context)
         {
             var authHeader = context.Request.Headers["Authorization"].FirstOrDefault();
             if (!string.IsNullOrEmpty(authHeader) && authHeader.StartsWith("Bearer "))
