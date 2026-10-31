@@ -4925,3 +4925,67 @@ td.expand-btn-cell * {
         background-color: #ced4da;
         border-radius: 6px;
     }
+@keyframes bellRing {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    10% {
+        transform: rotate(14deg);
+    }
+
+    20% {
+        transform: rotate(-14deg);
+    }
+
+    30% {
+        transform: rotate(14deg);
+    }
+
+    40% {
+        transform: rotate(-14deg);
+    }
+
+    50% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(0deg);
+    }
+}
+
+.ring-bell {
+    display: inline-block;
+    transform-origin: top center;
+    animation: bellRing 1.5s ease infinite;
+}
+@keyframes badgeRing {
+  0% { transform: rotate(0deg); }
+  10% { transform: rotate(12deg); }
+  20% { transform: rotate(-12deg); }
+  30% { transform: rotate(12deg); }
+  40% { transform: rotate(-12deg); }
+  50% { transform: rotate(0deg); }
+  100% { transform: rotate(0deg); }
+}
+
+.ring-badge {
+  display: inline-block;
+  transform-origin: top center;
+  animation: badgeRing 1.5s ease infinite;
+}
+@keyframes pointShake {
+    0%, 100% {
+        transform: translateX(0);
+    }
+
+    50% {
+        transform: translateX(3px);
+    }
+}
+
+.shake-hand {
+    display: inline-block;
+    animation: pointShake 0.8s ease-in-out infinite;
+}

@@ -66,9 +66,13 @@ namespace risk.control.system.Services.AgencyAdmin
                 context.Investigations.Update(caseTask);
                 var rowsUpdated = await context.SaveChangesAsync(null, false) > 0;
                 await timelineService.UpdateTaskStatus(caseTask.Id, userEmail);
-                _backgroundJobClient.Enqueue(() => _pdfReportService.GenerateAgencyReport(caseId));
 
-                return rowsUpdated ? true : false;
+                if (caseTask.AiEnabled)
+                {
+                    _backgroundJobClient.Enqueue(() => _pdfReportService.GenerateAgencyReport(caseId));
+                }
+
+                return rowsUpdated;
             }
             catch (Exception ex)
             {

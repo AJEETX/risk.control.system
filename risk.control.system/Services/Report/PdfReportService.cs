@@ -1,13 +1,11 @@
-﻿using System.IO.Compression;
-using Amazon.S3;
-using Amazon.S3.Model;
-using Gehtsoft.PDFFlow.Builder;
+﻿using Gehtsoft.PDFFlow.Builder;
 using Gehtsoft.PDFFlow.Models.Enumerations;
 using Hangfire;
 using Microsoft.EntityFrameworkCore;
 using risk.control.system.AppConstant;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
+using risk.control.system.Services.AgencyAdmin;
 using risk.control.system.Services.Agentic;
 using risk.control.system.Services.Common;
 namespace risk.control.system.Services.Report
@@ -19,7 +17,7 @@ namespace risk.control.system.Services.Report
     }
 
     internal class PdfReportService(
-        IAmazonS3 s3Client,
+        IAwsS3Service awsS3Service,
         ApplicationDbContext context,
         IWebHostEnvironment env,
         IPdfGenerateReportService pdfGenerate,
@@ -35,7 +33,7 @@ namespace risk.control.system.Services.Report
         private readonly IFileStorageService _fileStorageService = fileStorageService;
         private readonly IAgenticService _agenticService = agenticService;
         private readonly IPdfGenerateDetailReportService _pdfGenerateDetail = pdfGenerateDetail;
-        private readonly IAmazonS3 _s3Client = s3Client;
+        private readonly IAwsS3Service _awsS3Service = awsS3Service;
         private readonly IPdfGenerateCaseDetailService _caseDetailService = caseDetailService;
         private readonly ILogger<PdfReportService> _logger = logger;
         [AutomaticRetry(Attempts = 0)]
@@ -147,7 +145,7 @@ namespace risk.control.system.Services.Report
                 {
                     var sourceFolderPath = Path.GetFullPath(Path.Combine(_env.ContentRootPath, CONSTANTS.DOCUMENT, CONSTANTS.CASE, policy.ContractNumber, CONSTANTS.REPORT));
                     var s3KeyName = $"backups/{policy.ContractNumber}/{CONSTANTS.AGENCY_REPORT_ZIP_FILENAME}";
-                    await ZipAndUploadToS3Async(sourceFolderPath, s3KeyName);
+                    await _awsS3Service.ZipAndUploadToS3Async(sourceFolderPath, s3KeyName);
 
                     await _agenticService.StartAiProcessAsync(policy!.ContractNumber);
                 }
@@ -157,59 +155,6 @@ namespace risk.control.system.Services.Report
             {
                 _logger.LogError(ex, "Error occurred  while generating PDF report for InvestigationTaskId: {InvestigationTaskId}", investigationTaskId);
                 throw; // Rethrow the exception to be handled by Hangfire or the calling method
-            }
-        }
-        private async Task<bool> ZipAndUploadToS3Async(string sourceFolder, string s3Key)
-        {
-            try
-            {
-                if (!(await Amazon.S3.Util.AmazonS3Util.DoesS3BucketExistV2Async(_s3Client, EnvHelper.Get(CONSTANTS.S3_BUCKET))))
-                {
-                    var putBucketRequest = new PutBucketRequest { BucketName = EnvHelper.Get(CONSTANTS.S3_BUCKET), UseClientRegion = true };
-
-                    await _s3Client.PutBucketAsync(putBucketRequest);
-
-                    var publicAccessBlockRequest = new PutPublicAccessBlockRequest
-                    {
-                        BucketName = EnvHelper.Get(CONSTANTS.S3_BUCKET),
-                        PublicAccessBlockConfiguration = new PublicAccessBlockConfiguration
-                        {
-                            BlockPublicAcls = true,
-                            BlockPublicPolicy = true,
-                            IgnorePublicAcls = true,
-                            RestrictPublicBuckets = true
-                        }
-                    };
-                    await _s3Client.PutPublicAccessBlockAsync(publicAccessBlockRequest);
-                }
-
-                await using var memoryStream = new MemoryStream();
-
-                ZipFile.CreateFromDirectory(sourceFolder, memoryStream, CompressionLevel.Optimal, includeBaseDirectory: false);
-                memoryStream.Position = 0;
-
-                var putRequest = new PutObjectRequest
-                {
-                    BucketName = EnvHelper.Get(CONSTANTS.S3_BUCKET),
-                    Key = s3Key,
-                    InputStream = memoryStream,
-                    ContentType = CONSTANTS.ZIP_CONTENT_TYPE,
-                };
-
-                PutObjectResponse response = await _s3Client.PutObjectAsync(putRequest);
-                return (response.HttpStatusCode == System.Net.HttpStatusCode.OK);
-            }
-            catch (AmazonS3Exception ex) when (ex.StatusCode == System.Net.HttpStatusCode.PreconditionFailed)
-            {
-                // The object already exists, handle accordingly
-                _logger.LogError(ex, "Error occurred while zipping and uploading to S3.");
-                return false;
-            }
-            catch (Exception ex)
-            {
-                // Log the exception or handle it as needed
-                _logger.LogError(ex, "Error occurred while zipping and uploading to S3.");
-                return false;
             }
         }
     }

@@ -27,20 +27,20 @@
 					<i class="fas fa-info-circle"></i>
 					<span class="tooltip-text" id="information">
 						<li>
-							<i class='far fa-hand-point-right'></i>
+							<i class='far fa-hand-point-right shake-hand'></i>
 							<button class="btn btn-warning btn-xs"><i class="far fa-file-powerpoint"></i>  Edit Case</button>
 						</li>
 						@if (customerExist)
 						{
 							<li>
-								<i class='far fa-hand-point-right'></i>
+								<i class='far fa-hand-point-right shake-hand'></i>
 								<button class="btn btn-warning btn-xs"><i class="fa fa-user-plus"></i>  Edit Customer</button>
 							</li>
 						}
 						else
 						{
 							<li>
-								<i class='far fa-hand-point-right'></i>
+								<i class='far fa-hand-point-right shake-hand'></i>
 								<a class="btn btn-success btn-xs"><i class="fa fa-user-plus"></i> Add Customer</a>
 							</li>
 						}
@@ -48,21 +48,21 @@
 						@if (!customerExist && !beneficiaryExist)
 						{
 							<li>
-								<i class='far fa-hand-point-right'></i>
+								<i class='far fa-hand-point-right shake-hand'></i>
 								<a class="btn btn-outline-secondary btn-xs beneficiary-not-exist"><i class="fas fa-user-tie"></i> Beneficiary</a>
 							</li>
 						}
 						else if (customerExist && !beneficiaryExist)
 						{
 							<li>
-								<i class='far fa-hand-point-right'></i>
+								<i class='far fa-hand-point-right shake-hand'></i>
 								<a class="btn btn-success btn-xs"><i class="fas fa-user-tie"></i> Add Beneficiary</a>
 							</li>
 						}
 						else if (customerExist && beneficiaryExist)
 						{
 							<li>
-								<i class='far fa-hand-point-right'></i>
+								<i class='far fa-hand-point-right shake-hand'></i>
 								<button class="btn btn-warning btn-xs"><i class="fas fa-user-tie"></i> Edit Beneficiary</button>
 							</li>
 						}

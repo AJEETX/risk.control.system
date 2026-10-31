@@ -9,7 +9,7 @@
                 <i class="fas fa-info-circle"></i>
                 <span class="tooltip-text" id="information">
                     <span>
-                        <i class='far fa-hand-point-right'></i>
+                        <i class='far fa-hand-point-right shake-hand'></i>
                         <b> @Model.ClaimsInvestigation?.Vendor?.Email</b> report  (@Model.ClaimsInvestigation?.PolicyDetail?.InsuranceType?.GetEnumDisplayName())<i class="fas fa-print nav-icon"></i>.
                     </span>
 
@@ -18,9 +18,9 @@
         </h3>
         <div class="card-tools">
             <span data-bs-toggle="tooltip" title="Agency report (@Model.ClaimsInvestigation?.PolicyDetail?.InsuranceType?.GetEnumDisplayName()): @Model.ClaimsInvestigation?.Vendor!.Email" class="badge badge-light">
-                <i class='far fa-hand-point-right'></i>
+                <i class='far fa-hand-point-right shake-hand'></i>
             </span>
-            <button type="button" class="btn btn-sm btn-light border" data-card-widget="collapse">
+            <button type="button" class="btn btn-sm btn-light border-secondary" data-card-widget="collapse">
                 <i class="fas fa-plus"></i>
             </button>
         </div>
@@ -63,7 +63,7 @@
                                 <span data-bs-toggle="tooltip" title="submitted time" class="badge badge-light">
                                     <i class="nav-icon fas fa-clock"></i>@questionTime
                                 </span>
-                                <button type="button" class="btn btn-sm btn-light border" data-card-widget="collapse">
+                                <button type="button" class="btn btn-sm btn-light border-secondary" data-card-widget="collapse">
                                     <i class="fas fa-plus"></i>
                                 </button>
                             </div>
@@ -130,7 +130,7 @@
                                 <span data-bs-toggle="tooltip" title=" submitted time" class="badge badge-light">
                                     <i class="nav-icon fas fa-clock"></i> @Model?.ClaimsInvestigation.InvestigationReport?.SupervisorRemarksUpdated!.Value.ToLocalTime().ToString("dd-MMM-yy HH:mm")
                                 </span>
-                                <button type="button" class="btn btn-sm btn-light border" data-card-widget="collapse">
+                                <button type="button" class="btn btn-sm btn-light border-secondary" data-card-widget="collapse">
                                     <i class="fas fa-plus"></i>
                                 </button>
                             </div>

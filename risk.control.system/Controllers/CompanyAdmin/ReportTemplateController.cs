@@ -6,6 +6,7 @@ using risk.control.system.AppConstant;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
+using risk.control.system.Services.Common;
 using risk.control.system.Services.Report;
 using SmartBreadcrumbs.Attributes;
 
@@ -13,9 +14,15 @@ namespace risk.control.system.Controllers.CompanyAdmin
 {
     [Breadcrumb("Company Settings")]
     [Authorize(Roles = $"{CREATOR.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME}")]
-    public class ReportTemplateController(ApplicationDbContext context, ICloneReportService cloneService, INotyfService notifyService, ILogger<ReportTemplateController> logger) : Controller
+    public class ReportTemplateController(
+        ApplicationDbContext context,
+        IEncryptionService encryptionService,
+        ICloneReportService cloneService,
+        INotyfService notifyService,
+        ILogger<ReportTemplateController> logger) : Controller
     {
         private readonly ApplicationDbContext _context = context;
+        private readonly IEncryptionService _encryptionService = encryptionService;
         private readonly ICloneReportService _cloneService = cloneService;
         private readonly INotyfService _notifyService = notifyService;
         private readonly ILogger<ReportTemplateController> _logger = logger;
@@ -88,7 +95,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             var data = await query.Skip(skip).Take(pageSize)
                 .Select(t => new
                 {
-                    id = t.Id,
+                    id = _encryptionService.ProtectId(t.Id),
                     name = t.Name,
                     insuranceType = t.InsuranceType.GetEnumDisplayName(),
                     serviceType = t.InvestigationServiceType.Name,
@@ -120,7 +127,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
         }
 
         [Breadcrumb(" Detail", FromAction = nameof(Profile))]
-        public async Task<IActionResult> Details(long id)
+        public async Task<IActionResult> Details([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id)
         {
             var template = await _context.ReportTemplates.Include(r => r.LocationReport).ThenInclude(l => l.AgentIdReport).Include(r => r.LocationReport).ThenInclude(l => l.MediaReports).Include(r => r.LocationReport).ThenInclude(l => l.FaceIds)
                 .Include(r => r.LocationReport).ThenInclude(l => l.DocumentIds).Include(r => r.LocationReport).ThenInclude(l => l.Questions).FirstOrDefaultAsync(r => r.Id == id);
@@ -133,7 +140,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CloneDetails(long templateId)
+        public async Task<IActionResult> CloneDetails([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long templateId)
         {
             if (!ModelState.IsValid)
             {
@@ -155,14 +162,13 @@ namespace risk.control.system.Controllers.CompanyAdmin
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Issue cloning {TemplateId} . {UserEmail}", templateId, HttpContext.User?.Identity?.Name);
-                _notifyService.Error($"Issue cloning Report. Try again.");
-                return RedirectToAction(nameof(Profile));
+                return Json(new { success = false, message = "Report clone failed!" });
             }
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Activate(long id)
+        public async Task<IActionResult> Activate([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id)
         {
             if (!ModelState.IsValid)
             {
@@ -190,7 +196,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteTemplate(long id)
+        public async Task<IActionResult> DeleteTemplate([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id)
         {
             if (!ModelState.IsValid)
             {
@@ -398,7 +404,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CloneLocation(long locationId, long reportTemplateId)
+        public async Task<IActionResult> CloneLocation(long locationId, [ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long reportTemplateId)
         {
             try
             {

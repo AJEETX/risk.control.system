@@ -10,16 +10,21 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using risk.control.system.AppConstant;
 using risk.control.system.Models;
-
+using risk.control.system.Services.Common;
 using SmartBreadcrumbs.Attributes;
 
 namespace risk.control.system.Controllers.CompanyAdmin
 {
     [Breadcrumb("General Setup")]
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME}")]
-    public class PinCodesController(ApplicationDbContext context, INotyfService notifyService, ILogger<PinCodesController> logger) : Controller
+    public class PinCodesController(
+        ApplicationDbContext context,
+        IEncryptionService encryptionService,
+        INotyfService notifyService,
+        ILogger<PinCodesController> logger) : Controller
     {
         private readonly ApplicationDbContext _context = context;
+        private readonly IEncryptionService _encryptionService = encryptionService;
         private readonly INotyfService _notifyService = notifyService;
         private readonly ILogger<PinCodesController> _logger = logger;
 

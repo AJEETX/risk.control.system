@@ -8,10 +8,10 @@
                 <i class="fas fa-headset text-primary me-2"></i> Audio Call History
             </h5>
             <div class="card-tools d-flex align-items-center gap-2">
-                <span class="badge bg-light text-secondary border px-2 py-1 rounded-pill">
+                <span class="badge bg-light text-secondary border px-2 py-1 rounded-pill @((Model?.Count ?? 0) > 0 ? "ring-badge" : "")">
                     <i class="fas fa-phone-alt me-1 text-muted"></i> @(Model?.Count ?? 0) Calls
                 </span>
-                <button type="button" class="btn btn-sm btn-light border" data-card-widget="collapse">
+                <button type="button" class="btn btn-sm btn-light border-secondary" data-card-widget="collapse">
                     <i class="fas fa-plus"></i>
                 </button>
             </div>

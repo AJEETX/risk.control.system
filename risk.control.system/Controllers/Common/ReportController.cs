@@ -26,14 +26,8 @@ namespace risk.control.system.Controllers.Common
                     return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
                 }
 
-                var claim = await _reportPdfService.GetClaimPdfReport(userEmail, id);
+                var (fileName, memory) = await _reportPdfService.PrintPdfReport(userEmail, id);
 
-                var fileName = Path.GetFileName(claim.ClaimsInvestigation!.InvestigationReport!.PdfReportFilePath);
-                var memory = new MemoryStream();
-                using var stream = new FileStream(claim.ClaimsInvestigation.InvestigationReport.PdfReportFilePath!, FileMode.Open);
-                await stream.CopyToAsync(memory);
-                memory.Position = 0;
-                //notifyService.Success($"Policy {claim.PolicyDetail.ContractNumber} Report download success !!!");
                 return File(memory, "application/pdf", fileName);
             }
             catch (Exception ex)

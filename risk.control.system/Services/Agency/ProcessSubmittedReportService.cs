@@ -75,8 +75,10 @@ namespace risk.control.system.Services.Agency
                 var rowsAffected = await context.SaveChangesAsync(null, false) > 0;
 
                 await timelineService.UpdateTaskStatus(caseTask.Id, userEmail);
-
-                _backgroundJobClient.Enqueue(() => _pdfReportService.GenerateAgencyReport(caseId));
+                if (caseTask.AiEnabled)
+                {
+                    _backgroundJobClient.Enqueue(() => _pdfReportService.GenerateAgencyReport(caseId));
+                }
 
                 return rowsAffected ? caseTask : null!;
             }

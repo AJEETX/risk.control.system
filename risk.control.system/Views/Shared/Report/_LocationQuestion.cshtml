@@ -7,76 +7,92 @@
 <!-- Questions Table -->
 @if (location.Questions?.Any() == true)
 {
-	<div class="table-responsive mb-4">
+	<div class="card mb-2 border @location.StatusClass @location.LocationStatus  collapsed-card">
+		<div class="card-header bg-light text-white d-flex">
+			<h5 class="mb-0 flex-grow-1 @location.StatusClass">
+				<i class="fas fa-watchman-monitoring"></i> Questionaire
+			</h5>
+			<div class="card-tools">
+				<span data-bs-toggle="tooltip" title="Questionaire" class="badge badge-light">
+					<i class='far fa-hand-point-right shake-hand'></i>
+				</span>
+				<button type="button" class="btn btn-sm @location.LocationStatus" data-card-widget="collapse">
+					<i class="fas fa-plus"></i>
+				</button>
+			</div>
+		</div>
+		<div class="card-body">
+		<div class="table-responsive mb-4">
 
-		<input type="hidden" name="LocationId" value="@location.Id" />
-		<input type="hidden" name="caseId" value="@Model.CaseId" />
+			<input type="hidden" name="LocationId" value="@location.Id" />
+			<input type="hidden" name="caseId" value="@Model.CaseId" />
 
-		<table class="table table-bordered table-striped">
-			<thead class="thead-light">
-				<tr>
-					<th>Question</th>
-					<th>Answer</th>
-				</tr>
-			</thead>
-			<tbody>
-				@for (int i = 0; i < location.Questions.Count; i++)
-				{
-					var question = location.Questions[i];
-					var required = question.IsRequired ? "required" : "";
+			<table class="table table-bordered table-striped">
+				<thead class="thead-light">
 					<tr>
-						<td>
-							@question.QuestionText
-							@if (question.IsRequired)
-							{
-								<span class="required-asterisk" title="Required field" data-bs-toggle="tooltip">*</span>
-							}
-
-							@* Hidden fields to pass extra data back *@
-							<input type="hidden" name="Questions[@i].Id" value="@question.Id" />
-							<input type="hidden" name="Questions[@i].QuestionText" value="@question.QuestionText" />
-							<input type="hidden" name="Questions[@i].QuestionType" value="@question.QuestionType" />
-							<input type="hidden" name="Questions[@i].Options" value="@question.Options" />
-							<input type="hidden" name="Questions[@i].IsRequired" value="@(question.IsRequired.ToString().ToLower())" />
-						</td>
-						<td>
-							@if (question.QuestionType == "text")
-							{
-								<span class="form-control-plaintext">@question.AnswerText</span>
-							}
-							else if (question.QuestionType == "date")
-							{
-								<span class="form-control-plaintext">
-									@(DateTimeOffset.TryParse(question.AnswerText, out var dto)
-															? dto.ToLocalTime().ToString("dd-MMM-yy hh:mm tt")
-															: question.AnswerText)
-							</span>
-							}
-							else if (question.QuestionType == "radio" || question.QuestionType == "dropdown")
-							{
-								<span class="form-control-plaintext">@question.AnswerText</span>
-							}
-							else if (question.QuestionType == "checkbox")
-							{
-								var selectedOptions = question.AnswerText?.Split(',') ?? new string[] { };
-								<ul class="list-unstyled mb-0">
-									@foreach (var option in selectedOptions)
-									{
-										<li><i class="bi bi-check-circle-fill text-success"></i> @option</li>
-									}
-								</ul>
-							}
-							else
-							{
-								<span class="form-control-plaintext text-muted">N/A</span>
-							}
-						</td>
-
+						<th>Question</th>
+						<th>Answer</th>
 					</tr>
-				}
-			</tbody>
-		</table>
-	</div>
+				</thead>
+				<tbody>
+					@for (int i = 0; i < location.Questions.Count; i++)
+					{
+						var question = location.Questions[i];
+						var required = question.IsRequired ? "required" : "";
+						<tr>
+							<td>
+								@question.QuestionText
+								@if (question.IsRequired)
+								{
+									<span class="required-asterisk" title="Required field" data-bs-toggle="tooltip">*</span>
+								}
 
+								@* Hidden fields to pass extra data back *@
+								<input type="hidden" name="Questions[@i].Id" value="@question.Id" />
+								<input type="hidden" name="Questions[@i].QuestionText" value="@question.QuestionText" />
+								<input type="hidden" name="Questions[@i].QuestionType" value="@question.QuestionType" />
+								<input type="hidden" name="Questions[@i].Options" value="@question.Options" />
+								<input type="hidden" name="Questions[@i].IsRequired" value="@(question.IsRequired.ToString().ToLower())" />
+							</td>
+							<td>
+								@if (question.QuestionType == "text")
+								{
+									<span class="form-control-plaintext">@question.AnswerText</span>
+								}
+								else if (question.QuestionType == "date")
+								{
+									<span class="form-control-plaintext">
+										@(DateTimeOffset.TryParse(question.AnswerText, out var dto)
+																? dto.ToLocalTime().ToString("dd-MMM-yy hh:mm tt")
+																: question.AnswerText)
+								</span>
+								}
+								else if (question.QuestionType == "radio" || question.QuestionType == "dropdown")
+								{
+									<span class="form-control-plaintext">@question.AnswerText</span>
+								}
+								else if (question.QuestionType == "checkbox")
+								{
+									var selectedOptions = question.AnswerText?.Split(',') ?? new string[] { };
+									<ul class="list-unstyled mb-0">
+										@foreach (var option in selectedOptions)
+										{
+											<li><i class="bi bi-check-circle-fill text-success"></i> @option</li>
+										}
+									</ul>
+								}
+								else
+								{
+									<span class="form-control-plaintext text-muted">N/A</span>
+								}
+							</td>
+
+						</tr>
+					}
+				</tbody>
+			</table>
+		</div>
+		</div>
+    </div>
 }
 

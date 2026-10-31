@@ -20,7 +20,7 @@ namespace risk.control.system.Services.Report
 
         public async Task<string> BuildInvestigationPdfReport(InvestigationTask investigation, PolicyDetail policy, CustomerDetail customer, BeneficiaryDetail beneficiary, ReportTemplate investigationReport, Vendor vendor)
         {
-            string ReportFilePath = Path.GetFullPath(Path.Combine(_env.ContentRootPath, CONSTANTS.DOCUMENT, CONSTANTS.CASE, policy.ContractNumber, CONSTANTS.REPORT_FILENAME));
+            string ReportFilePath = Path.Combine(_env.ContentRootPath, CONSTANTS.DOCUMENT, CONSTANTS.CASE, policy.ContractNumber, CONSTANTS.REPORT_FILENAME);
             DocumentBuilder builder = DocumentBuilder.New();
             SectionBuilder section = builder.AddSection();
             section.SetOrientation(PageOrientation.Landscape);

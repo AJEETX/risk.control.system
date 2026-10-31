@@ -232,9 +232,6 @@
                 "mRender": function (data, type, row) {
                     var buttons = "";
                     buttons += `<a data-id="${row.id}" class="active-claims btn btn-xs btn-info"><i class="fa fa-search"></i> Detail</a>&nbsp;`
-                    //buttons += (row.canDownload)
-                    //    ? '<a href="/Report/PrintPdfReport?Id=' + row.id + '" class="btn btn-xs btn-danger"><i class="far fa-file-pdf"></i> PDF</a>'
-                    //    : '<button class="btn btn-xs btn-secondary" disabled><i class="far fa-file-pdf"></i> limit Reached</button>';
                     return buttons;
                 }
             },
