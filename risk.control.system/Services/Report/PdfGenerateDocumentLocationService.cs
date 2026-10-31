@@ -9,10 +9,9 @@ namespace risk.control.system.Services.Report
     {
         Task<SectionBuilder> Build(SectionBuilder section, LocationReport loc, bool isClaim = true);
     }
-    internal class PdfGenerateDocumentLocationService(IWebHostEnvironment env, IHttpClientFactory httpClientFactory, IImageConverter imageConverter) : IPdfGenerateDocumentLocationService
+    internal class PdfGenerateDocumentLocationService(IWebHostEnvironment env, IImageConverter imageConverter) : IPdfGenerateDocumentLocationService
     {
         private readonly IWebHostEnvironment _env = env;
-        private readonly IHttpClientFactory _httpClientFactory = httpClientFactory;
         private readonly IImageConverter _imageConverter = imageConverter;
 
         public async Task<SectionBuilder> Build(SectionBuilder section, LocationReport loc, bool isClaim = true)
@@ -27,14 +26,14 @@ namespace risk.control.system.Services.Report
                 {
                     var rowBuilder = tableBuilder.AddRow();
                     rowBuilder.AddCell().AddParagraph().AddText(doc.ReportName!).SetFontSize(9F);
-                    var pngBytes = _imageConverter.ConvertToPngFromPath(_env, doc.FilePath!);
+                    var pngBytes = _imageConverter.ConvertToPngFromPath(doc.FilePath!);
                     rowBuilder.AddCell().SetVerticalAlignment(VerticalAlignment.Center).SetHorizontalAlignment(HorizontalAlignment.Center).AddParagraph().AddInlineImage(pngBytes).SetWidth(140F);
                     string location = isClaim ? "Beneficiary" : "Life-Assured";
                     var addressData = $"{doc.LocationAddress}\r\n\r\nIndicative Distance from {location} Address:{doc.Distance}\r\n\r\nCaptured Date & Time:{doc.LongLatTime.GetValueOrDefault().ToLocalTime():dd-MMM-yy hh:mm tt}";
                     rowBuilder.AddCell().AddParagraph(addressData).SetFontSize(9F);
                     var locData = $"{doc.LocationInfo}";
                     rowBuilder.AddCell().AddParagraph(locData).SetFontSize(9F);
-                    var mapImage = await _imageConverter.DownloadMapImageAsync(_httpClientFactory, string.Format(doc.LocationMapUrl!, "300", "300"));
+                    var mapImage = await _imageConverter.DownloadMapImageAsync(string.Format(doc.LocationMapUrl!, "300", "300"));
                     var cell = rowBuilder.AddCell().SetVerticalAlignment(VerticalAlignment.Center).SetHorizontalAlignment(HorizontalAlignment.Center);
                     var paragraph = cell.AddParagraph();
                     paragraph.AddInlineImage(mapImage).SetWidth(180);

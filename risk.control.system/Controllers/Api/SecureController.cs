@@ -238,8 +238,7 @@ namespace risk.control.system.Controllers.Api
             }
         }
 
-        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
-        [AllowAnonymous]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
         [HttpGet("agency-report")]
         public async Task<IActionResult> AgencyReport(long id = 1)
         {

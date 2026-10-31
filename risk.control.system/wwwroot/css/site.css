@@ -4989,3 +4989,16 @@ td.expand-btn-cell * {
     display: inline-block;
     animation: pointShake 0.8s ease-in-out infinite;
 }
+.scanned-info{
+    max-height:300px;
+    overflow-y:scroll;
+    width:410px;
+}
+.ai-analytics{
+    width:410px;
+}
+.media-transcript {
+    max-height: 300px;
+    overflow-y: scroll;
+    width: 380px;
+}

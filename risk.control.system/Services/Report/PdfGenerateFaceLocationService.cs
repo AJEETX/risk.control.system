@@ -9,10 +9,9 @@ namespace risk.control.system.Services.Report
     {
         Task<SectionBuilder> Build(SectionBuilder section, LocationReport loc, bool isClaim = true);
     }
-    internal class PdfGenerateFaceLocationService(IWebHostEnvironment env, IHttpClientFactory httpClientFactory, IImageConverter imageConverter) : IPdfGenerateFaceLocationService
+    internal class PdfGenerateFaceLocationService(IWebHostEnvironment env, IImageConverter imageConverter) : IPdfGenerateFaceLocationService
     {
         private readonly IWebHostEnvironment _env = env;
-        private readonly IHttpClientFactory _httpClientFactory = httpClientFactory;
         private readonly IImageConverter _imageConverter = imageConverter;
 
         public async Task<SectionBuilder> Build(SectionBuilder section, LocationReport loc, bool isClaim = true)
@@ -27,7 +26,7 @@ namespace risk.control.system.Services.Report
                 {
                     var rowBuilder = tableBuilder.AddRow();
                     rowBuilder.AddCell().AddParagraph().AddText(face.ReportName!).SetFontSize(9F);
-                    var faceImagePngBytes = _imageConverter.ConvertToPngFromPath(_env, face.FilePath!);
+                    var faceImagePngBytes = _imageConverter.ConvertToPngFromPath(face.FilePath!);
                     var agentPhotoCell = rowBuilder.AddCell().SetVerticalAlignment(VerticalAlignment.Center).SetHorizontalAlignment(HorizontalAlignment.Center);
 
                     // 2. Add the Image Paragraph
@@ -76,7 +75,7 @@ namespace risk.control.system.Services.Report
                     rowBuilder.AddCell().AddParagraph(addressData).SetFontSize(9F);
                     var locData = $"{face.LocationInfo}";
                     rowBuilder.AddCell().AddParagraph(locData).SetFontSize(9F);
-                    var mapImage = await _imageConverter.DownloadMapImageAsync(_httpClientFactory, string.Format(face.LocationMapUrl!, "300", "300"));
+                    var mapImage = await _imageConverter.DownloadMapImageAsync(string.Format(face.LocationMapUrl!, "300", "300"));
                     var cell = rowBuilder.AddCell().SetVerticalAlignment(VerticalAlignment.Center).SetHorizontalAlignment(HorizontalAlignment.Center);
                     var paragraph = cell.AddParagraph();
                     paragraph.AddInlineImage(mapImage).SetWidth(180);
