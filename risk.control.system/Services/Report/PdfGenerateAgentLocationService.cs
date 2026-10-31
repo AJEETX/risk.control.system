@@ -11,10 +11,9 @@ namespace risk.control.system.Services.Report
         Task<SectionBuilder> Build(SectionBuilder section, LocationReport loc, bool isClaim = true);
     }
 
-    internal class PdfGenerateAgentLocationService(IWebHostEnvironment env, IHttpClientFactory httpClientFactory, IImageConverter imageConverter, ApplicationDbContext context) : IPdfGenerateAgentLocationService
+    internal class PdfGenerateAgentLocationService(IWebHostEnvironment env, IImageConverter imageConverter, ApplicationDbContext context) : IPdfGenerateAgentLocationService
     {
         private readonly IWebHostEnvironment _env = env;
-        private readonly IHttpClientFactory _httpClientFactory = httpClientFactory;
         private readonly IImageConverter _imageConverter = imageConverter;
         private readonly ApplicationDbContext _context = context;
 
@@ -33,7 +32,7 @@ namespace risk.control.system.Services.Report
                 var tableBuilder = section.AddTable().SetBorder(Stroke.Solid);
                 tableBuilder.AddColumnPercentToTable("Agent Photo", 30).AddColumnPercentToTable("Captured Address Info", 20).AddColumnPercentToTable("Address Info", 20).AddColumnPercentToTable("Map Image", 25).AddColumnPercentToTable("Match", 5);
                 var rowBuilder = tableBuilder.AddRow();
-                byte[] agentImagePngBytes = _imageConverter.ConvertToPngFromPath(_env, loc.AgentIdReport.FilePath!);
+                byte[] agentImagePngBytes = _imageConverter.ConvertToPngFromPath(loc.AgentIdReport.FilePath!);
 
                 var agentPhotoCell = rowBuilder.AddCell().SetVerticalAlignment(VerticalAlignment.Center).SetHorizontalAlignment(HorizontalAlignment.Center);
 
@@ -82,7 +81,7 @@ namespace risk.control.system.Services.Report
                 rowBuilder.AddCell().AddParagraph(addressData).SetFontSize(9F);
                 var locData = $"{loc.AgentIdReport.LocationInfo}";
                 rowBuilder.AddCell().AddParagraph(locData).SetFontSize(9F);
-                var mapImage = await _imageConverter.DownloadMapImageAsync(_httpClientFactory, string.Format(loc.AgentIdReport.LocationMapUrl!, "400", "400"));
+                var mapImage = await _imageConverter.DownloadMapImageAsync(string.Format(loc.AgentIdReport.LocationMapUrl!, "400", "400"));
                 var cell = rowBuilder.AddCell().SetVerticalAlignment(VerticalAlignment.Center).SetHorizontalAlignment(HorizontalAlignment.Center);
                 var paragraph = cell.AddParagraph();
                 paragraph.AddInlineImage(mapImage).SetWidth(180);

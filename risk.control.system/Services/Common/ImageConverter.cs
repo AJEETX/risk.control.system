@@ -9,13 +9,16 @@ namespace risk.control.system.Services.Common
     public interface IImageConverter
     {
         byte[] ConvertToPng(byte[] imageBytes);
-        byte[] ConvertToPngFromPath(IWebHostEnvironment webHostEnvironment, string imagePath);
-        Task<byte[]> DownloadMapImageAsync(IHttpClientFactory httpClientFactory, string url);
+        byte[] ConvertToPngFromPath(string imagePath);
+        Task<byte[]> DownloadMapImageAsync(string url);
     }
-    internal class ImageConverter : IImageConverter
+    internal class ImageConverter(IHttpClientFactory httpClientFactory, IWebHostEnvironment env, ILogger<ImageConverter> logger) : IImageConverter
     {
         private const int maxWidth = 50;
         private const int maxHeight = 50;
+        private readonly IHttpClientFactory _httpClientFactory = httpClientFactory;
+        private readonly IWebHostEnvironment _env = env;
+        private readonly ILogger<ImageConverter> _logger = logger;
         public byte[] ConvertToPng(byte[] imageBytes)
         {
             if (imageBytes == null || imageBytes.Length == 0)
@@ -61,13 +64,13 @@ namespace risk.control.system.Services.Common
             }
         }
 
-        public byte[] ConvertToPngFromPath(IWebHostEnvironment webHostEnvironment, string imagePath)
+        public byte[] ConvertToPngFromPath(string imagePath)
         {
             if (string.IsNullOrWhiteSpace(imagePath))
                 throw new ArgumentException("Input image URL is null or empty.", nameof(imagePath));
             try
             {
-                var imageBytes = File.ReadAllBytes(Path.Combine(webHostEnvironment.ContentRootPath, imagePath));
+                var imageBytes = File.ReadAllBytes(Path.Combine(_env.ContentRootPath, imagePath));
                 return ResizeCropToPng(imageBytes);
             }
             catch (Exception ex)
@@ -96,17 +99,56 @@ namespace risk.control.system.Services.Common
 
             return ms.ToArray();
         }
-        public async Task<byte[]> DownloadMapImageAsync(IHttpClientFactory httpClientFactory, string url)
+        public async Task<byte[]> DownloadMapImageAsync(string url)
         {
-            var client = httpClientFactory.CreateClient();
-            var response = await client.GetAsync(url);
-            if (response.IsSuccessStatusCode)
+            try
             {
-                return await response.Content.ReadAsByteArrayAsync();
+                var client = _httpClientFactory.CreateClient();
+                // Set a reasonable timeout to prevent hanging requests
+                client.Timeout = TimeSpan.FromSeconds(10);
+
+                var response = await client.GetAsync(url);
+                if (response.IsSuccessStatusCode)
+                {
+                    return await response.Content.ReadAsByteArrayAsync();
+                }
+
+                // Log non-success status codes (e.g., 404, 500)
+                _logger?.LogWarning("Failed to download map image from {Url}. Status Code: {StatusCode}", url, response.StatusCode);
             }
-            else
+            catch (HttpRequestException ex)
             {
-                throw new Exception($"Failed to download map image. Status: {response.StatusCode}");
+                // Catches DNS resolution failures ("No such host is known"), connection refused, etc.
+                _logger?.LogError(ex, "Network or DNS error while downloading map image from {Url}: {Message}", url, ex.Message);
+            }
+            catch (TaskCanceledException ex)
+            {
+                // Catches request timeouts
+                _logger?.LogError(ex, "Timeout occurred while trying to download map image from {Url}", url);
+            }
+            catch (Exception ex)
+            {
+                // Catches any other unexpected errors
+                _logger?.LogError(ex, "Unexpected error while downloading map image from {Url}", url);
+            }
+
+            // Return a fallback placeholder image byte array so report generation doesn't crash
+            return await GetFallbackPlaceholderImage();
+        }
+
+        private async Task<byte[]> GetFallbackPlaceholderImage()
+        {
+            string mapImagePath = Path.Combine(_env.WebRootPath, "img", "no-map.jpeg");
+
+            try
+            {
+                var byteImage = await File.ReadAllBytesAsync(mapImagePath);
+                return byteImage;
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError(ex, "Failed to decode fallback placeholder image.");
+                return Array.Empty<byte>();
             }
         }
     }

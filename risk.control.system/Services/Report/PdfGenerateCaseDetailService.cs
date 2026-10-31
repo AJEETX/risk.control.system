@@ -11,9 +11,8 @@ namespace risk.control.system.Services.Report
         SectionBuilder BuildUnderwritng(SectionBuilder section, InvestigationTask investigation, PolicyDetail policy, CustomerDetail customer, BeneficiaryDetail beneficiary, bool interimReport = false);
         SectionBuilder BuildClaim(SectionBuilder section, InvestigationTask investigation, PolicyDetail policy, CustomerDetail customer, BeneficiaryDetail beneficiary, bool interimReport = false);
     }
-    internal class PdfGenerateCaseDetailService(IWebHostEnvironment env, IImageConverter imageConverter) : IPdfGenerateCaseDetailService
+    internal class PdfGenerateCaseDetailService(IImageConverter imageConverter) : IPdfGenerateCaseDetailService
     {
-        private readonly IWebHostEnvironment _env = env;
         private readonly IImageConverter _imageConverter = imageConverter;
 
         public SectionBuilder BuildUnderwritng(SectionBuilder section, InvestigationTask investigation, PolicyDetail policy, CustomerDetail customer, BeneficiaryDetail beneficiary, bool interimReport = false)
@@ -156,7 +155,7 @@ namespace risk.control.system.Services.Report
                 var row = table.AddRow();
                 try
                 {
-                    var photoBytes = _imageConverter.ConvertToPngFromPath(_env, imagePath);
+                    var photoBytes = _imageConverter.ConvertToPngFromPath(imagePath);
                     row.AddCell().SetVerticalAlignment(VerticalAlignment.Center).SetHorizontalAlignment(HorizontalAlignment.Center).AddParagraph().AddInlineImage(photoBytes).SetWidth(100F).SetHeight(100F);
                 }
                 catch

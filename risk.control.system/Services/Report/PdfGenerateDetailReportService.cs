@@ -12,14 +12,12 @@ namespace risk.control.system.Services.Report
 
     internal class PdfGenerateDetailReportService(IPdfGenerateAgentLocationService agentService,
         IPdfGenerateFaceLocationService faceService, IPdfGenerateDocumentLocationService documentService,
-        IWebHostEnvironment env,
         IImageConverter imageConverter,
         IPdfGenerateQuestionLocationService questionService) : IPdfGenerateDetailReportService
     {
         public IPdfGenerateAgentLocationService _agentService = agentService;
         private readonly IPdfGenerateFaceLocationService _faceService = faceService;
         private readonly IPdfGenerateDocumentLocationService _documentService = documentService;
-        private readonly IWebHostEnvironment _env = env;
         private readonly IImageConverter _imageConverter = imageConverter;
         private readonly IPdfGenerateQuestionLocationService _questionService = questionService;
 
@@ -32,7 +30,7 @@ namespace risk.control.system.Services.Report
             tableBuilder.AddColumnPercentToTable("Logo", 35).AddColumnPercentToTable("Info", 65);
             var rowBuilder = tableBuilder.AddRow();
 
-            var pngBytes = _imageConverter.ConvertToPngFromPath(_env, vendor!.DocumentUrl!);
+            var pngBytes = _imageConverter.ConvertToPngFromPath(vendor!.DocumentUrl!);
             rowBuilder.AddCell().SetVerticalAlignment(VerticalAlignment.Center).SetHorizontalAlignment(HorizontalAlignment.Center).AddParagraph().AddInlineImage(pngBytes).SetWidth(160F);
             var agencyDetail = vendor!.Email + "\r\n" + vendor!.Name + "\r\n" + vendor!.Addressline + "\r\n" + vendor!.District!.Name + "\r\n" + vendor!.State!.Name + "\r\n" + vendor!.Country!.Name + "\r\n" + vendor!.PinCode!.Code;
             rowBuilder.AddCell().AddParagraph(agencyDetail).SetFontSize(10);
