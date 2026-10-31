@@ -189,9 +189,9 @@ function loadNotifications(keepOpen = false) {
             response.maxCountReached ? `${response.maxCount}+` : totalCount
         );
         if (totalCount > 0) {
-            $("#notificationBell").addClass("fas").removeClass('far');
+            $("#notificationBell").addClass("fas ring-bell").removeClass('far');
         } else {
-            $("#notificationBell").addClass("far").removeClass('fas');
+            $("#notificationBell").addClass("far").removeClass('fas ring-bell');
         }
         if (Array.isArray(response.data) && response.data.length > 0) {
 

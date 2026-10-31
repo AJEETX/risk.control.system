@@ -26,7 +26,7 @@ namespace risk.control.system.Services.Report
             var template = await _context.ReportTemplates.FirstOrDefaultAsync(r => r.Id == templateId);
             if (template == null)
                 return false;
-            var sameTypeTemplates = await _context.ReportTemplates.Where(r => r.InsuranceType == template.InsuranceType && r.Id != templateId).ToListAsync();
+            var sameTypeTemplates = await _context.ReportTemplates.Where(r => r.InsuranceType == template.InsuranceType && r.InvestigationServiceTypeId == template.InvestigationServiceTypeId && r.Id != templateId).ToListAsync();
             foreach (var t in sameTypeTemplates)
             {
                 t.IsActive = false;
@@ -103,7 +103,7 @@ namespace risk.control.system.Services.Report
             }).ToList();
             return locationTemplate;
         }
-        private ReportTemplate DeepCloneReportTemplate(ReportTemplate originalTemplate, long serviceTypeId)
+        private static ReportTemplate DeepCloneReportTemplate(ReportTemplate originalTemplate, long serviceTypeId)
         {
             return new ReportTemplate
             {
@@ -118,7 +118,7 @@ namespace risk.control.system.Services.Report
                 LocationReport = GetLocationreport(originalTemplate)
             };
         }
-        private List<LocationReport> GetLocationreport(ReportTemplate originalTemplate)
+        private static List<LocationReport> GetLocationreport(ReportTemplate originalTemplate)
         {
             return originalTemplate.LocationReport.Select(loc => new LocationReport
             {
@@ -162,13 +162,14 @@ namespace risk.control.system.Services.Report
                 }).ToList()
             }).ToList();
         }
-        private ReportTemplate CloneReportTemplate(string newName, ReportTemplate originalTemplate, string currentUserEmail)
+        private static ReportTemplate CloneReportTemplate(string newName, ReportTemplate originalTemplate, string currentUserEmail)
         {
             return new ReportTemplate
             {
                 Name = newName,
                 ClientCompanyId = originalTemplate.ClientCompanyId,
                 InsuranceType = originalTemplate.InsuranceType,
+                InvestigationServiceTypeId = originalTemplate.InvestigationServiceTypeId,
                 Basetemplate = false, // Set to false for the cloned template
                 OriginalTemplateId = originalTemplate.Id, // Reference to the original template
                 Created = DateTime.UtcNow,

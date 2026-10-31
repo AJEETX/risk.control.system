@@ -13,7 +13,7 @@
 		location.Address = Model.InsuranceType == InsuranceType.CLAIM ? "Beneficiary" : location.Address;
 
 		<div class="col-12 mb-4 location-container">
-			<div class="card mb-2 border @location.StatusClass @location.LocationStatus">
+			<div class="card mb-2 border @location.StatusClass @location.LocationStatus  collapsed-card">
 				<div class="card-header bg-light text-white d-flex">
 					<h5 class="mb-0 flex-grow-1 @location.LocationStatus">
 						<i class="fas fa-map-marker-alt me-2"></i> @location.LocationName
@@ -22,310 +22,32 @@
 							<span class="required-asterisk" title="Mandatory Location">*</span>
 						}
 					</h5>
-
-					<button class="btn btn-sm @location.LocationStatusButton  mb-2" type="button"
-							data-toggle="collapse"
-							data-target="#location-@location.Id"
-							aria-expanded="false"
-							aria-controls="location-@location.Id">
-						 <i class="fas fa-chevron-down"></i>
-					</button>
-				</div>
-			
-
-				<div id="location-@location.Id" class="collapse">
-
-					<div class="card-body bg-light">
-						@* Insert all the current content here (the agent table, face/doc/questions) *@
-
-						@Html.AntiForgeryToken()
-						<button class="btn btn-sm @location.AgentStatus mb-2" type="button"
-								data-toggle="collapse"
-								data-target="#agent-@location.Id"
-								aria-expanded="false"
-								aria-controls="agent-@location.Id">
-							Agent ID <i class="fas fa-chevron-down"></i>
+					<div class="card-tools">
+						<span data-bs-toggle="tooltip" title="Agent report" class="badge badge-light">
+							<i class='far fa-hand-point-right shake-hand'></i>
+						</span>
+						<button type="button" class="btn btn-sm @location.LocationStatus" data-card-widget="collapse">
+							<i class="fas fa-plus"></i>
 						</button>
-						<div class="collapse" id="agent-@location.Id">
-							<div class="table-responsive mb-4">
-								<table class="table table-bordered table-hover dt-responsive nowrap w-100">
-									<thead class="thead-light">
-										<tr>
-											<th scope="col" class="min-vw-25" data-toggle="tooltip" title="Agent Info">
-												<img class="action-image me-2" src="~/headers/customer.gif" alt="Agent" />Agent  Info
-											</th>
-											<th scope="col" class="text-center col-1" title="Agent Photo" data-toggle="tooltip">
-												<i class="far fa-user text-primary"></i> Agent Photo
-											</th>
-											<th scope="col" class="w-25" data-toggle="tooltip" title="AI Analytics & Info">
-												<img class="action-image me-2" src="~/headers/information.gif" alt="Info" />AI Analytics & Info
-											</th>
-											<th scope="col" class="min-vw-25" title="Address Info" data-toggle="tooltip"> <i class="fas fa-home"></i>  Address Info</th>
-										
-											<th scope="col" class="text-center col-1" title="Map View" data-toggle="tooltip">
-												<img class="action-image me-2" src="~/headers/pincode.gif" alt="Map" />Map View
-											</th>
-											<th scope="col" class="text-center col-1" title="Match" data-toggle="tooltip">Match</th>
-										</tr>
-									</thead>
-									<tbody>
-										<tr class="align-middle">
-											<!-- Email or Report Type -->
-											<td>
-											
-												<div class="text-start mt-1 p-2 bg-white rounded bordertext-left" data-toggle="tooltip" title="Agent Email">
-												<small>
-												@if (agent!.ValidationExecuted)
-												{
-													@location.AgentEmail
-												}
-												else
-												{
-													@agent.ReportType.GetEnumDisplayName()
-												}
-														@if (agent.IsRequired)
-														{
-															<span class="required-asterisk" title="Mandatory Location" data-toggle="tooltip">*</span>
-														}
-												</small>
-											
-												</div>
-												<div class="p-2 bg-white rounded border d-flex align-items-center justify-content-between shadow-sm" title="Captured Time" data-toggle="tooltip">
-													<span class="badge bg-light px-2.5 py-1.5 fs-7 fw-medium">
-														<i class="fas fa-clock me-1 text-dark"></i>
-														<span class="local-time-display" data-utc="@(agent.LongLatTime.HasValue ? agent.LongLatTime.Value.ToString("o") : "")">
-															@(agent.LongLatTime.HasValue ? "Loading..." : "--")
-														</span>
-													</span>
-												</div>
-												</td>
+					</div>
+				</div>
+				<div class="card-body bg-light">
 
-											<!-- ID Photo -->
-											<td class="text-center face-photo-column">
-												@if (agent.ValidationExecuted)
-												{
-													@if (agent.FaceResult != null && agent.FaceResult.TotalFacesDetected > 0)
-													{
-														<div class="badge bg-info text-white bottom-0 end-0 m-2 opacity-90">
-															<i class="fas fa-user-check"></i> AI Verified
-														</div>
-													}
-													<div class="position-relative d-inline-block mb-4">
-														<img id="face-img-@agent.Id"
-															 src="/Document/GetAgentDocument/@agent.Id"
-															 class="mobile-capture-map  img-thumbnail thumbnail img-fluid shadow-sm preview-image"
-															 title="@location.AgentEmail photo" />
-													</div>
-												}
-												else
-												{
-													<img src="~/img/no-user.png" class="img-thumbnail img-fluid profile-image" />
-												}
-											</td>
-											<td>
-												@if (agent.FaceResult != null)
-												{
-													<div class="text-start mt-1 p-2 bg-white rounded bordertext-left">
-														@if (agent.FaceResult.TotalFacesDetected == 0)
-														{
-															<div class="text-danger text-center fw-bold">
-																<i class="fas fa-exclamation-triangle"></i> No face detected
-															</div>
-														}
-														else
-														{
-															@foreach (var face in agent.FaceResult.Faces)
-															{
-																<div class="card border-0 shadow-sm mb-3 @(face.FaceNumber > 1 ? "border-top pt-3" : "")">
-																	<div class="card-body p-2">
-																		<!-- Metrics Table/Grid -->
-																		<div class="d-flex flex-column gap-2 p-0 mb-2">
-																			<!-- Age Range -->
-																			<div class="p-2 rounded border d-flex align-items-center justify-content-between bg-light border-secondary-subtle">
-																				<div class="d-flex align-items-center text-muted">
-																					<span class="badge">
-																						<i class="fas fa-hourglass-half fs-6 me-2">
-																						</i>
-																					</span>
-																					<span class="badge fw-semibold">Age Range</span>
-																				</div>
-																				<span class="fw-bold text-dark">@face.AgeRange</span>
-																			</div>
+					@Html.AntiForgeryToken()
+					<!-- Agent Table -->
+					<partial name="Report/_LocationAgent" model="@location" />
+					<!-- FaceIds Table -->
+					<partial name="Report/_LocationFaceId" model="@location" />
 
-																			<!-- Gender -->
-																			<div class="p-2 rounded border d-flex align-items-center justify-content-between bg-light border-secondary-subtle">
-																				<div class="d-flex align-items-center text-muted">
-																					<i class="fas @(face.Gender?.ToLower() == "female" ? "fa-venus" : face.Gender?.ToLower() == "male" ? "fa-mars" : "fa-genderless") fs-6 me-2"></i>
-																					<span class="badge fw-semibold">Gender</span>
-																				</div>
-																				<div class="d-flex align-items-center gap-1">
-																					<span class="fw-bold text-dark">@face.Gender</span>
-																					<span class="badge bg-white text-secondary border fw-normal text-xs">@face.GenderConfidence.ToString("F0")%</span>
-																				</div>
-																			</div>
+					<!-- DocumentIds Table -->
 
-																			<!-- Primary Emotion -->
-																			<div class="p-2 rounded border d-flex align-items-center justify-content-between bg-light border-secondary-subtle">
-																				<div class="d-flex align-items-center text-muted">
-																					<i class="fas fa-heart fs-6 me-2"></i>
-																					<span class="badge fw-semibold">Emotion</span>
-																				</div>
-																				<span class="fw-bold text-dark text-capitalize">@face.PrimaryEmotion</span>
-																			</div>
-																		</div>
+					<partial name="Report/_LocationDocId" model="@location" />
 
-																		<!-- Features Badges Grid -->
-																		<div class="d-flex flex-column gap-2 pt-1 mt-2">
-																			<!-- Smile -->
-																			<div class="p-2 rounded border d-flex align-items-center justify-content-between @(face.IsSmiling ? "bg-success-subtle text-success border-success" : "bg-light text-muted border-secondary-subtle")">
-																				<div class="d-flex align-items-center">
-																					<i class="fas @(face.IsSmiling ? "fa-smile" : "fa-meh") fs-5 me-2"></i> <span class="badge  fw-semibold"> Smile </span>
-																				</div>
-																				<span class="fs-5 fw-bold @(face.IsSmiling ? "text-success" : "text-danger")">
-																					@(face.IsSmiling ? "✓" : "✗")
-																				</span>
-																			</div>
-
-																			<!-- Glasses -->
-																			<div class="p-2 rounded border d-flex align-items-center justify-content-between @(face.IsWearingGlasses ? "bg-info-subtle text-info-emphasis border-info" : "bg-light text-muted border-secondary-subtle")">
-																				<div class="d-flex align-items-center">
-																					<i class="fas fa-glasses fs-5 me-2"></i> <span class="badge fw-semibold"> Glasses </span>
-
-																				</div>
-																				<span class="fs-5 fw-bold @(face.IsWearingGlasses ? "text-success" : "text-danger")">
-																					@(face.IsWearingGlasses ? "✓" : "✗")
-																				</span>
-																			</div>
-
-																			<!-- Beard -->
-																			<div class="p-2 rounded border d-flex align-items-center justify-content-between @(face.HasBeard ? "bg-warning-subtle text-warning-emphasis border-success" : "bg-light text-muted border-secondary-subtle")">
-																				<div class="d-flex align-items-center">
-																					<i class="fas fa-user-tie fs-5 me-2"></i> <span class="badge fw-semibold"> Beard </span>
-
-																				</div>
-																				<span class="fs-5 fw-bold @(face.HasBeard ? "text-success" : "text-danger")">
-																					@(face.HasBeard ? "✓" : "✗")
-																				</span>
-																			</div>
-																		</div>
-																	</div>
-																</div>
-															}
-														}
-
-													</div>
-												}
-											</td>
-											<td>
-												<div class="d-flex flex-column gap-2 p-1">
-													<div class="card border border-light-subtle shadow-sm bg-white rounded-3 overflow-hidden">
-														<div class="card-header bg-light py-1 px-2 border-bottom border-light-subtle text-center">
-															<small class="text-secondary strong text-uppercase tracking-wider fs-8">
-																<i class="fas fa-compass me-1 text-primary"></i> Latitude, Longitude
-															</small>
-														</div>
-														<div class="card-body p-2 bg-white text-center">
-															<code class="text-dark fw-bold small">@agent.LongLat</code>
-														</div>
-													</div>
-
-													<div class="card border border-light-subtle shadow-sm bg-white rounded-3 overflow-hidden">
-														<div class="card-header bg-light py-1 px-2 border-bottom border-light-subtle text-center">
-															<small class="text-secondary fw-bold text-uppercase tracking-wider fs-8" title="From Agent Address to @location.Address Address">
-																<i class="fas fa-route me-1 text-warning"></i> Indicative Distance
-															</small>
-														</div>
-														<div class="card-body p-2 bg-white text-center">
-															<span class="badge bg-light text-dark border border-secondary-subtle fw-bold fs-7">
-																@agent.Distance
-															</span>
-														</div>
-													</div>
-
-													<div class="card border border-light-subtle shadow-sm bg-white rounded-3 overflow-hidden">
-														<div class="card-header bg-light py-1 px-2 border-bottom border-light-subtle text-center">
-															<small class="text-secondary fw-bold text-uppercase tracking-wider fs-8">
-																<i class="fas fa-cloud-sun me-1 text-info"></i> Weather Info
-															</small>
-														</div>
-														<div class="card-body p-2 bg-white">
-															<div class="text-muted small italic">@agent.LocationInfo</div>
-														</div>
-													</div>
-												</div>
-											</td>
-											<td class="text-center">
-												@if (agent.ValidationExecuted && agent.LocationMapUrl != null)
-												{
-													<img src="@string.Format(@agent.LocationMapUrl, "400", "400")"
-														 class="mobile-capture-map map-image"
-														 data-faceid="@agent.Id"
-														 data-locationid="@location.Id"
-														 data-source="agent"
-														 title="Click to view map" />
-														 <div class="d-flex flex-column gap-2 p-1">
-													<div class="card border border-light-subtle shadow-sm bg-white rounded-3 overflow-hidden">
-														<div class="card-header bg-light py-1 px-2 border-bottom border-light-subtle text-center">
-															<small class="text-secondary fw-bold text-uppercase tracking-wider fs-8">
-																<i class="fas fa-map-pin me-1 text-danger"></i> Captured Address
-															</small>
-														</div>
-														<div class="card-body p-2 bg-white">
-															<div class="text-dark fw-medium small text-wrap">@agent.LocationAddress</div>
-														</div>
-													</div>
-													</div>
-
-												}
-												else
-												{
-													<img src="~/img/no-map.jpeg" class="thumbnail profile-image doc-profile-image" />
-												}
-											</td>
-											<td class="text-center">
-												<div class="d-flex flex-column align-items-center justify-content-center gap-1">
-													@if (agent.ValidationExecuted)
-													{
-														if (agent.ImageValid.GetValueOrDefault())
-														{
-															<span class="badge bg-success-subtle text-success border border-success px-2 py-1 small">
-																<i class="fas fa-check-circle me-1"></i> Match
-															</span>
-														}
-														else
-														{
-															<span class="badge bg-danger-subtle text-danger border border-danger px-2 py-1 small">
-																<i class="fa fa-times-circle me-1"></i> Invalid
-															</span>
-														}
-													}
-													else
-													{
-														<span class="badge bg-secondary-subtle text-muted border px-2 py-1 small">
-															<i class="fa fa-minus-circle me-1"></i> Pending
-														</span>
-													}
-													<span class="fw-bold small text-secondary mt-1" title="Match percentage">@agent.Similarity %</span>
-												</div>
-											</td>
-										</tr>
-									</tbody>
-								</table>
-							</div>
-						</div>
-						<!-- FaceIds Table -->
-						<partial name="Report/_LocationFaceId" model="@location" />
-
-						<!-- DocumentIds Table -->
-
-						<partial name="Report/_LocationDocId" model="@location" />
-
-						<!-- Media Table -->
-						<partial name="Report/_LocationMedia" model="@location" />
-						<!-- Questions Table -->
-						<partial name="Report/_LocationQuestion" model="@location" />
-					</div> <!-- card-body -->
-				</div> <!-- collapse -->
+					<!-- Media Table -->
+					<partial name="Report/_LocationMedia" model="@location" />
+					<!-- Questions Table -->
+					<partial name="Report/_LocationQuestion" model="@location" />
+				</div> <!-- card-body -->
 			</div> <!-- card -->
 		</div> 
 	}

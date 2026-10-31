@@ -54,7 +54,7 @@ namespace risk.control.system.Services.Agency
             {
                 RoleId = managerRole!.Id,
                 ClientCompanyId = companyUser!.ClientCompanyId,
-                Symbol = "far fa-hand-point-right i-green",
+                Symbol = "far fa-hand-point-right shake-hand i-green",
                 Message = $"Agency {vendor.Email}",
                 Status = "Created",
                 NotifierUserEmail = userEmail

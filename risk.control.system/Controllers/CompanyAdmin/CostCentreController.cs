@@ -8,16 +8,21 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using risk.control.system.AppConstant;
 using risk.control.system.Models;
-
+using risk.control.system.Services.Common;
 using SmartBreadcrumbs.Attributes;
 
 namespace risk.control.system.Controllers.CompanyAdmin
 {
     [Breadcrumb("Company Settings ")]
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME}")]
-    public class CostCentreController(ApplicationDbContext context, INotyfService notifyService, ILogger<CostCentreController> logger) : Controller
+    public class CostCentreController(
+        ApplicationDbContext context,
+        IEncryptionService encryptionService,
+        INotyfService notifyService,
+        ILogger<CostCentreController> logger) : Controller
     {
         private readonly ApplicationDbContext _context = context;
+        private readonly IEncryptionService _encryptionService = encryptionService;
         private readonly INotyfService _notifyService = notifyService;
         private readonly ILogger<CostCentreController> _logger = logger;
 
@@ -38,7 +43,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             var data = await _context.CostCentre
                 .Select(c => new
                 {
-                    c.CostCentreId,
+                    CostCentreId = _encryptionService.ProtectId(c.CostCentreId),
                     c.Name,
                     c.Code,
                     Updated = c.Updated ?? c.Created,
@@ -98,7 +103,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<JsonResult> CheckDuplicateCode(string code, long? id)
+        public async Task<JsonResult> CheckDuplicateCode(string code, [ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long? id)
         {
             if (string.IsNullOrWhiteSpace(code))
                 return Json(false);
@@ -110,7 +115,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
 
         // GET: CostCentre/Edit/5
         [Breadcrumb("Edit ", FromAction = nameof(Profile))]
-        public async Task<IActionResult> Edit(long id)
+        public async Task<IActionResult> Edit([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id)
         {
             if (id <= 0)
             {
@@ -132,7 +137,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(long id, [Bind("CostCentreId,Name,Code,Created,Updated,UpdatedBy")] CostCentre costCentre)
+        public async Task<IActionResult> Edit([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id, [Bind("CostCentreId,Name,Code,Created,Updated,UpdatedBy")] CostCentre costCentre)
         {
             if (id < 1 || !ModelState.IsValid)
             {
@@ -174,7 +179,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
         // POST: CostCentre/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(long id)
+        public async Task<IActionResult> DeleteConfirmed([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id)
         {
             if (id <= 0)
             {

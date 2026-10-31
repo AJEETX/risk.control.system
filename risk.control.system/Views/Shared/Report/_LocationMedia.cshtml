@@ -5,159 +5,176 @@
 
 @if (location.MediaReports?.Any(d => d.ValidationExecuted) == true)
 {
-	<div class="table-responsive mb-4">
+	<div class="card mb-2 border @location.StatusClass @location.LocationStatus  collapsed-card">
+		<div class="card-header bg-light text-white d-flex">
+			<h5 class="mb-0 flex-grow-1 @location.StatusClass">
+				<i class="fas fa-watchman-monitoring"></i> Media report
+			</h5>
+			<div class="card-tools">
+				<span data-bs-toggle="tooltip" title="Media report" class="badge badge-light">
+					<i class='far fa-hand-point-right shake-hand'></i>
+				</span>
+				<button type="button" class="btn btn-sm @location.LocationStatus" data-card-widget="collapse">
+					<i class="fas fa-plus"></i>
+				</button>
+			</div>
+		</div>
+		<div class="card-body">
+			<div class="table-responsive mb-4">
 
-		<table class="table table-bordered table-hover dt-responsive nowrap w-100">
-			<thead class="thead-light">
-			<tr>
-					<th scope="col" class="min-vw-25" data-toggle="tooltip" title=" Media File Type">
-						Media File
-					</th>
-					<th scope="col" class="min-vw-25" data-toggle="tooltip" title="Play Media">
-						<i class="fas fa-copy text-muted ms-2"></i> Play Media
-					</th>
-					<th title="Transcript Data" data-toggle="tooltip"><img class="action-image" src="~/headers/information.gif" />Transcript Data</th>
+			<table class="table table-bordered table-hover dt-responsive nowrap w-100">
+				<thead class="thead-light">
+				<tr>
+						<th scope="col" class="min-vw-25" data-toggle="tooltip" title=" Media File Type">
+							Media File
+						</th>
+						<th scope="col" class="min-vw-25" data-toggle="tooltip" title="Play Media">
+							<i class="fas fa-copy text-muted ms-2"></i> Play Media
+						</th>
+						<th title="Transcript Data" data-toggle="tooltip"><img class="action-image" src="~/headers/information.gif" />Transcript Data</th>
 
-					<th scope="col" class="min-vw-25" title="Address Info" data-toggle="tooltip"> <i class="fas fa-home"></i>  Address Info</th>
+						<th scope="col" class="min-vw-25" title="Address Info" data-toggle="tooltip"> <i class="fas fa-home"></i>  Address Info</th>
 					
-					<th scope="col" class="text-center col-1" title="Map View" data-toggle="tooltip">
-						<img class="action-image me-2" src="~/headers/pincode.gif" alt="Map" />Map View
-					</th>
-				</tr>
-		</thead>
-		<tbody>
-			@foreach (var doc in location.MediaReports.Where(d => d.Selected && d.ValidationExecuted))
-			{
-					<tr class="align-middle">
+						<th scope="col" class="text-center col-1" title="Map View" data-toggle="tooltip">
+							<img class="action-image me-2" src="~/headers/pincode.gif" alt="Map" />Map View
+						</th>
+					</tr>
+			</thead>
+			<tbody>
+				@foreach (var doc in location.MediaReports.Where(d => d.Selected && d.ValidationExecuted))
+				{
+						<tr class="align-middle">
 
-						<td>
-							<div class="text-start mt-1 p-2 bg-white rounded bordertext-left" data-toggle="tooltip" title="Media File Type">
+							<td>
+								<div class="text-start mt-1 p-2 bg-white rounded bordertext-left" data-toggle="tooltip" title="Media File Type">
 
-							@doc.ReportName
-							@if (doc.IsRequired)
-							{
-								<span class="required-asterisk" title="Mandatory Location">*</span>
-							}
-							</div>
-							<div class="p-2 bg-white rounded border d-flex align-items-center justify-content-between shadow-sm" title="Captured Time" data-toggle="tooltip">
-								<span class="badge bg-light px-2.5 py-1.5 fs-7 fw-medium">
-									<i class="fas fa-clock me-1 text-dark"></i>
-									<span class="local-time-display" data-utc="@(doc.LongLatTime.HasValue ? doc.LongLatTime.Value.ToString("o") : "")">
-										@(doc.LongLatTime.HasValue ? "Loading..." : "--")
-									</span>
-								</span>
-							</div>
-							</td>
-						<td>
-							@if (doc.ValidationExecuted)
-							{
-								<div id="doc-img-@doc.Id">
-									@if (doc.MediaType == MediaType.VIDEO)
-									{
-										<video class="media-view" controls>
-											<source src="/Document/GetMediaDocument/@doc.Id"
-													type="video/@doc.MediaExtension">
-											Your browser does not support the video tag.
-										</video>
-									}
-									else if (doc.MediaType == MediaType.AUDIO)
-									{
-										// Ensure .m4a maps to the browser-compatible audio/mp4 MIME type
-										var mimeType = doc.MediaExtension?.ToLowerInvariant() == "m4a" ? "audio/mp4" : $"audio/{doc.MediaExtension}";
-    
-										<audio controls>
-											<source src="/Document/GetMediaDocument/@doc.Id" type="@mimeType" />
-											Your browser does not support the audio element.
-										</audio>
-									}
-								</div>
-							}
-							else
-							{
-								if (doc.MediaType == MediaType.VIDEO)
+								@doc.ReportName
+								@if (doc.IsRequired)
 								{
-									<img src="~/img/no-video.png" class="thumbnail profile-image doc-profile-image" />
+									<span class="required-asterisk" title="Mandatory Location">*</span>
+								}
+								</div>
+								<div class="p-2 bg-white rounded border d-flex align-items-center justify-content-between shadow-sm" title="Captured Time" data-toggle="tooltip">
+									<span class="badge bg-light px-2.5 py-1.5 fs-7 fw-medium">
+										<i class="fas fa-clock me-1 text-dark"></i>
+										<span class="local-time-display" data-utc="@(doc.LongLatTime.HasValue ? doc.LongLatTime.Value.ToString("o") : "")">
+											@(doc.LongLatTime.HasValue ? "Loading..." : "--")
+										</span>
+									</span>
+								</div>
+								</td>
+							<td>
+								@if (doc.ValidationExecuted)
+								{
+									<div id="doc-img-@doc.Id">
+										@if (doc.MediaType == MediaType.VIDEO)
+										{
+											<video class="media-view" controls>
+												<source src="/Document/GetMediaDocument/@doc.Id"
+														type="video/@doc.MediaExtension">
+												Your browser does not support the video tag.
+											</video>
+										}
+										else if (doc.MediaType == MediaType.AUDIO)
+										{
+											// Ensure .m4a maps to the browser-compatible audio/mp4 MIME type
+											var mimeType = doc.MediaExtension?.ToLowerInvariant() == "m4a" ? "audio/mp4" : $"audio/{doc.MediaExtension}";
+    
+											<audio controls>
+												<source src="/Document/GetMediaDocument/@doc.Id" type="@mimeType" />
+												Your browser does not support the audio element.
+											</audio>
+										}
+									</div>
 								}
 								else
 								{
-									<img src="~/img/no-audio.png" class="thumbnail profile-image doc-profile-image" />
+									if (doc.MediaType == MediaType.VIDEO)
+									{
+										<img src="~/img/no-video.png" class="thumbnail profile-image doc-profile-image" />
+									}
+									else
+									{
+										<img src="~/img/no-audio.png" class="thumbnail profile-image doc-profile-image" />
+									}
 								}
-							}
 
-						</td>
-						<td>
-							<div class="p-4 bg-white rounded border shadow-sm">
-								<div class="text-dark fs-6 fw-bold ps-1 small">@doc.Transcript</div>
-							</div>
-						</td>
-						<td>
-							<div class="d-flex flex-column gap-2 p-1">
-								<div class="card border border-light-subtle shadow-sm bg-white rounded-3 overflow-hidden">
-									<div class="card-header bg-light py-1 px-2 border-bottom border-light-subtle text-center">
-										<small class="text-secondary fw-bold text-uppercase tracking-wider fs-8">
-											<i class="fas fa-compass me-1 text-primary"></i> Latitude, Longitude
-										</small>
-									</div>
-									<div class="card-body p-2 bg-white text-center">
-										<code class="text-dark fw-bold small">@doc.LongLat</code>
-									</div>
+							</td>
+							<td>
+								<div class="p-4 bg-white rounded border shadow-sm">
+									<div class="text-dark fs-6 fw-bold ps-1 small">@doc.Transcript</div>
 								</div>
-
-								<div class="card border border-light-subtle shadow-sm bg-white rounded-3 overflow-hidden">
-									<div class="card-header bg-light py-1 px-2 border-bottom border-light-subtle text-center">
-										<small class="text-secondary fw-bold text-uppercase tracking-wider fs-8" title="From Agent Address to @location.Address Address">
-											<i class="fas fa-route me-1 text-warning"></i> Indicative Distance
-										</small>
-									</div>
-									<div class="card-body p-2 bg-white text-center">
-										<span class="badge bg-light text-dark border border-secondary-subtle fw-bold fs-7">
-											@doc.Distance
-										</span>
-									</div>
-								</div>
-								<div class="card border border-light-subtle shadow-sm bg-white rounded-3 overflow-hidden">
-									<div class="card-header bg-light py-1 px-2 border-bottom border-light-subtle text-center">
-										<small class="text-secondary fw-bold text-uppercase tracking-wider fs-8">
-											<i class="fas fa-cloud-sun me-1 text-info"></i> Weather Info
-										</small>
-									</div>
-									<div class="card-body p-2 bg-white">
-										<div class="text-muted small italic">@doc.LocationInfo</div>
-									</div>
-								</div>
-							</div>
-						</td>
-						<td class="text-center">
-							@if (doc.ValidationExecuted && doc.LocationMapUrl != null)
-							{
-								<img id="face-img-@doc.Id"
-									 src="@string.Format(@doc.LocationMapUrl, "300", "300")"
-									 class="mobile-capture-map map-image"
-									 data-faceid="@doc.Id"
-									 data-locationid="@location.Id"
-									 data-source="media"
-									 title="Click to view map" />
+							</td>
+							<td>
 								<div class="d-flex flex-column gap-2 p-1">
 									<div class="card border border-light-subtle shadow-sm bg-white rounded-3 overflow-hidden">
 										<div class="card-header bg-light py-1 px-2 border-bottom border-light-subtle text-center">
 											<small class="text-secondary fw-bold text-uppercase tracking-wider fs-8">
-												<i class="fas fa-map-pin me-1 text-danger"></i> Captured Address
+												<i class="fas fa-compass me-1 text-primary"></i> Latitude, Longitude
+											</small>
+										</div>
+										<div class="card-body p-2 bg-white text-center">
+											<code class="text-dark fw-bold small">@doc.LongLat</code>
+										</div>
+									</div>
+
+									<div class="card border border-light-subtle shadow-sm bg-white rounded-3 overflow-hidden">
+										<div class="card-header bg-light py-1 px-2 border-bottom border-light-subtle text-center">
+											<small class="text-secondary fw-bold text-uppercase tracking-wider fs-8" title="From Agent Address to @location.Address Address">
+												<i class="fas fa-route me-1 text-warning"></i> Indicative Distance
+											</small>
+										</div>
+										<div class="card-body p-2 bg-white text-center">
+											<span class="badge bg-light text-dark border border-secondary-subtle fw-bold fs-7">
+												@doc.Distance
+											</span>
+										</div>
+									</div>
+									<div class="card border border-light-subtle shadow-sm bg-white rounded-3 overflow-hidden">
+										<div class="card-header bg-light py-1 px-2 border-bottom border-light-subtle text-center">
+											<small class="text-secondary fw-bold text-uppercase tracking-wider fs-8">
+												<i class="fas fa-cloud-sun me-1 text-info"></i> Weather Info
 											</small>
 										</div>
 										<div class="card-body p-2 bg-white">
-											<div class="text-dark fw-medium small text-wrap">@doc.LocationAddress</div>
+											<div class="text-muted small italic">@doc.LocationInfo</div>
 										</div>
 									</div>
 								</div>
-							}
-							else
-							{
-								<img src="~/img/no-map.jpeg" class="thumbnail profile-image doc-profile-image" />
-							}
-						</td>
-				</tr>
-			}
-		</tbody>
-	</table>
+							</td>
+							<td class="text-center">
+								@if (doc.ValidationExecuted && doc.LocationMapUrl != null)
+								{
+									<img id="face-img-@doc.Id"
+										 src="@string.Format(@doc.LocationMapUrl, "300", "300")"
+										 class="mobile-capture-map map-image"
+										 data-faceid="@doc.Id"
+										 data-locationid="@location.Id"
+										 data-source="media"
+										 title="Click to view map" />
+									<div class="d-flex flex-column gap-2 p-1">
+										<div class="card border border-light-subtle shadow-sm bg-white rounded-3 overflow-hidden">
+											<div class="card-header bg-light py-1 px-2 border-bottom border-light-subtle text-center">
+												<small class="text-secondary fw-bold text-uppercase tracking-wider fs-8">
+													<i class="fas fa-map-pin me-1 text-danger"></i> Captured Address
+												</small>
+											</div>
+											<div class="card-body p-2 bg-white">
+												<div class="text-dark fw-medium small text-wrap">@doc.LocationAddress</div>
+											</div>
+										</div>
+									</div>
+								}
+								else
+								{
+									<img src="~/img/no-map.jpeg" class="thumbnail profile-image doc-profile-image" />
+								}
+							</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+		</div>\
+		</div>
 	</div>
 }

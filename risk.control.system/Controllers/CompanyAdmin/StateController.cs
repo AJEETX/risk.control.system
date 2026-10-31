@@ -8,15 +8,21 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using risk.control.system.AppConstant;
 using risk.control.system.Models;
+using risk.control.system.Services.Common;
 using SmartBreadcrumbs.Attributes;
 
 namespace risk.control.system.Controllers.CompanyAdmin
 {
     [Breadcrumb("General Setup")]
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME}")]
-    public class StateController(ApplicationDbContext context, INotyfService notifyService, ILogger<StateController> logger) : Controller
+    public class StateController(
+        ApplicationDbContext context,
+        IEncryptionService encryptionService,
+        INotyfService notifyService,
+        ILogger<StateController> logger) : Controller
     {
         private readonly ApplicationDbContext _context = context;
+        private readonly IEncryptionService _encryptionService = encryptionService;
         private readonly INotyfService _notifyService = notifyService;
         private readonly ILogger<StateController> _logger = logger;
 
@@ -77,7 +83,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             var totalRecords = await query.CountAsync();
             var rawData = await query.Skip(start).Take(length).Select(s => new
             {
-                s.StateId,
+                StateId = _encryptionService.ProtectId(s.StateId),
                 s.Name,
                 s.Code,
                 s.UpdatedBy,
@@ -92,7 +98,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<JsonResult> CheckDuplicateCode(string code, long? id, long CountryId)
+        public async Task<JsonResult> CheckDuplicateCode(string code, [ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long? id, long CountryId)
         {
             if (string.IsNullOrWhiteSpace(code))
                 return Json(false);
@@ -174,7 +180,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
         }
 
         [Breadcrumb("Edit", FromAction = nameof(Profile))]
-        public async Task<IActionResult> Edit(long id)
+        public async Task<IActionResult> Edit([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id)
         {
             if (id < 1)
             {
@@ -194,7 +200,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(long id, State state)
+        public async Task<IActionResult> Edit([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id, State state)
         {
             if (!ModelState.IsValid)
             {
@@ -242,7 +248,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
 
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(long id)
+        public async Task<IActionResult> DeleteConfirmed([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id)
         {
             if (id <= 0)
             {
