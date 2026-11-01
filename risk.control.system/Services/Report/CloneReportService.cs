@@ -13,6 +13,7 @@ namespace risk.control.system.Services.Report
         Task<ReportTemplate> CreateCloneReportTemplate(long templateId, string currentUserEmail);
 
         Task<bool> Activate(long templateId);
+        LocationReport CreateLocationReport(LocationReport original, long reportTemplateId);
 
         Task<object> GetReportTemplate(long caseId, string agentEmail);
     }
@@ -32,6 +33,7 @@ namespace risk.control.system.Services.Report
                 t.IsActive = false;
             }
             template.IsActive = true;
+            template.Updated = DateTime.UtcNow;
             _context.ReportTemplates.UpdateRange(sameTypeTemplates);
             _context.ReportTemplates.Update(template);
             var rowsAffected = await _context.SaveChangesAsync(null, false);
@@ -41,11 +43,11 @@ namespace risk.control.system.Services.Report
         public async Task<ReportTemplate> CreateCloneReportTemplate(long templateId, string currentUserEmail)
         {
             var originalTemplate = await GetReportTemplateDetails(templateId);
-            string newName = $"{Regex.Replace(originalTemplate!.Name!, @"_\d{8}_\d{6,9}$", "")}_{DateTime.UtcNow:yyyyMMdd_HHmmss}";
+            string newName = $"{Regex.Replace(originalTemplate!.Name!, @"_\d{8}_\d{6,9}$", "")}_{DateTime.UtcNow.ToLocalTime():ddMMyyyHHmmss}";
             var clone = CloneReportTemplate(newName, originalTemplate, currentUserEmail);
             var addedTemplate = await _context.ReportTemplates.AddAsync(clone);
             var rowsAffected = await _context.SaveChangesAsync(null, false);
-            return addedTemplate.Entity;
+            return rowsAffected > 0 ? addedTemplate.Entity : null;
         }
 
         public async Task<ReportTemplate> DeepCloneReportTemplate(long clientCompanyId, InsuranceType insuranceType, long serviceTypeId)
@@ -103,6 +105,54 @@ namespace risk.control.system.Services.Report
             }).ToList();
             return locationTemplate;
         }
+        public LocationReport CreateLocationReport(LocationReport original, long reportTemplateId)
+        {
+            var clone = new LocationReport
+            {
+                LocationName = original.LocationName + $" (Copy){DateTime.UtcNow.ToLocalTime():ddMMyyyyHHmmss}",
+                IsRequired = original.IsRequired,
+                ReportTemplateId = reportTemplateId,
+                Created = DateTime.UtcNow,
+                AgentIdReport = new AgentIdReport
+                {
+                    Selected = original.AgentIdReport!.Selected,
+                    IsRequired = original.AgentIdReport.IsRequired,
+                    ReportName = original.AgentIdReport.ReportName,                                          // You can set other properties of Agent here if needed
+                    ReportType = original.AgentIdReport.ReportType,  // Default agent
+                },
+                FaceIds = original.FaceIds?.Select(f => new FaceIdReport
+                {
+                    IsRequired = f.IsRequired,
+                    Selected = f.Selected,
+                    ReportName = f.ReportName,
+                    Has2Face = f.Has2Face,
+                    ReportType = f.ReportType
+                }).ToList(),
+                DocumentIds = original.DocumentIds?.Select(d => new DocumentIdReport
+                {
+                    IsRequired = d.IsRequired,
+                    Selected = d.Selected,
+                    HasBackImage = d.HasBackImage,
+                    ReportName = d.ReportName,
+                    ReportType = d.ReportType
+                }).ToList(),
+                MediaReports = original.MediaReports?.Select(m => new MediaReport
+                {
+                    IsRequired = m.IsRequired,
+                    Selected = m.Selected,
+                    ReportName = m.ReportName,
+                    MediaType = m.MediaType,
+                    MediaExtension = m.MediaExtension
+                }).ToList(),
+                Questions = original.Questions?.Select(q => new Question
+                {
+                    QuestionText = q.QuestionText,
+                    QuestionType = q.QuestionType,
+                    IsRequired = q.IsRequired
+                }).ToList()
+            };
+            return clone;
+        }
         private static ReportTemplate DeepCloneReportTemplate(ReportTemplate originalTemplate, long serviceTypeId)
         {
             return new ReportTemplate
@@ -114,6 +164,7 @@ namespace risk.control.system.Services.Report
                 Basetemplate = false, // Set to false for the cloned template
                 OriginalTemplateId = originalTemplate.Id, // Reference to the original template
                 Created = DateTime.UtcNow,
+                Updated = DateTime.UtcNow,
                 UpdatedBy = "system", // Or current user
                 LocationReport = GetLocationreport(originalTemplate)
             };
@@ -173,6 +224,7 @@ namespace risk.control.system.Services.Report
                 Basetemplate = false, // Set to false for the cloned template
                 OriginalTemplateId = originalTemplate.Id, // Reference to the original template
                 Created = DateTime.UtcNow,
+                Updated = DateTime.UtcNow,
                 UpdatedBy = currentUserEmail, // Or current user
                 LocationReport = originalTemplate.LocationReport.Select(loc => new LocationReport
                 {
