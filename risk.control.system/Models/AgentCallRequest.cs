@@ -18,6 +18,10 @@ namespace risk.control.system.Models
         public IFormFile? CallRecording { get; set; }
         [BindNever]
         public string? CallRecordingPath { get; set; }
+        public string? LocationLatLong { get; set; }
+        [BindNever]
+        public string? LocationMapUrl { get; set; }
+        [BindNever]
         public string? Transcript { get; set; }
 
     }

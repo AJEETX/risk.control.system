@@ -1,6 +1,7 @@
 ﻿using Hangfire;
 using Microsoft.EntityFrameworkCore;
 using risk.control.system.AppConstant;
+using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services.Common;
@@ -140,7 +141,8 @@ namespace risk.control.system.Services.Agent
                     ScheduleeId = scheduleeId,
                     InsurerName = insurerName,
                     ScheduleRequested = caseDetails.ScheduleMeeting!.ScheduleRequested,
-                    ScheduleAccepted = caseDetails.ScheduleMeeting!.ScheduleAccepted
+                    ScheduleAccepted = caseDetails.ScheduleMeeting!.ScheduleAccepted,
+                    LocationMapUrl = caseDetails.ScheduleMeeting!.LocationMapUrl
                 };
                 return scheduleResponse;
             }
@@ -318,12 +320,21 @@ namespace risk.control.system.Services.Agent
                        $"{_logo}";
 
                 await _smsService.DoSendSmsAsync(countryCode, contactNumberForSchedule, message);
+
+                var (lat, lon) = !string.IsNullOrWhiteSpace(request.LocationLatLong) ? VerificationHelper.ParseCoordinates(request.LocationLatLong!) : ("-37.8136", "144.9631");
+
+                var latLong = lat + "," + lon;
+
+                var url = string.Format("https://maps.googleapis.com/maps/api/staticmap?center={0}&zoom=14&size=400x400&maptype=roadmap&markers=color:red%7Clabel:A%7C{0}&key={1}", latLong, EnvHelper.Get("GOOGLE_MAP_KEY"));
+
                 caseDetails!.ScheduleMeeting = new ScheduleMeeting
                 {
                     CaseId = request.CaseId,
                     ScheduleDateTime = request.ScheduleDateTime,
                     ScheduleRequestedDateTime = DateTime.UtcNow,
                     ScheduleRequested = true,
+                    LocationLatLong = request.LocationLatLong,
+                    LocationMapUrl = url
                 };
                 _context.Investigations.Update(caseDetails);
                 return await _context.SaveChangesAsync() > 0;
@@ -347,6 +358,12 @@ namespace risk.control.system.Services.Agent
 
                 var (fileName, relativePath) = await _fileStorageService.SaveMediaAsync(agentCallRequest.CallRecording!, CONSTANTS.CASE, caseDetail.PolicyDetail!.ContractNumber, CONSTANTS.REPORT);
                 agentCallRequest.CallRecordingPath = relativePath;
+                var (lat, lon) = !string.IsNullOrWhiteSpace(agentCallRequest.LocationLatLong) ? VerificationHelper.ParseCoordinates(agentCallRequest.LocationLatLong!) : ("-37.8136", "144.9631");
+
+                var latLong = lat + "," + lon;
+
+                var url = string.Format("https://maps.googleapis.com/maps/api/staticmap?center={0}&zoom=14&size=400x400&maptype=roadmap&markers=color:red%7Clabel:A%7C{0}&key={1}", latLong, EnvHelper.Get("GOOGLE_MAP_KEY"));
+                agentCallRequest.LocationMapUrl = url;
                 caseDetail.AgentCallInfo.Add(agentCallRequest);
                 var result = await _context.SaveChangesAsync() > 0;
                 var audioCall = await _context.AgentCallRequests.FirstOrDefaultAsync(c => c.CaseId == agentCallRequest.CaseId && c.CallReceivedTime == agentCallRequest.CallReceivedTime && c.StartTime == agentCallRequest.StartTime);

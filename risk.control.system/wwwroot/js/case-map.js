@@ -103,9 +103,19 @@ document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('.preview-image').forEach(function (img) {
         img.addEventListener('click', function () {
             const src = this.getAttribute('src');
+
+            // Get the title from the clicked image, fallback to "Preview Image" if not present
+            const modalTitleText = this.getAttribute('data-modal-title') || 'Preview Image';
+
+            // Update modal image source
             const modalImage = document.getElementById('modalImage');
             modalImage.setAttribute('src', src);
 
+            // Update modal title text
+            const modalTitleLabel = document.getElementById('imageModalLabel');
+            modalTitleLabel.textContent = modalTitleText;
+
+            // Show the Bootstrap modal
             const imageModal = new bootstrap.Modal(document.getElementById('imageModal'));
             imageModal.show();
         });
