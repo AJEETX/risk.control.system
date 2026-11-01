@@ -14,7 +14,7 @@ namespace risk.control.system.Services.Agent
 
         Task<ApplicationUser> ResetUid(string mobile, string portal_base_url, bool sendSMS = false);
 
-        Task<ApplicationUser> GetPin(string agentEmail, string portal_base_url);
+        Task<ApplicationUser> GetPin(string agentEmail, string portal_base_url, bool sendSMS = false);
 
         Task<List<CaseInvestigationAgencyResponse>> GetNewCases(string userEmail);
 
@@ -101,11 +101,11 @@ namespace risk.control.system.Services.Agent
             return [.. finalData];
         }
 
-        public async Task<ApplicationUser> GetPin(string agentEmail, string portal_base_url)
+        public async Task<ApplicationUser> GetPin(string agentEmail, string portal_base_url, bool sendSMS = false)
         {
             var agentRole = await _roleManager.FindByNameAsync(AGENT.DISPLAY_NAME);
 
-            var user2Onboard = await _context.ApplicationUser.FirstOrDefaultAsync(u => !u.Deleted && u.Active && u.Email == agentEmail);
+            var user2Onboard = await _context.ApplicationUser.Include(u => u.Country).FirstOrDefaultAsync(u => !u.Deleted && u.Active && u.Email == agentEmail);
             if (user2Onboard == null)
                 return null!;
             var agency = await _context.Vendor.FirstOrDefaultAsync(a => a.VendorId == user2Onboard!.VendorId && a.Status == VendorStatus.ACTIVE && !a.Deleted);
@@ -115,7 +115,34 @@ namespace risk.control.system.Services.Agent
             }
             var isAgent = await _userVendorManager.IsInRoleAsync(user2Onboard!, agentRole?.Name!);
             if (isAgent)
+            {
+                if (sendSMS)
+                {
+                    string message = $"Dear {user2Onboard.FirstName} {user2Onboard.LastName}\n\n";
+                    //mask last 2 digits of PIN
+                    message += $"Your PIN is: {user2Onboard.SecretPin!.Substring(0, 2)}**\n\n";
+                    message += $"Please get last 2-digits of PIN from the ageny admin.\n\n";
+                    message += $"{portal_base_url}";
+                    await _smsService.DoSendSmsAsync(user2Onboard!.Country!.Code, user2Onboard!.Country!.ISDCode.ToString() + user2Onboard.PhoneNumber!, message);
+
+                    var agencyAdminRole = await _roleManager.FindByNameAsync(AGENCY_ADMIN.DISPLAY_NAME);
+                    var agencyUsers = _context.ApplicationUser.Where(u => !u.Deleted && u.Active && u.VendorId == user2Onboard!.VendorId);
+                    foreach (var agencyUser in agencyUsers)
+                    {
+                        var isAgencyAdmin = await _userVendorManager.IsInRoleAsync(agencyUser, agencyAdminRole!.Name!);
+                        if (isAgencyAdmin)
+                        {
+                            string messageToAdmin = $"Dear {agencyUser.FirstName} {agencyUser.LastName}\n\n";
+                            //mask first 2 digits of PIN
+                            messageToAdmin += $"Agent {user2Onboard.FirstName} {user2Onboard.LastName} has requested for PIN. The PIN is: **{user2Onboard.SecretPin!.Substring(2, 2)}\n\n";
+                            messageToAdmin += $"{portal_base_url}";
+                            await _smsService.DoSendSmsAsync(agencyUser!.Country!.Code, agencyUser!.Country!.ISDCode.ToString() + agencyUser.PhoneNumber!, messageToAdmin);
+                        }
+                    }
+                }
+
                 return user2Onboard!;
+            }
             return null!;
         }
 

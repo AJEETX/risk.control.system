@@ -46,8 +46,8 @@ namespace risk.control.system.Services.Report
             string newName = $"{Regex.Replace(originalTemplate!.Name!, @"_\d{8}_\d{6,9}$", "")}_{DateTime.UtcNow.ToLocalTime():ddMMyyyHHmmss}";
             var clone = CloneReportTemplate(newName, originalTemplate, currentUserEmail);
             var addedTemplate = await _context.ReportTemplates.AddAsync(clone);
-            var rowsAffected = await _context.SaveChangesAsync(null, false);
-            return rowsAffected > 0 ? addedTemplate.Entity : null;
+            var rowsAffected = await _context.SaveChangesAsync(null, false) > 0;
+            return rowsAffected ? addedTemplate.Entity : null!;
         }
 
         public async Task<ReportTemplate> DeepCloneReportTemplate(long clientCompanyId, InsuranceType insuranceType, long serviceTypeId)

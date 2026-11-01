@@ -111,6 +111,8 @@ namespace risk.control.system.Controllers.Common
                 {
                     return BadRequest("The confirmation link is invalid or has expired.");
                 }
+                _logger.LogError("Confirming schedule with token {Token} {CaseId} {DateTime}", token, decryptedCaseId, DateTime.UtcNow.ToLocalTime());
+
                 var schedule = await _agentMeetingSetupService.SetSchedule(decryptedCaseId);
                 return View(schedule);
             }

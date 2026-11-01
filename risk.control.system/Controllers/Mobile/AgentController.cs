@@ -97,6 +97,37 @@ namespace risk.control.system.Controllers.Mobile
             }
         }
 
+        [HttpPost("forgot-pin")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
+        public async Task<IActionResult> ForgotAgentPin(string agentEmail)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(agentEmail))
+                {
+                    return BadRequest($"Empty email");
+                }
+                var user2Onboard = await _agentService.GetPin(agentEmail, _baseurl, true);
+
+                if (user2Onboard == null)
+                {
+                    return BadRequest($"Agent does not exist");
+                }
+
+                return Ok(new
+                {
+                    Email = user2Onboard.Email,
+                    Phone = user2Onboard.PhoneNumber,
+                    Pin = user2Onboard.SecretPin
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred for {UserEmail}.", agentEmail);
+                return BadRequest($"Agent does not exist or Error");
+            }
+        }
+
         [HttpPost("ResetUid")]
         [AllowAnonymous]
         public async Task<IActionResult> ResetUid([Required] string mobile, bool sendSMS = false)

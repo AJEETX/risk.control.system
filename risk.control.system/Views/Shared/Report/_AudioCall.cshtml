@@ -30,6 +30,7 @@
                                 <th scope="col" class="py-3"><i class="far fa-clock text-warning me-1"></i> Duration</th>
                                 <th scope="col" class="py-3"><i class="fas fa-microphone me-1" aria-hidden="true"></i> Recording</th>
                                 <th scope="col" class="py-3"><i class="fas fa-file-alt text-info me-1"></i> Transcript</th>
+                                <th scope="col" class="py-3"><i class="fas fa-map-marker-alt text-info me-1"></i> Location</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -92,6 +93,11 @@
                                         {
                                             <span class="call-transcript-preview transcript-scroll-box">No transcript</span>
                                         }
+                                    </td>
+                                    <td>
+                                        <span class="bg-light text-dark border px-2 py-1">
+                                            <img data-modal-title="Call Location" data-img="@call.LocationMapUrl" class="thumbnail profile-image preview-image" src="@call.LocationMapUrl" title="Display Location in map" data-bs-toggle="tooltip" alt="Map" />
+                                        </span>
                                     </td>
                                 </tr>
                             }

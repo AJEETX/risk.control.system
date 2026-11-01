@@ -7,6 +7,7 @@ namespace risk.control.system.Models.ViewModel
     {
         public long CaseId { get; set; }
         public DateTime ScheduleDateTime { get; set; }
+        public string? LocationLatLong { get; set; }
     }
     public class ScheduleResponse
     {
@@ -21,6 +22,7 @@ namespace risk.control.system.Models.ViewModel
         public string InsurerName { get; set; } = default!;
         public bool ScheduleRequested { get; set; } = false;
         public bool ScheduleAccepted { get; set; } = false;
+        public string? LocationMapUrl { get; set; }
     }
     public class ScheduleMeeting
     {
@@ -32,5 +34,7 @@ namespace risk.control.system.Models.ViewModel
         public DateTime ScheduleDateTime { get; set; }
         public bool ScheduleRequested { get; set; } = false;
         public bool ScheduleAccepted { get; set; } = false;
+        public string? LocationLatLong { get; set; }
+        public string? LocationMapUrl { get; set; }
     }
 }

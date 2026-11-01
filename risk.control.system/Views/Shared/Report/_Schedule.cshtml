@@ -44,6 +44,7 @@
                                     </th>
                                 <th scope="col">Scheduled Date</th>
                                 <th scope="col">Scheduled Time</th>
+                                <th scope="col"><i class="fas fa-map-marker-alt text-info me-1"></i> Location</th>
                                 <th scope="col" class="ps-3">Status</th>
                             </tr>
                         </thead>
@@ -52,6 +53,7 @@
                                 
                                 <td>
                                        <span class="bg-light text-dark border px-2 py-1"> @Model.ScheduleRequestedDateTime.ToString("D") </span>
+                                           <br />
                                     <span class="bg-light text-dark border px-2 py-1">  @Model.ScheduleRequestedDateTime.ToString("t") </span>
                                 </td>
                                 <!-- 2. Assigned Agent (Image on top, Name below) -->
@@ -86,6 +88,11 @@
                                 <!-- 5. Scheduled Time -->
                                 <td>
                                     <span class="bg-light text-dark border px-2 py-1">  @Model.ScheduledDateTime.ToString("t") </span>
+                                </td>
+                                <td>
+                                    <span class="bg-light text-dark border px-2 py-1">                    
+                                        <img data-modal-title="SMS Location" data-img="@Model.LocationMapUrl" class="thumbnail profile-image preview-image" src="@Model.LocationMapUrl" title="Display Location in map" data-bs-toggle="tooltip" alt="Map" />
+                                        </span>
                                 </td>
                                 <!-- 1. Status Section -->
                                 <td class="ps-3">
