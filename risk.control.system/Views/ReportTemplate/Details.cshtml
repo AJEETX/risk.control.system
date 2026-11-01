@@ -43,7 +43,7 @@
                     <span>
                         Template Name:
                     </span>
-                    <strong>@Model.Name</strong>
+                    <strong>@Model.Name (@Model.InvestigationServiceType.Name)</strong>
                 </div>
                 @foreach (var location in Model.LocationReport)
                 {
@@ -288,5 +288,5 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-    <script src="~/js/company/report-template-list.js"></script>
+    <script src="~/js/company/report-template-detail.js"></script>
 }

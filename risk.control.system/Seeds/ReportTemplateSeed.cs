@@ -23,12 +23,17 @@ namespace risk.control.system.Seeds
                     MediaReports = CreateDefaultMediaReports(true, false),
                     FaceIds = new List<FaceIdReport>
                     {
-                        CreateFaceReport(DigitalIdReportType.CUSTOMER_FACE, true, true)
+                        CreateFaceReport(DigitalIdReportType.BENEFICIARY_FACE, true, true),
+                        CreateFaceReport(DigitalIdReportType.CUSTOMER_FACE, true, false),
                     },
                     DocumentIds = new List<DocumentIdReport>
                     {
                         CreateDocumentReport(DocumentIdReportType.ADHAAR, true),
                         CreateDocumentReport(DocumentIdReportType.PAN, false),
+                        CreateDocumentReport(DocumentIdReportType.VOTER_ID, false),
+                        CreateDocumentReport(DocumentIdReportType.DRIVING_LICENSE, false),
+                        CreateDocumentReport(DocumentIdReportType.BIRTH_CERTIFICATE, false),
+                        CreateDocumentReport(DocumentIdReportType.EMPLOYMENT_RECORD, false),
                         CreateDocumentReport(DocumentIdReportType.ITR, false)
                     },
                     Questions = UnderwritingQuestion.QuestionsUNDERWRITING_LA_ADDRESS()
@@ -48,13 +53,28 @@ namespace risk.control.system.Seeds
 
                 template.LocationReport = new List<LocationReport>
                  {
-                CreateLocation(CONSTANTS.LOCATIONS.BENEFICIARY_ADDRESS, true,
-                    ClaimQuestion.QuestionsCLAIM_LA_ADDRESS(),
-                    faceIds: new() {
-                        CreateFaceReport(DigitalIdReportType.CUSTOMER_FACE, false, false),
+                    new ()
+                    {
+                    LocationName = CONSTANTS.LOCATIONS.BENEFICIARY_ADDRESS,
+                    IsRequired = true,
+                    AgentIdReport = CreateDefaultAgentReport(),
+                    MediaReports = CreateDefaultMediaReports(true, false),
+                    FaceIds = new List<FaceIdReport>
+                    {
                         CreateFaceReport(DigitalIdReportType.BENEFICIARY_FACE, true, true)
                     },
-                    docType: DocumentIdReportType.PAN),
+                    DocumentIds = new List<DocumentIdReport>
+                    {
+                        CreateDocumentReport(DocumentIdReportType.ADHAAR, true),
+                        CreateDocumentReport(DocumentIdReportType.PAN, false),
+                        CreateDocumentReport(DocumentIdReportType.VOTER_ID, false),
+                        CreateDocumentReport(DocumentIdReportType.DRIVING_LICENSE, false),
+                        CreateDocumentReport(DocumentIdReportType.BIRTH_CERTIFICATE, false),
+                        CreateDocumentReport(DocumentIdReportType.EMPLOYMENT_RECORD, false),
+                        CreateDocumentReport(DocumentIdReportType.ITR, false)
+                    },
+                    Questions = ClaimQuestion.QuestionsCLAIM_LA_ADDRESS()
+                    },
 
                 CreateLocation(CONSTANTS.LOCATIONS.HOSPITAL_ADDRESS, false,
                     ClaimQuestion.QuestionsCLAIM_HOSPITAL(),
