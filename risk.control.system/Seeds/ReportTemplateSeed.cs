@@ -15,30 +15,30 @@ namespace risk.control.system.Seeds
 
                 template.LocationReport = new List<LocationReport>
                  {
-                new()
-                {
-                    LocationName = CONSTANTS.LOCATIONS.LA_ADDRESS,
-                    IsRequired = true,
-                    AgentIdReport = CreateDefaultAgentReport(),
-                    MediaReports = CreateDefaultMediaReports(true, false),
-                    FaceIds = new List<FaceIdReport>
-                    {
-                        CreateFaceReport(DigitalIdReportType.BENEFICIARY_FACE, true, true),
-                        CreateFaceReport(DigitalIdReportType.CUSTOMER_FACE, true, false),
-                    },
-                    DocumentIds = new List<DocumentIdReport>
-                    {
-                        CreateDocumentReport(DocumentIdReportType.ADHAAR, true),
-                        CreateDocumentReport(DocumentIdReportType.PAN, false),
-                        CreateDocumentReport(DocumentIdReportType.VOTER_ID, false),
-                        CreateDocumentReport(DocumentIdReportType.DRIVING_LICENSE, false),
-                        CreateDocumentReport(DocumentIdReportType.BIRTH_CERTIFICATE, false),
-                        CreateDocumentReport(DocumentIdReportType.EMPLOYMENT_RECORD, false),
-                        CreateDocumentReport(DocumentIdReportType.ITR, false)
-                    },
-                    Questions = UnderwritingQuestion.QuestionsUNDERWRITING_LA_ADDRESS()
-                }
-            };
+                    new()
+                        {
+                            LocationName = CONSTANTS.LOCATIONS.LA_ADDRESS,
+                            IsRequired = true,
+                            AgentIdReport = CreateDefaultAgentReport(),
+                            MediaReports = CreateDefaultMediaReports(true, false),
+                            FaceIds = new List<FaceIdReport>
+                            {
+                                CreateFaceReport(DigitalIdReportType.CUSTOMER_FACE, true, true),
+                                CreateFaceReport(DigitalIdReportType.BENEFICIARY_FACE, true, false),
+                            },
+                            DocumentIds = new List<DocumentIdReport>
+                            {
+                                CreateDocumentReport(DocumentIdReportType.ADHAAR, true),
+                                CreateDocumentReport(DocumentIdReportType.PAN, false),
+                                CreateDocumentReport(DocumentIdReportType.VOTER_ID, false),
+                                CreateDocumentReport(DocumentIdReportType.DRIVING_LICENSE, false),
+                                CreateDocumentReport(DocumentIdReportType.BIRTH_CERTIFICATE, false),
+                                CreateDocumentReport(DocumentIdReportType.EMPLOYMENT_RECORD, false),
+                                CreateDocumentReport(DocumentIdReportType.ITR, false)
+                            },
+                            Questions = UnderwritingQuestion.QuestionsUNDERWRITING_LA_ADDRESS()
+                        }
+                };
 
                 context.ReportTemplates.Add(template);
             }
@@ -54,52 +54,52 @@ namespace risk.control.system.Seeds
                 template.LocationReport = new List<LocationReport>
                  {
                     new ()
-                    {
-                    LocationName = CONSTANTS.LOCATIONS.BENEFICIARY_ADDRESS,
-                    IsRequired = true,
-                    AgentIdReport = CreateDefaultAgentReport(),
-                    MediaReports = CreateDefaultMediaReports(true, false),
-                    FaceIds = new List<FaceIdReport>
-                    {
-                        CreateFaceReport(DigitalIdReportType.BENEFICIARY_FACE, true, true)
-                    },
-                    DocumentIds = new List<DocumentIdReport>
-                    {
-                        CreateDocumentReport(DocumentIdReportType.ADHAAR, true),
-                        CreateDocumentReport(DocumentIdReportType.PAN, false),
-                        CreateDocumentReport(DocumentIdReportType.VOTER_ID, false),
-                        CreateDocumentReport(DocumentIdReportType.DRIVING_LICENSE, false),
-                        CreateDocumentReport(DocumentIdReportType.BIRTH_CERTIFICATE, false),
-                        CreateDocumentReport(DocumentIdReportType.EMPLOYMENT_RECORD, false),
-                        CreateDocumentReport(DocumentIdReportType.ITR, false)
-                    },
-                    Questions = ClaimQuestion.QuestionsCLAIM_LA_ADDRESS()
-                    },
+                        {
+                        LocationName = CONSTANTS.LOCATIONS.BENEFICIARY_ADDRESS,
+                        IsRequired = true,
+                        AgentIdReport = CreateDefaultAgentReport(),
+                        MediaReports = CreateDefaultMediaReports(true, false),
+                        FaceIds = new List<FaceIdReport>
+                        {
+                            CreateFaceReport(DigitalIdReportType.BENEFICIARY_FACE, true, true)
+                        },
+                        DocumentIds = new List<DocumentIdReport>
+                        {
+                            CreateDocumentReport(DocumentIdReportType.ADHAAR, true),
+                            CreateDocumentReport(DocumentIdReportType.PAN, false),
+                            CreateDocumentReport(DocumentIdReportType.VOTER_ID, false),
+                            CreateDocumentReport(DocumentIdReportType.DRIVING_LICENSE, false),
+                            CreateDocumentReport(DocumentIdReportType.BIRTH_CERTIFICATE, false),
+                            CreateDocumentReport(DocumentIdReportType.EMPLOYMENT_RECORD, false),
+                            CreateDocumentReport(DocumentIdReportType.ITR, false)
+                        },
+                        Questions = ClaimQuestion.QuestionsCLAIM_LA_ADDRESS()
+                        },
 
-                CreateLocation(CONSTANTS.LOCATIONS.HOSPITAL_ADDRESS, false,
-                    ClaimQuestion.QuestionsCLAIM_HOSPITAL(),
-                    docType: DocumentIdReportType.MEDICAL_CERTIFICATE),
+                        CreateLocation(CONSTANTS.LOCATIONS.HOSPITAL_ADDRESS, false,
+                            ClaimQuestion.QuestionsCLAIM_HOSPITAL(),
+                            docType: DocumentIdReportType.MEDICAL_CERTIFICATE),
 
-                CreateLocation(CONSTANTS.LOCATIONS.BUSINESS_ADDRESS, false,
-                    ClaimQuestion.QuestionsCLAIM_BUSINESS_ADDRESS(),
-                    docType: DocumentIdReportType.ITR),
+                        CreateLocation(CONSTANTS.LOCATIONS.BUSINESS_ADDRESS, false,
+                            ClaimQuestion.QuestionsCLAIM_BUSINESS_ADDRESS(),
+                            docType: DocumentIdReportType.ITR),
 
-                CreateLocation(CONSTANTS.LOCATIONS.CHEMIST_ADDRESS, false,
-                    ClaimQuestion.QuestionsCLAIM_CHEMIST_ADDRESS(),
-                    docType: DocumentIdReportType.MEDICAL_PRESCRIPTION),
+                        CreateLocation(CONSTANTS.LOCATIONS.CHEMIST_ADDRESS, false,
+                            ClaimQuestion.QuestionsCLAIM_CHEMIST_ADDRESS(),
+                            docType: DocumentIdReportType.MEDICAL_PRESCRIPTION),
 
-                CreateLocation(CONSTANTS.LOCATIONS.EMPLOYMENT_ADDRESS, false,
-                    ClaimQuestion.QuestionsCLAIM_EMPLOYMENT_ADDRESS(),
-                    docType: DocumentIdReportType.EMPLOYMENT_RECORD),
+                        CreateLocation(CONSTANTS.LOCATIONS.EMPLOYMENT_ADDRESS, false,
+                            ClaimQuestion.QuestionsCLAIM_EMPLOYMENT_ADDRESS(),
+                            docType: DocumentIdReportType.EMPLOYMENT_RECORD),
 
-                CreateLocation(CONSTANTS.LOCATIONS.CEMETERY_ADDRESS, true,
-                    ClaimQuestion.QuestionsCLAIM_CEMETERY_ADDRESS(),
-                    docType: DocumentIdReportType.DEATH_CERTIFICATE),
+                        CreateLocation(CONSTANTS.LOCATIONS.CEMETERY_ADDRESS, true,
+                            ClaimQuestion.QuestionsCLAIM_CEMETERY_ADDRESS(),
+                            docType: DocumentIdReportType.DEATH_CERTIFICATE),
 
-                CreateLocation(CONSTANTS.LOCATIONS.POLICE_ADDRESS, false,
-                    ClaimQuestion.QuestionsCLAIM_POLIC_STATION(),
-                    docType: DocumentIdReportType.POLICE_FIR_REPORT)
-            };
+                        CreateLocation(CONSTANTS.LOCATIONS.POLICE_ADDRESS, false,
+                            ClaimQuestion.QuestionsCLAIM_POLIC_STATION(),
+                            docType: DocumentIdReportType.POLICE_FIR_REPORT)
+                };
 
                 context.ReportTemplates.Add(template);
             }

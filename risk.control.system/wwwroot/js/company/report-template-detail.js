@@ -630,7 +630,7 @@
                                     .addClass('btn-outline-success')
                                     .prop('disabled', true)
                                     .attr('title', 'The template is active')
-                                    .html('<i class="fas fa-flash igreen"></i> <b>Active</b>');
+                                    .html('<i class="fas fa-flash igreen"></i> <b>Active</b> <i class="fas fa-check-circle"></i>');
                             }
                         });
                     }

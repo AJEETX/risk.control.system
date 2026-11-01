@@ -58,7 +58,7 @@ namespace risk.control.system.Controllers.Creator
         }
         //[ValidateAntiForgeryToken]
         [HttpPost("WithdrawClaim/{id}")]
-        public async Task<IActionResult> WithdrawClaim(int id, [FromBody] WithdrawClaimRequest request)
+        public async Task<IActionResult> WithdrawClaim(int id, [FromBody] WithdrawCaseRequest request)
         {
             var userEmail = HttpContext.User?.Identity?.Name!;
             if (string.IsNullOrWhiteSpace(request?.Reason))
