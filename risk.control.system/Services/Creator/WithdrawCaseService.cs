@@ -9,7 +9,7 @@ namespace risk.control.system.Services.Creator
     public interface IWithdrawCaseService
     {
         Task<(string, long)> WithdrawCaseByCompany(string userEmail, CaseTransactionModel model, long caseId);
-        Task<(string, long)> WithdrawCaseByCompanyNew(string userEmail, WithdrawClaimRequest request);
+        Task<(string, long)> WithdrawCaseByCompanyNew(string userEmail, WithdrawCaseRequest request);
     }
 
     internal class WithdrawCaseService(ApplicationDbContext context, ILogger<WithdrawCaseService> logger, ITimelineService timelineService) : IWithdrawCaseService
@@ -51,7 +51,7 @@ namespace risk.control.system.Services.Creator
             }
         }
 
-        public async Task<(string, long)> WithdrawCaseByCompanyNew(string userEmail, WithdrawClaimRequest request)
+        public async Task<(string, long)> WithdrawCaseByCompanyNew(string userEmail, WithdrawCaseRequest request)
         {
             var currentUser = await _context.ApplicationUser.AsNoTracking().FirstOrDefaultAsync(u => u.Email == userEmail);
 
