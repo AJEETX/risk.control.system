@@ -89,7 +89,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error in Login for {UserEmail}", User?.Identity?.Name ?? "Anonymous");
+                _logger.LogError(ex, "Error in Login for UserEmail {UserEmail}.", User?.Identity?.Name ?? "Anonymous");
                 return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred." });
             }
         }
@@ -164,7 +164,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while changing password for {UserEmail}", User?.Identity?.Name ?? "Anonymous");
+                _logger.LogError(ex, "Error occurred while changing password for UserEmail {UserEmail}.", User?.Identity?.Name ?? "Anonymous");
                 _notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Login));
             }
@@ -206,7 +206,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error in Forgot Password for {UserEmail}", input?.Email ?? "Anonymous"); ;
+                _logger.LogError(ex, "Error in Forgot Password for UserEmail {UserEmail}.", input?.Email ?? "Anonymous"); ;
                 throw;
             }
         }

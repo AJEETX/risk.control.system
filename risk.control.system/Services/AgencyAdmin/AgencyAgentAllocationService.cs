@@ -56,7 +56,7 @@ namespace risk.control.system.Services.AgencyAdmin
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Allocation failed for Case {ClaimId} by {User}", caseId, allocatedByEmail ?? "Anonymous");
+                _logger.LogError(ex, "Allocation failed for Case {CaseId}, by {User}", caseId, allocatedByEmail ?? "Anonymous");
 
                 return new AllocateVendorAgentResult
                 {

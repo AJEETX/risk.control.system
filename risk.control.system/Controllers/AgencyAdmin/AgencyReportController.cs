@@ -66,7 +66,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred for CaseId {Id}. {UserEmail}.", caseId, userEmail ?? "Anonymous");
+                _logger.LogError(ex, "Error occurred for CaseId {Id}, UserEmail {UserEmail}.", caseId, userEmail ?? "Anonymous");
                 _notifyService.Error("OOPs !!!..Contact Admin");
                 var encryptedId = _encryptionService.ProtectId(caseId);
                 return RedirectToAction(nameof(AgentController.GetInvestigate), ControllerName<AgentController>.Name, new { id = encryptedId });
@@ -121,7 +121,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred for Case {Id}. {UserEmail}.", claimId, userEmail ?? "Anonymous");
+                _logger.LogError(ex, "Error occurred for Case {Id}, UserEmail {UserEmail}.", claimId, userEmail ?? "Anonymous");
                 _notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(VendorInvestigationController.ReportDetail), ControllerName<VendorInvestigationController>.Name, new { selectedcase = encryptedId });
             }

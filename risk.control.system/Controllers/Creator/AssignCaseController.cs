@@ -70,7 +70,7 @@ namespace risk.control.system.Controllers.Creator
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error deleting case(s). {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error deleting case(s). UserEmail {UserEmail}", userEmail);
                 _notifyService.Error("Error assigning case. Try again.");
             }
             return RedirectToAction(nameof(AddAssignController.New), ControllerName<AddAssignController>.Name);
@@ -105,7 +105,7 @@ namespace risk.control.system.Controllers.Creator
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error assigning case {Id} to {Agency}. {UserEmail}", caseId, selectedcase, userEmail);
+                _logger.LogError(ex, "Error assigning case Id {Id} to Agency Id {AgencyId}. UserEmail {UserEmail}", caseId, selectedcase, userEmail);
                 _notifyService.Error("Error assigning case. Try again.");
                 return RedirectToAction(nameof(AddAssignController.New), ControllerName<AddAssignController>.Name);
             }
@@ -140,7 +140,7 @@ namespace risk.control.system.Controllers.Creator
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error assigning case {Id} to {Agency}. {UserEmail}", caseId, selectedcase, userEmail);
+                _logger.LogError(ex, "Error assigning case Id {Id} to Agency Id {AgencyId}. UserEmail {UserEmail}", caseId, selectedcase, userEmail);
                 _notifyService.Error("Error assigning case. Try again.");
                 return RedirectToAction(nameof(ClaimController.Add), ControllerName<ClaimController>.Name);
             }
@@ -169,7 +169,7 @@ namespace risk.control.system.Controllers.Creator
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error assigning case {Id}. {UserEmail}", caseId, userEmail);
+                _logger.LogError(ex, "Error assigning case Id {Id}. UserEmail {UserEmail}", caseId, userEmail);
                 _notifyService.Error("Error assigning case. Try again.");
                 return RedirectToAction(nameof(AddAssignController.New), ControllerName<AddAssignController>.Name);
             }

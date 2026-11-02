@@ -106,7 +106,7 @@ namespace risk.control.system.Services.Creator
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred creating Case detail. {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error occurred creating Case detail. UserEmail {UserEmail}", userEmail);
                 return null!;
             }
         }
@@ -155,7 +155,7 @@ namespace risk.control.system.Services.Creator
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred editing Case detail. {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error occurred editing Case detail. User {UserEmail}", userEmail);
                 return null!;
             }
         }
@@ -197,7 +197,7 @@ namespace risk.control.system.Services.Creator
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred creating Customer detail. {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error occurred creating Customer detail. User {UserEmail}", userEmail);
                 return false;
             }
         }
@@ -255,7 +255,7 @@ namespace risk.control.system.Services.Creator
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred editing Customer detail. {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error occurred editing Customer detail. User {UserEmail}", userEmail);
                 return false;
             }
         }
@@ -303,7 +303,7 @@ namespace risk.control.system.Services.Creator
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred creating Beneficiary detail. {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error occurred creating Beneficiary detail. User {UserEmail}", userEmail);
                 return false;
             }
         }
@@ -366,7 +366,7 @@ namespace risk.control.system.Services.Creator
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred editing Beneficiary detail. {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error occurred editing Beneficiary detail. User {UserEmail}", userEmail);
                 return false;
             }
         }

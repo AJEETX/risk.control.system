@@ -59,7 +59,7 @@ namespace risk.control.system.Controllers.Manager
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting {AgencyId}. {UserEmail}", id, userEmail);
+                _logger.LogError(ex, "Error getting Agency Service Id {Id}. UserEmail {UserEmail}", id, userEmail);
                 _notifyService.Error("Error getting agency service. Try again.");
                 return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
             }
@@ -85,7 +85,7 @@ namespace risk.control.system.Controllers.Manager
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error creating service. {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error creating service. UserEmail {UserEmail}", userEmail);
                 _notifyService.Error("Error creating service. Try again.");
             }
             var encryptedId = _encryptionService.ProtectId(service.VendorId);
@@ -111,7 +111,7 @@ namespace risk.control.system.Controllers.Manager
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting service for {ServiceId}. {UserEmail}", id, userEmail);
+                _logger.LogError(ex, "Error getting service for Id {Id}. UserEmail {UserEmail}", id, userEmail);
                 _notifyService.Error("Error getting agency service. Try again.");
                 return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
             }
@@ -149,7 +149,7 @@ namespace risk.control.system.Controllers.Manager
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error editing Service. {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error editing Service Id {ServiceId}. UserEmail {UserEmail}", model.Id, userEmail);
                 _notifyService.Custom("Error editing service. Try again.", 3, "red", "fas fa-cog");
             }
             var encryptedId = _encryptionService.ProtectId(model.VendorId);
@@ -171,7 +171,7 @@ namespace risk.control.system.Controllers.Manager
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error deleting service {ServiceId}", id);
+                _logger.LogError(ex, "Error deleting service Id {ServiceId}. UserEmail {UserEmail}", id, User?.Identity?.Name);
                 return StatusCode(500, new { success = false, message = "Delete failed." });
             }
         }

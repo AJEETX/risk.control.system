@@ -51,7 +51,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred for Case {Id}. {UserEmail}.", caseId, userEmail ?? "Anonymous");
+                _logger.LogError(ex, "Error occurred for Case Id {Id}, UserEmail {UserEmail}.", caseId, userEmail ?? "Anonymous");
                 _notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(VendorInvestigationController.Allocate), ControllerName<VendorInvestigationController>.Name);
             }
@@ -80,7 +80,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred for Case {Id}. {UserEmail}.", caseId, userEmail ?? "Anonymous");
+                _logger.LogError(ex, "Error occurred for Case Id {Id}, UserEmail {UserEmail}.", caseId, userEmail ?? "Anonymous");
                 _notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(VendorInvestigationController.Allocate), ControllerName<VendorInvestigationController>.Name);
             }

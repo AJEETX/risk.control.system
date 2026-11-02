@@ -55,7 +55,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while getting case detail {PolicyId} for user {UserEmail}", id, userEmail);
+                _logger.LogError(ex, "Error occurred while getting case detail Id {PolicyId}, for UserEmail {UserEmail}.", id, userEmail ?? "Anonymous");
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -77,7 +77,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while getting case notes for {ClaimId} for user {UserEmail}", claimId, userEmail);
+                _logger.LogError(ex, "Error occurred while getting case notes for CaseId {ClaimId}, for UserEmail {UserEmail}.", claimId, userEmail ?? "Anonymous");
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -117,7 +117,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while getting {CustomerId} for user {UserEmail}", id, userEmail);
+                _logger.LogError(ex, "Error occurred while getting CustomerId {CustomerId}, for UserEmail {UserEmail}.", id, userEmail ?? "Anonymous");
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -150,7 +150,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while getting {BeneficiaryId} for user {UserEmail}", id, userEmail);
+                _logger.LogError(ex, "Error occurred while getting BeneficiaryId {BeneficiaryId}, for UserEmail {UserEmail}.", id, userEmail ?? "Anonymous");
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -186,7 +186,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while getting {CustomerId} address map for user {UserEmail}", id, userEmail);
+                _logger.LogError(ex, "Error occurred while getting CustomerId {CustomerId}, address map for UserEmail {UserEmail}.", id, userEmail ?? "Anonymous");
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -222,7 +222,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while getting {BeneficiaryId} address map for user {UserEmail}", id, userEmail);
+                _logger.LogError(ex, "Error occurred while getting BeneficiaryId {BeneficiaryId}, address map for UserEmail {UserEmail}.", id, userEmail ?? "Anonymous");
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -264,7 +264,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while getting {CaseId} and {FaceId} for user {UserEmail}", caseId, faceId, userEmail);
+                _logger.LogError(ex, "Error occurred while getting CaseId {CaseId}, and FaceId {FaceId}, for UserEmail {UserEmail}.", caseId, faceId, userEmail ?? "Anonymous");
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -307,7 +307,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while getting {CaseId} and {FaceId} for user {UserEmail}", caseId, faceId, userEmail);
+                _logger.LogError(ex, "Error occurred while getting CaseId {CaseId}, and FaceId {FaceId}, for UserEmail {UserEmail}.", caseId, faceId, userEmail ?? "Anonymous");
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -350,7 +350,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while getting {CaseId} and {DocumentId} for user {UserEmail}", caseId, docId, userEmail);
+                _logger.LogError(ex, "Error occurred while getting CaseId {CaseId}, and DocumentId {DocumentId}, for UserEmail {UserEmail}.", caseId, docId, userEmail ?? "Anonymous");
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -394,7 +394,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while getting {CaseId} and {MediaId} for user {UserEmail}", caseId, docId, userEmail);
+                _logger.LogError(ex, "Error occurred while getting CaseId {CaseId}, and MediaId {MediaId}, for UserEmail {UserEmail}.", caseId, docId, userEmail ?? "Anonymous");
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }

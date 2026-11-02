@@ -69,7 +69,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred for Case {Id}. {UserEmail}.", claimId, userEmail);
+                _logger.LogError(ex, "Error occurred for Case {Id}, UserEmail {UserEmail}.", claimId, userEmail);
                 _notifyService.Error("An internal error occurred.");
             }
 

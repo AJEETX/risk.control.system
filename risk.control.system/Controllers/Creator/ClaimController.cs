@@ -353,7 +353,7 @@ namespace risk.control.system.Controllers.Creator
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting Empanelled Agencies of case {CaseId}. {UserEmail}", id, userEmail);
+                _logger.LogError(ex, "Error getting Empanelled Agencies of case CaseId {CaseId}. UserEmail {UserEmail}", id, userEmail);
                 _notifyService.Error("Error getting Agencies. Try again.");
                 return RedirectToAction(nameof(Assign));
             }
@@ -405,7 +405,7 @@ namespace risk.control.system.Controllers.Creator
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred getting active cases. {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error occurred getting active cases. UserEmail {UserEmail}", userEmail);
                 _notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
             }
@@ -452,7 +452,7 @@ namespace risk.control.system.Controllers.Creator
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting agency details. VendorId: {VendorId}, User: {UserEmail}", id, userEmail ?? "Anonymous");
+                _logger.LogError(ex, "Error getting agency details. VendorId: {VendorId}, UserEmail: {UserEmail}", id, userEmail ?? "Anonymous");
                 _notifyService.Error("Error getting agency details. Try again.");
                 return RedirectToAction(nameof(Assign));
             }

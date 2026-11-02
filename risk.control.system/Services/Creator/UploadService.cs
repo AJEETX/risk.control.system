@@ -42,7 +42,7 @@ namespace risk.control.system.Services.Creator
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Error uploading row {RowNumber} for user {Email}", i + 1, companyUser.Email);
+                    _logger.LogError(ex, "Error uploading row {RowNumber}, for user {Email}", i + 1, companyUser.Email);
                 }
             }
             return results;

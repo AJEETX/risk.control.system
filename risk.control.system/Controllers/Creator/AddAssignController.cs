@@ -56,7 +56,7 @@ namespace risk.control.system.Controllers.Creator
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error fetching Add/Assign page for {UserEmail}", currentUserEmail);
+                _logger.LogError(ex, "Error fetching Add/Assign page for UserEmail {UserEmail}", currentUserEmail);
                 _notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction("Index", "Dashboard");
             }
@@ -84,7 +84,7 @@ namespace risk.control.system.Controllers.Creator
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred creating case. {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error occurred creating case. UserEmail {UserEmail}", userEmail);
                 _notifyService.Error("OOPS!!!..Try Again");
                 return RedirectToAction(nameof(Create));
             }
@@ -101,7 +101,7 @@ namespace risk.control.system.Controllers.Creator
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred to create case. {UserEmail} ", userEmail);
+                _logger.LogError(ex, "Error occurred to create case. UserEmail {UserEmail} ", userEmail);
                 _notifyService.Error("Error creating case detail. Try Again.");
                 return RedirectToAction(nameof(Add));
             }
@@ -145,7 +145,7 @@ namespace risk.control.system.Controllers.Creator
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred to create case. {UserEmail} ", userEmail);
+                _logger.LogError(ex, "Error occurred to create case. UserEmail {UserEmail} ", userEmail);
                 _notifyService.Error("Error creating case detail. Try Again.");
                 return RedirectToAction(nameof(Add));
             }
@@ -177,7 +177,7 @@ namespace risk.control.system.Controllers.Creator
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred to get edit case {Id}. {UserEmail} ", id, userEmail);
+                _logger.LogError(ex, "Error occurred to get edit case Id {Id}. UserEmail {UserEmail} ", id, userEmail);
                 _notifyService.Error("Error editing case detail. Try Again");
                 return RedirectToAction(nameof(CreatorController.Details), ControllerName<CreatorController>.Name, new { id = id });
             }
@@ -223,7 +223,7 @@ namespace risk.control.system.Controllers.Creator
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred to edit case {Id}. {UserEmail} ", model.Id, userEmail);
+                _logger.LogError(ex, "Error occurred to edit case Id {Id}. UserEmail {UserEmail} ", model.Id, userEmail);
                 _notifyService.Error("OOPs !!!..Error editing Case detail. Try again.");
                 var encryptedId = _encryptionService.ProtectId(model.Id);
                 return RedirectToAction(nameof(CreatorController.Details), ControllerName<CreatorController>.Name, new { id = model.Id });

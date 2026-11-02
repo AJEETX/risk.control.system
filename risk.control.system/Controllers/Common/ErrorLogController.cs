@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using AspNetCoreHero.ToastNotification.Abstractions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using risk.control.system.AppConstant;
@@ -8,8 +9,13 @@ using SmartBreadcrumbs.Attributes;
 namespace risk.control.system.Controllers.Common
 {
     [Breadcrumb("General Setup")]
-    public class ErrorLogController(IWebHostEnvironment env, ILogger<ErrorLogController> logger) : Controller
+    [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME}")]
+    public class ErrorLogController(
+        IWebHostEnvironment env,
+        INotyfService notifyService,
+        ILogger<ErrorLogController> logger) : Controller
     {
+        private readonly INotyfService _notifyService = notifyService;
         private readonly IWebHostEnvironment _env = env;
         private readonly ILogger<ErrorLogController> _logger = logger;
 
@@ -18,7 +24,6 @@ namespace risk.control.system.Controllers.Common
             return RedirectToAction(nameof(ErrorLog));
         }
 
-        [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME}")]
         [HttpGet]
         [Breadcrumb("Error Logs")]
         public IActionResult ErrorLog()
@@ -33,14 +38,51 @@ namespace risk.control.system.Controllers.Common
                 {
                     FileName = f.Name,
                     FullPath = f.FullName,
-                    Date = f.CreationTime,
+                    Date = f.CreationTime.ToLocalTime(),
                     SizeKB = f.Length / 1024
                 }).ToList();
 
             return View(files);
         }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Delete(string fileName)
+        {
+            if (string.IsNullOrEmpty(fileName))
+            {
+                return BadRequest();
+            }
 
-        [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME}")]
+            var safeFileName = Path.GetFileName(fileName);
+            var logPath = Path.Combine(_env.ContentRootPath, CONSTANTS.LogsDirectory);
+            var filePath = Path.Combine(logPath, safeFileName);
+
+            if (System.IO.File.Exists(filePath))
+            {
+                try
+                {
+                    // Attempt to open the file to verify it's not locked by Serilog
+                    using (var stream = new FileStream(filePath, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
+                    {
+                        // If it successfully opens, it's not locked
+                    }
+
+                    // -> HERE: Since it successfully opened and closed, it's safe to delete!
+                    System.IO.File.Delete(filePath);
+
+                    // Optional: Add a success notification using your notify service
+                    _notifyService.Success("Log file deleted successfully.");
+                }
+                catch (Exception ex)
+                {
+                    // The file is currently in use/locked by Serilog (active log file)
+                    _logger.LogError(ex, "Cannot delete the active log file currently in use by the system.");
+                    _notifyService.Custom("Cannot delete the active log file currently in use by the system", 3, "red", "fa fa-lock");
+                }
+            }
+
+            return RedirectToAction(nameof(ErrorLog));
+        }
         [HttpGet]
         [Breadcrumb("Error List", FromAction = nameof(ErrorLog))]
         public async Task<IActionResult> Details(string fileName)
@@ -50,14 +92,10 @@ namespace risk.control.system.Controllers.Common
                 return BadRequest("File name is missing.");
             }
 
-            // --- SECURITY FIX: Prevent Path Traversal ---
-            // Extract only the base file name (strips path manipulators like '../' or 'c:\')
             string safeFileName = Path.GetFileName(fileName);
-
             string logsFolderPath = Path.GetFullPath(Path.Combine(_env.ContentRootPath, CONSTANTS.LogsDirectory));
             string filePath = Path.GetFullPath(Path.Combine(logsFolderPath, safeFileName));
 
-            // Ensure the resolved full path actually starts inside the intended folder
             if (!filePath.StartsWith(logsFolderPath, StringComparison.OrdinalIgnoreCase) || !System.IO.File.Exists(filePath))
             {
                 return NotFound("Log file not found.");
@@ -73,30 +111,38 @@ namespace risk.control.system.Controllers.Common
             {
                 var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
 
-                // --- ASYNC & LOCKING FIX: Non-blocking async reading with shared access ---
-                using var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite, bufferSize: 4096, useAsync: true);
-                using var reader = new StreamReader(stream);
-
-                string? line;
-                while ((line = await reader.ReadLineAsync()) != null)
+                // Read the entire file content asynchronously to handle concatenated objects safely
+                string fileContent;
+                using (var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite, bufferSize: 4096, useAsync: true))
+                using (var reader = new StreamReader(stream))
                 {
-                    if (string.IsNullOrWhiteSpace(line))
-                        continue;
+                    fileContent = await reader.ReadToEndAsync();
+                }
 
-                    try
+                if (!string.IsNullOrWhiteSpace(fileContent))
+                {
+                    var utf8Bytes = System.Text.Encoding.UTF8.GetBytes(fileContent);
+                    var reader = new Utf8JsonReader(utf8Bytes);
+
+                    // Parse multiple consecutive JSON objects even if they share lines
+                    while (JsonDocument.TryParseValue(ref reader, out var jsonDoc))
                     {
-                        var errorEntry = JsonSerializer.Deserialize<ErrorDetailsViewModel>(line, options);
-                        if (errorEntry != null)
+                        try
                         {
-                            viewModel.ErrorDetails.Add(errorEntry);
+                            var errorEntry = jsonDoc.Deserialize<ErrorDetailsViewModel>(options);
+                            if (errorEntry != null)
+                            {
+                                viewModel.ErrorDetails.Add(errorEntry);
+                            }
+                        }
+                        catch (JsonException)
+                        {
+                            // Skip malformed individual entries
+                            continue;
                         }
                     }
-                    catch (JsonException)
-                    {
-                        // Skip malformed individual NDJSON entries
-                        continue;
-                    }
                 }
+
                 viewModel.ErrorDetails = viewModel.ErrorDetails.OrderByDescending(o => o.Timestamp).ToList();
                 return View(viewModel);
             }
@@ -106,7 +152,6 @@ namespace risk.control.system.Controllers.Common
                 return View(viewModel);
             }
         }
-        [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME}")]
         [HttpGet]
         public async Task<IActionResult> Download(string fileName)
         {

@@ -53,7 +53,7 @@ namespace risk.control.system.Controllers.Creator
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "File Upload Error for {User}", userEmail);
+                _logger.LogError(ex, "File Upload Error for UserEmail {UserEmail}", userEmail);
                 _notifyService.Custom($"File Upload Error.", 3, "red", "fa fa-upload");
                 return RedirectToAction(nameof(CaseUploadController.Uploads), ControllerName<CaseUploadController>.Name);
             }

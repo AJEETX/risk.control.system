@@ -65,7 +65,7 @@ namespace risk.control.system.Controllers.Creator
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred getting active case {JobId}. {UserEmail}", jobId, userEmail);
+                _logger.LogError(ex, "Error occurred getting active case JobId {JobId}. UserEmail {UserEmail}", jobId, userEmail);
                 _notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
             }
@@ -88,7 +88,7 @@ namespace risk.control.system.Controllers.Creator
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred active case detail {Id}. {UserEmail}", id, userEmail);
+                _logger.LogError(ex, "Error occurred active case detail Id {Id}. UserEmail {UserEmail}", id, userEmail);
                 _notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
             }

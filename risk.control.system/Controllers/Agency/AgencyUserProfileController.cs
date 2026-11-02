@@ -57,7 +57,7 @@ namespace risk.control.system.Controllers.Agency
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting {UserId} for {UserEmail}", id, HttpContext.User?.Identity?.Name ?? "Anonymous");
+                _logger.LogError(ex, "Error getting UserId {UserId}, for UserEmail {UserEmail}", id, HttpContext.User?.Identity?.Name ?? "Anonymous");
                 _notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
             }
@@ -95,7 +95,7 @@ namespace risk.control.system.Controllers.Agency
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error editing {UserId} for {UserEmail}", sanitisedId, userEmail ?? "Anonymous");
+                _logger.LogError(ex, "Error editing UserId {UserId}, for UserEmail {UserEmail}", sanitisedId, userEmail ?? "Anonymous");
                 _notifyService.Error("OOPS !!!..Contact Admin");
             }
             return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
@@ -117,7 +117,7 @@ namespace risk.control.system.Controllers.Agency
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error for {UserEmail}", userEmail ?? "Anonymous");
+                _logger.LogError(ex, "Error for UserEmail {UserEmail}", userEmail ?? "Anonymous");
                 _notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
             }
@@ -156,7 +156,7 @@ namespace risk.control.system.Controllers.Agency
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while changing password for {UserEmail}", userEmail ?? "Anonymous");
+                _logger.LogError(ex, "Error occurred while changing password for UserEmail {UserEmail}", userEmail ?? "Anonymous");
                 _notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(AccountController.Login), ControllerName<AccountController>.Name);
             }

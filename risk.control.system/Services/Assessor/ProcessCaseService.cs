@@ -96,7 +96,7 @@ namespace risk.control.system.Services.Assessor
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred Processing Case {contractNumber}. {UserEmail}", contractNumber, userEmail);
+                _logger.LogError(ex, "Error occurred Processing Case {ContractNumber}, User {UserEmail}", contractNumber, userEmail);
                 throw;
             }
         }
@@ -135,7 +135,7 @@ namespace risk.control.system.Services.Assessor
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred Approving Case {CaseId}. {UserEmail}", caseId, userEmail);
+                _logger.LogError(ex, "Error occurred Approving Case {CaseId}, User {UserEmail}", caseId, userEmail);
                 throw;
             }
         }

@@ -42,7 +42,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error fetching profile for {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error fetching profile for UserEmail {UserEmail}", userEmail);
                 _notifyService.Error("An error occurred. Contact Admin.");
                 return RedirectToAction("Index", "Dashboard");
             }
@@ -64,7 +64,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error loading edit mode for {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error loading edit mode for UserEmail {UserEmail}", userEmail);
                 return RedirectToAction(nameof(Profile));
             }
         }
@@ -97,7 +97,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error saving Agency for {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error saving Agency for UserEmail {UserEmail}", userEmail);
                 _notifyService.Error("Error Editing Agency. Try again.");
                 return RedirectToAction(nameof(Profile));
             }

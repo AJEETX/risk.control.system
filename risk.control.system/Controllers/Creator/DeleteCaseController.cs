@@ -43,7 +43,7 @@ namespace risk.control.system.Controllers.Creator
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error deleting case {Id} for {User}", id, userEmail);
+                _logger.LogError(ex, "Error deleting case Id {Id}. UserEmail {UserEmail}", id, userEmail);
                 return Json(new { success = false, message = "Error deleting case. Try again." });
             }
         }
@@ -84,7 +84,7 @@ namespace risk.control.system.Controllers.Creator
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error during bulk delete for {User}", userEmail);
+                _logger.LogError(ex, "Error during bulk delete for UserEmail {UserEmail}", userEmail);
                 return Json(new { success = false, message = "An error occurred during bulk deletion." });
             }
         }

@@ -46,7 +46,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred sending SMS to Customer for Case {Id} for user {UserEmail}", model.CaseId, userEmail);
+                _logger.LogError(ex, "Error occurred sending SMS to Customer for Case {Id}, for UserEmail {UserEmail}", model.CaseId, userEmail ?? "Anonymous");
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -68,7 +68,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred sending SMS to Beneficiary for Case {Id} for user {UserEmail}", model.CaseId, userEmail);
+                _logger.LogError(ex, "Error occurred sending SMS to Beneficiary for Case {Id}, for UserEmail {UserEmail}", model.CaseId, userEmail ?? "Anonymous");
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -90,18 +90,19 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred adding notes for Case {Id} for user {UserEmail}", model.CaseId, userEmail);
+                _logger.LogError(ex, "Error occurred adding notes for Case {Id}, for UserEmail {UserEmail}", model.CaseId, userEmail ?? "Anonymous");
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
 
         [AllowAnonymous]
         [HttpGet]
-        public async Task<IActionResult> Schedule([FromQuery] string token)
+        public async Task<IActionResult> Schedule([FromQuery] string token, bool set = false)
         {
-            if (string.IsNullOrEmpty(token))
+            if (string.IsNullOrEmpty(token) || !set)
             {
                 return BadRequest("Invalid confirmation link.");
+                _logger.LogError("Not set DateTime {DateTime}", DateTime.UtcNow.ToLocalTime());
             }
 
             try
@@ -111,7 +112,7 @@ namespace risk.control.system.Controllers.Common
                 {
                     return BadRequest("The confirmation link is invalid or has expired.");
                 }
-                _logger.LogError("Confirming schedule with token {Token} {CaseId} {DateTime}", token, decryptedCaseId, DateTime.UtcNow.ToLocalTime());
+                _logger.LogError("Confirming schedule with token {Token}, CaseId {CaseId}, DateTime {DateTime}", token, decryptedCaseId, DateTime.UtcNow.ToLocalTime());
 
                 var schedule = await _agentMeetingSetupService.SetSchedule(decryptedCaseId);
                 return View(schedule);

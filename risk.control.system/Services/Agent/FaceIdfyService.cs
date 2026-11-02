@@ -51,7 +51,7 @@ internal class FaceIdfyService(ApplicationDbContext context,
         var locationRecord = caseDetail.InvestigationReport.ReportTemplate!.LocationReport.FirstOrDefault(l => l.LocationName == data.LocationName);
         if (locationRecord == null)
         {
-            _logger.LogError("Location not found for Case {CaseId} and LocationName {LocationName}", data.CaseId, data.LocationName);
+            _logger.LogError("Location not found for Case {CaseId}, and LocationName {LocationName}", data.CaseId, data.LocationName);
             return new AppiCheckifyResponse
             {
                 BeneficiaryId = caseDetail?.BeneficiaryDetail?.BeneficiaryDetailId ?? 0,
@@ -64,7 +64,7 @@ internal class FaceIdfyService(ApplicationDbContext context,
         var locationTemplate = await _context.LocationReport.Include(l => l.FaceIds).FirstAsync(l => l.Id == locationRecord!.Id);
         if (locationTemplate == null)
         {
-            _logger.LogError("Location template not found for Case {CaseId} and LocationName {LocationName}", data.CaseId, data.LocationName);
+            _logger.LogError("Location template not found for Case {CaseId}, and LocationName {LocationName}", data.CaseId, data.LocationName);
             return new AppiCheckifyResponse
             {
                 BeneficiaryId = caseDetail?.BeneficiaryDetail?.BeneficiaryDetailId ?? 0,
@@ -138,7 +138,7 @@ internal class FaceIdfyService(ApplicationDbContext context,
         catch (Exception ex)
         {
             var sanitizedEmail = data.Email?.Replace("\n", "").Replace("\r", "").Trim();
-            _logger.LogError(ex, "Failed Face Id processing for {CaseId}. {AgentEmail}", data.CaseId, sanitizedEmail);
+            _logger.LogError(ex, "Failed Face Id processing for Case {CaseId}, Agent Email {AgentEmail}", data.CaseId, sanitizedEmail);
             return await HandleError(caseDetail, faceIdReport);
         }
     }

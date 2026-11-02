@@ -54,7 +54,7 @@ namespace risk.control.system.Services.Api
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred for {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error occurred for User {UserEmail}", userEmail);
                 throw;
             }
         }

@@ -62,7 +62,7 @@ namespace risk.control.system.Services.Api
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while fetching manager dashboard data. {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error occurred while fetching manager dashboard data for User {UserEmail}", userEmail);
                 throw;
             }
         }

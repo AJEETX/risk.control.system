@@ -59,7 +59,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error creating user for {UserEmail}.", userEmail);
+                _logger.LogError(ex, "Error creating user for UserEmail {UserEmail}.", userEmail);
                 _notifyService.Error("Error creating user. Try again");
                 return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
             }
@@ -96,7 +96,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error creating user for {Company}. {UserEmail}.", emailSuffix, userEmail);
+                _logger.LogError(ex, "Error creating user for Company {Company}. UserEmail {UserEmail}.", emailSuffix, userEmail);
                 _notifyService.Error("Error creating user. Try again");
             }
             return RedirectToAction(nameof(Users), ControllerName<ManageCompanyUserController>.Name);
@@ -119,7 +119,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error editing {UserId} for {UserEmail}.", id, HttpContext.User?.Identity?.Name);
+                _logger.LogError(ex, "Error editing UserId {UserId} for UserEmail {UserEmail}.", id, HttpContext.User?.Identity?.Name);
                 _notifyService.Error("Error editing user. Try again");
             }
             return RedirectToAction(nameof(Users), ControllerName<ManageCompanyUserController>.Name);
@@ -199,7 +199,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             catch (Exception ex)
             {
                 // 🔥 log this properly in real apps
-                _logger.LogError(ex, "Error deleting user {UserId}. {UserEmail}", userId, userEmail);
+                _logger.LogError(ex, "Error deleting user UserId {UserId}. UserEmail {UserEmail}", userId, userEmail);
 
                 return Json(new
                 {
