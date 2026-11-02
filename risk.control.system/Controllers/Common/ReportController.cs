@@ -32,7 +32,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred to Print Pdf for {CaseId} . {UserEmail}", id, userEmail);
+                _logger.LogError(ex, "Error occurred to Print Pdf for CaseId {CaseId} . UserEmail {UserEmail}", id, userEmail);
                 _notifyService.Error("Error occurred. Try again.");
                 return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
             }

@@ -167,7 +167,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Issue cloning {TemplateId} . {UserEmail}", templateId, HttpContext.User?.Identity?.Name);
+                _logger.LogError(ex, "Issue cloning TemplateId {TemplateId} . UserEmail {UserEmail}", templateId, HttpContext.User?.Identity?.Name);
                 return Json(new { success = false, message = "Report clone failed!" });
             }
         }
@@ -195,7 +195,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Report activation failed for {TemplateId}. {UserEmail}.", id, HttpContext.User?.Identity?.Name);
+                _logger.LogError(ex, "Report activation failed for TemplateId {TemplateId}. UserEmail {UserEmail}.", id, HttpContext.User?.Identity?.Name);
                 return Json(new { success = false, message = "Report activation failed! Try again" });
             }
         }
@@ -222,7 +222,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Report activation failed for {TemplateId}. {UserEmail}.", id, HttpContext.User?.Identity?.Name);
+                _logger.LogError(ex, "Report activation failed for TemplateId {TemplateId}. UserEmail {UserEmail}.", id, HttpContext.User?.Identity?.Name);
                 return Json(new { success = false, message = "Report activation failed! Try again" });
             }
         }
@@ -260,7 +260,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Exception to delete for {TemplateId}. {UserEmail}.", id, HttpContext.User?.Identity?.Name);
+                _logger.LogError(ex, "Exception to delete for TemplateId {TemplateId}. UserEmail {UserEmail}.", id, HttpContext.User?.Identity?.Name);
                 return Json(new { success = false, message = "Exception to delete Template" });
             }
         }
@@ -311,7 +311,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Add Question Error for {LocationId}. {UserEmail}.", locationId, HttpContext.User?.Identity?.Name);
+                _logger.LogError(ex, "Add Question Error for LocationId {LocationId}. UserEmail {UserEmail}.", locationId, HttpContext.User?.Identity?.Name);
                 return Json(new { success = false, message = "Add Question Error." });
             }
         }
@@ -345,7 +345,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error Question Delete for {QueationId} {LocationId}. {UserEmail}.", id, locationId, HttpContext.User?.Identity?.Name);
+                _logger.LogError(ex, "Error Question Delete for QuestionId {QuestionId} LocationId {LocationId}. UserEmail {UserEmail}.", id, locationId, HttpContext.User?.Identity?.Name);
                 return Json(new { success = false, message = "Error Question Delete." });
             }
         }
@@ -383,7 +383,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error Location Delete for {LocationId}. {UserEmail}.", id, HttpContext.User.Identity?.Name);
+                _logger.LogError(ex, "Error Location Delete for LocationId {LocationId}. UserEmail {UserEmail}.", id, HttpContext.User.Identity?.Name);
                 return Json(new { success = false, message = "Error Location Delete." });
             }
         }
@@ -436,7 +436,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error Location Ssave for {LocationId}. {UserEmail}.", model.LocationId, HttpContext.User.Identity!.Name);
+                _logger.LogError(ex, "Error Location Save for LocationId {LocationId}. UserEmail {UserEmail}.", model.LocationId, HttpContext.User.Identity!.Name);
                 return Json(new { success = false, message = "Error Location Save." });
             }
         }
@@ -475,7 +475,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error Location Clone for {ReportTemplateId} {LocationId}. {UserEmail}.", reportTemplateId, locationId, HttpContext.User.Identity?.Name);
+                _logger.LogError(ex, "Error Location Clone for ReportTemplateId {ReportTemplateId}, LocationId {LocationId}. UserEmail {UserEmail}.", reportTemplateId, locationId, HttpContext.User.Identity?.Name);
                 return Json(new { success = false, message = ex.Message });
             }
 

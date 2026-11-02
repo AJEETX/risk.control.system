@@ -95,7 +95,7 @@ namespace risk.control.system.Controllers.Manager
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error Creating AgencyUser {Id}. {UserEmail}.", model.Id, userEmail);
+                _logger.LogError(ex, "Error Creating AgencyUser Id {Id}. UserEmail {UserEmail}", model.Id, userEmail);
                 _notifyService.Error("OOPS !!!..Error Creating User. Try again.");
             }
 
@@ -129,7 +129,7 @@ namespace risk.control.system.Controllers.Manager
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting {AgencyId}. {UserEmail}.", id, userEmail);
+                _logger.LogError(ex, "Error getting AgencyUser Id {Id}. UserEmail {UserEmail}", id, userEmail);
                 _notifyService.Error("Error getting user. Try again");
                 return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
             }
@@ -165,7 +165,7 @@ namespace risk.control.system.Controllers.Manager
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error editing {AgencyId}. {UserEmail}.", id, userEmail);
+                _logger.LogError(ex, "Error editing AgencyUser Id {Id}. UserEmail {UserEmail}", id, userEmail);
                 _notifyService.Error("OOPS !!!..Error editing User. Try again.");
             }
             var encryptedId = _encryptionService.ProtectId(model.VendorId!.Value);
@@ -197,7 +197,7 @@ namespace risk.control.system.Controllers.Manager
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting {AgencyId}. {UserEmail}.", id, userEmail);
+                _logger.LogError(ex, "Error getting AgencyUser Id {Id}. UserEmail {UserEmail}", id, userEmail);
                 _notifyService.Error("Error getting user. Try again");
                 return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
             }
@@ -228,7 +228,7 @@ namespace risk.control.system.Controllers.Manager
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error deleting {AgencyUser}. {UserEmail}.", id, userEmail);
+                _logger.LogError(ex, "Error deleting AgencyUser Id {Id}. UserEmail {UserEmail}", id, userEmail);
                 _notifyService.Error("Error deleting user. Try again");
             }
 

@@ -57,7 +57,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error allocating Case {Id} by {UserEmail}", caseId, userEmail ?? "Anonymous");
+                _logger.LogError(ex, "Error allocating Case Id {Id} by UserEmail {UserEmail}", caseId, userEmail ?? "Anonymous");
                 return HandleError();
             }
         }

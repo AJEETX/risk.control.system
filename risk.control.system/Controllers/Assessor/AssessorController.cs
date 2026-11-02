@@ -59,7 +59,7 @@ namespace risk.control.system.Controllers.Assessor
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred getting the case {Id}. {UserEmail}", id, userEmail);
+                _logger.LogError(ex, "Error occurred getting the case Id {Id}, for UserEmail {UserEmail}.", id, userEmail ?? "Anonymous");
                 _notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
             }
@@ -84,7 +84,7 @@ namespace risk.control.system.Controllers.Assessor
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred getting the enquiry case {Id}. {UserEmail}", id, userEmail);
+                _logger.LogError(ex, "Error occurred getting the enquiry case Id {Id}, for UserEmail {UserEmail}.", id, userEmail ?? "Anonymous");
                 _notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
             }
@@ -115,7 +115,7 @@ namespace risk.control.system.Controllers.Assessor
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred getting the review case detail {Id}. {UserEmail}", id, userEmail);
+                _logger.LogError(ex, "Error occurred getting the review case detail Id {Id}, for UserEmail {UserEmail}.", id, userEmail ?? "Anonymous");
                 _notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
             }
@@ -149,7 +149,7 @@ namespace risk.control.system.Controllers.Assessor
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred getting the approved case detail {Id}. {UserEmail}", id, userEmail);
+                _logger.LogError(ex, "Error occurred getting the approved case detail Id {Id}, for UserEmail {UserEmail}.", id, userEmail ?? "Anonymous");
                 _notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
             }
@@ -178,7 +178,7 @@ namespace risk.control.system.Controllers.Assessor
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred getting the rejected case detail {Id}. {UserEmail}", id, userEmail);
+                _logger.LogError(ex, "Error occurred getting the rejected case detail Id {Id}, for UserEmail {UserEmail}.", id, userEmail ?? "Anonymous");
                 _notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
             }
@@ -202,7 +202,7 @@ namespace risk.control.system.Controllers.Assessor
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred getting the invoice case detail {Id}. {UserEmail}", id, userEmail);
+                _logger.LogError(ex, "Error occurred getting the invoice case detail Id {Id}, for UserEmail {UserEmail}.", id, userEmail ?? "Anonymous");
                 _notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
             }
@@ -225,7 +225,7 @@ namespace risk.control.system.Controllers.Assessor
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred getting the invoice case detail {Id}. {UserEmail}", id, userEmail);
+                _logger.LogError(ex, "Error occurred getting the invoice case detail Id {Id}, for UserEmail {UserEmail}.", id, userEmail ?? "Anonymous");
                 _notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
             }
@@ -248,7 +248,7 @@ namespace risk.control.system.Controllers.Assessor
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred priting the invoice case detail {Id}. {UserEmail}", id, userEmail);
+                _logger.LogError(ex, "Error occurred printing the invoice case detail Id {Id}, for UserEmail {UserEmail}.", id, userEmail ?? "Anonymous");
                 _notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
             }

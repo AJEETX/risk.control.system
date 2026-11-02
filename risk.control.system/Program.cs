@@ -1,6 +1,7 @@
 ﻿using risk.control.system.AppConstant;
 using risk.control.system.StartupExtensions;
 using Serilog;
+using Serilog.Templates;
 
 AppDomain.CurrentDomain.SetData("REGEX_DEFAULT_MATCH_TIMEOUT", TimeSpan.FromMilliseconds(200)); // process-wide setting
 //QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
@@ -28,11 +29,11 @@ Log.Logger = new LoggerConfiguration()
     .Enrich.FromLogContext()
     .Enrich.WithProperty("Application", Applicationsettings.WEBSITE_NAME)
     .WriteTo.File(
+        new ExpressionTemplate("{ { Timestamp: @t, Level: @l, Message: @m, Exception: @x, Properties: @p } \n}"),
         path: "Logs/log-.json",
         shared: true,
         rollingInterval: RollingInterval.Day,
-        retainedFileCountLimit: 30,
-        formatter: new Serilog.Formatting.Json.JsonFormatter()
+        retainedFileCountLimit: 30
     )
     .CreateLogger();
 

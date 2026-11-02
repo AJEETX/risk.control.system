@@ -67,7 +67,7 @@ namespace risk.control.system.Controllers.Assessor
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error processing case {Id}. {UserEmail}", claimId, userEmail);
+                _logger.LogError(ex, "Error processing case Id {Id}, for UserEmail {UserEmail}.", claimId, userEmail ?? "Anonymous");
                 _notifyService.Error("Error processing case. Try again.");
                 return RedirectToAction(nameof(AssessorController.Assess), ControllerName<AssessorController>.Name);
             }

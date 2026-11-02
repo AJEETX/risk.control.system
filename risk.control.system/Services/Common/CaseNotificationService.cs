@@ -72,7 +72,7 @@ namespace risk.control.system.Services.Common
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "File Upload Notification Error for {UserEmail}", senderUserEmail);
+                _logger.LogError(ex, "File Upload Notification Error for User {UserEmail}", senderUserEmail);
             }
         }
 
@@ -94,7 +94,7 @@ namespace risk.control.system.Services.Common
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Allocation Notification Error for Case: {CaseId}", caseId);
+                _logger.LogError(ex, "Allocation Notification Error for Case {CaseId}", caseId);
             }
         }
 
@@ -259,7 +259,7 @@ namespace risk.control.system.Services.Common
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Notification Error for Agent {AgentEmail} from {Sender}", agentEmail, senderUserEmail);
+                _logger.LogError(ex, "Notification Error for Agent {AgentEmail} from User {Sender}", agentEmail, senderUserEmail);
             }
         }
 

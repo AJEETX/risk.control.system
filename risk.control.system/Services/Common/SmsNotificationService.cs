@@ -36,7 +36,7 @@ namespace risk.control.system.Services.Common
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while sending SMS to Customer for Case {CaseId} by user {UserEmail}", caseId, currentUser);
+                _logger.LogError(ex, "Error occurred while sending SMS to Customer for Case {CaseId}, by user {UserEmail}", caseId, currentUser);
                 return string.Empty;
             }
         }
@@ -53,7 +53,7 @@ namespace risk.control.system.Services.Common
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while sending SMS to Beneficiary for Case {CaseId} by user {UserEmail}", caseId, currentUser);
+                _logger.LogError(ex, "Error occurred while sending SMS to Beneficiary for Case {CaseId}, by user {UserEmail}", caseId, currentUser);
                 return string.Empty;
             }
         }

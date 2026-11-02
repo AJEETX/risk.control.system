@@ -59,7 +59,7 @@ namespace risk.control.system.Controllers.Manager
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred creating Service for {AgencyId} . {UserEmail}", id, HttpContext.User.Identity?.Name!);
+                _logger.LogError(ex, "Error occurred creating Service for Agency Id {AgencyId}. UserEmail {UserEmail}", id, HttpContext.User.Identity?.Name!);
                 _notifyService.Error("Error occurred. Try again");
                 return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
             }
@@ -85,7 +85,7 @@ namespace risk.control.system.Controllers.Manager
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred creating Service . {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error occurred creating Service for Agency Id {AgencyId}. UserEmail {UserEmail}", service.VendorId, userEmail);
                 _notifyService.Error("Error creating agency service. Try again.");
             }
             var encryptedId = _encryptionService.ProtectId(service.VendorId);
@@ -112,7 +112,7 @@ namespace risk.control.system.Controllers.Manager
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred getting Service for {ServiceId}. {UserEmail}", id, userEmail);
+                _logger.LogError(ex, "Error occurred getting Service for ServiceId {ServiceId}. UserEmail {UserEmail}", id, userEmail);
                 _notifyService.Error("Error occurred. Try again.");
                 return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
             }
@@ -150,7 +150,7 @@ namespace risk.control.system.Controllers.Manager
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred editing Service. {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error occurred editing Service Id {ServiceId}. UserEmail {UserEmail}", model.Id, userEmail);
                 _notifyService.Error("Error editing agency service. Try again.");
             }
             var encryptedId = _encryptionService.ProtectId(model.VendorId);
@@ -172,7 +172,7 @@ namespace risk.control.system.Controllers.Manager
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error deleting service {ServiceId}", id);
+                _logger.LogError(ex, "Error deleting service ServiceId {ServiceId}. UserEmail {UserEmail}", id, HttpContext.User?.Identity?.Name);
                 return StatusCode(500, new { success = false, message = "Delete failed." });
             }
         }

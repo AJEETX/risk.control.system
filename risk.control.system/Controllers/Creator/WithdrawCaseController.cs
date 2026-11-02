@@ -51,7 +51,7 @@ namespace risk.control.system.Controllers.Creator
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error withdrawing case {Id}. {UserEmail}", caseId, userEmail);
+                _logger.LogError(ex, "Error withdrawing case Id {Id}. UserEmail {UserEmail}", caseId, userEmail);
                 _notifyService.Error("Error withdrawing case. Try again.");
                 return RedirectToAction(nameof(AddAssignController.New), ControllerName<AddAssignController>.Name);
             }

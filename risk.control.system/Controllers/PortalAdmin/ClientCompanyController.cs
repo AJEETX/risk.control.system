@@ -354,7 +354,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting {AgencyId} by {UserName}.", id, HttpContext.User.Identity?.Name);
+                _logger.LogError(ex, "Error getting Agency {AgencyId}, by User {UserName}.", id, HttpContext.User.Identity?.Name);
                 _notifyService.Error("Error getting Agency. Try again.");
                 return RedirectToAction("AvailableVendors", "Vendors");
             }
@@ -383,8 +383,8 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting Agency {Id}. {UserEmail}", id, userEmail);
-                _notifyService.Error("Error getting User. Try again.");
+                _logger.LogError(ex, "Error getting Agency {AgencyId}, by User {UserEmail}.", id, userEmail);
+                _notifyService.Error("Error getting Agency. Try again.");
                 return RedirectToAction(nameof(AgencyDetails), "ClientCompany", new { id = id });
             }
         }
@@ -417,7 +417,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error editing {AgencyId}. {UserEmail}.", vendorId, userEmail);
+                _logger.LogError(ex, "Error editing Agency {AgencyId}, by User {UserEmail}.", vendorId, userEmail);
                 _notifyService.Error("Error editing Agency. Try again.");
             }
             return RedirectToAction(nameof(AgencyDetails), "ClientCompany", new { id = vendorId });

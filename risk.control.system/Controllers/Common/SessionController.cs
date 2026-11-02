@@ -46,7 +46,7 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error in KeepSessionAlive for {UserEmail}", User?.Identity?.Name ?? "Anonymous");
+                _logger.LogError(ex, "Error in KeepSessionAlive for UserEmail {UserEmail}", User?.Identity?.Name ?? "Anonymous");
                 return StatusCode(500, new { message = "An error occurred." });
             }
         }

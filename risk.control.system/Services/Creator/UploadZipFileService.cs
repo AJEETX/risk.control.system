@@ -42,7 +42,7 @@ namespace risk.control.system.Services.Creator
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred for {UploadId} for {UserEmail}", uploadId, userEmail);
+                _logger.LogError(ex, "Error occurred for {UploadId}, for {UserEmail}", uploadId, userEmail);
             }
         }
     }

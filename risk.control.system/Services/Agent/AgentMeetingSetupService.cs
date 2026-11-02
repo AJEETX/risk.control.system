@@ -399,7 +399,7 @@ namespace risk.control.system.Services.Agent
             var encryptedCaseId = _encryptionService.ProtectId(caseId);
 
             // Construct the URL with the encrypted token
-            return $"{portalUrl}/confirm/schedule?token={Uri.EscapeDataString(encryptedCaseId)}";
+            return $"{portalUrl}/confirm/schedule?token={Uri.EscapeDataString(encryptedCaseId)}&set=true";
         }
     }
 }

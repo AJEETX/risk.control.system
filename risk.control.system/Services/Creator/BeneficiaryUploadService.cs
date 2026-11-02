@@ -58,7 +58,7 @@ namespace risk.control.system.Services.Creator
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "AddBeneficiary failed in Docker. CaseId={CaseId}, Relation='{Relation}'", uploadCase.CaseId!.Trim(), uploadCase.Relation);
+                _logger.LogError(ex, "Error occurred Case {CaseId}. Relation {Relation}", uploadCase.CaseId!.Trim(), uploadCase.Relation);
                 return (null, errors, summaries);
             }
         }

@@ -62,7 +62,7 @@ namespace risk.control.system.Services.Assessor
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred Submit Query case {Id}. {UserEmail}", caseId, userEmail);
+                _logger.LogError(ex, "Error occurred Submit Query case {CaseId}, User {UserEmail}", caseId, userEmail);
                 return null!;
             }
         }

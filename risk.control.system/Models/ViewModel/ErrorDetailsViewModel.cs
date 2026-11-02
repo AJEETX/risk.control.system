@@ -9,7 +9,7 @@
     {
         public DateTime? Timestamp { get; set; }
         public string? Level { get; set; } = default!;
-        public string? MessageTemplate { get; set; }
+        public string? Message { get; set; }
         public string? TraceId { get; set; }
         public string? SpanId { get; set; }
         public ErrorProperties? Properties { get; set; }

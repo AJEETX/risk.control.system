@@ -57,7 +57,7 @@ namespace risk.control.system.Controllers.Creator
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error loading Uploads page for {User}", userEmail);
+                _logger.LogError(ex, "Error loading Uploads page for UserEmail {UserEmail}", userEmail);
                 return RedirectToDashboard("An unexpected error occurred.");
             }
         }

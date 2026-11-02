@@ -47,7 +47,7 @@ namespace risk.control.system.Controllers.Creator
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting case {Id}. {UserEmail}", id, userEmail);
+                _logger.LogError(ex, "Error getting case Id {Id}. UserEmail {UserEmail}", id, userEmail);
                 _notifyService.Error("Error creating beneficiary. Try again.");
                 var encryptedId = _encryptionService.ProtectId(id);
                 return RedirectToAction(nameof(CreatorController.Details), ControllerName<CreatorController>.Name, new { id = encryptedId });
@@ -82,7 +82,7 @@ namespace risk.control.system.Controllers.Creator
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error creating Beneficiary for Case {Id}. {UserEmail}", model.InvestigationTaskId, userEmail);
+                _logger.LogError(ex, "Error creating Beneficiary for Case Id {Id}. UserEmail {UserEmail}", model.InvestigationTaskId, userEmail);
                 _notifyService.Warning("Error creating Beneficiary. Try again. ");
             }
             var encryptedId = _encryptionService.ProtectId(model.InvestigationTaskId!.Value);
@@ -108,7 +108,7 @@ namespace risk.control.system.Controllers.Creator
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting Beneficiary {Id}. {UserEmail}", id, userEmail);
+                _logger.LogError(ex, "Error getting Beneficiary Id {Id}. UserEmail {UserEmail}", id, userEmail);
                 _notifyService.Error("Error editing Beneficiary. Try again.");
                 var encryptedId = _encryptionService.ProtectId(id);
                 return RedirectToAction(nameof(CreatorController.Details), ControllerName<CreatorController>.Name, new { id = encryptedId });
@@ -144,7 +144,7 @@ namespace risk.control.system.Controllers.Creator
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error editing Beneficiary Case {Id}. {UserEmail}", model.InvestigationTaskId, userEmail);
+                _logger.LogError(ex, "Error editing Beneficiary Id {Id}. UserEmail {UserEmail}", model.InvestigationTaskId, userEmail);
                 _notifyService.Error("Error editing Beneficiary. Try again.");
             }
             var encryptedId = _encryptionService.ProtectId(id);

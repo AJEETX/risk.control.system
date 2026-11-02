@@ -59,7 +59,7 @@ namespace risk.control.system.Services.Common
             }
             catch (Exception ex)
             {
-                _logger.LogError("Error sending SMS to Mobile {Number} with Error {Message}: ", mobile, ex.Message);
+                _logger.LogError("Error sending SMS to Mobile {Number}, with Error {Message}: ", mobile, ex.Message);
                 return string.Empty;
             }
         }

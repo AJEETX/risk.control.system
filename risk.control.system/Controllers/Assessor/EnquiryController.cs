@@ -67,7 +67,7 @@ namespace risk.control.system.Controllers.Assessor
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error submitting query case {Id}. {UserEmail}", claimId, userEmail);
+                _logger.LogError(ex, "Error submitting query case Id {Id}, for UserEmail {UserEmail}.", claimId, userEmail ?? "Anonymous");
                 _notifyService.Error("Error submitting query. Try again.");
                 return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
             }

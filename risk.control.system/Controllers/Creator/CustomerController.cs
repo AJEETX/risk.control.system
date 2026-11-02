@@ -46,7 +46,7 @@ namespace risk.control.system.Controllers.Creator
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error creating customer {Id}. {UserEmail}", id, userEmail);
+                _logger.LogError(ex, "Error creating customer Id {Id}. UserEmail {UserEmail}", id, userEmail);
                 _notifyService.Error("Error creating customer. Try Again");
                 var encryptedId = _encryptionService.ProtectId(id);
                 return RedirectToAction(nameof(CreatorController.Details), ControllerName<CreatorController>.Name, new { id = encryptedId });
@@ -83,7 +83,7 @@ namespace risk.control.system.Controllers.Creator
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error creating customer {Id}. {UserEmail}", model.CustomerDetailId, userEmail);
+                _logger.LogError(ex, "Error creating customer Id {Id}. UserEmail {UserEmail}", model.CustomerDetailId, userEmail);
                 _notifyService.Error("Error creating customer.Try Again");
             }
             var encryptedId = _encryptionService.ProtectId(model.InvestigationTaskId!.Value);
@@ -110,7 +110,7 @@ namespace risk.control.system.Controllers.Creator
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting customer {Id}. {UserEmail}", id, userEmail);
+                _logger.LogError(ex, "Error getting customer Id {Id}. UserEmail {UserEmail}", id, userEmail);
                 _notifyService.Error("Error editing Customer.Try Again");
                 var encryptedId = _encryptionService.ProtectId(id);
                 return RedirectToAction(nameof(CreatorController.Details), ControllerName<CreatorController>.Name, new { id = id });
@@ -146,7 +146,7 @@ namespace risk.control.system.Controllers.Creator
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error editing customer {Id}. {UserEmail}", model.CustomerDetailId, userEmail);
+                _logger.LogError(ex, "Error editing customer Id {Id}. UserEmail {UserEmail}", model.CustomerDetailId, userEmail);
                 _notifyService.Error("Error edting customer. Try again.");
             }
             var encryptedId = _encryptionService.ProtectId(id);

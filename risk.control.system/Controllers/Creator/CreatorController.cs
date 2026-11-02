@@ -52,7 +52,7 @@ namespace risk.control.system.Controllers.Creator
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting report template. CaseId: {CaseId}, User: {UserEmail}", caseId, User.Identity?.Name ?? "Anonymous");
+                _logger.LogError(ex, "Error getting report template. CaseId: {CaseId}, UserEmail: {UserEmail}", caseId, User.Identity?.Name ?? "Anonymous");
 
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
@@ -79,7 +79,7 @@ namespace risk.control.system.Controllers.Creator
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting Empanelled Agencies of case {Id}. {UserEmail}", id, userEmail);
+                _logger.LogError(ex, "Error getting Empanelled Agencies of case Id {Id}. UserEmail {UserEmail}", id, userEmail);
                 _notifyService.Error("Error getting Agencies. Try again.");
                 return RedirectToAction(nameof(AddAssignController.New), ControllerName<AddAssignController>.Name);
             }
@@ -102,7 +102,7 @@ namespace risk.control.system.Controllers.Creator
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting case details {Id}. {UserEmail}", id, userEmail);
+                _logger.LogError(ex, "Error getting case details Id {Id}. UserEmail {UserEmail}", id, userEmail);
                 _notifyService.Error("Error getting case details. Try again.");
                 return RedirectToAction(nameof(AddAssignController.New), ControllerName<AddAssignController>.Name);
             }
@@ -136,7 +136,7 @@ namespace risk.control.system.Controllers.Creator
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting agency details. VendorId: {VendorId}, User: {UserEmail}", id, userEmail ?? "Anonymous");
+                _logger.LogError(ex, "Error getting agency details. VendorId: {VendorId}, UserEmail: {UserEmail}", id, userEmail ?? "Anonymous");
                 _notifyService.Error("Error getting agency details. Try again.");
                 return RedirectToAction(nameof(AddAssignController.New), ControllerName<AddAssignController>.Name);
             }

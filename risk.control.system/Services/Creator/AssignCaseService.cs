@@ -62,7 +62,7 @@ namespace risk.control.system.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred. {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error occurred. User {UserEmail}", userEmail);
                 throw;
             }
         }
@@ -84,7 +84,7 @@ namespace risk.control.system.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred. {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error occurred. User {UserEmail}", userEmail);
                 throw;
             }
         }
@@ -175,7 +175,7 @@ namespace risk.control.system.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred Case {CaseId}. {UserEmail}", caseId, userEmail);
+                _logger.LogError(ex, "Error occurred Case {CaseId}. User {UserEmail}", caseId, userEmail);
                 throw;
             }
         }
@@ -218,7 +218,7 @@ namespace risk.control.system.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred Case(s) {Count}. {UserEmail}", cases.Count, userEmail);
+                _logger.LogError(ex, "Error occurred Case(s) {Count}. User {UserEmail}", cases.Count, userEmail);
                 throw;
             }
         }
@@ -261,7 +261,7 @@ namespace risk.control.system.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred Case {CasId}. {UserEmail}", caseId, userEmail);
+                _logger.LogError(ex, "Error occurred Case {CaseId}. User {UserEmail}", caseId, userEmail);
                 throw;
             }
         }
@@ -303,7 +303,7 @@ namespace risk.control.system.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred Case {CasId}. {UserEmail}", caseId, userEmail);
+                _logger.LogError(ex, "Error occurred Case {CasId}. UserEmail {UserEmail}", caseId, userEmail);
                 throw;
             }
         }

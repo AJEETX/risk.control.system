@@ -43,7 +43,7 @@ namespace risk.control.system.Controllers.Manager
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error loading Create Agency for {UserEmail}.", userEmail);
+                _logger.LogError(ex, "Error loading Create Agency for UserEmail {UserEmail}.", userEmail);
                 return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
             }
         }
@@ -88,7 +88,7 @@ namespace risk.control.system.Controllers.Manager
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error creating user. {UserEmail}.", userEmail);
+                _logger.LogError(ex, "Error creating user. UserEmail {UserEmail}.", userEmail);
                 _notifyService.Error("OOPS !!!..Error creating Agency. Try again.");
                 return RedirectToAction(nameof(Create));
             }

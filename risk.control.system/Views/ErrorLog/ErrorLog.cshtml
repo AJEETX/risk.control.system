@@ -23,7 +23,7 @@
 						@foreach (var file in Model)
 						{
 							<tr>
-								<td class="align-middle" title="@file.Date.ToString("yyyy-MM-dd HH:mm")">@file.Date.ToString("yyyy-MM-dd HH:mm")</td>
+								<td class="align-middle" title="@file.Date.ToString("dd-MM-yyyy HH:mm")">@file.Date.ToString("dd-MM-yyyy HH:mm")</td>
 								<td class="align-middle fw-bold text-primary" title="@file.FileName">@file.FileName</td>
 								<td class="align-middle" title="@file.SizeKB KB">@file.SizeKB KB</td>
 								<td class="text-end">
@@ -36,6 +36,11 @@
 									   class="btn btn-outline-info btn-sm">
 										<i class="fa fa-eye me-1"></i> Error List
 									</a>
+									<form asp-action="Delete" asp-route-fileName="@file.FileName" method="post" class="d-inline delete-form">
+										<button type="submit" class="btn btn-outline-danger btn-sm">
+											<i class="fas fa-trash me-1"></i> Delete
+										</button>
+									</form>
 								</td>
 							</tr>
 						}
@@ -53,3 +58,9 @@
 		</div>
 	</div>
 </section>
+@section Scripts {
+	@{
+		await Html.RenderPartialAsync("_ValidationScriptsPartial");
+	}
+	<script src="~/js/portal-admin/error.js"></script>
+}

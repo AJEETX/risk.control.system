@@ -32,7 +32,7 @@ namespace risk.control.system.Services.Tool
             // 1. Validate file existence and extract filename
             if (string.IsNullOrWhiteSpace(relativePath) || !File.Exists(relativePath))
             {
-                _logger.LogError("File not found at path: {FilePath} for AudioId: {AudioId}", relativePath, audioId);
+                _logger.LogError("File not found at path: {FilePath}, for AudioId: {AudioId}", relativePath, audioId);
                 return;
             }
 
@@ -107,7 +107,7 @@ namespace risk.control.system.Services.Tool
                 }
                 else if (status.TranscriptionJobStatus == TranscriptionJobStatus.FAILED)
                 {
-                    _logger.LogError("Transcription Job {JobName} failed: {FailureReason}", jobName, status.FailureReason);
+                    _logger.LogError("Transcription Job {JobName}, failed: {FailureReason}", jobName, status.FailureReason);
                     transcribedText = $"Transcription failed: {status.FailureReason}";
                 }
             }
@@ -147,7 +147,7 @@ namespace risk.control.system.Services.Tool
             // 1. Validate file existence and extract filename
             if (string.IsNullOrWhiteSpace(relativePath) || !File.Exists(relativePath))
             {
-                _logger.LogError("File not found at path: {FilePath} for MediaId: {MediaId}", relativePath, mediaId);
+                _logger.LogError("File not found at path: {FilePath}, for MediaId: {MediaId}", relativePath, mediaId);
                 return;
             }
 
@@ -222,7 +222,7 @@ namespace risk.control.system.Services.Tool
                 }
                 else if (status.TranscriptionJobStatus == TranscriptionJobStatus.FAILED)
                 {
-                    _logger.LogError("Transcription Job {JobName} failed: {FailureReason}", jobName, status.FailureReason);
+                    _logger.LogError("Transcription Job {JobName}, failed: {FailureReason}", jobName, status.FailureReason);
                     transcribedText = $"Transcription failed: {status.FailureReason}";
                 }
             }

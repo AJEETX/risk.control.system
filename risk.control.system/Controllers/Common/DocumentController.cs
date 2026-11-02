@@ -26,7 +26,7 @@ namespace risk.control.system.Controllers.Common
                 .Select(p => p.DocumentPath)
                 .FirstOrDefaultAsync();
 
-            return await ServeFileAsync(path, "Policy", id);
+            return await ServeFileAsync(path, "Policy", id, "img/no-image.png");
         }
 
         [AllowAnonymous]
@@ -37,7 +37,7 @@ namespace risk.control.system.Controllers.Common
                 .Select(x => x.ImagePath)
                 .FirstOrDefaultAsync();
 
-            return await ServeFileAsync(path, "Customer", id);
+            return await ServeFileAsync(path, "Customer", id, "img/guest-user.png");
         }
 
         [AllowAnonymous]
@@ -48,7 +48,7 @@ namespace risk.control.system.Controllers.Common
                 .Select(x => x.ImagePath)
                 .FirstOrDefaultAsync();
 
-            return await ServeFileAsync(path, "Beneficiary", id);
+            return await ServeFileAsync(path, "Beneficiary", id, "img/guest-user.png");
         }
 
         public async Task<IActionResult> GetCompanyDocument(long id)
@@ -61,11 +61,11 @@ namespace risk.control.system.Controllers.Common
                     .Select(x => x.DocumentUrl) // Only fetch the string, not the whole object
                     .FirstOrDefaultAsync();
 
-                return await ServeFileAsync(documentUrl, "Company", id);
+                return await ServeFileAsync(documentUrl, "Company", id, "no-image.png");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error retrieving company document for ID {CompanyId}", id);
+                _logger.LogError(ex, "Error retrieving company document for CompanyId {CompanyId}", id);
                 return StatusCode(500, "An internal error occurred.");
             }
         }
@@ -79,7 +79,7 @@ namespace risk.control.system.Controllers.Common
                 .Select(v => v.DocumentUrl)
                 .FirstOrDefaultAsync();
 
-            return await ServeFileAsync(documentUrl, "Agency", id);
+            return await ServeFileAsync(documentUrl, "Agency", id, "img/no-image.png");
         }
         [AllowAnonymous]
         public async Task<IActionResult> GetUserProfileImage(long id)
@@ -90,28 +90,28 @@ namespace risk.control.system.Controllers.Common
                 .FirstOrDefaultAsync();
 
             // Pass the fallback image path as the last argument
-            return await ServeFileAsync(path, "User", id, "img/no-user.png");
+            return await ServeFileAsync(path, "User", id, "img/guest-user.png");
         }
 
         public async Task<IActionResult> GetAgentDocument(long id)
         {
             var path = await _context.AgentIdReport.AsNoTracking()
                 .Where(x => x.Id == id).Select(x => x.FilePath).FirstOrDefaultAsync();
-            return await ServeFileAsync(path, "Agent", id);
+            return await ServeFileAsync(path, "Agent", id, "img/no-image.png");
         }
 
         public async Task<IActionResult> GetFaceDocument(long id)
         {
             var path = await _context.DigitalIdReport.AsNoTracking()
                 .Where(x => x.Id == id).Select(x => x.FilePath).FirstOrDefaultAsync();
-            return await ServeFileAsync(path, "Face", id);
+            return await ServeFileAsync(path, "Face", id, "img/guest-user.png");
         }
 
         public async Task<IActionResult> GetOcrDocument(long id)
         {
             var path = await _context.DocumentIdReport.AsNoTracking()
                 .Where(x => x.Id == id).Select(x => x.FilePath).FirstOrDefaultAsync();
-            return await ServeFileAsync(path, "OCR", id);
+            return await ServeFileAsync(path, "OCR", id, "img/no-image.png");
         }
 
         public async Task<IActionResult> GetMediaDocument(long id)
@@ -120,7 +120,7 @@ namespace risk.control.system.Controllers.Common
                 .Where(x => x.Id == id).Select(x => x.FilePath).FirstOrDefaultAsync();
 
             // ServeFileAsync now handles .mp4, .wav, etc., via the ContentTypeProvider
-            return await ServeFileAsync(path, "Media", id);
+            return await ServeFileAsync(path, "Media", id, "img/no-audio.png");
         }
         public async Task<IActionResult> GetAudioCall(long id)
         {
@@ -128,7 +128,7 @@ namespace risk.control.system.Controllers.Common
                 .Where(x => x.Id == id).Select(x => x.CallRecordingPath).FirstOrDefaultAsync();
 
             // ServeFileAsync now handles .mp4, .wav, etc., via the ContentTypeProvider
-            return await ServeFileAsync(path, "Audio", id);
+            return await ServeFileAsync(path, "Audio", id, "img/no-audio.png");
         }
 
         private async Task<IActionResult> ServeFileAsync(string? relativePath, string entityName, long id, string? defaultPath = null)
@@ -166,7 +166,7 @@ namespace risk.control.system.Controllers.Common
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error serving {Entity} file for ID {Id}", entityName, id);
+                _logger.LogError(ex, "Error serving {Entity}, file for ID {Id}", entityName, id);
                 return StatusCode(500, "Internal server error");
             }
         }

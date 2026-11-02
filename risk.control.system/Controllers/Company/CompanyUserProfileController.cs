@@ -59,7 +59,7 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting user {UserId} Profile. {UserEmail}", id, userEmail);
+                _logger.LogError(ex, "Error getting user {UserId}, Profile. UserEmail {UserEmail}", id, userEmail);
                 _notifyService.Error("Error getting user Profile. Try again.");
                 return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name);
             }
@@ -95,7 +95,7 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error editing user {UserId} Profile. {UserEmail}", id, userEmail);
+                _logger.LogError(ex, "Error editing user {UserId}, Profile. UserEmail {UserEmail}", id, userEmail);
                 _notifyService.Error("Error getting user Profile. Try again.");
             }
             return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
@@ -117,7 +117,7 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error for {UserEmail}", userEmail ?? "Anonymous");
+                _logger.LogError(ex, "Error for UserEmail {UserEmail}", userEmail ?? "Anonymous");
                 _notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
             }
@@ -155,7 +155,7 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while changing password for {UserEmail}", User.Identity?.Name ?? "Anonymous");
+                _logger.LogError(ex, "Error occurred while changing password for UserEmail {UserEmail}", User.Identity?.Name ?? "Anonymous");
                 _notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(AccountController.Login), ControllerName<AccountController>.Name);
             }

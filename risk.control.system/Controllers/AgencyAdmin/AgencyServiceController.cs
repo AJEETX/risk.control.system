@@ -44,7 +44,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error preparing create view for {UserEmail}", userEmail);
+                _logger.LogError(ex, "Error preparing create view for UserEmail {UserEmail}", userEmail);
                 _notifyService.Error("Error creating service. Try again.");
                 return RedirectToAction(nameof(Service));
             }
@@ -150,7 +150,7 @@ namespace risk.control.system.Controllers.AgencyAdmin
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error deleting service {Id}", id);
+                _logger.LogError(ex, "Error deleting service Id {Id}", id);
                 return StatusCode(500, new { success = false, message = "Delete failed." });
             }
         }

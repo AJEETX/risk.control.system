@@ -92,7 +92,7 @@ namespace risk.control.system.Controllers.Mobile
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred for {UserEmail}.", agentEmail);
+                _logger.LogError(ex, "Error occurred for UserEmail {UserEmail}.", agentEmail);
                 return BadRequest($"Agent does not exist or Error");
             }
         }
@@ -123,7 +123,7 @@ namespace risk.control.system.Controllers.Mobile
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred for {UserEmail}.", agentEmail);
+                _logger.LogError(ex, "Error occurred for UserEmail {UserEmail}.", agentEmail);
                 return BadRequest($"Agent does not exist or Error");
             }
         }
@@ -149,7 +149,7 @@ namespace risk.control.system.Controllers.Mobile
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred for {Mobile}.", mobile);
+                _logger.LogError(ex, "Error occurred for Mobile {Mobile}.", mobile);
                 return BadRequest($"mobile number and/or Agent does not exist");
             }
         }
@@ -210,7 +210,7 @@ namespace risk.control.system.Controllers.Mobile
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred for {Mobile}.", request.Mobile);
+                _logger.LogError(ex, "Error occurred for Mobile {Mobile}.", request.Mobile);
                 return BadRequest("An error occurred while verifying the mobile number.");
             }
         }
@@ -275,7 +275,7 @@ namespace risk.control.system.Controllers.Mobile
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred for {Uid}.", request.Uid);
+                _logger.LogError(ex, "Error occurred for Uid {Uid}.", request.Uid);
                 return BadRequest("face matcherror " + ex.StackTrace);
             }
         }
@@ -426,7 +426,7 @@ namespace risk.control.system.Controllers.Mobile
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred for {Agent}.", email);
+                _logger.LogError(ex, "Error occurred for Agent Email {AgentEmail}.", email);
                 return StatusCode(500, $"Error occurred for {email}");
             }
         }
@@ -504,7 +504,7 @@ namespace risk.control.system.Controllers.Mobile
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred for {Email}.", email);
+                _logger.LogError(ex, "Error occurred for Agent Email {AgentEmail}.", email);
                 return StatusCode(500);
             }
         }
@@ -626,7 +626,7 @@ namespace risk.control.system.Controllers.Mobile
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred for {CaseId} for {Email}.", caseId, email);
+                _logger.LogError(ex, "Error occurred for CaseId {CaseId} for Agent Email {AgentEmail}.", caseId, email);
                 return StatusCode(500);
             }
         }
@@ -665,7 +665,7 @@ namespace risk.control.system.Controllers.Mobile
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred for {CaseId} for {Email}.", caseId, email);
+                _logger.LogError(ex, "Error occurred for CaseId {CaseId} for Agent Email {AgentEmail}.", caseId, email);
                 return StatusCode(500);
             }
         }
@@ -726,7 +726,7 @@ namespace risk.control.system.Controllers.Mobile
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred for {Email}.", data.Email);
+                _logger.LogError(ex, "Error occurred for Agent Email {AgentEmail}.", data.Email);
                 return StatusCode(500);
             }
         }
@@ -777,7 +777,7 @@ namespace risk.control.system.Controllers.Mobile
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred for {Email}.", data.Email);
+                _logger.LogError(ex, "Error occurred for Agent Email {AgentEmail}.", data.Email);
                 return StatusCode(500);
             }
         }
@@ -834,7 +834,7 @@ namespace risk.control.system.Controllers.Mobile
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred for {Email}.", data.Email);
+                _logger.LogError(ex, "Error occurred for Agent Email {AgentEmail}.", data.Email);
                 return StatusCode(500);
             }
         }
@@ -883,7 +883,7 @@ namespace risk.control.system.Controllers.Mobile
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred for {CaseId} for {Email}.", caseId, email);
+                _logger.LogError(ex, "Error occurred for CaseId {CaseId} for Agent Email {AgentEmail}.", caseId, email);
                 return StatusCode(500);
             }
         }
@@ -935,7 +935,7 @@ namespace risk.control.system.Controllers.Mobile
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred for {Email}.", data.Email);
+                _logger.LogError(ex, "Error occurred for Agent Email {AgentEmail}.", data.Email);
                 return StatusCode(500);
             }
         }

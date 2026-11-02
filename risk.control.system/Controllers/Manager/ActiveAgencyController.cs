@@ -93,7 +93,7 @@ namespace risk.control.system.Controllers.Manager
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting {AgencyId} for {UserEmail}.", id, HttpContext.User?.Identity?.Name);
+                _logger.LogError(ex, "Error getting Agency Id {AgencyId}. UserEmail {UserEmail}", id, HttpContext.User?.Identity?.Name);
                 _notifyService.Error("Error getting Agency. Try again");
                 return RedirectToAction(nameof(Agencies));
             }
@@ -122,7 +122,7 @@ namespace risk.control.system.Controllers.Manager
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting {AgencyId} for {UserEmail}.", id, HttpContext.User?.Identity?.Name);
+                _logger.LogError(ex, "Error getting Agency Id {AgencyId}. UserEmail {UserEmail}", id, HttpContext.User?.Identity?.Name);
                 _notifyService.Error("Agency Not Found. Try again.");
                 return RedirectToAction(nameof(Agencies));
             }
@@ -156,7 +156,7 @@ namespace risk.control.system.Controllers.Manager
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error editing {AgencyId} for {UserEmail}.", vendorId, userEmail);
+                _logger.LogError(ex, "Error editing Agency Id {AgencyId}. UserEmail {UserEmail}", vendorId, userEmail);
                 _notifyService.Error("Error editing agency. Try again.");
             }
             var encryptedId = _encryptionService.ProtectId(vendorId);

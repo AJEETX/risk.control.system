@@ -56,7 +56,7 @@ namespace risk.control.system.Controllers.Manager
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting active case {CaseId}. {UserEmail}", id, userEmail);
+                _logger.LogError(ex, "Error getting active case Id {CaseId}. UserEmail {UserEmail}", id, userEmail);
                 _notifyService.Error("Error getting case detail. Please try again.");
                 return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
             }
@@ -85,9 +85,7 @@ namespace risk.control.system.Controllers.Manager
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting approved case detail.User: {UserEmail}, CaseId: {CaseId}",
-                    userEmail,
-                    id);
+                _logger.LogError(ex, "Error getting approved case detail.User: {UserEmail}, CaseId: {CaseId}", userEmail, id);
                 _notifyService.Error("Error getting case detail. Try again.");
                 return RedirectToAction(nameof(DashboardController.Index), ControllerName<DashboardController>.Name); ;
             }
