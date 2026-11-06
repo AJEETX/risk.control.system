@@ -4999,6 +4999,10 @@ td.expand-btn-cell * {
 }
 .media-transcript {
     max-height: 300px;
-    overflow-y: scroll;
+    overflow-y: auto;
     width: 380px;
+}
+.scrollable-list {
+    max-height: 250px;
+    overflow-y: auto;
 }
