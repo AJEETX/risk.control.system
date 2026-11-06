@@ -7,7 +7,7 @@ namespace risk.control.system.Models
     {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long Id { get; set; }
-
+        public CameraCaptureMode CameraCaptureMode { get; set; } = CameraCaptureMode.Front;
         public bool Selected { get; set; } = false;
         public string? ReportName { get; set; }
         public string? FilePath { get; set; }
@@ -38,5 +38,12 @@ namespace risk.control.system.Models
                 $"- Location Address: {LocationAddress}\n" +
                 $"- Valid: {ImageValid}";
         }
+    }
+
+    public enum CameraCaptureMode
+    {
+        Front,
+        Rear,
+        None
     }
 }

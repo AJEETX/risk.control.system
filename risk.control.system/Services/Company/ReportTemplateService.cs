@@ -19,6 +19,7 @@ namespace risk.control.system.Services.Creator
                 .FirstOrDefaultAsync(c => c.Id == caseId);
 
             var template = await _context.ReportTemplates
+                .Include(r => r.InvestigationServiceType)
                 .Include(r => r.LocationReport)
                     .ThenInclude(l => l.AgentIdReport)
                 .Include(r => r.LocationReport)

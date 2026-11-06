@@ -23,18 +23,18 @@ namespace risk.control.system.Seeds
                             MediaReports = CreateDefaultMediaReports(true, false),
                             FaceIds = new List<FaceIdReport>
                             {
-                                CreateFaceReport(DigitalIdReportType.CUSTOMER_FACE, true, true),
-                                CreateFaceReport(DigitalIdReportType.BENEFICIARY_FACE, true, false),
+                                CreateFaceReport(DigitalIdReportType.CUSTOMER_FACE, true, true, CameraCaptureMode.Front),
+                                CreateFaceReport(DigitalIdReportType.BENEFICIARY_FACE, true, false, CameraCaptureMode.Rear),
                             },
                             DocumentIds = new List<DocumentIdReport>
                             {
-                                CreateDocumentReport(DocumentIdReportType.ADHAAR, true),
-                                CreateDocumentReport(DocumentIdReportType.PAN, false),
-                                CreateDocumentReport(DocumentIdReportType.VOTER_ID, false),
-                                CreateDocumentReport(DocumentIdReportType.DRIVING_LICENSE, false),
-                                CreateDocumentReport(DocumentIdReportType.BIRTH_CERTIFICATE, false),
-                                CreateDocumentReport(DocumentIdReportType.EMPLOYMENT_RECORD, false),
-                                CreateDocumentReport(DocumentIdReportType.ITR, false)
+                                CreateDocumentReport(DocumentIdReportType.ADHAAR, true, PageCount.DOUBLE, true),
+                                CreateDocumentReport(DocumentIdReportType.PAN, false, PageCount.SINGLE, false),
+                                CreateDocumentReport(DocumentIdReportType.VOTER_ID, false, PageCount.DOUBLE, true),
+                                CreateDocumentReport(DocumentIdReportType.DRIVING_LICENSE, false, PageCount.DOUBLE, true),
+                                CreateDocumentReport(DocumentIdReportType.BIRTH_CERTIFICATE, false, PageCount.SINGLE, false),
+                                CreateDocumentReport(DocumentIdReportType.EMPLOYMENT_RECORD, false, PageCount.MULTIPLE, false),
+                                CreateDocumentReport(DocumentIdReportType.ITR, false, PageCount.SINGLE, false)
                             },
                             Questions = UnderwritingQuestion.QuestionsUNDERWRITING_LA_ADDRESS()
                         }
@@ -61,17 +61,17 @@ namespace risk.control.system.Seeds
                         MediaReports = CreateDefaultMediaReports(true, false),
                         FaceIds = new List<FaceIdReport>
                         {
-                            CreateFaceReport(DigitalIdReportType.BENEFICIARY_FACE, true, true)
+                            CreateFaceReport(DigitalIdReportType.BENEFICIARY_FACE, true, true, CameraCaptureMode.Rear)
                         },
                         DocumentIds = new List<DocumentIdReport>
                         {
-                            CreateDocumentReport(DocumentIdReportType.ADHAAR, true),
-                            CreateDocumentReport(DocumentIdReportType.PAN, false),
-                            CreateDocumentReport(DocumentIdReportType.VOTER_ID, false),
-                            CreateDocumentReport(DocumentIdReportType.DRIVING_LICENSE, false),
-                            CreateDocumentReport(DocumentIdReportType.BIRTH_CERTIFICATE, false),
-                            CreateDocumentReport(DocumentIdReportType.EMPLOYMENT_RECORD, false),
-                            CreateDocumentReport(DocumentIdReportType.ITR, false)
+                            CreateDocumentReport(DocumentIdReportType.ADHAAR, true, PageCount.DOUBLE, true),
+                            CreateDocumentReport(DocumentIdReportType.PAN, false, PageCount.SINGLE, false),
+                            CreateDocumentReport(DocumentIdReportType.VOTER_ID, false, PageCount.DOUBLE, true),
+                            CreateDocumentReport(DocumentIdReportType.DRIVING_LICENSE, false, PageCount.DOUBLE, true),
+                            CreateDocumentReport(DocumentIdReportType.BIRTH_CERTIFICATE, false, PageCount.SINGLE, false),
+                            CreateDocumentReport(DocumentIdReportType.EMPLOYMENT_RECORD, false, PageCount.MULTIPLE, false),
+                            CreateDocumentReport(DocumentIdReportType.ITR, false, PageCount.SINGLE, false)
                         },
                         Questions = ClaimQuestion.QuestionsCLAIM_LA_ADDRESS()
                         },
@@ -133,31 +133,35 @@ namespace risk.control.system.Seeds
             Selected = true,
             IsRequired = true,
             ReportType = DigitalIdReportType.AGENT_FACE,
-            ReportName = DigitalIdReportType.AGENT_FACE.GetEnumDisplayName()
+            ReportName = DigitalIdReportType.AGENT_FACE.GetEnumDisplayName(),
+            CameraCaptureMode = CameraCaptureMode.Front
         };
 
         private static List<MediaReport> CreateDefaultMediaReports(bool selected, bool isRequired) => new()
         {
-            new() { Selected = selected, IsRequired = isRequired, ReportName = MediaType.AUDIO.GetEnumDisplayName(), MediaType = MediaType.AUDIO, MediaExtension = "mp3" },
-            new() { Selected = selected, IsRequired = isRequired, ReportName = MediaType.VIDEO.GetEnumDisplayName(), MediaType = MediaType.VIDEO, MediaExtension = "mp4" }
+            new() { Selected = selected, IsRequired = isRequired, ReportName = MediaType.AUDIO.GetEnumDisplayName(), MediaType = MediaType.AUDIO, MediaExtension = "mp3", CameraCaptureMode = CameraCaptureMode.None },
+            new() { Selected = selected, IsRequired = isRequired, ReportName = MediaType.VIDEO.GetEnumDisplayName(), MediaType = MediaType.VIDEO, MediaExtension = "mp4", CameraCaptureMode = CameraCaptureMode.Front }
         };
 
-        private static FaceIdReport CreateFaceReport(DigitalIdReportType type, bool selected, bool isRequired) => new()
+        private static FaceIdReport CreateFaceReport(DigitalIdReportType type, bool selected, bool isRequired, CameraCaptureMode cameraCapture = CameraCaptureMode.Front) => new()
         {
             Selected = selected,
             IsRequired = isRequired,
             ReportType = type,
             ReportName = type.GetEnumDisplayName(),
-            Has2Face = false
+            Has2Face = false,
+            CameraCaptureMode = cameraCapture
         };
 
-        private static DocumentIdReport CreateDocumentReport(DocumentIdReportType type, bool required) => new()
+        private static DocumentIdReport CreateDocumentReport(DocumentIdReportType type, bool required, PageCount pages = PageCount.SINGLE, bool hasBackImage = false, CameraCaptureMode cameraCapture = CameraCaptureMode.Rear) => new()
         {
             Selected = true,
             IsRequired = required,
             ReportType = type,
             ReportName = type.GetEnumDisplayName(),
-            HasBackImage = false
+            PageCount = pages,
+            HasBackImage = hasBackImage,
+            CameraCaptureMode = cameraCapture
         };
 
         #endregion

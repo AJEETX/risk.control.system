@@ -87,11 +87,12 @@ namespace risk.control.system.Services.Report
                     ReportName = face.ReportName
                 }).ToList(),
 
-                DocumentIds = loc.DocumentIds!.Where(face => face.Selected)?.Select(doc => new
+                DocumentIds = loc.DocumentIds!.Where(doc => doc.Selected)?.Select(doc => new
                 {
                     IsRequired = doc.IsRequired,
                     ReportType = doc.ReportType.GetEnumDisplayName(),
                     ReportName = doc.ReportName,
+                    Pages = doc.PageCount
                 }).ToList(),
 
                 Questions = loc.Questions?.Select(q => new
@@ -134,7 +135,8 @@ namespace risk.control.system.Services.Report
                     Selected = d.Selected,
                     HasBackImage = d.HasBackImage,
                     ReportName = d.ReportName,
-                    ReportType = d.ReportType
+                    ReportType = d.ReportType,
+                    PageCount = d.PageCount
                 }).ToList(),
                 MediaReports = original.MediaReports?.Select(m => new MediaReport
                 {
@@ -259,6 +261,8 @@ namespace risk.control.system.Services.Report
                         ReportType = doc.ReportType,
                         ReportName = doc.ReportName,
                         Selected = doc.Selected,
+                        PageCount = doc.PageCount,
+                        HasBackImage = doc.HasBackImage
                     }).ToList(),
 
                     Questions = loc.Questions?.Select(q => new Question

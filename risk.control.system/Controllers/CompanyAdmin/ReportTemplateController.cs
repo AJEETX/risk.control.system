@@ -408,26 +408,36 @@ namespace risk.control.system.Controllers.CompanyAdmin
                     return Json(new { success = false, message = $"Location name {model.LocationName} exists." });
                 }
                 location.LocationName = model.LocationName!.Trim().ToUpper();
-                var agent = location.AgentIdReport;
-                if (agent != null)
-                    agent.Selected = model.AgentId!.Selected;
+
                 foreach (var f in model.FaceIds!)
                 {
                     var face = location.FaceIds!.FirstOrDefault(x => x.Id == f.Id);
                     if (face != null)
+                    {
                         face.Selected = f.Selected;
+                        face.IsRequired = f.Required;
+                        face.CameraCaptureMode = f.CameraCaptureMode;
+                    }
                 }
                 foreach (var d in model.DocumentIds!)
                 {
                     var doc = location.DocumentIds!.FirstOrDefault(x => x.Id == d.Id);
                     if (doc != null)
+                    {
                         doc.Selected = d.Selected;
+                        doc.IsRequired = d.Required;
+                        doc.CameraCaptureMode = CameraCaptureMode.Rear;
+                        doc.PageCount = d.PageCount;
+                    }
                 }
                 foreach (var m in model.MediaReports!)
                 {
                     var media = location.MediaReports!.FirstOrDefault(x => x.Id == m.Id);
                     if (media != null)
+                    {
                         media.Selected = m.Selected;
+                        media.IsRequired = m.Required;
+                    }
                 }
                 var template = await _context.ReportTemplates.FirstOrDefaultAsync(t => t.Id == location.ReportTemplateId);
                 template!.Updated = DateTime.UtcNow;

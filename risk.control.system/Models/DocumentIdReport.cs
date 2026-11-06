@@ -8,6 +8,7 @@ namespace risk.control.system.Models
     {
         public bool HasBackImage { get; set; } = true;
         public DocumentIdReportType ReportType { get; set; } = DocumentIdReportType.PAN;
+        public PageCount PageCount { get; set; } = PageCount.SINGLE;
         public long? LocationReportId { get; set; }  // This is the FK property
         public LocationReport? LocationReport { get; set; }  // Navigation property
 
@@ -18,7 +19,15 @@ namespace risk.control.system.Models
                 $"Report Type:{ReportType.GetEnumDisplayName()}";
         }
     }
-
+    public enum PageCount
+    {
+        [Display(Name = "Single")]
+        SINGLE,
+        [Display(Name = "Double")]
+        DOUBLE,
+        [Display(Name = "Multiple")]
+        MULTIPLE
+    }
     public enum DocumentIdReportType
     {
         [Display(Name = "Aadhaar_Card")]

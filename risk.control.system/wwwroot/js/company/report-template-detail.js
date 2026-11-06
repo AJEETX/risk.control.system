@@ -162,21 +162,16 @@
                         $container.append($row);
                         $li.append($container);
 
-                        // find the target list safely (avoid interpolated selector)
-                        var $addBtns = $('button.add-question-btn[data-locationid]');
-                        var $addBtn = $addBtns.filter(function () {
-                            // compare the sanitized attribute value to sanitized locationId
-                            return String($(this).attr('data-locationid')) === String(locationId);
-                        }).first();
+                        // Directly find the <ul> that belongs to this specific location ID
+                        var $list = $('button.add-question-btn[data-locationid="' + locationId + '"]')
+                            .closest('.card')
+                            .find('ul.list-unstyled')
+                            .first();
 
-                        var $list = $addBtn.closest('.col-md-9').find('ul.list-unstyled').first();
-                        if ($list && $list.length) {
-                            $list.append($li);
-                        } else {
-                            // fallback: append to a known container if selector fails
-                            $('#questionsFallbackList').append($li);
+                            if ($list.length) {
+                                $list.append($li);
+                            }
                         }
-                    }
                 } else {
                     $.alert({ title: 'Error', content: response.message || 'Failed to add question.', type: 'red' });
                 }
@@ -354,132 +349,150 @@
     });
 
     //Save locations' FaceId, DocumentIds, ...
-    $(document).on("click", ".save-location-btn", function (e) {
-        e.preventDefault();
+   $(document).on("click", ".save-location-btn", function (e) {
+    e.preventDefault();
 
-        var $btn = $(this);
-        var locationId = $btn.data("locationid");
-        var templateId = $btn.data("reporttemplateid");
-        var $card = $btn.closest(".card"); // scope to this location card
-        var $spinner = $(".submit-progress"); // global spinner (you already have this)
+    var $btn = $(this);
+    var locationId = $btn.data("locationid");
+    var templateId = $btn.data("reporttemplateid");
+    var $card = $btn.closest(".card"); 
+    var $spinner = $(".submit-progress"); 
 
-        // ✅ Get Location Name
-        var locationName = $card.find("input.form-control.title-name").val()
-            || $card.find("input[asp-for$='LocationName']").val()
-            || $card.find("input[id^='location_']").val();
+    // Get Location Name
+    var locationName = $card.find("input.form-control.title-name").val()
+        || $card.find("input[asp-for$='LocationName']").val()
+        || $card.find("input[id^='location_']").val();
 
-        if (!locationName || !locationName.trim()) {
-            $.alert({
-                title: '<span class="i-orangered"><i class="fas fa-exclamation-triangle"></i></span> Error!',
-                content: "Location name is empty.",
-                type: "red"
-            });
-            return;
-        }
-        // Collect AgentId
-        var agentId = null;
-        var $agentCheckbox = $card.find("input[id^='agent_']");
-        if ($agentCheckbox.length) {
-            agentId = {
-                Id: $agentCheckbox.attr("id").replace("agent_", ""),
-                Selected: $agentCheckbox.is(":checked")
-            };
-        }
-
-        // Collect selected FaceIds
-        var faceIds = [];
-        $card.find("input[id^='face_']").each(function () {
-            faceIds.push({
-                Id: $(this).attr("id").replace("face_", ""),
-                Selected: $(this).is(":checked")
-            });
+    if (!locationName || !locationName.trim()) {
+        $.alert({
+            title: '<span class="i-orangered"><i class="fas fa-exclamation-triangle"></i></span> Error!',
+            content: "Location name is empty.",
+            type: "red"
         });
+        return;
+    }
 
-        // Collect selected DocumentIds
-        var documentIds = [];
-        $card.find("input[id^='doc_']").each(function () {
-            documentIds.push({
-                Id: $(this).attr("id").replace("doc_", ""),
-                Selected: $(this).is(":checked")
-            });
-        });
+    // Helper function to read camera capture mode safely
+       function getCameraCaptureMode($container) {
+           var $checkedRadio = $container.find("input[type='radio']:checked");
+           if ($checkedRadio.length > 0) {
+               return $checkedRadio.val();
+           }
+           var $hiddenInput = $container.find("input[type='hidden'][name='CameraCaptureMode']");
+           return $hiddenInput.length > $hiddenInput.val() ? $hiddenInput.val() : "Front";
+       }
 
-        // Collect selected MediaReports
-        var mediaReports = [];
-        $card.find("input[id^='media_']").each(function () {
-            mediaReports.push({
-                Id: $(this).attr("id").replace("media_", ""),
-                Selected: $(this).is(":checked")
-            });
-        });
+    // Collect FaceIds
+       var faceIds = [];
+       $card.find("input[id^='face_']").each(function () {
+           var faceId = $(this).attr("id").replace("face_", "");
+           var $container = $(this).closest(".border");
+           var isRequired = $card.find("#isfaceRequiredCheckbox_" + faceId).is(":checked");
 
-        $.confirm({
-            title: 'Confirm Save',
-            icon: 'fas fa-edit',
-            content: 'Are you sure you want to save this location?',
-            type: 'green',
-            buttons: {
-                confirm: {
-                    text: 'Yes',
-                    btnClass: 'btn-success',
-                    action: function () {
-                        $spinner.removeClass("hidden");
-                        // Disable button and show spinner
-                        $btn.prop("disabled", true).html('<i class="fas fa-sync fa-spin"></i> Save');
-                        $.ajax({
-                            url: '/ReportTemplate/SaveLocation',
-                            type: 'POST',
-                            contentType: 'application/json',
-                            headers: {
-                                'X-CSRF-TOKEN': $('input[name="__RequestVerificationToken"]').val()
-                            },
-                            data: JSON.stringify({
-                                TemplateId: templateId,
-                                LocationName: locationName,
-                                AgentId: agentId,
-                                LocationId: locationId,
-                                FaceIds: faceIds,
-                                DocumentIds: documentIds,
-                                MediaReports: mediaReports
-                            }),
-                            success: function (response) {
-                                if (response.success) {
-                                    $.alert({
-                                        title: '<span class="i-green"><i class="fas fa-check-circle"></i></span> Success',
-                                        content: response.message || "Location saved successfully!",
-                                        type: "green",
-                                    });
-                                } else {
-                                    $.alert({
-                                        title: '<span class="i-orangered"><i class="fas fa-exclamation-triangle"></i></span> Error!',
-                                        content: response.message || "Failed to save location.",
-                                        type: "red"
-                                    });
-                                }
-                            },
-                            error: function (xhr) {
-                                console.error(xhr.responseText);
+           faceIds.push({
+               Id: faceId,
+               Selected: $(this).is(":checked"),
+               Required: isRequired,
+               CameraCaptureMode: getCameraCaptureMode($container)
+           });
+       });
+
+       // Collect DocumentIds
+       var documentIds = [];
+       $card.find("input[id^='doc_']").each(function () {
+           var docId = $(this).attr("id").replace("doc_", "");
+           var $container = $(this).closest(".border");
+           var isRequired = $card.find("#isdocRequiredCheckbox_" + docId).is(":checked");
+
+           // Get the selected PageCount enum value (e.g., "SINGLE", "DOUBLE", or "MULTIPLE")
+           var pageCount = $container.find("input[id^='pageCount_" + docId + "_']:checked").val();
+
+           documentIds.push({
+               Id: docId,
+               Selected: $(this).is(":checked"),
+               Required: isRequired,
+               PageCount: pageCount, // Added PageCount value here
+               CameraCaptureMode: 1
+           });
+       });
+    // Collect MediaReports
+       var mediaReports = [];
+       $card.find("input[id^='media_']").each(function () {
+           var mediaId = $(this).attr("id").replace("media_", "");
+           var $container = $(this).closest(".border");
+           var isRequired = $card.find("#ismediaRequiredCheckbox_" + mediaId).is(":checked");
+
+           mediaReports.push({
+               Id: mediaId,
+               Selected: $(this).is(":checked"),
+               Required: isRequired,
+               CameraCaptureMode: getCameraCaptureMode($container)
+           });
+       });
+
+    $.confirm({
+        title: 'Confirm Save',
+        icon: 'fas fa-edit',
+        content: 'Are you sure you want to save this location?',
+        type: 'green',
+        buttons: {
+            confirm: {
+                text: 'Yes',
+                btnClass: 'btn-success',
+                action: function () {
+                    $spinner.removeClass("hidden");
+                    $btn.prop("disabled", true).html('<i class="fas fa-sync fa-spin"></i> Save');
+                    $.ajax({
+                        url: '/ReportTemplate/SaveLocation',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        headers: {
+                            'X-CSRF-TOKEN': $('input[name="__RequestVerificationToken"]').val()
+                        },
+                        data: JSON.stringify({
+                            TemplateId: templateId,
+                            LocationName: locationName,
+                            LocationId: locationId,
+                            FaceIds: faceIds,
+                            DocumentIds: documentIds,
+                            MediaReports: mediaReports
+                        }),
+                        success: function (response) {
+                            if (response.success) {
+                                $.alert({
+                                    title: '<span class="i-green"><i class="fas fa-check-circle"></i></span> Success',
+                                    content: response.message || "Location saved successfully!",
+                                    type: "green",
+                                });
+                            } else {
                                 $.alert({
                                     title: '<span class="i-orangered"><i class="fas fa-exclamation-triangle"></i></span> Error!',
-                                    content: "An error occurred while saving.",
+                                    content: response.message || "Failed to save location.",
                                     type: "red"
                                 });
-                            },
-                            complete: function () {
-                                $spinner.addClass("hidden");
-                                // ✅ Re-enable button and restore text
-                                $btn.prop("disabled", false).html('<i class="fas fa-edit me-1"></i> Save');
                             }
-                        });
-                    }
-                },
-                cancel: function () {
-                    // Do nothing
+                        },
+                        error: function (xhr) {
+                            console.error(xhr.responseText);
+                            $.alert({
+                                title: '<span class="i-orangered"><i class="fas fa-exclamation-triangle"></i></span> Error!',
+                                content: "An error occurred while saving.",
+                                type: "red"
+                            });
+                        },
+                        complete: function () {
+                            $spinner.addClass("hidden");
+                            $btn.prop("disabled", false).html('<i class="fas fa-edit me-1"></i> Save');
+                        }
+                    });
                 }
+            },
+            cancel: function () {
+                // Do nothing
             }
-        });
+        }
     });
-
+});
     //Clone location
     $(document).on("click", ".clone-location-btn", function (e) {
         e.preventDefault();
