@@ -120,7 +120,7 @@
 <div class="card shadow-lg border-1 rounded-lg">
 	<button id="refreshTable" class="btn btn-default"> <i id="refreshIcon" class="fas fa-sync"></i> Refresh</button>
 </div>
-<form id="radioButtons" method="post" asp-controller="AssignCase" asp-action="AllocateSingle2Vendor">
+<form id="radioButtons" method="post" asp-controller="AssignCase" asp-action="AllocateCase2AgencyManually">
 	<div class="card-body">
 
 		<input type="hidden" id="caseId" name="caseId" value="@Model?.ClaimsInvestigation!.Id" />

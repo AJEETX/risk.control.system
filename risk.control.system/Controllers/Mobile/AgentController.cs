@@ -27,7 +27,7 @@ namespace risk.control.system.Controllers.Mobile
             RoleManager<ApplicationRole> roleManager,
             IAgentAnswerService answerService,
             IMediaIdfyService mediaIdfyService,
-            IDocumentIdfyService documentIdfyService,
+            IManageDocumentIdfyService manageDocumentIdfyService,
             IAgentFaceIdfyService agentFaceIdfyService,
             ILogger<AgentController> logger,
             ICloneReportService cloneReportService,
@@ -50,7 +50,7 @@ namespace risk.control.system.Controllers.Mobile
         private readonly RoleManager<ApplicationRole> _roleManager = roleManager;
         private readonly IAgentAnswerService _answerService = answerService;
         private readonly IMediaIdfyService _mediaIdfyService = mediaIdfyService;
-        private readonly IDocumentIdfyService _documentIdfyService = documentIdfyService;
+        private readonly IManageDocumentIdfyService _manageDocumentIdfyService = manageDocumentIdfyService;
         private readonly IAgentFaceIdfyService _agentFaceIdfyService = agentFaceIdfyService;
         private readonly ILogger<AgentController> _logger = logger;
         private readonly ICloneReportService _cloneReportService = cloneReportService;
@@ -771,7 +771,7 @@ namespace risk.control.system.Controllers.Mobile
                         return StatusCode(401, new { message = "Offboarded Agent." });
                     }
                 }
-                var response = await _documentIdfyService.CaptureDocumentId(data);
+                var response = await _manageDocumentIdfyService.CaptureDocumentId(data);
                 response.Registered = agent.Active && !string.IsNullOrWhiteSpace(agent.MobileUId);
                 return Ok(response);
             }

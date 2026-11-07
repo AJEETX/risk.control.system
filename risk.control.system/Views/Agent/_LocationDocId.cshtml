@@ -1,12 +1,11 @@
-﻿@using risk.control.system.Helpers;
-@model LocationReport
+﻿@model LocationReport
 @{
 	var location = Model;
 }
 
 @if (location.DocumentIds?.Any(d => d.Selected) == true)
 {
-	<div class="table-responsive mb-4">
+	<div class="table-responsive mb-2">
 
 		<table class="table table-bordered table-hover dt-responsive nowrap w-100">
 		<thead class="table-light">
@@ -47,22 +46,64 @@
 								</span>
 							</div>
 						</td>
-						<td class="text-center face-photo-column">
-						@if (doc.ValidationExecuted)
-						{
-								<div class="position-relative d-inline-block mb-2">
-							<img id="doc-img-@doc.Id"
-									 src="/Document/GetOcrDocument/@doc.Id"
-										 class="mobile-capture-info img-thumbnail img-fluid shadow-sm thumbnail preview-image"
-								 title="Click to view document" />
-								 </div>
-						}
-						else
-						{
-							<img id="doc-img-@doc.Id" src="~/img/no-policy.jpg" class="thumbnail profile-image doc-profile-image" />
-						}
+						<td class="text-center face-photo-column" data-doc-container="@doc.Id">
+							@if (doc.ValidationExecuted && doc.DocumentFiles != null && doc.DocumentFiles.Any())
+							{
+								var orderedFiles = doc.DocumentFiles.OrderBy(f => f.PageNumber).ToList();
+								var firstPage = orderedFiles.First().PageNumber;
 
-					</td>
+								<div class="d-flex flex-column align-items-center">
+									<!-- 1. Image Display Area -->
+									<div class="position-relative d-inline-block mb-2">
+										@foreach (var file in orderedFiles)
+										{
+											// If it's NOT the first page, add Bootstrap's 'd-none' class to hide it on load
+											var visibilityClass = (file.PageNumber == firstPage) ? "" : "d-none";
+
+											<img id="doc-img-@doc.Id-page-@file.PageNumber"
+												 src="/Document/GetOcrDocument/@doc.Id?page=@file.PageNumber"
+												 class="mobile-capture-info img-thumbnail img-fluid shadow-sm thumbnail preview-image doc-page-img-@doc.Id doc-document-thumb @visibilityClass"
+												 data-page="@file.PageNumber"
+												 title="Document @doc.ReportName - Page @file.PageNumber" />
+										}
+									</div>
+
+									<!-- 2. Movable Page Number Links Bar -->
+									@if (orderedFiles.Count > 1)
+									{
+										<div class="d-flex flex-wrap justify-content-center gap-1 mt-1 page-nav-bar"
+										data-docid="@doc.Id"
+										data-current-page="@firstPage"
+										data-total-pages="@orderedFiles.Count">
+											@foreach (var file in orderedFiles)
+											{
+												var activeClass = (file.PageNumber == firstPage) ? "btn-dark" : "btn-outline-secondary";
+
+												<button type="button"
+												class="btn btn-sm py-0 px-2 fs-8 page-nav-btn @activeClass"
+												data-docid="@doc.Id"
+												data-page="@file.PageNumber">
+													@file.PageNumber
+												</button>
+											}
+										</div>
+									}
+								</div>
+							}
+							else if (doc.ValidationExecuted)
+							{
+								<div class="position-relative d-inline-block mb-2">
+									<img id="doc-img-@doc.Id"
+										 src="/Document/GetOcrDocument/@doc.Id?page=1"
+										 class="mobile-capture-info img-thumbnail img-fluid shadow-sm thumbnail preview-image doc-document-thumb"
+										 title="Click to view document" />
+								</div>
+							}
+							else
+							{
+								<img id="doc-img-@doc.Id" src="~/img/no-policy.jpg" class="thumbnail profile-image doc-profile-image doc-document-thumb" />
+							}
+						</td>
 						<td>
 							<div class="d-flex flex-column gap-2">
 								<!-- Address Card -->
@@ -74,7 +115,13 @@
 						</td>
 						<td>
 							<div class="p-2.5 bg-white rounded border shadow-sm">
-								<div class="text-dark fs-6 fw-bold ps-1 small">@doc.LocationInfo</div>
+                                @foreach (var file in doc.DocumentFiles!.OrderBy(f => f.PageNumber))
+                                {
+                                    <div class="text-dark fs-6 fw-bold ps-1 small mb-1">
+                                        <span class="badge bg-light text-dark border px-2 py-1 me-1">Page @file.PageNumber</span>
+                                        @file.OcrText
+                                    </div>
+                                }
 							</div>
 						</td>
 						<td class="text-center">
@@ -121,6 +168,11 @@
 						</td>
 					<td>
 							<input type="file" class="form-control remarks form-control-sm doc-upload" data-docid="@doc.Id" />
+							<!-- Add an input to specify the page number -->
+							<div class="input-group input-group-sm mt-2">
+								<span class="input-group-text">Page #</span>
+								<input type="number" class="form-control page-number-input" data-docid="@doc.Id" value="1" min="1" />
+							</div>
 							<button class="btn btn-sm btn-success mt-2  upload-doc-btn"
 								data-docid="@doc.Id"
 								data-locationid="@location.Id"

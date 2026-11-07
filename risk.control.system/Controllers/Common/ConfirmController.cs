@@ -101,8 +101,8 @@ namespace risk.control.system.Controllers.Common
         {
             if (string.IsNullOrEmpty(token) || !set)
             {
-                return BadRequest("Invalid confirmation link.");
                 _logger.LogError("Not set DateTime {DateTime}", DateTime.UtcNow.ToLocalTime());
+                return BadRequest("Invalid confirmation link.");
             }
 
             try

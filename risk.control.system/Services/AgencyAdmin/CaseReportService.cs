@@ -63,7 +63,8 @@ namespace risk.control.system.Services.AgencyAdmin
                     .ThenInclude(a => a.FaceResult!)
                     .ThenInclude(f => f.Faces)
                .Include(r => r.LocationReport)
-                   .ThenInclude(l => l.DocumentIds)
+                   .ThenInclude(l => l.DocumentIds!)
+                   .ThenInclude(l => l.DocumentFiles!)
                .Include(r => r.LocationReport)
                    .ThenInclude(l => l.Questions)
                    .FirstOrDefaultAsync(q => q.Id == reportTemplateId);

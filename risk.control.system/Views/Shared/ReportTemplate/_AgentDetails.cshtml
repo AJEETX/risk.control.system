@@ -1,0 +1,69 @@
+﻿@using risk.control.system.Helpers
+@model LocationReport
+@{
+    var location = Model;
+}
+<div class="col-md-3 border rounded p-2">
+    <h6 class="text-muted"><i class="far fa-user"></i> Agent ID</h6>
+    <ul class="list-unstyled mb-3">
+        <li class="mb-2">
+            <div class="border rounded p-2  bg-light">
+                <div class="form-check">
+                    <input disabled class="form-check-input" type="checkbox" id="agent_@location.AgentIdReport!.Id" @(location.AgentIdReport.Selected ? "checked" : "") />
+                    <input type="hidden" name="AgentIdReport.Selected" value="@(location.AgentIdReport.Selected)" />
+                    <label class="form-check-label" for="agent_@location.AgentIdReport.Id">
+                        @if (location.AgentIdReport.Has2Face)
+                        {
+                            <i class="fas fa-users text-info me-1"></i>
+                        }
+                        else
+                        {
+                            <i class="far fa-user text-info me-1"></i>
+                        }
+                        @location.AgentIdReport.ReportName
+                                                            
+                        @if (location.AgentIdReport.IsRequired)
+                        {
+                            <span class="required-asterisk" title="Required field" data-bs-toggle="tooltip">*</span>
+                        }
+                    </label>
+                </div>
+                <div class="form-check">
+                    <span class="required-asterisk">
+                        <input type="checkbox" title="Required field" data-bs-toggle="tooltip"
+                               id="isfaceRequiredCheckbox_@location.AgentIdReport.Id"
+                               name="face.IsRequired"
+                               class="form-check-input" checked disabled
+                        @(location.AgentIdReport.IsRequired ? "checked" : "") />
+                        <label class="form-check-label small" for="isfaceRequiredCheckbox_@location.AgentIdReport.Id">
+                            Is Mandatory Face ?
+                        </label>
+                    </span>
+                </div>
+                <div class="mt-3">
+                    <label class="form-label fw-bold">Camera Capture Mode</label>
+                    <div class="d-flex">
+                        @foreach (CameraCaptureMode captureOption in Enum.GetValues(typeof(CameraCaptureMode)))
+                        {
+                            var radioId = $"camera_{location.AgentIdReport.Id}_{captureOption}";
+                            var isChecked = location.AgentIdReport.CameraCaptureMode == captureOption;
+                            <div class="form-check form-check-inline me-3">
+                                <input class="form-check-input"
+                                       type="radio"
+                                       name="SelectedCameraCapture"
+                                       id="@radioId"
+                                       value="@captureOption"
+                                       disabled
+                                @(isChecked ? "checked" : "") />
+                                <label class="form-check-label small" for="@radioId">
+                                    @captureOption
+                                </label>
+                            </div>
+                        }
+                    </div>
+                    <input type="hidden" name="AgentIdReport.CameraCaptureMode" value="@location.AgentIdReport.CameraCaptureMode" />
+                </div>
+            </div>
+        </li>
+    </ul>
+</div>

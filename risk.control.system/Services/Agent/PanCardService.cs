@@ -8,7 +8,7 @@ namespace risk.control.system.Services.Agent
 {
     public interface IPanCardService
     {
-        Task<byte[]> Process(byte[] IdImage, byte[] registeredImage, IReadOnlyList<TextBlock> imageReadOnly, ClientCompany company, DocumentIdReport doc);
+        Task<byte[]> Process(byte[] IdImage, byte[] registeredImage, IReadOnlyList<TextBlock> imageReadOnly, ClientCompany company, DocumentIdReport doc, int pageNumber = 1);
     }
 
     internal class PanCardService(
@@ -37,9 +37,10 @@ namespace risk.control.system.Services.Agent
         private string panNumber = string.Empty;
         private string docyTypePan = string.Empty;
 
-        public async Task<byte[]> Process(byte[] idImage, byte[] registeredImage, IReadOnlyList<TextBlock> imageReadOnly, ClientCompany company, DocumentIdReport doc)
+        public async Task<byte[]> Process(byte[] idImage, byte[] registeredImage, IReadOnlyList<TextBlock> imageReadOnly, ClientCompany company, DocumentIdReport doc, int pageNumber = 1)
         {
-            var filePath = Path.Combine(_env.ContentRootPath, doc.FilePath!);
+            var documentFileForPage = doc.DocumentFiles.FirstOrDefault(d => d.PageNumber == pageNumber);
+            var filePath = Path.Combine(_env.ContentRootPath, documentFileForPage?.FilePath!);
             string allPanText = imageReadOnly.FirstOrDefault()?.Text ?? string.Empty;
 
             try
@@ -83,21 +84,21 @@ namespace risk.control.system.Services.Agent
                 if (!panIsValid)
                 {
                     doc.ImageValid = false;
-                    doc.LocationInfo = "Invalid PAN number detected";
+                    documentFileForPage!.OcrText = "Invalid PAN number detected";
                     idImage = await SaveCompressedInValidImage(filePath, idImage);
                     return idImage;
                 }
                 doc.ImageValid = true;
                 idImage = MaskPanIfFound(idImage, imageReadOnly, allPanText);
                 idImage = await SaveCompressedValidImage(filePath, idImage);
-                doc.LocationInfo = FormatLocationInfo(allPanText, panNumber, documentType);
+                documentFileForPage!.OcrText = FormatLocationInfo(allPanText, panNumber, documentType);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error occurred during PAN document processing.");
                 idImage = await SaveCompressedInValidImage(filePath, idImage);
                 doc.LongLatTime = DateTime.UtcNow;
-                doc.LocationInfo = "no data: ";
+                documentFileForPage!.OcrText = "Error occurred during PAN document processing.";
             }
 
             return idImage;

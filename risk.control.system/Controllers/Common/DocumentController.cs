@@ -107,10 +107,10 @@ namespace risk.control.system.Controllers.Common
             return await ServeFileAsync(path, "Face", id, "img/guest-user.png");
         }
 
-        public async Task<IActionResult> GetOcrDocument(long id)
+        public async Task<IActionResult> GetOcrDocument(long id, int page)
         {
             var path = await _context.DocumentIdReport.AsNoTracking()
-                .Where(x => x.Id == id).Select(x => x.FilePath).FirstOrDefaultAsync();
+                .Where(x => x.Id == id).Select(x => x.DocumentFiles!.FirstOrDefault(d => d.PageNumber == page)!.FilePath).FirstOrDefaultAsync();
             return await ServeFileAsync(path, "OCR", id, "img/no-image.png");
         }
 

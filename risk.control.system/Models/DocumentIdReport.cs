@@ -1,13 +1,32 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 using risk.control.system.Helpers;
 
 namespace risk.control.system.Models
 {
-    public class DocumentIdReport : ReportBase
+    public class DocumentIdReport : BaseEntity
     {
+        [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public long Id { get; set; }
+        public CameraCaptureMode CameraCaptureMode { get; set; } = CameraCaptureMode.Front;
+        public bool Selected { get; set; } = false;
+        public string? ReportName { get; set; }
         public bool HasBackImage { get; set; } = true;
+        public List<DocumentFile> DocumentFiles { get; set; } = new List<DocumentFile>();
         public DocumentIdReportType ReportType { get; set; } = DocumentIdReportType.PAN;
+        public string? LocationInfo { get; set; }
+        public string? LocationMapUrl { get; set; }
+        public string? Distance { get; set; }
+        public float? DistanceInMetres { get; set; }
+        public string? Duration { get; set; }
+        public int? DurationInSeconds { get; set; }
+        public string? LocationAddress { get; set; }
+        public string? LongLat { get; set; }
+        public DateTime? LongLatTime { get; set; }
+        public bool ValidationExecuted { get; set; } = false;
+        public bool? ImageValid { get; set; } = false;
+        public bool IsRequired { get; set; } = false;
         public PageCount PageCount { get; set; } = PageCount.SINGLE;
         public long? LocationReportId { get; set; }  // This is the FK property
         public LocationReport? LocationReport { get; set; }  // Navigation property
@@ -18,6 +37,15 @@ namespace risk.control.system.Models
                 $"Document Has Back Image:{HasBackImage}\n" +
                 $"Report Type:{ReportType.GetEnumDisplayName()}";
         }
+    }
+    public class DocumentFile
+    {
+        [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public long Id { get; set; }
+        public int PageNumber { get; set; }
+        public string? FilePath { get; set; }
+        public string? OriginalFilePath { get; set; }
+        public string? OcrText { get; set; }
     }
     public enum PageCount
     {

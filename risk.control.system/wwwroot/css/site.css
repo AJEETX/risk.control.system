@@ -5006,3 +5006,45 @@ td.expand-btn-cell * {
     max-height: 250px;
     overflow-y: auto;
 }
+/* Base card transition setup */
+.toggle-card {
+    transition: background-color 0.3s ease-in-out, border-color 0.3s ease-in-out;
+}
+
+    /* Dependent controls opacity and interaction transition */
+    .toggle-card .dependent-controls {
+        opacity: 0.4;
+        pointer-events: none; /* Prevents interaction when disabled */
+        transition: opacity 0.3s ease-in-out;
+    }
+
+    /* Enabled state (when the main checkbox inside the card is checked) */
+    .toggle-card:has(.form-check-input:checked) {
+        background-color: #f8f9fa !important; /* Light background or your preferred active color */
+        border-color: #ced4da !important;
+    }
+
+        .toggle-card:has(.form-check-input:checked) .dependent-controls {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+    /* Disabled state (when unchecked) - slightly darker background tint */
+    .toggle-card:not(:has(.form-check-input:checked)) {
+        background-color: #e9ecef !important; /* Slightly muted/darker background when disabled */
+        border-color: #dee2e6 !important;
+    }
+
+/* Standardize document thumbnail image sizing */
+.doc-document-thumb {
+    height: auto;
+}
+
+/* Visibility states for pagination */
+.doc-page-hidden {
+    display: none !important;
+}
+
+.doc-page-active {
+    display: inline-block !important;
+}

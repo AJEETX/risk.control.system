@@ -53,7 +53,7 @@ namespace risk.control.system.Services.Report
                 var investigationReport = await _context.ReportTemplates
                     .Include(r => r.LocationReport).ThenInclude(l => l.AgentIdReport).ThenInclude(l => l!.FaceResult).ThenInclude(l => l!.Faces)
                    .Include(r => r.LocationReport).ThenInclude(l => l.FaceIds!).ThenInclude(l => l.FaceResult).ThenInclude(l => l!.Faces)
-                   .Include(r => r.LocationReport).ThenInclude(l => l.DocumentIds)
+                   .Include(r => r.LocationReport).ThenInclude(l => l.DocumentIds)!.ThenInclude(d => d.DocumentFiles!)
                    .Include(r => r.LocationReport).ThenInclude(l => l.Questions)
                    .FirstOrDefaultAsync(q => q.Id == investigation!.ReportTemplateId);
                 var vendor = _context.Vendor.Include(s => s.District).Include(s => s.State).Include(s => s.Country).Include(s => s.PinCode).Include(s => s.VendorInvestigationServiceTypes).FirstOrDefault(v => v.VendorId == investigation!.VendorId);
@@ -111,7 +111,7 @@ namespace risk.control.system.Services.Report
                 var investigationReport = await _context.ReportTemplates
                         .Include(r => r.LocationReport).ThenInclude(l => l.AgentIdReport).ThenInclude(l => l!.FaceResult).ThenInclude(l => l!.Faces)
                        .Include(r => r.LocationReport).ThenInclude(l => l.FaceIds!).ThenInclude(l => l.FaceResult).ThenInclude(l => l!.Faces)
-                       .Include(r => r.LocationReport).ThenInclude(l => l.DocumentIds)
+                       .Include(r => r.LocationReport).ThenInclude(l => l.DocumentIds)!.ThenInclude(d => d.DocumentFiles!)
                        .Include(r => r.LocationReport).ThenInclude(l => l.Questions)
                        .FirstOrDefaultAsync(q => q.Id == investigation!.ReportTemplateId);
 

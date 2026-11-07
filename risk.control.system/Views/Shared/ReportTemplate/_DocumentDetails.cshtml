@@ -1,0 +1,82 @@
+﻿@using risk.control.system.Helpers
+@model LocationReport
+@{
+    var location = Model;
+}
+
+<div class="col-md-3 border rounded p-2">
+    <h6 class="text-muted"><i class="far fa-file-alt"></i> Document IDs</h6>
+    <ul class="list-unstyled mb-3 scrollable-list">
+        @{
+            int i = 0;
+        }
+        @foreach (var doc in location.DocumentIds ?? new List<DocumentIdReport>())
+        {
+            var isDisabled = !doc.Selected;
+            <li class="mb-2">
+                <div class="border rounded p-2 bg-light toggle-card">
+                    <!-- Main Checkbox -->
+                    <div class="form-check">
+                        <input class="form-check-input doc-toggle-checkbox"
+                               type="checkbox"
+                               id="doc_@doc.Id"
+                               data-target="doc_group_@doc.Id"
+                        @(doc.Selected ? "checked" : "") />
+                        <label class="form-check-label" for="doc_@doc.Id">
+                            @if (doc.HasBackImage)
+                            {
+                                <i class="fas fa-copy text-muted me-1"></i>
+                            }
+                            else
+                            {
+                                <i class="far fa-file text-muted me-1"></i>
+                            }
+                            @doc.ReportName
+                        </label>
+                    </div>
+
+                    <!-- Dependent Inputs Container -->
+                    <div id="doc_group_@doc.Id" class="dependent-controls">
+                        <!-- Mandatory Document Checkbox -->
+                        <div class="form-check mt-2">
+                            <span class="required-asterisk">
+                                <input type="checkbox" title="Required field" data-bs-toggle="tooltip"
+                                       id="isdocRequiredCheckbox_@doc.Id"
+                                       name="location.DocumentIds[@i].IsRequired"
+                                       class="form-check-input dependent-input"
+                                @(doc.IsRequired ? "checked" : "")
+                                @(isDisabled ? "disabled" : "") />
+                                <label class="form-check-label small" for="isdocRequiredCheckbox_@doc.Id">
+                                    Is Mandatory Document ?
+                                </label>
+                            </span>
+                        </div>
+
+                        <!-- PageCount Radio Buttons with Index -->
+                        <div class="form-check mt-2">
+                            <span class="text-muted small d-block mb-1">Page Count:</span>
+                            <div class="d-flex flex-wrap gap-3">
+                                @foreach (PageCount countOption in Enum.GetValues(typeof(PageCount)))
+                                {
+                                    <div class="form-check form-check-inline mb-0">
+                                        <input class="form-check-input dependent-input"
+                                               type="radio"
+                                               name="location.DocumentIds[@i].PageCount"
+                                               id="pageCount_@doc.Id.ToString()_@countOption"
+                                               value="@countOption"
+                                               checked="@(doc.PageCount == countOption)"
+                                        @(isDisabled ? "disabled" : "") />
+                                        <label class="form-check-label small" for="pageCount_@doc.Id.ToString()_@countOption">
+                                            @countOption.GetEnumDisplayName()
+                                        </label>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </li>
+            i++;
+        }
+    </ul>
+</div>

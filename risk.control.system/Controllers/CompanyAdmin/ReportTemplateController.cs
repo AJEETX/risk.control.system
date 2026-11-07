@@ -437,17 +437,18 @@ namespace risk.control.system.Controllers.CompanyAdmin
                     {
                         media.Selected = m.Selected;
                         media.IsRequired = m.Required;
+                        media.CameraCaptureMode = m.CameraCaptureMode;
                     }
                 }
                 var template = await _context.ReportTemplates.FirstOrDefaultAsync(t => t.Id == location.ReportTemplateId);
                 template!.Updated = DateTime.UtcNow;
-                await _context.SaveChangesAsync(null, false);
-                return Json(new { success = true, message = "Location saved successfully!" });
+                var result = await _context.SaveChangesAsync(null, false) > 0;
+                return Json(new { success = result, message = "Location information saved successfully!" });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error Location Save for LocationId {LocationId}. UserEmail {UserEmail}.", model.LocationId, HttpContext.User.Identity!.Name);
-                return Json(new { success = false, message = "Error Location Save." });
+                return Json(new { success = false, message = "Error Location information Save." });
             }
         }
 

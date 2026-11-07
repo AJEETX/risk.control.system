@@ -12,9 +12,9 @@ namespace risk.control.system.Controllers.Agent
 {
     [Authorize(Roles = $"{AGENT.DISPLAY_NAME}")]
     public class AgentReportController(IAgentAnswerService answerService,
-            IDocumentIdfyService documentIdfyService,
             IEncryptionService encryptionService,
             IFaceIdfyService agentIdService,
+            IManageDocumentIdfyService manageDocumentIdfyService,
             IAgentFaceIdfyService agentFaceIdfyService,
             IMediaIdfyService mediaIdfyService,
             ILogger<AgentReportController> logger,
@@ -23,9 +23,9 @@ namespace risk.control.system.Controllers.Agent
         private readonly ILogger<AgentReportController> _logger = logger;
         private readonly IEncryptionService _encryptionService = encryptionService;
         private readonly IAgentAnswerService _answerService = answerService;
-        private readonly IDocumentIdfyService _documentIdfyService = documentIdfyService;
         private readonly IFaceIdfyService _agentIdService = agentIdService;
         private readonly IAgentFaceIdfyService _agentFaceIdfyService = agentFaceIdfyService;
+        private readonly IManageDocumentIdfyService _manageDocumentIdfyService = manageDocumentIdfyService;
         private readonly IMediaIdfyService _mediaIdfyService = mediaIdfyService;
         private readonly INotyfService _notifyService = notifyService;
 
@@ -82,7 +82,7 @@ namespace risk.control.system.Controllers.Agent
                 if (model.Image == null || model.Image.Length == 0)
                     return Json(new { success = false, message = "No file provided." });
 
-                var result = await _documentIdfyService.CaptureDocumentId(model);
+                var result = await _manageDocumentIdfyService.CaptureDocumentId(model);
                 return Json(new { success = true, image = result.ByteImage });
 
             }

@@ -30,5 +30,6 @@
         public long Id { get; set; }
         public bool Selected { get; set; }
         public bool Required { get; set; }
+        public CameraCaptureMode CameraCaptureMode { get; set; } = CameraCaptureMode.Front;
     }
 }

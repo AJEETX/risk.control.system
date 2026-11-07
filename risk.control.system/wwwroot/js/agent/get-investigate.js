@@ -145,7 +145,8 @@ $(document).ready(function () {
         const locationId = button.data("locationid");
         const reportName = button.data("name");
         const locationName = button.data("location-name");
-
+        var pageInput = $('.page-number-input[data-docid="' + docId + '"]');
+        var pageNumber = parseInt(pageInput.val()) || 1;
         var file = fileInput.files[0];
         if (!file) {
             alert("Please select a document image to upload.");
@@ -162,6 +163,7 @@ $(document).ready(function () {
         formData.append("ReportName", reportName);
         formData.append("LocationName", locationName);
         formData.append("LocationLatLong", latitude + '/' + longitude);
+        formData.append("PageNumber", pageNumber);
         // Get anti-forgery token
         var token = $('input[name="__RequestVerificationToken"]').val();
         formData.append("__RequestVerificationToken", token);

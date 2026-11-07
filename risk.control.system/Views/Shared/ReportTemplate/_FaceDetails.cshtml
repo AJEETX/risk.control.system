@@ -1,0 +1,80 @@
+﻿@using risk.control.system.Helpers
+@model LocationReport
+@{
+    var location = Model;
+}
+
+<div class="col-md-3 border rounded p-2">
+    <h6 class="text-muted"><i class="fas fa-users"></i> Face IDs</h6>
+    <ul class="list-unstyled mb-3">
+        @foreach (var face in location.FaceIds ?? new List<FaceIdReport>())
+        {
+            var isDisabled = !face.Selected;
+            <li class="mb-2">
+                <div class="border rounded p-2 bg-light toggle-card">
+                    <!-- Main Checkbox -->
+                    <div class="form-check">
+                        <input class="form-check-input face-toggle-checkbox"
+                               type="checkbox"
+                               id="face_@face.Id"
+                               data-target="face_group_@face.Id"
+                        @(face.Selected ? "checked" : "") />
+                        <label class="form-check-label" for="face_@face.Id">
+                            @if (face.Has2Face)
+                            {
+                                <i class="fas fa-users text-info me-1"></i>
+                            }
+                            else
+                            {
+                                <i class="far fa-user text-info me-1"></i>
+                            }
+                            @face.ReportName
+                        </label>
+                    </div>
+
+                    <!-- Dependent Inputs Container -->
+                    <div id="face_group_@face.Id" class="dependent-controls">
+                        <div class="form-check mt-2">
+                            <span class="required-asterisk">
+                                <input type="checkbox"
+                                       title="Required field"
+                                       data-bs-toggle="tooltip"
+                                       id="isfaceRequiredCheckbox_@face.Id"
+                                       name="face.IsRequired"
+                                       class="form-check-input dependent-input"
+                                @(face.IsRequired ? "checked" : "")
+                                @(isDisabled ? "disabled" : "") />
+                                <label class="form-check-label small" for="isfaceRequiredCheckbox_@face.Id">
+                                    Is Mandatory Face?
+                                </label>
+                            </span>
+                        </div>
+                        <div class="mt-3">
+                            <label class="form-label fw-bold">Camera Capture Mode</label>
+                            <div class="d-flex">
+                                @foreach (CameraCaptureMode captureOption in Enum.GetValues(typeof(CameraCaptureMode)))
+                                {
+                                    var radioId = $"camera_face_{face.Id}_{captureOption}";
+                                    var isChecked = face.CameraCaptureMode == captureOption;
+                                    <div class="form-check form-check-inline me-3">
+                                        <input class="form-check-input dependent-input"
+                                               type="radio"
+                                               id="@radioId"
+                                               name="face_camera_@face.Id"
+                                               value="@captureOption"
+                                        @(isChecked ? "checked" : "")
+                                        @(isDisabled ? "disabled" : "") />
+                                        <label class="form-check-label small" for="@radioId">
+                                            @captureOption
+                                        </label>
+                                    </div>
+                                }
+                            </div>
+                            <input type="hidden" name="CameraCaptureMode" value="@face.CameraCaptureMode" class="dependent-input" @(isDisabled ? "disabled" : "") />
+                        </div>
+                    </div>
+                </div>
+            </li>
+        }
+    </ul>
+</div>

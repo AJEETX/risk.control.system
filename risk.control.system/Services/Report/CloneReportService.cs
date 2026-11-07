@@ -127,7 +127,8 @@ namespace risk.control.system.Services.Report
                     Selected = f.Selected,
                     ReportName = f.ReportName,
                     Has2Face = f.Has2Face,
-                    ReportType = f.ReportType
+                    ReportType = f.ReportType,
+                    CameraCaptureMode = f.CameraCaptureMode
                 }).ToList(),
                 DocumentIds = original.DocumentIds?.Select(d => new DocumentIdReport
                 {
@@ -136,7 +137,8 @@ namespace risk.control.system.Services.Report
                     HasBackImage = d.HasBackImage,
                     ReportName = d.ReportName,
                     ReportType = d.ReportType,
-                    PageCount = d.PageCount
+                    PageCount = d.PageCount,
+                    CameraCaptureMode = d.CameraCaptureMode
                 }).ToList(),
                 MediaReports = original.MediaReports?.Select(m => new MediaReport
                 {
@@ -144,7 +146,8 @@ namespace risk.control.system.Services.Report
                     Selected = m.Selected,
                     ReportName = m.ReportName,
                     MediaType = m.MediaType,
-                    MediaExtension = m.MediaExtension
+                    MediaExtension = m.MediaExtension,
+                    CameraCaptureMode = m.CameraCaptureMode
                 }).ToList(),
                 Questions = original.Questions?.Select(q => new Question
                 {
@@ -190,6 +193,7 @@ namespace risk.control.system.Services.Report
                     ReportName = m.ReportName,
                     MediaType = m.MediaType,
                     Selected = m.Selected,
+                    CameraCaptureMode = m.CameraCaptureMode,
                 }).ToList(),
                 FaceIds = loc.FaceIds?.Select(face => new FaceIdReport
                 {
@@ -197,7 +201,8 @@ namespace risk.control.system.Services.Report
                     ReportType = face.ReportType,
                     Selected = face.Selected,
                     Has2Face = face.Has2Face,
-                    ReportName = face.ReportName
+                    ReportName = face.ReportName,
+                    CameraCaptureMode = face.CameraCaptureMode,
                 }).ToList(),
                 DocumentIds = loc.DocumentIds?.Select(doc => new DocumentIdReport
                 {
@@ -205,6 +210,8 @@ namespace risk.control.system.Services.Report
                     ReportType = doc.ReportType,
                     ReportName = doc.ReportName,
                     Selected = doc.Selected,
+                    CameraCaptureMode = doc.CameraCaptureMode,
+                    PageCount = doc.PageCount
                 }).ToList(),
                 Questions = loc.Questions?.Select(q => new Question
                 {
@@ -245,6 +252,7 @@ namespace risk.control.system.Services.Report
                         ReportName = m.ReportName,
                         MediaType = m.MediaType,
                         Selected = m.Selected,
+                        CameraCaptureMode = m.CameraCaptureMode,
                     }).ToList(),
                     FaceIds = loc.FaceIds?.Select(face => new FaceIdReport
                     {
@@ -252,7 +260,8 @@ namespace risk.control.system.Services.Report
                         ReportType = face.ReportType,
                         Selected = face.Selected,
                         Has2Face = face.Has2Face,
-                        ReportName = face.ReportName
+                        ReportName = face.ReportName,
+                        CameraCaptureMode = face.CameraCaptureMode
                     }).ToList(),
 
                     DocumentIds = loc.DocumentIds?.Select(doc => new DocumentIdReport
@@ -262,7 +271,8 @@ namespace risk.control.system.Services.Report
                         ReportName = doc.ReportName,
                         Selected = doc.Selected,
                         PageCount = doc.PageCount,
-                        HasBackImage = doc.HasBackImage
+                        HasBackImage = doc.HasBackImage,
+                        CameraCaptureMode = doc.CameraCaptureMode
                     }).ToList(),
 
                     Questions = loc.Questions?.Select(q => new Question
@@ -290,7 +300,7 @@ namespace risk.control.system.Services.Report
                     .ThenInclude(l => l.Questions)
                 .FirstOrDefaultAsync(r => r.Id == id);
         }
-        private async Task<ReportTemplate?> GetReportDefaultTemplateDetails(long? clientCompanyId, InsuranceType insuranceType, long serviceTypeId)
+        private async Task<ReportTemplate?> GetReportDefaultTemplateDetails(long clientCompanyId, InsuranceType insuranceType, long serviceTypeId)
         {
             return await _context.ReportTemplates
                 .Include(r => r.LocationReport)
