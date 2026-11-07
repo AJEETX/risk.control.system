@@ -208,28 +208,31 @@
                                                     }
                                                 </label>
                                             </div>
-                                            <div class="mt-3">
-                                                <label class="form-label fw-bold">Camera Capture Mode</label>
-                                                <div class="d-flex">
-                                                    @foreach (CameraCaptureMode captureOption in Enum.GetValues(typeof(CameraCaptureMode)))
-                                                    {
-                                                        var radioId = $"camera_media_{media.Id}_{captureOption}";
-                                                        var isChecked = media.CameraCaptureMode == captureOption;
-                                                        <div class="form-check form-check-inline me-3">
-                                                            <input class="form-check-input"
-                                                                   type="radio"
-                                                                   id="@radioId"
-                                                                   name="media_camera_@media.Id"
-                                                                   value="@captureOption"
-                                                                   disabled
-                                                            @(isChecked ? "checked" : "") />
-                                                            <label class="form-check-label small" for="@radioId">
-                                                                @captureOption
-                                                            </label>
-                                                        </div>
-                                                    }
+                                            @if(media.MediaType == MediaType.VIDEO)
+                                            {
+                                                <div class="mt-3">
+                                                    <label class="form-label fw-bold">Camera Capture Mode</label>
+                                                    <div class="d-flex">
+                                                        @foreach (CameraCaptureMode captureOption in Enum.GetValues(typeof(CameraCaptureMode)))
+                                                        {
+                                                            var radioId = $"camera_media_{media.Id}_{captureOption}";
+                                                            var isChecked = media.CameraCaptureMode == captureOption;
+                                                            <div class="form-check form-check-inline me-3">
+                                                                <input class="form-check-input"
+                                                                       type="radio"
+                                                                       id="@radioId"
+                                                                       name="media_camera_@media.Id"
+                                                                       value="@captureOption"
+                                                                       disabled
+                                                                @(isChecked ? "checked" : "") />
+                                                                <label class="form-check-label small" for="@radioId">
+                                                                    @captureOption
+                                                                </label>
+                                                            </div>
+                                                        }
+                                                    </div>
                                                 </div>
-                                            </div>
+                                            }
                                         </div>
                                     </li>
                                 }

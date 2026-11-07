@@ -7,7 +7,7 @@
 {
 	location.CaseId = Model.CaseId;
 	location.Address = Model.InsuranceType == InsuranceType.CLAIM ? "Beneficiary" : location.Address;
-	<div class="col-12 p-4 mb-5 border rounded shadow-sm bg-light location-container">
+	<div class="col-12 p-4 mb-2 border rounded shadow-sm bg-light location-container">
 		@Html.AntiForgeryToken()
 
 		<h6 class="mb-4 text-primary border-bottom pb-2">
@@ -19,7 +19,7 @@
 		</h6>
 
 		<!-- Agent Table -->
-		<partial name="_locationAgent" model="@location" />
+		<partial name="_LocationAgent" model="@location" />
 		
 		<!-- FaceIds Table -->
 		<partial name="_LocationFaceId" model="@location" />

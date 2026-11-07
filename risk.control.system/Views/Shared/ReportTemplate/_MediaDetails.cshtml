@@ -1,0 +1,76 @@
+﻿@model LocationReport
+@{
+    var location = Model;
+}
+
+<div class="col-md-3 border rounded p-2">
+    <h6 class="text-muted"><i class="far fa-file-alt"></i> Media</h6>
+    <ul class="list-unstyled mb-3">
+        @foreach (var media in location.MediaReports ?? new List<MediaReport>())
+        {
+            var isDisabled = !media.Selected;
+            <li class="mb-2">
+                <div class="border rounded p-2 bg-light toggle-card">
+                    <!-- Main Checkbox -->
+                    <div class="form-check">
+                        <input class="form-check-input media-toggle-checkbox"
+                               type="checkbox"
+                               id="media_@media.Id"
+                               data-target="media_group_@media.Id"
+                        @(media.Selected ? "checked" : "") />
+                        <label class="form-check-label" for="media_@media.Id">
+                            <i class="far fa-file text-muted me-1"></i>
+                            @media.ReportName
+                        </label>
+                    </div>
+
+                    <!-- Dependent Inputs Container -->
+                    <div id="media_group_@media.Id" class="dependent-controls">
+                        <!-- Mandatory Media Checkbox -->
+                        <div class="form-check mt-2">
+                            <span class="required-asterisk">
+                                <input type="checkbox" title="Required field" data-bs-toggle="tooltip"
+                                       id="ismediaRequiredCheckbox_@media.Id"
+                                       name="media.IsRequired"
+                                       class="form-check-input dependent-input"
+                                @(media.IsRequired ? "checked" : "")
+                                @(isDisabled ? "disabled" : "") />
+                                <label class="form-check-label small" for="ismediaRequiredCheckbox_@media.Id">
+                                    Is Mandatory Media ?
+                                </label>
+                            </span>
+                        </div>
+                        @if(media.MediaType == MediaType.VIDEO)
+                        {
+                            <!-- Camera Capture Mode Radio Buttons -->
+                            <div class="mt-3">
+                                <label class="form-label fw-bold">Camera Capture Mode</label>
+                                <div class="d-flex">
+                                    @foreach (CameraCaptureMode captureOption in Enum.GetValues(typeof(CameraCaptureMode)))
+                                    {
+                                        var radioId = $"camera_media_{media.Id}_{captureOption}";
+                                        var isChecked = media.CameraCaptureMode == captureOption;
+                                        <div class="form-check form-check-inline me-3">
+                                            <input class="form-check-input dependent-input"
+                                                   type="radio"
+                                                   id="@radioId"
+                                                   name="media_camera_@media.Id"
+                                                   value="@captureOption"
+                                            @(isChecked ? "checked" : "")
+                                            @(isDisabled ? "disabled" : "") />
+                                            <label class="form-check-label small" for="@radioId">
+                                                @captureOption
+                                            </label>
+                                        </div>
+                                    }
+                                </div>
+                                <input type="hidden" name="CameraCaptureMode" value="@media.CameraCaptureMode" class="dependent-input" @(isDisabled ? "disabled" : "") />
+                            </div>
+                        }
+                        
+                    </div>
+                </div>
+            </li>
+        }
+    </ul>
+</div>

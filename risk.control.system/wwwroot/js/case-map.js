@@ -121,3 +121,22 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 });
+
+$(document).ready(function () {
+
+    $(document).on('click', '.page-nav-btn', function () {
+        var docId = $(this).data('docid');
+        var targetPage = parseInt($(this).data('page'));
+
+        // 1. Hide ALL page images for this specific document by adding 'd-none'
+        $('.doc-page-img-' + docId).addClass('d-none');
+
+        // 2. Show ONLY the selected target page image by removing 'd-none'
+        $('#doc-img-' + docId + '-page-' + targetPage).removeClass('d-none');
+
+        // 3. Update active button styles
+        var container = $(this).closest('td');
+        container.find('.page-nav-btn').removeClass('btn-dark').addClass('btn-outline-secondary');
+        $(this).removeClass('btn-outline-secondary').addClass('btn-dark');
+    });
+});

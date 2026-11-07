@@ -46,6 +46,8 @@ namespace risk.control.system.Models.ViewModel
     public class DocumentData
     {
         public IFormFile? Image { get; set; }
+        public int PageNumber { get; set; } = 1;
+        public bool IsLastPage { get; set; } = true;
 
         [EmailAddress]
         public string Email { get; set; } = default!;

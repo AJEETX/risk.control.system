@@ -8,7 +8,7 @@ namespace risk.control.system.Services.Agent
 {
     public interface IProcessDocumentService
     {
-        Task ProcessOcrResults(DocumentIdReport doc, byte[] docImage, IReadOnlyList<TextBlock> ocrResult, InvestigationTask caseDetail, string extension, string docFullName);
+        Task ProcessOcrResults(DocumentIdReport doc, byte[] docImage, IReadOnlyList<TextBlock> ocrResult, InvestigationTask caseDetail, string extension, string docFullName, int pageNumber = 1);
     }
     internal class ProcessDocumentService(ApplicationDbContext context,
     IProcessImageService processImageService,
@@ -29,7 +29,7 @@ namespace risk.control.system.Services.Agent
         private readonly IDeathCertificateService _deathCertificateService = deathCertificateService;
         private readonly IIncomeTaxService _incomeTaxService = incomeTaxService;
         private readonly IWebHostEnvironment _env = env;
-        public async Task ProcessOcrResults(DocumentIdReport doc, byte[] docImage, IReadOnlyList<TextBlock> ocrResult, InvestigationTask caseDetail, string extension, string docFullName)
+        public async Task ProcessOcrResults(DocumentIdReport doc, byte[] docImage, IReadOnlyList<TextBlock> ocrResult, InvestigationTask caseDetail, string extension, string docFullName, int pageNumber = 1)
         {
             try
             {
@@ -37,53 +37,31 @@ namespace risk.control.system.Services.Agent
                 {
                     var company = await _context.ClientCompany.FindAsync(caseDetail.ClientCompanyId);
 
-                    if (doc.ReportName == DocumentIdReportType.PAN.GetEnumDisplayName())
-                    {
-                        var isUnderwriting = caseDetail.PolicyDetail?.InsuranceType == InsuranceType.UNDERWRITING;
-                        string registeredImagePath = isUnderwriting ? caseDetail.CustomerDetail!.ImagePath! : caseDetail.BeneficiaryDetail!.ImagePath!;
-                        var regPath = Path.Combine(_env.ContentRootPath, FaceIdfyHelper.GetRegisteredImagePath(caseDetail, isUnderwriting));
-                        var registeredImageBytes = await File.ReadAllBytesAsync(regPath);
-
-                        var maskedDocImage = await _panCardService.Process(docImage, registeredImageBytes, ocrResult, company!, doc);
-                        var (_, originalRelativePath) = await _fileStorageService.SaveAsync(maskedDocImage, extension, CONSTANTS.CASE, caseDetail.PolicyDetail!.ContractNumber, CONSTANTS.REPORT, null, $"{docFullName}{extension}");
-                        doc.OriginalFilePath = originalRelativePath;
-                    }
-                    else if (doc.ReportName == DocumentIdReportType.ADHAAR.GetEnumDisplayName())
-                    {
-                        var isUnderwriting = caseDetail.PolicyDetail?.InsuranceType == InsuranceType.UNDERWRITING;
-                        string registeredImagePath = isUnderwriting ? caseDetail.CustomerDetail!.ImagePath! : caseDetail.BeneficiaryDetail!.ImagePath!;
-                        var regPath = Path.Combine(_env.ContentRootPath, FaceIdfyHelper.GetRegisteredImagePath(caseDetail, isUnderwriting));
-                        var registeredImageBytes = await File.ReadAllBytesAsync(regPath);
-
-                        var maskedDocImage = await _adharCardService.Process(docImage, registeredImageBytes, ocrResult, company!, doc);
-                        var (_, originalRelativePath) = await _fileStorageService.SaveAsync(maskedDocImage, extension, CONSTANTS.CASE, caseDetail.PolicyDetail!.ContractNumber, CONSTANTS.REPORT, null, $"{docFullName}{extension}");
-                        doc.OriginalFilePath = originalRelativePath;
-                    }
-                    else if (doc.ReportName == DocumentIdReportType.DEATH_CERTIFICATE.GetEnumDisplayName())
+                    if (doc.ReportName == DocumentIdReportType.DEATH_CERTIFICATE.GetEnumDisplayName())
                     {
                         var maskedDocImage = await _deathCertificateService.Process(docImage, ocrResult, company!, doc);
                         var (_, originalRelativePath) = await _fileStorageService.SaveAsync(maskedDocImage, extension, CONSTANTS.CASE, caseDetail.PolicyDetail!.ContractNumber, CONSTANTS.REPORT, null, $"{docFullName}{extension}");
-                        doc.OriginalFilePath = originalRelativePath;
+                        doc.DocumentFiles.FirstOrDefault(f => f.PageNumber == pageNumber)!.OriginalFilePath = originalRelativePath;
                     }
                     else if (doc.ReportName == DocumentIdReportType.ITR.GetEnumDisplayName())
                     {
                         var maskedDocImage = await _incomeTaxService.Process(docImage, ocrResult, company!, doc);
                         var (_, originalRelativePath) = await _fileStorageService.SaveAsync(maskedDocImage, extension, CONSTANTS.CASE, caseDetail.PolicyDetail!.ContractNumber, CONSTANTS.REPORT, null, $"{docFullName}{extension}");
-                        doc.OriginalFilePath = originalRelativePath;
+                        doc.DocumentFiles.FirstOrDefault(f => f.PageNumber == pageNumber)!.OriginalFilePath = originalRelativePath;
                     }
                     else
                     {
                         var compressed = _processImageService.CompressAndWaterMarkImage(docImage, 80, "VALID", 0F);
-                        await File.WriteAllBytesAsync(doc.FilePath!, compressed);
+                        await File.WriteAllBytesAsync(doc.DocumentFiles.FirstOrDefault(f => f.PageNumber == pageNumber)!.FilePath!, compressed);
                         doc.ImageValid = true;
-                        doc.LocationInfo = ocrResult.FirstOrDefault()?.Text ?? string.Empty;
+                        doc.DocumentFiles.FirstOrDefault(f => f.PageNumber == pageNumber)!.OcrText = ocrResult.FirstOrDefault()?.Text ?? string.Empty;
                     }
                 }
                 else
                 {
                     doc.ImageValid = false;
-                    doc.LocationInfo = "No OCR data detected";
-                    await File.WriteAllBytesAsync(doc.FilePath!, _processImageService.CompressAndWaterMarkImage(docImage, 80, "UNKNOWN", 2F));
+                    doc.DocumentFiles.FirstOrDefault(f => f.PageNumber == pageNumber)!.OcrText = "No OCR data detected";
+                    await File.WriteAllBytesAsync(doc.DocumentFiles.FirstOrDefault(f => f.PageNumber == pageNumber)!.FilePath!, _processImageService.CompressAndWaterMarkImage(docImage, 80, "UNKNOWN", 2F));
                 }
                 doc.ValidationExecuted = true;
             }

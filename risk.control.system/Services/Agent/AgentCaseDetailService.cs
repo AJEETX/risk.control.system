@@ -56,7 +56,8 @@ namespace risk.control.system.Services.Agent
                     .Include(r => r.LocationReport)
                     .ThenInclude(l => l.MediaReports)
                     .Include(r => r.LocationReport)
-                    .ThenInclude(l => l.DocumentIds)
+                    .ThenInclude(l => l.DocumentIds!)
+                    .ThenInclude(l => l.DocumentFiles!)
                     .Include(r => r.LocationReport)
                     .ThenInclude(l => l.Questions)
                 .FirstOrDefaultAsync(r => r.Id == caseTask.ReportTemplateId);

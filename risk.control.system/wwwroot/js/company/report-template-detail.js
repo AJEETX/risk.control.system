@@ -1,4 +1,21 @@
 ﻿$(document).ready(function () {
+
+    // Generic handler for Face, Document, and Media toggle checkboxes
+    $(document).on('change', '.doc-toggle-checkbox, .face-toggle-checkbox, .media-toggle-checkbox', function () {
+        var isChecked = $(this).is(':checked');
+        var targetId = $(this).data('target');
+        var $container = $('#' + targetId);
+
+        // Enable or disable all dependent inputs inside the container
+        $container.find('.dependent-input').prop('disabled', !isChecked);
+
+        // If unchecked, clear/reset the dependent input values
+        if (!isChecked) {
+            $container.find('input[type="checkbox"].dependent-input').prop('checked', false);
+            $container.find('input[type="hidden"].dependent-input').val('');
+        }
+    });
+
     // Add Question button click event
     $(document).on('click', '.add-question-btn', function () {
         var locationId = $(this).data('locationid');
@@ -492,7 +509,8 @@
             }
         }
     });
-});
+   });
+
     //Clone location
     $(document).on("click", ".clone-location-btn", function (e) {
         e.preventDefault();

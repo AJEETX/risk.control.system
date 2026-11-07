@@ -78,7 +78,7 @@ namespace risk.control.system.Controllers.Creator
 
         [ValidateAntiForgeryToken]
         [HttpPost]
-        public async Task<IActionResult> AllocateSingle2Vendor([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long selectedcase, long caseId)
+        public async Task<IActionResult> AllocateCase2AgencyManually([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long selectedcase, long caseId)
         {
             var userEmail = HttpContext.User?.Identity?.Name!;
             try
@@ -113,7 +113,7 @@ namespace risk.control.system.Controllers.Creator
 
         [ValidateAntiForgeryToken]
         [HttpPost]
-        public async Task<IActionResult> AllocateSingleClaim2Agency(long selectedcase, long caseId)
+        public async Task<IActionResult> AllocateSingleCase2Agency(long selectedcase, long caseId)
         {
             var userEmail = HttpContext.User?.Identity?.Name!;
             try

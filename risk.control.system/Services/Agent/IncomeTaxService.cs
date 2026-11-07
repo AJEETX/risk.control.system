@@ -7,7 +7,7 @@ namespace risk.control.system.Services.Agent
 {
     public interface IIncomeTaxService
     {
-        Task<byte[]> Process(byte[] idImage, IReadOnlyList<TextBlock> imageReadOnly, ClientCompany company, DocumentIdReport doc);
+        Task<byte[]> Process(byte[] idImage, IReadOnlyList<TextBlock> imageReadOnly, ClientCompany company, DocumentIdReport doc, int pageNumber = 1);
         //byte[] MaskAdharIfFound(byte[] idImage, IReadOnlyList<TextBlock> imageReadOnly, string adharNumber);
     }
     internal class IncomeTaxService(IGoogleMaskHelper googleHelper, IProcessImageService processImageService, IHttpClientService httpClientService, IWebHostEnvironment env, ILogger<IncomeTaxService> logger) : IIncomeTaxService
@@ -19,9 +19,10 @@ namespace risk.control.system.Services.Agent
         private readonly IHttpClientService _httpClientService = httpClientService;
         private readonly IWebHostEnvironment _env = env;
         private readonly ILogger<IncomeTaxService> _logger = logger;
-        public async Task<byte[]> Process(byte[] idImage, IReadOnlyList<TextBlock> imageReadOnly, ClientCompany company, DocumentIdReport doc)
+        public async Task<byte[]> Process(byte[] idImage, IReadOnlyList<TextBlock> imageReadOnly, ClientCompany company, DocumentIdReport doc, int pageNumber = 1)
         {
-            var filePath = Path.Combine(_env.ContentRootPath, doc.FilePath!);
+            var documentFileForPage = doc.DocumentFiles.FirstOrDefault(d => d.PageNumber == pageNumber);
+            var filePath = Path.Combine(_env.ContentRootPath, documentFileForPage?.FilePath ?? string.Empty);
             try
             {
                 string extractedText = imageReadOnly.FirstOrDefault()?.Text ?? string.Empty;
@@ -29,31 +30,32 @@ namespace risk.control.system.Services.Agent
                 {
                     doc.ImageValid = false;
                     idImage = await SaveCompressedInValidImage(filePath, idImage);
-                    doc.LocationInfo = "No text detected in the image";
+                    documentFileForPage!.OcrText = "No text detected in the image";
                     return idImage;
                 }
                 var extractedTextToLower = extractedText.ToLowerInvariant();
-                bool hasKeywords = extractedTextToLower.Contains("income") && (extractedTextToLower.Contains("tax") || extractedTextToLower.Contains("return")) && extractedTextToLower.Contains("date");
-                if (hasKeywords)
+                if (pageNumber == 1)
                 {
-                    // Clean up space characters to return raw 12 digits
-                    doc.ImageValid = true;
-                    idImage = await SaveCompressedValidImage(filePath, idImage);
-                    doc.LocationInfo = extractedText;
+                    bool hasKeywords = extractedTextToLower.Contains("income") && (extractedTextToLower.Contains("tax") || extractedTextToLower.Contains("return")) && extractedTextToLower.Contains("date");
+                    doc.ImageValid = hasKeywords;
+                }
+
+                if (doc.ImageValid == true)
+                {
+                    documentFileForPage!.OcrText = extractedText;
                 }
                 else
                 {
-                    doc.ImageValid = false;
-                    idImage = await SaveCompressedInValidImage(filePath, idImage);
-                    doc.LocationInfo = "Invalid ITR detected";
+                    documentFileForPage!.OcrText = "Invalid ITR detected";
                 }
+                idImage = await SaveCompressedValidImage(filePath, idImage);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error occurred during INCOME TAX document processing.");
                 idImage = await SaveCompressedInValidImage(filePath, idImage);
                 doc.LongLatTime = DateTime.UtcNow;
-                doc.LocationInfo = "no data: ";
+                documentFileForPage!.OcrText = "Error occurred during INCOME TAX document processing.";
             }
 
             return idImage;

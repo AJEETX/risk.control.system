@@ -9,7 +9,7 @@ namespace risk.control.system.Services.Agent
 {
     public interface IAdharCardService
     {
-        Task<byte[]> Process(byte[] idImage, byte[] registeredImage, IReadOnlyList<TextBlock> imageReadOnly, ClientCompany company, DocumentIdReport doc);
+        Task<byte[]> Process(byte[] idImage, byte[] registeredImage, IReadOnlyList<TextBlock> imageReadOnly, ClientCompany company, DocumentIdReport doc, int pageNumber = 1);
     }
     internal class AdharCardService(
         IGoogleMaskHelper googleHelper,
@@ -31,9 +31,10 @@ namespace risk.control.system.Services.Agent
         private readonly IWebHostEnvironment _env = env;
         private readonly IFeatureManager _featureManager = featureManager;
         private readonly ILogger<AdharCardService> _logger = logger;
-        public async Task<byte[]> Process(byte[] idImage, byte[] registeredImage, IReadOnlyList<TextBlock> imageReadOnly, ClientCompany company, DocumentIdReport doc)
+        public async Task<byte[]> Process(byte[] idImage, byte[] registeredImage, IReadOnlyList<TextBlock> imageReadOnly, ClientCompany company, DocumentIdReport doc, int pageNumber = 1)
         {
-            var filePath = Path.Combine(_env.ContentRootPath, doc.FilePath!);
+            var documentFileForPage = doc.DocumentFiles.FirstOrDefault(d => d.PageNumber == pageNumber);
+            var filePath = Path.Combine(_env.ContentRootPath, documentFileForPage?.FilePath!);
             try
             {
                 var checkDocumentface = await _featureManager.IsEnabledAsync(FeatureFlags.DOCUMENT_FACE_MATCH_CHECK);
@@ -70,6 +71,14 @@ namespace risk.control.system.Services.Agent
                     }
                 }
                 string extractedText = imageReadOnly.FirstOrDefault()?.Text ?? string.Empty;
+                if (string.IsNullOrWhiteSpace(extractedText))
+                {
+                    doc.ImageValid = false;
+                    idImage = await SaveCompressedInValidImage(filePath, idImage);
+                    documentFileForPage!.OcrText = "No text detected in the image";
+                    return idImage;
+                }
+
                 Match match = regex.Match(extractedText);
                 if (match.Success)
                 {
@@ -78,13 +87,13 @@ namespace risk.control.system.Services.Agent
                     idImage = MaskAdharIfFound(idImage, imageReadOnly, match.Value);
                     doc.ImageValid = await ValidateAdharNumber(adharNumber, company);
                     idImage = await SaveCompressedValidImage(filePath, idImage);
-                    doc.LocationInfo = FormatLocationInfo(extractedText, match.Value, docyTypeAdharName);
+                    documentFileForPage!.OcrText = FormatLocationInfo(extractedText, match.Value, docyTypeAdharName, pageNumber);
                 }
                 else
                 {
                     doc.ImageValid = false;
                     idImage = await SaveCompressedInValidImage(filePath, idImage);
-                    doc.LocationInfo = "No ADHAR number detected";
+                    documentFileForPage!.OcrText = "No ADHAR number detected";
                 }
             }
             catch (Exception ex)
@@ -92,20 +101,20 @@ namespace risk.control.system.Services.Agent
                 _logger.LogError(ex, "Error occurred during ADHAR document processing.");
                 idImage = await SaveCompressedInValidImage(filePath, idImage);
                 doc.LongLatTime = DateTime.UtcNow;
-                doc.LocationInfo = "no data: ";
+                documentFileForPage!.OcrText = "Error occurred during ADHAR document processing. ";
             }
 
             return idImage;
         }
-        private string FormatLocationInfo(string extractedText, string adharNumber, string documentType)
+        private string FormatLocationInfo(string extractedText, string adharNumber, string documentType, int pageNumber = 1)
         {
             if (!string.IsNullOrWhiteSpace(adharNumber) && documentType == docyTypeAdharName)
             {
                 string maskedText = extractedText.Replace(adharNumber[..9], "XXXX XXXX ");
-                return $"{documentType} data: \r\n {maskedText}";
+                return $"{documentType} Page {pageNumber} data: \r\n\n {maskedText}";
             }
 
-            return $"{documentType} data: \r\n {extractedText}";
+            return $"{documentType}  Page {pageNumber} data: \r\n\n {extractedText}";
         }
         private byte[] MaskAdharIfFound(byte[] idImage, IReadOnlyList<TextBlock> imageReadOnly, string adharNumber)
         {

@@ -226,7 +226,8 @@ namespace risk.control.system.Services.Agency
                    .ThenInclude(l => l.FaceResult)
                 .ThenInclude(l => l!.Faces)
               .Include(r => r.LocationReport)
-                  .ThenInclude(l => l.DocumentIds)
+                  .ThenInclude(l => l.DocumentIds)!
+                  .ThenInclude(l => l.DocumentFiles!)
               .Include(r => r.LocationReport)
                   .ThenInclude(l => l.Questions)
               .FirstOrDefaultAsync(q => q.Id == templateId);

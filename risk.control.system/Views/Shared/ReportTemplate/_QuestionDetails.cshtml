@@ -1,0 +1,68 @@
+﻿@using risk.control.system.Helpers
+@model LocationReport
+@{
+    var location = Model;
+}
+<div class="row g-3 align-items-start">
+    <div class="col-md-12 border rounded p-2">
+        <div class="card h-100 shadow-sm border rounded  collapsed-card">
+            <div class="card-header bg-light">
+                <div class="card-title  bg-light">
+                                           
+                    <h6 class="text-muted"><i class="fas fa-question-circle"></i> Questions</h6>
+                                            
+                </div>
+                <div class="card-tools">
+                    <button type="button" class="btn btn-sm btn-light border-secondary" data-card-widget="collapse">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled">
+                    @foreach (var question in location.Questions ?? new List<Question>())
+                    {
+                        <li class="mb-2">
+                            <div class="border rounded p-2 bg-light">
+                                <div class="row">
+                                    <div class="col-md-11">
+                                        <span>@question.QuestionText</span>
+                                        @if (question.IsRequired)
+                                        {
+                                            <span class="required-asterisk" title="Required field" data-bs-toggle="tooltip">*</span>
+                                        }
+                                        <small class="text-muted">[@question.QuestionType]</small>
+                                        @if (question.QuestionType != "Text" && !string.IsNullOrEmpty(question.Options))
+                                        {
+                                            var options = question.Options.Split(',').Select(o => o.Trim());
+                                            <div class="mt-4">
+                                                @foreach (var opt in options)
+                                                {
+                                                    <span class="badge bg-light text-dark border me-1">@opt</span>
+                                                }
+                                            </div>
+                                        }
+                                    </div>
+                                    <div class="mt-2">
+                                        <button class="btn btn-sm btn-outline-danger delete-question-btn" data-questionid="@question.Id" data-locationid="@location.Id">
+                                            <i class="fas fa-trash me-1"></i><small> Delete </small>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    }
+                </ul>
+            </div>
+            <div class="card-footer">
+                <div class="row float-right">
+                    <div class="col-md-12">
+                        <button class="btn btn-sm btn-outline-success add-question-btn" data-locationid="@location.Id">
+                            <i class="fas fa-question me-1"></i> Add Question
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
