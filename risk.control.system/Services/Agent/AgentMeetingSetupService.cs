@@ -205,7 +205,7 @@ namespace risk.control.system.Services.Agent
                     countryCode = beneficiary!.Country!.Code;
                     scheduleeId = beneficiary.BeneficiaryDetailId;
                 }
-                if (caseDetails!.ScheduleMeeting!.ScheduleAccepted || caseDetails!.ScheduleMeeting!.ScheduleRequestedDateTime.AddHours(48) < DateTime.UtcNow.ToLocalTime())
+                if (caseDetails!.ScheduleMeeting!.ScheduleAccepted || caseDetails!.ScheduleMeeting!.ScheduleRequestedDateTime.AddHours(48) < DateTime.UtcNow)
                 {
                     var alreadyScheduled = new ScheduleResponse
                     {
@@ -222,13 +222,16 @@ namespace risk.control.system.Services.Agent
                     };
                     return alreadyScheduled;
                 }
+                string caseType = isClaim ? "Policy" : "Proposal";
                 var message = $"Dear {contactNameForSchedule},\n" +
                               $"Your meeting schedule has been confirmed on {caseDetails!.ScheduleMeeting!.ScheduleDateTime:dd-MM-yyyy} at {caseDetails!.ScheduleMeeting!.ScheduleDateTime:HH:mm}.\n\n" +
+                                   $"The meeting schedule for {caseType} # {caseDetails!.PolicyDetail!.ContractNumber} with Insurance company {insurerName} \n\n" +
+                                   $"The agent coming to meet is {agent.FirstName} {agent.LastName}.\n\n" +
                               $"Thanks,\n" +
                               $"{_logo}";
 
                 var agentMessage = $"Dear {agent?.FirstName} {agent?.LastName},\n" +
-                                   $"The schedule for Case/Policy # {caseDetails!.PolicyDetail!.ContractNumber} has been confirmed by the {contactNameForSchedule}.\n" +
+                                   $"The schedule for {caseType} # {caseDetails!.PolicyDetail!.ContractNumber} has been confirmed by the {contactNameForSchedule}.\n" +
                                     $"The meeting schedule has been confirmed on {caseDetails!.ScheduleMeeting!.ScheduleDateTime:dd-MM-yyyy} at {caseDetails!.ScheduleMeeting!.ScheduleDateTime:HH:mm}.\n\n" +
                                    $"Thanks,\n" +
                                    $"{_logo}";
@@ -310,9 +313,10 @@ namespace risk.control.system.Services.Agent
                 var confirmationUrl = GenerateConfirmationUrl(portalUrl, request.CaseId);
 
                 var shortUrl = await _tinyUrlService.ShortenUrlAsync(confirmationUrl);
+                string caseType = isClaim ? "Policy" : "Proposal";
                 var message = $"Dear {contactNameForSchedule},\n\n" +
                        $"You have received a request to schedule a meeting with the agent on {request.ScheduleDateTime:dd-MM-yyyy} at {request.ScheduleDateTime:HH:mm}.\n\n" +
-                       $"Reference Policy/Case Number: {caseDetails!.PolicyDetail!.ContractNumber}\n\n" +
+                       $"{caseType} Number: {caseDetails!.PolicyDetail!.ContractNumber}\n\n" +
                        $"Please confirm your availability by clicking the link below (valid for 48 hours):\n" +
                        $"{shortUrl}\n\n" +
                        $"If you did not request this meeting, please disregard this message.\n\n" +

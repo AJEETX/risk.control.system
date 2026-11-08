@@ -97,7 +97,7 @@ namespace risk.control.system.Controllers.Common
 
         [AllowAnonymous]
         [HttpGet]
-        public async Task<IActionResult> Schedule([FromQuery] string token, bool set = false)
+        public async Task<IActionResult> Schedule(string token, bool set)
         {
             if (string.IsNullOrEmpty(token) || !set)
             {
