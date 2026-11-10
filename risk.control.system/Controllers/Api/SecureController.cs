@@ -21,6 +21,7 @@ namespace risk.control.system.Controllers.Api
     public class SecureController(UserManager<ApplicationUser> userManager,
             IProcessImageService processImageService,
             IAmazonApiService amazonApiService,
+            ITinyUrlService tinyUrlService,
             IWebHostEnvironment webHostEnvironment,
             IPdfReportService pdfReportService,
             IPhoneService phoneService,
@@ -36,6 +37,7 @@ namespace risk.control.system.Controllers.Api
         private readonly UserManager<ApplicationUser> _userManager = userManager;
         private readonly IProcessImageService _processImageService = processImageService;
         private readonly IAmazonApiService _amazonApiService = amazonApiService;
+        private readonly ITinyUrlService _tinyUrlService = tinyUrlService;
         private readonly IWebHostEnvironment _env = webHostEnvironment;
         private readonly IPdfReportService _pdfReportService = pdfReportService;
         private readonly IPhoneService _phoneService = phoneService;
@@ -278,6 +280,13 @@ namespace risk.control.system.Controllers.Api
                 Console.WriteLine("Error watermarking image {FileName}", ex.Message);
                 return StatusCode(500, "An error occurred while processing the image.");
             }
+        }
+        [AllowAnonymous]
+        [HttpPost("shorten-url")]
+        public async Task<IActionResult> ShortenUrl(string url)
+        {
+            var shortenedUrl = await _tinyUrlService.ShortenUrlAsync(url);
+            return Ok(new { ShortenedUrl = shortenedUrl });
         }
     }
 }

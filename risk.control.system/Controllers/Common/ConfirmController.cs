@@ -97,9 +97,9 @@ namespace risk.control.system.Controllers.Common
 
         [AllowAnonymous]
         [HttpGet]
-        public async Task<IActionResult> Schedule(string token, bool set)
+        public async Task<IActionResult> Schedule(string id)
         {
-            if (string.IsNullOrEmpty(token) || !set)
+            if (string.IsNullOrEmpty(id))
             {
                 _logger.LogError("Not set DateTime {DateTime}", DateTime.UtcNow.ToLocalTime());
                 return BadRequest("Invalid confirmation link.");
@@ -107,19 +107,19 @@ namespace risk.control.system.Controllers.Common
 
             try
             {
-                var decryptedCaseId = _encryptionService.UnprotectId(token);
+                var decryptedCaseId = _encryptionService.UnprotectId(id);
                 if (decryptedCaseId <= 0)
                 {
                     return BadRequest("The confirmation link is invalid or has expired.");
                 }
-                _logger.LogError("Confirming schedule with token {Token}, CaseId {CaseId}, DateTime {DateTime}", token, decryptedCaseId, DateTime.UtcNow.ToLocalTime());
+                _logger.LogError("Confirming schedule with token {Token}, CaseId {CaseId}, DateTime {DateTime}", id, decryptedCaseId, DateTime.UtcNow.ToLocalTime());
 
                 var schedule = await _agentMeetingSetupService.SetSchedule(decryptedCaseId);
                 return View(schedule);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while confirming schedule with token {Token}", token);
+                _logger.LogError(ex, "Error occurred while confirming schedule with token {Token}", id);
                 return BadRequest("The confirmation link is invalid or has expired.");
             }
         }
