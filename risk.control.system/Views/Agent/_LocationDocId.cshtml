@@ -169,10 +169,14 @@
 					<td>
 							<input type="file" class="form-control remarks form-control-sm doc-upload" data-docid="@doc.Id" />
 							<!-- Add an input to specify the page number -->
+							@if(doc.PageCount != PageCount.SINGLE)
+							{
 							<div class="input-group input-group-sm mt-2">
 								<span class="input-group-text">Page #</span>
 								<input type="number" class="form-control page-number-input" data-docid="@doc.Id" value="1" min="1" />
-							</div>
+							</div>	
+							}
+							
 							<button class="btn btn-sm btn-success mt-2  upload-doc-btn"
 								data-docid="@doc.Id"
 								data-locationid="@location.Id"

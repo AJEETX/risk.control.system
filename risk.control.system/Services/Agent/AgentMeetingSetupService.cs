@@ -310,9 +310,8 @@ namespace risk.control.system.Services.Agent
                     countryCode = beneficiary!.Country!.Code;
                 }
 
-                var confirmationUrl = GenerateConfirmationUrl(portalUrl, request.CaseId);
+                var shortUrl = await GenerateConfirmationUrl(portalUrl, request.CaseId);
 
-                var shortUrl = await _tinyUrlService.ShortenUrlAsync(confirmationUrl);
                 string caseType = isClaim ? "Policy" : "Proposal";
                 var message = $"Dear {contactNameForSchedule},\n\n" +
                        $"You have received a request to schedule a meeting with the agent on {request.ScheduleDateTime:dd-MM-yyyy} at {request.ScheduleDateTime:HH:mm}.\n\n" +
@@ -397,13 +396,15 @@ namespace risk.control.system.Services.Agent
                 throw;
             }
         }
-        private string GenerateConfirmationUrl(string portalUrl, long caseId)
+        private async Task<string> GenerateConfirmationUrl(string portalUrl, long caseId)
         {
             // Encrypt the caseId into a secure, URL-safe string token
             var encryptedCaseId = _encryptionService.ProtectId(caseId);
 
             // Construct the URL with the encrypted token
-            return $"{portalUrl}/confirm/schedule?token={Uri.EscapeDataString(encryptedCaseId)}&set=true";
+            var confirmationUrl = $"{portalUrl}/confirm/schedule/{Uri.EscapeDataString(encryptedCaseId)}";
+            var shortUrl = await _tinyUrlService.ShortenUrlAsync(confirmationUrl);
+            return shortUrl;
         }
     }
 }
