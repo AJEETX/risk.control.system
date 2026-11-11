@@ -14,6 +14,7 @@ namespace risk.control.system.Services.Agent
         Task<bool> RequestSchedule(ScheduleRequest request, string portalUrl);
         Task<bool> ClearSchedule(long caseId);
         Task<ScheduleResponse> SetSchedule(long caseId);
+        Task<ScheduleResponse> ConfirmSchedule(long caseId);
         Task<ScheduleResponse> GetScheduleResponseForReport(long caseId);
         Task<(bool, string?)> GetSchedule(long caseId);
         Task<bool> SetAgentCallInfo(AgentCallRequest agentCallRequest);
@@ -172,6 +173,74 @@ namespace risk.control.system.Services.Agent
                 {
                     throw new Exception("Agent details not found for the given case ID.");
                 }
+                string contactNameForSchedule = string.Empty;
+                long scheduleeId = 0;
+                string insurerName = caseDetails?.ClientCompany?.Name ?? string.Empty;
+                if (!isClaim)
+                {
+                    var customer = await _context.CustomerDetail
+                        .Include(c => c.Country)
+                        .FirstOrDefaultAsync(c => c.InvestigationTaskId == caseId);
+                    if (customer == null)
+                    {
+                        throw new Exception("Customer details not found for the given case ID.");
+                    }
+                    contactNameForSchedule = customer?.Name ?? string.Empty;
+                    scheduleeId = customer!.CustomerDetailId;
+                }
+                else
+                {
+                    var beneficiary = await _context.BeneficiaryDetail
+                        .Include(b => b.Country)
+                        .FirstOrDefaultAsync(b => b.InvestigationTaskId == caseId);
+                    if (beneficiary == null)
+                    {
+                        throw new Exception("Beneficiary details not found for the given case ID.");
+                    }
+                    contactNameForSchedule = beneficiary?.Name ?? string.Empty;
+                    scheduleeId = beneficiary!.BeneficiaryDetailId;
+                }
+                var scheduleResponse = new ScheduleResponse
+                {
+                    IsClaim = isClaim,
+                    ScheduledDateTime = caseDetails!.ScheduleMeeting!.ScheduleDateTime,
+                    ScheduleRequestedDateTime = caseDetails.ScheduleMeeting.ScheduleRequestedDateTime.ToLocalTime(),
+                    ScheduleeName = contactNameForSchedule,
+                    AgentName = $"{agent.FirstName} {agent.LastName}",
+                    PolicyNumber = caseDetails.PolicyDetail!.ContractNumber,
+                    InsurerName = insurerName,
+                    ScheduleeId = scheduleeId,
+                    AgentId = agent.Id,
+                    ScheduleAccepted = caseDetails!.ScheduleMeeting.ScheduleAccepted
+                };
+                return scheduleResponse;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while responding to schedule for Case {CaseId}", caseId);
+                return new ScheduleResponse();
+            }
+        }
+        public async Task<ScheduleResponse> ConfirmSchedule(long caseId)
+        {
+            try
+            {
+                var caseDetails = await _context.Investigations
+                    .Include(c => c.ClientCompany)
+                    .Include(c => c.PolicyDetail)
+                    .Include(c => c.ScheduleMeeting)
+                    .FirstOrDefaultAsync(c => !c.Deleted && c.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT && c.Id == caseId);
+                if (caseDetails == null)
+                {
+                    throw new Exception("Case details not found for the given case ID.");
+                }
+
+                var isClaim = caseDetails?.PolicyDetail?.InsuranceType == InsuranceType.CLAIM;
+                var agent = await _context.ApplicationUser.Include(a => a.Country).FirstOrDefaultAsync(u => u.Email == caseDetails!.TaskedAgentEmail);
+                if (agent == null)
+                {
+                    throw new Exception("Agent details not found for the given case ID.");
+                }
                 string contactNumberForSchedule = string.Empty;
                 string contactNameForSchedule = string.Empty;
                 string countryCode = string.Empty;
@@ -205,23 +274,7 @@ namespace risk.control.system.Services.Agent
                     countryCode = beneficiary!.Country!.Code;
                     scheduleeId = beneficiary.BeneficiaryDetailId;
                 }
-                if (caseDetails!.ScheduleMeeting!.ScheduleAccepted || caseDetails!.ScheduleMeeting!.ScheduleRequestedDateTime.AddHours(48) < DateTime.UtcNow)
-                {
-                    var alreadyScheduled = new ScheduleResponse
-                    {
-                        IsClaim = isClaim,
-                        ScheduledDateTime = caseDetails.ScheduleMeeting.ScheduleDateTime,
-                        ScheduleRequestedDateTime = caseDetails.ScheduleMeeting.ScheduleRequestedDateTime.ToLocalTime(),
-                        ScheduleeName = contactNameForSchedule,
-                        AgentName = $"{agent.FirstName} {agent.LastName}",
-                        PolicyNumber = caseDetails.PolicyDetail!.ContractNumber,
-                        AgentId = agent.Id,
-                        ScheduleeId = scheduleeId,
-                        InsurerName = insurerName,
-                        ScheduleAccepted = caseDetails!.ScheduleMeeting.ScheduleAccepted
-                    };
-                    return alreadyScheduled;
-                }
+
                 string caseType = isClaim ? "Policy" : "Proposal";
                 var message = $"Dear {contactNameForSchedule},\n" +
                               $"Your meeting schedule has been confirmed on {caseDetails!.ScheduleMeeting!.ScheduleDateTime:dd-MM-yyyy} at {caseDetails!.ScheduleMeeting!.ScheduleDateTime:HH:mm}.\n\n" +
@@ -251,7 +304,7 @@ namespace risk.control.system.Services.Agent
                     AgentId = agent.Id,
                     ScheduleeId = scheduleeId,
                     InsurerName = insurerName,
-                    ScheduleAccepted = false
+                    ScheduleAccepted = caseDetails.ScheduleMeeting!.ScheduleAccepted
                 };
                 return scheduleResponse;
             }
@@ -399,11 +452,9 @@ namespace risk.control.system.Services.Agent
         private async Task<string> GenerateConfirmationUrl(string portalUrl, long caseId)
         {
             // Encrypt the caseId into a secure, URL-safe string token
-            var encryptedCaseId = _encryptionService.ProtectId(caseId);
-            var flagId = EnvHelper.Get("WEBSITE_NAME");
-            var protectedFlagId = _encryptionService.ProtectData(flagId!);
+            var encryptedCaseId = _encryptionService.ProtectIdWithExpiry(caseId, TimeSpan.FromHours(48));
             // Construct the URL with the encrypted token
-            var confirmationUrl = $"{portalUrl}/confirm/schedule/{Uri.EscapeDataString(encryptedCaseId)}/{Uri.EscapeDataString(protectedFlagId)}";
+            var confirmationUrl = $"{portalUrl}/confirm/schedule/{Uri.EscapeDataString(encryptedCaseId)}";
             var shortUrl = await _tinyUrlService.ShortenUrlAsync(confirmationUrl);
             return shortUrl;
         }

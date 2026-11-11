@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using risk.control.system.AppConstant;
-using risk.control.system.Helpers;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services.Agent;
 using risk.control.system.Services.Common;
@@ -97,10 +96,10 @@ namespace risk.control.system.Controllers.Common
         }
 
         [AllowAnonymous]
-        [HttpGet("confirm/schedule/{id}/{flagId}")]
-        public async Task<IActionResult> Schedule(string id, string flagId)
+        [HttpGet("confirm/schedule/{id}")]
+        public async Task<IActionResult> Schedule(string id)
         {
-            if (string.IsNullOrEmpty(id) || string.IsNullOrEmpty(flagId))
+            if (string.IsNullOrEmpty(id))
             {
                 _logger.LogError("Not set DateTime {DateTime}", DateTime.UtcNow.ToLocalTime());
                 return BadRequest("Invalid confirmation link.");
@@ -108,19 +107,53 @@ namespace risk.control.system.Controllers.Common
 
             try
             {
-                var decryptedCaseId = _encryptionService.UnprotectId(id);
+                var decryptedCaseId = _encryptionService.UnprotectIdWithExpiry(id);
                 if (decryptedCaseId <= 0)
                 {
                     return BadRequest("The confirmation link is invalid or has expired.");
                 }
-                var decryptedFlagId = _encryptionService.UnprotectData(flagId);
-                if (decryptedFlagId != EnvHelper.Get("WEBSITE_NAME")!)
+
+                var schedule = await _agentMeetingSetupService.SetSchedule(decryptedCaseId);
+                if (schedule.ScheduleRequestedDateTime.AddHours(48) < DateTime.UtcNow)
+                {
+                    // return a message indicating that the link is no longer valid
+                    return BadRequest("The confirmation link is invalid or has expired.");
+                }
+
+                schedule.Token = id; // Pass the token to the view for form submission
+                if (schedule.ScheduleAccepted)
+                {
+                    return View("AlreadyAccepted", schedule);
+                }
+                return View(schedule);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while seeing schedule with token {Token}", id);
+                return BadRequest("The confirmation link is invalid or has expired.");
+            }
+        }
+        [AllowAnonymous]
+        [HttpPost("confirm/schedule/{id}")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ConfirmSchedule(string id)
+        {
+            if (string.IsNullOrEmpty(id))
+            {
+                return BadRequest("Invalid confirmation request.");
+            }
+
+            try
+            {
+                var decryptedCaseId = _encryptionService.UnprotectIdWithExpiry(id);
+
+                if (decryptedCaseId <= 0)
                 {
                     return BadRequest("The confirmation link is invalid or has expired.");
                 }
-                _logger.LogError("Confirming schedule with token {Token}, CaseId {CaseId}, DateTime {DateTime}", id, decryptedCaseId, DateTime.UtcNow.ToLocalTime());
 
-                var schedule = await _agentMeetingSetupService.SetSchedule(decryptedCaseId);
+                // State change happens ONLY on POST when a human actively submits the form/button
+                var schedule = await _agentMeetingSetupService.ConfirmSchedule(decryptedCaseId);
                 return View(schedule);
             }
             catch (Exception ex)
