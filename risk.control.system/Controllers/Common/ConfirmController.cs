@@ -96,7 +96,7 @@ namespace risk.control.system.Controllers.Common
         }
 
         [AllowAnonymous]
-        [HttpGet]
+        [HttpGet("set-schedule")]
         public async Task<IActionResult> Schedule(string id)
         {
             if (string.IsNullOrEmpty(id))

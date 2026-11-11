@@ -88,12 +88,22 @@ namespace risk.control.system.Services.Common
                 Message = sms,
                 IsCustomer = isCustomer,
                 InvestigationTaskId = caseId,
-                RecepicientEmail = name,
+                RecepientEmail = name,
                 SenderEmail = user.Email,
                 UpdatedBy = user.Email,
                 Updated = DateTime.UtcNow
             };
-
+            var smsForCase = new SmsForCase
+            {
+                Message = message,
+                InvestigationTaskId = caseId,
+                RecepientEmail = name,
+                SenderEmail = user!.Email!,
+                UpdatedBy = user.Email,
+                Status = "Sms Sent to" + (isCustomer ? " Customer" : " Beneficiary"),
+                Updated = DateTime.UtcNow
+            };
+            _context.SmsForCase.Add(smsForCase);
             caseTask.CaseMessages!.Add(scheduleMessage);
             await _context.SaveChangesAsync(null, false);
 
