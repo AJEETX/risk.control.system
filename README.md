@@ -1,7 +1,7 @@
 <img src="risk.control.system/wwwroot/img/logo.jpeg" />™️ engine
 ### a simple and secure investigation workflow system [Multi-tenant SAAS^]
 
-### 1. iCheckify™️ engine highlights [web-portal]
+### 1. Policy-Intel™️ engine highlights [web-portal]
 
 ##### Admin features : [admin user from Insurer]
 

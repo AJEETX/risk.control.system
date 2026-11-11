@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using risk.control.system.AppConstant;
+using risk.control.system.Helpers;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services.Agent;
 using risk.control.system.Services.Common;
@@ -96,10 +97,10 @@ namespace risk.control.system.Controllers.Common
         }
 
         [AllowAnonymous]
-        [HttpGet("set-schedule")]
-        public async Task<IActionResult> Schedule(string id)
+        [HttpGet("confirm/schedule/{id}/{flagId}")]
+        public async Task<IActionResult> Schedule(string id, string flagId)
         {
-            if (string.IsNullOrEmpty(id))
+            if (string.IsNullOrEmpty(id) || string.IsNullOrEmpty(flagId))
             {
                 _logger.LogError("Not set DateTime {DateTime}", DateTime.UtcNow.ToLocalTime());
                 return BadRequest("Invalid confirmation link.");
@@ -109,6 +110,11 @@ namespace risk.control.system.Controllers.Common
             {
                 var decryptedCaseId = _encryptionService.UnprotectId(id);
                 if (decryptedCaseId <= 0)
+                {
+                    return BadRequest("The confirmation link is invalid or has expired.");
+                }
+                var decryptedFlagId = _encryptionService.UnprotectData(flagId);
+                if (decryptedFlagId != EnvHelper.Get("WEBSITE_NAME")!)
                 {
                     return BadRequest("The confirmation link is invalid or has expired.");
                 }

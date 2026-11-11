@@ -400,9 +400,10 @@ namespace risk.control.system.Services.Agent
         {
             // Encrypt the caseId into a secure, URL-safe string token
             var encryptedCaseId = _encryptionService.ProtectId(caseId);
-
+            var flagId = EnvHelper.Get("WEBSITE_NAME");
+            var protectedFlagId = _encryptionService.ProtectData(flagId!);
             // Construct the URL with the encrypted token
-            var confirmationUrl = $"{portalUrl}/confirm/set-schedule/{Uri.EscapeDataString(encryptedCaseId)}";
+            var confirmationUrl = $"{portalUrl}/confirm/schedule/{Uri.EscapeDataString(encryptedCaseId)}/{Uri.EscapeDataString(protectedFlagId)}";
             var shortUrl = await _tinyUrlService.ShortenUrlAsync(confirmationUrl);
             return shortUrl;
         }
