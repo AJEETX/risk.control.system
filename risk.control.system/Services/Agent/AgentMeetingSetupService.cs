@@ -200,34 +200,18 @@ namespace risk.control.system.Services.Agent
                     contactNameForSchedule = beneficiary?.Name ?? string.Empty;
                     scheduleeId = beneficiary!.BeneficiaryDetailId;
                 }
-                if (caseDetails!.ScheduleMeeting!.ScheduleAccepted || caseDetails!.ScheduleMeeting!.ScheduleRequestedDateTime.AddHours(48) < DateTime.UtcNow)
-                {
-                    var alreadyScheduled = new ScheduleResponse
-                    {
-                        IsClaim = isClaim,
-                        ScheduledDateTime = caseDetails.ScheduleMeeting.ScheduleDateTime,
-                        ScheduleRequestedDateTime = caseDetails.ScheduleMeeting.ScheduleRequestedDateTime.ToLocalTime(),
-                        ScheduleeName = contactNameForSchedule,
-                        AgentName = $"{agent.FirstName} {agent.LastName}",
-                        PolicyNumber = caseDetails.PolicyDetail!.ContractNumber,
-                        InsurerName = insurerName,
-                        ScheduleAccepted = caseDetails!.ScheduleMeeting.ScheduleAccepted
-                    };
-                    return alreadyScheduled;
-                }
-
                 var scheduleResponse = new ScheduleResponse
                 {
                     IsClaim = isClaim,
-                    ScheduledDateTime = caseDetails.ScheduleMeeting.ScheduleDateTime,
+                    ScheduledDateTime = caseDetails!.ScheduleMeeting!.ScheduleDateTime,
                     ScheduleRequestedDateTime = caseDetails.ScheduleMeeting.ScheduleRequestedDateTime.ToLocalTime(),
                     ScheduleeName = contactNameForSchedule,
                     AgentName = $"{agent.FirstName} {agent.LastName}",
                     PolicyNumber = caseDetails.PolicyDetail!.ContractNumber,
-                    AgentId = agent.Id,
-                    ScheduleeId = scheduleeId,
                     InsurerName = insurerName,
-                    ScheduleAccepted = false
+                    ScheduleeId = scheduleeId,
+                    AgentId = agent.Id,
+                    ScheduleAccepted = caseDetails!.ScheduleMeeting.ScheduleAccepted
                 };
                 return scheduleResponse;
             }
@@ -290,23 +274,7 @@ namespace risk.control.system.Services.Agent
                     countryCode = beneficiary!.Country!.Code;
                     scheduleeId = beneficiary.BeneficiaryDetailId;
                 }
-                if (caseDetails!.ScheduleMeeting!.ScheduleAccepted || caseDetails!.ScheduleMeeting!.ScheduleRequestedDateTime.AddHours(48) < DateTime.UtcNow)
-                {
-                    var alreadyScheduled = new ScheduleResponse
-                    {
-                        IsClaim = isClaim,
-                        ScheduledDateTime = caseDetails.ScheduleMeeting.ScheduleDateTime,
-                        ScheduleRequestedDateTime = caseDetails.ScheduleMeeting.ScheduleRequestedDateTime.ToLocalTime(),
-                        ScheduleeName = contactNameForSchedule,
-                        AgentName = $"{agent.FirstName} {agent.LastName}",
-                        PolicyNumber = caseDetails.PolicyDetail!.ContractNumber,
-                        AgentId = agent.Id,
-                        ScheduleeId = scheduleeId,
-                        InsurerName = insurerName,
-                        ScheduleAccepted = caseDetails!.ScheduleMeeting.ScheduleAccepted
-                    };
-                    return alreadyScheduled;
-                }
+
                 string caseType = isClaim ? "Policy" : "Proposal";
                 var message = $"Dear {contactNameForSchedule},\n" +
                               $"Your meeting schedule has been confirmed on {caseDetails!.ScheduleMeeting!.ScheduleDateTime:dd-MM-yyyy} at {caseDetails!.ScheduleMeeting!.ScheduleDateTime:HH:mm}.\n\n" +
@@ -336,7 +304,7 @@ namespace risk.control.system.Services.Agent
                     AgentId = agent.Id,
                     ScheduleeId = scheduleeId,
                     InsurerName = insurerName,
-                    ScheduleAccepted = false
+                    ScheduleAccepted = caseDetails.ScheduleMeeting!.ScheduleAccepted
                 };
                 return scheduleResponse;
             }
@@ -484,7 +452,7 @@ namespace risk.control.system.Services.Agent
         private async Task<string> GenerateConfirmationUrl(string portalUrl, long caseId)
         {
             // Encrypt the caseId into a secure, URL-safe string token
-            var encryptedCaseId = _encryptionService.ProtectId(caseId);
+            var encryptedCaseId = _encryptionService.ProtectIdWithExpiry(caseId, TimeSpan.FromHours(48));
             // Construct the URL with the encrypted token
             var confirmationUrl = $"{portalUrl}/confirm/schedule/{Uri.EscapeDataString(encryptedCaseId)}";
             var shortUrl = await _tinyUrlService.ShortenUrlAsync(confirmationUrl);

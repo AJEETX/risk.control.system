@@ -1,7 +1,7 @@
 ﻿@model ScheduleResponse
 
 @{
-    ViewData["Title"] = "Meeting Scheduled";
+    ViewData["Title"] = "Confirm Meeting";
     Layout = null;
 }
 <!DOCTYPE html>
@@ -80,7 +80,7 @@
                     </tbody>
                 </table>
                 <div class="card shadow-sm border-0">
-                    <form asp-action="ConfirmSchedule" asp-controller="Confirm" method="post">
+                    <form asp-action="Schedule" asp-controller="Confirm" method="post">
                         <input type="hidden" name="id" value="@Model.Token" />
 
                         <div class="confirm-btn-container">

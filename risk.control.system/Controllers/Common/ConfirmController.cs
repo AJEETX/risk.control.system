@@ -107,14 +107,24 @@ namespace risk.control.system.Controllers.Common
 
             try
             {
-                var decryptedCaseId = _encryptionService.UnprotectId(id);
+                var decryptedCaseId = _encryptionService.UnprotectIdWithExpiry(id);
                 if (decryptedCaseId <= 0)
                 {
                     return BadRequest("The confirmation link is invalid or has expired.");
                 }
 
                 var schedule = await _agentMeetingSetupService.SetSchedule(decryptedCaseId);
+                if (schedule.ScheduleRequestedDateTime.AddHours(48) < DateTime.UtcNow)
+                {
+                    // return a message indicating that the link is no longer valid
+                    return BadRequest("The confirmation link is invalid or has expired.");
+                }
+
                 schedule.Token = id; // Pass the token to the view for form submission
+                if (schedule.ScheduleAccepted)
+                {
+                    return View("AlreadyAccepted", schedule);
+                }
                 return View(schedule);
             }
             catch (Exception ex)
@@ -124,7 +134,8 @@ namespace risk.control.system.Controllers.Common
             }
         }
         [AllowAnonymous]
-        [HttpPost]
+        [HttpPost("confirm/schedule/{id}")]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> ConfirmSchedule(string id)
         {
             if (string.IsNullOrEmpty(id))
@@ -134,7 +145,7 @@ namespace risk.control.system.Controllers.Common
 
             try
             {
-                var decryptedCaseId = _encryptionService.UnprotectId(id);
+                var decryptedCaseId = _encryptionService.UnprotectIdWithExpiry(id);
 
                 if (decryptedCaseId <= 0)
                 {
