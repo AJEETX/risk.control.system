@@ -197,7 +197,7 @@ namespace risk.control.system.Services.Common
                           $"Your code is {otp}\n" +
                           $"{request.BaseUrl}";
 
-            var response = await _smsService.SendSmsAsync(country.Code, cleanIsd + cleanMobile, message);
+            var response = await _smsService.DoSendSmsAsync(country.Code, cleanIsd + cleanMobile, message);
 
             if (!string.IsNullOrWhiteSpace(response))
                 return (true, "OTP sent successfully!");

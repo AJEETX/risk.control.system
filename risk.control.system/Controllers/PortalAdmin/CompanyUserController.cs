@@ -111,8 +111,8 @@ namespace risk.control.system.Controllers.PortalAdmin
             if (result.Succeeded)
             {
                 await _userManager.AddToRoleAsync(user, user.Role.ToString()!);
-                var isdCode = _context.Country.FirstOrDefault(c => c.CountryId == user.CountryId)?.ISDCode;
-                await _smsService.SendSmsAsync(isdCode + user.PhoneNumber, "Company account created. Domain : " + user.Email);
+                var country = _context.Country.FirstOrDefault(c => c.CountryId == user.CountryId);
+                await _smsService.DoSendSmsAsync(country!.Code, country.ISDCode + user.PhoneNumber, "Company account created. Domain : " + user.Email);
                 _notifyService.Custom($"User created successfully.", 3, "green", "fas fa-user-plus");
                 var encryptedId = _encryptionService.ProtectId(user.ClientCompanyId!.Value);
                 return RedirectToAction(nameof(CompanyUserController.Index), ControllerName<CompanyUserController>.Name, new { id = encryptedId });

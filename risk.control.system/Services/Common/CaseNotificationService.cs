@@ -390,39 +390,77 @@ namespace risk.control.system.Services.Common
                             (vendorId.HasValue && u.VendorId == vendorId)).Where(u => _context.UserRoles.Any(ur => ur.UserId == u.Id && roleIds.Contains(ur.RoleId))).ToListAsync();
         }
 
-        private async Task SendNotificationInternal(long caseId, string senderUserEmail, long? targetRoleId, long? clientCompanyId, long? vendorId, string symbol, string status, string message, string url, List<ApplicationUser>? smsRecipients = null, string? agentEmail = null) // Added as optional parameter
+        private async Task SendNotificationInternal(
+    long caseId,
+    string senderUserEmail,
+    long? targetRoleId,
+    long? clientCompanyId,
+    long? vendorId,
+    string symbol,
+    string status,
+    string message,
+    string url,
+    List<ApplicationUser>? smsRecipients = null,
+    string? agentEmail = null)
         {
             await using var _context = await _contextFactory.CreateDbContextAsync();
+
             var notification = new StatusNotification
             {
                 RoleId = targetRoleId,
                 ClientCompanyId = clientCompanyId,
                 VendorId = vendorId,
-                AgentUserEmail = agentEmail, // Now the engine knows where to put it
+                AgentUserEmail = agentEmail,
                 Symbol = symbol ?? BlueSymbol,
                 Message = message,
                 Status = status,
+                InvestigationTaskId = caseId,
                 NotifierUserEmail = senderUserEmail,
                 CreatedAt = DateTime.UtcNow
             };
+
             _context.Notifications.Add(notification);
-            await _context.SaveChangesAsync();
-            if (smsRecipients != null && smsRecipients.Any() && await _featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
+            // Handle SMS Recipients safely
+            if (smsRecipients?.Any() == true && await _featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
             {
-                var smsTasks = smsRecipients.Select(async user =>
+                var listOfSms = new List<SmsForCase>();
+
+                foreach (var user in smsRecipients)
                 {
                     try
                     {
                         string smsBody = $"Dear {user.Email},\n{message} : {status}.\nThanks\n{senderUserEmail},\n{url}";
+
+                        // 1. Send the SMS first
                         await _smsService.DoSendSmsAsync(user.Country!.Code, user.Country.ISDCode + user.PhoneNumber, smsBody);
+
+                        // 2. If successful, prepare the audit record
+                        listOfSms.Add(new SmsForCase
+                        {
+                            SenderEmail = senderUserEmail,
+                            RecepientEmail = user.Email!,
+                            Message = smsBody,
+                            InvestigationTaskId = caseId,
+                            ClientCompanyId = clientCompanyId,
+                            Status = status,
+                        });
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogWarning("SMS failed for {Email}: {Msg}", user.Email, ex.Message);
+                        _logger.LogError("SMS failed for {Email}: {Msg}", user.Email, ex.Message);
+                        // Notice: The loop continues for other users even if one fails!
                     }
-                });
-                await Task.WhenAll(smsTasks);
+                }
+
+                if (listOfSms.Any())
+                {
+                    await _context.SmsForCase.AddRangeAsync(listOfSms);
+                }
             }
+
+            // Save changes and ensure records are persisted
+            int savedCount = await _context.SaveChangesAsync();
+            _logger.LogInformation("Successfully saved {Count} database records for notification on Case {CaseId}", savedCount, caseId);
         }
     }
 }

@@ -11,7 +11,7 @@ namespace risk.control.system.Services.Common
 {
     public interface ISmsService
     {
-        Task DoSendSmsAsync(string countryCode, string mobile, string message, bool onboard = false);
+        Task<string> DoSendSmsAsync(string countryCode, string mobile, string message, bool onboard = false);
 
         Task<string> SendSmsAsync(string countryCode, string mobile = "+61432854196", string message = "Testing fom Azy");
     }
@@ -22,12 +22,13 @@ namespace risk.control.system.Services.Common
         private readonly IHttpClientFactory _httpClientFactory = httpClientFactory;
         private readonly ILogger<SmsService> _logger = logger;
 
-        public async Task DoSendSmsAsync(string countryCode, string mobile, string message, bool onboard = false)
+        public async Task<string> DoSendSmsAsync(string countryCode, string mobile, string message, bool onboard = false)
         {
             if (await _featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN) || onboard)
             {
-                await SendSmsAsync(countryCode, mobile, message);
+                return await SendSmsAsync(countryCode, mobile, message);
             }
+            return string.Empty;
         }
 
         public async Task<string> SendSmsAsync(string countryCode, string mobile = "+61432854196", string message = "Testing fom Azy")

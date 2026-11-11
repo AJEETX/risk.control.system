@@ -62,7 +62,7 @@ namespace risk.control.system.Services.Agentic
                         message += request.Set ? $"Policy # {caseTask.PolicyDetail!.ContractNumber} has been adjudicated.\n" : $"Policy # {caseTask.PolicyDetail!.ContractNumber} has been un-adjudicated.\n";
                         message += request.Set ? "Please process the case.\n" : "";
                         message += "Thanks \n";
-                        await _smsService.SendSmsAsync(companyUser.Country!.Code, companyUser.Country!.ISDCode.ToString() + companyUser.PhoneNumber, message);
+                        await _smsService.DoSendSmsAsync(companyUser.Country!.Code, companyUser.Country!.ISDCode.ToString() + companyUser.PhoneNumber, message);
                     }
                 }
             }

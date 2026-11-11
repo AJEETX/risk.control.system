@@ -16,7 +16,7 @@
         public bool IsReadByVendorAgent { get; set; } = false;
         public bool IsReadByManager { get; set; } = false;
         public bool IsReadByCompanyAdmin { get; set; } = false;
-
+        public long? InvestigationTaskId { get; set; }
         public string Symbol { get; set; } = "fas fa-check-circle i-green";
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }

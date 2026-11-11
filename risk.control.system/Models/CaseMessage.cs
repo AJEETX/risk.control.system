@@ -13,7 +13,7 @@ namespace risk.control.system.Models
         public string? SenderEmail { get; set; }
 
         [EmailAddress]
-        public string? RecepicientEmail { get; set; }
+        public string? RecepientEmail { get; set; }
 
         public bool IsCustomer { get; set; } = false;
 
@@ -26,7 +26,7 @@ namespace risk.control.system.Models
         {
             return $"Claim Message Information:\n" +
                 $"- Sender Email: {SenderEmail}\n" +
-                $"- Recepicient Email: {RecepicientEmail}\n" +
+                $"- Recepicient Email: {RecepientEmail}\n" +
                 $"- Message: {Message}\n";
         }
     }

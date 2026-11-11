@@ -29,6 +29,7 @@ namespace risk.control.system.Models
             }
         }
 
+        public virtual DbSet<SmsForCase> SmsForCase { get; set; }
         public virtual DbSet<AgentCallRequest> AgentCallRequests { get; set; }
         public virtual DbSet<CaseTimeline> CaseTimeline { get; set; }
         public virtual DbSet<FormField> FormFields { get; set; }

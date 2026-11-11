@@ -402,7 +402,7 @@ namespace risk.control.system.Services.Agent
             var encryptedCaseId = _encryptionService.ProtectId(caseId);
 
             // Construct the URL with the encrypted token
-            var confirmationUrl = $"{portalUrl}/confirm/schedule/{Uri.EscapeDataString(encryptedCaseId)}";
+            var confirmationUrl = $"{portalUrl}/confirm/set-schedule/{Uri.EscapeDataString(encryptedCaseId)}";
             var shortUrl = await _tinyUrlService.ShortenUrlAsync(confirmationUrl);
             return shortUrl;
         }

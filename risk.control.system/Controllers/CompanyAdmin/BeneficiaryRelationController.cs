@@ -132,7 +132,7 @@ namespace risk.control.system.Controllers.CompanyAdmin
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<JsonResult> CheckDuplicateCode(string code, [ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long? id)
+        public async Task<JsonResult> CheckDuplicateCode(string code, long? id)
         {
             if (string.IsNullOrWhiteSpace(code))
                 return Json(false);
