@@ -277,15 +277,21 @@ namespace risk.control.system.Services.Agent
 
                 string caseType = isClaim ? "Policy" : "Proposal";
                 var message = $"Dear {contactNameForSchedule},\n" +
-                              $"Your meeting schedule has been confirmed on {caseDetails!.ScheduleMeeting!.ScheduleDateTime:dd-MM-yyyy} at {caseDetails!.ScheduleMeeting!.ScheduleDateTime:HH:mm}.\n\n" +
-                                   $"The meeting schedule for {caseType} # {caseDetails!.PolicyDetail!.ContractNumber} with Insurance company {insurerName} \n\n" +
-                                   $"The agent coming to meet is {agent.FirstName} {agent.LastName}.\n\n" +
+                              $"Meeting schedule has been confirmed by you.\n" +
+                              $"{caseType} #: {caseDetails!.PolicyDetail!.ContractNumber}. \n" +
+                                   $"Insurance company: {insurerName}. \n" +
+                              $"Date of meeting: {caseDetails!.ScheduleMeeting!.ScheduleDateTime:dd-MM-yyyy}.\n " +
+                              $"Time of meeting:  {caseDetails!.ScheduleMeeting!.ScheduleDateTime:HH:mm}.\n" +
+                                   $"Agent name: {agent.FirstName} {agent.LastName}.\n\n" +
                               $"Thanks,\n" +
                               $"{_logo}";
 
                 var agentMessage = $"Dear {agent?.FirstName} {agent?.LastName},\n" +
-                                   $"The schedule for {caseType} # {caseDetails!.PolicyDetail!.ContractNumber} has been confirmed by the {contactNameForSchedule}.\n" +
-                                    $"The meeting schedule has been confirmed on {caseDetails!.ScheduleMeeting!.ScheduleDateTime:dd-MM-yyyy} at {caseDetails!.ScheduleMeeting!.ScheduleDateTime:HH:mm}.\n\n" +
+                                   $"The meeting schedule has been confirmed.\n" +
+                                    $"{caseType} #: {caseDetails!.PolicyDetail!.ContractNumber}. \n" +
+                                   $"Confirmed by: {contactNameForSchedule}.\n\n" +
+                                   $"Date of meeting: {caseDetails!.ScheduleMeeting!.ScheduleDateTime:dd-MM-yyyy}.\n " +
+                                    $"Time of meeting:  {caseDetails!.ScheduleMeeting!.ScheduleDateTime:HH:mm}.\n" +
                                    $"Thanks,\n" +
                                    $"{_logo}";
                 await _smsService.DoSendSmsAsync(countryCode, contactNumberForSchedule, message);
@@ -323,6 +329,7 @@ namespace risk.control.system.Services.Agent
                     throw new Exception("Schedule date and time cannot be in the past.");
                 }
                 var caseDetails = await _context.Investigations
+                .Include(c => c.ClientCompany)
                 .Include(c => c.PolicyDetail)
                 .Include(c => c.ScheduleMeeting)
                 .FirstOrDefaultAsync(c => !c.Deleted && c.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT && c.Id == request.CaseId);
@@ -332,10 +339,11 @@ namespace risk.control.system.Services.Agent
                 }
 
                 var isClaim = caseDetails?.PolicyDetail?.InsuranceType == InsuranceType.CLAIM;
-                var agentName = await _context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == caseDetails!.TaskedAgentEmail);
+                var agent = await _context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == caseDetails!.TaskedAgentEmail);
                 string contactNumberForSchedule = string.Empty;
                 string contactNameForSchedule = string.Empty;
                 string countryCode = string.Empty;
+                string insurerName = caseDetails?.ClientCompany?.Name ?? string.Empty;
                 if (!isClaim)
                 {
                     var customer = await _context.CustomerDetail
@@ -367,9 +375,12 @@ namespace risk.control.system.Services.Agent
 
                 string caseType = isClaim ? "Policy" : "Proposal";
                 var message = $"Dear {contactNameForSchedule},\n\n" +
-                       $"You have received a request to schedule a meeting with the agent on {request.ScheduleDateTime:dd-MM-yyyy} at {request.ScheduleDateTime:HH:mm}.\n\n" +
-                       $"{caseType} Number: {caseDetails!.PolicyDetail!.ContractNumber}\n\n" +
-                       $"Please confirm your availability by clicking the link below (valid for 48 hours):\n" +
+                       $"You have received a request to schedule a meeting." +
+                       $"{caseType} Number: {caseDetails!.PolicyDetail!.ContractNumber}.\n" +
+                       $"Insurance company: {insurerName}. \n" +
+                       $"Date and time of meeting: {request.ScheduleDateTime:dd-MM-yyyy}  {request.ScheduleDateTime:HH:mm}.\n" +
+                       $"Agent name: {agent?.FirstName} {agent?.LastName}.\n" +
+                       $"Please confirm your availability by clicking the link below (valid for 48 hours):\n\n" +
                        $"{shortUrl}\n\n" +
                        $"If you did not request this meeting, please disregard this message.\n\n" +
                        $"Best regards,\n" +

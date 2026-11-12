@@ -118,8 +118,10 @@
                                 @foreach (var file in doc.DocumentFiles!.OrderBy(f => f.PageNumber))
                                 {
                                     <div class="text-dark fs-6 fw-bold ps-1 small mb-1">
-                                        <span class="badge bg-light text-dark border px-2 py-1 me-1">Page @file.PageNumber</span>
-                                        @file.OcrText
+										<div class="badge bg-light text-dark border px-2 py-1 me-1">Page @file.PageNumber</div>
+										<div class="bg-light text-dark border px-2 py-1 me-1">
+											@file.OcrText
+										</div>
                                     </div>
                                 }
 							</div>
@@ -173,7 +175,14 @@
 							{
 							<div class="input-group input-group-sm mt-2">
 								<span class="input-group-text">Page #</span>
-								<input type="number" class="form-control page-number-input" data-docid="@doc.Id" value="1" min="1" />
+									@if (doc.PageCount == PageCount.DOUBLE)
+									{
+										<input type="number" class="form-control page-number-input" data-docid="@doc.Id" value="1" min="1" max="2" />
+									}
+									@if (doc.PageCount == PageCount.MULTIPLE)
+									{
+										<input type="number" class="form-control page-number-input" data-docid="@doc.Id" value="1" min="1"  />
+									}
 							</div>	
 							}
 							
