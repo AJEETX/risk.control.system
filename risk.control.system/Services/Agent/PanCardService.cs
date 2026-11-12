@@ -157,10 +157,10 @@ namespace risk.control.system.Services.Agent
             if (!string.IsNullOrWhiteSpace(panNumber) && documentType == docyTypePanName)
             {
                 string maskedText = allPanText.Replace(panNumber[..6], "XXXXXXX");
-                return $"{documentType} data: \r\n {maskedText}";
+                return $"{maskedText}";
             }
 
-            return $"{documentType} data: \r\n {allPanText}";
+            return $"{allPanText}";
         }
 
         private async Task<byte[]> SaveCompressedValidImage(string filePath, byte[] imageBytes)

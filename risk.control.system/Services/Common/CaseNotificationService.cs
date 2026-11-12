@@ -458,9 +458,7 @@ namespace risk.control.system.Services.Common
                 }
             }
 
-            // Save changes and ensure records are persisted
             int savedCount = await _context.SaveChangesAsync();
-            _logger.LogInformation("Successfully saved {Count} database records for notification on Case {CaseId}", savedCount, caseId);
         }
     }
 }

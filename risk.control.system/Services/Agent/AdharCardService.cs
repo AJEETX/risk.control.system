@@ -111,10 +111,10 @@ namespace risk.control.system.Services.Agent
             if (!string.IsNullOrWhiteSpace(adharNumber) && documentType == docyTypeAdharName)
             {
                 string maskedText = extractedText.Replace(adharNumber[..9], "XXXX XXXX ");
-                return $"{documentType} Page {pageNumber} data: \r\n\n {maskedText}";
+                return $" {maskedText}";
             }
 
-            return $"{documentType}  Page {pageNumber} data: \r\n\n {extractedText}";
+            return $"{extractedText}";
         }
         private byte[] MaskAdharIfFound(byte[] idImage, IReadOnlyList<TextBlock> imageReadOnly, string adharNumber)
         {
