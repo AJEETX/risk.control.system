@@ -32,7 +32,7 @@ namespace risk.control.system.Services.Report
 
             var pngBytes = _imageConverter.ConvertToPngFromPath(vendor!.DocumentUrl!);
             rowBuilder.AddCell().SetVerticalAlignment(VerticalAlignment.Center).SetHorizontalAlignment(HorizontalAlignment.Center).AddParagraph().AddInlineImage(pngBytes).SetWidth(160F);
-            var agencyDetail = vendor!.Email + "\r\n" + vendor!.Name + "\r\n" + vendor!.Addressline + "\r\n" + vendor!.District!.Name + "\r\n" + vendor!.State!.Name + "\r\n" + vendor!.Country!.Name + "\r\n" + vendor!.PinCode!.Code;
+            var agencyDetail = vendor!.Name + "\r\n" + vendor!.Addressline + "\r\n" + vendor!.District!.Name + "\r\n" + vendor!.State!.Name + "\r\n" + vendor!.Country!.Name + "\r\n" + vendor!.PinCode!.Code;
             rowBuilder.AddCell().AddParagraph(agencyDetail).SetFontSize(10);
 
             int locationCount = 1;

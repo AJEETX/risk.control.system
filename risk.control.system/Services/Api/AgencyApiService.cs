@@ -29,12 +29,14 @@ namespace risk.control.system.Services.Api
 
     internal class AgencyApiService(
         IDbContextFactory<ApplicationDbContext> contextFactory,
+        IEncryptionService encryptionService,
         IAgencyInvestigationServiceService agencyInvestigationServiceService,
         ICompanyAgencyApiService empanelledAvailableAgencyService,
         IAgencyAgentService agencyAgentService,
         IBase64FileService base64FileService) : IAgencyApiService
     {
         private readonly IDbContextFactory<ApplicationDbContext> _contextFactory = contextFactory;
+        private readonly IEncryptionService _encryptionService = encryptionService;
         private readonly IAgencyInvestigationServiceService _agencyInvestigationServiceService = agencyInvestigationServiceService;
         private readonly ICompanyAgencyApiService _empanelledAvailableAgencyService = empanelledAvailableAgencyService;
         private readonly IAgencyAgentService _agencyAgentService = agencyAgentService;
@@ -68,7 +70,7 @@ namespace risk.control.system.Services.Api
                 var documentImage = await _base64FileService.GetBase64FileAsync(u.DocumentUrl!, Applicationsettings.NO_IMAGE);
                 return new
                 {
-                    Id = u.VendorId,
+                    Id = _encryptionService.ProtectId(u.VendorId),
                     Document = documentImage,
                     Domain = $"<a>{u.Email}</a>",
                     u.Name,

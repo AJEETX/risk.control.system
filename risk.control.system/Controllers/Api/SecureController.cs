@@ -228,7 +228,7 @@ namespace risk.control.system.Controllers.Api
                 var caseNumber = await _pdfReportService.Generate(id, currentUserEmail);
                 string ReportFilePath = Path.GetFullPath(Path.Combine(_env.ContentRootPath, CONSTANTS.DOCUMENT, CONSTANTS.CASE, caseNumber, CONSTANTS.REPORT_FILENAME));
                 var memory = new MemoryStream();
-                using var stream = new FileStream(ReportFilePath, FileMode.Open);
+                await using var stream = new FileStream(ReportFilePath, FileMode.Open);
                 await stream.CopyToAsync(memory);
                 memory.Position = 0;
                 return File(memory, "application/pdf", CONSTANTS.REPORT_FILENAME);
