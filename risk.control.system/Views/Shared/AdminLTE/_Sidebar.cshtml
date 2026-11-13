@@ -138,6 +138,9 @@
 					<a asp-controller="CaseEnabler" asp-action="Profile" is-active-page
 						   class="navlink-border nav-link
 						@Url.MakeActiveClass("Form", "")
+						@Url.MakeActiveClass("OccupationType", "")
+						@Url.MakeActiveClass("EducationType", "")
+						@Url.MakeActiveClass("AnnualIncome", "")
 						@Url.MakeActiveClass("CaseEnabler", "")
 						@Url.MakeActiveClass("Costcentre", "")
 						@Url.MakeActiveClass("BeneficiaryRelation", "")">
@@ -156,7 +159,30 @@
 						</p>
 					</a>
 				</li>
-				
+				<li class="nav-item">
+					<a is-active-page asp-controller="OccupationType" asp-action="Profile" class="actual-link nav-link @Url.MakeActiveClass("OccupationType", "")">
+						<i class="fas fa-business-time nav-icon"></i>
+						<p>
+							Occupation Type
+						</p>
+					</a>
+				</li>
+				<li class="nav-item">
+					<a is-active-page asp-controller="EducationType" asp-action="Profile" class="actual-link nav-link @Url.MakeActiveClass("EducationType", "")">
+						<i class="fas fa-graduation-cap nav-icon"></i>
+						<p>
+							Education Type
+						</p>
+					</a>
+				</li>
+				<li class="nav-item">
+					<a is-active-page asp-controller="AnnualIncome" asp-action="Profile" class="actual-link nav-link @Url.MakeActiveClass("AnnualIncome", "")">
+						<i class="fas fa-money nav-icon"></i>
+						<p>
+							Income Type
+						</p>
+					</a>
+				</li>
 				<li class="nav-item">
 					<a is-active-page asp-controller="CaseEnabler" asp-action="Profile" class="actual-link nav-link @Url.MakeActiveClass("CaseEnabler", "")">
 						<i class="fas fa-sun nav-icon"></i>

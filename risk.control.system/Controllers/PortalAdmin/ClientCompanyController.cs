@@ -306,7 +306,7 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb(title: "Agency Profile", FromAction = nameof(Agencies))]
-        public async Task<IActionResult> AgencyDetails(long id)
+        public async Task<IActionResult> AgencyDetails([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id)
         {
             try
             {
@@ -328,7 +328,7 @@ namespace risk.control.system.Controllers
                 if (vendor == null)
                 {
                     _notifyService.Error("Error getting Agency");
-                    return RedirectToAction("AvailableVendors", "Vendors");
+                    return RedirectToAction(nameof(Agencies));
                 }
                 var approvedStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR;
                 var rejectedStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR;
@@ -356,27 +356,28 @@ namespace risk.control.system.Controllers
             {
                 _logger.LogError(ex, "Error getting Agency {AgencyId}, by User {UserName}.", id, HttpContext.User.Identity?.Name);
                 _notifyService.Error("Error getting Agency. Try again.");
-                return RedirectToAction("AvailableVendors", "Vendors");
+                return RedirectToAction(nameof(Agencies));
             }
         }
 
         [Breadcrumb(title: "Edit Agency", FromAction = nameof(AgencyDetails))]
-        public async Task<IActionResult> EditAgency(long id)
+        public async Task<IActionResult> EditAgency([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
+            if (!ModelState.IsValid)
+            {
+                _notifyService.Error("Error getting User. Try again.");
+                return RedirectToAction(nameof(Agencies));
+            }
+            var encryptedId = _encryptionService.ProtectId(id);
             try
             {
-                if (!ModelState.IsValid)
-                {
-                    _notifyService.Error("Error getting User. Try again.");
-                    return RedirectToAction(nameof(AgencyDetails), "ClientCompany", new { id = id });
-                }
 
                 var vendor = await _context.Vendor.Include(v => v.Country).FirstOrDefaultAsync(v => v.VendorId == id);
                 if (vendor == null)
                 {
                     _notifyService.Error("Error getting User. Try again.");
-                    return RedirectToAction(nameof(AgencyDetails), "ClientCompany", new { id = id });
+                    return RedirectToAction(nameof(AgencyDetails), ControllerName<ClientCompanyController>.Name, new { id = encryptedId });
                 }
                 vendor.SelectedByCompany = await _context.ApplicationUser.AnyAsync(u => u.Email == userEmail && u.IsSuperAdmin);
                 return View(vendor);
@@ -385,7 +386,7 @@ namespace risk.control.system.Controllers
             {
                 _logger.LogError(ex, "Error getting Agency {AgencyId}, by User {UserEmail}.", id, userEmail);
                 _notifyService.Error("Error getting Agency. Try again.");
-                return RedirectToAction(nameof(AgencyDetails), "ClientCompany", new { id = id });
+                return RedirectToAction(nameof(AgencyDetails), ControllerName<ClientCompanyController>.Name, new { id = encryptedId });
             }
         }
 
@@ -420,7 +421,8 @@ namespace risk.control.system.Controllers
                 _logger.LogError(ex, "Error editing Agency {AgencyId}, by User {UserEmail}.", vendorId, userEmail);
                 _notifyService.Error("Error editing Agency. Try again.");
             }
-            return RedirectToAction(nameof(AgencyDetails), "ClientCompany", new { id = vendorId });
+            var encryptedId = _encryptionService.ProtectId(vendorId);
+            return RedirectToAction(nameof(AgencyDetails), ControllerName<ClientCompanyController>.Name, new { id = encryptedId });
         }
 
         private async Task LoadModel(Vendor model)
@@ -434,7 +436,7 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb("Agency Users", FromAction = nameof(AgencyDetails))]
-        public IActionResult AgencyUsers(long id)
+        public IActionResult AgencyUsers([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id)
         {
             var model = new ServiceModel { Id = id };
 
@@ -442,7 +444,7 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb("Agency Service", FromAction = nameof(AgencyDetails))]
-        public IActionResult AgencyService(long id)
+        public IActionResult AgencyService([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id)
         {
             var model = new ServiceModel { Id = id };
 
