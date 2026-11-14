@@ -516,8 +516,8 @@
         if (!anyChecked) {
             e.preventDefault();
             $.alert({
-                title: "ASSIGN <sub>auto</sub> !",
-                content: "Please select Case(s) to Assign <sub>auto</sub>",
+                title: "ASSIGN<sub>auto</sub> !",
+                content: "Please select Case(s) to Assign<sub><b>auto</b></sub>",
                 icon: 'fas fa-random fa-sync',
                 type: 'orange',
                 closeIcon: true,
@@ -532,8 +532,8 @@
         else if (!askConfirmation) {
             e.preventDefault();
             $.confirm({
-                title: "Confirm Assign <sub>auto</sub>",
-                content: "Are you sure to Assign <sub>auto</sub> ?",
+                title: "Confirm Assign<sub>auto</sub>",
+                content: "Are you sure to Assign<sub>auto</sub> ?",
                 icon: 'fas fa-random',
                 type: 'orange',
                 closeIcon: true,

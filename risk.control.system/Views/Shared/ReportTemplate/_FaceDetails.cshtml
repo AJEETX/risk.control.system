@@ -40,7 +40,7 @@
                                        title="Required field"
                                        data-bs-toggle="tooltip"
                                        id="isfaceRequiredCheckbox_@face.Id"
-                                       name="face.IsRequired"
+                                       name="face_@(face.Id)_IsRequired"
                                        class="form-check-input dependent-input"
                                 @(face.IsRequired ? "checked" : "")
                                 @(isDisabled ? "disabled" : "") />

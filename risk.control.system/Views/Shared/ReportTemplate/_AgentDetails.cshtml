@@ -32,7 +32,7 @@
                     <span class="required-asterisk">
                         <input type="checkbox" title="Required field" data-bs-toggle="tooltip"
                                id="isfaceRequiredCheckbox_@location.AgentIdReport.Id"
-                               name="face.IsRequired"
+                               name="agent.@(location.AgentIdReport.Id)IsRequired"
                                class="form-check-input" checked disabled
                         @(location.AgentIdReport.IsRequired ? "checked" : "") />
                         <label class="form-check-label small" for="isfaceRequiredCheckbox_@location.AgentIdReport.Id">
@@ -50,7 +50,7 @@
                             <div class="form-check form-check-inline me-3">
                                 <input class="form-check-input"
                                        type="radio"
-                                       name="SelectedCameraCapture"
+                                       name="AgentIdReport_@(location.AgentIdReport.Id)_CameraCaptureMode"
                                        id="@radioId"
                                        value="@captureOption"
                                        disabled

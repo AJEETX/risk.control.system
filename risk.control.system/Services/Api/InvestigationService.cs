@@ -70,7 +70,6 @@ namespace risk.control.system.Services.Api
                 query = query.Where(c => c.PolicyDetail!.InsuranceType == Enum.Parse<InsuranceType>(caseType));  // Assuming CaseType is the field in your data model
             }
 
-            // 4. Apply Sorting (In SQL)
             bool isAsc = string.Equals(orderDir, "asc", StringComparison.OrdinalIgnoreCase);
             query = orderColumn switch
             {
@@ -95,22 +94,21 @@ namespace risk.control.system.Services.Api
                 // Default fallback (Updated Date)
                 _ => isAsc ? query.OrderByDescending(a => a.Updated) : query.OrderBy(a => a.Updated)
             };
-            // 5. Paginate and Project (Only fetch what you need)
+
+            int recordsFiltered = await query.CountAsync();
+
             var pagedRawData = await query
                 .Skip(start)
                 .Take(length)
                 .Select(a => new
                 {
-                    investigation = a,
+                    Investigation = a,
                     RawId = a.Id,
-                    Id = _encryptionService.ProtectId(a.Id),
-                    policyId = a.PolicyDetail!.ContractNumber,
-                    PolicyNum = a.GetPolicyNum(a.PolicyDetail.ContractNumber),
-                    InsuranceType = a.PolicyDetail.InsuranceType,
-                    ServiceTypeName = a.PolicyDetail.InvestigationServiceType!.Name,
-                    ContractNumber = a.PolicyDetail.ContractNumber,
-                    PolicyDocumentPath = a.PolicyDetail.DocumentPath,
-                    SumAssuredValue = a.PolicyDetail.SumAssuredValue,
+                    PolicyContractNumber = a.PolicyDetail != null ? a.PolicyDetail.ContractNumber : null,
+                    InsuranceType = a.PolicyDetail != null ? (InsuranceType?)a.PolicyDetail.InsuranceType : null,
+                    ServiceTypeName = a.PolicyDetail != null && a.PolicyDetail.InvestigationServiceType != null ? a.PolicyDetail.InvestigationServiceType.Name : null,
+                    PolicyDocumentPath = a.PolicyDetail != null ? a.PolicyDetail.DocumentPath : null,
+                    SumAssuredValue = a.PolicyDetail != null ? a.PolicyDetail.SumAssuredValue : 0,
                     a.IsNew,
                     a.IsReady2Assign,
                     a.IsUploaded,
@@ -119,86 +117,93 @@ namespace risk.control.system.Services.Api
                     a.Updated,
                     a.ORIGIN,
                     CustomerName = a.CustomerDetail != null ? a.CustomerDetail.Name : null,
-                    customerImagePath = a.CustomerDetail != null ? a.CustomerDetail.ImagePath : Applicationsettings.GUEST_USER,
-                    CustomerLocationMap = a.CustomerDetail!.CustomerLocationMap,
-                    customerAddressline = a.CustomerDetail != null ? a.CustomerDetail.Addressline : string.Empty,
-                    customerDistrict = a.CustomerDetail != null ? a.CustomerDetail.District!.Name : string.Empty,
-                    customerState = a.CustomerDetail != null ? a.CustomerDetail.State!.Name : string.Empty,
-                    customerPincode = a.CustomerDetail != null ? a.CustomerDetail.PinCode!.Code : 0,
+                    CustomerImagePath = a.CustomerDetail != null ? a.CustomerDetail.ImagePath : null,
+                    CustomerLocationMap = a.CustomerDetail != null ? a.CustomerDetail.CustomerLocationMap : null,
+                    CustomerAddressline = a.CustomerDetail != null ? a.CustomerDetail.Addressline : null,
+                    CustomerDistrict = a.CustomerDetail != null && a.CustomerDetail.District != null ? a.CustomerDetail.District.Name : null,
+                    CustomerState = a.CustomerDetail != null && a.CustomerDetail.State != null ? a.CustomerDetail.State.Name : null,
+                    CustomerPincode = a.CustomerDetail != null && a.CustomerDetail.PinCode != null ? a.CustomerDetail.PinCode.Code : 0,
                     BeneficiaryName = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.Name : null,
-                    beneficiaryImagePath = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.ImagePath : Applicationsettings.GUEST_USER,
-                    BeneficiaryLocationMap = a.BeneficiaryDetail!.BeneficiaryLocationMap,
-                    beneficiaryAddressline = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.Addressline : string.Empty,
-                    beneficiaryDistrict = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.District!.Name : string.Empty,
-                    beneficiaryState = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.State!.Name : string.Empty,
-                    beneficiaryPincode = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.PinCode!.Code : 0,
-                }).ToListAsync();
+                    BeneficiaryImagePath = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.ImagePath : null,
+                    BeneficiaryLocationMap = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.BeneficiaryLocationMap : null,
+                    BeneficiaryAddressline = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.Addressline : null,
+                    BeneficiaryDistrict = a.BeneficiaryDetail != null && a.BeneficiaryDetail.District != null ? a.BeneficiaryDetail.District.Name : null,
+                    BeneficiaryState = a.BeneficiaryDetail != null && a.BeneficiaryDetail.State != null ? a.BeneficiaryDetail.State.Name : null,
+                    BeneficiaryPincode = a.BeneficiaryDetail != null && a.BeneficiaryDetail.PinCode != null ? a.BeneficiaryDetail.PinCode.Code : 0,
+                })
+                .ToListAsync();
 
-            int recordsFiltered = await query.CountAsync();
+            var culture = CustomExtensions.GetCultureByCountry(companyUser!.Country!.Code.ToUpper());
 
             var finalDataTasks = pagedRawData.Select(async i =>
             {
                 var isUW = i.InsuranceType == InsuranceType.UNDERWRITING;
-                var culture = CustomExtensions.GetCultureByCountry(companyUser!.Country!.Code.ToUpper());
+                var encryptedId = _encryptionService.ProtectId(i.RawId);
+                var policyNum = i.Investigation.GetPolicyNum(i.PolicyContractNumber!);
 
-                var policyId = i.policyId;
                 var amount = string.Format(culture, "{0:C}", i.SumAssuredValue);
-                var pincodeCode = isUW ? i.customerPincode : i.beneficiaryPincode;
-                var customerAddress = i.IsReady2Assign ? i.customerAddressline + ',' + i.customerDistrict + ',' + i.customerState + ',' + i.customerPincode : null;
-                var beneficiaryAddress = i.IsReady2Assign ? i.beneficiaryAddressline + ',' + i.beneficiaryDistrict + ',' + i.beneficiaryState + ',' + i.beneficiaryPincode : null;
+                var pincodeCode = isUW ? i.CustomerPincode : i.BeneficiaryPincode;
+
+                var customerAddress = i.IsReady2Assign ? $"{i.CustomerAddressline},{i.CustomerDistrict},{i.CustomerState},{i.CustomerPincode}" : null;
+                var beneficiaryAddress = i.IsReady2Assign ? $"{i.BeneficiaryAddressline},{i.BeneficiaryDistrict},{i.BeneficiaryState},{i.BeneficiaryPincode}" : null;
                 var pincodeName = i.IsReady2Assign ? (isUW ? customerAddress : beneficiaryAddress) : null;
+
                 var customerName = string.IsNullOrWhiteSpace(i.CustomerName) ? "<span class=\"badge badge-light\">customer name</span>" : i.CustomerName;
-                var policyName = i.InsuranceType!.GetEnumDisplayName();
-                var Origin = i.ORIGIN.GetEnumDisplayName();
-                var ready2Assign = i.IsReady2Assign;
-                var investigationService = i.ServiceTypeName;
-                var serviceType = $"{i.InsuranceType!.GetEnumDisplayName()} ({investigationService})";
-                var timePending = GetDraftedTimePending(i.investigation);
-                var policyNumber = i.PolicyNum;
-                var beneficiaryName = string.IsNullOrWhiteSpace(i.BeneficiaryName) ?
-                    "<span class=\"badge badge-light\">beneficiary name</span>" : i.BeneficiaryName;
+                var policyName = i.InsuranceType?.GetEnumDisplayName() ?? string.Empty;
+                var origin = i.ORIGIN.GetEnumDisplayName();
+                var investigationService = i.ServiceTypeName ?? string.Empty;
+                var serviceType = $"{policyName} ({investigationService})";
+                var timePending = GetDraftedTimePending(i.Investigation);
+                var beneficiaryNameDisplay = string.IsNullOrWhiteSpace(i.BeneficiaryName) ? "<span class=\"badge badge-light\">beneficiary name</span>" : i.BeneficiaryName;
                 var timeElapsed = DateTime.UtcNow.Subtract(i.Updated.GetValueOrDefault()).TotalSeconds;
                 var personMapAddressUrl = pincodeName == null ? Applicationsettings.NO_MAP : (isUW ? i.CustomerLocationMap : i.BeneficiaryLocationMap);
 
-                // Run file operations in parallel for this specific row
-                var documentTask = _base64FileService.GetBase64FileAsync(i.PolicyDocumentPath!, Applicationsettings.NO_POLICY_IMAGE);
-                var customerTask = _base64FileService.GetBase64FileAsync(i.customerImagePath!, Applicationsettings.NO_USER);
-                var beneficiaryTask = _base64FileService.GetBase64FileAsync(i.beneficiaryImagePath!, Applicationsettings.NO_USER);
+                // Resolve image and document paths safely
+                var customerImg = i.CustomerImagePath ?? Applicationsettings.GUEST_USER;
+                var beneficiaryImg = i.BeneficiaryImagePath ?? Applicationsettings.GUEST_USER;
+
+                // Run file operations concurrently for the current row
+                var documentTask = !string.IsNullOrEmpty(i.PolicyDocumentPath)
+                    ? _base64FileService.GetBase64FileAsync(i.PolicyDocumentPath, Applicationsettings.NO_POLICY_IMAGE)
+                    : Task.FromResult(Applicationsettings.NO_POLICY_IMAGE);
+
+                var customerTask = _base64FileService.GetBase64FileAsync(customerImg, Applicationsettings.NO_USER);
+                var beneficiaryTask = _base64FileService.GetBase64FileAsync(beneficiaryImg, Applicationsettings.NO_USER);
 
                 await Task.WhenAll(documentTask, customerTask, beneficiaryTask);
+
                 return new CaseAutoAllocationResponse
                 {
-                    Id = i.Id,
+                    Id = encryptedId,
                     RawId = i.RawId,
                     IsNew = i.IsNew,
                     Amount = amount,
-                    PolicyId = policyId,
-                    PolicyNum = i.PolicyNum,
+                    PolicyId = i.PolicyContractNumber!,
+                    PolicyNum = policyNum,
                     AssignedToAgency = i.IsNew,
                     PincodeCode = pincodeCode,
-                    PincodeAddress = pincodeName!,
+                    PincodeAddress = pincodeName ?? string.Empty,
                     Document = await documentTask,
                     Customer = await customerTask,
                     Name = customerName,
                     Policy = policyName,
-                    Origin = Origin,
+                    Origin = origin,
                     SubStatus = i.SubStatus,
-                    Ready2Assign = ready2Assign,
+                    Ready2Assign = i.IsReady2Assign,
                     Service = investigationService,
                     Created = i.Updated ?? i.Created,
                     ServiceType = serviceType,
                     TimePending = timePending,
                     BeneficiaryPhoto = await beneficiaryTask,
-                    BeneficiaryName = beneficiaryName,
+                    BeneficiaryName = beneficiaryNameDisplay,
                     TimeElapsed = timeElapsed,
                     BeneficiaryFullName = i.BeneficiaryName ?? "?",
                     CustomerFullName = i.CustomerName ?? "?",
-                    PersonMapAddressUrl = personMapAddressUrl!
+                    PersonMapAddressUrl = personMapAddressUrl ?? Applicationsettings.NO_MAP
                 };
             });
 
-            // 2. Await all rows
-            var finalData = (await Task.WhenAll(finalDataTasks));
+            var finalData = await Task.WhenAll(finalDataTasks);
 
             // 7. Bulk Update "IsNew" (Fastest way)
             var idsToUpdate = finalData.Where(x => x.IsNew).Select(x => x.RawId).ToList();
@@ -278,21 +283,18 @@ namespace risk.control.system.Services.Api
                 11 => isAsc ? query.OrderBy(a => a.Created) : query.OrderByDescending(a => a.Created),
                 _ => query.OrderByDescending(a => a.AllocatedToAgencyTime)
             };
-
+            // 1. Project ONLY raw primitives and safe nullable properties (clean SQL translation)
             var pagedList = await query
                 .Skip(start).Take(length)
                 .Select(a => new
                 {
                     investigation = a,
-                    Id = a.Id,
-                    policyId = a.PolicyDetail!.ContractNumber,
-                    PolicyNum = a.GetPolicyNum(a.PolicyDetail.ContractNumber),
-                    InsuranceType = a.PolicyDetail.InsuranceType,
-                    ServiceTypeName = a.PolicyDetail!.InvestigationServiceType!.Name,
-                    serviceType = $"{a.PolicyDetail.InsuranceType!.GetEnumDisplayName()} ({a.PolicyDetail.InvestigationServiceType.Name})",
-                    ContractNumber = a.PolicyDetail.ContractNumber,
-                    PolicyDocumentPath = a.PolicyDetail.DocumentPath,
-                    SumAssuredValue = a.PolicyDetail.SumAssuredValue,
+                    RawId = a.Id,
+                    PolicyContractNumber = a.PolicyDetail != null ? a.PolicyDetail.ContractNumber : null,
+                    InsuranceType = a.PolicyDetail != null ? (InsuranceType?)a.PolicyDetail.InsuranceType : null,
+                    ServiceTypeName = a.PolicyDetail != null && a.PolicyDetail.InvestigationServiceType != null ? a.PolicyDetail.InvestigationServiceType.Name : null,
+                    PolicyDocumentPath = a.PolicyDetail != null ? a.PolicyDetail.DocumentPath : null,
+                    SumAssuredValue = a.PolicyDetail != null ? a.PolicyDetail.SumAssuredValue : 0,
                     a.IsNew,
                     a.IsAutoAllocated,
                     a.AssignedToAgency,
@@ -304,55 +306,76 @@ namespace risk.control.system.Services.Api
                     a.CaseOwner,
                     a.AllocatedToAgencyTime,
                     a.CreatorSla,
-                    CustomerName = a.CustomerDetail!.Name,
-                    customerImagePath = a.CustomerDetail.ImagePath,
-                    customerAddressline = a.CustomerDetail.Addressline,
-                    customerDistrict = a.CustomerDetail.District!.Name,
-                    customerState = a.CustomerDetail.State!.Name,
-                    customerPincode = a.CustomerDetail!.PinCode!.Code,
-                    a.CustomerDetail.CustomerLocationMap,
-                    BeneficiaryName = a.BeneficiaryDetail!.Name,
-                    beneficiaryImagePath = a.BeneficiaryDetail.ImagePath,
-                    beneficiaryAddressline = a.BeneficiaryDetail.Addressline,
-                    beneficiaryDistrict = a.BeneficiaryDetail!.District!.Name,
-                    beneficiaryState = a.BeneficiaryDetail!.State!.Name,
-                    beneficiaryPincode = a.BeneficiaryDetail!.PinCode!.Code,
-                    a.BeneficiaryDetail.BeneficiaryLocationMap
-                }).ToListAsync();
+                    CustomerName = a.CustomerDetail != null ? a.CustomerDetail.Name : null,
+                    CustomerImagePath = a.CustomerDetail != null ? a.CustomerDetail.ImagePath : null,
+                    CustomerAddressline = a.CustomerDetail != null ? a.CustomerDetail.Addressline : null,
+                    CustomerDistrict = a.CustomerDetail != null && a.CustomerDetail.District != null ? a.CustomerDetail.District.Name : null,
+                    CustomerState = a.CustomerDetail != null && a.CustomerDetail.State != null ? a.CustomerDetail.State.Name : null,
+                    CustomerPincode = a.CustomerDetail != null && a.CustomerDetail.PinCode != null ? a.CustomerDetail.PinCode.Code : 0,
+                    CustomerLocationMap = a.CustomerDetail != null ? a.CustomerDetail.CustomerLocationMap : null,
+                    BeneficiaryName = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.Name : null,
+                    BeneficiaryImagePath = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.ImagePath : null,
+                    BeneficiaryAddressline = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.Addressline : null,
+                    BeneficiaryDistrict = a.BeneficiaryDetail != null && a.BeneficiaryDetail.District != null ? a.BeneficiaryDetail.District.Name : null,
+                    BeneficiaryState = a.BeneficiaryDetail != null && a.BeneficiaryDetail.State != null ? a.BeneficiaryDetail.State.Name : null,
+                    BeneficiaryPincode = a.BeneficiaryDetail != null && a.BeneficiaryDetail.PinCode != null ? a.BeneficiaryDetail.PinCode.Code : 0,
+                    BeneficiaryLocationMap = a.BeneficiaryDetail != null ? a.BeneficiaryDetail.BeneficiaryLocationMap : null
+                })
+                .ToListAsync();
 
-            // 6. Transform & Async File I/O
+            // Optional: If GetOwner(id) queries the database, batch-fetch them here to eliminate N+1 queries.
+            // var investigationIds = pagedList.Select(x => x.RawId).ToList();
+            // var ownersDict = await _context.Owners.Where(o => investigationIds.Contains(o.InvestigationId)).ToDictionaryAsync(o => o.InvestigationId);
+
+            // 2. In-memory transformation and parallel file fetching
+            var culture = CustomExtensions.GetCultureByCountry(companyUser!.Country!.Code.ToUpper());
+
             var finalTasks = pagedList.Select(async a =>
             {
                 var isUW = a.InsuranceType == InsuranceType.UNDERWRITING;
-                var culture = CustomExtensions.GetCultureByCountry(companyUser!.Country!.Code.ToUpper());
-                var policyNumber = a.PolicyNum;
-                var investigationService = a.ServiceTypeName;
-                var serviceType = a.serviceType;
-                var personMapAddressUrl = isUW ? string.Format(a.CustomerLocationMap!, "400", "400") : string.Format(a.BeneficiaryLocationMap!, "400", "400");
-                var pincode = ClaimsInvestigationExtension.GetPincodeOfInterest(isUW, a.customerPincode, a.beneficiaryPincode);
-                var customerAddress = $"{a.customerAddressline}  {a.customerDistrict} {a.customerState} {a.customerPincode}";
-                var beneficiaryAddress = $"{a.beneficiaryAddressline} {a.beneficiaryDistrict} {a.beneficiaryState} {a.beneficiaryPincode}";
-                var pincodeName = isUW ? customerAddress : beneficiaryAddress;
-                var customerName = a.CustomerName ?? "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\"></i> </span>";
-                var beneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryName) ?
-                    "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\"></i> </span>" : a.BeneficiaryName;
+                var policyNumber = a.investigation.GetPolicyNum(a.PolicyContractNumber!);
+                var investigationService = a.ServiceTypeName ?? string.Empty;
+                var insuranceEnumName = a.InsuranceType?.GetEnumDisplayName() ?? string.Empty;
+                var serviceType = $"{insuranceEnumName} ({investigationService})";
 
-                // Fetch files in parallel for this row
-                var docTask = _base64FileService.GetBase64FileAsync(a.PolicyDocumentPath!, Applicationsettings.NO_POLICY_IMAGE);
-                var custTask = _base64FileService.GetBase64FileAsync(a.customerImagePath!, Applicationsettings.GUEST_USER);
-                var beneTask = _base64FileService.GetBase64FileAsync(a.beneficiaryImagePath!, Applicationsettings.GUEST_USER);
+                var mapTemplate = isUW ? a.CustomerLocationMap : a.BeneficiaryLocationMap;
+                var personMapAddressUrl = !string.IsNullOrEmpty(mapTemplate) ? string.Format(mapTemplate, "400", "400") : Applicationsettings.NO_MAP;
+
+                var pincode = ClaimsInvestigationExtension.GetPincodeOfInterest(isUW, a.CustomerPincode, a.BeneficiaryPincode);
+                var customerAddress = $"{a.CustomerAddressline} {a.CustomerDistrict} {a.CustomerState} {a.CustomerPincode}";
+                var beneficiaryAddress = $"{a.BeneficiaryAddressline} {a.BeneficiaryDistrict} {a.BeneficiaryState} {a.BeneficiaryPincode}";
+                var pincodeName = isUW ? customerAddress : beneficiaryAddress;
+
+                var customerNameDisplay = string.IsNullOrWhiteSpace(a.CustomerName)
+                    ? "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\"></i> </span>"
+                    : a.CustomerName;
+
+                var beneficiaryNameDisplay = string.IsNullOrWhiteSpace(a.BeneficiaryName)
+                    ? "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\"></i> </span>"
+                    : a.BeneficiaryName;
+
+                // Resolve file paths with proper fallbacks
+                var docPath = a.PolicyDocumentPath ?? Applicationsettings.NO_POLICY_IMAGE;
+                var custPath = a.CustomerImagePath ?? Applicationsettings.GUEST_USER;
+                var benePath = a.BeneficiaryImagePath ?? Applicationsettings.GUEST_USER;
+
+                // Run file operations and owner tasks concurrently for this specific row
+                var docTask = _base64FileService.GetBase64FileAsync(docPath, Applicationsettings.NO_POLICY_IMAGE);
+                var custTask = _base64FileService.GetBase64FileAsync(custPath, Applicationsettings.NO_USER);
+                var beneTask = _base64FileService.GetBase64FileAsync(benePath, Applicationsettings.NO_USER);
                 var ownerImageTask = GetOwnerImage(a.investigation);
-                var ownerDetailTask = GetOwner(a.Id);
+                var ownerDetailTask = GetOwner(a.RawId); // Ensure GetOwner is optimized or batched if hitting DB
 
                 await Task.WhenAll(docTask, custTask, beneTask, ownerImageTask, ownerDetailTask);
+
                 return new ActiveCaseResponse
                 {
                     PolicyNum = policyNumber,
                     AutoAllocated = a.IsAutoAllocated,
-                    RawId = a.Id,
-                    Id = _encryptionService.ProtectId(a.Id),
+                    RawId = a.RawId,
+                    Id = _encryptionService.ProtectId(a.RawId),
                     IsNew = a.IsNew,
-                    PolicyId = a.policyId,
+                    PolicyId = a.PolicyContractNumber,
                     Amount = string.Format(culture, "{0:c}", a.SumAssuredValue),
                     CustomerFullName = a.CustomerName ?? "",
                     BeneficiaryFullName = a.BeneficiaryName ?? "",
@@ -372,9 +395,9 @@ namespace risk.control.system.Services.Api
                     PersonMapAddressUrl = personMapAddressUrl,
                     Pincode = pincode,
                     PincodeName = pincodeName,
-                    Name = customerName,
-                    BeneficiaryName = beneficiaryName,
-                    Policy = a.InsuranceType!.GetEnumDisplayName(),
+                    Name = customerNameDisplay,
+                    BeneficiaryName = beneficiaryNameDisplay,
+                    Policy = insuranceEnumName,
                     Status = a.ORIGIN.GetEnumDisplayName(),
                 };
             });

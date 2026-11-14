@@ -55,25 +55,25 @@ namespace risk.control.system.Seeds
                  {
                     new ()
                         {
-                        LocationName = CONSTANTS.LOCATIONS.BENEFICIARY_ADDRESS,
-                        IsRequired = true,
-                        AgentIdReport = CreateDefaultAgentReport(),
-                        MediaReports = CreateDefaultMediaReports(true, false),
-                        FaceIds = new List<FaceIdReport>
-                        {
-                            CreateFaceReport(DigitalIdReportType.BENEFICIARY_FACE, true, true, CameraCaptureMode.Rear)
-                        },
-                        DocumentIds = new List<DocumentIdReport>
-                        {
-                            CreateDocumentReport(DocumentIdReportType.ADHAAR, true, PageCount.DOUBLE, true),
-                            CreateDocumentReport(DocumentIdReportType.PAN, false, PageCount.SINGLE, false),
-                            CreateDocumentReport(DocumentIdReportType.VOTER_ID, false, PageCount.DOUBLE, true),
-                            CreateDocumentReport(DocumentIdReportType.DRIVING_LICENSE, false, PageCount.DOUBLE, true),
-                            CreateDocumentReport(DocumentIdReportType.BIRTH_CERTIFICATE, false, PageCount.SINGLE, false),
-                            CreateDocumentReport(DocumentIdReportType.EMPLOYMENT_RECORD, false, PageCount.MULTIPLE, false),
-                            CreateDocumentReport(DocumentIdReportType.ITR, false, PageCount.SINGLE, false)
-                        },
-                        Questions = ClaimQuestion.QuestionsCLAIM_LA_ADDRESS()
+                            LocationName = CONSTANTS.LOCATIONS.BENEFICIARY_ADDRESS,
+                            IsRequired = true,
+                            AgentIdReport = CreateDefaultAgentReport(),
+                            MediaReports = CreateDefaultMediaReports(true, false),
+                            FaceIds = new List<FaceIdReport>
+                            {
+                                CreateFaceReport(DigitalIdReportType.BENEFICIARY_FACE, true, true, CameraCaptureMode.Rear)
+                            },
+                            DocumentIds = new List<DocumentIdReport>
+                            {
+                                CreateDocumentReport(DocumentIdReportType.ADHAAR, true, PageCount.DOUBLE, true),
+                                CreateDocumentReport(DocumentIdReportType.PAN, false, PageCount.SINGLE, false),
+                                CreateDocumentReport(DocumentIdReportType.VOTER_ID, false, PageCount.DOUBLE, true),
+                                CreateDocumentReport(DocumentIdReportType.DRIVING_LICENSE, false, PageCount.DOUBLE, true),
+                                CreateDocumentReport(DocumentIdReportType.BIRTH_CERTIFICATE, false, PageCount.SINGLE, false),
+                                CreateDocumentReport(DocumentIdReportType.EMPLOYMENT_RECORD, false, PageCount.MULTIPLE, false),
+                                CreateDocumentReport(DocumentIdReportType.ITR, false, PageCount.SINGLE, false)
+                            },
+                            Questions = ClaimQuestion.QuestionsCLAIM_LA_ADDRESS()
                         },
 
                         CreateLocation(CONSTANTS.LOCATIONS.HOSPITAL_ADDRESS, false,
