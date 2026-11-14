@@ -7,9 +7,10 @@ namespace risk.control.system.Services.Common
         Task<string> GetWeatherAsync(string latitude, string longitude);
     }
 
-    internal class WeatherInfoService(IHttpClientFactory httpClientFctory) : IWeatherInfoService
+    internal class WeatherInfoService(IHttpClientFactory httpClientFctory, ILogger<WeatherInfoService> logger) : IWeatherInfoService
     {
         private readonly IHttpClientFactory _httpClientFctory = httpClientFctory;
+        private readonly ILogger<WeatherInfoService> _logger = logger;
 
         public async Task<string> GetWeatherAsync(string latitude, string longitude)
         {
@@ -33,7 +34,7 @@ namespace risk.control.system.Services.Common
             }
             catch (Exception ex)
             {
-                // Log the specific inner exception details
+                _logger.LogError(ex, "Error occurred while fetching weather data for coordinates: {Latitude}, {Longitude}", latitude, longitude);
                 return $"Weather update failed: {ex.Message}";
             }
         }
