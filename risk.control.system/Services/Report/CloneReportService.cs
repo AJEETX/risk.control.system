@@ -118,8 +118,9 @@ namespace risk.control.system.Services.Report
                 {
                     Selected = original.AgentIdReport!.Selected,
                     IsRequired = original.AgentIdReport.IsRequired,
-                    ReportName = original.AgentIdReport.ReportName,                                          // You can set other properties of Agent here if needed
-                    ReportType = original.AgentIdReport.ReportType,  // Default agent
+                    ReportName = original.AgentIdReport.ReportName,
+                    ReportType = original.AgentIdReport.ReportType,
+                    CameraCaptureMode = original.AgentIdReport.CameraCaptureMode
                 },
                 FaceIds = original.FaceIds?.Select(f => new FaceIdReport
                 {
@@ -186,6 +187,7 @@ namespace risk.control.system.Services.Report
                     IsRequired = loc.AgentIdReport.IsRequired,
                     ReportType = loc.AgentIdReport.ReportType,
                     ReportName = loc.AgentIdReport.ReportName,
+                    CameraCaptureMode = loc.AgentIdReport.CameraCaptureMode
                 },
                 MediaReports = loc.MediaReports?.Select(m => new MediaReport
                 {
@@ -245,6 +247,7 @@ namespace risk.control.system.Services.Report
                         IsRequired = loc.AgentIdReport.IsRequired,
                         ReportType = loc.AgentIdReport.ReportType,
                         ReportName = loc.AgentIdReport.ReportName,
+                        CameraCaptureMode = loc.AgentIdReport.CameraCaptureMode
                     },
                     MediaReports = loc.MediaReports?.Select(m => new MediaReport
                     {
