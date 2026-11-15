@@ -150,9 +150,9 @@ namespace risk.control.system.Services.AgencyAdmin
 
                 if (agencyUsers.Count == 0)
                 {
-                    return (true, $"Agency <b>{agency.Email}</b> deleted successfully.");
+                    return (true, $"Agency <b>{agency.Name}</b> deleted successfully.");
                 }
-                return (true, $"Agency <b>{agency.Email}</b> and its users deleted successfully.");
+                return (true, $"Agency <b>{agency.Name}</b> and its users deleted successfully.");
             }
             catch (Exception)
             {
