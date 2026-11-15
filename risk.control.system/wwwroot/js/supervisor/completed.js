@@ -107,17 +107,17 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var img = '<div class="map-thumbnail table-profile-image">';
-                    img += '<img src="' + row.customer + '" class="full-map" title="' + row.name + '" data-bs-toggle="tooltip"/>'; // Full map image with class 'full-map'
-                    img += '<img src="' + row.customer + '" class="thumbnail table-profile-image" title="' + row.name + '" data-bs-toggle="tooltip"/>'; // Thumbnail image with class 'thumbnail'
+                    img += '<img src="' + row.personPhoto + '" class="full-map" title="' + row.personName + '" data-bs-toggle="tooltip"/>'; // Full map image with class 'full-map'
+                    img += '<img src="' + row.personPhoto + '" class="thumbnail table-profile-image" title="' + row.personName + '" data-bs-toggle="tooltip"/>'; // Thumbnail image with class 'thumbnail'
                     img += '</div>';
                     return img;
                 }
             },
 
             {
-                "data": "name",
+                "data": "personName",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.name + '" data-bs-toggle="tooltip">' + data + '</span>';
+                    return '<span title="' + data + '" data-bs-toggle="tooltip">' + data + '</span>';
                 }
             },
             {
@@ -133,9 +133,9 @@
                 }
             },
             {
-                "data": "location",
+                "data": "status",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.location + '" data-bs-toggle="tooltip">' + data + '</span>'
+                    return '<span title="' + data + '" data-bs-toggle="tooltip">' + data + '</span>'
                 }
             },
             {

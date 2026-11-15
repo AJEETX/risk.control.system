@@ -138,15 +138,15 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var img = '<div class="table-profile-image">';
-                    img += '<img src="' + row.customer + '" class="thumbnail table-profile-image" />'; // Thumbnail image with class 'thumbnail'
+                    img += '<img src="' + row.personPhoto + '" class="thumbnail table-profile-image" />'; // Thumbnail image with class 'thumbnail'
                     img += '</div>';
                     return img;
                 }
             },
             {
-                "data": "name",
+                "data": "personName",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.name + '" data-bs-toggle="tooltip">' + data + '</span>';
+                    return '<span title="' + row.personName + '" data-bs-toggle="tooltip">' + data + '</span>';
                 }
             },
             {

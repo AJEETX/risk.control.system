@@ -50,12 +50,11 @@ namespace risk.control.system.Services.Agent
         public async Task<List<CaseInvestigationAgencyResponse>> GetNewCases(string userEmail)
         {
             var agentUser = await _context.ApplicationUser.Include(v => v.Country).FirstOrDefaultAsync(c => c.Email == userEmail);
-            var assignedToAgentStatus = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT;
             var claims = await GetClaims()
                     .Where(i => i.VendorId == agentUser!.VendorId &&
                     i.TaskedAgentEmail == userEmail &&
                     !i.Deleted &&
-                    i.SubStatus == assignedToAgentStatus).ToListAsync();
+                    i.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT).ToListAsync();
 
             var finalDataTasks = claims
                    .Select(async a =>
@@ -64,7 +63,7 @@ namespace risk.control.system.Services.Agent
                        var isUW = a.PolicyDetail!.InsuranceType == InsuranceType.UNDERWRITING;
                        var documentTask = _base64FileService.GetBase64FileAsync(a.PolicyDetail!.DocumentPath!, Applicationsettings.NO_POLICY_IMAGE);
                        var customerPhotoTask = _base64FileService.GetBase64FileAsync(isUW ? a.CustomerDetail!.ImagePath! : a.BeneficiaryDetail!.ImagePath!);
-                       var beneficiaryPhotoTask = _base64FileService.GetBase64FileAsync(a.BeneficiaryDetail!.ImagePath!, Applicationsettings.GUEST_USER);
+                       //var beneficiaryPhotoTask = _base64FileService.GetBase64FileAsync(a.BeneficiaryDetail!.ImagePath!, Applicationsettings.GUEST_USER);
 
                        return new CaseInvestigationAgencyResponse
                        {
@@ -76,18 +75,17 @@ namespace risk.control.system.Services.Agent
                            PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING, a.CustomerDetail!, a.BeneficiaryDetail!),
                            AssignedToAgency = a.AssignedToAgency,
                            Document = await documentTask,
-                           Customer = await customerPhotoTask,
-                           Name = a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING ? a.CustomerDetail!.Name : a.BeneficiaryDetail!.Name,
+                           PersonPhoto = await customerPhotoTask,
+                           PersonName = a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING ? a.CustomerDetail!.Name : a.BeneficiaryDetail!.Name,
                            Policy = a.PolicyDetail.InsuranceType!.GetEnumDisplayName(),
                            Status = a.SubStatus,
                            ServiceType = a.PolicyDetail.InsuranceType!.GetEnumDisplayName(),
                            Service = a.PolicyDetail.InvestigationServiceType!.Name,
-                           Location = a.SubStatus,
                            Created = a.Created,
                            timePending = a.GetAgentTimePending(),
                            PolicyNum = a.GetPolicyNumForAgency(CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR),
-                           BeneficiaryPhoto = await beneficiaryPhotoTask,
-                           BeneficiaryName = a.BeneficiaryDetail.Name,
+                           //BeneficiaryPhoto = await beneficiaryPhotoTask,
+                           //BeneficiaryName = a.BeneficiaryDetail.Name,
                            TimeElapsed = DateTime.UtcNow.Subtract(a.TaskToAgentTime!.Value).TotalSeconds,
                            IsNewAssigned = a.IsNewSubmittedToAgent,
                            IsQueryCase = a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR,
@@ -162,8 +160,7 @@ namespace risk.control.system.Services.Agent
                        var isUW = a.PolicyDetail!.InsuranceType == InsuranceType.UNDERWRITING;
                        var documentTask = _base64FileService.GetBase64FileAsync(a.PolicyDetail.DocumentPath!, Applicationsettings.NO_POLICY_IMAGE);
                        var customerPhotoTask = _base64FileService.GetBase64FileAsync(isUW ? a.CustomerDetail!.ImagePath! : a.BeneficiaryDetail!.ImagePath!);
-                       var beneficiaryPhotoTask = _base64FileService.GetBase64FileAsync(a.BeneficiaryDetail!.ImagePath!, Applicationsettings.GUEST_USER);
-                       await Task.WhenAll(documentTask, customerPhotoTask, beneficiaryPhotoTask);
+                       await Task.WhenAll(documentTask, customerPhotoTask);
 
                        return new CaseInvestigationAgencyResponse
                        {
@@ -171,22 +168,19 @@ namespace risk.control.system.Services.Agent
                            PolicyId = a.PolicyDetail.ContractNumber,
                            Amount = string.Format(culture, "{0:C}", a.PolicyDetail.SumAssuredValue),
                            AssignedToAgency = a.AssignedToAgency,
-                           Pincode = ClaimsInvestigationExtension.GetPincode(isUW, a.CustomerDetail!, a.BeneficiaryDetail),
-                           PincodeName = ClaimsInvestigationExtension.GetPincodeName(isUW, a.CustomerDetail!, a.BeneficiaryDetail),
+                           Pincode = ClaimsInvestigationExtension.GetPincode(isUW, a.CustomerDetail!, a.BeneficiaryDetail!),
+                           PincodeName = ClaimsInvestigationExtension.GetPincodeName(isUW, a.CustomerDetail!, a.BeneficiaryDetail!),
                            Company = a.ClientCompany!.Name,
                            Document = await documentTask,
-                           Customer = await customerPhotoTask,
-                           Name = a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING ? a.CustomerDetail!.Name : a.BeneficiaryDetail.Name,
+                           PersonPhoto = await customerPhotoTask,
+                           PersonName = a.PolicyDetail.InsuranceType == InsuranceType.UNDERWRITING ? a.CustomerDetail!.Name : a.BeneficiaryDetail!.Name,
                            Policy = a.PolicyDetail.InsuranceType!.GetEnumDisplayName(),
                            Status = a.SubStatus,
                            ServiceType = a.PolicyDetail.InsuranceType!.GetEnumDisplayName(),
                            Service = a.PolicyDetail.InvestigationServiceType!.Name,
-                           Location = a.SubStatus,
                            Created = a.Created,
                            timePending = a.GetAgentTimePending(true),
                            PolicyNum = a.PolicyDetail.ContractNumber,
-                           BeneficiaryPhoto = await beneficiaryPhotoTask,
-                           BeneficiaryName = a.BeneficiaryDetail.Name,
                            TimeElapsed = DateTime.UtcNow.Subtract(a.SubmittedToSupervisorTime!.Value).TotalSeconds,
                            PersonMapAddressUrl = string.Format(a.SelectedAgentDrivingMap!, "300", "300"),
                            Distance = a.SelectedAgentDrivingDistance,

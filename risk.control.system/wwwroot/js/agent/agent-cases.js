@@ -109,16 +109,16 @@ $(document).ready(function () {
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var img = '<div class="map-thumbnail table-profile-image">';
-                    img += '<img src="' + row.customer + '" class="full-map" title="' + row.name + '" data-toggle="tooltip"/>'; // Full map image with class 'full-map'
-                    img += '<img src="' + row.customer + '" class="thumbnail table-profile-image" />'; // Thumbnail image with class 'thumbnail'
+                    img += '<img src="' + row.personPhoto + '" class="full-map" title="' + row.personName + '" data-toggle="tooltip"/>'; // Full map image with class 'full-map'
+                    img += '<img src="' + row.personPhoto + '" class="thumbnail table-profile-image" />'; // Thumbnail image with class 'thumbnail'
                     img += '</div>';
                     return img;
                 }
             },
             {
-                "data": "name",
+                "data": "personName",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.name + '" data-toggle="tooltip">' + data + '</span>';
+                    return '<span title="' + data + '" data-toggle="tooltip">' + data + '</span>';
                 }
             },
             {

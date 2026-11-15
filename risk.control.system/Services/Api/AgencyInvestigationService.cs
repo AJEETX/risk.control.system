@@ -180,16 +180,11 @@ namespace risk.control.system.Services.Api
                     ? string.Format(a.CustomerLocationMap ?? string.Empty, "400", "400")
                     : string.Format(a.BeneficiaryLocationMap ?? string.Empty, "400", "400");
 
-                // Concurrent external service/file operations per row
-                var addressLocationInfoTask = isUW
-                    ? _weatherInfoService.GetWeatherAsync(a.CustomerDetailLatitude!, a.CustomerDetailLongitude!)
-                    : _weatherInfoService.GetWeatherAsync(a.BeneficiaryDetailLatitude!, a.BeneficiaryDetailLongitude!);
-
                 var ownerDetailTask = _base64FileService.GetBase64FileAsync(a.ClientCompanyDocumentUrl!);
                 var documentTask = _base64FileService.GetBase64FileAsync(a.PolicyDocumentPath!, Applicationsettings.NO_POLICY_IMAGE);
                 var customerPhotoTask = _base64FileService.GetBase64FileAsync(isUW ? a.customerImagePath! : a.beneficiaryImagePath!);
 
-                await Task.WhenAll(ownerDetailTask, documentTask, customerPhotoTask, addressLocationInfoTask);
+                await Task.WhenAll(ownerDetailTask, documentTask, customerPhotoTask);
 
                 return new CaseInvestigationAgencyResponse
                 {
@@ -204,18 +199,18 @@ namespace risk.control.system.Services.Api
                     PincodeName = pincodeName,
                     AssignedToAgency = a.AssignedToAgency,
                     Document = await documentTask,
-                    Customer = await customerPhotoTask,
-                    Name = personName!,
+                    PersonPhoto = await customerPhotoTask,
+                    PersonName = personName!,
                     Policy = policyTypeDisplay,
                     ServiceType = policyTypeDisplay,
                     Service = a.ServiceTypeName,
+                    Status = a.SubStatus,
                     Created = time ?? DateTime.UtcNow,
                     timePending = timePending,
                     TimeElapsed = a.GetTimeElapsed,
                     IsNewAssigned = a.IsNewAssignedToAgency,
                     IsQueryCase = isQueryCase,
-                    PersonMapAddressUrl = personMapAddressUrl,
-                    AddressLocationInfo = await addressLocationInfoTask
+                    PersonMapAddressUrl = personMapAddressUrl
                 };
             });
 
@@ -409,6 +404,7 @@ namespace risk.control.system.Services.Api
                     a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR ? a.SubmittedToAssessorTime :
                     a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR ? a.EnquiryReplyByAgencyTime : a.Created;
                 var isUW = a.InsuranceType == InsuranceType.UNDERWRITING;
+                var personName = isUW ? a.CustomerName : a.BeneficiaryName;
                 var culture = CustomExtensions.GetCultureByCountry(vendorUser.Country!.Code);
                 var pincode = isUW ? a.customerPincode : a.beneficiaryPincode;
                 var customerAddress = $"{a.customerAddressline} {a.customerDistrict} {a.customerState} {a.customerPincode}";
@@ -441,8 +437,8 @@ namespace risk.control.system.Services.Api
                     Pincode = pincode.ToString(),
                     Company = a.ClientCompanyName,
                     Document = await documentTask,
-                    Customer = await customerPhotoTask,
-                    Name = a.CustomerName!,
+                    PersonPhoto = await customerPhotoTask,
+                    PersonName = personName!,
                     Policy = policy,
                     ServiceType = a.InsuranceType!.GetEnumDisplayName(),
                     Service = a.ServiceTypeName,
@@ -644,17 +640,16 @@ namespace risk.control.system.Services.Api
                 var timeElapsed = a.AllocatedToAgencyTime.HasValue ? DateTime.UtcNow.Subtract(a.AllocatedToAgencyTime.Value).TotalSeconds : 0;
                 var isQueryCase = a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR;
                 var personMapAddressUrl = isUW ? string.Format(a.CustomerLocationMap!, "400", "400") : string.Format(a.BeneficiaryLocationMap!, "400", "400");
-                var addressLocationInfoTask = isUW ?
-                    _weatherInfoService.GetWeatherAsync(a.CustomerDetailLatitude!, a.CustomerDetailLongitude!) :
-                        _weatherInfoService.GetWeatherAsync(a.BeneficiaryDetailLatitude!, a.BeneficiaryDetailLongitude!);
+                //var addressLocationInfoTask = isUW ?
+                //    _weatherInfoService.GetWeatherAsync(a.CustomerDetailLatitude!, a.CustomerDetailLongitude!) :
+                //        _weatherInfoService.GetWeatherAsync(a.BeneficiaryDetailLatitude!, a.BeneficiaryDetailLongitude!);
 
                 var ownerDetailTask = _base64FileService.GetBase64FileAsync(a.ClientCompanyDocumentUrl!);
                 var documentTask = _base64FileService.GetBase64FileAsync(a.PolicyDocumentPath!, Applicationsettings.NO_POLICY_IMAGE);
                 var customerPhotoTask = _base64FileService.GetBase64FileAsync(isUW ? a.customerImagePath! : a.beneficiaryImagePath!);
-                var beneficiaryPhotoTask = _base64FileService.GetBase64FileAsync(a.beneficiaryImagePath!, Applicationsettings.GUEST_USER);
 
                 // Wait for all images for THIS case to load
-                await Task.WhenAll(ownerDetailTask, documentTask, customerPhotoTask, beneficiaryPhotoTask);
+                await Task.WhenAll(ownerDetailTask, documentTask, customerPhotoTask);
 
                 return new CaseInvestigationAgencyResponse
                 {
@@ -667,23 +662,19 @@ namespace risk.control.system.Services.Api
                     PincodeName = pincodeName,
                     AssignedToAgency = a.AssignedToAgency,
                     Document = await documentTask,
-                    Customer = await customerPhotoTask,
-                    Name = personName!,
+                    PersonPhoto = await customerPhotoTask,
+                    PersonName = personName!,
                     Policy = policy,
-                    Status = a.Status,
+                    Status = a.SubStatus,
                     ServiceType = serviceType,
                     Service = service,
-                    Location = a.SubStatus,
                     Created = a.ProcessedByAssessorTime!.Value,
                     timePending = timePending,
                     PolicyNum = policyNum,
-                    BeneficiaryPhoto = await beneficiaryPhotoTask,
-                    BeneficiaryName = beneficiaryName!,
                     TimeElapsed = timeElapsed,
                     IsNewAssigned = a.IsNewAssignedToAgency,
                     IsQueryCase = isQueryCase,
                     PersonMapAddressUrl = personMapAddressUrl,
-                    AddressLocationInfo = await addressLocationInfoTask,
                     Distance = a.SelectedAgentDrivingDistance,
                     Duration = a.SelectedAgentDrivingDuration
                 };
@@ -843,15 +834,13 @@ namespace risk.control.system.Services.Api
                 var beneficiaryName = a.BeneficiaryName;
                 var timeElapsed = a.SubmittedToSupervisorTime.HasValue ? DateTime.UtcNow.Subtract(a.SubmittedToSupervisorTime.Value).TotalSeconds : 0;
                 var isQueryCase = a.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR;
-                var addressLocationInfoTask = isUW ? _weatherInfoService.GetWeatherAsync(a.CustomerDetailLatitude!, a.CustomerDetailLongitude!) : _weatherInfoService.GetWeatherAsync(a.BeneficiaryDetailLatitude!, a.BeneficiaryDetailLongitude!);
 
                 var ownerDetailTask = _base64FileService.GetBase64FileAsync(a.ClientCompanyDocumentUrl!);
                 var documentTask = _base64FileService.GetBase64FileAsync(a.PolicyDocumentPath!, Applicationsettings.NO_POLICY_IMAGE);
                 var customerPhotoTask = _base64FileService.GetBase64FileAsync(isUW ? a.customerImagePath! : a.beneficiaryImagePath!);
-                var beneficiaryPhotoTask = _base64FileService.GetBase64FileAsync(a.beneficiaryImagePath!, Applicationsettings.GUEST_USER);
 
                 // Wait for all images for THIS case to load
-                await Task.WhenAll(ownerDetailTask, documentTask, customerPhotoTask, beneficiaryPhotoTask, addressLocationInfoTask);
+                await Task.WhenAll(ownerDetailTask, documentTask, customerPhotoTask);
 
                 return new CaseInvestigationAgencyResponse
                 {
@@ -864,21 +853,18 @@ namespace risk.control.system.Services.Api
                     Pincode = pincode.ToString(),
                     AssignedToAgency = a.AssignedToAgency,
                     Document = await documentTask,
-                    Customer = await customerPhotoTask,
-                    Name = personName!,
+                    PersonPhoto = await customerPhotoTask,
+                    PersonName = personName!,
                     Policy = policy,
                     ServiceType = serviceType,
                     Service = service,
                     Created = a.SubmittedToSupervisorTime!.Value,
                     timePending = timePending,
                     PolicyNum = policyNum,
-                    BeneficiaryPhoto = await beneficiaryPhotoTask,
-                    BeneficiaryName = beneficiaryName!,
                     TimeElapsed = timeElapsed,
                     IsNewAssigned = a.IsNewAssignedToAgency,
                     IsQueryCase = isQueryCase,
                     PersonMapAddressUrl = string.Format(a.SelectedAgentDrivingMap!, "400", "400"),
-                    AddressLocationInfo = await addressLocationInfoTask,
                     Distance = a.SelectedAgentDrivingDistance,
                     Duration = a.SelectedAgentDrivingDuration,
                     AgentAddress = $"{agentAddress}",

@@ -165,15 +165,15 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var img = '<div class="map-thumbnail table-profile-image">';
-                    img += '<img data-title="Person Name: ' + row.name + '" data-img="' + row.customer + '" src="' + row.customer + '" class="thumbnail table-profile-image open-map-modal" title="' + row.name + '" data-bs-toggle="tooltip"/>'; // Thumbnail image with class 'thumbnail'
+                    img += '<img data-title="Person Name: ' + row.personName + '" data-img="' + row.personPhoto + '" src="' + row.personPhoto + '" class="thumbnail table-profile-image open-map-modal" title="' + row.personName + '" data-bs-toggle="tooltip"/>'; // Thumbnail image with class 'thumbnail'
                     img += '</div>';
                     return img;
                 }
             },
             {
-                "data": "name",
+                "data": "personName",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.name + '" data-bs-toggle="tooltip">' + data + '</span>';
+                    return '<span title="' + data + '" data-bs-toggle="tooltip">' + data + '</span>';
                 }
             },
             {
@@ -190,10 +190,10 @@
             },
 
             {
-                "data": "addressLocationInfo",
+                "data": "status",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.addressLocationInfo + '" data-bs-toggle="tooltip">' + data + '</span>'
+                    return '<span title="' + data + '" data-bs-toggle="tooltip">' + data + '</span>'
                 }
             },
             {
