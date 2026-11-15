@@ -131,15 +131,15 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var img = '<div class="map-thumbnail table-profile-image">';
-                    img += '<img data-title="Customer: ' + row.customerFullName + '" data-img="' + row.customer + '" src="' + row.customer + '" class="thumbnail table-profile-image open-map-modal" title="' + row.customerFullName + '" data-bs-toggle="tooltip" title="' + row.customerFullName + '"/>'; // Thumbnail image with class 'thumbnail'
+                    img += '<img data-title="Customer: ' + row.personName + '" data-img="' + row.personPhoto + '" src="' + row.personPhoto + '" class="thumbnail table-profile-image open-map-modal" title="' + row.personName + '" data-bs-toggle="tooltip" title="' + row.customerFullName + '"/>'; // Thumbnail image with class 'thumbnail'
                     img += '</div>';
                     return img;
                 }
             },
             {
-                "data": "name",
+                "data": "personName",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.name + '" data-bs-toggle="tooltip">' + data + '</span>';
+                    return '<span title="' + row.personName + '" data-bs-toggle="tooltip">' + data + '</span>';
                 }
             },
             {
@@ -147,7 +147,7 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var img = '<div class="map-thumbnail table-profile-image">';
-                    img += '<img data-title="Beneficiary: ' + row.beneficiaryFullName + '" data-img="' + row.beneficiaryPhoto + '" src="' + row.beneficiaryPhoto + '" class="thumbnail table-profile-image open-map-modal" title="' + row.beneficiaryFullName + '" data-bs-toggle="tooltip"/>'; // Thumbnail image with class 'thumbnail'
+                    img += '<img data-title="Beneficiary: ' + row.beneficiaryName + '" data-img="' + row.beneficiaryPhoto + '" src="' + row.beneficiaryPhoto + '" class="thumbnail table-profile-image open-map-modal" title="' + row.beneficiaryName + '" data-bs-toggle="tooltip"/>'; // Thumbnail image with class 'thumbnail'
                     img += '</div>';
                     return img;
                 }
@@ -165,7 +165,7 @@
                 }
             },
             {
-                "data": "location",
+                "data": "subStatus",
                 "mRender": function (data, type, row) {
                     return '<span title="' + data + '" data-bs-toggle="tooltip"><small>' + data + '</small></span>'
                 }
