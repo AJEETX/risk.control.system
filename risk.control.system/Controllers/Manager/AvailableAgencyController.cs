@@ -45,7 +45,7 @@ namespace risk.control.system.Controllers.Manager
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Agencies(List<long> vendors)
+        public async Task<IActionResult> Agencies(List<string> vendors)
         {
             var userEmail = User.Identity?.Name!;
 
@@ -55,12 +55,22 @@ namespace risk.control.system.Controllers.Manager
                 _notifyService.Error("No agency selected !!!");
                 return RedirectToAction(nameof(Agencies));
             }
-
-            var (Success, Message) = await _companyAgencyService.EmpanelAgenciesAsync(userEmail, vendors);
+            var listOfAgencies = new List<long>();
+            foreach (var vendor in vendors)
+            {
+                long agencyId = _encryptionService.UnprotectId(vendor);
+                if (agencyId <= 0)
+                {
+                    _notifyService.Error("Invalid agency selected !!!");
+                    return RedirectToAction(nameof(Agencies));
+                }
+                listOfAgencies.Add(agencyId);
+            }
+            var (Success, Message) = await _companyAgencyService.EmpanelAgenciesAsync(userEmail, listOfAgencies);
 
             if (Success)
             {
-                _notifyService.Custom(Message, 3, "green", "fas fa-thumbs-up");
+                _notifyService.Custom(Message, 3, "green", "fas fa-handshake");
             }
             else
             {
@@ -168,7 +178,7 @@ namespace risk.control.system.Controllers.Manager
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(long id)
+        public async Task<IActionResult> Delete([ModelBinder(BinderType = typeof(EncryptedLongModelBinder))] long id)
         {
             if (id < 1)
                 return BadRequest(new { message = "Invalid Agency Id." });

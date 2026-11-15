@@ -119,34 +119,40 @@ namespace risk.control.system.Services.AgencyAdmin
 
         public async Task<(bool Success, string Message)> SoftDeleteAgencyAsync(long id, string performedBy)
         {
-            using var transaction = await _context.Database.BeginTransactionAsync();
+            await using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-                var vendor = await _context.Vendor.FindAsync(id);
-                if (vendor == null)
+                var agency = await _context.Vendor.FindAsync(id);
+                if (agency == null)
                     return (false, "Agency not found.");
 
                 // 1. Soft delete all users associated with this agency
-                var vendorUsers = await _context.ApplicationUser
+                var agencyUsers = await _context.ApplicationUser
                     .Where(v => v.VendorId == id && !v.Deleted)
                     .ToListAsync();
-
-                foreach (var user in vendorUsers)
+                if (agencyUsers.Count != 0)
                 {
-                    user.Updated = DateTime.UtcNow;
-                    user.UpdatedBy = performedBy;
-                    user.Deleted = true;
+                    foreach (var user in agencyUsers)
+                    {
+                        user.Updated = DateTime.UtcNow;
+                        user.UpdatedBy = performedBy;
+                        user.Deleted = true;
+                    }
                 }
 
                 // 2. Soft delete the agency itself
-                vendor.Updated = DateTime.UtcNow;
-                vendor.UpdatedBy = performedBy;
-                vendor.Deleted = true;
+                agency.Updated = DateTime.UtcNow;
+                agency.UpdatedBy = performedBy;
+                agency.Deleted = true;
 
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
 
-                return (true, $"Agency {vendor.Email} and its users deleted successfully.");
+                if (agencyUsers.Count == 0)
+                {
+                    return (true, $"Agency <b>{agency.Email}</b> deleted successfully.");
+                }
+                return (true, $"Agency <b>{agency.Email}</b> and its users deleted successfully.");
             }
             catch (Exception)
             {

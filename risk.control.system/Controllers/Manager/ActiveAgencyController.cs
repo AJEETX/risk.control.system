@@ -47,7 +47,7 @@ namespace risk.control.system.Controllers.Manager
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Agencies(List<long> vendors)
+        public async Task<IActionResult> Agencies(List<string> vendors)
         {
             var userEmail = User.Identity?.Name!;
 
@@ -57,8 +57,18 @@ namespace risk.control.system.Controllers.Manager
                 _notifyService.Error("No agency selected !!!");
                 return RedirectToAction(nameof(Agencies));
             }
-
-            var (Success, Message) = await _companyAgencyService.DepanelAgenciesAsync(userEmail, vendors);
+            var listOfAgencies = new List<long>();
+            foreach (var vendor in vendors)
+            {
+                long agencyId = _encryptionService.UnprotectId(vendor);
+                if (agencyId <= 0)
+                {
+                    _notifyService.Error("Invalid agency selected !!!");
+                    return RedirectToAction(nameof(Agencies));
+                }
+                listOfAgencies.Add(agencyId);
+            }
+            var (Success, Message) = await _companyAgencyService.DepanelAgenciesAsync(userEmail, listOfAgencies);
 
             if (Success)
             {
