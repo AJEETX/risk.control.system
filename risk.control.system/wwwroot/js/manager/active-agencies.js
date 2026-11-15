@@ -35,9 +35,12 @@
                 "sDefaultContent": "",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    var img = '<input title="select to depanel" data-bs-toggle="tooltip" class="vendors" name="vendors" type="checkbox" id="' + row.id + '"  value="' + row.id + '"  />';
-                    return img;
-                }
+                    if (row.caseCount > 0) {
+                        return "<span class='i-grey'><i class='fa fa-times-circle' data-bs-toggle='tooltip' title='Contains Active Case(s)'></i></span>";
+                    } else {
+                        var img = '<input title="select to depanel" data-bs-toggle="tooltip" class="vendors" name="vendors" type="checkbox" id="' + row.id + '"  value="' + row.id + '"  />';
+                        return img;
+                    }                }
             },
             {
                 "sDefaultContent": "",
