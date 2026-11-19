@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Local E2E settings: visible browser, slowed down so you can watch.
+  Used automatically by Visual Studio Test Explorer, VS Code (C# Dev Kit) and `dotnet test`
+  via <RunSettingsFilePath> in the .csproj.
+
+  Override from the CLI without editing this file. For a fast hidden run, append after a
+  double-dash separator:  Playwright.LaunchOptions.Headless=true Playwright.LaunchOptions.SlowMo=0
+  (see README.md for the full command).
+-->
+<RunSettings>
+  <RunConfiguration>
+    <EnvironmentVariables>
+      <!-- Kestrel binds IPv4 only on this machine; change if your app runs elsewhere. -->
+      <E2E_BASE_URL>https://127.0.0.1:6001</E2E_BASE_URL>
+    </EnvironmentVariables>
+  </RunConfiguration>
+
+  <NUnit>
+    <!-- One browser window at a time. -->
+    <NumberOfTestWorkers>1</NumberOfTestWorkers>
+  </NUnit>
+
+  <Playwright>
+    <BrowserName>chromium</BrowserName>
+    <ExpectTimeout>10000</ExpectTimeout>
+    <LaunchOptions>
+      <Headless>false</Headless>
+      <SlowMo>500</SlowMo>
+    </LaunchOptions>
+  </Playwright>
+</RunSettings>

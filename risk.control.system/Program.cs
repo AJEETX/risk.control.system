@@ -50,6 +50,8 @@ builder.Services.AddDatastoreServices(builder.Configuration, env);
 
 builder.Services.AddAwsServices(builder.Configuration);
 
+builder.Services.AddFakeExternalServicesIfEnabled(env);
+
 builder.WebHost.ConfigureKestrel(serverOptions =>
 {
     serverOptions.Limits.MaxRequestHeadersTotalSize = 32768;
