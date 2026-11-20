@@ -20,8 +20,8 @@ public sealed class AppHost : IAsyncDisposable
         ["WEBSITE_SITE_URL"] = "localhost.com",
         ["WEBSITE_NAME"] = "RiskControl-E2E",
         ["WEBSITE_SITE_LOGO"] = "/img/logo.jpeg",
-        ["SAMPLE_MOBILE_AUSTRALIA"] = "400000000",
-        ["SAMPLE_MOBILE_INDIA"] = "9000000000",
+        ["SAMPLE_MOBILE_AUSTRALIA"] = "432854196",
+        ["SAMPLE_MOBILE_INDIA"] = "9956312800",
     };
 
     // The app opens "Data Source={COUNTRY}_Database.db" in the project folder

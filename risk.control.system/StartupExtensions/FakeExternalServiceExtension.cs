@@ -34,7 +34,7 @@ public static class FakeExternalServiceExtension
         services.Replace(ServiceDescriptor.Scoped<ISpeech2TextService, FakeSpeech2TextService>());
 
         // Outbound location/verification HTTP calls (slow or hanging without API keys).
-        services.Replace(ServiceDescriptor.Scoped<ICustomApiClient, FakeCustomApiClient>());
+        //services.Replace(ServiceDescriptor.Scoped<ICustomApiClient, FakeCustomApiClient>());
         services.Replace(ServiceDescriptor.Scoped<IHttpClientService, FakeHttpClientService>());
         services.Replace(ServiceDescriptor.Scoped<IWeatherInfoService, FakeWeatherInfoService>());
 

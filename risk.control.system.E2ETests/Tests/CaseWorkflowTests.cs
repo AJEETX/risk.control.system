@@ -17,6 +17,7 @@ public class CaseWorkflowTests : E2ETestBase
 {
     private static readonly string WwwRoot = Path.Combine(AppHost.FindProjectDirectory(), "wwwroot");
     private static readonly string DocumentImage = Path.Combine(WwwRoot, "img", "document.jpeg");
+    private static readonly string CustomerImage = Path.Combine(WwwRoot, "seed", "company-admin.jpeg");
     private static readonly string PersonImage = Path.Combine(WwwRoot, "seed", "agent.jpeg");
 
     private static bool _aiDisabled;
@@ -343,7 +344,7 @@ public class CaseWorkflowTests : E2ETestBase
         await Page.Locator("#add-customer").ClickAsync();
         await Expect(Page).ToHaveURLAsync(new Regex("/Customer/Create", RegexOptions.IgnoreCase));
         await Expect(Page.Locator("#PinCodeText")).Not.ToHaveValueAsync("", new() { Timeout = 15_000 });
-        await Page.Locator("#createImageInput").SetInputFilesAsync(PersonImage);
+        await Page.Locator("#createImageInput").SetInputFilesAsync(CustomerImage);
         await Page.Locator("#create").ClickAsync();
         await ConfirmAsync("Add Customer");
         await Expect(Page).ToHaveURLAsync(new Regex("/Creator/Details", RegexOptions.IgnoreCase), new() { Timeout = 15_000 });
