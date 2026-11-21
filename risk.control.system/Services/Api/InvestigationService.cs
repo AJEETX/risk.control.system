@@ -783,11 +783,11 @@ namespace risk.control.system.Services.Api
                 caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR ||
                 caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR)
             {
-                return caseTask.Vendor!.Email;
+                return $"Agency: {caseTask.Vendor!.Name}";
             }
             else if (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT)
             {
-                return caseTask.TaskedAgentEmail!;
+                return $"Agent: {caseTask.TaskedAgentEmail}";
             }
             else if (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR ||
                 caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR ||
@@ -800,7 +800,7 @@ namespace risk.control.system.Services.Api
                 var company = await _context.ClientCompany.AsNoTracking().FirstOrDefaultAsync(v => v.ClientCompanyId == caseTask.ClientCompanyId);
                 if (company != null)
                 {
-                    return company.Email;
+                    return $"Insurer: {company.Name}";
                 }
             }
             return string.Empty;
