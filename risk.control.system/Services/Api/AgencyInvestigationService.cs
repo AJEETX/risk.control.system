@@ -624,7 +624,7 @@ namespace risk.control.system.Services.Api
 
                 var documentTask = _base64FileService.GetBase64FileAsync(a.PolicyDocumentPath!, Applicationsettings.NO_POLICY_IMAGE);
                 var customerPhotoTask = _base64FileService.GetBase64FileAsync(isUW ? a.customerImagePath! : a.beneficiaryImagePath!);
-                var ownerImageTask = _base64FileService.GetBase64FileAsync(await GetOwner(a.investigation), Applicationsettings.GUEST_USER);
+                var ownerImageTask = _base64FileService.GetBase64FileAsync(await GetOwnerImage(a.investigation), Applicationsettings.GUEST_USER);
                 var ownerEmailTask = GetOwnerEmail(a.investigation);
 
                 // Wait for all images for THIS case to load
@@ -1022,7 +1022,7 @@ namespace risk.control.system.Services.Api
                 var agencyUser = await _context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == ownerEmail);
                 if (agencyUser != null && !string.IsNullOrWhiteSpace(agencyUser.Email))
                 {
-                    return $"{agencyUser.FirstName} {agencyUser.LastName}";
+                    return $"Agent: {agencyUser.FirstName} {agencyUser.LastName}";
                 }
             }
             else if (caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR || caseTask.SubStatus == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR)
@@ -1030,13 +1030,13 @@ namespace risk.control.system.Services.Api
                 var companyUser = await _context.ClientCompany.FirstOrDefaultAsync(v => v.ClientCompanyId == caseTask.ClientCompanyId);
                 if (companyUser != null && !string.IsNullOrWhiteSpace(companyUser.Email))
                 {
-                    return companyUser.Name;
+                    return $"Insurer: {companyUser.Name}";
                 }
             }
             return "...";
         }
 
-        private async Task<string> GetOwner(InvestigationTask caseTask)
+        private async Task<string> GetOwnerImage(InvestigationTask caseTask)
         {
             string ownerEmail = string.Empty;
             var allocated2agent = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT;
