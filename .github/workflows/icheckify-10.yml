@@ -24,11 +24,11 @@ jobs:
           dotnet-version: '10.x'
 
       - name: Build with dotnet
+        env:
+          SIXLABORS_LICENSE_KEY: ${{ secrets.SIXLABORS_LICENSE_KEY }}
         run: dotnet build --configuration Release
 
       - name: dotnet publish
-        env:
-          SIXLABORS_LICENSE_KEY: ${{ secrets.SIXLABORS_LICENSE_KEY }}
         run: dotnet publish -c Release -o "${{env.DOTNET_ROOT}}/myapp"
 
       - name: Upload artifact for deployment job
