@@ -16,7 +16,6 @@ env:
   RESOURCE_GROUP: rg-icheckify-demo
   LOCATION: australiaeast
   APP_SERVICE_PLAN: asp-icheckify-demo
-  SIXLABORS_LICENSE_KEY: ${{ secrets.SIXLABORS_LICENSE_KEY }}
 
 jobs:
 

@@ -13,7 +13,6 @@ permissions:
 
 env:
   APP_SERVICE_NAME: "icheckify"
-  SIXLABORS_LICENSE_KEY: ${{ secrets.SIXLABORS_LICENSE_KEY }}
 
 jobs:
 

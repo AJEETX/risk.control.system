@@ -9,9 +9,6 @@ on:
       - Net10-without-docker-sqllite
   workflow_dispatch:
 
-env:
-  SIXLABORS_LICENSE_KEY: ${{ secrets.SIXLABORS_LICENSE_KEY }}
-
 jobs:
   build:
     runs-on: windows-latest
