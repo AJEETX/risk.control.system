@@ -64,7 +64,7 @@ jobs:
         run: dotnet build --configuration Release
      
       - name: Publish
-        run: dotnet publish risk.control.system/risk.control.system/risk.control.system.csproj -c Release -o "${{ env.DOTNET_ROOT }}/myapp" --no-build
+        run: dotnet publish risk.control.system/risk.control.system.csproj -c Release -o "${{ env.DOTNET_ROOT }}/myapp" --no-build
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
