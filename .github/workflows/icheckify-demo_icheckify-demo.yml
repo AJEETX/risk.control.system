@@ -63,6 +63,8 @@ jobs:
         run: dotnet build --configuration Release
      
       - name: Publish
+        env:
+          SIXLABORS_LICENSE_KEY: ${{ secrets.SIXLABORS_LICENSE_KEY }}
         run: dotnet publish -c Release -o "${{ env.DOTNET_ROOT }}/myapp"
 
       - name: Upload artifact
