@@ -16,6 +16,7 @@ env:
   RESOURCE_GROUP: rg-icheckify-demo
   LOCATION: australiaeast
   APP_SERVICE_PLAN: asp-icheckify-demo
+  SIXLABORS_LICENSE_KEY: ${{ secrets.SIXLABORS_LICENSE_KEY }}
 
 jobs:
 
@@ -60,12 +61,10 @@ jobs:
           dotnet-version: '10.x'
 
       - name: Build
-        env:
-          SIXLABORS_LICENSE_KEY: ${{ secrets.SIXLABORS_LICENSE_KEY }}
         run: dotnet build --configuration Release
      
       - name: Publish
-        run: dotnet publish -c Release -o "${{ env.DOTNET_ROOT }}/myapp"
+        run: dotnet publish risk.control.system/risk.control.system/risk.control.system.csproj -c Release -o "${{ env.DOTNET_ROOT }}/myapp" --no-build
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4

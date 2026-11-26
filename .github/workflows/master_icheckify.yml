@@ -13,6 +13,7 @@ permissions:
 
 env:
   APP_SERVICE_NAME: "icheckify"
+  SIXLABORS_LICENSE_KEY: ${{ secrets.SIXLABORS_LICENSE_KEY }}
 
 jobs:
 
@@ -24,7 +25,7 @@ jobs:
     secrets: inherit
 
   # ---------------------------------------------------
-  # 2️⃣   Build  .Net Core Application Job
+  # 2️⃣ Build .Net Core Application Job
   # ---------------------------------------------------
   build:
     name: Build .Net Core Application
@@ -34,7 +35,8 @@ jobs:
       contents: read
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v4
@@ -42,12 +44,10 @@ jobs:
           dotnet-version: '10.x'
 
       - name: Build with dotnet
-        env:
-          SIXLABORS_LICENSE_KEY: ${{ secrets.SIXLABORS_LICENSE_KEY }}
         run: dotnet build --configuration Release
 
       - name: dotnet publish
-        run: dotnet publish -c Release -o "${{env.DOTNET_ROOT}}/myapp"
+        run: dotnet publish risk.control.system/risk.control.system/risk.control.system.csproj -c Release -o "${{env.DOTNET_ROOT}}/myapp" --no-build
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
@@ -57,10 +57,10 @@ jobs:
 
       - name: Add Summary Output
         run: |
-            echo "## Build Completed" >> $GITHUB_STEP_SUMMARY
-            echo "The .NET application has been built and published successfully." >> $GITHUB_STEP_SUMMARY
+          echo "## Build Completed" >> $GITHUB_STEP_SUMMARY
+          echo "The .NET application has been built and published successfully." >> $GITHUB_STEP_SUMMARY
 
- # ---------------------------------------------------
+  # ---------------------------------------------------
   # 3️⃣ Deploy to Azure Job
   # ---------------------------------------------------
   deploy:
@@ -71,7 +71,7 @@ jobs:
       name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
     permissions:
-      id-token: write #This is required for requesting the JWT
+      id-token: write # Required for requesting the JWT
       contents: read
 
     steps:
@@ -79,7 +79,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: .net-app
-      
+
       - name: Login to Azure
         uses: azure/login@v2
         with:
@@ -94,13 +94,14 @@ jobs:
           app-name: '${{ env.APP_SERVICE_NAME }}'
           slot-name: 'Production'
           package: .
- 
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_B8230710C65446CFA9F95CAFE779BBB4 }}
+
       - name: Add Deployment Summary Output
         run: |
-            echo "## Deployment Completed" >> $GITHUB_STEP_SUMMARY
-            echo "The application has been deployed to Azure Web App successfully." >> $GITHUB_STEP_SUMMARY
-            
- # ---------------------------------------------------
+          echo "## Deployment Completed" >> $GITHUB_STEP_SUMMARY
+          echo "The application has been deployed to Azure Web App successfully." >> $GITHUB_STEP_SUMMARY
+
+  # ---------------------------------------------------
   # 4️⃣ Warmup Job
   # ---------------------------------------------------
   warmup:
@@ -109,36 +110,36 @@ jobs:
     needs: deploy
 
     steps:
-    - name: Wait for App Service warmup
-      shell: bash
-      run: |
-        echo "🌐 Waiting for App Service to be ready..."
-        URL="https://${{ env.APP_SERVICE_NAME }}.azurewebsites.net/Account/Login"
+      - name: Wait for App Service warmup
+        shell: bash
+        run: |
+          echo "🌐 Waiting for App Service to be ready..."
+          URL="https://${{ env.APP_SERVICE_NAME }}.azurewebsites.net/Account/Login"
 
-        for i in {1..20}; do
-          STATUS=$(curl -o /dev/null -s -w "%{http_code}\n" "$URL" || echo 000)
+          for i in {1..20}; do
+            STATUS=$(curl -o /dev/null -s -w "%{http_code}\n" "$URL" || echo 000)
 
-          echo "Attempt $i → Status: $STATUS"
+            echo "Attempt $i → Status: $STATUS"
 
-          if [ "$STATUS" -eq 200 ] || [ "$STATUS" -eq 302 ]; then
-            echo "✅ App is ready!"
-            exit 0
-          fi
+            if [ "$STATUS" -eq 200 ] || [ "$STATUS" -eq 302 ]; then
+              echo "✅ App is ready!"
+              exit 0
+            fi
 
-          echo "⏳ Not ready, waiting 60s..."
-          sleep 60
-        done
+            echo "⏳ Not ready, waiting 60s..."
+            sleep 60
+          done
 
-        echo "❌ App did NOT become ready in time."
-        exit 1
+          echo "❌ App did NOT become ready in time."
+          exit 1
 
-    - name: Add Warm-up Summary Output
-      if: always()
-      run: |
-        echo "## App Service Warmup Completed" >> $GITHUB_STEP_SUMMARY
-        echo "The Azure Web App warm-up job has finished." >> $GITHUB_STEP_SUMMARY
-            
- # ---------------------------------------------------
+      - name: Add Warm-up Summary Output
+        if: always()
+        run: |
+          echo "## App Service Warmup Completed" >> $GITHUB_STEP_SUMMARY
+          echo "The Azure Web App warm-up job has finished." >> $GITHUB_STEP_SUMMARY
+
+  # ---------------------------------------------------
   # 5️⃣ OWASP ZAP Baseline Scan Job
   # ---------------------------------------------------
   zap-scan:
@@ -149,7 +150,7 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
+
       - name: Fix permissions
         run: sudo chmod -R 777 $GITHUB_WORKSPACE
 
@@ -163,16 +164,16 @@ jobs:
               -J report_json.json \
               -w report_md.md \
               -r report_html.html \
-              -a || true   
+              -a || true
 
       - name: Upload ZAP Report
         uses: actions/upload-artifact@v4
         with:
           name: zap-reports
           path: |
-              report_html.html
-              report_json.json
-              report_md.md
+            report_html.html
+            report_json.json
+            report_md.md
 
       - name: Show Summary
         run: |
@@ -200,12 +201,12 @@ jobs:
             echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
             grep -E 'FAIL|WARN|INFO|ALERT' report_md.md || echo "No issues detected." >> $GITHUB_STEP_SUMMARY
             echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-            else
+          else
             echo "⚠️ report_md.md not found." >> $GITHUB_STEP_SUMMARY
-            fi
+          fi
 
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "**Artifacts Generated:**" >> $GITHUB_STEP_SUMMARY
-            echo "- report_html.html" >> $GITHUB_STEP_SUMMARY
-            echo "- report_json.json" >> $GITHUB_STEP_SUMMARY
-            echo "- report_md.md" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Artifacts Generated:**" >> $GITHUB_STEP_SUMMARY
+          echo "- report_html.html" >> $GITHUB_STEP_SUMMARY
+          echo "- report_json.json" >> $GITHUB_STEP_SUMMARY
+          echo "- report_md.md" >> $GITHUB_STEP_SUMMARY
