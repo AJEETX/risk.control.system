@@ -29,7 +29,7 @@ public sealed class AppHost : IAsyncDisposable
     // environment because Program.cs re-adds the appsettings files last, but COUNTRY can, and it is only used
     // for the file name and seed selection. Any value other than AU/IN seeds both countries, so the AU users
     // exist. Always forcing it guarantees tests never open (or delete) a developer database.
-    private const string E2ECountry = "E2E";
+    private const string E2ECountry = "AU";
     private const string E2EDatabaseFile = E2ECountry + "_Database.db";
 
     private readonly Process? _process;
